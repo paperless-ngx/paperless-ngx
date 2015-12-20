@@ -55,3 +55,15 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Stored PDFs & JPGs
+media/*
+
+# Sqlite database
+db.sqlite3
+
+# PyCharm
+.idea
+
+# Fixtures
+src/paperless/fixtures/
