@@ -4,6 +4,7 @@ import random
 import re
 import shutil
 import subprocess
+import time
 
 import pyocr
 
@@ -35,8 +36,11 @@ class Command(BaseCommand):
     MEDIA_IMG = os.path.join(settings.MEDIA_ROOT, "documents", "img")
     MEDIA_PDF = os.path.join(settings.MEDIA_ROOT, "documents", "pdf")
 
+    PARSER_REGEX = re.compile(r"^.*/(.*) - (.*)\.pdf$")
+
     def __init__(self, *args, **kwargs):
         self.verbosity = 0
+        self.stats = {}
         BaseCommand.__init__(self, *args, **kwargs)
 
     def handle(self, *args, **options):
@@ -45,18 +49,32 @@ class Command(BaseCommand):
 
         self._setup()
 
+        try:
+            while True:
+                self.loop()
+                time.sleep(10)
+                print(".")
+        except KeyboardInterrupt:
+            print("Exiting")
+
+    def loop(self):
+
         for pdf in os.listdir(self.CONSUME):
 
-            if not os.path.isfile(os.path.join(self.CONSUME, pdf)):
+            pdf = os.path.join(self.CONSUME, pdf)
+
+            if not os.path.isfile(pdf):
                 continue
 
             if not pdf.endswith(".pdf"):
                 continue
 
+            if self._is_ready(pdf):
+                continue
+
             if self.verbosity > 1:
                 print("Consuming {}".format(pdf))
 
-            pdf = os.path.join(self.CONSUME, pdf)
             pngs = self._get_greyscale(pdf)
             jpgs = self._get_colour(pdf)
             text = self._get_ocr(pngs)
@@ -70,6 +88,22 @@ class Command(BaseCommand):
                 os.makedirs(d)
             except FileExistsError:
                 pass
+
+    def _is_ready(self, pdf):
+        """
+        Detect whether `pdf` is ready to consume or if it's still being written
+        to by the scanner.
+        """
+
+        t = os.stat(pdf).st_mtime
+
+        if self.stats.get(pdf) == t:
+            del(self.stats[pdf])
+            return True
+
+        self.stats[pdf] = t
+
+        return False
 
     def _get_greyscale(self, pdf):
 
@@ -104,12 +138,27 @@ class Command(BaseCommand):
 
     def _store(self, text, jpgs, pdf):
 
-        doc = Document.objects.create(content=text)
+        sender, title = self._parse_file_name(pdf)
+
+        doc = Document.objects.create(sender=sender, title=title, content=text)
 
         shutil.move(jpgs[0], os.path.join(
             self.MEDIA_IMG, "{:07}.jpg".format(doc.pk)))
         shutil.move(pdf, os.path.join(
             self.MEDIA_PDF, "{:07}.pdf".format(doc.pk)))
+
+    def _parse_file_name(self, pdf):
+        """
+        We use a crude naming convention to make handling the sender and title
+        easier:
+          "sender - title.pdf"
+        """
+
+        m = re.match(self.PARSER_REGEX, pdf)
+        if m:
+            return m.group(1), m.group(2)
+
+        return "", ""
 
     def _cleanup(self, pngs, jpgs):
 
