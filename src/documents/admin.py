@@ -12,8 +12,9 @@ class DocumentAdmin(admin.ModelAdmin):
     save_on_top = True
 
     def thumbnail(self, obj):
-        return '<img src="{}documents/img/{:07}.jpg" width="100" />'.format(
-            settings.MEDIA_URL, obj.pk)
+        return '<a href="{media}documents/img/{pk:07}.jpg" target="_blank">' \
+                 '<img src="{media}documents/img/{pk:07}.jpg" width="100" />' \
+               '</a>'.format(media=settings.MEDIA_URL, pk=obj.pk)
     thumbnail.allow_tags = True
 
     def pdf(self, obj):
