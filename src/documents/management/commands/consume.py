@@ -1,3 +1,4 @@
+import datetime
 import glob
 import os
 import random
@@ -12,6 +13,7 @@ from PIL import Image
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from documents.models import Document
 
@@ -26,6 +28,8 @@ class Command(BaseCommand):
          and original pdf
       5. Delete the pdf and images
     """
+
+    LOOP_TIME = 10  # Seconds
 
     CONVERT = settings.CONVERT_BINARY
     SCRATCH = settings.SCRATCH_DIR
@@ -52,8 +56,9 @@ class Command(BaseCommand):
         try:
             while True:
                 self.loop()
-                time.sleep(10)
-                print(".")
+                time.sleep(self.LOOP_TIME)
+                if self.verbosity > 1:
+                    print(".")
         except KeyboardInterrupt:
             print("Exiting")
 
@@ -140,7 +145,17 @@ class Command(BaseCommand):
 
         sender, title = self._parse_file_name(pdf)
 
-        doc = Document.objects.create(sender=sender, title=title, content=text)
+        stats = os.stat(pdf)
+
+        doc = Document.objects.create(
+                sender=sender,
+                title=title,
+                content=text,
+                created=timezone.make_aware(
+                    datetime.datetime.fromtimestamp(stats.st_ctime)),
+                modified=timezone.make_aware(
+                    datetime.datetime.fromtimestamp(stats.st_mtime)),
+        )
 
         shutil.move(jpgs[0], os.path.join(
             self.MEDIA_IMG, "{:07}.jpg".format(doc.pk)))
