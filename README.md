@@ -27,7 +27,7 @@ it... because paper.  I wrote this to make my life easier.
 
 ## Requirements
 
-This is all really quite simple, a shiny, user-friendly wrapper around some very
+This is all really a quite simple, shiny, user-friendly wrapper around some very
 powerful tools.
 
 * [ImageMagick](http://imagemagick.org/) converts the images between colour and
