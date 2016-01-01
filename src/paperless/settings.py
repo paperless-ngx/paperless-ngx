@@ -135,3 +135,5 @@ MEDIA_URL = "/media/"
 CONVERT_BINARY = "/usr/bin/convert"
 SCRATCH_DIR = "/tmp/paperless"  # Will be created if it doesn't exist
 CONSUMPTION_DIR = "/tmp/paperless/consume"
+GNUPG_HOME = os.environ.get("HOME", "/dev/null")
+PASSPHRASE = None  # Set via manage.py

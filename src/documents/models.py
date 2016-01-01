@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -20,3 +23,16 @@ class Document(models.Model):
         if self.sender or self.title:
             return "{}: {}, {}".format(created, self.sender or self.title)
         return str(created)
+
+    @property
+    def pdf_path(self):
+        return os.path.join(
+            settings.MEDIA_ROOT,
+            "documents",
+            "pdf",
+            "{:07}.pdf.gpg".format(self.pk)
+        )
+
+    @property
+    def pdf(self):
+        return open(self.pdf_path, "rb")
