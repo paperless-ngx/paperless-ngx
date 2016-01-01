@@ -33,6 +33,7 @@ powerful tools.
 * [ImageMagick](http://imagemagick.org/) converts the images between colour and
   greyscale.
 * [Tesseract](https://github.com/tesseract-ocr) does the character recognition
+* [GNU Privacy Guard](https://gnupg.org)
 * [Python 3](https://python.org/) is the language of the project
     * [Pillow](https://pypi.python.org/pypi/pillowfight/) converts the PDFs to
       images
@@ -40,6 +41,7 @@ powerful tools.
       around tesseract
     * [Django](https://djangoproject.org/) is the framework this project is 
       written against.
+    * [Python-GNUPG](http://pythonhosted.org/python-gnupg/)
 
 
 ## Instructions
@@ -59,10 +61,10 @@ powerful tools.
 
 3. Run `python manage.py migrate`.  This will create your local database.
 
-4. Run `python manage.py consume`.  You may want to do this in a background
-   process like a SystemD service or rc script because it runs in an infinite
-   loop.
+4. Run `python manage.py consume` and enter your preferred passphrase when
+   prompted.
 
-5. Start the webserver with `python manage.py runserver`.
+5. Start the webserver with `python manage.py runserver` and enter the same
+   passphrase when prompted.
 
 6. Log into your new toy by visiting `http://localhost:8000/`.
