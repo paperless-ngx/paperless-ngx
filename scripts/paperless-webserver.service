@@ -1,0 +1,11 @@
+[Unit]
+Description=Paperless webserver
+
+[Service]
+EnvironmentFile=/etc/conf.d/paperless
+User=paperless
+Group=paperless
+ExecStart=/home/paperless/project/virtualenv/bin/python /home/paperless/project/src/manage.py runserver 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target
