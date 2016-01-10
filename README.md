@@ -14,7 +14,7 @@ it... because paper.  I wrote this to make my life easier.
 
 ## How it Works:
 
-1. Buy a document scanner like [this one](http://welcome.brother.com/sg-en/products-services/scanners/ads-1100w.html).
+1. Buy a document scanner like [this one](http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail).
 2. Set it up to "scan to FTP" or something similar. It should be able to push
    scanned images to a server without you having to do anything.
 3. Have the target server run the *paperless* consumption script to OCR the PDF
