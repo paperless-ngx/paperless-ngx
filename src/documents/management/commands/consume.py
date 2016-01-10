@@ -21,12 +21,11 @@ from documents.models import Document
 class Command(BaseCommand):
     """
     Loop over every file found in CONSUMPTION_DIR and:
-      1. Convert it to a greyscale tif
-      2. Convert it to a full-colour jpg
-      3. Use tesseract on the tif
-      4. Store the OCR'd text in the database along with the paths to the jpg
-         and original pdf
-      5. Delete the pdf and images
+      1. Convert it to a greyscale png
+      2. Use tesseract on the png
+      3. Encrypt and store the PDF in the MEDIA_ROOT
+      4. Store the OCR'd text in the database
+      5. Delete the pdf and image(s)
     """
 
     LOOP_TIME = 10  # Seconds
