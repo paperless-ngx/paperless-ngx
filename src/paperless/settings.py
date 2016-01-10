@@ -142,7 +142,7 @@ MEDIA_URL = "/media/"
 GNUPG_HOME = os.environ.get("HOME", "/dev/null")
 CONVERT_BINARY = "/usr/bin/convert"
 SCRATCH_DIR = "/tmp/paperless"  # Will be created if it doesn't exist
-CONSUMPTION_DIR = "/tmp/paperless/consume"
+CONSUMPTION_DIR = os.environ.get("PAPERLESS_CONSUME")
 
 # Set this and change the permissions on this file to 0600, or set it to
 # `None` and you'll be prompted for the passphrase at runtime.  The default
