@@ -84,6 +84,13 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+if os.environ.get("PAPERLESS_DBUSER") and os.environ.get("PAPERLESS_DBPASS"):
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.environ.get("PAPERLESS_DBNAME", "paperless"),
+        "USER": os.environ.get("PAPERLESS_DBUSER"),
+        "PASSWORD": os.environ.get("PAPERLESS_DBPASS")
+    }
 
 
 # Password validation
@@ -132,8 +139,13 @@ MEDIA_URL = "/media/"
 # Paperless-specific stuffs
 # Change these paths if yours are different
 
+GNUPG_HOME = os.environ.get("HOME", "/dev/null")
 CONVERT_BINARY = "/usr/bin/convert"
 SCRATCH_DIR = "/tmp/paperless"  # Will be created if it doesn't exist
 CONSUMPTION_DIR = "/tmp/paperless/consume"
-GNUPG_HOME = os.environ.get("HOME", "/dev/null")
-PASSPHRASE = None  # Set via manage.py
+
+# Set this and change the permissions on this file to 0600, or set it to
+# `None` and you'll be prompted for the passphrase at runtime.  The default
+# looks for an environment variable.
+PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
+

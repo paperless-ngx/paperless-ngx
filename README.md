@@ -55,14 +55,18 @@ powerful tools.
     * `CONVERT_BINARY`: The path to `convert`, installed as part of ImageMagick.
     * `SCRATCH_DIR`: A place for files to be created and destroyed.  The default
       is as good a place as any.
-    * `CONSUMPTION_DIR`: The directory you scanner will be depositing files.
-      Note that the consumption script will import files from here **and then
-      delete them**.
+    * `CONSUMPTION_DIR`: The directory into which your scanner will be
+      depositing files.  Note that the consumption script will import files from
+      here **and then delete them**.
+    * `PASSPHRASE`: You can set this here, or allow the running of the service
+      to ask you for it each time you start.  If you store the value here, you
+      should probably set the permissions on `settings.py` to `0400`.
 
-3. Run `python manage.py migrate`.  This will create your local database.
+3. Run `python manage.py migrate`.  This will create your local database if it
+   doesn't exist.  You should probably change the permissions on this database
+   file to 0600.
 
-4. Run `python manage.py consume` and enter your preferred passphrase when
-   prompted.
+4. Run `python manage.py consume`.
 
 5. Start the webserver with `python manage.py runserver` and enter the same
    passphrase when prompted.

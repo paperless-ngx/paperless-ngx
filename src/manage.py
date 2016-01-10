@@ -11,9 +11,8 @@ if __name__ == "__main__":
     # The runserver and consumer need to have access to the passphrase, so it
     # must be entered at start time to keep it safe.
     if "runserver" in sys.argv or "consume" in sys.argv:
-        settings.PASSPHRASE = "asdf"
-        if not settings.DEBUG:
+        if not settings.PASSPHRASE:
             settings.PASSPHRASE = input(
-                "Production environment.  Input passphrase: ")
+                "settings.PASSPHRASE is unset.  Input passphrase: ")
 
     execute_from_command_line(sys.argv)
