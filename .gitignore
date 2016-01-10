@@ -56,7 +56,7 @@ docs/_build/
 # PyBuilder
 target/
 
-# Stored PDFs & JPGs
+# Stored PDFs
 media/*
 
 # Sqlite database
@@ -65,5 +65,6 @@ db.sqlite3
 # PyCharm
 .idea
 
-# Fixtures
+# Other stuff that doesn't belong
 src/paperless/fixtures/
+virtualenv
