@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 
-from .models import Document
+from .models import Sender, Document
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -26,4 +26,5 @@ class DocumentAdmin(admin.ModelAdmin):
                 )
     pdf.allow_tags = True
 
+admin.site.register(Sender)
 admin.site.register(Document, DocumentAdmin)

@@ -2,12 +2,27 @@ import os
 
 from django.conf import settings
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.utils import timezone
+
+
+class Sender(models.Model):
+
+    name = models.CharField(max_length=128, unique=True)
+    slug = models.SlugField()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        models.Model.save(self, *args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class Document(models.Model):
 
-    sender = models.CharField(max_length=128, blank=True, db_index=True)
+    sender = models.ForeignKey(Sender, blank=True)
     title = models.CharField(max_length=128, blank=True, db_index=True)
     content = models.TextField(db_index=True)
     created = models.DateTimeField(default=timezone.now, editable=False)
