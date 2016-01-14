@@ -22,7 +22,8 @@ class Sender(models.Model):
 
 class Document(models.Model):
 
-    sender = models.ForeignKey(Sender, blank=True)
+    sender = models.ForeignKey(
+        Sender, blank=True, null=True, related_name="documents")
     title = models.CharField(max_length=128, blank=True, db_index=True)
     content = models.TextField(db_index=True)
     created = models.DateTimeField(default=timezone.now, editable=False)
@@ -36,7 +37,7 @@ class Document(models.Model):
         if self.sender and self.title:
             return "{}: {}, {}".format(created, self.sender, self.title)
         if self.sender or self.title:
-            return "{}: {}, {}".format(created, self.sender or self.title)
+            return "{}: {}".format(created, self.sender or self.title)
         return str(created)
 
     @property
@@ -51,3 +52,9 @@ class Document(models.Model):
     @property
     def pdf(self):
         return open(self.pdf_path, "rb")
+
+    @property
+    def parseable_file_name(self):
+        if self.sender and self.title:
+            return "{} - {}.pdf".format(self.sender, self.title)
+        return os.path.basename(self.pdf_path)

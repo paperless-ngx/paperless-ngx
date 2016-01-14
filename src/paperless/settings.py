@@ -148,4 +148,3 @@ CONSUMPTION_DIR = os.environ.get("PAPERLESS_CONSUME")
 # `None` and you'll be prompted for the passphrase at runtime.  The default
 # looks for an environment variable.
 PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
-

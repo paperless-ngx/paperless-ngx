@@ -12,11 +12,12 @@ import pyocr
 from PIL import Image
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 
 from documents.models import Document, Sender
+from paperless.db import GnuPG
 
 
 class Command(BaseCommand):
@@ -38,7 +39,8 @@ class Command(BaseCommand):
     OCR = pyocr.get_available_tools()[0]
     MEDIA_PDF = os.path.join(settings.MEDIA_ROOT, "documents", "pdf")
 
-    PARSER_REGEX = re.compile(r"^.*/(.*) - (.*)\.pdf$")
+    PARSER_REGEX_TITLE = re.compile(r"^.*/(.*)\.pdf$")
+    PARSER_REGEX_SENDER_TITLE = re.compile(r"^.*/(.*) - (.*)\.pdf$")
 
     def __init__(self, *args, **kwargs):
         self.verbosity = 0
@@ -49,6 +51,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         self.verbosity = options["verbosity"]
+
+        if not os.path.exists(self.CONSUME):
+            raise CommandError("Consumption directory {} does not exist".format(
+                self.CONSUME))
 
         self._setup()
 
@@ -70,7 +76,7 @@ class Command(BaseCommand):
             if not os.path.isfile(pdf):
                 continue
 
-            if not pdf.endswith(".pdf"):
+            if not re.match(self.PARSER_REGEX_TITLE, pdf):
                 continue
 
             if self._is_ready(pdf):
@@ -155,12 +161,7 @@ class Command(BaseCommand):
         with open(pdf, "rb") as unencrypted:
             with open(doc.pdf_path, "wb") as encrypted:
                 self._render("  Encrypting", 3)
-                encrypted.write(self.gpg.encrypt_file(
-                    unencrypted,
-                    recipients=None,
-                    passphrase=settings.PASSPHRASE,
-                    symmetric=True
-                ).data)
+                encrypted.write(GnuPG.encrypted(unencrypted))
 
     def _parse_file_name(self, pdf):
         """
@@ -169,14 +170,17 @@ class Command(BaseCommand):
           "sender - title.pdf"
         """
 
-        m = re.match(self.PARSER_REGEX, pdf)
+        # First we attempt "sender - title.pdf"
+        m = re.match(self.PARSER_REGEX_SENDER_TITLE, pdf)
         if m:
             sender_name, title = m.group(1), m.group(2)
             sender, __ = Sender.objects.get_or_create(
                 name=sender_name, defaults={"slug": slugify(sender_name)})
             return sender, title
 
-        return "", ""
+        # That didn't work, so we assume sender is None
+        m = re.match(self.PARSER_REGEX_TITLE, pdf)
+        return None, m.group(1)
 
     def _cleanup(self, pngs, pdf):
 
@@ -186,6 +190,8 @@ class Command(BaseCommand):
         for f in list(glob.glob(png_glob)) + [pdf]:
             self._render("  Deleting {}".format(f), 2)
             os.unlink(f)
+
+        self._render("", 2)
 
     def _render(self, text, verbosity):
         if self.verbosity >= verbosity:
