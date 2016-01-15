@@ -13,9 +13,10 @@ from PIL import Image
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.template.defaultfilters import slugify
 from django.utils import timezone
 
-from documents.models import Document
+from documents.models import Document, Sender
 
 
 class Command(BaseCommand):
@@ -170,7 +171,10 @@ class Command(BaseCommand):
 
         m = re.match(self.PARSER_REGEX, pdf)
         if m:
-            return m.group(1), m.group(2)
+            sender_name, title = m.group(1), m.group(2)
+            sender, __ = Sender.objects.get_or_create(
+                name=sender_name, defaults={"slug": slugify(sender_name)})
+            return sender, title
 
         return "", ""
 

@@ -7,7 +7,7 @@ from .models import Sender, Document
 
 class DocumentAdmin(admin.ModelAdmin):
 
-    search_fields = ("sender", "title", "content",)
+    search_fields = ("sender__name", "title", "content",)
     list_display = ("edit", "created", "sender", "title", "pdf")
     list_filter = ("created", "sender")
     save_on_top = True
