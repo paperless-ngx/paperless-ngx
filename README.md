@@ -25,6 +25,14 @@ it... because paper.  I wrote this to make my life easier.
    In most cases, no one will care or notice.
 
 
+## Stability
+
+Paperless is still under active development (just look at the git commit
+history) so don't expect it to be 100% stable.  I'm using it for my own
+documents, but I'm crazy like that.  If you use this and it breaks something,
+you get to keep all the shiny pieces.
+
+
 ## Requirements
 
 This is all really a quite simple, shiny, user-friendly wrapper around some very
