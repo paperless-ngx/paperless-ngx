@@ -74,12 +74,15 @@ object, so we're sort of stuck.
    doesn't exist.  You should probably change the permissions on this database
    file to 0600.
 
-4. Run `python manage.py consume`.
+4. Run `python manage.py createsuperuser` and follow the prompts that follow
+   to create a user for logging in.
 
-5. Start the webserver with `python manage.py runserver` and enter the same
+5. Run `python manage.py document_consumer`.
+
+6. Start the webserver with `python manage.py runserver` and enter the same
    passphrase when prompted.
 
-6. Log into your new toy by visiting `http://localhost:8000/`.
+7. Log into your new toy by visiting `http://localhost:8000/`.
 
 
 ## Important Note
