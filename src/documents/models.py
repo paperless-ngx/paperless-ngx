@@ -11,6 +11,9 @@ class Sender(models.Model):
     name = models.CharField(max_length=128, unique=True)
     slug = models.SlugField()
 
+    class Meta(object):
+        ordering = ("name",)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
