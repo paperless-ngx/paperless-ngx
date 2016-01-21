@@ -1,6 +1,6 @@
 import datetime
 import glob
-import gnupg
+import langdetect
 import os
 import random
 import re
@@ -44,9 +44,10 @@ class Command(BaseCommand):
     PARSER_REGEX_SENDER_TITLE = re.compile(r"^.*/(.*) - (.*)\.pdf$")
 
     def __init__(self, *args, **kwargs):
+
         self.verbosity = 0
         self.stats = {}
-        self.gpg = gnupg.GPG(gnupghome=settings.GNUPG_HOME)
+
         BaseCommand.__init__(self, *args, **kwargs)
 
     def handle(self, *args, **options):
@@ -131,6 +132,16 @@ class Command(BaseCommand):
     def _get_ocr(self, pngs):
 
         self._render("  OCRing the PDF", 2)
+
+        raw_text = self._ocr(pngs, self.OCR_LANG)
+
+        guessed_language = langdetect.detect(raw_text)
+        if guessed_language == self.OCR_LANG:
+            return raw_text
+
+        return self._ocr(pngs, guessed_language)
+
+    def _ocr(self, pngs, lang):
 
         r = ""
         for png in pngs:
