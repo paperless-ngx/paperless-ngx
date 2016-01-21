@@ -37,6 +37,7 @@ class Command(BaseCommand):
     CONSUME = settings.CONSUMPTION_DIR
 
     OCR = pyocr.get_available_tools()[0]
+    OCR_LANG = settings.TESSERACT_LANGUAGE
     MEDIA_PDF = os.path.join(settings.MEDIA_ROOT, "documents", "pdf")
 
     PARSER_REGEX_TITLE = re.compile(r"^.*/(.*)\.pdf$")
@@ -135,7 +136,7 @@ class Command(BaseCommand):
         for png in pngs:
             with Image.open(os.path.join(self.SCRATCH, png)) as f:
                 self._render("    {}".format(f.filename), 3)
-                r += self.OCR.image_to_string(f)
+                r += self.OCR.image_to_string(f, lang=self.OCR_LANG)
                 r += "\n\n\n\n\n\n\n\n"
 
         return r
