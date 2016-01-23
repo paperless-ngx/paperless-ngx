@@ -66,5 +66,6 @@ db.sqlite3
 .idea
 
 # Other stuff that doesn't belong
-src/paperless/fixtures/
 virtualenv
+scripts/import-for-development
+
