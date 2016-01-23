@@ -1,5 +1,6 @@
 Django==1.9
 Pillow==3.0.0
 django-extensions==1.6.1
+langdetect==1.0.5
 pyocr==0.3.1
 python-gnupg==0.3.8
