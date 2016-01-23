@@ -126,9 +126,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Tesseract language setting
-TESSERACT_LANGUAGE = "eng"
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
@@ -139,12 +136,30 @@ STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 
 
+#
 # Paperless-specific stuffs
 # Change these paths if yours are different
+#
 
+# The default language that tesseract will attempt to use when parsing
+# documents.  It should be a 3-letter language code consistent with ISO 639.
+OCR_LANGUAGE = "eng"
+
+# If this is true, any failed attempts to OCR a PDF will result in the PDF being
+# indexed anyway, with whatever we could get.  If it's False, the file will
+# simply be left in the CONSUMPTION_DIR.
+FORGIVING_OCR = True
+
+# GNUPG needs a home directory for some reason
 GNUPG_HOME = os.environ.get("HOME", "/dev/null")
+
+# Convert is part of the Imagemagick package
 CONVERT_BINARY = "/usr/bin/convert"
-SCRATCH_DIR = "/tmp/paperless"  # Will be created if it doesn't exist
+
+# This will be created if it doesn't exist
+SCRATCH_DIR = "/tmp/paperless"
+
+# This is where Paperless will look for PDFs to index
 CONSUMPTION_DIR = os.environ.get("PAPERLESS_CONSUME")
 
 # Set this and change the permissions on this file to 0600, or set it to
