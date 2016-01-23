@@ -16,8 +16,13 @@ from django.core.management.base import BaseCommand, CommandError
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 
-from documents.models import Document, Sender
+from ...languages import ISO639
+from ...models import Document, Sender
 from paperless.db import GnuPG
+
+
+class OCRError(BaseException):
+    pass
 
 
 class Command(BaseCommand):
@@ -37,7 +42,7 @@ class Command(BaseCommand):
     CONSUME = settings.CONSUMPTION_DIR
 
     OCR = pyocr.get_available_tools()[0]
-    OCR_LANG = settings.TESSERACT_LANGUAGE
+    DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
     MEDIA_PDF = os.path.join(settings.MEDIA_ROOT, "documents", "pdf")
 
     PARSER_REGEX_TITLE = re.compile(r"^.*/(.*)\.pdf$")
@@ -47,6 +52,7 @@ class Command(BaseCommand):
 
         self.verbosity = 0
         self.stats = {}
+        self._ignore = []
 
         BaseCommand.__init__(self, *args, **kwargs)
 
@@ -81,13 +87,22 @@ class Command(BaseCommand):
             if not re.match(self.PARSER_REGEX_TITLE, pdf):
                 continue
 
+            if pdf in self._ignore:
+                continue
+
             if self._is_ready(pdf):
                 continue
 
             self._render("Consuming {}".format(pdf), 1)
 
             pngs = self._get_greyscale(pdf)
-            text = self._get_ocr(pngs)
+
+            try:
+                text = self._get_ocr(pngs)
+            except OCRError:
+                self._ignore.append(pdf)
+                self._render("OCR FAILURE: {}".format(pdf), 0)
+                continue
 
             self._store(text, pdf)
             self._cleanup(pngs, pdf)
@@ -131,23 +146,51 @@ class Command(BaseCommand):
 
     def _get_ocr(self, pngs):
 
-        self._render("  OCRing the PDF", 2)
+        self._render("  OCRing the PDF", 1)
 
-        raw_text = self._ocr(pngs, self.OCR_LANG)
+        raw_text = self._ocr(pngs, self.DEFAULT_OCR_LANGUAGE)
 
         guessed_language = langdetect.detect(raw_text)
-        if guessed_language == self.OCR_LANG:
+
+        self._render("    Language detected: {}".format(guessed_language), 2)
+
+        if guessed_language not in ISO639:
+            self._render("Language detection failed!", 0)
+            if settings.FORGIVING_OCR:
+                self._render(
+                    "As FORGIVING_OCR is enabled, we're going to make the best "
+                    "with what we have.",
+                    1
+                )
+                return raw_text
+            raise OCRError
+
+        if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
             return raw_text
 
-        return self._ocr(pngs, guessed_language)
+        try:
+            return self._ocr(pngs, ISO639[guessed_language])
+        except pyocr.pyocr.tesseract.TesseractError:
+            if settings.FORGIVING_OCR:
+                self._render(
+                    "OCR for {} failed, but we're going to stick with what "
+                    "we've got since FORGIVING_OCR is enabled.".format(
+                        guessed_language
+                    ),
+                    0
+                )
+                return raw_text
+            raise OCRError
 
     def _ocr(self, pngs, lang):
+
+        self._render("    Parsing for {}".format(lang), 2)
 
         r = ""
         for png in pngs:
             with Image.open(os.path.join(self.SCRATCH, png)) as f:
                 self._render("    {}".format(f.filename), 3)
-                r += self.OCR.image_to_string(f, lang=self.OCR_LANG)
+                r += self.OCR.image_to_string(f, lang=lang)
                 r += "\n\n\n\n\n\n\n\n"
 
         return r
