@@ -61,10 +61,6 @@ class Command(BaseCommand):
 
         self.verbosity = options["verbosity"]
 
-        if not os.path.exists(self.CONSUME):
-            raise CommandError("Consumption directory {} does not exist".format(
-                self.CONSUME))
-
         self._setup()
 
         try:
@@ -109,6 +105,17 @@ class Command(BaseCommand):
             self._cleanup(pngs, pdf)
 
     def _setup(self):
+
+        if not self.CONSUME:
+            raise CommandError(
+                "The CONSUMPTION_DIR settings variable does not appear to be "
+                "set."
+            )
+
+        if not os.path.exists(self.CONSUME):
+            raise CommandError("Consumption directory {} does not exist".format(
+                self.CONSUME))
+
         for d in (self.SCRATCH, self.MEDIA_PDF):
             try:
                 os.makedirs(d)
@@ -147,7 +154,7 @@ class Command(BaseCommand):
 
     def _get_ocr(self, pngs):
 
-        self._render("  OCRing the PDF", 1)
+        self._render("  OCRing the PDF", 2)
 
         raw_text = self._ocr(pngs, self.DEFAULT_OCR_LANGUAGE)
 
