@@ -16,9 +16,10 @@ from django.core.management.base import BaseCommand, CommandError
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 
+from paperless.db import GnuPG
+
 from ...languages import ISO639
 from ...models import Document, Sender
-from paperless.db import GnuPG
 
 
 class OCRError(BaseException):
