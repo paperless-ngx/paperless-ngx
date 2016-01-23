@@ -48,10 +48,8 @@ class Command(BaseCommand):
 
             with open(target, "wb") as f:
                 f.write(GnuPG.decrypted(document.pdf))
-                os.utime(target, times=(
-                    int(time.mktime(document.created.timetuple())),
-                    int(time.mktime(document.modified.timetuple()))
-                ))
+                t = int(time.mktime(document.created.timetuple()))
+                os.utime(target, times=(t, t))
 
     def _render(self, text, verbosity):
         if self.verbosity >= verbosity:
