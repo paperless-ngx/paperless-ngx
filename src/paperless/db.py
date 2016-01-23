@@ -11,13 +11,14 @@ class GnuPG(object):
     gpg = gnupg.GPG(gnupghome=settings.GNUPG_HOME)
 
     @classmethod
-    def decrypted(cls, path):
-        return cls.gpg.decrypt_file(path, passphrase=settings.PASSPHRASE).data
+    def decrypted(cls, file_handle):
+        return cls.gpg.decrypt_file(
+            file_handle, passphrase=settings.PASSPHRASE).data
 
     @classmethod
-    def encrypted(cls, path):
+    def encrypted(cls, file_handle):
         return cls.gpg.encrypt_file(
-            path,
+            file_handle,
             recipients=None,
             passphrase=settings.PASSPHRASE,
             symmetric=True
