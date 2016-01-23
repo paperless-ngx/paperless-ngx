@@ -1,5 +1,6 @@
 import gnupg
 import os
+import time
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -47,6 +48,10 @@ class Command(BaseCommand):
 
             with open(target, "wb") as f:
                 f.write(GnuPG.decrypted(document.pdf))
+                os.utime(target, times=(
+                    int(time.mktime(document.created.timetuple())),
+                    int(time.mktime(document.modified.timetuple()))
+                ))
 
     def _render(self, text, verbosity):
         if self.verbosity >= verbosity:
