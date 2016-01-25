@@ -46,20 +46,15 @@ Requirements
 This is all really a quite simple, shiny, user-friendly wrapper around some very
 powerful tools.
 
-* `ImageMagick`_ converts the images between colour and
-  greyscale.
-* `Tesseract`_ does the character recognition
-* `GNU Privacy Guard`_
-* `Python 3`_ is the language of the project
-    * `Pillow`_ loads the image data
-      as a python object to be used with PyOCR.
-    * `PyOCR`_ is a slick programmatic wrapper
-      around tesseract
-    * `Django`_ is the framework this project is
-      written against.
-    * `Python-GNUPG`_ decrypts the PDFs
-      on-the-fly to allow you to download unencrypted files, leaving the
-      encrypted ones on-disk.
+* `ImageMagick`_ converts the images between colour and greyscale.
+* `Tesseract`_ does the character recognition.
+* `GNU Privacy Guard`_ is used as the encryption backend.
+* `Python 3`_ is the language of the project.
+    * `Pillow`_ loads the image data as a python object to be used with PyOCR.
+    * `PyOCR`_ is a slick programmatic wrapper around tesseract.
+    * `Django`_ is the framework this project is written against.
+    * `Python-GNUPG`_ decrypts the PDFs on-the-fly to allow you to download
+      unencrypted files, leaving the encrypted ones on-disk.
 
 The keen eye might have noticed that we're converting a PDF to an image to be
 read by Tesseract, and to do this we're using a chain of: scanned PDF >
