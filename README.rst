@@ -1,4 +1,7 @@
-# paperless
+Paperless
+#########
+|Documentation|
+
 Scan, index, and archive all of your paper documents
 
 I hate paper.  Environmental issues aside, it's a tech person's nightmare:
@@ -12,12 +15,14 @@ of not having the right document around.  Sometimes I recycled a document I
 needed (who keeps water bills for two years?) and other times I just lost
 it... because paper.  I wrote this to make my life easier.
 
-## How it Works:
+
+How it Works
+============
 
 1. Buy a document scanner like [this one](http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail).
 2. Set it up to "scan to FTP" or something similar. It should be able to push
    scanned images to a server without you having to do anything.
-3. Have the target server run the *paperless* consumption script to OCR the PDF
+3. Have the target server run the *Paperless* consumption script to OCR the PDF
    and index it into a local database.
 4. Use the web frontend to sift through the database and find what you want.
 5. Download the PDF you need/want via the web interface and do whatever you
@@ -25,7 +30,8 @@ it... because paper.  I wrote this to make my life easier.
    In most cases, no one will care or notice.
 
 
-## Stability
+Stability
+=========
 
 Paperless is still under active development (just look at the git commit
 history) so don't expect it to be 100% stable.  I'm using it for my own
@@ -33,7 +39,8 @@ documents, but I'm crazy like that.  If you use this and it breaks something,
 you get to keep all the shiny pieces.
 
 
-## Requirements
+Requirements
+============
 
 This is all really a quite simple, shiny, user-friendly wrapper around some very
 powerful tools.
@@ -60,40 +67,16 @@ apparently, Pillow lacks the ability to read PDFs, and PyOCR requires a Pillow
 object, so we're sort of stuck.
 
 
-## Instructions
+Documentation
+=============
 
-1. Check out this repo to somewhere convenient and install the requirements
-   listed here into your environment.
+It's all available on `ReadTheDocs`_.
 
-2. Configure `settings.py` and make sure that `CONVERT_BINARY`, `SCRATCH_DIR`,
-   and `CONSUMPTION_DIR` are set to values you'd expect:
-
-    * `CONVERT_BINARY`: The path to `convert`, installed as part of ImageMagick.
-    * `SCRATCH_DIR`: A place for files to be created and destroyed.  The default
-      is as good a place as any.
-    * `CONSUMPTION_DIR`: The directory into which your scanner will be
-      depositing files.  Note that the consumption script will import files from
-      here **and then delete them**.
-    * `PASSPHRASE`: You can set this here, or allow the running of the service
-      to ask you for it each time you start.  If you store the value here, you
-      should probably set the permissions on `settings.py` to `0400`.
-
-3. Run `python manage.py migrate`.  This will create your local database if it
-   doesn't exist.  You should probably change the permissions on this database
-   file to 0600.
-
-4. Run `python manage.py createsuperuser` and follow the prompts that follow
-   to create a user for logging in.
-
-5. Run `python manage.py document_consumer`.
-
-6. Start the webserver with `python manage.py runserver` and enter the same
-   passphrase when prompted.
-
-7. Log into your new toy by visiting `http://localhost:8000/`.
+.. _ReadTheDocs: https://paperless.readthedocs.org/
 
 
-## Important Note
+Important Note
+==============
 
 Document scanners are typically used to scan sensitive documents.  Things like
 your social insurance number, tax records, invoices, etc.  While paperless
@@ -103,3 +86,5 @@ if someone has ideas on how to do that on encrypted data, I'm all ears).  This
 means that paperless should never be run on an untrusted host.  Instead, I
 recommend that if you do want to use it, run it locally on a server in your own
 home.
+
+.. |Documentation| image:: https://readthedocs.org/projects/ripe-atlas-tools/badge/?version=latest

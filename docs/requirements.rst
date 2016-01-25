@@ -6,9 +6,15 @@ Requirements
 You need a Linux machine or Unix-like setup (theoretically an Apple machine
 should work) that has the following software installed on it:
 
-* Python3 (with development libraries, pip and virtualenv)
-* Tesseract
-* Imagemagick
+* `Python3`_ (with development libraries, pip and virtualenv)
+* `GNU Privacy Guard`_
+* `Tesseract`_
+* `Imagemagick`_
+
+.. _Python3: https://python.org/
+.. _GNU Privacy Guard: https://gnupg.org
+.. _Tesseract: https://github.com/tesseract-ocr
+.. _Imagemagick: http://imagemagick.org/
 
 If you're not working on a virtual environment (like Vagrant or Docker), you
 should probably be using a virtualenv, but that's your call.  The reasons why
