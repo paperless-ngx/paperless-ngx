@@ -1,6 +1,8 @@
 Changelog
 #########
 
+* 0.0.3
+    * Added basic tagging
 * 0.0.2
     * Added language detection
     * Added datestamps to ``document_exporter``.
