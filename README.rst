@@ -19,7 +19,7 @@ it... because paper.  I wrote this to make my life easier.
 How it Works
 ============
 
-1. Buy a document scanner like [this one](http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail).
+1. Buy a document scanner like `this one`_.
 2. Set it up to "scan to FTP" or something similar. It should be able to push
    scanned images to a server without you having to do anything.
 3. Have the target server run the *Paperless* consumption script to OCR the PDF
@@ -29,6 +29,7 @@ How it Works
    like with it.  You can even print it and send it as if it's the original.
    In most cases, no one will care or notice.
 
+.. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
 
 Stability
 =========
@@ -45,18 +46,18 @@ Requirements
 This is all really a quite simple, shiny, user-friendly wrapper around some very
 powerful tools.
 
-* [ImageMagick](http://imagemagick.org/) converts the images between colour and
+* `ImageMagick`_ converts the images between colour and
   greyscale.
-* [Tesseract](https://github.com/tesseract-ocr) does the character recognition
-* [GNU Privacy Guard](https://gnupg.org)
-* [Python 3](https://python.org/) is the language of the project
-    * [Pillow](https://pypi.python.org/pypi/pillowfight/) loads the image data
+* `Tesseract`_ does the character recognition
+* `GNU Privacy Guard`_
+* `Python 3`_ is the language of the project
+    * `Pillow`_ loads the image data
       as a python object to be used with PyOCR.
-    * [PyOCR](https://github.com/jflesch/pyocr) is a slick programmatic wrapper
+    * `PyOCR`_ is a slick programmatic wrapper
       around tesseract
-    * [Django](https://djangoproject.org/) is the framework this project is 
+    * `Django`_ is the framework this project is
       written against.
-    * [Python-GNUPG](http://pythonhosted.org/python-gnupg/) decrypts the PDFs
+    * `Python-GNUPG`_ decrypts the PDFs
       on-the-fly to allow you to download unencrypted files, leaving the
       encrypted ones on-disk.
 
@@ -65,6 +66,15 @@ read by Tesseract, and to do this we're using a chain of: scanned PDF >
 Imagemagick > Pillow > PyOCR > Tesseract > text.  It's not ideal, but
 apparently, Pillow lacks the ability to read PDFs, and PyOCR requires a Pillow
 object, so we're sort of stuck.
+
+.. _ImageMagick: http://imagemagick.org/
+.. _Tesseract: https://github.com/tesseract-ocr
+.. _GNU Privacy Guard: https://gnupg.org/
+.. _Python 3: https://python.org/
+.. _Pillow: https://pypi.python.org/pypi/pillowfight/
+.. _PyOCR: https://github.com/jflesch/pyocr
+.. _Django: https://djangoproject.org/
+.. _Python-GNUPG: http://pythonhosted.org/python-gnupg/
 
 
 Documentation
