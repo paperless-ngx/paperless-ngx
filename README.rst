@@ -93,4 +93,4 @@ means that paperless should never be run on an untrusted host.  Instead, I
 recommend that if you do want to use it, run it locally on a server in your own
 home.
 
-.. |Documentation| image:: https://readthedocs.org/projects/ripe-atlas-tools/badge/?version=latest
+.. |Documentation| image:: https://readthedocs.org/projects/paperless/badge/?version=latest
