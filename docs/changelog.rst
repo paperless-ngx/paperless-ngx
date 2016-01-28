@@ -1,6 +1,10 @@
 Changelog
 #########
 
+* 0.0.4
+
+  * Added automated tagging basted on keyword matching
+
 * 0.0.3
 
   * Added basic tagging
