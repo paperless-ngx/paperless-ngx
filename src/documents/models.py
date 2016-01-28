@@ -1,4 +1,5 @@
 import os
+import re
 
 from django.conf import settings
 from django.db import models
@@ -46,7 +47,66 @@ class Tag(SluggedModel):
         (12, "#000000"),
         (13, "#cccccc")
     )
+
+    MATCH_ANY = 1
+    MATCH_ALL = 2
+    MATCH_LITERAL = 3
+    MATCH_REGEX = 4
+    MATCHING_ALGORITHMS = (
+        (MATCH_ANY, "Any"),
+        (MATCH_ALL, "All"),
+        (MATCH_LITERAL, "Literal"),
+        (MATCH_REGEX, "Regular Expression"),
+    )
+
     colour = models.PositiveIntegerField(choices=COLOURS, default=1)
+    match = models.CharField(max_length=256, blank=True)
+    matching_algorithm = models.PositiveIntegerField(
+        choices=MATCHING_ALGORITHMS,
+        blank=True,
+        null=True,
+        help_text=(
+            "Which algorithm you want to use when matching text to the OCR'd "
+            "PDF.  Here, \"any\" looks for any occurrence of any word provided "
+            "in the PDF, while \"all\" requires that every word provided "
+            "appear in the PDF, albeit not in the order provided.  A "
+            "\"literal\" match means that the text you enter must appear in "
+            "the PDF exactly as you've entered it, and \"regular expression\" "
+            "uses a regex to match the PDF.  If you don't know what a regex"
+            "is, you probably don't want this option."
+        )
+    )
+
+    @property
+    def conditions(self):
+        return "{}: \"{}\" ({})".format(
+            self.name, self.match, self.get_matching_algorithm_display())
+
+    def matches(self, text):
+
+        if self.matching_algorithm == self.MATCH_ALL:
+            for word in self.match.split(" "):
+                if word not in text:
+                    return False
+            return True
+
+        if self.matching_algorithm == self.MATCH_ANY:
+            for word in self.match.split(" "):
+                if word in text:
+                    return True
+            return False
+
+        if self.matching_algorithm == self.MATCH_LITERAL:
+            return self.match in text
+
+        if self.matching_algorithm == self.MATCH_REGEX:
+            return re.search(re.compile(self.match), text)
+
+        raise NotImplementedError("Unsupported matching algorithm")
+
+    def save(self, *args, **kwargs):
+        self.match = self.match.lower()
+        SluggedModel.save(self, *args, **kwargs)
 
 
 class Document(models.Model):

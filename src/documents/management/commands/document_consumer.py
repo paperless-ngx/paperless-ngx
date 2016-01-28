@@ -19,7 +19,7 @@ from django.utils import timezone
 from paperless.db import GnuPG
 
 from ...languages import ISO639
-from ...models import Document, Sender
+from ...models import Document, Sender, Tag
 
 
 class OCRError(BaseException):
@@ -199,13 +199,14 @@ class Command(BaseCommand):
             with Image.open(os.path.join(self.SCRATCH, png)) as f:
                 self._render("    {}".format(f.filename), 3)
                 r += self.OCR.image_to_string(f, lang=lang)
-                r += "\n\n\n\n\n\n\n\n"
 
-        return r
+        # Strip out excess white space to allow matching to go smoother
+        return re.sub(r"\s+", " ", r)
 
     def _store(self, text, pdf):
 
         sender, title = self._parse_file_name(pdf)
+        relevant_tags = [t for t in Tag.objects.all() if t.matches(text.lower())]
 
         stats = os.stat(pdf)
 
@@ -220,6 +221,11 @@ class Command(BaseCommand):
             modified=timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime))
         )
+
+        if relevant_tags:
+            tag_names = ", ".join([t.slug for t in relevant_tags])
+            self._render("    Tagging with {}".format(tag_names), 2)
+            doc.tags.add(*relevant_tags)
 
         with open(pdf, "rb") as unencrypted:
             with open(doc.pdf_path, "wb") as encrypted:
