@@ -31,6 +31,13 @@ class MonthListFilter(admin.SimpleListFilter):
         return queryset.filter(created__year=year, created__month=month)
 
 
+class TagAdmin(admin.ModelAdmin):
+
+    list_display = ("name", "colour", "match", "matching_algorithm")
+    list_filter = ("colour", "matching_algorithm")
+    list_editable = ("colour", "match", "matching_algorithm")
+
+
 class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("sender__name", "title", "content",)
@@ -64,7 +71,7 @@ class DocumentAdmin(admin.ModelAdmin):
     tags_.allow_tags = True
 
 admin.site.register(Sender)
-admin.site.register(Tag)
+admin.site.register(Tag, TagAdmin)
 admin.site.register(Document, DocumentAdmin)
 
 # Unless we implement multi-user, these default registrations don't make sense.
