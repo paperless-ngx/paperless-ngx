@@ -4,6 +4,8 @@ Changelog
 * 0.0.4
 
   * Added automated tagging basted on keyword matching
+  * Cleaned up the document listing page
+  * Removed ``User`` and ``Group`` from the admin
 
 * 0.0.3
 
