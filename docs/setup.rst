@@ -55,9 +55,11 @@ Standard (Bare Metal)
 4. Initialise the database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
-6. Start the webserver with ``./manage.py runserver``.
+6. Start the webserver with ``./manage.py runserver <IP>:<PORT>``.
+   If no specifc IP or port are given, the default is ``127.0.0.1:8000``.
    You should now be able to visit your (empty) `Paperless webserver`_ at
-   ``127.0.0.1:8000``.  You can login with the user/pass you created in #5.
+   ``127.0.0.1:8000`` (or whatever you chose).  You can login with the
+   user/pass you created in #5.
 7. In a separate window, change to the ``src`` directory in this repo again, but
    this time, you should start the consumer script with
    ``./manage.py document_consumer``.
