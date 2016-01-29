@@ -1,5 +1,9 @@
 Paperless
 #########
+
+.. image:: https://badges.gitter.im/danielquinn/paperless.svg
+   :alt: Join the chat at https://gitter.im/danielquinn/paperless
+   :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 |Documentation|
 
 Scan, index, and archive all of your paper documents
