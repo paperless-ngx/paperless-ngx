@@ -111,10 +111,22 @@ class Tag(SluggedModel):
 
 class Document(models.Model):
 
+    TYPE_PDF = "pdf"
+    TYPE_PNG = "png"
+    TYPE_JPG = "jpg"
+    TYPE_GIF = "gif"
+    TYPE_TIF = "tiff"
+    TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,)
+
     sender = models.ForeignKey(
         Sender, blank=True, null=True, related_name="documents")
     title = models.CharField(max_length=128, blank=True, db_index=True)
     content = models.TextField(db_index=True)
+    file_type = models.CharField(
+        max_length=4,
+        editable=False,
+        choices=tuple([(t, t.upper()) for t in TYPES])
+    )
     tags = models.ManyToManyField(Tag, related_name="documents")
     created = models.DateTimeField(default=timezone.now, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
@@ -131,20 +143,19 @@ class Document(models.Model):
         return str(created)
 
     @property
-    def pdf_path(self):
+    def source_path(self):
         return os.path.join(
             settings.MEDIA_ROOT,
             "documents",
-            "pdf",
-            "{:07}.pdf.gpg".format(self.pk)
+            "{:07}.{}.gpg".format(self.pk, self.file_type)
         )
 
     @property
-    def pdf(self):
-        return open(self.pdf_path, "rb")
+    def source_file(self):
+        return open(self.source_path, "rb")
 
     @property
     def parseable_file_name(self):
         if self.sender and self.title:
-            return "{} - {}.pdf".format(self.sender, self.title)
-        return os.path.basename(self.pdf_path)
+            return "{} - {}.{}".format(self.sender, self.title, self.file_types)
+        return os.path.basename(self.source_path)

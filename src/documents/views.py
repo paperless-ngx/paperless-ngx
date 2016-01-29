@@ -16,9 +16,19 @@ class PdfView(DetailView):
         Override the default to return the unencrypted PDF as raw data.
         """
 
+        content_types = {
+            Document.TYPE_PDF: "application/pdf",
+            Document.TYPE_PNG: "image/png",
+            Document.TYPE_JPG: "image/jpeg",
+            Document.TYPE_GIF: "image/gif",
+            Document.TYPE_TIF: "image/tiff",
+        }
+
         response = HttpResponse(
-            GnuPG.decrypted(self.object.pdf), content_type="application/pdf")
+            GnuPG.decrypted(self.object.source_file),
+            content_type=content_types[self.object.file_type]
+        )
         response["Content-Disposition"] = 'attachment; filename="{}"'.format(
-            slugify(str(self.object)) + ".pdf")
+            slugify(str(self.object)) + "." + self.object.file_type)
 
         return response

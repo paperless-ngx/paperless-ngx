@@ -34,7 +34,7 @@ class MonthListFilter(admin.SimpleListFilter):
 class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("sender__name", "title", "content",)
-    list_display = ("edit", "created", "sender", "title", "tags_", "pdf")
+    list_display = ("edit", "created", "sender", "title", "tags_", "document")
     list_filter = (MonthListFilter, "tags", "sender")
     list_editable = ("sender", "title",)
     list_per_page = 25
@@ -44,14 +44,14 @@ class DocumentAdmin(admin.ModelAdmin):
             static("documents/img/edit.png"))
     edit.allow_tags = True
 
-    def pdf(self, obj):
+    def document(self, obj):
         return '<a href="{}">' \
                  '<img src="{}" width="22" height="22" alt="PDF icon">' \
                '</a>'.format(
                     reverse("fetch", kwargs={"pk": obj.pk}),
                     static("documents/img/application-pdf.png")
                 )
-    pdf.allow_tags = True
+    document.allow_tags = True
 
     def tags_(self, obj):
         r = ""

@@ -31,9 +31,9 @@ class Command(BaseCommand):
     Loop over every file found in CONSUMPTION_DIR and:
       1. Convert it to a greyscale png
       2. Use tesseract on the png
-      3. Encrypt and store the PDF in the MEDIA_ROOT
+      3. Encrypt and store the document in the MEDIA_ROOT
       4. Store the OCR'd text in the database
-      5. Delete the pdf and image(s)
+      5. Delete the document and image(s)
     """
 
     LOOP_TIME = 10  # Seconds
@@ -44,10 +44,12 @@ class Command(BaseCommand):
 
     OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
-    MEDIA_PDF = os.path.join(settings.MEDIA_ROOT, "documents", "pdf")
+    MEDIA_DOCS = os.path.join(settings.MEDIA_ROOT, "documents")
 
-    PARSER_REGEX_TITLE = re.compile(r"^.*/(.*)\.pdf$")
-    PARSER_REGEX_SENDER_TITLE = re.compile(r"^.*/(.*) - (.*)\.pdf$")
+    PARSER_REGEX_TITLE = re.compile(
+        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$", flags=re.IGNORECASE)
+    PARSER_REGEX_SENDER_TITLE = re.compile(
+        r"^.*/(.*) - (.*)\.(pdf|jpe?g|png|gif|tiff)", flags=re.IGNORECASE)
 
     def __init__(self, *args, **kwargs):
 
@@ -74,35 +76,35 @@ class Command(BaseCommand):
 
     def loop(self):
 
-        for pdf in os.listdir(self.CONSUME):
+        for doc in os.listdir(self.CONSUME):
 
-            pdf = os.path.join(self.CONSUME, pdf)
+            doc = os.path.join(self.CONSUME, doc)
 
-            if not os.path.isfile(pdf):
+            if not os.path.isfile(doc):
                 continue
 
-            if not re.match(self.PARSER_REGEX_TITLE, pdf):
+            if not re.match(self.PARSER_REGEX_TITLE, doc):
                 continue
 
-            if pdf in self._ignore:
+            if doc in self._ignore:
                 continue
 
-            if self._is_ready(pdf):
+            if self._is_ready(doc):
                 continue
 
-            self._render("Consuming {}".format(pdf), 1)
+            self._render("Consuming {}".format(doc), 1)
 
-            pngs = self._get_greyscale(pdf)
+            pngs = self._get_greyscale(doc)
 
             try:
                 text = self._get_ocr(pngs)
             except OCRError:
-                self._ignore.append(pdf)
-                self._render("OCR FAILURE: {}".format(pdf), 0)
+                self._ignore.append(doc)
+                self._render("OCR FAILURE: {}".format(doc), 0)
                 continue
 
-            self._store(text, pdf)
-            self._cleanup(pngs, pdf)
+            self._store(text, doc)
+            self._cleanup(pngs, doc)
 
     def _setup(self):
 
@@ -116,29 +118,29 @@ class Command(BaseCommand):
             raise CommandError("Consumption directory {} does not exist".format(
                 self.CONSUME))
 
-        for d in (self.SCRATCH, self.MEDIA_PDF):
+        for d in (self.SCRATCH, self.MEDIA_DOCS):
             try:
                 os.makedirs(d)
             except FileExistsError:
                 pass
 
-    def _is_ready(self, pdf):
+    def _is_ready(self, doc):
         """
-        Detect whether `pdf` is ready to consume or if it's still being written
+        Detect whether `doc` is ready to consume or if it's still being written
         to by the scanner.
         """
 
-        t = os.stat(pdf).st_mtime
+        t = os.stat(doc).st_mtime
 
-        if self.stats.get(pdf) == t:
-            del(self.stats[pdf])
+        if self.stats.get(doc) == t:
+            del(self.stats[doc])
             return True
 
-        self.stats[pdf] = t
+        self.stats[doc] = t
 
         return False
 
-    def _get_greyscale(self, pdf):
+    def _get_greyscale(self, doc):
 
         self._render("  Generating greyscale image", 2)
 
@@ -147,14 +149,14 @@ class Command(BaseCommand):
 
         subprocess.Popen((
             self.CONVERT, "-density", "300", "-depth", "8",
-            "-type", "grayscale", pdf, png
+            "-type", "grayscale", doc, png
         )).wait()
 
         return sorted(glob.glob(os.path.join(self.SCRATCH, "{}*".format(i))))
 
     def _get_ocr(self, pngs):
 
-        self._render("  OCRing the PDF", 2)
+        self._render("  OCRing the document", 2)
 
         raw_text = self._ocr(pngs, self.DEFAULT_OCR_LANGUAGE)
 
@@ -203,19 +205,22 @@ class Command(BaseCommand):
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)
 
-    def _store(self, text, pdf):
+    def _store(self, text, doc):
 
-        sender, title = self._parse_file_name(pdf)
-        relevant_tags = [t for t in Tag.objects.all() if t.matches(text.lower())]
+        sender, title, file_type = self._parse_file_name(doc)
 
-        stats = os.stat(pdf)
+        lower_text = text.lower()
+        relevant_tags = [t for t in Tag.objects.all() if t.matches(lower_text)]
+
+        stats = os.stat(doc)
 
         self._render("  Saving record to database", 2)
 
-        doc = Document.objects.create(
+        document = Document.objects.create(
             sender=sender,
             title=title,
             content=text,
+            file_type=file_type,
             created=timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime)),
             modified=timezone.make_aware(
@@ -225,38 +230,38 @@ class Command(BaseCommand):
         if relevant_tags:
             tag_names = ", ".join([t.slug for t in relevant_tags])
             self._render("    Tagging with {}".format(tag_names), 2)
-            doc.tags.add(*relevant_tags)
+            document.tags.add(*relevant_tags)
 
-        with open(pdf, "rb") as unencrypted:
-            with open(doc.pdf_path, "wb") as encrypted:
+        with open(doc, "rb") as unencrypted:
+            with open(document.source_path, "wb") as encrypted:
                 self._render("  Encrypting", 3)
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
-    def _parse_file_name(self, pdf):
+    def _parse_file_name(self, doc):
         """
         We use a crude naming convention to make handling the sender and title
         easier:
-          "sender - title.pdf"
+          "<sender> - <title>.<suffix>"
         """
 
-        # First we attempt "sender - title.pdf"
-        m = re.match(self.PARSER_REGEX_SENDER_TITLE, pdf)
+        # First we attempt "<sender> - <title>.<suffix>"
+        m = re.match(self.PARSER_REGEX_SENDER_TITLE, doc)
         if m:
-            sender_name, title = m.group(1), m.group(2)
+            sender_name, title, file_type = m.group(1), m.group(2), m.group(3)
             sender, __ = Sender.objects.get_or_create(
                 name=sender_name, defaults={"slug": slugify(sender_name)})
-            return sender, title
+            return sender, title, file_type
 
         # That didn't work, so we assume sender is None
-        m = re.match(self.PARSER_REGEX_TITLE, pdf)
-        return None, m.group(1)
+        m = re.match(self.PARSER_REGEX_TITLE, doc)
+        return None, m.group(1), m.group(2)
 
-    def _cleanup(self, pngs, pdf):
+    def _cleanup(self, pngs, doc):
 
         png_glob = os.path.join(
             self.SCRATCH, re.sub(r"^.*/(\d+)-\d+.png$", "\\1*", pngs[0]))
 
-        for f in list(glob.glob(png_glob)) + [pdf]:
+        for f in list(glob.glob(png_glob)) + [doc]:
             self._render("  Deleting {}".format(f), 2)
             os.unlink(f)
 
