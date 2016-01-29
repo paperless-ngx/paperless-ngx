@@ -50,8 +50,14 @@ Standard (Bare Metal)
 
 1. Install the requirements as per the :ref:`requirements <requirements>` page.
 2. Change to the ``src`` directory in this repo.
-3. Edit ``paperless/settings.py`` and be sure to set the values for
-   ``CONSUMPTION_DIR`` and ``PASSPHRASE`` at the bottom of the file.
+3. Edit ``paperless/settings.py`` and be sure to set the values for:
+    * ``CONSUMPTION_DIR``: this is where your documents will be dumped to be
+      consumed by Paperless.
+    * ``PASSPHRASE``: this is the passphrase Paperless uses to encrypt/decrypt
+      the original document.  The default value attempts to source the
+      passphrase from the environment, so if you don't set it to a static value
+      here, you must set ``PAPERLESS_PASSPHRASE=some-secret-string`` on the
+      command line whenever invoking the consumer or webserver.
 4. Initialise the database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
@@ -80,9 +86,14 @@ Vagrant Method
 2. Run ``vagrant up``.  An instance will start up for you.  When it's ready and
    provisioned...
 3. Run ``vagrant ssh`` and once inside your new vagrant box, edit
-   ``/opt/paperless/src/paperless/settings.py``.  Specifically, you need to make
-   sure that you set values for ``CONSUMPTION_DIR`` and ``PASSPHRASE`` at the
-   bottom of the file.
+   ``/opt/paperless/src/paperless/settings.py`` and set the values for:
+    * ``CONSUMPTION_DIR``: this is where your documents will be dumped to be
+      consumed by Paperless.
+    * ``PASSPHRASE``: this is the passphrase Paperless uses to encrypt/decrypt
+      the original document.  The default value attempts to source the
+      passphrase from the environment, so if you don't set it to a static value
+      here, you must set ``PAPERLESS_PASSPHRASE=some-secret-string`` on the
+      command line whenever invoking the consumer or webserver.
 4. Initialise the database with ``/opt/paperless/src/manage.py migrate``.
 5. Still inside your vagrant box, create a user for your Paperless instance with
    ``/opt/paperless/src/manage.py createsuperuser``. Follow the prompts to
