@@ -67,8 +67,9 @@ db.sqlite3
 
 # Other stuff that doesn't belong
 virtualenv
-
-scripts/import-for-development
-
-# Vagrant
 .vagrant
+
+# Used for development
+scripts/import-for-development
+environment
+

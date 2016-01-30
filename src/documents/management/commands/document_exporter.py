@@ -47,7 +47,7 @@ class Command(BaseCommand):
             self._render("Exporting: {}".format(target), 1)
 
             with open(target, "wb") as f:
-                f.write(GnuPG.decrypted(document.pdf))
+                f.write(GnuPG.decrypted(document.source_file))
                 t = int(time.mktime(document.created.timetuple()))
                 os.utime(target, times=(t, t))
 

@@ -162,7 +162,21 @@ SCRATCH_DIR = "/tmp/paperless"
 # This is where Paperless will look for PDFs to index
 CONSUMPTION_DIR = os.environ.get("PAPERLESS_CONSUME")
 
-# Set this and change the permissions on this file to 0600, or set it to
-# `None` and you'll be prompted for the passphrase at runtime.  The default
-# looks for an environment variable.
+# If you want to use IMAP mail consumption, populate this with useful values.
+# If you leave HOST set to None, we assume you're not going to use this feature.
+MAIL_CONSUMPTION = {
+    "HOST": os.environ.get("PAPERLESS_CONSUME_MAIL_HOST"),
+    "PORT": os.environ.get("PAPERLESS_CONSUME_MAIL_PORT"),
+    "USERNAME": os.environ.get("PAPERLESS_CONSUME_MAIL_USER"),
+    "PASSWORD": os.environ.get("PAPERLESS_CONSUME_MAIL_PASS"),
+    "USE_SSL": True,  # If True, use SSL/TLS to connect
+    "INBOX": "INBOX"  # The name of the inbox on the server
+}
+
+# This is used to encrypt the original documents and decrypt them later when you
+# want to download them.  Set it and change the permissions on this file to
+# 0600, or set it to `None` and you'll be prompted for the passphrase at
+# runtime.  The default looks for an environment variable.
+# DON'T FORGET TO SET THIS as leaving it blank may cause some strang things with
+# GPG, including an interesting case where it may "encrypt" zero-byte files.
 PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
