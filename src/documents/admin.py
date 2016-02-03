@@ -40,10 +40,10 @@ class TagAdmin(admin.ModelAdmin):
 
 class DocumentAdmin(admin.ModelAdmin):
 
-    search_fields = ("sender__name", "title", "content",)
+    search_fields = ("sender__name", "title", "content")
     list_display = ("edit", "created", "sender", "title", "tags_", "document")
-    list_filter = (MonthListFilter, "tags", "sender")
-    list_editable = ("sender", "title",)
+    list_filter = ("tags", "sender", MonthListFilter)
+    list_editable = ("sender", "title")
     list_per_page = 25
 
     def edit(self, obj):
