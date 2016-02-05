@@ -61,8 +61,8 @@ class Command(BaseCommand):
 
         self.file_consumer.consume()
 
-        now = datetime.datetime.now()
-        if self.mail_consumer.last_checked + self.MAIL_DELTA > now:
+        delta = self.mail_consumer.last_checked + self.MAIL_DELTA
+        if delta > datetime.datetime.now():
             self.mail_consumer.consume()
 
     def _render(self, text, verbosity):

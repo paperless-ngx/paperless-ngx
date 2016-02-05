@@ -1,8 +1,6 @@
 import os
 import re
 
-from django.conf import settings
-
 from .base import Consumer, OCRError
 
 
@@ -11,8 +9,6 @@ class FileConsumerError(Exception):
 
 
 class FileConsumer(Consumer):
-
-    CONSUME = settings.CONSUMPTION_DIR
 
     def __init__(self, *args, **kwargs):
 

@@ -28,6 +28,7 @@ class Consumer(object):
 
     SCRATCH = settings.SCRATCH_DIR
     CONVERT = settings.CONVERT_BINARY
+    CONSUME = settings.CONSUMPTION_DIR
 
     OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE

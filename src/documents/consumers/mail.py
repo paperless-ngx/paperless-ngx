@@ -1,9 +1,10 @@
 import datetime
 import email
 import imaplib
+import os
+import re
 
 from base64 import b64decode
-from io import BytesIO
 
 from django.conf import settings
 
@@ -14,11 +15,48 @@ class MailConsumerError(Exception):
     pass
 
 
-class MailConsumer(Consumer):
+class Message(object):
+    """
+    A crude, but simple email message class.  We assume that there's a subject
+    and exactly one attachment, and that we don't care about the message body.
+    """
 
-    def __init__(self, *args, **kwargs):
+    SAFE_SUBJECT_REGEX = re.compile(r"^[\w\- ,.]+$")
+    SAFE_SUFFIX_REGEX = re.compile(
+        r"^(application/(pdf))|(image/(png|jpg|gif|tiff))$")
 
-        Consumer.__init__(self, *args, **kwargs)
+    def __init__(self, subject, attachment):
+
+        self.subject = subject
+        self.attachment = attachment
+        self.suffix = None
+
+        m = self.SAFE_SUFFIX_REGEX.match(attachment.content_type)
+        if not m:
+            raise MailConsumerError(
+                "Not-awesome file type: {}".format(attachment.content_type))
+        self.suffix = m.group(1) or m.group(3)
+
+    @property
+    def file_name(self):
+        if self.SAFE_SUFFIX_REGEX.match(self.subject):
+            return "{}.{}".format(self.subject, self.suffix)
+
+
+class Attachment(object):
+
+    def __init__(self, data):
+        self.content_type = None
+        self.size = None
+        self.name = None
+        self.created = None
+        self.modified = None
+        self.data = data
+
+
+class MailFetcher(object):
+
+    def __init__(self):
 
         self._connection = None
         self._host = settings.MAIL_CONSUMPTION["HOST"]
@@ -51,10 +89,25 @@ class MailConsumer(Consumer):
             yield data[0][1]
 
     def consume(self):
+        """
+        We don't actually consume here 'cause it's much easier to do that with
+        files and we already have a FileConsumer.  So instead, we simply write
+        the attachment to the consumption directory as a file with the proper
+        format so the FileConsumer can do its job.
+        """
 
         if self._enabled:
+
             for message in self.get_messages():
-                pass
+
+                t = message.attachment.created or \
+                    message.attachment.modified or \
+                    datetime.datetime.now()
+
+                file_name = os.path.join(Consumer.CONSUME, message.file_name)
+                with open(file_name, "wb") as f:
+                    f.write(message.attachment.data)
+                    os.utime(file_name, times=(t, t))
 
         self.last_checked = datetime.datetime.now()
 
@@ -96,13 +149,9 @@ class MailConsumer(Consumer):
                 continue
 
             file_data = part.get_payload()
-            attachment = BytesIO(b64decode(file_data))
+            attachment = Attachment(b64decode(file_data))
             attachment.content_type = part.get_content_type()
             attachment.size = len(file_data)
-            attachment.name = None
-            attachment.create_date = None
-            attachment.mod_date = None
-            attachment.read_date = None
 
             for param in dispositions[1:]:
 
@@ -112,15 +161,10 @@ class MailConsumer(Consumer):
                 if name == "filename":
                     attachment.name = value
                 elif name == "create-date":
-                    attachment.create_date = value
+                    attachment.created = value
                 elif name == "modification-date":
-                    attachment.mod_date = value
-                elif name == "read-date":
-                    attachment.read_date = value
+                    attachment.modified = value
 
-            r.append({
-                "subject": message.get("Subject"),
-                "attachment": attachment,
-            })
+            r.append(Message(message.get("Subject"), attachment))
 
         return r
