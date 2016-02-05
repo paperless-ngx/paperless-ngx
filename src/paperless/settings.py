@@ -136,10 +136,9 @@ STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 
 
-#
 # Paperless-specific stuffs
 # Change these paths if yours are different
-#
+# ----------------------------------------------------------------------------
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
@@ -180,3 +179,4 @@ MAIL_CONSUMPTION = {
 # DON'T FORGET TO SET THIS as leaving it blank may cause some strang things with
 # GPG, including an interesting case where it may "encrypt" zero-byte files.
 PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
+

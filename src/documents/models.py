@@ -157,5 +157,9 @@ class Document(models.Model):
     @property
     def parseable_file_name(self):
         if self.sender and self.title:
-            return "{} - {}.{}".format(self.sender, self.title, self.file_types)
+            tags = ",".join([t.slug for t in self.tags.all()])
+            if tags:
+                return "{} - {} - {}.{}".format(
+                    self.sender, self.title, tags, self.file_type)
+            return "{} - {}.{}".format(self.sender, self.title, self.file_type)
         return os.path.basename(self.source_path)

@@ -12,10 +12,11 @@ from PIL import Image
 
 from django.conf import settings
 from django.utils import timezone
+from django.template.defaultfilters import slugify
 
 from paperless.db import GnuPG
 
-from ..models import Tag, Document
+from ..models import Sender, Tag, Document
 from ..languages import ISO639
 
 
@@ -30,6 +31,19 @@ class Consumer(object):
 
     OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
+
+    REGEX_TITLE = re.compile(
+        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
+        flags=re.IGNORECASE
+    )
+    REGEX_SENDER_TITLE = re.compile(
+        r"^.*/(.*) - (.*)\.(pdf|jpe?g|png|gif|tiff)",
+        flags=re.IGNORECASE
+    )
+    REGEX_SENDER_TITLE_TAGS = re.compile(
+        r"^.*/(.*) - (.*) - ([a-z\-,])\.(pdf|jpe?g|png|gif|tiff)",
+        flags=re.IGNORECASE
+    )
 
     def __init__(self, verbosity=1):
 
@@ -105,13 +119,48 @@ class Consumer(object):
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)
 
-    def _guess_file_attributes(self, doc):
-        raise NotImplementedError(
-            "At the very least a consumer should determine the file type.")
+    def _guess_attributes_from_name(self, parseable):
+        """
+        We use a crude naming convention to make handling the sender, title, and
+        tags easier:
+          "<sender> - <title> - <tags>.<suffix>"
+          "<sender> - <title>.<suffix>"
+          "<title>.<suffix>"
+        """
+
+        def get_sender(sender_name):
+            return Sender.objects.get_or_create(
+                name=sender_name, defaults={"slug": slugify(sender_name)})[0]
+
+        def get_tags(tags):
+            r = []
+            for t in tags.split(","):
+                r.append(
+                    Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
+            return r
+
+        # First attempt: "<sender> - <title> - <tags>.<suffix>"
+        m = re.match(self.REGEX_SENDER_TITLE_TAGS, parseable)
+        if m:
+            return (
+                get_sender(m.group(1)),
+                m.group(2),
+                get_tags(m.group(3)),
+                m.group(4)
+            )
+
+        # Second attempt: "<sender> - <title>.<suffix>"
+        m = re.match(self.REGEX_SENDER_TITLE, parseable)
+        if m:
+            return get_sender(m.group(1)), m.group(2), [], m.group(3)
+
+        # That didn't work, so we assume sender and tags are None
+        m = re.match(self.REGEX_TITLE, parseable)
+        return None, m.group(1), [], m.group(2)
 
     def _store(self, text, doc):
 
-        sender, title, file_type = self._guess_file_attributes(doc)
+        sender, title, file_type = self._guess_attributes_from_name(doc)
 
         lower_text = text.lower()
         relevant_tags = [t for t in Tag.objects.all() if t.matches(lower_text)]

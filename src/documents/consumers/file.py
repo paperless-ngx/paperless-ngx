@@ -2,10 +2,8 @@ import os
 import re
 
 from django.conf import settings
-from django.template.defaultfilters import slugify
 
-from ..models import Sender
-from . import Consumer, OCRError
+from .base import Consumer, OCRError
 
 
 class FileConsumerError(Exception):
@@ -15,11 +13,6 @@ class FileConsumerError(Exception):
 class FileConsumer(Consumer):
 
     CONSUME = settings.CONSUMPTION_DIR
-
-    PARSER_REGEX_TITLE = re.compile(
-        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$", flags=re.IGNORECASE)
-    PARSER_REGEX_SENDER_TITLE = re.compile(
-        r"^.*/(.*) - (.*)\.(pdf|jpe?g|png|gif|tiff)", flags=re.IGNORECASE)
 
     def __init__(self, *args, **kwargs):
 
@@ -47,7 +40,7 @@ class FileConsumer(Consumer):
             if not os.path.isfile(doc):
                 continue
 
-            if not re.match(self.PARSER_REGEX_TITLE, doc):
+            if not re.match(self.REGEX_TITLE, doc):
                 continue
 
             if doc in self._ignore:
@@ -85,22 +78,3 @@ class FileConsumer(Consumer):
         self.stats[doc] = t
 
         return False
-
-    def _guess_file_attributes(self, doc):
-        """
-        We use a crude naming convention to make handling the sender and title
-        easier:
-          "<sender> - <title>.<suffix>"
-        """
-
-        # First we attempt "<sender> - <title>.<suffix>"
-        m = re.match(self.PARSER_REGEX_SENDER_TITLE, doc)
-        if m:
-            sender_name, title, file_type = m.group(1), m.group(2), m.group(3)
-            sender, __ = Sender.objects.get_or_create(
-                name=sender_name, defaults={"slug": slugify(sender_name)})
-            return sender, title, file_type
-
-        # That didn't work, so we assume sender is None
-        m = re.match(self.PARSER_REGEX_TITLE, doc)
-        return None, m.group(1), m.group(2)

@@ -1,5 +1,9 @@
 import datetime
+import email
 import imaplib
+
+from base64 import b64decode
+from io import BytesIO
 
 from django.conf import settings
 
@@ -49,7 +53,8 @@ class MailConsumer(Consumer):
     def consume(self):
 
         if self._enabled:
-            self.get_messages()
+            for message in self.get_messages():
+                pass
 
         self.last_checked = datetime.datetime.now()
 
@@ -58,12 +63,64 @@ class MailConsumer(Consumer):
         self._connect()
         self._login()
 
-        for message in self._fetch():
-            print(message)  # Now we have to do something with the attachment
+        messages = []
+        for data in self._fetch():
+            message = self._parse_message(data)
+            if message:
+                messages.append(message)
 
         self._connection.expunge()
         self._connection.close()
         self._connection.logout()
 
-    def _guess_file_attributes(self, doc):
-        return None, None, "jpg"
+        return messages
+
+    @staticmethod
+    def _parse_message(data):
+        """
+        Cribbed heavily from
+        https://www.ianlewis.org/en/parsing-email-attachments-python
+        """
+
+        r = []
+        message = email.message_from_string(data)
+
+        for part in message.walk():
+
+            content_disposition = part.get("Content-Disposition")
+            if not content_disposition:
+                continue
+
+            dispositions = content_disposition.strip().split(";")
+            if not dispositions[0].lower() == "attachment":
+                continue
+
+            file_data = part.get_payload()
+            attachment = BytesIO(b64decode(file_data))
+            attachment.content_type = part.get_content_type()
+            attachment.size = len(file_data)
+            attachment.name = None
+            attachment.create_date = None
+            attachment.mod_date = None
+            attachment.read_date = None
+
+            for param in dispositions[1:]:
+
+                name, value = param.split("=")
+                name = name.lower()
+
+                if name == "filename":
+                    attachment.name = value
+                elif name == "create-date":
+                    attachment.create_date = value
+                elif name == "modification-date":
+                    attachment.mod_date = value
+                elif name == "read-date":
+                    attachment.read_date = value
+
+            r.append({
+                "subject": message.get("Subject"),
+                "attachment": attachment,
+            })
+
+        return r
