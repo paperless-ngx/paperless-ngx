@@ -16,15 +16,27 @@ from django.template.defaultfilters import slugify
 
 from paperless.db import GnuPG
 
-from ..models import Sender, Tag, Document
-from ..languages import ISO639
+from .models import Sender, Tag, Document
+from .languages import ISO639
 
 
 class OCRError(Exception):
     pass
 
 
+class ConsumerError(Exception):
+    pass
+
+
 class Consumer(object):
+    """
+    Loop over every file found in CONSUMPTION_DIR and:
+      1. Convert it to a greyscale png
+      2. Use tesseract on the png
+      3. Encrypt and store the document in the MEDIA_ROOT
+      4. Store the OCR'd text in the database
+      5. Delete the document and image(s)
+    """
 
     SCRATCH = settings.SCRATCH_DIR
     CONVERT = settings.CONVERT_BINARY
@@ -34,15 +46,15 @@ class Consumer(object):
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
 
     REGEX_TITLE = re.compile(
-        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
+        r"^.*/([^/]*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
     REGEX_SENDER_TITLE = re.compile(
-        r"^.*/(.*) - (.*)\.(pdf|jpe?g|png|gif|tiff)",
+        r"^[^/]*/(.+) - ([^/]+)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
     REGEX_SENDER_TITLE_TAGS = re.compile(
-        r"^.*/(.*) - (.*) - ([a-z\-,])\.(pdf|jpe?g|png|gif|tiff)",
+        r"^.*/([^/]+) - ([^/]+) - ([a-z\-,]+)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
 
@@ -54,6 +66,51 @@ class Consumer(object):
             os.makedirs(self.SCRATCH)
         except FileExistsError:
             pass
+
+        self.stats = {}
+        self._ignore = []
+
+        if not self.CONSUME:
+            raise ConsumerError(
+                "The CONSUMPTION_DIR settings variable does not appear to be "
+                "set."
+            )
+
+        if not os.path.exists(self.CONSUME):
+            raise ConsumerError(
+                "Consumption directory {} does not exist".format(self.CONSUME))
+
+    def consume(self):
+
+        for doc in os.listdir(self.CONSUME):
+
+            doc = os.path.join(self.CONSUME, doc)
+
+            if not os.path.isfile(doc):
+                continue
+
+            if not re.match(self.REGEX_TITLE, doc):
+                continue
+
+            if doc in self._ignore:
+                continue
+
+            if self._is_ready(doc):
+                continue
+
+            self._render("Consuming {}".format(doc), 1)
+
+            pngs = self._get_greyscale(doc)
+
+            try:
+                text = self._get_ocr(pngs)
+            except OCRError:
+                self._ignore.append(doc)
+                self._render("OCR FAILURE: {}".format(doc), 0)
+                continue
+
+            self._store(text, doc)
+            self._cleanup(pngs, doc)
 
     def _get_greyscale(self, doc):
 
@@ -69,17 +126,27 @@ class Consumer(object):
 
         return sorted(glob.glob(os.path.join(self.SCRATCH, "{}*".format(i))))
 
+    def _guess_language(self, text):
+        try:
+            guess = langdetect.detect(text)
+            self._render("    Language detected: {}".format(guess), 2)
+            return guess
+        except Exception:
+            return None
+
     def _get_ocr(self, pngs):
+        """
+        Attempts to do the best job possible OCR'ing the document based on
+        simple language detection trial & error.
+        """
 
         self._render("  OCRing the document", 2)
 
         raw_text = self._ocr(pngs, self.DEFAULT_OCR_LANGUAGE)
 
-        guessed_language = langdetect.detect(raw_text)
+        guessed_language = self._guess_language(raw_text)
 
-        self._render("    Language detected: {}".format(guessed_language), 2)
-
-        if guessed_language not in ISO639:
+        if not guessed_language or guessed_language not in ISO639:
             self._render("Language detection failed!", 0)
             if settings.FORGIVING_OCR:
                 self._render(
@@ -108,6 +175,9 @@ class Consumer(object):
             raise OCRError
 
     def _ocr(self, pngs, lang):
+        """
+        Performs a single OCR attempt.
+        """
 
         self._render("    Parsing for {}".format(lang), 2)
 
@@ -161,10 +231,11 @@ class Consumer(object):
 
     def _store(self, text, doc):
 
-        sender, title, file_type = self._guess_attributes_from_name(doc)
+        sender, title, tags, file_type = self._guess_attributes_from_name(doc)
 
         lower_text = text.lower()
-        relevant_tags = [t for t in Tag.objects.all() if t.matches(lower_text)]
+        relevant_tags = set(
+            [t for t in Tag.objects.all() if t.matches(lower_text)] + tags)
 
         stats = os.stat(doc)
 
@@ -205,3 +276,19 @@ class Consumer(object):
     def _render(self, text, verbosity):
         if self.verbosity >= verbosity:
             print(text)
+
+    def _is_ready(self, doc):
+        """
+        Detect whether `doc` is ready to consume or if it's still being written
+        to by the uploader.
+        """
+
+        t = os.stat(doc).st_mtime
+
+        if self.stats.get(doc) == t:
+            del(self.stats[doc])
+            return True
+
+        self.stats[doc] = t
+
+        return False

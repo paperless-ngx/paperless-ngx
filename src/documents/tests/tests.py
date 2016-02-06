@@ -1,1 +1,1 @@
-from .consumers.mail import TestMailConsumer
+from .consumers.mail import TestMailFetcher

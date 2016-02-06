@@ -5,18 +5,14 @@ import time
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from ...consumers import (
-    FileConsumer, FileConsumerError, MailConsumer, MailConsumerError)
+from ...consumer import Consumer, ConsumerError
+from ...mail import MailFetcher, MailFetcherError
 
 
 class Command(BaseCommand):
     """
-    Loop over every file found in CONSUMPTION_DIR and:
-      1. Convert it to a greyscale png
-      2. Use tesseract on the png
-      3. Encrypt and store the document in the MEDIA_ROOT
-      4. Store the OCR'd text in the database
-      5. Delete the document and image(s)
+    On every iteration of an infinite loop, consume what we can from the
+    consumption directory, and fetch any mail available.
     """
 
     LOOP_TIME = 10  # Seconds
@@ -29,7 +25,7 @@ class Command(BaseCommand):
         self.verbosity = 0
 
         self.file_consumer = None
-        self.mail_consumer = None
+        self.mail_fetcher = None
 
         BaseCommand.__init__(self, *args, **kwargs)
 
@@ -38,9 +34,9 @@ class Command(BaseCommand):
         self.verbosity = options["verbosity"]
 
         try:
-            self.file_consumer = FileConsumer(verbosity=self.verbosity)
-            self.mail_consumer = MailConsumer(verbosity=self.verbosity)
-        except (FileConsumerError, MailConsumerError) as e:
+            self.file_consumer = Consumer(verbosity=self.verbosity)
+            self.mail_fetcher = MailFetcher()
+        except (ConsumerError, MailFetcherError) as e:
             raise CommandError(e)
 
         try:
@@ -59,11 +55,13 @@ class Command(BaseCommand):
 
     def loop(self):
 
+        # Consume whatever files we can
         self.file_consumer.consume()
 
-        delta = self.mail_consumer.last_checked + self.MAIL_DELTA
+        # Occasionally fetch mail and store it to be consumed on the next loop
+        delta = self.mail_fetcher.last_checked + self.MAIL_DELTA
         if delta > datetime.datetime.now():
-            self.mail_consumer.consume()
+            self.mail_fetcher.pull()
 
     def _render(self, text, verbosity):
         if self.verbosity >= verbosity:
