@@ -7,7 +7,7 @@ from hashlib import md5
 from django.conf import settings
 from django.test import TestCase
 
-from ...mail import Message, Attachment
+from ..mail import Message, Attachment
 
 
 class TestMessage(TestCase):
@@ -19,7 +19,6 @@ class TestMessage(TestCase):
             settings.BASE_DIR,
             "documents",
             "tests",
-            "consumers",
             "samples",
             "mail.txt"
         )
