@@ -41,30 +41,30 @@ class TagAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("sender__name", "title", "content")
-    list_display = ("edit", "created", "sender", "title", "tags_", "document")
+    list_display = ("created", "sender", "title", "tags_", "document")
     list_filter = ("tags", "sender", MonthListFilter)
     list_editable = ("sender", "title")
     list_per_page = 25
 
-    def edit(self, obj):
-        return '<img src="{}" width="22" height="22" alt="Edit icon" />'.format(
-            static("documents/img/edit.png"))
-    edit.allow_tags = True
-
     def document(self, obj):
         return '<a href="{}">' \
-                 '<img src="{}" width="22" height="22" alt="PDF icon">' \
+                 '<img src="{}" width="22" height="22" alt="{} icon">' \
                '</a>'.format(
                     reverse("fetch", kwargs={"pk": obj.pk}),
-                    static("documents/img/application-pdf.png")
+                    static("documents/img/application-pdf.png"),
+                    obj.file_type
                 )
     document.allow_tags = True
 
     def tags_(self, obj):
         r = ""
         for tag in obj.tags.all():
-            r += '<span style="padding: 0 0.5em; background-color: {}; color: #ffffff; border-radius: 0.2em; margin: 1px; display: inline-block;">{}</span>'.format(
+            r += '<a style="padding: 0 0.5em; background-color: {}; color: #ffffff; border-radius: 0.2em; margin: 1px; display: inline-block;" href="{}">{}</a>'.format(
                 tag.get_colour_display(),
+                "{}?tags__id__exact={}".format(
+                    reverse("admin:documents_document_changelist"),
+                    tag.pk
+                ),
                 tag.slug
             )
         return r
