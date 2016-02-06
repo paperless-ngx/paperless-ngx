@@ -40,26 +40,21 @@ class TagAdmin(admin.ModelAdmin):
 
 class DocumentAdmin(admin.ModelAdmin):
 
+    class Media:
+        css = {
+            "all": ("paperless.css",)
+        }
+
     search_fields = ("sender__name", "title", "content")
     list_display = ("created", "sender", "title", "tags_", "document")
     list_filter = ("tags", "sender", MonthListFilter)
     list_editable = ("sender", "title")
     list_per_page = 25
 
-    def document(self, obj):
-        return '<a href="{}">' \
-                 '<img src="{}" width="22" height="22" alt="{} icon">' \
-               '</a>'.format(
-                    reverse("fetch", kwargs={"pk": obj.pk}),
-                    static("documents/img/application-pdf.png"),
-                    obj.file_type
-                )
-    document.allow_tags = True
-
     def tags_(self, obj):
         r = ""
         for tag in obj.tags.all():
-            r += '<a style="padding: 0 0.5em; background-color: {}; color: #ffffff; border-radius: 0.2em; margin: 1px; display: inline-block;" href="{}">{}</a>'.format(
+            r += '<a class="tag" style="background-color: {};" href="{}">{}</a>'.format(
                 tag.get_colour_display(),
                 "{}?tags__id__exact={}".format(
                     reverse("admin:documents_document_changelist"),
@@ -69,6 +64,16 @@ class DocumentAdmin(admin.ModelAdmin):
             )
         return r
     tags_.allow_tags = True
+
+    def document(self, obj):
+        return '<a href="{}">' \
+                 '<img src="{}" width="22" height="22" alt="{} icon">' \
+               '</a>'.format(
+                    reverse("fetch", kwargs={"pk": obj.pk}),
+                    static("documents/img/{}.png".format(obj.file_type)),
+                    obj.file_type
+                )
+    document.allow_tags = True
 
 admin.site.register(Sender)
 admin.site.register(Tag, TagAdmin)

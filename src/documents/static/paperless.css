@@ -1,0 +1,12 @@
+th.column-document,
+td.field-document {
+  text-align: center;
+}
+
+td a.tag {
+  padding: 0 0.5em;
+  color: #ffffff;
+  border-radius: 0.2em;
+  margin: 1px;
+  display: inline-block;
+}
