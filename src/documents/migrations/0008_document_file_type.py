@@ -18,4 +18,10 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('pdf', 'PDF'), ('png', 'PNG'), ('jpg', 'JPG'), ('gif', 'GIF'), ('tiff', 'TIFF')], default='pdf', editable=False, max_length=4),
             preserve_default=False,
         ),
+        migrations.AlterField(
+            model_name='document',
+            name='tags',
+            field=models.ManyToManyField(blank=True, related_name='documents', to='documents.Tag'),
+        ),
     ]
+
