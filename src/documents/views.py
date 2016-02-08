@@ -1,10 +1,12 @@
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
-from django.views.generic.detail import DetailView
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import FormView, DetailView
 
 from paperless.db import GnuPG
 
 from .models import Document
+from .forms import UploadForm
 
 
 class PdfView(DetailView):
@@ -32,3 +34,21 @@ class PdfView(DetailView):
             slugify(str(self.object)) + "." + self.object.file_type)
 
         return response
+
+
+class PushView(FormView):
+    """
+    A crude REST API for creating documents.
+    """
+
+    form_class = UploadForm
+
+    @classmethod
+    def as_view(cls, **kwargs):
+        return csrf_exempt(FormView.as_view(**kwargs))
+
+    def form_valid(self, form):
+        return HttpResponse("1")
+
+    def form_invalid(self, form):
+        return HttpResponse("0")

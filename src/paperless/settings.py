@@ -176,7 +176,12 @@ MAIL_CONSUMPTION = {
 # want to download them.  Set it and change the permissions on this file to
 # 0600, or set it to `None` and you'll be prompted for the passphrase at
 # runtime.  The default looks for an environment variable.
-# DON'T FORGET TO SET THIS as leaving it blank may cause some strang things with
-# GPG, including an interesting case where it may "encrypt" zero-byte files.
+# DON'T FORGET TO SET THIS as leaving it blank may cause some strange things
+# with GPG, including an interesting case where it may "encrypt" zero-byte
+# files.
 PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
 
+# If you intend to use the "API" to push files into the consumer, you'll need to
+# provide a shared secret here.  Leaving this as the default will disable the
+# API.
+UPLOAD_SHARED_SECRET = os.environ.get("PAPERLESS_SECRET", "")

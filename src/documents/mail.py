@@ -12,6 +12,7 @@ from dateutil import parser
 from django.conf import settings
 
 from .consumer import Consumer
+from .models import Sender
 
 
 class MailFetcherError(Exception):
@@ -27,10 +28,6 @@ class Message(object):
     A crude, but simple email message class.  We assume that there's a subject
     and n attachments, and that we don't care about the message body.
     """
-
-    # This regex is probably more restrictive than it needs to be, but it's
-    # better safe than sorry.
-    SAFE_SUBJECT_REGEX = re.compile(r"^[\w\- ,.']+$")
 
     def _set_time(self, message):
         self.time = datetime.datetime.now()
@@ -58,7 +55,7 @@ class Message(object):
 
         if self.subject is None:
             raise InvalidMessageError("Message does not have a subject")
-        if not self.SAFE_SUBJECT_REGEX.match(self.subject):
+        if not Sender.SAFE_REGEX.match(self.subject):
             raise InvalidMessageError("Message subject is unsafe")
 
         print('Fetching email: "{}"'.format(self.subject))

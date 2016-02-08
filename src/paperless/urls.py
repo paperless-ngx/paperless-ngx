@@ -18,9 +18,12 @@ from django.conf import settings
 from django.conf.urls import url, static
 from django.contrib import admin
 
-from documents.views import PdfView
+from documents.views import PdfView, PushView
 
 urlpatterns = [
     url(r"^fetch/(?P<pk>\d+)$", PdfView.as_view(), name="fetch"),
     url(r'', admin.site.urls),
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.UPLOAD_SHARED_SECRET:
+    urlpatterns.insert(0, url(r"^push$", PushView.as_view(), name="push"))

@@ -26,6 +26,10 @@ class SluggedModel(models.Model):
 
 class Sender(SluggedModel):
 
+    # This regex is probably more restrictive than it needs to be, but it's
+    # better safe than sorry.
+    SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
+
     class Meta(object):
         ordering = ("name",)
 
@@ -72,7 +76,7 @@ class Tag(SluggedModel):
             "appear in the PDF, albeit not in the order provided.  A "
             "\"literal\" match means that the text you enter must appear in "
             "the PDF exactly as you've entered it, and \"regular expression\" "
-            "uses a regex to match the PDF.  If you don't know what a regex"
+            "uses a regex to match the PDF.  If you don't know what a regex "
             "is, you probably don't want this option."
         )
     )
@@ -127,7 +131,8 @@ class Document(models.Model):
         editable=False,
         choices=tuple([(t, t.upper()) for t in TYPES])
     )
-    tags = models.ManyToManyField(Tag, related_name="documents")
+    tags = models.ManyToManyField(
+        Tag, related_name="documents", blank=True)
     created = models.DateTimeField(default=timezone.now, editable=False)
     modified = models.DateTimeField(auto_now=True, editable=False)
 
