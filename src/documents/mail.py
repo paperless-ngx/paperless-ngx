@@ -2,7 +2,6 @@ import datetime
 import email
 import imaplib
 import os
-import random
 import re
 import time
 
@@ -93,12 +92,7 @@ class Message(object):
 
     @property
     def file_name(self):
-
-        prefix = str(random.randint(100000, 999999))
-        if self.SAFE_SUBJECT_REGEX.match(self.subject):
-            prefix = self.subject
-
-        return "{}.{}".format(prefix, self.attachment.suffix)
+        return "{}.{}".format(self.subject, self.attachment.suffix)
 
 
 class Attachment(object):
