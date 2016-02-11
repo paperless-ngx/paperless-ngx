@@ -1,6 +1,14 @@
 Changelog
 #########
 
+* 0.0.5
+
+  * Added support for image files as documents (png, jpg, gif, tiff)
+  * Added a crude means of HTTP POST for document imports
+  * Added IMAP mail support
+  * Added a re-tagging utility
+  * Documentation for the above as well as data migration
+
 * 0.0.4
 
   * Added automated tagging basted on keyword matching

@@ -30,4 +30,5 @@ Contents
    requirements
    setup
    utilities
+   migrating
    changelog
