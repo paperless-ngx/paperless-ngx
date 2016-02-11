@@ -16,6 +16,7 @@ from django.template.defaultfilters import slugify
 
 from paperless.db import GnuPG
 
+from .mixins import Renderable
 from .models import Sender, Tag, Document
 from .languages import ISO639
 
@@ -28,7 +29,7 @@ class ConsumerError(Exception):
     pass
 
 
-class Consumer(object):
+class Consumer(Renderable):
     """
     Loop over every file found in CONSUMPTION_DIR and:
       1. Convert it to a greyscale png
@@ -50,11 +51,11 @@ class Consumer(object):
         flags=re.IGNORECASE
     )
     REGEX_SENDER_TITLE = re.compile(
-        r"^[^/]*/(.+) - ([^/]+)\.(pdf|jpe?g|png|gif|tiff)$",
+        r"^.*/(.+) - ([^/]+)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
     REGEX_SENDER_TITLE_TAGS = re.compile(
-        r"^.*/([^/]+) - ([^/]+) - ([a-z\-,]+)\.(pdf|jpe?g|png|gif|tiff)$",
+        r"^.*/(.*) - (.*) - ([a-z0-9\-,]*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
 
@@ -208,7 +209,7 @@ class Consumer(object):
             for t in tags.split(","):
                 r.append(
                     Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
-            return r
+            return tuple(r)
 
         # First attempt: "<sender> - <title> - <tags>.<suffix>"
         m = re.match(self.REGEX_SENDER_TITLE_TAGS, parseable)
@@ -223,11 +224,11 @@ class Consumer(object):
         # Second attempt: "<sender> - <title>.<suffix>"
         m = re.match(self.REGEX_SENDER_TITLE, parseable)
         if m:
-            return get_sender(m.group(1)), m.group(2), [], m.group(3)
+            return get_sender(m.group(1)), m.group(2), (), m.group(3)
 
         # That didn't work, so we assume sender and tags are None
         m = re.match(self.REGEX_TITLE, parseable)
-        return None, m.group(1), [], m.group(2)
+        return None, m.group(1), (), m.group(2)
 
     def _store(self, text, doc):
 
@@ -272,10 +273,6 @@ class Consumer(object):
             os.unlink(f)
 
         self._render("", 2)
-
-    def _render(self, text, verbosity):
-        if self.verbosity >= verbosity:
-            print(text)
 
     def _is_ready(self, doc):
         """
