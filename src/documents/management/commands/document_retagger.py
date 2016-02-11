@@ -2,8 +2,10 @@ from django.core.management.base import BaseCommand
 
 from documents.models import Document, Tag
 
+from ...mixins import Renderable
 
-class Command(BaseCommand):
+
+class Command(Renderable, BaseCommand):
 
     help = """
         Using the current set of tagging rules, apply said rules to all
@@ -28,7 +30,3 @@ class Command(BaseCommand):
                     self._render(
                         'Tagging {} with "{}"'.format(document, tag), 1)
                     document.tags.add(tag)
-
-    def _render(self, text, verbosity):
-        if self.verbosity >= verbosity:
-            print(text)

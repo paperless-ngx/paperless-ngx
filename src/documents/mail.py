@@ -11,6 +11,7 @@ from dateutil import parser
 from django.conf import settings
 
 from .consumer import Consumer
+from .mixins import Renderable
 from .models import Sender
 
 
@@ -22,7 +23,7 @@ class InvalidMessageError(Exception):
     pass
 
 
-class Message(object):
+class Message(Renderable):
     """
     A crude, but simple email message class.  We assume that there's a subject
     and n attachments, and that we don't care about the message body.
@@ -37,7 +38,7 @@ class Message(object):
             except (ValueError, AttributeError):
                 pass  # We assume that "now" is ok
 
-    def __init__(self, data):
+    def __init__(self, data, verbosity=1):
         """
         Cribbed heavily from
         https://www.ianlewis.org/en/parsing-email-attachments-python
@@ -57,7 +58,7 @@ class Message(object):
         if not Sender.SAFE_REGEX.match(self.subject):
             raise InvalidMessageError("Message subject is unsafe")
 
-        print('Fetching email: "{}"'.format(self.subject))
+        self._render('Fetching email: "{}"'.format(self.subject), 1)
 
         attachments = []
         for part in message.walk():
@@ -116,9 +117,9 @@ class Attachment(object):
         return self.data
 
 
-class MailFetcher(object):
+class MailFetcher(Renderable):
 
-    def __init__(self):
+    def __init__(self, verbosity=1):
 
         self._connection = None
         self._host = settings.MAIL_CONSUMPTION["HOST"]
@@ -130,6 +131,7 @@ class MailFetcher(object):
         self._enabled = bool(self._host)
 
         self.last_checked = datetime.datetime.now()
+        self.verbosity = verbosity
 
     def pull(self):
         """
@@ -142,7 +144,7 @@ class MailFetcher(object):
 
             for message in self._get_messages():
 
-                print("Storing email: \"{}\"".format(message.subject))
+                self._render("Storing email: \"{}\"".format(message.subject), 1)
 
                 t = int(time.mktime(message.time.timetuple()))
                 file_name = os.path.join(Consumer.CONSUME, message.file_name)
@@ -189,9 +191,9 @@ class MailFetcher(object):
 
             message = None
             try:
-                message = Message(data[0][1])
+                message = Message(data[0][1], self.verbosity)
             except InvalidMessageError as e:
-                print(e)
+                self._render(e, 0)
                 pass
 
             self._connection.store(num, "+FLAGS", "\\Deleted")

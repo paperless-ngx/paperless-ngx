@@ -8,8 +8,10 @@ from django.core.management.base import BaseCommand, CommandError
 from documents.models import Document
 from paperless.db import GnuPG
 
+from ...mixins import Renderable
 
-class Command(BaseCommand):
+
+class Command(Renderable, BaseCommand):
 
     help = """
         Decrypt and rename all files in our collection into a given target
@@ -50,7 +52,3 @@ class Command(BaseCommand):
                 f.write(GnuPG.decrypted(document.source_file))
                 t = int(time.mktime(document.created.timetuple()))
                 os.utime(target, times=(t, t))
-
-    def _render(self, text, verbosity):
-        if self.verbosity >= verbosity:
-            print(text)

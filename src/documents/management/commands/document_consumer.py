@@ -7,9 +7,10 @@ from django.core.management.base import BaseCommand, CommandError
 
 from ...consumer import Consumer, ConsumerError
 from ...mail import MailFetcher, MailFetcherError
+from ...mixins import Renderable
 
 
-class Command(BaseCommand):
+class Command(Renderable, BaseCommand):
     """
     On every iteration of an infinite loop, consume what we can from the
     consumption directory, and fetch any mail available.
@@ -62,7 +63,3 @@ class Command(BaseCommand):
         delta = self.mail_fetcher.last_checked + self.MAIL_DELTA
         if delta > datetime.datetime.now():
             self.mail_fetcher.pull()
-
-    def _render(self, text, verbosity):
-        if self.verbosity >= verbosity:
-            print(text)
