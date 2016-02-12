@@ -44,6 +44,8 @@ class Message(Renderable):
         https://www.ianlewis.org/en/parsing-email-attachments-python
         """
 
+        self.verbosity = verbosity
+
         self.subject = None
         self.time = None
         self.attachment = None
