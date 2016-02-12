@@ -47,11 +47,11 @@ class Consumer(Renderable):
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
 
     REGEX_TITLE = re.compile(
-        r"^.*/([^/]*)\.(pdf|jpe?g|png|gif|tiff)$",
+        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
     REGEX_SENDER_TITLE = re.compile(
-        r"^.*/(.+) - ([^/]+)\.(pdf|jpe?g|png|gif|tiff)$",
+        r"^.*/(.+) - (.*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
     REGEX_SENDER_TITLE_TAGS = re.compile(
@@ -233,6 +233,7 @@ class Consumer(Renderable):
     def _store(self, text, doc):
 
         sender, title, tags, file_type = self._guess_attributes_from_name(doc)
+        tags = list(tags)
 
         lower_text = text.lower()
         relevant_tags = set(
