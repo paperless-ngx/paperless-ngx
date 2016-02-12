@@ -20,7 +20,7 @@ by using ``git``:
 
 .. code:: bash
 
-    $ git clone github.com:danielquinn/paperless.git
+    $ git clone https://github.com/danielquinn/paperless.git
     $ cd paperless
 
 or just download the tarball and go that route:
