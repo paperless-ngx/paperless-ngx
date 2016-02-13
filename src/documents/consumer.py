@@ -115,7 +115,7 @@ class Consumer(Renderable):
 
     def _get_greyscale(self, doc):
 
-        self._render("  Generating greyscale image", 2)
+        self._render("  Generating greyscale image from {}".format(doc), 2)
 
         i = random.randint(1000000, 9999999)
         png = os.path.join(self.SCRATCH, "{}.png".format(i))
