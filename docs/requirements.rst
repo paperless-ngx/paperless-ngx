@@ -35,6 +35,23 @@ document.  Needless to say if you don't know what a virtualenv is, you should
 probably figure that out before continuing.
 
 
+.. _requirements-apple:
+
+Apple-tastic Complications
+--------------------------
+
+Some users have `run into problems`_ with installing ImageMagick on Apple
+systems using HomeBrew.  The solution appears to be to install ghostscript as
+well as ImageMagick:
+
+.. _run into problems: https://github.com/danielquinn/paperless/issues/25
+
+.. code:: bash
+
+    $ brew install ghostscript
+    $ brew install imagemagick
+
+
 .. _requirements-baremetal:
 
 Python-specific Requirements: No Virtualenv
