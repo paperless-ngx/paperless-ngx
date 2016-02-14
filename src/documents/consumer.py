@@ -9,6 +9,7 @@ import random
 import re
 import subprocess
 
+import math
 import pyocr
 
 from PIL import Image
@@ -152,9 +153,14 @@ class Consumer(Renderable):
         simple language detection trial & error.
         """
 
+        if not pngs:
+            raise OCRError
+
         self._render("  OCRing the document", 2)
 
-        raw_text = self._ocr(pngs, self.DEFAULT_OCR_LANGUAGE)
+        # Since the division gets rounded down by int, this calculation works for every edge-case, i.e. 1
+        middle = int(len(pngs) / 2)
+        raw_text = self._ocr([pngs[middle]], self.DEFAULT_OCR_LANGUAGE)
 
         guessed_language = self._guess_language(raw_text)
 
@@ -166,10 +172,14 @@ class Consumer(Renderable):
                     "with what we have.",
                     1
                 )
+                raw_text = self._ocr(pngs[:middle], self.DEFAULT_OCR_LANGUAGE) + raw_text
+                raw_text += self._ocr(pngs[middle+1:], self.DEFAULT_OCR_LANGUAGE)
                 return raw_text
             raise OCRError
 
         if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
+            raw_text = self._ocr(pngs[:middle], self.DEFAULT_OCR_LANGUAGE) + raw_text
+            raw_text += self._ocr(pngs[middle+1:], self.DEFAULT_OCR_LANGUAGE)
             return raw_text
 
         try:
@@ -183,6 +193,8 @@ class Consumer(Renderable):
                     ),
                     0
                 )
+                raw_text = self._ocr(pngs[:middle], self.DEFAULT_OCR_LANGUAGE) + raw_text
+                raw_text += self._ocr(pngs[middle+1:], self.DEFAULT_OCR_LANGUAGE)
                 return raw_text
             raise OCRError
 
@@ -190,6 +202,9 @@ class Consumer(Renderable):
         """
         Performs a single OCR attempt.
         """
+
+        if not pngs:
+            return ""
 
         self._render("    Parsing for {}".format(lang), 2)
 
