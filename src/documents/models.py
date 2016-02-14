@@ -86,6 +86,9 @@ class Tag(SluggedModel):
             self.name, self.match, self.get_matching_algorithm_display())
 
     def matches(self, text):
+        # Check that match is not empty
+        if self.match.strip() == "":
+            return False
 
         if self.matching_algorithm == self.MATCH_ALL:
             for word in self.match.split(" "):
