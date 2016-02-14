@@ -67,8 +67,7 @@ class Tag(SluggedModel):
     match = models.CharField(max_length=256, blank=True)
     matching_algorithm = models.PositiveIntegerField(
         choices=MATCHING_ALGORITHMS,
-        blank=True,
-        null=True,
+        default=MATCH_ANY,
         help_text=(
             "Which algorithm you want to use when matching text to the OCR'd "
             "PDF.  Here, \"any\" looks for any occurrence of any word provided "
