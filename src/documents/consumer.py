@@ -1,5 +1,8 @@
 import datetime
 import glob
+from multiprocessing.pool import Pool
+
+import itertools
 import langdetect
 import os
 import random
@@ -19,6 +22,13 @@ from paperless.db import GnuPG
 from .mixins import Renderable
 from .models import Sender, Tag, Document
 from .languages import ISO639
+
+
+def image_to_string(args):
+    self, png, lang = args
+    with Image.open(os.path.join(self.SCRATCH, png)) as f:
+        self._render("    {}".format(f.filename), 3)
+        return self.OCR.image_to_string(f, lang=lang)
 
 
 class OCRError(Exception):
@@ -42,6 +52,7 @@ class Consumer(Renderable):
     SCRATCH = settings.SCRATCH_DIR
     CONVERT = settings.CONVERT_BINARY
     CONSUME = settings.CONSUMPTION_DIR
+    THREADS = settings.OCR_THREADS
 
     OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
@@ -182,11 +193,10 @@ class Consumer(Renderable):
 
         self._render("    Parsing for {}".format(lang), 2)
 
-        r = ""
-        for png in pngs:
-            with Image.open(os.path.join(self.SCRATCH, png)) as f:
-                self._render("    {}".format(f.filename), 3)
-                r += self.OCR.image_to_string(f, lang=lang)
+        with Pool(processes=self.THREADS) as pool:
+            r = pool.map(image_to_string,
+                         itertools.product([self], pngs, [lang]))
+            r = "".join(r)
 
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)

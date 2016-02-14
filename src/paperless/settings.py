@@ -144,6 +144,9 @@ MEDIA_URL = "/media/"
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 OCR_LANGUAGE = "eng"
 
+# The amount of threads to use for OCR
+OCR_THREADS = os.environ.get("PAPERLESS_OCR_THREADS")
+
 # If this is true, any failed attempts to OCR a PDF will result in the PDF being
 # indexed anyway, with whatever we could get.  If it's False, the file will
 # simply be left in the CONSUMPTION_DIR.
