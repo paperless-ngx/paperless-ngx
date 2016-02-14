@@ -51,14 +51,15 @@ class Message(Renderable):
         self.attachment = None
 
         message = email.message_from_bytes(data)
-        self.subject = message.get("Subject")
+        self.subject = message.get("Subject").replace("\r\n", "")
 
         self._set_time(message)
 
         if self.subject is None:
             raise InvalidMessageError("Message does not have a subject")
         if not Sender.SAFE_REGEX.match(self.subject):
-            raise InvalidMessageError("Message subject is unsafe")
+            raise InvalidMessageError("Message subject is unsafe: {}".format(
+                self.subject))
 
         self._render('Fetching email: "{}"'.format(self.subject), 1)
 
@@ -144,9 +145,11 @@ class MailFetcher(Renderable):
 
         if self._enabled:
 
+            self._render("Checking mail", 1)
+
             for message in self._get_messages():
 
-                self._render("Storing email: \"{}\"".format(message.subject), 1)
+                self._render('  Storing email: "{}"'.format(message.subject), 1)
 
                 t = int(time.mktime(message.time.timetuple()))
                 file_name = os.path.join(Consumer.CONSUME, message.file_name)
@@ -158,17 +161,22 @@ class MailFetcher(Renderable):
 
     def _get_messages(self):
 
-        self._connect()
-        self._login()
-
         r = []
-        for message in self._fetch():
-            if message:
-                r.append(message)
+        try:
 
-        self._connection.expunge()
-        self._connection.close()
-        self._connection.logout()
+            self._connect()
+            self._login()
+
+            for message in self._fetch():
+                if message:
+                    r.append(message)
+
+            self._connection.expunge()
+            self._connection.close()
+            self._connection.logout()
+
+        except Exception as e:
+            self._render(e, 0)
 
         return r
 
@@ -196,8 +204,8 @@ class MailFetcher(Renderable):
                 message = Message(data[0][1], self.verbosity)
             except InvalidMessageError as e:
                 self._render(e, 0)
-                pass
+            else:
+                self._connection.store(num, "+FLAGS", "\\Deleted")
 
-            self._connection.store(num, "+FLAGS", "\\Deleted")
             if message:
                 yield message

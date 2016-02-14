@@ -61,5 +61,5 @@ class Command(Renderable, BaseCommand):
 
         # Occasionally fetch mail and store it to be consumed on the next loop
         delta = self.mail_fetcher.last_checked + self.MAIL_DELTA
-        if delta > datetime.datetime.now():
+        if delta < datetime.datetime.now():
             self.mail_fetcher.pull()
