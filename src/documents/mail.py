@@ -11,8 +11,9 @@ from dateutil import parser
 
 from django.conf import settings
 
+from logger.models import Log
+
 from .consumer import Consumer
-from .mixins import Renderable
 from .models import Sender
 
 
@@ -24,7 +25,7 @@ class InvalidMessageError(Exception):
     pass
 
 
-class Message(Renderable):
+class Message(object):
     """
     A crude, but simple email message class.  We assume that there's a subject
     and n attachments, and that we don't care about the message body.
@@ -53,7 +54,8 @@ class Message(Renderable):
 
         self._set_time(message)
 
-        self._render('Fetching email: "{}"'.format(self.subject), 1)
+        Log.info(
+            'Importing email: "{}"'.format(self.subject), Log.COMPONENT_MAIL)
 
         attachments = []
         for part in message.walk():
@@ -132,7 +134,7 @@ class Attachment(object):
         return self.data
 
 
-class MailFetcher(Renderable):
+class MailFetcher(object):
 
     def __init__(self, verbosity=1):
 
@@ -157,11 +159,14 @@ class MailFetcher(Renderable):
 
         if self._enabled:
 
-            self._render("Checking mail", 1)
+            Log.info("Checking mail", Log.COMPONENT_MAIL)
 
             for message in self._get_messages():
 
-                self._render('  Storing email: "{}"'.format(message.subject), 1)
+                Log.debug(
+                    'Storing email: "{}"'.format(message.subject),
+                    Log.COMPONENT_MAIL
+                )
 
                 t = int(time.mktime(message.time.timetuple()))
                 file_name = os.path.join(Consumer.CONSUME, message.file_name)
@@ -188,7 +193,7 @@ class MailFetcher(Renderable):
             self._connection.logout()
 
         except Exception as e:
-            self._render(e, 0)
+            Log.error(e, Log.COMPONENT_MAIL)
 
         return r
 
@@ -215,7 +220,7 @@ class MailFetcher(Renderable):
             try:
                 message = Message(data[0][1], self.verbosity)
             except InvalidMessageError as e:
-                self._render(e, 0)
+                Log.error(e, Log.COMPONENT_MAIL)
             else:
                 self._connection.store(num, "+FLAGS", "\\Deleted")
 

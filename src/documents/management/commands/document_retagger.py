@@ -27,6 +27,5 @@ class Command(Renderable, BaseCommand):
                 pk__in=document.tags.values_list("pk", flat=True))
             for tag in tags:
                 if tag.matches(document.content):
-                    self._render(
-                        'Tagging {} with "{}"'.format(document, tag), 1)
+                    print('Tagging {} with "{}"'.format(document, tag))
                     document.tags.add(tag)

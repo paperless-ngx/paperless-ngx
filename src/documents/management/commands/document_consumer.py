@@ -7,10 +7,9 @@ from django.core.management.base import BaseCommand, CommandError
 
 from ...consumer import Consumer, ConsumerError
 from ...mail import MailFetcher, MailFetcherError
-from ...mixins import Renderable
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
     """
     On every iteration of an infinite loop, consume what we can from the
     consumption directory, and fetch any mail available.

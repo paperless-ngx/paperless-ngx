@@ -17,9 +17,9 @@ from django.conf import settings
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 
+from logger.models import Log
 from paperless.db import GnuPG
 
-from .mixins import Renderable
 from .models import Sender, Tag, Document
 from .languages import ISO639
 
@@ -27,7 +27,6 @@ from .languages import ISO639
 def image_to_string(args):
     self, png, lang = args
     with Image.open(os.path.join(self.SCRATCH, png)) as f:
-        self._render("    {}".format(f.filename), 3)
         return self.OCR.image_to_string(f, lang=lang)
 
 
@@ -39,7 +38,7 @@ class ConsumerError(Exception):
     pass
 
 
-class Consumer(Renderable):
+class Consumer(object):
     """
     Loop over every file found in CONSUMPTION_DIR and:
       1. Convert it to a greyscale png
@@ -110,7 +109,7 @@ class Consumer(Renderable):
             if self._is_ready(doc):
                 continue
 
-            self._render("Consuming {}".format(doc), 1)
+            Log.info("Consuming {}".format(doc), Log.COMPONENT_CONSUMER)
 
             pngs = self._get_greyscale(doc)
 
@@ -118,7 +117,7 @@ class Consumer(Renderable):
                 text = self._get_ocr(pngs)
             except OCRError:
                 self._ignore.append(doc)
-                self._render("OCR FAILURE: {}".format(doc), 0)
+                Log.error("OCR FAILURE: {}".format(doc), Log.COMPONENT_CONSUMER)
                 continue
 
             self._store(text, doc)
@@ -126,7 +125,10 @@ class Consumer(Renderable):
 
     def _get_greyscale(self, doc):
 
-        self._render("  Generating greyscale image from {}".format(doc), 2)
+        Log.debug(
+            "Generating greyscale image from {}".format(doc),
+            Log.COMPONENT_CONSUMER
+        )
 
         i = random.randint(1000000, 9999999)
         png = os.path.join(self.SCRATCH, "{}.png".format(i))
@@ -141,7 +143,10 @@ class Consumer(Renderable):
     def _guess_language(self, text):
         try:
             guess = langdetect.detect(text)
-            self._render("    Language detected: {}".format(guess), 2)
+            Log.debug(
+                "Language detected: {}".format(guess),
+                Log.COMPONENT_CONSUMER
+            )
             return guess
         except Exception:
             return None
@@ -152,19 +157,19 @@ class Consumer(Renderable):
         simple language detection trial & error.
         """
 
-        self._render("  OCRing the document", 2)
+        Log.debug("OCRing the document", Log.COMPONENT_CONSUMER)
 
         raw_text = self._ocr(pngs, self.DEFAULT_OCR_LANGUAGE)
 
         guessed_language = self._guess_language(raw_text)
 
         if not guessed_language or guessed_language not in ISO639:
-            self._render("Language detection failed!", 0)
+            Log.warning("Language detection failed!", Log.COMPONENT_CONSUMER)
             if settings.FORGIVING_OCR:
-                self._render(
+                Log.warning(
                     "As FORGIVING_OCR is enabled, we're going to make the best "
                     "with what we have.",
-                    1
+                    Log.COMPONENT_CONSUMER
                 )
                 return raw_text
             raise OCRError
@@ -176,12 +181,12 @@ class Consumer(Renderable):
             return self._ocr(pngs, ISO639[guessed_language])
         except pyocr.pyocr.tesseract.TesseractError:
             if settings.FORGIVING_OCR:
-                self._render(
+                Log.warning(
                     "OCR for {} failed, but we're going to stick with what "
                     "we've got since FORGIVING_OCR is enabled.".format(
                         guessed_language
                     ),
-                    0
+                    Log.COMPONENT_CONSUMER
                 )
                 return raw_text
             raise OCRError
@@ -191,12 +196,12 @@ class Consumer(Renderable):
         Performs a single OCR attempt.
         """
 
-        self._render("    Parsing for {}".format(lang), 2)
+        Log.debug("Parsing for {}".format(lang), Log.COMPONENT_CONSUMER)
 
         with Pool(processes=self.THREADS) as pool:
-            r = pool.map(image_to_string,
-                         itertools.product([self], pngs, [lang]))
-            r = "".join(r)
+            r = pool.map(
+                image_to_string, itertools.product([self], pngs, [lang]))
+            r = " ".join(r)
 
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)
@@ -251,7 +256,7 @@ class Consumer(Renderable):
 
         stats = os.stat(doc)
 
-        self._render("  Saving record to database", 2)
+        Log.debug("Saving record to database", Log.COMPONENT_CONSUMER)
 
         document = Document.objects.create(
             sender=sender,
@@ -266,12 +271,13 @@ class Consumer(Renderable):
 
         if relevant_tags:
             tag_names = ", ".join([t.slug for t in relevant_tags])
-            self._render("    Tagging with {}".format(tag_names), 2)
+            Log.debug(
+                "Tagging with {}".format(tag_names), Log.COMPONENT_CONSUMER)
             document.tags.add(*relevant_tags)
 
         with open(doc, "rb") as unencrypted:
             with open(document.source_path, "wb") as encrypted:
-                self._render("  Encrypting", 3)
+                Log.debug("Encrypting", Log.COMPONENT_CONSUMER)
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
     def _cleanup(self, pngs, doc):
@@ -280,10 +286,8 @@ class Consumer(Renderable):
             self.SCRATCH, re.sub(r"^.*/(\d+)-\d+.png$", "\\1*", pngs[0]))
 
         for f in list(glob.glob(png_glob)) + [doc]:
-            self._render("  Deleting {}".format(f), 2)
+            Log.debug("Deleting {}".format(f), Log.COMPONENT_CONSUMER)
             os.unlink(f)
-
-        self._render("", 2)
 
     def _is_ready(self, doc):
         """

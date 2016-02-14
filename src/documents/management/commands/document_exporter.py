@@ -46,7 +46,7 @@ class Command(Renderable, BaseCommand):
 
             target = os.path.join(self.target, document.parseable_file_name)
 
-            self._render("Exporting: {}".format(target), 1)
+            print("Exporting: {}".format(target))
 
             with open(target, "wb") as f:
                 f.write(GnuPG.decrypted(document.source_file))
