@@ -29,6 +29,7 @@ Contents
 
    requirements
    setup
+   consumption
    utilities
    migrating
    changelog
