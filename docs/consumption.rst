@@ -90,13 +90,16 @@ So, with all that in mind, here's what you do to get it running:
    folder in an existing email box and note the path to that folder.
 2. In ``settings.py`` set all of the appropriate values in ``MAIL_CONSUMPTION``.
    If you decided to use a subfolder of an existing account, then make sure you
-   set ``INBOX`` accordingly here.
+   set ``INBOX`` accordingly here.  You also have to set the
+   ``UPLOAD_SHARED_SECRET`` to something you can remember 'cause you'll have to
+   include that in every email you send.
 3. Restart the :ref:`consumer <utilities-consumer>`.  The consumer will check
    the configured email account every 10 minutes for something new and pull down
    whatever it finds.
 4. Send yourself an email!  Note that the subject is treated as the file name,
    so if you set the subject to ``Sender - Title - tag,tag,tag``, you'll get
-   what you expect.
+   what you expect.  Also, you must include the aforementioned secret string in
+   every email so the fetcher knows that it's safe to import.
 5. After a few minutes, the consumer will poll your mailbox, pull down the
    message, and place the attachment in the consumption directory with the
    appropriate name.  A few minutes later, the consumer will import it like any

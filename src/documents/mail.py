@@ -1,11 +1,12 @@
 import datetime
-import email
 import imaplib
 import os
 import re
 import time
 
 from base64 import b64decode
+from email import policy
+from email.parser import BytesParser
 from dateutil import parser
 
 from django.conf import settings
@@ -29,14 +30,7 @@ class Message(Renderable):
     and n attachments, and that we don't care about the message body.
     """
 
-    def _set_time(self, message):
-        self.time = datetime.datetime.now()
-        message_time = message.get("Date")
-        if message_time:
-            try:
-                self.time = parser.parse(message_time)
-            except (ValueError, AttributeError):
-                pass  # We assume that "now" is ok
+    SECRET = settings.UPLOAD_SHARED_SECRET
 
     def __init__(self, data, verbosity=1):
         """
@@ -50,16 +44,14 @@ class Message(Renderable):
         self.time = None
         self.attachment = None
 
-        message = email.message_from_bytes(data)
-        self.subject = message.get("Subject").replace("\r\n", "")
+        message = BytesParser(policy=policy.default).parsebytes(data)
+        self.subject = str(message["Subject"]).replace("\r\n", "")
+        self.body = str(message.get_body())
+
+        self.check_subject()
+        self.check_body()
 
         self._set_time(message)
-
-        if self.subject is None:
-            raise InvalidMessageError("Message does not have a subject")
-        if not Sender.SAFE_REGEX.match(self.subject):
-            raise InvalidMessageError("Message subject is unsafe: {}".format(
-                self.subject))
 
         self._render('Fetching email: "{}"'.format(self.subject), 1)
 
@@ -93,6 +85,26 @@ class Message(Renderable):
 
     def __bool__(self):
         return bool(self.attachment)
+
+    def check_subject(self):
+        if self.subject is None:
+            raise InvalidMessageError("Message does not have a subject")
+        if not Sender.SAFE_REGEX.match(self.subject):
+            raise InvalidMessageError("Message subject is unsafe: {}".format(
+                self.subject))
+
+    def check_body(self):
+        if self.SECRET not in self.body:
+            raise InvalidMessageError("The secret wasn't in the body")
+
+    def _set_time(self, message):
+        self.time = datetime.datetime.now()
+        message_time = message.get("Date")
+        if message_time:
+            try:
+                self.time = parser.parse(message_time)
+            except (ValueError, AttributeError):
+                pass  # We assume that "now" is ok
 
     @property
     def file_name(self):

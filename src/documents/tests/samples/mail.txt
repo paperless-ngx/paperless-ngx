@@ -38,7 +38,7 @@ This is a multi-part message in MIME format.
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-This is the test body.
+The secret word is "paperless" :-)
 
 --------------090701020702030809070008
 Content-Type: application/pdf;
