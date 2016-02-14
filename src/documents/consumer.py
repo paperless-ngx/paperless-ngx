@@ -51,7 +51,7 @@ class Consumer(object):
     SCRATCH = settings.SCRATCH_DIR
     CONVERT = settings.CONVERT_BINARY
     CONSUME = settings.CONSUMPTION_DIR
-    THREADS = settings.OCR_THREADS
+    THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
 
     OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
@@ -140,7 +140,8 @@ class Consumer(object):
 
         return sorted(glob.glob(os.path.join(self.SCRATCH, "{}*".format(i))))
 
-    def _guess_language(self, text):
+    @staticmethod
+    def _guess_language(text):
         try:
             guess = langdetect.detect(text)
             Log.debug(
@@ -148,8 +149,9 @@ class Consumer(object):
                 Log.COMPONENT_CONSUMER
             )
             return guess
-        except Exception:
-            return None
+        except Exception as e:
+            Log.warning(
+                "Language detection error: {}".format(e), Log.COMPONENT_MAIL)
 
     def _get_ocr(self, pngs):
         """
@@ -157,9 +159,15 @@ class Consumer(object):
         simple language detection trial & error.
         """
 
+        if not pngs:
+            raise OCRError
+
         Log.debug("OCRing the document", Log.COMPONENT_CONSUMER)
 
-        raw_text = self._ocr(pngs, self.DEFAULT_OCR_LANGUAGE)
+        # Since the division gets rounded down by int, this calculation works
+        # for every edge-case, i.e. 1
+        middle = int(len(pngs) / 2)
+        raw_text = self._ocr([pngs[middle]], self.DEFAULT_OCR_LANGUAGE)
 
         guessed_language = self._guess_language(raw_text)
 
@@ -171,10 +179,12 @@ class Consumer(object):
                     "with what we have.",
                     Log.COMPONENT_CONSUMER
                 )
+                raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
                 return raw_text
             raise OCRError
 
         if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
+            raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
             return raw_text
 
         try:
@@ -188,13 +198,26 @@ class Consumer(object):
                     ),
                     Log.COMPONENT_CONSUMER
                 )
+                raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
                 return raw_text
             raise OCRError
+
+    def _assemble_ocr_sections(self, pngs, middle, text):
+        """
+        Given a `middle` value and the text that middle page represents, we OCR
+        the remainder of the document and return the whole thing.
+        """
+        text = self._ocr(pngs[:middle], self.DEFAULT_OCR_LANGUAGE) + text
+        text += self._ocr(pngs[middle+1:], self.DEFAULT_OCR_LANGUAGE)
+        return text
 
     def _ocr(self, pngs, lang):
         """
         Performs a single OCR attempt.
         """
+
+        if not pngs:
+            return ""
 
         Log.debug("Parsing for {}".format(lang), Log.COMPONENT_CONSUMER)
 

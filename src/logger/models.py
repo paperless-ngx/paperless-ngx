@@ -26,6 +26,9 @@ class Log(models.Model):
     level = models.PositiveIntegerField(choices=LEVELS, default=LEVEL_INFO)
     component = models.PositiveIntegerField(choices=COMPONENTS)
 
+    class Meta(object):
+        ordering = ("time",)
+
     @classmethod
     def error(cls, message, component):
         cls.objects.create(
