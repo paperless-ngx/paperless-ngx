@@ -1,6 +1,12 @@
 Changelog
 #########
 
+* 0.0.6
+
+  * Added support for parallel OCR (significant work from pitkley)
+  * Sped up the language detection (significant work from pitkley)
+  * Added simple logging
+
 * 0.0.5
 
   * Added support for image files as documents (png, jpg, gif, tiff)
