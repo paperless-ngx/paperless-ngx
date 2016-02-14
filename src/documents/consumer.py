@@ -52,7 +52,7 @@ class Consumer(Renderable):
     SCRATCH = settings.SCRATCH_DIR
     CONVERT = settings.CONVERT_BINARY
     CONSUME = settings.CONSUMPTION_DIR
-    THREADS = settings.OCR_THREADS
+    THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
 
     OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
