@@ -58,6 +58,11 @@ Standard (Bare Metal)
       passphrase from the environment, so if you don't set it to a static value
       here, you must set ``PAPERLESS_PASSPHRASE=some-secret-string`` on the
       command line whenever invoking the consumer or webserver.
+    * ``OCR_THREADS``: this is the number of threads the OCR process will spawn
+      to process document pages in parallel. The default value gets sourced from
+      the environment-variable ``PAPERLESS_OCR_THREADS`` and expects it to be an
+      integer. If the variable is not set, Python determines the core-count of
+      your CPU and uses that value.
 4. Initialise the database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
