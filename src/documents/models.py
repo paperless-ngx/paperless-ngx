@@ -2,6 +2,7 @@ import os
 import re
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
@@ -162,7 +163,7 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
-    def parseable_file_name(self):
+    def file_name(self):
         if self.sender and self.title:
             tags = ",".join([t.slug for t in self.tags.all()])
             if tags:
@@ -170,3 +171,7 @@ class Document(models.Model):
                     self.sender, self.title, tags, self.file_type)
             return "{} - {}.{}".format(self.sender, self.title, self.file_type)
         return os.path.basename(self.source_path)
+
+    @property
+    def download_url(self):
+        return reverse("fetch", kwargs={"pk": self.pk})

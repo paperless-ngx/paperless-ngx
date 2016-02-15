@@ -48,7 +48,6 @@ class DocumentAdmin(admin.ModelAdmin):
     search_fields = ("sender__name", "title", "content")
     list_display = ("created", "sender", "title", "tags_", "document")
     list_filter = ("tags", "sender", MonthListFilter)
-    list_editable = ("sender", "title")
     list_per_page = 25
 
     def tags_(self, obj):
@@ -67,11 +66,12 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def document(self, obj):
         return '<a href="{}">' \
-                 '<img src="{}" width="22" height="22" alt="{} icon">' \
+                 '<img src="{}" width="22" height="22" alt="{} icon" title="{}">' \
                '</a>'.format(
-                    reverse("fetch", kwargs={"pk": obj.pk}),
+                    obj.download_url,
                     static("documents/img/{}.png".format(obj.file_type)),
-                    obj.file_type
+                    obj.file_type,
+                    obj.file_name
                 )
     document.allow_tags = True
 

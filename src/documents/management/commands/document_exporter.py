@@ -1,4 +1,3 @@
-import gnupg
 import os
 import time
 
@@ -25,7 +24,6 @@ class Command(Renderable, BaseCommand):
     def __init__(self, *args, **kwargs):
         self.verbosity = 0
         self.target = None
-        self.gpg = gnupg.GPG(gnupghome=settings.GNUPG_HOME)
         BaseCommand.__init__(self, *args, **kwargs)
 
     def handle(self, *args, **options):
@@ -44,7 +42,7 @@ class Command(Renderable, BaseCommand):
 
         for document in Document.objects.all():
 
-            target = os.path.join(self.target, document.parseable_file_name)
+            target = os.path.join(self.target, document.file_name)
 
             print("Exporting: {}".format(target))
 
