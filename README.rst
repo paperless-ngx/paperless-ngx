@@ -98,3 +98,5 @@ recommend that if you do want to use it, run it locally on a server in your own
 home.
 
 .. |Documentation| image:: https://readthedocs.org/projects/paperless/badge/?version=latest
+   :alt: Read the documentation at https://paperless.readthedocs.org/
+   :target: https://paperless.readthedocs.org/
