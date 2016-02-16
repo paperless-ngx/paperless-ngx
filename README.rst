@@ -1,10 +1,8 @@
 Paperless
 #########
 
-.. image:: https://badges.gitter.im/danielquinn/paperless.svg
-   :alt: Join the chat at https://gitter.im/danielquinn/paperless
-   :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 |Documentation|
+|Chat|
 
 Scan, index, and archive all of your paper documents
 
@@ -33,7 +31,12 @@ How it Works
    like with it.  You can even print it and send it as if it's the original.
    In most cases, no one will care or notice.
 
-.. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
+Here's what you get:
+
+.. image:: docs/_static/screenshot.png
+   :alt: The before and after
+   :target: docs/_static/screenshot.png
+
 
 Stability
 =========
@@ -67,22 +70,11 @@ Imagemagick > Pillow > PyOCR > Tesseract > text.  It's not ideal, but
 apparently, Pillow lacks the ability to read PDFs, and PyOCR requires a Pillow
 object, so we're sort of stuck.
 
-.. _ImageMagick: http://imagemagick.org/
-.. _Tesseract: https://github.com/tesseract-ocr
-.. _GNU Privacy Guard: https://gnupg.org/
-.. _Python 3: https://python.org/
-.. _Pillow: https://pypi.python.org/pypi/pillowfight/
-.. _PyOCR: https://github.com/jflesch/pyocr
-.. _Django: https://djangoproject.org/
-.. _Python-GNUPG: http://pythonhosted.org/python-gnupg/
-
 
 Documentation
 =============
 
 It's all available on `ReadTheDocs`_.
-
-.. _ReadTheDocs: https://paperless.readthedocs.org/
 
 
 Important Note
@@ -97,6 +89,20 @@ means that paperless should never be run on an untrusted host.  Instead, I
 recommend that if you do want to use it, run it locally on a server in your own
 home.
 
+.. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
+.. _ImageMagick: http://imagemagick.org/
+.. _Tesseract: https://github.com/tesseract-ocr
+.. _GNU Privacy Guard: https://gnupg.org/
+.. _Python 3: https://python.org/
+.. _Pillow: https://pypi.python.org/pypi/pillowfight/
+.. _PyOCR: https://github.com/jflesch/pyocr
+.. _Django: https://djangoproject.org/
+.. _Python-GNUPG: http://pythonhosted.org/python-gnupg/
+.. _ReadTheDocs: https://paperless.readthedocs.org/
 .. |Documentation| image:: https://readthedocs.org/projects/paperless/badge/?version=latest
    :alt: Read the documentation at https://paperless.readthedocs.org/
    :target: https://paperless.readthedocs.org/
+.. |Chat| image:: https://badges.gitter.im/danielquinn/paperless.svg
+   :alt: Join the chat at https://gitter.im/danielquinn/paperless
+   :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
