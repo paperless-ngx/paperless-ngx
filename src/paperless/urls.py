@@ -15,14 +15,24 @@ Including another URLconf
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf import settings
-from django.conf.urls import url, static
+from django.conf.urls import url, static, include
 from django.contrib import admin
 
-from documents.views import PdfView, PushView
+from rest_framework.routers import DefaultRouter
+
+from documents.views import (
+    PdfView, PushView, SenderViewSet, TagViewSet, DocumentViewSet)
+
+router = DefaultRouter()
+router.register(r'senders', SenderViewSet)
+router.register(r'tags', TagViewSet)
+router.register(r'documents', DocumentViewSet)
 
 urlpatterns = [
+    url(r"^api/auth/", include('rest_framework.urls', namespace='rest_framework')),
+    url(r"^api/", include(router.urls)),
     url(r"^fetch/(?P<pk>\d+)$", PdfView.as_view(), name="fetch"),
-    url(r'', admin.site.urls),
+    url(r"", admin.site.urls),
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.UPLOAD_SHARED_SECRET:

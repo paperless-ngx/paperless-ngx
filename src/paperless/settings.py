@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "documents",
     "logger",
 
+    "rest_framework",
+
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -46,9 +46,12 @@ class DocumentAdmin(admin.ModelAdmin):
         }
 
     search_fields = ("sender__name", "title", "content")
-    list_display = ("created", "sender", "title", "tags_", "document")
+    list_display = ("created_", "sender", "title", "tags_", "document")
     list_filter = ("tags", "sender", MonthListFilter)
     list_per_page = 25
+
+    def created_(self, obj):
+        return obj.created.date().strftime("%Y-%m-%d")
 
     def tags_(self, obj):
         r = ""

@@ -3,10 +3,13 @@ from django.template.defaultfilters import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, DetailView
 
+from rest_framework.viewsets import ModelViewSet
+
 from paperless.db import GnuPG
 
-from .models import Document
 from .forms import UploadForm
+from .models import Sender, Tag, Document
+from .serialisers import SenderSerializer, TagSerializer, DocumentSerializer
 
 
 class PdfView(DetailView):
@@ -52,3 +55,18 @@ class PushView(FormView):
 
     def form_invalid(self, form):
         return HttpResponse("0")
+
+
+class SenderViewSet(ModelViewSet):
+    model = Sender
+    serializer_class = SenderSerializer
+
+
+class TagViewSet(ModelViewSet):
+    model = Tag
+    serializer_class = TagSerializer
+
+
+class DocumentViewSet(ModelViewSet):
+    model = Document
+    serializer_class = DocumentSerializer
