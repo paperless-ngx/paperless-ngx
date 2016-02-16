@@ -39,8 +39,8 @@ class ConsumerError(Exception):
 class Consumer(object):
     """
     Loop over every file found in CONSUMPTION_DIR and:
-      1. Convert it to a greyscale png
-      2. Use tesseract on the png
+      1. Convert it to a greyscale pnm
+      2. Use tesseract on the pnm
       3. Encrypt and store the document in the MEDIA_ROOT
       4. Store the OCR'd text in the database
       5. Delete the document and image(s)
@@ -48,6 +48,7 @@ class Consumer(object):
 
     SCRATCH = settings.SCRATCH_DIR
     CONVERT = settings.CONVERT_BINARY
+    UNPAPER = settings.UNPAPER_BINARY
     CONSUME = settings.CONSUMPTION_DIR
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
 
@@ -118,11 +119,11 @@ class Consumer(object):
             self.log("info", "Consuming {}".format(doc))
 
             tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
-            pngs = self._get_greyscale(tempdir, doc)
+            imgs = self._get_greyscale(tempdir, doc)
             thumbnail = self._get_thumbnail(tempdir, doc)
 
             try:
-                text = self._get_ocr(pngs)
+                text = self._get_ocr(imgs)
                 self._store(text, doc, thumbnail)
             except OCRError as e:
                 self._ignore.append(doc)
@@ -140,19 +141,30 @@ class Consumer(object):
 
         self.log("info", "Generating greyscale image from {}".format(doc))
 
-        png = os.path.join(tempdir, "convert-%04d.jpg")
-
+        # Convert PDF to multiple PNMs
+        pnm = os.path.join(tempdir, "convert-%04d.pnm")
         subprocess.Popen((
             self.CONVERT, "-density", "300", "-depth", "8",
-            "-type", "grayscale", doc, png
+            "-type", "grayscale", doc, pnm
         )).wait()
 
-        pngs = []
+        # Get a list of converted images
+        pnms = []
         for f in os.listdir(tempdir):
-            if f.startswith("convert"):
-                pngs.append(os.path.join(tempdir, f))
+            if f.endswith(".pnm"):
+                pnms.append(os.path.join(tempdir, f))
 
-        return sorted(filter(lambda __: os.path.isfile(__), pngs))
+        # Run unpaper in parallel on converted images
+        with Pool(processes=self.THREADS) as pool:
+            pool.map(run_unpaper, itertools.product([self.UNPAPER], pnms))
+
+        # Return list of converted images, processed with unpaper
+        pnms = []
+        for f in os.listdir(tempdir):
+            if f.endswith(".unpaper.pnm"):
+                pnms.append(os.path.join(tempdir, f))
+
+        return sorted(filter(lambda __: os.path.isfile(__), pnms))
 
     def _get_thumbnail(self, tempdir, doc):
         """
@@ -179,21 +191,21 @@ class Consumer(object):
         except Exception as e:
             self.log("warning", "Language detection error: {}".format(e))
 
-    def _get_ocr(self, pngs):
+    def _get_ocr(self, imgs):
         """
         Attempts to do the best job possible OCR'ing the document based on
         simple language detection trial & error.
         """
 
-        if not pngs:
+        if not imgs:
             raise OCRError("No images found")
 
         self.log("info", "OCRing the document")
 
         # Since the division gets rounded down by int, this calculation works
         # for every edge-case, i.e. 1
-        middle = int(len(pngs) / 2)
-        raw_text = self._ocr([pngs[middle]], self.DEFAULT_OCR_LANGUAGE)
+        middle = int(len(imgs) / 2)
+        raw_text = self._ocr([imgs[middle]], self.DEFAULT_OCR_LANGUAGE)
 
         guessed_language = self._guess_language(raw_text)
 
@@ -205,16 +217,16 @@ class Consumer(object):
                     "As FORGIVING_OCR is enabled, we're going to make the "
                     "best with what we have."
                 )
-                raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
+                raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
             raise OCRError("Language detection failed")
 
         if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
-            raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
+            raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
             return raw_text
 
         try:
-            return self._ocr(pngs, ISO639[guessed_language])
+            return self._ocr(imgs, ISO639[guessed_language])
         except pyocr.pyocr.tesseract.TesseractError:
             if settings.FORGIVING_OCR:
                 self.log(
@@ -224,34 +236,34 @@ class Consumer(object):
                         guessed_language
                     )
                 )
-                raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
+                raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
             raise OCRError(
                 "The guessed language is not available in this instance of "
                 "Tesseract."
             )
 
-    def _assemble_ocr_sections(self, pngs, middle, text):
+    def _assemble_ocr_sections(self, imgs, middle, text):
         """
         Given a `middle` value and the text that middle page represents, we OCR
         the remainder of the document and return the whole thing.
         """
-        text = self._ocr(pngs[:middle], self.DEFAULT_OCR_LANGUAGE) + text
-        text += self._ocr(pngs[middle+1:], self.DEFAULT_OCR_LANGUAGE)
+        text = self._ocr(imgs[:middle], self.DEFAULT_OCR_LANGUAGE) + text
+        text += self._ocr(imgs[middle + 1:], self.DEFAULT_OCR_LANGUAGE)
         return text
 
-    def _ocr(self, pngs, lang):
+    def _ocr(self, imgs, lang):
         """
         Performs a single OCR attempt.
         """
 
-        if not pngs:
+        if not imgs:
             return ""
 
         self.log("info", "Parsing for {}".format(lang))
 
         with Pool(processes=self.THREADS) as pool:
-            r = pool.map(image_to_string, itertools.product(pngs, [lang]))
+            r = pool.map(image_to_string, itertools.product(imgs, [lang]))
             r = " ".join(r)
 
         # Strip out excess white space to allow matching to go smoother
@@ -374,16 +386,9 @@ class Consumer(object):
 
 
 def image_to_string(args):
-    """
-    I have no idea why, but if this function were a method of Consumer, it
-    would explode with:
-
-      `TypeError: cannot serialize '_io.TextIOWrapper' object`.
-    """
-
-    png, lang = args
+    img, lang = args
     ocr = pyocr.get_available_tools()[0]
-    with Image.open(os.path.join(Consumer.SCRATCH, png)) as f:
+    with Image.open(os.path.join(Consumer.SCRATCH, img)) as f:
         if ocr.can_detect_orientation():
             try:
                 orientation = ocr.detect_orientation(f, lang=lang)
@@ -391,3 +396,10 @@ def image_to_string(args):
             except TesseractError:
                 pass
         return ocr.image_to_string(f, lang=lang)
+
+
+def run_unpaper(args):
+    unpaper, pnm = args
+    subprocess.Popen((
+        unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm")
+    )).wait()

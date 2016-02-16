@@ -5,7 +5,7 @@ MAINTAINER Pit Kleyersburg <pitkley@googlemail.com>
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         sudo \
-        tesseract-ocr tesseract-ocr-eng imagemagick ghostscript \
+        tesseract-ocr tesseract-ocr-eng imagemagick ghostscript unpaper \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies
