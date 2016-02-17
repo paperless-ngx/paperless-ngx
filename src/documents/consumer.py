@@ -1,15 +1,16 @@
 import datetime
-import glob
+import tempfile
 from multiprocessing.pool import Pool
 
 import itertools
+
 import langdetect
 import os
-import random
 import re
 import subprocess
 
 import pyocr
+import shutil
 
 from PIL import Image
 
@@ -111,34 +112,35 @@ class Consumer(object):
 
             Log.info("Consuming {}".format(doc), Log.COMPONENT_CONSUMER)
 
-            pngs = self._get_greyscale(doc)
+            tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
+            pngs = self._get_greyscale(tempdir, doc)
 
             try:
                 text = self._get_ocr(pngs)
+                self._store(text, doc)
             except OCRError:
                 self._ignore.append(doc)
                 Log.error("OCR FAILURE: {}".format(doc), Log.COMPONENT_CONSUMER)
                 continue
+            finally:
+                self._cleanup(tempdir, doc)
 
-            self._store(text, doc)
-            self._cleanup(pngs, doc)
-
-    def _get_greyscale(self, doc):
+    def _get_greyscale(self, tempdir, doc):
 
         Log.debug(
             "Generating greyscale image from {}".format(doc),
             Log.COMPONENT_CONSUMER
         )
 
-        i = random.randint(1000000, 9999999)
-        png = os.path.join(self.SCRATCH, "{}.png".format(i))
+        png = os.path.join(tempdir, "convert-%04d.jpg")
 
         subprocess.Popen((
             self.CONVERT, "-density", "300", "-depth", "8",
             "-type", "grayscale", doc, png
         )).wait()
 
-        return sorted(glob.glob(os.path.join(self.SCRATCH, "{}*".format(i))))
+        pngs = [os.path.join(tempdir, f) for f in os.listdir(tempdir) if f.startswith("convert")]
+        return sorted(filter(lambda f: os.path.isfile(f), pngs))
 
     @staticmethod
     def _guess_language(text):
@@ -303,14 +305,14 @@ class Consumer(object):
                 Log.debug("Encrypting", Log.COMPONENT_CONSUMER)
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
-    def _cleanup(self, pngs, doc):
+    def _cleanup(self, tempdir, doc):
+        # Remove temporary directory recursively
+        Log.debug("Deleting directory {}".format(tempdir), Log.COMPONENT_CONSUMER)
+        shutil.rmtree(tempdir)
 
-        png_glob = os.path.join(
-            self.SCRATCH, re.sub(r"^.*/(\d+)-\d+.png$", "\\1*", pngs[0]))
-
-        for f in list(glob.glob(png_glob)) + [doc]:
-            Log.debug("Deleting {}".format(f), Log.COMPONENT_CONSUMER)
-            os.unlink(f)
+        # Remove doc
+        Log.debug("Deleting document {}".format(doc), Log.COMPONENT_CONSUMER)
+        os.unlink(doc)
 
     def _is_ready(self, doc):
         """
