@@ -27,7 +27,7 @@ class Log(models.Model):
     component = models.PositiveIntegerField(choices=COMPONENTS)
 
     class Meta(object):
-        ordering = ("time",)
+        ordering = ("-time",)
 
     @classmethod
     def error(cls, message, component):
