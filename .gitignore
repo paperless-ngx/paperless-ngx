@@ -68,6 +68,7 @@ db.sqlite3
 # Other stuff that doesn't belong
 virtualenv
 .vagrant
+docker-compose.yml
 
 # Used for development
 scripts/import-for-development
