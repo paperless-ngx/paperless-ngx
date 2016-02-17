@@ -29,6 +29,9 @@ class Log(models.Model):
     class Meta(object):
         ordering = ("-time",)
 
+    def __str__(self):
+        return self.message
+
     @classmethod
     def error(cls, message, component):
         cls.objects.create(
