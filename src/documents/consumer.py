@@ -132,7 +132,7 @@ class Consumer(object):
             Log.COMPONENT_CONSUMER
         )
 
-        png = os.path.join(tempdir, "convert.png")
+        png = os.path.join(tempdir, "convert-%04d.jpg")
 
         subprocess.Popen((
             self.CONVERT, "-density", "300", "-depth", "8",
