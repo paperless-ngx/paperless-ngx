@@ -273,11 +273,7 @@ class Consumer(object):
     def _store(self, text, doc):
 
         sender, title, tags, file_type = self._guess_attributes_from_name(doc)
-        tags = list(tags)
-
-        lower_text = text.lower()
-        relevant_tags = set(
-            [t for t in Tag.objects.all() if t.matches(lower_text)] + tags)
+        relevant_tags = set(list(Tag.match_all(text)) + list(tags))
 
         stats = os.stat(doc)
 

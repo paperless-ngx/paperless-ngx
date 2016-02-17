@@ -23,9 +23,10 @@ class Command(Renderable, BaseCommand):
         self.verbosity = options["verbosity"]
 
         for document in Document.objects.all():
+
             tags = Tag.objects.exclude(
                 pk__in=document.tags.values_list("pk", flat=True))
-            for tag in tags:
-                if tag.matches(document.content):
-                    print('Tagging {} with "{}"'.format(document, tag))
-                    document.tags.add(tag)
+
+            for tag in Tag.match_all(document.content, tags):
+                print('Tagging {} with "{}"'.format(document, tag))
+                document.tags.add(tag)

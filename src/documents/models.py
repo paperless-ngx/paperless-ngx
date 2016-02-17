@@ -86,7 +86,19 @@ class Tag(SluggedModel):
         return "{}: \"{}\" ({})".format(
             self.name, self.match, self.get_matching_algorithm_display())
 
+    @classmethod
+    def match_all(cls, text, tags=None):
+
+        if tags is None:
+            tags = cls.objects.all()
+
+        text = text.lower()
+        for tag in tags:
+            if tag.matches(text):
+                yield tag
+
     def matches(self, text):
+
         # Check that match is not empty
         if self.match.strip() == "":
             return False
