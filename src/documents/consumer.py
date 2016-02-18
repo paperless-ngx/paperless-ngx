@@ -28,6 +28,9 @@ from .languages import ISO639
 def image_to_string(args):
     self, png, lang = args
     with Image.open(os.path.join(self.SCRATCH, png)) as f:
+        if self.OCR.can_detect_orientation():
+            orientation = self.OCR.detect_orientation(f, lang=lang)
+            f = f.rotate(orientation["angle"], expand=1)
         return self.OCR.image_to_string(f, lang=lang)
 
 
