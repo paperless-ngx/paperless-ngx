@@ -17,6 +17,7 @@ from PIL import Image
 from django.conf import settings
 from django.utils import timezone
 from django.template.defaultfilters import slugify
+from pyocr.tesseract import TesseractError
 
 from logger.models import Log
 from paperless.db import GnuPG
@@ -29,8 +30,11 @@ def image_to_string(args):
     self, png, lang = args
     with Image.open(os.path.join(self.SCRATCH, png)) as f:
         if self.OCR.can_detect_orientation():
-            orientation = self.OCR.detect_orientation(f, lang=lang)
-            f = f.rotate(orientation["angle"], expand=1)
+            try:
+                orientation = self.OCR.detect_orientation(f, lang=lang)
+                f = f.rotate(orientation["angle"], expand=1)
+            except TesseractError:
+                pass
         return self.OCR.image_to_string(f, lang=lang)
 
 
