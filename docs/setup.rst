@@ -156,8 +156,15 @@ Docker Method
        .. _Docker installation guide: https://docs.docker.com/engine/installation/
        .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
-3. Create a copy of ``docker-compose.yml.example`` as ``docker-compose.yml``.
-4. Modify ``docker-compose.env`` and adapt the following environment variables:
+3. Create a copy of ``docker-compose.yml.example`` as ``docker-compose.yml`` and
+   a copy of ``docker-compose.env.example`` as ``docker-compose.env``. You'll be
+   editing both these files: taking a copy ensures that you can ``git pull`` to 
+   receive updates without risking merge conflicts with your modified versions 
+   of the configuration files.
+4. Modify ``docker-compose.yml`` to your preferences, following the instructions
+   in comments in the file. The only change that is a hard requirement is to 
+   specify where the consumption directory should mount.
+5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
    ``PAPERLESS_PASSPHRASE``
      This is the passphrase Paperless uses to encrypt/decrypt the original
@@ -186,9 +193,9 @@ Docker Method
      and thus the one of the consumption directory. Furthermore, you can change
      the id of the default user as well using ``USERMAP_UID``.
 
-5. Run ``docker-compose up -d``. This will create and start the necessary
+6. Run ``docker-compose up -d``. This will create and start the necessary
    containers.
-6. To be able to login, you will need a super user. To create it, execute the
+7. To be able to login, you will need a super user. To create it, execute the
    following command:
 
    .. code-block:: shell-session
@@ -197,11 +204,11 @@ Docker Method
 
    This will prompt you to set a username (default ``paperless``), an optional
    e-mail address and finally a password.
-7. The default ``docker-compose.yml`` exports the webserver on your local port
+8. The default ``docker-compose.yml`` exports the webserver on your local port
    8000. If you haven't adapted this, you should now be able to visit your
    `Paperless webserver`_ at ``http://127.0.0.1:8000``. You can login with the
    user and password you just created.
-8. Add files to consumption directory the way you prefer to. Following are two
+9. Add files to consumption directory the way you prefer to. Following are two
    possible options:
 
    1. Mount the consumption directory to a local host path by modifying your
