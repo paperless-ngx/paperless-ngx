@@ -86,28 +86,40 @@ class Tag(SluggedModel):
         return "{}: \"{}\" ({})".format(
             self.name, self.match, self.get_matching_algorithm_display())
 
+    @classmethod
+    def match_all(cls, text, tags=None):
+
+        if tags is None:
+            tags = cls.objects.all()
+
+        text = text.lower()
+        for tag in tags:
+            if tag.matches(text):
+                yield tag
+
     def matches(self, text):
+
         # Check that match is not empty
         if self.match.strip() == "":
             return False
 
         if self.matching_algorithm == self.MATCH_ALL:
             for word in self.match.split(" "):
-                if word not in text:
+                if not re.search(r"\b{}\b".format(word), text):
                     return False
             return True
 
         if self.matching_algorithm == self.MATCH_ANY:
             for word in self.match.split(" "):
-                if word in text:
+                if re.search(r"\b{}\b".format(word), text):
                     return True
             return False
 
         if self.matching_algorithm == self.MATCH_LITERAL:
-            return self.match in text
+            return bool(re.search(r"\b{}\b".format(self.match), text))
 
         if self.matching_algorithm == self.MATCH_REGEX:
-            return re.search(re.compile(self.match), text)
+            return bool(re.search(re.compile(self.match), text))
 
         raise NotImplementedError("Unsupported matching algorithm")
 

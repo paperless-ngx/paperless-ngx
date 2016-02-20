@@ -23,4 +23,8 @@ class Migration(migrations.Migration):
                 ('component', models.PositiveIntegerField(choices=[(1, 'Consumer'), (2, 'Mail Fetcher')])),
             ],
         ),
+        migrations.AlterModelOptions(
+            name='log',
+            options={'ordering': ('-time',)},
+        ),
     ]
