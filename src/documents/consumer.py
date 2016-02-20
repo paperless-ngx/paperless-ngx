@@ -128,9 +128,11 @@ class Consumer(object):
             except OCRError:
                 self._ignore.append(doc)
                 Log.error("OCR FAILURE: {}".format(doc), Log.COMPONENT_CONSUMER)
+                self._cleanup_tempdir(tempdir)
                 continue
-            finally:
-                self._cleanup(tempdir, doc)
+            else:
+                self._cleanup_tempdir(tempdir)
+                self._cleanup_doc(doc)
 
     def _get_greyscale(self, tempdir, doc):
 
@@ -146,8 +148,12 @@ class Consumer(object):
             "-type", "grayscale", doc, png
         )).wait()
 
-        pngs = [os.path.join(tempdir, f) for f in os.listdir(tempdir) if f.startswith("convert")]
-        return sorted(filter(lambda f: os.path.isfile(f), pngs))
+        pngs = []
+        for f in os.listdir(tempdir):
+            if f.startswith("convert"):
+                pngs.append(os.path.join(tempdir, f))
+
+        return sorted(filter(lambda __: os.path.isfile(__), pngs))
 
     @staticmethod
     def _guess_language(text):
@@ -308,12 +314,13 @@ class Consumer(object):
                 Log.debug("Encrypting", Log.COMPONENT_CONSUMER)
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
-    def _cleanup(self, tempdir, doc):
-        # Remove temporary directory recursively
-        Log.debug("Deleting directory {}".format(tempdir), Log.COMPONENT_CONSUMER)
-        shutil.rmtree(tempdir)
+    @staticmethod
+    def _cleanup_tempdir(d):
+        Log.debug("Deleting directory {}".format(d), Log.COMPONENT_CONSUMER)
+        shutil.rmtree(d)
 
-        # Remove doc
+    @staticmethod
+    def _cleanup_doc(doc):
         Log.debug("Deleting document {}".format(doc), Log.COMPONENT_CONSUMER)
         os.unlink(doc)
 
