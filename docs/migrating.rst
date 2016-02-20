@@ -74,57 +74,37 @@ as JSON is almost as easy:
 
     $ docker-compose run --rm webserver dumpdata documents.Tag > /path/to/arbitrary/place/tags.json
 
-Exporting the documents though is a little more involved, since docker-compose
-doesn't support mounting additional volumes with the ``run`` command. You have
-three general options:
+To export the documents you can either use ``docker run`` directly, specifying all
+the commandline options by hand, or (more simply) mount a second volume for export.
 
-1. Use the consumption directory if you happen to already have it mounted to a
-   host directory.
+To mount a volume for exports, follow the instructions in the
+``docker-compose.yml.example`` file for the ``/export`` volume (making the changes
+in your own ``docker-compose.yml`` file, of course). Once you have the
+volume mounted, the command to run an export is:
 
-   .. code-block:: console
+.. code-block:: console
 
-       $ # Stop the consumer so that it doesn't consume the exported documents
-       $ docker-compose stop consumer
-       $ # Export into the consumption directory
-       $ docker-compose run --rm consumer document_exporter /consume
+   $ docker-compose run --rm consumer document_exporter /export
 
-2. Add another volume to ``docker-compose.yml`` for exports and use
-   ``docker-compose run``:
+If you prefer to use ``docker run`` directly, supplying the necessary commandline
+options:
 
-   .. code-block:: diff
+.. code-block:: shell-session
 
-      diff --git a/docker-compose.yml b/docker-compose.yml
-      --- a/docker-compose.yml
-      +++ b/docker-compose.yml
-      @@ -17,9 +18,8 @@ services:
-               volumes:
-                   - paperless-data:/usr/src/paperless/data
-                   - paperless-media:/usr/src/paperless/media
-                   - /consume
-      +            - /path/to/arbitrary/place:/export
+   $ # Identify your containers
+   $ docker-compose ps
+           Name                       Command                State     Ports
+   -------------------------------------------------------------------------
+   paperless_consumer_1    /sbin/docker-entrypoint.sh ...   Exit 0
+   paperless_webserver_1   /sbin/docker-entrypoint.sh ...   Exit 0
 
-   .. code-block:: shell-session
-
-       $ docker-compose run --rm consumer document_exporter /export
-
-3. Use ``docker run`` directly, supplying the necessary commandline options:
-
-   .. code-block:: shell-session
-
-       $ # Identify your containers
-       $ docker-compose ps
-               Name                       Command                State     Ports
-       -------------------------------------------------------------------------
-       paperless_consumer_1    /sbin/docker-entrypoint.sh ...   Exit 0
-       paperless_webserver_1   /sbin/docker-entrypoint.sh ...   Exit 0
-
-       $ # Make sure to replace your passphrase and remove or adapt the id mapping
-       $ docker run --rm \
-           --volumes-from paperless_data_1 \
-           --volume /path/to/arbitrary/place:/export \
-           -e PAPERLESS_PASSPHRASE=YOUR_PASSPHRASE \
-           -e USERMAP_UID=1000 -e USERMAP_GID=1000 \
-           paperless document_exporter /export
+   $ # Make sure to replace your passphrase and remove or adapt the id mapping
+   $ docker run --rm \
+       --volumes-from paperless_data_1 \
+       --volume /path/to/arbitrary/place:/export \
+       -e PAPERLESS_PASSPHRASE=YOUR_PASSPHRASE \
+       -e USERMAP_UID=1000 -e USERMAP_GID=1000 \
+       paperless document_exporter /export
 
 
 .. _migrating-restoring:
