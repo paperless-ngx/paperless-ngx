@@ -158,7 +158,7 @@ OCR_THREADS = os.environ.get("PAPERLESS_OCR_THREADS")
 FORGIVING_OCR = True
 
 # GNUPG needs a home directory for some reason
-GNUPG_HOME = os.environ.get("HOME", "/dev/null")
+GNUPG_HOME = os.environ.get("HOME", "/tmp")
 
 # Convert is part of the Imagemagick package
 CONVERT_BINARY = "/usr/bin/convert"

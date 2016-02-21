@@ -1,5 +1,6 @@
 Django==1.9
 django-extensions==1.6.1
+djangorestframework==3.3.2
 filemagic==1.6
 langdetect==1.0.5
 Pillow==3.0.0
