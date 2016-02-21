@@ -170,7 +170,8 @@ SCRATCH_DIR = "/tmp/paperless"
 CONSUMPTION_DIR = os.environ.get("PAPERLESS_CONSUME")
 
 # If you want to use IMAP mail consumption, populate this with useful values.
-# If you leave HOST set to None, we assume you're not going to use this feature.
+# If you leave HOST set to None, we assume you're not going to use this
+# feature.
 MAIL_CONSUMPTION = {
     "HOST": os.environ.get("PAPERLESS_CONSUME_MAIL_HOST"),
     "PORT": os.environ.get("PAPERLESS_CONSUME_MAIL_PORT"),
@@ -180,8 +181,8 @@ MAIL_CONSUMPTION = {
     "INBOX": "INBOX"  # The name of the inbox on the server
 }
 
-# This is used to encrypt the original documents and decrypt them later when you
-# want to download them.  Set it and change the permissions on this file to
+# This is used to encrypt the original documents and decrypt them later when
+# you want to download them.  Set it and change the permissions on this file to
 # 0600, or set it to `None` and you'll be prompted for the passphrase at
 # runtime.  The default looks for an environment variable.
 # DON'T FORGET TO SET THIS as leaving it blank may cause some strange things
@@ -189,7 +190,7 @@ MAIL_CONSUMPTION = {
 # files.
 PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
 
-# If you intend to use the "API" to push files into the consumer, you'll need to
-# provide a shared secret here.  Leaving this as the default will disable the
-# API.
+# If you intend to use the "API" to push files into the consumer, you'll need
+# to provide a shared secret here.  Leaving this as the default will disable
+# the API.
 UPLOAD_SHARED_SECRET = os.environ.get("PAPERLESS_SECRET", "")
