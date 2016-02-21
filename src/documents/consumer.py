@@ -26,18 +26,6 @@ from .models import Sender, Tag, Document
 from .languages import ISO639
 
 
-def image_to_string(args):
-    self, png, lang = args
-    with Image.open(os.path.join(self.SCRATCH, png)) as f:
-        if self.OCR.can_detect_orientation():
-            try:
-                orientation = self.OCR.detect_orientation(f, lang=lang)
-                f = f.rotate(orientation["angle"], expand=1)
-            except TesseractError:
-                pass
-        return self.OCR.image_to_string(f, lang=lang)
-
-
 class OCRError(Exception):
     pass
 
@@ -61,7 +49,6 @@ class Consumer(object):
     CONSUME = settings.CONSUMPTION_DIR
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
 
-    OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
 
     REGEX_TITLE = re.compile(
@@ -239,11 +226,23 @@ class Consumer(object):
 
         with Pool(processes=self.THREADS) as pool:
             r = pool.map(
-                image_to_string, itertools.product([self], pngs, [lang]))
+                self.image_to_string, itertools.product(pngs, [lang]))
             r = " ".join(r)
 
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)
+
+    def image_to_string(self, args):
+        png, lang = args
+        ocr = pyocr.get_available_tools()[0]
+        with Image.open(os.path.join(self.SCRATCH, png)) as f:
+            if ocr.can_detect_orientation():
+                try:
+                    orientation = ocr.detect_orientation(f, lang=lang)
+                    f = f.rotate(orientation["angle"], expand=1)
+                except TesseractError:
+                    pass
+            return ocr.image_to_string(f, lang=lang)
 
     def _guess_attributes_from_name(self, parseable):
         """

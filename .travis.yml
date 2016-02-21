@@ -8,7 +8,8 @@ matrix:
           env: TOXENV=py34
         - python: 3.5
           env: TOXENV=py35
-        - env: TOXENV=pep8
+        - python: 3.5
+          env: TOXENV=pep8
 
 install:
     - pip install --requirement requirements.txt
