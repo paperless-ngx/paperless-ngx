@@ -33,9 +33,9 @@ urlpatterns = [
     # API
     url(
         r"^api/auth/",
-        include('rest_framework.urls', namespace='rest_framework')
+        include('rest_framework.urls', namespace="rest_framework")
     ),
-    url(r"^api/", include(router.urls)),
+    url(r"^api/", include(router.urls, namespace="drf")),
 
     # File downloads
     url(r"^fetch/(?P<pk>\d+)$", PdfView.as_view(), name="fetch"),

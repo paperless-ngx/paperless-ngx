@@ -3,6 +3,7 @@ from django.template.defaultfilters import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, DetailView
 
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 
 from paperless.db import GnuPG
@@ -57,16 +58,28 @@ class PushView(FormView):
         return HttpResponse("0")
 
 
+class StandardPagination(PageNumberPagination):
+    page_size = 25
+    page_size_query_param = "page-size"
+    max_page_size = 100000
+
+
 class SenderViewSet(ModelViewSet):
     model = Sender
+    queryset = Sender.objects.all()
     serializer_class = SenderSerializer
+    pagination_class = StandardPagination
 
 
 class TagViewSet(ModelViewSet):
     model = Tag
+    queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = StandardPagination
 
 
 class DocumentViewSet(ModelViewSet):
     model = Document
+    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
+    pagination_class = StandardPagination

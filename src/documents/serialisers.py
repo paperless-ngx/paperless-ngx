@@ -3,14 +3,14 @@ from rest_framework import serializers
 from .models import Sender, Tag, Document
 
 
-class SenderSerializer(serializers.ModelSerializer):
+class SenderSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta(object):
         model = Sender
         fields = ("id", "slug", "name")
 
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta(object):
         model = Tag
@@ -20,8 +20,10 @@ class TagSerializer(serializers.ModelSerializer):
 
 class DocumentSerializer(serializers.ModelSerializer):
 
-    sender = serializers.HyperlinkedModelSerializer(read_only=True)
-    tags = serializers.HyperlinkedModelSerializer(read_only=True)
+    sender = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="drf:sender-detail", allow_null=True)
+    tags = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name="drf:tag-detail", many=True)
 
     class Meta(object):
         model = Document
