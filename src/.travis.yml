@@ -1,0 +1,10 @@
+language: python
+sudo: false
+env:
+  - TOXENV=py34
+  - TOXENV=py35
+  - TOXENV=pep8
+install:
+  - pip install --requirement ../requirements.txt
+  - pip install tox
+script: tox
