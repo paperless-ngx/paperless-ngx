@@ -1,7 +1,7 @@
 class Renderable(object):
     """
-    A handy mixin to make it easier/cleaner to print output based on a verbosity
-    value.
+    A handy mixin to make it easier/cleaner to print output based on a
+    verbosity value.
     """
 
     def _render(self, text, verbosity):

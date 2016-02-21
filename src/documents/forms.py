@@ -26,15 +26,17 @@ class UploadForm(forms.Form):
     sender = forms.CharField(
         max_length=Sender._meta.get_field("name").max_length, required=False)
     title = forms.CharField(
-        max_length=Document._meta.get_field("title").max_length, required=False)
+        max_length=Document._meta.get_field("title").max_length,
+        required=False
+    )
     document = forms.FileField()
     signature = forms.CharField(max_length=256)
 
     def clean_sender(self):
         """
         I suppose it might look cleaner to use .get_or_create() here, but that
-        would also allow someone to fill up the db with bogus senders before all
-        validation was met.
+        would also allow someone to fill up the db with bogus senders before
+        all validation was met.
         """
         sender = self.cleaned_data.get("sender")
         if not sender:

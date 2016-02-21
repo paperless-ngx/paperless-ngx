@@ -185,8 +185,8 @@ ISO639 = {
     "yo": "yor",
     "za": "zha",
 
-    # Tessdata contains two values for Chinese, "chi_sim" and "chi_tra".  I have
-    # no idea which one is better, so I just picked the bigger file.
+    # Tessdata contains two values for Chinese, "chi_sim" and "chi_tra".  I
+    # have no idea which one is better, so I just picked the bigger file.
     "zh": "chi_tra",
 
     "zu": "zul"

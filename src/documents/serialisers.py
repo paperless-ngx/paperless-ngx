@@ -14,7 +14,8 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = Tag
-        fields = ("id", "slug", "name", "colour", "match", "matching_algorithm")
+        fields = (
+            "id", "slug", "name", "colour", "match", "matching_algorithm")
 
 
 class DocumentSerializer(serializers.ModelSerializer):

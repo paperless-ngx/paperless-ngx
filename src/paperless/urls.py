@@ -29,10 +29,20 @@ router.register(r'tags', TagViewSet)
 router.register(r'documents', DocumentViewSet)
 
 urlpatterns = [
-    url(r"^api/auth/", include('rest_framework.urls', namespace='rest_framework')),
+
+    # API
+    url(
+        r"^api/auth/",
+        include('rest_framework.urls', namespace='rest_framework')
+    ),
     url(r"^api/", include(router.urls)),
+
+    # File downloads
     url(r"^fetch/(?P<pk>\d+)$", PdfView.as_view(), name="fetch"),
+
+    # The Django admin
     url(r"", admin.site.urls),
+
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.UPLOAD_SHARED_SECRET:

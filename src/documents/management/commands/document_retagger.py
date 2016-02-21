@@ -10,8 +10,8 @@ class Command(Renderable, BaseCommand):
     help = """
         Using the current set of tagging rules, apply said rules to all
         documents in the database, effectively allowing you to back-tag all
-        previously indexed documents with tags created (or modified) after their
-        initial import.
+        previously indexed documents with tags created (or modified) after
+        their initial import.
     """.replace("    ", "")
 
     def __init__(self, *args, **kwargs):

@@ -117,4 +117,3 @@ class TestTagMatching(TestCase):
         self.assertFalse(t.matches("I have alpha, charlie, and gamma in me"))
         self.assertFalse(t.matches("I have alphas, charlie, and gamma in me"))
         self.assertFalse(t.matches("I have alphas in me"))
-

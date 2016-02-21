@@ -127,7 +127,8 @@ class Consumer(object):
                 self._store(text, doc)
             except OCRError:
                 self._ignore.append(doc)
-                Log.error("OCR FAILURE: {}".format(doc), Log.COMPONENT_CONSUMER)
+                Log.error(
+                    "OCR FAILURE: {}".format(doc), Log.COMPONENT_CONSUMER)
                 self._cleanup_tempdir(tempdir)
                 continue
             else:
@@ -190,8 +191,8 @@ class Consumer(object):
             Log.warning("Language detection failed!", Log.COMPONENT_CONSUMER)
             if settings.FORGIVING_OCR:
                 Log.warning(
-                    "As FORGIVING_OCR is enabled, we're going to make the best "
-                    "with what we have.",
+                    "As FORGIVING_OCR is enabled, we're going to make the "
+                    "best with what we have.",
                     Log.COMPONENT_CONSUMER
                 )
                 raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
@@ -246,8 +247,8 @@ class Consumer(object):
 
     def _guess_attributes_from_name(self, parseable):
         """
-        We use a crude naming convention to make handling the sender, title, and
-        tags easier:
+        We use a crude naming convention to make handling the sender, title,
+        and tags easier:
           "<sender> - <title> - <tags>.<suffix>"
           "<sender> - <title>.<suffix>"
           "<title>.<suffix>"

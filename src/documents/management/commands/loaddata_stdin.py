@@ -13,7 +13,7 @@ from django.core.management.commands.loaddata import Command as LoadDataCommand
 
 class Command(LoadDataCommand):
     def parse_name(self, fixture_name):
-        self.compression_formats['stdin'] = (lambda x,y: sys.stdin, None)
+        self.compression_formats['stdin'] = (lambda x, y: sys.stdin, None)
         if fixture_name == '-':
             return '-', 'json', 'stdin'
 

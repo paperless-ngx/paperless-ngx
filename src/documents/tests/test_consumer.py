@@ -4,10 +4,10 @@ from ..consumer import Consumer
 
 
 class TestAttachment(TestCase):
-    
+
     TAGS = ("tag1", "tag2", "tag3")
     CONSUMER = Consumer()
-    
+
     def _test_guess_attributes_from_name(self, path, sender, title, tags):
         for suffix in ("pdf", "png", "jpg", "jpeg", "gif"):
             f = path.format(suffix)
