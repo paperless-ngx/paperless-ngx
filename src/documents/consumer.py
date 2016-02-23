@@ -264,6 +264,12 @@ class Consumer(object):
                     Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
             return tuple(r)
 
+        def get_suffix(suffix):
+            suffix = suffix.lower()
+            if suffix == "jpeg":
+                return "jpg"
+            return suffix
+
         # First attempt: "<sender> - <title> - <tags>.<suffix>"
         m = re.match(self.REGEX_SENDER_TITLE_TAGS, parseable)
         if m:
@@ -271,17 +277,22 @@ class Consumer(object):
                 get_sender(m.group(1)),
                 m.group(2),
                 get_tags(m.group(3)),
-                m.group(4)
+                get_suffix(m.group(4))
             )
 
         # Second attempt: "<sender> - <title>.<suffix>"
         m = re.match(self.REGEX_SENDER_TITLE, parseable)
         if m:
-            return get_sender(m.group(1)), m.group(2), (), m.group(3)
+            return (
+                get_sender(m.group(1)),
+                m.group(2),
+                (),
+                get_suffix(m.group(3))
+            )
 
         # That didn't work, so we assume sender and tags are None
         m = re.match(self.REGEX_TITLE, parseable)
-        return None, m.group(1), (), m.group(2)
+        return None, m.group(1), (), get_suffix(m.group(2))
 
     def _store(self, text, doc):
 

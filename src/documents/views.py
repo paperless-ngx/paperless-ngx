@@ -13,7 +13,7 @@ from .models import Sender, Tag, Document
 from .serialisers import SenderSerializer, TagSerializer, DocumentSerializer
 
 
-class PdfView(DetailView):
+class FetchView(DetailView):
 
     model = Document
 

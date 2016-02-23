@@ -21,7 +21,7 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from documents.views import (
-    PdfView, PushView, SenderViewSet, TagViewSet, DocumentViewSet)
+    FetchView, PushView, SenderViewSet, TagViewSet, DocumentViewSet)
 
 router = DefaultRouter()
 router.register(r'senders', SenderViewSet)
@@ -38,7 +38,7 @@ urlpatterns = [
     url(r"^api/", include(router.urls, namespace="drf")),
 
     # File downloads
-    url(r"^fetch/(?P<pk>\d+)$", PdfView.as_view(), name="fetch"),
+    url(r"^fetch/(?P<pk>\d+)$", FetchView.as_view(), name="fetch"),
 
     # The Django admin
     url(r"", admin.site.urls),
