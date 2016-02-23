@@ -7,15 +7,23 @@ class TestAttachment(TestCase):
 
     TAGS = ("tag1", "tag2", "tag3")
     CONSUMER = Consumer()
+    SUFFIXES = (
+        "pdf", "png", "jpg", "jpeg", "gif",
+        "PDF", "PNG", "JPG", "JPEG", "GIF",
+        "PdF", "PnG", "JpG", "JPeG", "GiF",
+    )
 
     def _test_guess_attributes_from_name(self, path, sender, title, tags):
-        for suffix in ("pdf", "png", "jpg", "jpeg", "gif"):
+        for suffix in self.SUFFIXES:
             f = path.format(suffix)
             results = self.CONSUMER._guess_attributes_from_name(f)
             self.assertEqual(results[0].name, sender, f)
             self.assertEqual(results[1], title, f)
             self.assertEqual(tuple([t.slug for t in results[2]]), tags, f)
-            self.assertEqual(results[3], suffix, f)
+            if suffix.lower() == "jpeg":
+                self.assertEqual(results[3], "jpg", f)
+            else:
+                self.assertEqual(results[3], suffix.lower(), f)
 
     def test_guess_attributes_from_name0(self):
         self._test_guess_attributes_from_name(
