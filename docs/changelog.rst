@@ -1,6 +1,11 @@
 Changelog
 #########
 
+* 0.1.1 (master)
+
+  * `#53`_: Fixed an annoying bug that caused ``.jpeg`` and ``.JPG`` images
+    to be imported but made unavailable.
+
 * 0.1.0
 
   * Docker support!  Big thanks to `Wayne Werner`_, `Brian Conn`_, and
@@ -65,5 +70,6 @@ Changelog
 .. _#45: https://github.com/danielquinn/paperless/issues/45
 .. _#47: https://github.com/danielquinn/paperless/issues/47
 .. _#48: https://github.com/danielquinn/paperless/issues/48
+.. _#53: https://github.com/danielquinn/paperless/issues/53
 .. _#54: https://github.com/danielquinn/paperless/issues/54
 .. _#57: https://github.com/danielquinn/paperless/issues/57
