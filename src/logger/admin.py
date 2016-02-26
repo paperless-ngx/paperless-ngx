@@ -5,7 +5,7 @@ from .models import Log
 
 class LogAdmin(admin.ModelAdmin):
 
-    list_display = ("message", "level", "component")
+    list_display = ("message", "time", "level", "component")
     list_filter = ("level", "component",)
 
 
