@@ -1,9 +1,9 @@
-Django==1.9
+Django==1.9.2
 django-extensions==1.6.1
 djangorestframework==3.3.2
 filemagic==1.6
 langdetect==1.0.5
-Pillow==3.0.0
+Pillow==3.1.1
 pyocr==0.3.1
 python-dateutil==2.4.2
 python-gnupg==0.3.8
