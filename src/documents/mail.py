@@ -1,8 +1,10 @@
 import datetime
 import imaplib
+import logging
 import os
 import re
 import time
+import uuid
 
 from base64 import b64decode
 from email import policy
@@ -11,10 +13,8 @@ from dateutil import parser
 
 from django.conf import settings
 
-from logger.models import Log
-
 from .consumer import Consumer
-from .models import Sender
+from .models import Sender, Log
 
 
 class MailFetcherError(Exception):
@@ -25,7 +25,20 @@ class InvalidMessageError(Exception):
     pass
 
 
-class Message(object):
+class Loggable(object):
+
+    def __init__(self, group=None):
+        self.logger = logging.getLogger(__name__)
+        self.logging_group = group or uuid.uuid4()
+
+    def log(self, level, message):
+        getattr(self.logger, level)(message, extra={
+            "group": self.logging_group,
+            "component": Log.COMPONENT_MAIL
+        })
+
+
+class Message(Loggable):
     """
     A crude, but simple email message class.  We assume that there's a subject
     and n attachments, and that we don't care about the message body.
@@ -33,13 +46,13 @@ class Message(object):
 
     SECRET = settings.UPLOAD_SHARED_SECRET
 
-    def __init__(self, data, verbosity=1):
+    def __init__(self, data, group=None):
         """
         Cribbed heavily from
         https://www.ianlewis.org/en/parsing-email-attachments-python
         """
 
-        self.verbosity = verbosity
+        Loggable.__init__(self, group=group)
 
         self.subject = None
         self.time = None
@@ -54,8 +67,7 @@ class Message(object):
 
         self._set_time(message)
 
-        Log.info(
-            'Importing email: "{}"'.format(self.subject), Log.COMPONENT_MAIL)
+        self.log("info", 'Importing email: "{}"'.format(self.subject))
 
         attachments = []
         for part in message.walk():
@@ -134,9 +146,11 @@ class Attachment(object):
         return self.data
 
 
-class MailFetcher(object):
+class MailFetcher(Loggable):
 
-    def __init__(self, verbosity=1):
+    def __init__(self):
+
+        Loggable.__init__(self)
 
         self._connection = None
         self._host = settings.MAIL_CONSUMPTION["HOST"]
@@ -148,7 +162,6 @@ class MailFetcher(object):
         self._enabled = bool(self._host)
 
         self.last_checked = datetime.datetime.now()
-        self.verbosity = verbosity
 
     def pull(self):
         """
@@ -159,14 +172,11 @@ class MailFetcher(object):
 
         if self._enabled:
 
-            Log.info("Checking mail", Log.COMPONENT_MAIL)
+            self.log("info", "Checking mail")
 
             for message in self._get_messages():
 
-                Log.debug(
-                    'Storing email: "{}"'.format(message.subject),
-                    Log.COMPONENT_MAIL
-                )
+                self.log("info", 'Storing email: "{}"'.format(message.subject))
 
                 t = int(time.mktime(message.time.timetuple()))
                 file_name = os.path.join(Consumer.CONSUME, message.file_name)
@@ -193,7 +203,7 @@ class MailFetcher(object):
             self._connection.logout()
 
         except Exception as e:
-            Log.error(e, Log.COMPONENT_MAIL)
+            self.log("error", str(e))
 
         return r
 
@@ -218,9 +228,9 @@ class MailFetcher(object):
 
             message = None
             try:
-                message = Message(data[0][1], self.verbosity)
+                message = Message(data[0][1], self.logging_group)
             except InvalidMessageError as e:
-                Log.error(e, Log.COMPONENT_MAIL)
+                self.log("error", str(e))
             else:
                 self._connection.store(num, "+FLAGS", "\\Deleted")
 

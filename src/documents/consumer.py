@@ -1,5 +1,8 @@
 import datetime
+import logging
 import tempfile
+import uuid
+
 from multiprocessing.pool import Pool
 
 import itertools
@@ -19,10 +22,9 @@ from django.utils import timezone
 from django.template.defaultfilters import slugify
 from pyocr.tesseract import TesseractError
 
-from logger.models import Log
 from paperless.db import GnuPG
 
-from .models import Sender, Tag, Document
+from .models import Sender, Tag, Document, Log
 from .languages import ISO639
 
 
@@ -67,6 +69,8 @@ class Consumer(object):
     def __init__(self, verbosity=1):
 
         self.verbosity = verbosity
+        self.logger = logging.getLogger(__name__)
+        self.logging_group = None
 
         try:
             os.makedirs(self.SCRATCH)
@@ -86,6 +90,12 @@ class Consumer(object):
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(self.CONSUME))
 
+    def log(self, level, message):
+        getattr(self.logger, level)(message, extra={
+            "group": self.logging_group,
+            "component": Log.COMPONENT_CONSUMER
+        })
+
     def consume(self):
 
         for doc in os.listdir(self.CONSUME):
@@ -104,7 +114,9 @@ class Consumer(object):
             if self._is_ready(doc):
                 continue
 
-            Log.info("Consuming {}".format(doc), Log.COMPONENT_CONSUMER)
+            self.logging_group = uuid.uuid4()
+
+            self.log("info", "Consuming {}".format(doc))
 
             tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
             pngs = self._get_greyscale(tempdir, doc)
@@ -114,8 +126,7 @@ class Consumer(object):
                 self._store(text, doc)
             except OCRError:
                 self._ignore.append(doc)
-                Log.error(
-                    "OCR FAILURE: {}".format(doc), Log.COMPONENT_CONSUMER)
+                self.log("error", "OCR FAILURE: {}".format(doc))
                 self._cleanup_tempdir(tempdir)
                 continue
             else:
@@ -124,10 +135,7 @@ class Consumer(object):
 
     def _get_greyscale(self, tempdir, doc):
 
-        Log.debug(
-            "Generating greyscale image from {}".format(doc),
-            Log.COMPONENT_CONSUMER
-        )
+        self.log("info", "Generating greyscale image from {}".format(doc))
 
         png = os.path.join(tempdir, "convert-%04d.jpg")
 
@@ -143,18 +151,13 @@ class Consumer(object):
 
         return sorted(filter(lambda __: os.path.isfile(__), pngs))
 
-    @staticmethod
-    def _guess_language(text):
+    def _guess_language(self, text):
         try:
             guess = langdetect.detect(text)
-            Log.debug(
-                "Language detected: {}".format(guess),
-                Log.COMPONENT_CONSUMER
-            )
+            self.log("debug", "Language detected: {}".format(guess))
             return guess
         except Exception as e:
-            Log.warning(
-                "Language detection error: {}".format(e), Log.COMPONENT_MAIL)
+            self.log("warning", "Language detection error: {}".format(e))
 
     def _get_ocr(self, pngs):
         """
@@ -165,7 +168,7 @@ class Consumer(object):
         if not pngs:
             raise OCRError
 
-        Log.debug("OCRing the document", Log.COMPONENT_CONSUMER)
+        self.log("info", "OCRing the document")
 
         # Since the division gets rounded down by int, this calculation works
         # for every edge-case, i.e. 1
@@ -175,12 +178,12 @@ class Consumer(object):
         guessed_language = self._guess_language(raw_text)
 
         if not guessed_language or guessed_language not in ISO639:
-            Log.warning("Language detection failed!", Log.COMPONENT_CONSUMER)
+            self.log("warning", "Language detection failed!")
             if settings.FORGIVING_OCR:
-                Log.warning(
+                self.log(
+                    "warning",
                     "As FORGIVING_OCR is enabled, we're going to make the "
-                    "best with what we have.",
-                    Log.COMPONENT_CONSUMER
+                    "best with what we have."
                 )
                 raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
                 return raw_text
@@ -194,12 +197,12 @@ class Consumer(object):
             return self._ocr(pngs, ISO639[guessed_language])
         except pyocr.pyocr.tesseract.TesseractError:
             if settings.FORGIVING_OCR:
-                Log.warning(
+                self.log(
+                    "warning",
                     "OCR for {} failed, but we're going to stick with what "
                     "we've got since FORGIVING_OCR is enabled.".format(
                         guessed_language
-                    ),
-                    Log.COMPONENT_CONSUMER
+                    )
                 )
                 raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
                 return raw_text
@@ -222,27 +225,14 @@ class Consumer(object):
         if not pngs:
             return ""
 
-        Log.debug("Parsing for {}".format(lang), Log.COMPONENT_CONSUMER)
+        self.log("info", "Parsing for {}".format(lang))
 
         with Pool(processes=self.THREADS) as pool:
-            r = pool.map(
-                self.image_to_string, itertools.product(pngs, [lang]))
+            r = pool.map(image_to_string, itertools.product(pngs, [lang]))
             r = " ".join(r)
 
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)
-
-    def image_to_string(self, args):
-        png, lang = args
-        ocr = pyocr.get_available_tools()[0]
-        with Image.open(os.path.join(self.SCRATCH, png)) as f:
-            if ocr.can_detect_orientation():
-                try:
-                    orientation = ocr.detect_orientation(f, lang=lang)
-                    f = f.rotate(orientation["angle"], expand=1)
-                except TesseractError:
-                    pass
-            return ocr.image_to_string(f, lang=lang)
 
     def _guess_attributes_from_name(self, parseable):
         """
@@ -301,7 +291,7 @@ class Consumer(object):
 
         stats = os.stat(doc)
 
-        Log.debug("Saving record to database", Log.COMPONENT_CONSUMER)
+        self.log("debug", "Saving record to database")
 
         document = Document.objects.create(
             sender=sender,
@@ -316,23 +306,22 @@ class Consumer(object):
 
         if relevant_tags:
             tag_names = ", ".join([t.slug for t in relevant_tags])
-            Log.debug(
-                "Tagging with {}".format(tag_names), Log.COMPONENT_CONSUMER)
+            self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
         with open(doc, "rb") as unencrypted:
             with open(document.source_path, "wb") as encrypted:
-                Log.debug("Encrypting", Log.COMPONENT_CONSUMER)
+                self.log("debug", "Encrypting")
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
-    @staticmethod
-    def _cleanup_tempdir(d):
-        Log.debug("Deleting directory {}".format(d), Log.COMPONENT_CONSUMER)
+        self.log("info", "Completed")
+
+    def _cleanup_tempdir(self, d):
+        self.log("debug", "Deleting directory {}".format(d))
         shutil.rmtree(d)
 
-    @staticmethod
-    def _cleanup_doc(doc):
-        Log.debug("Deleting document {}".format(doc), Log.COMPONENT_CONSUMER)
+    def _cleanup_doc(self, doc):
+        self.log("debug", "Deleting document {}".format(doc))
         os.unlink(doc)
 
     def _is_ready(self, doc):
@@ -350,3 +339,23 @@ class Consumer(object):
         self.stats[doc] = t
 
         return False
+
+
+def image_to_string(args):
+    """
+    I have no idea why, but if this function were a method of Consumer, it
+    would explode with:
+
+      `TypeError: cannot serialize '_io.TextIOWrapper' object`.
+    """
+
+    png, lang = args
+    ocr = pyocr.get_available_tools()[0]
+    with Image.open(os.path.join(Consumer.SCRATCH, png)) as f:
+        if ocr.can_detect_orientation():
+            try:
+                orientation = ocr.detect_orientation(f, lang=lang)
+                f = f.rotate(orientation["angle"], expand=1)
+            except TesseractError:
+                pass
+        return ocr.image_to_string(f, lang=lang)

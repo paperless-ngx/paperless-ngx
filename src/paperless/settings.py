@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     "django_extensions",
 
     "documents",
-    "logger",
 
     "rest_framework",
 
@@ -89,12 +88,12 @@ DATABASES = {
         "NAME": os.path.join(BASE_DIR, "..", "data", "db.sqlite3"),
     }
 }
-if os.environ.get("PAPERLESS_DBUSER") and os.environ.get("PAPERLESS_DBPASS"):
+if os.getenv("PAPERLESS_DBUSER") and os.getenv("PAPERLESS_DBPASS"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("PAPERLESS_DBNAME", "paperless"),
-        "USER": os.environ.get("PAPERLESS_DBUSER"),
-        "PASSWORD": os.environ.get("PAPERLESS_DBPASS")
+        "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
+        "USER": os.getenv("PAPERLESS_DBUSER"),
+        "PASSWORD": os.getenv("PAPERLESS_DBPASS")
     }
 
 
@@ -141,6 +140,25 @@ STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 
 
+# Logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "consumer": {
+            "class": "documents.loggers.PaperlessLogger",
+        }
+    },
+    "loggers": {
+        "documents": {
+            "handlers": ["consumer"],
+            "level": os.getenv("PAPERLESS_CONSUMER_LOG_LEVEL", "INFO"),
+        },
+    },
+}
+
+
 # Paperless-specific stuffs
 # Change these paths if yours are different
 # ----------------------------------------------------------------------------
@@ -150,15 +168,15 @@ MEDIA_URL = "/media/"
 OCR_LANGUAGE = "eng"
 
 # The amount of threads to use for OCR
-OCR_THREADS = os.environ.get("PAPERLESS_OCR_THREADS")
+OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
 
-# If this is true, any failed attempts to OCR a PDF will result in the PDF being
-# indexed anyway, with whatever we could get.  If it's False, the file will
-# simply be left in the CONSUMPTION_DIR.
+# If this is true, any failed attempts to OCR a PDF will result in the PDF
+# being indexed anyway, with whatever we could get.  If it's False, the file
+# will simply be left in the CONSUMPTION_DIR.
 FORGIVING_OCR = True
 
 # GNUPG needs a home directory for some reason
-GNUPG_HOME = os.environ.get("HOME", "/tmp")
+GNUPG_HOME = os.getenv("HOME", "/tmp")
 
 # Convert is part of the Imagemagick package
 CONVERT_BINARY = "/usr/bin/convert"
@@ -167,16 +185,16 @@ CONVERT_BINARY = "/usr/bin/convert"
 SCRATCH_DIR = "/tmp/paperless"
 
 # This is where Paperless will look for PDFs to index
-CONSUMPTION_DIR = os.environ.get("PAPERLESS_CONSUME")
+CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUME")
 
 # If you want to use IMAP mail consumption, populate this with useful values.
 # If you leave HOST set to None, we assume you're not going to use this
 # feature.
 MAIL_CONSUMPTION = {
-    "HOST": os.environ.get("PAPERLESS_CONSUME_MAIL_HOST"),
-    "PORT": os.environ.get("PAPERLESS_CONSUME_MAIL_PORT"),
-    "USERNAME": os.environ.get("PAPERLESS_CONSUME_MAIL_USER"),
-    "PASSWORD": os.environ.get("PAPERLESS_CONSUME_MAIL_PASS"),
+    "HOST": os.getenv("PAPERLESS_CONSUME_MAIL_HOST"),
+    "PORT": os.getenv("PAPERLESS_CONSUME_MAIL_PORT"),
+    "USERNAME": os.getenv("PAPERLESS_CONSUME_MAIL_USER"),
+    "PASSWORD": os.getenv("PAPERLESS_CONSUME_MAIL_PASS"),
     "USE_SSL": True,  # If True, use SSL/TLS to connect
     "INBOX": "INBOX"  # The name of the inbox on the server
 }
@@ -188,9 +206,9 @@ MAIL_CONSUMPTION = {
 # DON'T FORGET TO SET THIS as leaving it blank may cause some strange things
 # with GPG, including an interesting case where it may "encrypt" zero-byte
 # files.
-PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
+PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 
 # If you intend to use the "API" to push files into the consumer, you'll need
 # to provide a shared secret here.  Leaving this as the default will disable
 # the API.
-UPLOAD_SHARED_SECRET = os.environ.get("PAPERLESS_SECRET", "")
+UPLOAD_SHARED_SECRET = os.getenv("PAPERLESS_SECRET", "")
