@@ -27,7 +27,7 @@ class TestMessage(TestCase):
 
         with open(self.sample, "rb") as f:
 
-            message = Message(f.read(), verbosity=0)
+            message = Message(f.read())
 
             self.assertTrue(message)
             self.assertEqual(message.subject, "Test 0")
