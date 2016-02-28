@@ -34,7 +34,7 @@ class Command(BaseCommand):
         self.verbosity = options["verbosity"]
 
         try:
-            self.file_consumer = Consumer(verbosity=self.verbosity)
+            self.file_consumer = Consumer()
             self.mail_fetcher = MailFetcher()
         except (ConsumerError, MailFetcherError) as e:
             raise CommandError(e)

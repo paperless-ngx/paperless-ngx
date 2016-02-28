@@ -66,9 +66,8 @@ class Consumer(object):
         flags=re.IGNORECASE
     )
 
-    def __init__(self, verbosity=1):
+    def __init__(self):
 
-        self.verbosity = verbosity
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
