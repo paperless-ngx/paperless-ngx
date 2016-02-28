@@ -3,6 +3,7 @@ import os
 import magic
 
 from hashlib import md5
+from unittest import mock
 
 from django.conf import settings
 from django.test import TestCase
@@ -27,7 +28,8 @@ class TestMessage(TestCase):
 
         with open(self.sample, "rb") as f:
 
-            message = Message(f.read())
+            with mock.patch("logging.StreamHandler.emit") as __:
+                message = Message(f.read())
 
             self.assertTrue(message)
             self.assertEqual(message.subject, "Test 0")
