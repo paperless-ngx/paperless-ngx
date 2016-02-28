@@ -172,6 +172,9 @@ class MailFetcher(Loggable):
 
         if self._enabled:
 
+            # Reset the grouping id for each fetch
+            self.logging_group = uuid.uuid4()
+
             self.log("info", "Checking mail")
 
             for message in self._get_messages():
