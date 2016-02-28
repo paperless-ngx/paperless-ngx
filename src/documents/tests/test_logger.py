@@ -137,6 +137,6 @@ class TestPaperlessLog(TestCase):
 
         self.assertEqual(Log.objects.all().by_group().count(), 1)
         self.assertEqual(
-            Log.objects.all().by_group()[0]["Messages"],
+            Log.objects.all().by_group()[0]["messages"],
             "Message 0\nMessage 1\nMessage 2\nMessage 3"
         )
