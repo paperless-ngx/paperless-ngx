@@ -122,3 +122,21 @@ class TestPaperlessLog(TestCase):
             self.logger.critical("This is a critical message", extra=kw1)
             self.assertEqual(Log.objects.all().count(), 4)
             self.assertEqual(Log.objects.filter(component=c1).count(), 2)
+
+    def test_groupped_query(self):
+
+        kw = {
+            "group": uuid.uuid4(),
+            "component": Log.COMPONENT_MAIL
+        }
+        with mock.patch("logging.StreamHandler.emit") as __:
+            self.logger.info("Message 0", extra=kw)
+            self.logger.info("Message 1", extra=kw)
+            self.logger.info("Message 2", extra=kw)
+            self.logger.info("Message 3", extra=kw)
+
+        self.assertEqual(Log.objects.all().by_group().count(), 1)
+        self.assertEqual(
+            Log.objects.all().by_group()[0]["Messages"],
+            "Message 0\nMessage 1\nMessage 2\nMessage 3"
+        )
