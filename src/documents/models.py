@@ -8,6 +8,8 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 
+from .managers import LogManager
+
 
 class SluggedModel(models.Model):
 
@@ -213,6 +215,8 @@ class Log(models.Model):
     component = models.PositiveIntegerField(choices=COMPONENTS)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    objects = LogManager()
 
     class Meta(object):
         ordering = ("-modified",)
