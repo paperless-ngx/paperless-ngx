@@ -3,6 +3,7 @@ Changelog
 
 * 0.1.1 (master)
 
+  * `#60`_: Setup logging to actually use the Python native logging framework.
   * `#53`_: Fixed an annoying bug that caused ``.jpeg`` and ``.JPG`` images
     to be imported but made unavailable.
 
@@ -73,3 +74,4 @@ Changelog
 .. _#53: https://github.com/danielquinn/paperless/issues/53
 .. _#54: https://github.com/danielquinn/paperless/issues/54
 .. _#57: https://github.com/danielquinn/paperless/issues/57
+.. _#60: https://github.com/danielquinn/paperless/issues/60

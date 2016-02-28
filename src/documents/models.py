@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 
@@ -6,6 +7,8 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+
+from .managers import LogManager
 
 
 class SluggedModel(models.Model):
@@ -187,3 +190,36 @@ class Document(models.Model):
     @property
     def download_url(self):
         return reverse("fetch", kwargs={"pk": self.pk})
+
+
+class Log(models.Model):
+
+    LEVELS = (
+        (logging.DEBUG, "Debugging"),
+        (logging.INFO, "Informational"),
+        (logging.WARNING, "Warning"),
+        (logging.ERROR, "Error"),
+        (logging.CRITICAL, "Critical"),
+    )
+
+    COMPONENT_CONSUMER = 1
+    COMPONENT_MAIL = 2
+    COMPONENTS = (
+        (COMPONENT_CONSUMER, "Consumer"),
+        (COMPONENT_MAIL, "Mail Fetcher")
+    )
+
+    group = models.UUIDField(blank=True)
+    message = models.TextField()
+    level = models.PositiveIntegerField(choices=LEVELS, default=logging.INFO)
+    component = models.PositiveIntegerField(choices=COMPONENTS)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    objects = LogManager()
+
+    class Meta(object):
+        ordering = ("-modified",)
+
+    def __str__(self):
+        return self.message
