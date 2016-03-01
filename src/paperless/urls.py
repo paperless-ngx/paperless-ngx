@@ -21,12 +21,13 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from documents.views import (
-    FetchView, PushView, SenderViewSet, TagViewSet, DocumentViewSet)
+    FetchView, PushView, SenderViewSet, TagViewSet, DocumentViewSet, LogViewSet)
 
 router = DefaultRouter()
 router.register(r'senders', SenderViewSet)
 router.register(r'tags', TagViewSet)
 router.register(r'documents', DocumentViewSet)
+router.register(r'logs', LogViewSet)
 
 urlpatterns = [
 

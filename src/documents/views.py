@@ -1,19 +1,25 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, DetailView
 
+from rest_framework.mixins import (
+    RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import (
+    ModelViewSet, ReadOnlyModelViewSet, GenericViewSet)
 
 from paperless.db import GnuPG
 
 from .forms import UploadForm
-from .models import Sender, Tag, Document
-from .serialisers import SenderSerializer, TagSerializer, DocumentSerializer
+from .models import Sender, Tag, Document, Log
+from .serialisers import (
+    SenderSerializer, TagSerializer, DocumentSerializer, LogSerializer)
 
 
-class FetchView(DetailView):
+class FetchView(LoginRequiredMixin, DetailView):
 
     model = Document
 
@@ -40,9 +46,9 @@ class FetchView(DetailView):
         return response
 
 
-class PushView(FormView):
+class PushView(LoginRequiredMixin, FormView):
     """
-    A crude REST API for creating documents.
+    A crude REST-ish API for creating documents.
     """
 
     form_class = UploadForm
@@ -69,6 +75,7 @@ class SenderViewSet(ModelViewSet):
     queryset = Sender.objects.all()
     serializer_class = SenderSerializer
     pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
 
 
 class TagViewSet(ModelViewSet):
@@ -76,10 +83,24 @@ class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
 
 
-class DocumentViewSet(ModelViewSet):
+class DocumentViewSet(RetrieveModelMixin,
+                      UpdateModelMixin,
+                      DestroyModelMixin,
+                      ListModelMixin,
+                      GenericViewSet):
     model = Document
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+
+
+class LogViewSet(ReadOnlyModelViewSet):
+    model = Log
+    queryset = Log.objects.all().by_group()
+    serializer_class = LogSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Sender, Tag, Document
+from .models import Sender, Tag, Document, Log
 
 
 class SenderSerializer(serializers.HyperlinkedModelSerializer):
@@ -38,4 +38,17 @@ class DocumentSerializer(serializers.ModelSerializer):
             "modified",
             "file_name",
             "download_url"
+        )
+
+
+class LogSerializer(serializers.ModelSerializer):
+
+    time = serializers.DateTimeField()
+    messages = serializers.CharField()
+
+    class Meta(object):
+        model = Log
+        fields = (
+            "time",
+            "messages"
         )
