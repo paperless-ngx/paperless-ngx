@@ -235,8 +235,10 @@ def deprecated(before, after):
     )
 
 if not CONVERT_BINARY:
-    deprecated("PAPERLESS_CONVERT", "PAPERLESS_CONVERT_BINARY")
-    CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT", "convert")
+    CONVERT_BINARY = "convert"
+    if os.getenv("PAPERLESS_CONVERT"):
+        deprecated("PAPERLESS_CONVERT", "PAPERLESS_CONVERT_BINARY")
+        CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT", CONVERT_BINARY)
 
 if not CONSUMPTION_DIR and os.getenv("PAPERLESS_CONSUME"):
     deprecated("PAPERLESS_CONSUME", "PAPERLESS_CONSUMPTION_DIR")
