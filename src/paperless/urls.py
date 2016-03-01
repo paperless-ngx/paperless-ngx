@@ -21,7 +21,8 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from documents.views import (
-    FetchView, PushView, SenderViewSet, TagViewSet, DocumentViewSet, LogViewSet)
+    FetchView, PushView, SenderViewSet, TagViewSet, DocumentViewSet, LogViewSet
+)
 
 router = DefaultRouter()
 router.register(r'senders', SenderViewSet)
