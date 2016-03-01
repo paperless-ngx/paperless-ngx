@@ -3,6 +3,7 @@ Changelog
 
 * 0.1.1 (master)
 
+  * `#44`_: Harmonise environment variable names with constant names.
   * `#60`_: Setup logging to actually use the Python native logging framework.
   * `#53`_: Fixed an annoying bug that caused ``.jpeg`` and ``.JPG`` images
     to be imported but made unavailable.
@@ -68,6 +69,7 @@ Changelog
 .. _darkmatter: https://github.com/darkmatter
 .. _zedster: https://github.com/zedster
 
+.. _#44: https://github.com/danielquinn/paperless/issues/44
 .. _#45: https://github.com/danielquinn/paperless/issues/45
 .. _#47: https://github.com/danielquinn/paperless/issues/47
 .. _#48: https://github.com/danielquinn/paperless/issues/48

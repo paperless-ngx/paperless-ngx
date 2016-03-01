@@ -14,7 +14,7 @@ from .consumer import Consumer
 
 class UploadForm(forms.Form):
 
-    SECRET = settings.UPLOAD_SHARED_SECRET
+    SECRET = settings.SHARED_SECRET
     TYPE_LOOKUP = {
         "application/pdf": Document.TYPE_PDF,
         "image/png": Document.TYPE_PNG,

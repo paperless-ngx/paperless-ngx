@@ -47,5 +47,5 @@ urlpatterns = [
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if settings.UPLOAD_SHARED_SECRET:
+if settings.SHARED_SECRET:
     urlpatterns.insert(0, url(r"^push$", PushView.as_view(), name="push"))

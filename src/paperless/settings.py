@@ -159,7 +159,7 @@ LOGGING = {
 }
 
 
-# Paperless-specific stuffs
+# Paperless-specific stuff
 # Change these paths if yours are different
 # ----------------------------------------------------------------------------
 
@@ -173,19 +173,19 @@ OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
 # If this is true, any failed attempts to OCR a PDF will result in the PDF
 # being indexed anyway, with whatever we could get.  If it's False, the file
 # will simply be left in the CONSUMPTION_DIR.
-FORGIVING_OCR = True
+FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("yes", "y", "1", "t", "true"))
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
 
-# Convert is part of the Imagemagick package
-CONVERT_BINARY = "/usr/bin/convert"
+# Convert is part of the ImageMagick package
+CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY")
 
 # This will be created if it doesn't exist
-SCRATCH_DIR = "/tmp/paperless"
+SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 
 # This is where Paperless will look for PDFs to index
-CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUME")
+CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 
 # If you want to use IMAP mail consumption, populate this with useful values.
 # If you leave HOST set to None, we assume you're not going to use this
@@ -211,4 +211,37 @@ PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 # If you intend to use the "API" to push files into the consumer, you'll need
 # to provide a shared secret here.  Leaving this as the default will disable
 # the API.
-UPLOAD_SHARED_SECRET = os.getenv("PAPERLESS_SECRET", "")
+SHARED_SECRET = os.getenv("PAPERLESS_SHARED_SECRET", "")
+
+#
+# TODO: Remove after 1.2
+#
+# This logic is here to address issue #44, wherein we were using inconsistent
+# constant names vs. environment variables.  If you're using Paperless for the
+# first time, you can safely ignore everything from here on, so long as you're
+# correctly defining the variables as per the documentation.
+#
+
+
+def deprecated(before, after):
+    print(
+        "\n\n"
+        "WARNING: {before} has been renamed to {after}.\n"
+        "WARNING: Use of {before} will not work as of version 1.2."
+        "\n\n".format(
+            before=before,
+            after=after
+        )
+    )
+
+if not CONVERT_BINARY:
+    deprecated("PAPERLESS_CONVERT", "PAPERLESS_CONVERT_BINARY")
+    CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT", "convert")
+
+if not CONSUMPTION_DIR and os.getenv("PAPERLESS_CONSUME"):
+    deprecated("PAPERLESS_CONSUME", "PAPERLESS_CONSUMPTION_DIR")
+    CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUME")
+
+if not SHARED_SECRET and os.getenv("PAPERLESS_SECRET"):
+    deprecated("PAPERLESS_SECRET", "PAPERLESS_SHARED_SECRET")
+    SHARED_SECRET = os.getenv("PAPERLESS_SECRET", "")

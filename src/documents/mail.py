@@ -44,7 +44,7 @@ class Message(Loggable):
     and n attachments, and that we don't care about the message body.
     """
 
-    SECRET = settings.UPLOAD_SHARED_SECRET
+    SECRET = settings.SHARED_SECRET
 
     def __init__(self, data, group=None):
         """
@@ -175,7 +175,7 @@ class MailFetcher(Loggable):
             # Reset the grouping id for each fetch
             self.logging_group = uuid.uuid4()
 
-            self.log("info", "Checking mail")
+            self.log("debug", "Checking mail")
 
             for message in self._get_messages():
 
