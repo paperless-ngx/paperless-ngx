@@ -19,8 +19,8 @@ RUN mkdir -p /usr/src/paperless/src
 COPY src/ /usr/src/paperless/src/
 
 # Set consumption directory
-ENV PAPERLESS_CONSUME /consume
-RUN mkdir -p $PAPERLESS_CONSUME
+ENV PAPERLESS_CONSUMPTION_DIR /consume
+RUN mkdir -p $PAPERLESS_CONSUMPTION_DIR
 
 # Migrate database
 WORKDIR /usr/src/paperless/src
