@@ -47,7 +47,7 @@ urlpatterns = [
     url(r"^fetch/(?P<pk>\d+)$", FetchView.as_view(), name="fetch"),
 
     # The Django admin
-    url(r"admin", admin.site.urls),
+    url(r"admin/", admin.site.urls),
     url(r"", admin.site.urls),  # This is going away
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
