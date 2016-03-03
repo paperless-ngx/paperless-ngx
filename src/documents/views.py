@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, DetailView
+from django.views.generic import FormView, DetailView, TemplateView
 
 from rest_framework.mixins import (
     RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin)
@@ -17,6 +17,17 @@ from .forms import UploadForm
 from .models import Sender, Tag, Document, Log
 from .serialisers import (
     SenderSerializer, TagSerializer, DocumentSerializer, LogSerializer)
+
+
+class IndexView(TemplateView):
+
+    template_name = "documents/index.html"
+
+    def get_context_data(self, **kwargs):
+        print(kwargs)
+        print(self.request.GET)
+        print(self.request.POST)
+        return TemplateView.get_context_data(self, **kwargs)
 
 
 class FetchView(LoginRequiredMixin, DetailView):

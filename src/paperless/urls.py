@@ -21,7 +21,8 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from documents.views import (
-    FetchView, PushView, SenderViewSet, TagViewSet, DocumentViewSet, LogViewSet
+    IndexView, FetchView, PushView,
+    SenderViewSet, TagViewSet, DocumentViewSet, LogViewSet
 )
 
 router = DefaultRouter()
@@ -39,11 +40,15 @@ urlpatterns = [
     ),
     url(r"^api/", include(router.urls, namespace="drf")),
 
+    # Normal pages (coming soon)
+    # url(r"^$", IndexView.as_view(), name="index"),
+
     # File downloads
     url(r"^fetch/(?P<pk>\d+)$", FetchView.as_view(), name="fetch"),
 
     # The Django admin
-    url(r"", admin.site.urls),
+    url(r"admin", admin.site.urls),
+    url(r"", admin.site.urls),  # This is going away
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
