@@ -123,9 +123,9 @@ class Consumer(object):
             try:
                 text = self._get_ocr(pngs)
                 self._store(text, doc)
-            except OCRError:
+            except OCRError as e:
                 self._ignore.append(doc)
-                self.log("error", "OCR FAILURE: {}".format(doc))
+                self.log("error", "OCR FAILURE for {}: {}".format(doc, e))
                 self._cleanup_tempdir(tempdir)
                 continue
             else:
@@ -165,7 +165,7 @@ class Consumer(object):
         """
 
         if not pngs:
-            raise OCRError
+            raise OCRError("No images found")
 
         self.log("info", "OCRing the document")
 
@@ -186,7 +186,7 @@ class Consumer(object):
                 )
                 raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
                 return raw_text
-            raise OCRError
+            raise OCRError("Language detection failed")
 
         if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
             raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
@@ -205,7 +205,10 @@ class Consumer(object):
                 )
                 raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
                 return raw_text
-            raise OCRError
+            raise OCRError(
+                "The guessed language is not available in this instance of "
+                "Tesseract."
+            )
 
     def _assemble_ocr_sections(self, pngs, middle, text):
         """
