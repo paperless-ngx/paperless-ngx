@@ -14,18 +14,18 @@ pip3 install -r /opt/paperless/requirements.txt
 echo "
 # This where your documents should go to be consumed.  Make sure that it exists
 # before you start Paperless.
-export PAPERLESS_CONSUMPTION_DIR='/home/vagrant/consumption'
+PAPERLESS_CONSUMPTION_DIR='/home/vagrant/consumption'
 
 # This is the secret passphrase used to encrypt the documents once they have
 # been consumed.  Change it to whatever you like, but you shouldn't change it
 # after it has been used to consume a document or you won't be able to read
 # that document again.
-export PAPERLESS_PASSPHRASE='secret'
+PAPERLESS_PASSPHRASE='secret'
 
 # This is the secret string used to verify PDFs sent by mail or consumed via
 # the API.  If you don't plan to use either of these, you can safely leave it
 # blank
-export PAPERLESS_SHARED_SECRET=''
+PAPERLESS_SHARED_SECRET=''
 " > /tmp/paperless.conf
 chmod 0640 /tmp/paperless.conf
 chown root:vagrant /tmp/paperless.conf
@@ -34,14 +34,6 @@ mv /tmp/paperless.conf /etc/
 # Create the consumption directory
 mkdir /home/vagrant/consumption
 chown vagrant:vagrant /home/vagrant/consumption
-
-# Create environment wrapper
-echo "
-
-
-# Setup the paperless environment variables
-. /etc/paperless.conf
-" >> /home/vagrant/.bashrc
 
 echo "
 
