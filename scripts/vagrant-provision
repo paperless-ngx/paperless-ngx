@@ -1,13 +1,55 @@
 #!/bin/bash
 
-# install packages
-sudo apt-get update
-sudo apt-get build-dep -y python-imaging
-sudo apt-get install -y libjpeg8 libjpeg62-dev libfreetype6 libfreetype6-dev
-sudo apt-get install -y build-essential python3-dev python3-pip sqlite3 libsqlite3-dev git
-sudo apt-get install -y tesseract-ocr tesseract-ocr-eng imagemagick
+# Install packages
+apt-get update
+apt-get build-dep -y python-imaging
+apt-get install -y libjpeg8 libjpeg62-dev libfreetype6 libfreetype6-dev
+apt-get install -y build-essential python3-dev python3-pip sqlite3 libsqlite3-dev git
+apt-get install -y tesseract-ocr tesseract-ocr-eng imagemagick
 
-# setup python project
-pushd /opt/paperless
-sudo pip3 install -r requirements.txt
-popd
+# Python dependencies
+pip3 install -r /opt/paperless/requirements.txt
+
+# Create the environment file
+echo "
+# This where your documents should go to be consumed.  Make sure that it exists
+# before you start Paperless.
+export PAPERLESS_CONSUMPTION_DIR='/home/vagrant/consumption'
+
+# This is the secret passphrase used to encrypt the documents once they have
+# been consumed.  Change it to whatever you like, but you shouldn't change it
+# after it has been used to consume a document or you won't be able to read
+# that document again.
+export PAPERLESS_PASSPHRASE='secret'
+
+# This is the secret string used to verify PDFs sent by mail or consumed via
+# the API.  If you don't plan to use either of these, you can safely leave it
+# blank
+export PAPERLESS_SHARED_SECRET=''
+" > /tmp/paperless.conf
+chmod 0640 /tmp/paperless.conf
+chown root:vagrant /tmp/paperless.conf
+mv /tmp/paperless.conf /etc/
+
+# Create the consumption directory
+mkdir /home/vagrant/consumption
+chown vagrant:vagrant /home/vagrant/consumption
+
+# Create environment wrapper
+echo "
+
+
+# Setup the paperless environment variables
+. /etc/paperless.conf
+" >> /home/vagrant/.bashrc
+
+echo "
+
+
+Now follow the remaining steps in the Vagrant section of the setup
+documentation to complete the process:
+
+http://paperless.readthedocs.org/en/latest/setup.html#setup-installation-vagrant
+
+
+"

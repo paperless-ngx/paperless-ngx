@@ -3,6 +3,8 @@ Changelog
 
 * 0.1.1 (master)
 
+  * Refactored the Vagrant installation process to use environment variables
+    rather than asking the user to modify ``settings.py``.
   * `#44`_: Harmonise environment variable names with constant names.
   * `#60`_: Setup logging to actually use the Python native logging framework.
   * `#53`_: Fixed an annoying bug that caused ``.jpeg`` and ``.JPG`` images

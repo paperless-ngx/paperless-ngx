@@ -98,27 +98,31 @@ Vagrant Method
 2. Run ``vagrant up``.  An instance will start up for you.  When it's ready and
    provisioned...
 3. Run ``vagrant ssh`` and once inside your new vagrant box, edit
-   ``/opt/paperless/src/paperless/settings.py`` and set the values for:
-    * ``CONSUMPTION_DIR``: this is where your documents will be dumped to be
-      consumed by Paperless.
-    * ``PASSPHRASE``: this is the passphrase Paperless uses to encrypt/decrypt
-      the original document.  The default value attempts to source the
-      passphrase from the environment, so if you don't set it to a static value
-      here, you must set ``PAPERLESS_PASSPHRASE=some-secret-string`` on the
-      command line whenever invoking the consumer or webserver.
-4. Initialise the database with ``/opt/paperless/src/manage.py migrate``.
-5. Still inside your vagrant box, create a user for your Paperless instance with
-   ``/opt/paperless/src/manage.py createsuperuser``. Follow the prompts to
+   ``/etc/paperless.conf`` and set the values for:
+    * ``PAPERLESS_CONSUMPTION_DIR``: this is where your documents will be
+      dumped to be consumed by Paperless.
+    * ``PAPERLESS_PASSPHRASE``: this is the passphrase Paperless uses to
+      encrypt/decrypt the original document.
+    * ``PAPERLESS_SHARED_SECRET``: this is the "magic word" used when consuming
+      documents from mail or via the API.  If you don't use either, leaving it
+      blank is just fine.
+4. Exit the vagrant box and re-enter it with ``vagrant ssh`` again.  This
+   updates the environment to make use of the changes you made to the config
+   file.
+5. Initialise the database with ``/opt/paperless/src/manage.py migrate``.
+6. Still inside your vagrant box, create a user for your Paperless instance
+   with ``/opt/paperless/src/manage.py createsuperuser``. Follow the prompts to
    create your user.
-6. Start the webserver with ``/opt/paperless/src/manage.py runserver 0.0.0.0:8000``.
-   You should now be able to visit your (empty) `Paperless webserver`_ at
-   ``172.28.128.4:8000``.  You can login with the user/pass you created in #5.
-7. In a separate window, run ``vagrant ssh`` again, but this time once inside
+7. Start the webserver with
+   ``/opt/paperless/src/manage.py runserver 0.0.0.0:8000``. You should now be
+   able to visit your (empty) `Paperless webserver`_ at ``172.28.128.4:8000``.
+   You can login with the user/pass you created in #6.
+8. In a separate window, run ``vagrant ssh`` again, but this time once inside
    your vagrant instance, you should start the consumer script with
    ``/opt/paperless/src/manage.py document_consumer``.
-8. Scan something.  Put it in the ``CONSUMPTION_DIR``.
-9. Wait a few minutes
-10. Visit the document list on your webserver, and it should be there, indexed
+9. Scan something.  Put it in the ``CONSUMPTION_DIR``.
+10. Wait a few minutes
+11. Visit the document list on your webserver, and it should be there, indexed
     and downloadable.
 
 .. _Vagrant: https://vagrantup.com/
@@ -158,11 +162,11 @@ Docker Method
 
 3. Create a copy of ``docker-compose.yml.example`` as ``docker-compose.yml`` and
    a copy of ``docker-compose.env.example`` as ``docker-compose.env``. You'll be
-   editing both these files: taking a copy ensures that you can ``git pull`` to 
-   receive updates without risking merge conflicts with your modified versions 
+   editing both these files: taking a copy ensures that you can ``git pull`` to
+   receive updates without risking merge conflicts with your modified versions
    of the configuration files.
 4. Modify ``docker-compose.yml`` to your preferences, following the instructions
-   in comments in the file. The only change that is a hard requirement is to 
+   in comments in the file. The only change that is a hard requirement is to
    specify where the consumption directory should mount.
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
