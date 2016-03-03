@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -140,6 +142,16 @@ STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 
 
+# Paperless-specific stuff
+# You shouldn't have to edit any of these values.  Rather, you can set these
+# values in /etc/paperless.conf instead.
+# ----------------------------------------------------------------------------
+
+# Tap paperless.conf if it's available
+if os.path.exists("/etc/paperless.conf"):
+    load_dotenv("/etc/paperless.conf")
+
+
 # Logging
 
 LOGGING = {
@@ -158,10 +170,6 @@ LOGGING = {
     },
 }
 
-
-# Paperless-specific stuff
-# Change these paths if yours are different
-# ----------------------------------------------------------------------------
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
