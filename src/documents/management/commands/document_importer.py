@@ -20,13 +20,6 @@ class Command(Renderable, BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("source")
-        parser.add_argument(
-            '--ignore-absent',
-            action='store_true',
-            default=False,
-            help="If the manifest refers to a document that doesn't exist, "
-                 "ignore it and attempt to import what it can"
-        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -80,18 +73,14 @@ class Command(Renderable, BaseCommand):
             if "__exported_file_name__" not in record:
                 raise CommandError(
                     'The manifest file contains a record which does not '
-                    'refer to an actual document file.  If you want to import '
-                    'the rest anyway (skipping such references) call the '
-                    'importer with --ignore-absent'
+                    'refer to an actual document file.'
                 )
 
             doc_file = record["__exported_file_name__"]
             if not os.path.exists(os.path.join(self.source, doc_file)):
                 raise CommandError(
                     'The manifest file refers to "{}" which does not '
-                    'appear to be in the source directory.  If you want to '
-                    'import the rest anyway (skipping such references) call '
-                    'the importer with --ignore-absent'.format(doc_file)
+                    'appear to be in the source directory.'.format(doc_file)
                 )
 
     def _import_files_from_manifest(self):
