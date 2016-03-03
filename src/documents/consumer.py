@@ -24,7 +24,7 @@ from pyocr.tesseract import TesseractError
 
 from paperless.db import GnuPG
 
-from .models import Sender, Tag, Document, Log
+from .models import Correspondent, Tag, Document, Log
 from .languages import ISO639
 
 
@@ -246,7 +246,7 @@ class Consumer(object):
         """
 
         def get_sender(sender_name):
-            return Sender.objects.get_or_create(
+            return Correspondent.objects.get_or_create(
                 name=sender_name, defaults={"slug": slugify(sender_name)})[0]
 
         def get_tags(tags):

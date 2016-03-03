@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from .models import Sender, Tag, Document, Log
+from .models import Correspondent, Tag, Document, Log
 
 
-class SenderSerializer(serializers.HyperlinkedModelSerializer):
+class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta(object):
-        model = Sender
+        model = Correspondent
         fields = ("id", "slug", "name")
 
 

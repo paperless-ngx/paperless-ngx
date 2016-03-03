@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 
-from .models import Sender, Tag, Document, Log
+from .models import Correspondent, Tag, Document, Log
 
 
 class MonthListFilter(admin.SimpleListFilter):
@@ -107,7 +107,7 @@ class LogAdmin(admin.ModelAdmin):
     list_filter = ("level", "component",)
 
 
-admin.site.register(Sender)
+admin.site.register(Correspondent)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Log, LogAdmin)

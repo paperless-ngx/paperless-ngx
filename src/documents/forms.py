@@ -8,7 +8,7 @@ from time import mktime
 from django import forms
 from django.conf import settings
 
-from .models import Document, Sender
+from .models import Document, Correspondent
 from .consumer import Consumer
 
 
@@ -24,7 +24,9 @@ class UploadForm(forms.Form):
     }
 
     sender = forms.CharField(
-        max_length=Sender._meta.get_field("name").max_length, required=False)
+        max_length=Correspondent._meta.get_field("name").max_length,
+        required=False
+    )
     title = forms.CharField(
         max_length=Document._meta.get_field("title").max_length,
         required=False
@@ -41,7 +43,7 @@ class UploadForm(forms.Form):
         sender = self.cleaned_data.get("sender")
         if not sender:
             return None
-        if not Sender.SAFE_REGEX.match(sender) or " - " in sender:
+        if not Correspondent.SAFE_REGEX.match(sender) or " - " in sender:
             raise forms.ValidationError("That sender name is suspicious.")
         return sender
 
@@ -49,7 +51,7 @@ class UploadForm(forms.Form):
         title = self.cleaned_data.get("title")
         if not title:
             return None
-        if not Sender.SAFE_REGEX.match(title) or " - " in title:
+        if not Correspondent.SAFE_REGEX.match(title) or " - " in title:
             raise forms.ValidationError("That title is suspicious.")
 
     def clean_document(self):

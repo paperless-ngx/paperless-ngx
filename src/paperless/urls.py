@@ -22,11 +22,11 @@ from rest_framework.routers import DefaultRouter
 
 from documents.views import (
     IndexView, FetchView, PushView,
-    SenderViewSet, TagViewSet, DocumentViewSet, LogViewSet
+    CorrespondentViewSet, TagViewSet, DocumentViewSet, LogViewSet
 )
 
 router = DefaultRouter()
-router.register(r'senders', SenderViewSet)
+router.register(r'senders', CorrespondentViewSet)
 router.register(r'tags', TagViewSet)
 router.register(r'documents', DocumentViewSet)
 router.register(r'logs', LogViewSet)

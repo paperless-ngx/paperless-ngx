@@ -44,10 +44,10 @@ Any document you put into the consumption directory will be consumed, but if you
 name the file right, it'll automatically set some values in the database for
 you.  This is is the logic the consumer follows:
 
-1. Try to find the sender, title, and tags in the file name following the
-   pattern: ``Sender - Title - tag,tag,tag.pdf``.
-2. If that doesn't work, try to find the sender and title in the file name
-   following the pattern:  ``Sender - Title.pdf``.
+1. Try to find the correspondent, title, and tags in the file name following
+   the pattern: ``Correspondent - Title - tag,tag,tag.pdf``.
+2. If that doesn't work, try to find the correspondent and title in the file
+   name following the pattern:  ``Correspondent - Title.pdf``.
 3. If that doesn't work, just assume that the name of the file is the title.
 
 So given the above, the following examples would work as you'd expect:
@@ -97,9 +97,9 @@ So, with all that in mind, here's what you do to get it running:
    the configured email account every 10 minutes for something new and pull down
    whatever it finds.
 4. Send yourself an email!  Note that the subject is treated as the file name,
-   so if you set the subject to ``Sender - Title - tag,tag,tag``, you'll get
-   what you expect.  Also, you must include the aforementioned secret string in
-   every email so the fetcher knows that it's safe to import.
+   so if you set the subject to ``Correspondent - Title - tag,tag,tag``, you'll
+   get what you expect.  Also, you must include the aforementioned secret
+   string in every email so the fetcher knows that it's safe to import.
 5. After a few minutes, the consumer will poll your mailbox, pull down the
    message, and place the attachment in the consumption directory with the
    appropriate name.  A few minutes later, the consumer will import it like any
@@ -118,16 +118,16 @@ a real API, it's just a URL that accepts an HTTP POST.
 To push your document to *Paperless*, send an HTTP POST to the server with the
 following name/value pairs:
 
-* ``sender``: The name of the document's sender.  Note that there are
-  restrictions on what characters you can use here.  Specifically, alphanumeric
-  characters, `-`, `,`, `.`, and `'` are ok, everything else it out.  You also
-  can't use the sequence ` - ` (space, dash, space).
+* ``correspondent``: The name of the document's correspondent.  Note that there
+  are restrictions on what characters you can use here.  Specifically,
+  alphanumeric characters, `-`, `,`, `.`, and `'` are ok, everything else it
+  out.  You also can't use the sequence ` - ` (space, dash, space).
 * ``title``: The title of the document.  The rules for characters is the same
-  here as the sender.
-* ``signature``: For security reasons, we have the sender send a signature using
-  a "shared secret" method to make sure that random strangers don't start
-  uploading stuff to your server.  The means of generating this signature is
-  defined below.
+  here as the correspondent.
+* ``signature``: For security reasons, we have the correspondent send a
+  signature using a "shared secret" method to make sure that random strangers
+  don't start uploading stuff to your server.  The means of generating this
+  signature is defined below.
 
 Specify ``enctype="multipart/form-data"``, and then POST your file with:::
 
@@ -146,12 +146,12 @@ verification.
 
 In the case of *Paperless*, you configure the server with the secret by setting
 ``UPLOAD_SHARED_SECRET``.  Then on your client, you generate your signature by
-concatenating the sender, title, and the secret, and then using sha256 to
-generate a hexdigest.
+concatenating the correspondent, title, and the secret, and then using sha256
+to generate a hexdigest.
 
 If you're using Python, this is what that looks like:
 
 .. code:: python
 
     from hashlib import sha256
-    signature = sha256(sender + title + secret).hexdigest()
+    signature = sha256(correspondent + title + secret).hexdigest()

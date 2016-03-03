@@ -14,7 +14,7 @@ from dateutil import parser
 from django.conf import settings
 
 from .consumer import Consumer
-from .models import Sender, Log
+from .models import Correspondent, Log
 
 
 class MailFetcherError(Exception):
@@ -103,7 +103,7 @@ class Message(Loggable):
     def check_subject(self):
         if self.subject is None:
             raise InvalidMessageError("Message does not have a subject")
-        if not Sender.SAFE_REGEX.match(self.subject):
+        if not Correspondent.SAFE_REGEX.match(self.subject):
             raise InvalidMessageError("Message subject is unsafe: {}".format(
                 self.subject))
 

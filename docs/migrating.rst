@@ -4,10 +4,68 @@ Migrating, Updates, and Backups
 ===============================
 
 As *Paperless* is still under active development, there's a lot that can change
-as software updates roll out.  The thing you just need to remember for all of
-this is that for the most part, **the database is expendable** so long as you
-have your files.  This is because the file name of the exported files includes
-the name of the sender, the title, and the tags (if any) on each file.
+as software updates roll out.  You should backup often, so if anything goes
+wrong during an update, you at least have a means of restoring to something
+usable.  Thankfully, there are automated ways of backing up, restoring, and
+updating the software.
+
+
+.. _migrating-backup:
+
+Backing Up
+----------
+
+So you're bored of this whole project, or you want to make a remote backup of
+the unencrypted files for whatever reason.  This is easy to do, simply use the
+:ref:`exporter <utilities-exporter>` to dump your documents and database out
+into an arbitrary directory.
+
+
+.. _migrating-restoring:
+
+Restoring
+---------
+
+Restoring your data is just as easy, since nearly all of your data exists either
+in the file names, or in the contents of the files themselves.  You just need to
+create an empty database (just follow the
+:ref:`installation instructions <setup-installation>` again) and then import the
+``tags.json`` file you created as part of your backup.  Lastly, copy your
+exported documents into the consumption directory and start up the consumer.
+
+.. code-block:: shell-session
+
+    $ cd /path/to/project
+    $ rm data/db.sqlite3  # Delete the database
+    $ cd src
+    $ ./manage.py migrate  # Create the database
+    $ ./manage.py createsuperuser
+    $ ./manage.py loaddata /path/to/arbitrary/place/tags.json
+    $ cp /path/to/exported/docs/* /path/to/consumption/dir/
+    $ ./manage.py document_consumer
+
+Importing your data if you are :ref:`using Docker <setup-installation-docker>`
+is almost as simple:
+
+.. code-block:: shell-session
+
+    # Stop and remove your current containers
+    $ docker-compose stop
+    $ docker-compose rm -f
+
+    # Recreate them, add the superuser
+    $ docker-compose up -d
+    $ docker-compose run --rm webserver createsuperuser
+
+    # Load the tags
+    $ cat /path/to/arbitrary/place/tags.json | docker-compose run --rm webserver loaddata_stdin -
+
+    # Load your exported documents into the consumption directory
+    # (How you do this highly depends on how you have set this up)
+    $ cp /path/to/exported/docs/* /path/to/mounted/consumption/dir/
+
+After loading the documents into the consumption directory the consumer will
+immediately start consuming the documents.
 
 
 .. _migrating-updates:
@@ -20,7 +78,7 @@ on the directory containing the project files, and then use Django's ``migrate``
 command to execute any database schema updates that might have been rolled in
 as part of the update:
 
-.. code:: bash
+.. code-block:: shell-session
 
     $ cd /path/to/project
     $ git pull
@@ -43,112 +101,3 @@ requires only one additional step:
 
 If ``git pull`` doesn't report any changes, there is no need to continue with
 the remaining steps.
-
-
-.. _migrating-backup:
-
-Backing Up
-----------
-
-So you're bored of this whole project, or you want to make a remote backup of
-the unencrypted files for whatever reason.  This is easy to do, simply use the
-:ref:`exporter <utilities-exporter>` to dump your documents out into an
-arbitrary directory.
-
-Additionally however, you'll need to back up the tags themselves.  The file
-names contain the tag names, but you still need to define the tags and their
-matching algorithms in the database for things to work properly.  We do this
-with Django's ``dumpdata`` command, which produces JSON output.
-
-.. code:: bash
-
-    $ cd /path/to/project
-    $ cd src
-    $ ./manage.py document_export /path/to/arbitrary/place/
-    $ ./manage.py dumpdata documents.Tag > /path/to/arbitrary/place/tags.json
-
-If you are :ref:`using Docker <setup-installation-docker>`, exporting your tags
-as JSON is almost as easy:
-
-.. code-block:: shell-session
-
-    $ docker-compose run --rm webserver dumpdata documents.Tag > /path/to/arbitrary/place/tags.json
-
-To export the documents you can either use ``docker run`` directly, specifying all
-the commandline options by hand, or (more simply) mount a second volume for export.
-
-To mount a volume for exports, follow the instructions in the
-``docker-compose.yml.example`` file for the ``/export`` volume (making the changes
-in your own ``docker-compose.yml`` file, of course). Once you have the
-volume mounted, the command to run an export is:
-
-.. code-block:: console
-
-   $ docker-compose run --rm consumer document_exporter /export
-
-If you prefer to use ``docker run`` directly, supplying the necessary commandline
-options:
-
-.. code-block:: shell-session
-
-   $ # Identify your containers
-   $ docker-compose ps
-           Name                       Command                State     Ports
-   -------------------------------------------------------------------------
-   paperless_consumer_1    /sbin/docker-entrypoint.sh ...   Exit 0
-   paperless_webserver_1   /sbin/docker-entrypoint.sh ...   Exit 0
-
-   $ # Make sure to replace your passphrase and remove or adapt the id mapping
-   $ docker run --rm \
-       --volumes-from paperless_data_1 \
-       --volume /path/to/arbitrary/place:/export \
-       -e PAPERLESS_PASSPHRASE=YOUR_PASSPHRASE \
-       -e USERMAP_UID=1000 -e USERMAP_GID=1000 \
-       paperless document_exporter /export
-
-
-.. _migrating-restoring:
-
-Restoring
----------
-
-Restoring your data is just as easy, since nearly all of your data exists either
-in the file names, or in the contents of the files themselves.  You just need to
-create an empty database (just follow the
-:ref:`installation instructions <setup-installation>` again) and then import the
-``tags.json`` file you created as part of your backup.  Lastly, copy your
-exported documents into the consumption directory and start up the consumer.
-
-.. code:: bash
-
-    $ cd /path/to/project
-    $ rm data/db.sqlite3  # Delete the database
-    $ cd src
-    $ ./manage.py migrate  # Create the database
-    $ ./manage.py createsuperuser
-    $ ./manage.py loaddata /path/to/arbitrary/place/tags.json
-    $ cp /path/to/exported/docs/* /path/to/consumption/dir/
-    $ ./manage.py document_consumer
-
-Importing your data if you are :ref:`using Docker <setup-installation-docker>`
-is almost as simple:
-
-.. code-block:: shell-session
-
-    $ # Stop and remove your current containers
-    $ docker-compose stop
-    $ docker-compose rm -f
-
-    $ # Recreate them, add the superuser
-    $ docker-compose up -d
-    $ docker-compose run --rm webserver createsuperuser
-
-    $ # Load the tags
-    $ cat /path/to/arbitrary/place/tags.json | docker-compose run --rm webserver loaddata_stdin -
-
-    $ # Load your exported documents into the consumption directory
-    $ # (How you do this highly depends on how you have set this up)
-    $ cp /path/to/exported/docs/* /path/to/mounted/consumption/dir/
-
-After loading the documents into the consumption directory the consumer will
-immediately start consuming the documents.
