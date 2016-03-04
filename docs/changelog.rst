@@ -4,7 +4,7 @@ Changelog
 * 0.1.1 (master)
 
   * `#68`_: Added support for using a proper config file at
-    ``/etc/paperless.conf``.
+    ``/etc/paperless.conf`` and modified the systemd unit files to use it.
   * Refactored the Vagrant installation process to use environment variables
     rather than asking the user to modify ``settings.py``.
   * `#44`_: Harmonise environment variable names with constant names.
