@@ -3,6 +3,10 @@ Changelog
 
 * 0.1.1 (master)
 
+  * Potentially **Breaking Change**: All references to "sender" in the code
+    have been renamed to "correspondent" to better reflect the nature of the
+    property (one could quite reasonably scan a document before sending it to
+    someone.)
   * `#68`_: Added support for using a proper config file at
     ``/etc/paperless.conf`` and modified the systemd unit files to use it.
   * Refactored the Vagrant installation process to use environment variables
