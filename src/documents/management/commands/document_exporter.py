@@ -22,6 +22,13 @@ class Command(Renderable, BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("target")
+        parser.add_argument(
+            "--legacy",
+            action="store_true",
+            help="Don't try to export all of the document data, just dump the "
+                 "original document files out in a format that makes "
+                 "re-consuming them easy."
+        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -39,6 +46,13 @@ class Command(Renderable, BaseCommand):
 
         if not settings.PASSPHRASE:
             settings.PASSPHRASE = input("Please enter the passphrase: ")
+
+        if options["legacy"]:
+            self.dump_legacy()
+        else:
+            self.dump()
+
+    def dump(self):
 
         documents = Document.objects.all()
         document_map = {d.pk: d for d in documents}
@@ -65,3 +79,28 @@ class Command(Renderable, BaseCommand):
 
         with open(os.path.join(self.target, "manifest.json"), "w") as f:
             json.dump(manifest, f, indent=2)
+
+    def dump_legacy(self):
+
+        for document in Document.objects.all():
+
+            target = os.path.join(
+                self.target, self._get_legacy_file_name(document))
+
+            print("Exporting: {}".format(target))
+
+            with open(target, "wb") as f:
+                f.write(GnuPG.decrypted(document.source_file))
+                t = int(time.mktime(document.created.timetuple()))
+                os.utime(target, times=(t, t))
+
+    @staticmethod
+    def _get_legacy_file_name(doc):
+        if doc.correspondent and doc.title:
+            tags = ",".join([t.slug for t in doc.tags.all()])
+            if tags:
+                return "{} - {} - {}.{}".format(
+                    doc.correspondent, doc.title, tags, doc.file_type)
+            return "{} - {}.{}".format(
+                doc.correspondent, doc.title, doc.file_type)
+        return os.path.basename(doc.source_path)

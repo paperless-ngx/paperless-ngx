@@ -140,7 +140,7 @@ class Document(models.Model):
     TYPE_TIF = "tiff"
     TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,)
 
-    sender = models.ForeignKey(
+    correspondent = models.ForeignKey(
         Correspondent, blank=True, null=True, related_name="documents")
     title = models.CharField(max_length=128, blank=True, db_index=True)
     content = models.TextField(db_index=True)
@@ -155,14 +155,15 @@ class Document(models.Model):
     modified = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta(object):
-        ordering = ("sender", "title")
+        ordering = ("correspondent", "title")
 
     def __str__(self):
         created = self.created.strftime("%Y%m%d%H%M%S")
-        if self.sender and self.title:
-            return "{}: {} - {}".format(created, self.sender, self.title)
-        if self.sender or self.title:
-            return "{}: {}".format(created, self.sender or self.title)
+        if self.correspondent and self.title:
+            return "{}: {} - {}".format(
+                created, self.correspondent, self.title)
+        if self.correspondent or self.title:
+            return "{}: {}".format(created, self.correspondent or self.title)
         return str(created)
 
     @property

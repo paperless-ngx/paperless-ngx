@@ -45,9 +45,9 @@ class DocumentAdmin(admin.ModelAdmin):
             "all": ("paperless.css",)
         }
 
-    search_fields = ("sender__name", "title", "content")
-    list_display = ("created_", "sender", "title", "tags_", "document")
-    list_filter = ("tags", "sender", MonthListFilter)
+    search_fields = ("correspondent__name", "title", "content")
+    list_display = ("created_", "correspondent", "title", "tags_", "document")
+    list_filter = ("tags", "correspondent", MonthListFilter)
     list_per_page = 25
 
     def created_(self, obj):

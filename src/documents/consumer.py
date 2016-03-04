@@ -57,11 +57,11 @@ class Consumer(object):
         r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
-    REGEX_SENDER_TITLE = re.compile(
+    REGEX_CORRESPONDENT_TITLE = re.compile(
         r"^.*/(.+) - (.*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
-    REGEX_SENDER_TITLE_TAGS = re.compile(
+    REGEX_CORRESPONDENT_TITLE_TAGS = re.compile(
         r"^.*/(.*) - (.*) - ([a-z0-9\-,]*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
@@ -238,16 +238,18 @@ class Consumer(object):
 
     def _guess_attributes_from_name(self, parseable):
         """
-        We use a crude naming convention to make handling the sender, title,
-        and tags easier:
-          "<sender> - <title> - <tags>.<suffix>"
-          "<sender> - <title>.<suffix>"
+        We use a crude naming convention to make handling the correspondent,
+        title, and tags easier:
+          "<correspondent> - <title> - <tags>.<suffix>"
+          "<correspondent> - <title>.<suffix>"
           "<title>.<suffix>"
         """
 
-        def get_sender(sender_name):
+        def get_correspondent(correspondent_name):
             return Correspondent.objects.get_or_create(
-                name=sender_name, defaults={"slug": slugify(sender_name)})[0]
+                name=correspondent_name,
+                defaults={"slug": slugify(correspondent_name)}
+            )[0]
 
         def get_tags(tags):
             r = []
@@ -262,27 +264,27 @@ class Consumer(object):
                 return "jpg"
             return suffix
 
-        # First attempt: "<sender> - <title> - <tags>.<suffix>"
-        m = re.match(self.REGEX_SENDER_TITLE_TAGS, parseable)
+        # First attempt: "<correspondent> - <title> - <tags>.<suffix>"
+        m = re.match(self.REGEX_CORRESPONDENT_TITLE_TAGS, parseable)
         if m:
             return (
-                get_sender(m.group(1)),
+                get_correspondent(m.group(1)),
                 m.group(2),
                 get_tags(m.group(3)),
                 get_suffix(m.group(4))
             )
 
-        # Second attempt: "<sender> - <title>.<suffix>"
-        m = re.match(self.REGEX_SENDER_TITLE, parseable)
+        # Second attempt: "<correspondent> - <title>.<suffix>"
+        m = re.match(self.REGEX_CORRESPONDENT_TITLE, parseable)
         if m:
             return (
-                get_sender(m.group(1)),
+                get_correspondent(m.group(1)),
                 m.group(2),
                 (),
                 get_suffix(m.group(3))
             )
 
-        # That didn't work, so we assume sender and tags are None
+        # That didn't work, so we assume correspondent and tags are None
         m = re.match(self.REGEX_TITLE, parseable)
         return None, m.group(1), (), get_suffix(m.group(2))
 
@@ -296,7 +298,7 @@ class Consumer(object):
         self.log("debug", "Saving record to database")
 
         document = Document.objects.create(
-            sender=sender,
+            correspondent=sender,
             title=title,
             content=text,
             file_type=file_type,
