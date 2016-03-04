@@ -28,7 +28,7 @@ class SluggedModel(models.Model):
         return self.name
 
 
-class Sender(SluggedModel):
+class Correspondent(SluggedModel):
 
     # This regex is probably more restrictive than it needs to be, but it's
     # better safe than sorry.
@@ -140,8 +140,8 @@ class Document(models.Model):
     TYPE_TIF = "tiff"
     TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,)
 
-    sender = models.ForeignKey(
-        Sender, blank=True, null=True, related_name="documents")
+    correspondent = models.ForeignKey(
+        Correspondent, blank=True, null=True, related_name="documents")
     title = models.CharField(max_length=128, blank=True, db_index=True)
     content = models.TextField(db_index=True)
     file_type = models.CharField(
@@ -155,14 +155,15 @@ class Document(models.Model):
     modified = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta(object):
-        ordering = ("sender", "title")
+        ordering = ("correspondent", "title")
 
     def __str__(self):
-        created = self.created.strftime("%Y-%m-%d")
-        if self.sender and self.title:
-            return "{}: {}, {}".format(created, self.sender, self.title)
-        if self.sender or self.title:
-            return "{}: {}".format(created, self.sender or self.title)
+        created = self.created.strftime("%Y%m%d%H%M%S")
+        if self.correspondent and self.title:
+            return "{}: {} - {}".format(
+                created, self.correspondent, self.title)
+        if self.correspondent or self.title:
+            return "{}: {}".format(created, self.correspondent or self.title)
         return str(created)
 
     @property
@@ -179,13 +180,7 @@ class Document(models.Model):
 
     @property
     def file_name(self):
-        if self.sender and self.title:
-            tags = ",".join([t.slug for t in self.tags.all()])
-            if tags:
-                return "{} - {} - {}.{}".format(
-                    self.sender, self.title, tags, self.file_type)
-            return "{} - {}.{}".format(self.sender, self.title, self.file_type)
-        return os.path.basename(self.source_path)
+        return slugify(str(self)) + "." + self.file_type
 
     @property
     def download_url(self):

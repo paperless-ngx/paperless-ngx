@@ -1,6 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
-from django.template.defaultfilters import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, DetailView, TemplateView
 
@@ -14,9 +13,9 @@ from rest_framework.viewsets import (
 from paperless.db import GnuPG
 
 from .forms import UploadForm
-from .models import Sender, Tag, Document, Log
+from .models import Correspondent, Tag, Document, Log
 from .serialisers import (
-    SenderSerializer, TagSerializer, DocumentSerializer, LogSerializer)
+    CorrespondentSerializer, TagSerializer, DocumentSerializer, LogSerializer)
 
 
 class IndexView(TemplateView):
@@ -52,7 +51,7 @@ class FetchView(LoginRequiredMixin, DetailView):
             content_type=content_types[self.object.file_type]
         )
         response["Content-Disposition"] = 'attachment; filename="{}"'.format(
-            slugify(str(self.object)) + "." + self.object.file_type)
+            self.object.file_name)
 
         return response
 
@@ -81,10 +80,10 @@ class StandardPagination(PageNumberPagination):
     max_page_size = 100000
 
 
-class SenderViewSet(ModelViewSet):
-    model = Sender
-    queryset = Sender.objects.all()
-    serializer_class = SenderSerializer
+class CorrespondentViewSet(ModelViewSet):
+    model = Correspondent
+    queryset = Correspondent.objects.all()
+    serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
 
