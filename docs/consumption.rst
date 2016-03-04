@@ -40,9 +40,9 @@ follow the :ref:`consumer <utilities-consumer>` instructions to get it running.
 A Note on File Naming
 ---------------------
 
-Any document you put into the consumption directory will be consumed, but if you
-name the file right, it'll automatically set some values in the database for
-you.  This is is the logic the consumer follows:
+Any document you put into the consumption directory will be consumed, but if
+you name the file right, it'll automatically set some values in the database
+for you.  This is is the logic the consumer follows:
 
 1. Try to find the correspondent, title, and tags in the file name following
    the pattern: ``Correspondent - Title - tag,tag,tag.pdf``.
@@ -111,11 +111,10 @@ So, with all that in mind, here's what you do to get it running:
 HTTP POST
 =========
 
-Currently, the API is limited to only handling file uploads, it doesn't do tags
-yet, and the URL schema isn't concrete, but it's a start.  It's also not much of
-a real API, it's just a URL that accepts an HTTP POST.
+You can also submit a document via HTTP POST.  It doesn't do tags yet, and the
+URL schema isn't concrete, but it's a start.
 
-To push your document to *Paperless*, send an HTTP POST to the server with the
+To push your document to Paperless, send an HTTP POST to the server with the
 following name/value pairs:
 
 * ``correspondent``: The name of the document's correspondent.  Note that there

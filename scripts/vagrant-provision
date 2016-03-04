@@ -11,25 +11,9 @@ apt-get install -y tesseract-ocr tesseract-ocr-eng imagemagick
 pip3 install -r /opt/paperless/requirements.txt
 
 # Create the environment file
-echo "
-# This where your documents should go to be consumed.  Make sure that it exists
-# before you start Paperless.
-PAPERLESS_CONSUMPTION_DIR='/home/vagrant/consumption'
-
-# This is the secret passphrase used to encrypt the documents once they have
-# been consumed.  Change it to whatever you like, but you shouldn't change it
-# after it has been used to consume a document or you won't be able to read
-# that document again.
-PAPERLESS_PASSPHRASE='secret'
-
-# This is the secret string used to verify PDFs sent by mail or consumed via
-# the API.  If you don't plan to use either of these, you can safely leave it
-# blank
-PAPERLESS_SHARED_SECRET=''
-" > /tmp/paperless.conf
-chmod 0640 /tmp/paperless.conf
-chown root:vagrant /tmp/paperless.conf
-mv /tmp/paperless.conf /etc/
+cat /opt/paperless/paperless.conf.example | sed -e 's#CONSUMPTION_DIR=""#CONSUMPTION_DIR="/home/vagrant/consumption"#' > /etc/paperless.conf
+chmod 0640 /etc/paperless.conf
+chown root:vagrant /etc/paperless.conf
 
 # Create the consumption directory
 mkdir /home/vagrant/consumption
