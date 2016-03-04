@@ -42,12 +42,13 @@ route`_ is quick & easy, but means you're running a VM which comes with memory
 consumption etc. We also `support Docker`_, which you can use natively under
 Linux and in a VM with `Docker Machine`_ (this guide was written for native
 Docker usage under Linux, you might have to adapt it for Docker Machine.)
-Alternatively the standard, `bare metal`_ approach is a little more complicated.
+Alternatively the standard, `bare metal`_ approach is a little more complicated,
+but worth it because it makes it easier to should you want to contribute some
+code back.
 
 .. _Vagrant route: setup-installation-vagrant_
 .. _support Docker: setup-installation-docker_
 .. _bare metal: setup-installation-standard_
-
 .. _Docker Machine: https://docs.docker.com/machine/
 
 .. _setup-installation-standard:
