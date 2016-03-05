@@ -8,7 +8,7 @@ PAPERLESS_CONSUMPTION_DIR=""
 
 # These values are required if you want paperless to check a particular email
 # box every 10 minutes and attempt to consume documents from there.  If you
-# dont define a HOST, mail checking will just be disabled.
+# don't define a HOST, mail checking will just be disabled.
 PAPERLESS_CONSUME_MAIL_HOST=""
 PAPERLESS_CONSUME_MAIL_PORT=""
 PAPERLESS_CONSUME_MAIL_USER=""
@@ -17,6 +17,7 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 # You must have a passphrase in order for Paperless to work at all.  If you set
 # this to "", GNUGPG will "encrypt" your PDF by writing it out as a zero-byte
 # file.
+#
 # The passphrase you use here will be used when storing your documents in
 # Paperless, but you can always export them in an unencrypted format by using
 # document exporter.  See the documentaiton for more information.
