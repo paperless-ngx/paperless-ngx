@@ -40,7 +40,7 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
 
     documents = os.listdir(os.path.join(settings.MEDIA_ROOT, "documents"))
 
-    if not documents:
+    if set(documents) == {"originals", "thumbnails"}:
         return
 
     print(colourise(
