@@ -11,6 +11,7 @@ import tempfile
 
 from django.conf import settings
 from django.db import migrations
+from django.utils.termcolors import colorize as colourise  # Spelling hurts me
 
 
 class GnuPG(object):
@@ -42,14 +43,25 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
     if not documents:
         return
 
-    print("\n")
+    print(colourise(
+        "\n\n"
+        "  This is a one-time only migration to generate thumbnails for all of your\n"
+        "  documents so that future UIs will have something to work with.  If you have\n"
+        "  a lot of documents though, this may take a while, so a coffee break may be\n"
+        "  in order."
+        "\n", opts=("bold",)
+    ))
 
     for f in sorted(documents):
 
         if not f.endswith("gpg"):
             continue
 
-        print("    * Generating a thumbnail for {}".format(f))
+        print("    {} {} {}".format(
+            colourise("*", fg="green"),
+            colourise("Generating a thumbnail for", fg="white"),
+            colourise(f, fg="cyan")
+        ))
 
         thumb_temp = tempfile.mkdtemp(
             prefix="paperless", dir=settings.SCRATCH_DIR)
