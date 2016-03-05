@@ -26,7 +26,7 @@ from documents.views import (
 )
 
 router = DefaultRouter()
-router.register(r'senders', CorrespondentViewSet)
+router.register(r'correspondents', CorrespondentViewSet)
 router.register(r'tags', TagViewSet)
 router.register(r'documents', DocumentViewSet)
 router.register(r'logs', LogViewSet)
