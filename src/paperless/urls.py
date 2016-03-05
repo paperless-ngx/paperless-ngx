@@ -44,7 +44,11 @@ urlpatterns = [
     # url(r"^$", IndexView.as_view(), name="index"),
 
     # File downloads
-    url(r"^fetch/(?P<pk>\d+)$", FetchView.as_view(), name="fetch"),
+    url(
+        r"^fetch/(?P<kind>doc|thumb)/(?P<pk>\d+)$",
+        FetchView.as_view(),
+        name="fetch"
+    ),
 
     # The Django admin
     url(r"admin/", admin.site.urls),

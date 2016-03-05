@@ -37,7 +37,8 @@ class DocumentSerializer(serializers.ModelSerializer):
             "created",
             "modified",
             "file_name",
-            "download_url"
+            "download_url",
+            "thumbnail_url",
         )
 
 
