@@ -57,7 +57,9 @@ docs/_build/
 target/
 
 # Stored PDFs
-media/*
+media/documents/*.gpg
+media/documents/thumbnails/*.gpg
+media/documents/originals/*.gpg
 
 # Sqlite database
 db.sqlite3
@@ -74,4 +76,3 @@ docker-compose.env
 # Used for development
 scripts/import-for-development
 environment
-

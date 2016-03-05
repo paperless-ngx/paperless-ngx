@@ -171,6 +171,7 @@ class Document(models.Model):
         return os.path.join(
             settings.MEDIA_ROOT,
             "documents",
+            "originals",
             "{:07}.{}.gpg".format(self.pk, self.file_type)
         )
 
@@ -184,7 +185,24 @@ class Document(models.Model):
 
     @property
     def download_url(self):
-        return reverse("fetch", kwargs={"pk": self.pk})
+        return reverse("fetch", kwargs={"kind": "doc", "pk": self.pk})
+
+    @property
+    def thumbnail_path(self):
+        return os.path.join(
+            settings.MEDIA_ROOT,
+            "documents",
+            "thumbnails",
+            "{:07}.jpg.gpg".format(self.pk)
+        )
+
+    @property
+    def thumbnail_file(self):
+        return open(self.thumbnail_path, "rb")
+
+    @property
+    def thumbnail_url(self):
+        return reverse("fetch", kwargs={"kind": "thumb", "pk": self.pk})
 
 
 class Log(models.Model):

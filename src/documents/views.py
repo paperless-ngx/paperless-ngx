@@ -35,7 +35,7 @@ class FetchView(LoginRequiredMixin, DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         """
-        Override the default to return the unencrypted PDF as raw data.
+        Override the default to return the unencrypted image/PDF as raw data.
         """
 
         content_types = {
@@ -45,6 +45,12 @@ class FetchView(LoginRequiredMixin, DetailView):
             Document.TYPE_GIF: "image/gif",
             Document.TYPE_TIF: "image/tiff",
         }
+
+        if self.kwargs["kind"] == "thumb":
+            return HttpResponse(
+                GnuPG.decrypted(self.object.thumb_file),
+                content_type=content_types[Document.TYPE_JPG]
+            )
 
         response = HttpResponse(
             GnuPG.decrypted(self.object.source_file),
