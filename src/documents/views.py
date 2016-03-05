@@ -29,7 +29,7 @@ class IndexView(TemplateView):
         return TemplateView.get_context_data(self, **kwargs)
 
 
-class FetchView(LoginRequiredMixin, DetailView):
+class FetchView(DetailView):
 
     model = Document
 
@@ -48,8 +48,8 @@ class FetchView(LoginRequiredMixin, DetailView):
 
         if self.kwargs["kind"] == "thumb":
             return HttpResponse(
-                GnuPG.decrypted(self.object.thumb_file),
-                content_type=content_types[Document.TYPE_JPG]
+                GnuPG.decrypted(self.object.thumbnail_file),
+                content_type=content_types[Document.TYPE_PNG]
             )
 
         response = HttpResponse(
