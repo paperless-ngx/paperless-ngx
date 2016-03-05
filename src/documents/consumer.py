@@ -119,10 +119,11 @@ class Consumer(object):
 
             tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
             pngs = self._get_greyscale(tempdir, doc)
+            thumbnail = self._get_thumbnail(tempdir, doc)
 
             try:
                 text = self._get_ocr(pngs)
-                self._store(text, doc)
+                self._store(text, doc, thumbnail)
             except OCRError as e:
                 self._ignore.append(doc)
                 self.log("error", "OCR FAILURE for {}: {}".format(doc, e))
@@ -133,6 +134,9 @@ class Consumer(object):
                 self._cleanup_doc(doc)
 
     def _get_greyscale(self, tempdir, doc):
+        """
+        Greyscale images are easier for Tesseract to OCR
+        """
 
         self.log("info", "Generating greyscale image from {}".format(doc))
 
@@ -149,6 +153,23 @@ class Consumer(object):
                 pngs.append(os.path.join(tempdir, f))
 
         return sorted(filter(lambda __: os.path.isfile(__), pngs))
+
+    def _get_thumbnail(self, tempdir, doc):
+        """
+        The thumbnail of a PDF is just a 500px wide image of the first page.
+        """
+
+        self.log("info", "Generating the thumbnail")
+
+        subprocess.Popen((
+            self.CONVERT,
+            "-scale", "500x5000",
+            "-alpha", "remove",
+            doc,
+            os.path.join(tempdir, "convert-%04d.png")
+        )).wait()
+
+        return os.path.join(tempdir, "convert-0000.png")
 
     def _guess_language(self, text):
         try:
@@ -288,7 +309,7 @@ class Consumer(object):
         m = re.match(self.REGEX_TITLE, parseable)
         return None, m.group(1), (), get_suffix(m.group(2))
 
-    def _store(self, text, doc):
+    def _store(self, text, doc, thumbnail):
 
         sender, title, tags, file_type = self._guess_attributes_from_name(doc)
         relevant_tags = set(list(Tag.match_all(text)) + list(tags))
@@ -313,9 +334,16 @@ class Consumer(object):
             self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
+        # Encrypt and store the actual document
         with open(doc, "rb") as unencrypted:
             with open(document.source_path, "wb") as encrypted:
-                self.log("debug", "Encrypting")
+                self.log("debug", "Encrypting the document")
+                encrypted.write(GnuPG.encrypted(unencrypted))
+
+        # Encrypt and store the thumbnail
+        with open(thumbnail, "rb") as unencrypted:
+            with open(document.thumbnail_path, "wb") as encrypted:
+                self.log("debug", "Encrypting the thumbnail")
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
         self.log("info", "Completed")
