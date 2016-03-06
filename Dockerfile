@@ -16,7 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application
 RUN mkdir -p /usr/src/paperless/src
+RUN mkdir -p /usr/src/paperless/data
+RUN mkdir -p /usr/src/paperless/media
 COPY src/ /usr/src/paperless/src/
+COPY data/ /usr/src/paperless/data/
+COPY media/ /usr/src/paperless/media/
 
 # Set consumption directory
 ENV PAPERLESS_CONSUMPTION_DIR /consume
@@ -24,7 +28,6 @@ RUN mkdir -p $PAPERLESS_CONSUMPTION_DIR
 
 # Migrate database
 WORKDIR /usr/src/paperless/src
-RUN mkdir /usr/src/paperless/data
 RUN ./manage.py migrate
 
 # Create user
