@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models.aggregates import Max
 
 
-class Concat(models.Aggregate):
+class GroupConcat(models.Aggregate):
     """
     Theoretically, this should work in Sqlite, PostgreSQL, and MySQL, but I've
     only ever tested it in Sqlite.
@@ -60,7 +60,7 @@ class LogQuerySet(models.query.QuerySet):
     def by_group(self):
         return self.values("group").annotate(
             time=Max("modified"),
-            messages=Concat("message"),
+            messages=GroupConcat("message"),
         ).order_by("-time")
 
 

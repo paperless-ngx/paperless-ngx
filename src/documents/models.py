@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import uuid
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -236,3 +237,16 @@ class Log(models.Model):
 
     def __str__(self):
         return self.message
+
+    def save(self, *args, **kwargs):
+        """
+        To allow for the case where we don't want to group the message, we
+        shouldn't force the caller to specify a one-time group value.  However,
+        allowing group=None means that the manager can't differentiate the
+        different un-grouped messages, so instead we set a random one here.
+        """
+
+        if not self.group:
+            self.group = uuid.uuid4()
+
+        models.Model.save(self, *args, **kwargs)
