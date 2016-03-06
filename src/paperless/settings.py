@@ -189,6 +189,9 @@ GNUPG_HOME = os.getenv("HOME", "/tmp")
 # Convert is part of the ImageMagick package
 CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY")
 
+# Unpaper
+UNPAPER_BINARY = os.getenv("PAPERLESS_UNPAPER_BINARY", "unpaper")
+
 # This will be created if it doesn't exist
 SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 
