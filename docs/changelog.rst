@@ -1,12 +1,20 @@
 Changelog
 #########
 
-* 0.1.1 (master)
+* 0.1.1
 
   * Potentially **Breaking Change**: All references to "sender" in the code
     have been renamed to "correspondent" to better reflect the nature of the
     property (one could quite reasonably scan a document before sending it to
     someone.)
+  * `#67`_: Rewrote the document exporter and added a new importer that allows
+    for full metadata retention without depending on the file name and
+    modification time.  A big thanks to `Tikitu de Jager`_, `Pit`_,
+    `Florian Jung`_, and `Christopher Luu`_ for their code snippets and
+    contributing conversation that lead to this change.
+  * `#20`_: Added *unpaper* support to help in cleaning up the scanned image
+    before it's OCR'd.  Thanks to `Pit`_ for this one.
+  * `#71`_ Added (encrypted) thumbnails in anticipation of a proper UI.
   * `#68`_: Added support for using a proper config file at
     ``/etc/paperless.conf`` and modified the systemd unit files to use it.
   * Refactored the Vagrant installation process to use environment variables
@@ -69,14 +77,17 @@ Changelog
 
   * Initial release
 
-.. _Wayne Werner: https://github.com/waynew
 .. _Brian Conn: https://github.com/TheConnMan
+.. _Christopher Luu: https://github.com/nuudles
+.. _Florian Jung: https://github.com/the01
 .. _Tikitu de Jager: https://github.com/tikitu
-.. _Pit: https://github.com/pitkley
 .. _Paul: https://github.com/polo2ro
+.. _Pit: https://github.com/pitkley
+.. _Wayne Werner: https://github.com/waynew
 .. _darkmatter: https://github.com/darkmatter
 .. _zedster: https://github.com/zedster
 
+.. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
 .. _#45: https://github.com/danielquinn/paperless/issues/45
 .. _#47: https://github.com/danielquinn/paperless/issues/47
@@ -85,4 +96,6 @@ Changelog
 .. _#54: https://github.com/danielquinn/paperless/issues/54
 .. _#57: https://github.com/danielquinn/paperless/issues/57
 .. _#60: https://github.com/danielquinn/paperless/issues/60
+.. _#67: https://github.com/danielquinn/paperless/issues/67
 .. _#68: https://github.com/danielquinn/paperless/issues/68
+.. _#71: https://github.com/danielquinn/paperless/issues/71
