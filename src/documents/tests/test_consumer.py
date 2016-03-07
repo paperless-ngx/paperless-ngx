@@ -92,6 +92,38 @@ class TestAttachment(TestCase):
             self.TAGS
         )
 
+    def test_guess_attributes_from_name_when_correspondent_empty(self):
+        self._test_guess_attributes_from_name(
+            '/path/to/ - weird empty correspondent but should not break.{}',
+            None,
+            ' - weird empty correspondent but should not break',
+            ()
+        )
+
+    def test_guess_attributes_from_name_when_title_starts_with_dash(self):
+        self._test_guess_attributes_from_name(
+            '/path/to/- weird but should not break.{}',
+            None,
+            '- weird but should not break',
+            ()
+        )
+
+    def test_guess_attributes_from_name_when_title_ends_with_dash(self):
+        self._test_guess_attributes_from_name(
+            '/path/to/weird but should not break -.{}',
+            None,
+            'weird but should not break -',
+            ()
+        )
+
+    def test_guess_attributes_from_name_when_title_is_empty(self):
+        self._test_guess_attributes_from_name(
+            '/path/to/weird correspondent but should not break - .{}',
+            'weird correspondent but should not break',
+            '',
+            ()
+        )
+
 
 class Permutations(TestCase):
     valid_correspondents = ['timmy', 'Dr. McWheelie',
