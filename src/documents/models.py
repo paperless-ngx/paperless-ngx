@@ -12,6 +12,35 @@ from django.utils import timezone
 from .managers import LogManager
 
 
+class FileInfo(object):
+    def __init__(self, title, suffix,
+                 correspondent=None, tags=None,
+                 file_mtime=None, path=None):
+        self._title = title
+        self._suffix = suffix
+        self._correspondent = correspondent
+        self._tags = tags
+        self._file_mtime = file_mtime
+        self._path = path
+
+    @classmethod
+    def from_path(cls, path):
+        pass
+
+    @classmethod
+    def from_document(cls, document):
+        pass
+
+    def filename(self):
+        pass
+
+    def kwargs_for_document_create(self):
+        pass
+
+    def add_tags(self, tags):
+        self._tags = set(tags).union(self._tags)
+
+
 class SluggedModel(models.Model):
 
     name = models.CharField(max_length=128, unique=True)
