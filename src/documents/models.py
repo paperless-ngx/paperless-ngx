@@ -87,6 +87,21 @@ class FileInfo(object):
         return FileInfo(
             title=m.group(1), tags=(), suffix=get_suffix(m.group(2)))
 
+    @property
+    def title(self):
+        return self._title
+
+    @property
+    def correspondent(self):
+        return self._correspondent
+
+    @property
+    def tags(self):
+        return self._tags
+
+    @property
+    def suffix(self):
+        return self._suffix
 
 class SluggedModel(models.Model):
 
