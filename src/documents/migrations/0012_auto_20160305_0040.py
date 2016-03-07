@@ -52,6 +52,11 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
         "\n", opts=("bold",)
     ))
 
+    try:
+        os.makedirs(settings.SCRATCH_DIR)
+    except FileExistsError:
+        pass
+
     for f in sorted(documents):
 
         if not f.endswith("gpg"):
