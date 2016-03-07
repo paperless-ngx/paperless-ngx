@@ -256,24 +256,20 @@ class Consumer(object):
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)
 
-    def _guess_attributes_from_name(self, parseable):
-        file_info = FileInfo.from_path(parseable)
-        return file_info.sender, file_info.title, file_info.tags, file_info.suffix
-
     def _store(self, text, doc, thumbnail):
 
-        sender, title, tags, file_type = self._guess_attributes_from_name(doc)
-        relevant_tags = set(list(Tag.match_all(text)) + list(tags))
+        file_info = FileInfo.from_path(doc)
+        relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
 
         stats = os.stat(doc)
 
         self.log("debug", "Saving record to database")
 
         document = Document.objects.create(
-            correspondent=sender,
-            title=title,
+            correspondent=file_info.correspondent,
+            title=file_info.title,
             content=text,
-            file_type=file_type,
+            file_type=file_info.suffix,
             created=timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime)),
             modified=timezone.make_aware(
