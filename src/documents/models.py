@@ -14,14 +14,11 @@ from .managers import LogManager
 
 class FileInfo(object):
     def __init__(self, title, suffix,
-                 correspondent=None, tags=None,
-                 file_mtime=None, path=None):
+                 correspondent=None, tags=None):
         self._title = title
         self._suffix = suffix
         self._correspondent = correspondent
         self._tags = tags
-        self._file_mtime = file_mtime
-        self._path = path
 
     REGEX_TITLE = re.compile(
         r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
@@ -89,19 +86,6 @@ class FileInfo(object):
         m = re.match(cls.REGEX_TITLE, path)
         return FileInfo(
             title=m.group(1), tags=(), suffix=get_suffix(m.group(2)))
-
-    @classmethod
-    def from_document(cls, document):
-        pass
-
-    def filename(self):
-        pass
-
-    def kwargs_for_document_create(self):
-        pass
-
-    def add_tags(self, tags):
-        self._tags = set(tags).union(self._tags)
 
 
 class SluggedModel(models.Model):
