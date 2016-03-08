@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+    webserver:
+        image: paperless
+        ports:
+            # You can adapt the port you want Paperless to listen on by
+            # modifying the part before the `:`.
+            - "8000:8000"
+        volumes:
+            - data:/usr/src/paperless/data
+            - media:/usr/src/paperless/media
+        env_file: docker-compose.env
+        environment:
+            - PAPERLESS_OCR_LANGUAGES=
+        command: ["runserver", "0.0.0.0:8000"]
+
+    consumer:
+        image: paperless
+        volumes:
+            - data:/usr/src/paperless/data
+            - media:/usr/src/paperless/media
+            # You have to adapt the local path you want the consumption
+            # directory to mount to by modifying the part before the ':'.
+            - /path/to/arbitrary/place:/consume
+            # Likewise, you can add a local path to mount a directory for
+            # exporting. This is not strictly needed for paperless to
+            # function, only if you're exporting your files: uncomment
+            # it and fill in a local path if you know you're going to
+            # want to export your documents.
+            # - /path/to/another/arbitrary/place:/export
+        env_file: docker-compose.env
+        command: ["document_consumer"]
+
+volumes:
+    data:
+    media:

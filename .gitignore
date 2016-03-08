@@ -57,7 +57,9 @@ docs/_build/
 target/
 
 # Stored PDFs
-media/*
+media/documents/*.gpg
+media/documents/thumbnails/*.gpg
+media/documents/originals/*.gpg
 
 # Sqlite database
 db.sqlite3
@@ -68,8 +70,9 @@ db.sqlite3
 # Other stuff that doesn't belong
 virtualenv
 .vagrant
+docker-compose.yml
+docker-compose.env
 
 # Used for development
 scripts/import-for-development
 environment
-

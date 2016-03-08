@@ -1,11 +1,15 @@
+import logging
 import os
 import re
+import uuid
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+
+from .managers import LogManager
 
 
 class SluggedModel(models.Model):
@@ -25,7 +29,7 @@ class SluggedModel(models.Model):
         return self.name
 
 
-class Sender(SluggedModel):
+class Correspondent(SluggedModel):
 
     # This regex is probably more restrictive than it needs to be, but it's
     # better safe than sorry.
@@ -36,7 +40,7 @@ class Sender(SluggedModel):
 
 
 class Tag(SluggedModel):
-    
+
     COLOURS = (
         (1, "#a6cee3"),
         (2, "#1f78b4"),
@@ -71,9 +75,9 @@ class Tag(SluggedModel):
         default=MATCH_ANY,
         help_text=(
             "Which algorithm you want to use when matching text to the OCR'd "
-            "PDF.  Here, \"any\" looks for any occurrence of any word provided "
-            "in the PDF, while \"all\" requires that every word provided "
-            "appear in the PDF, albeit not in the order provided.  A "
+            "PDF.  Here, \"any\" looks for any occurrence of any word "
+            "provided in the PDF, while \"all\" requires that every word "
+            "provided appear in the PDF, albeit not in the order provided.  A "
             "\"literal\" match means that the text you enter must appear in "
             "the PDF exactly as you've entered it, and \"regular expression\" "
             "uses a regex to match the PDF.  If you don't know what a regex "
@@ -86,28 +90,40 @@ class Tag(SluggedModel):
         return "{}: \"{}\" ({})".format(
             self.name, self.match, self.get_matching_algorithm_display())
 
+    @classmethod
+    def match_all(cls, text, tags=None):
+
+        if tags is None:
+            tags = cls.objects.all()
+
+        text = text.lower()
+        for tag in tags:
+            if tag.matches(text):
+                yield tag
+
     def matches(self, text):
+
         # Check that match is not empty
         if self.match.strip() == "":
             return False
 
         if self.matching_algorithm == self.MATCH_ALL:
             for word in self.match.split(" "):
-                if word not in text:
+                if not re.search(r"\b{}\b".format(word), text):
                     return False
             return True
 
         if self.matching_algorithm == self.MATCH_ANY:
             for word in self.match.split(" "):
-                if word in text:
+                if re.search(r"\b{}\b".format(word), text):
                     return True
             return False
 
         if self.matching_algorithm == self.MATCH_LITERAL:
-            return self.match in text
+            return bool(re.search(r"\b{}\b".format(self.match), text))
 
         if self.matching_algorithm == self.MATCH_REGEX:
-            return re.search(re.compile(self.match), text)
+            return bool(re.search(re.compile(self.match), text))
 
         raise NotImplementedError("Unsupported matching algorithm")
 
@@ -125,8 +141,8 @@ class Document(models.Model):
     TYPE_TIF = "tiff"
     TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,)
 
-    sender = models.ForeignKey(
-        Sender, blank=True, null=True, related_name="documents")
+    correspondent = models.ForeignKey(
+        Correspondent, blank=True, null=True, related_name="documents")
     title = models.CharField(max_length=128, blank=True, db_index=True)
     content = models.TextField(db_index=True)
     file_type = models.CharField(
@@ -140,14 +156,15 @@ class Document(models.Model):
     modified = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta(object):
-        ordering = ("sender", "title")
+        ordering = ("correspondent", "title")
 
     def __str__(self):
-        created = self.created.strftime("%Y-%m-%d")
-        if self.sender and self.title:
-            return "{}: {}, {}".format(created, self.sender, self.title)
-        if self.sender or self.title:
-            return "{}: {}".format(created, self.sender or self.title)
+        created = self.created.strftime("%Y%m%d%H%M%S")
+        if self.correspondent and self.title:
+            return "{}: {} - {}".format(
+                created, self.correspondent, self.title)
+        if self.correspondent or self.title:
+            return "{}: {}".format(created, self.correspondent or self.title)
         return str(created)
 
     @property
@@ -155,6 +172,7 @@ class Document(models.Model):
         return os.path.join(
             settings.MEDIA_ROOT,
             "documents",
+            "originals",
             "{:07}.{}.gpg".format(self.pk, self.file_type)
         )
 
@@ -164,14 +182,71 @@ class Document(models.Model):
 
     @property
     def file_name(self):
-        if self.sender and self.title:
-            tags = ",".join([t.slug for t in self.tags.all()])
-            if tags:
-                return "{} - {} - {}.{}".format(
-                    self.sender, self.title, tags, self.file_type)
-            return "{} - {}.{}".format(self.sender, self.title, self.file_type)
-        return os.path.basename(self.source_path)
+        return slugify(str(self)) + "." + self.file_type
 
     @property
     def download_url(self):
-        return reverse("fetch", kwargs={"pk": self.pk})
+        return reverse("fetch", kwargs={"kind": "doc", "pk": self.pk})
+
+    @property
+    def thumbnail_path(self):
+        return os.path.join(
+            settings.MEDIA_ROOT,
+            "documents",
+            "thumbnails",
+            "{:07}.png.gpg".format(self.pk)
+        )
+
+    @property
+    def thumbnail_file(self):
+        return open(self.thumbnail_path, "rb")
+
+    @property
+    def thumbnail_url(self):
+        return reverse("fetch", kwargs={"kind": "thumb", "pk": self.pk})
+
+
+class Log(models.Model):
+
+    LEVELS = (
+        (logging.DEBUG, "Debugging"),
+        (logging.INFO, "Informational"),
+        (logging.WARNING, "Warning"),
+        (logging.ERROR, "Error"),
+        (logging.CRITICAL, "Critical"),
+    )
+
+    COMPONENT_CONSUMER = 1
+    COMPONENT_MAIL = 2
+    COMPONENTS = (
+        (COMPONENT_CONSUMER, "Consumer"),
+        (COMPONENT_MAIL, "Mail Fetcher")
+    )
+
+    group = models.UUIDField(blank=True)
+    message = models.TextField()
+    level = models.PositiveIntegerField(choices=LEVELS, default=logging.INFO)
+    component = models.PositiveIntegerField(choices=COMPONENTS)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    objects = LogManager()
+
+    class Meta(object):
+        ordering = ("-modified",)
+
+    def __str__(self):
+        return self.message
+
+    def save(self, *args, **kwargs):
+        """
+        To allow for the case where we don't want to group the message, we
+        shouldn't force the caller to specify a one-time group value.  However,
+        allowing group=None means that the manager can't differentiate the
+        different un-grouped messages, so instead we set a random one here.
+        """
+
+        if not self.group:
+            self.group = uuid.uuid4()
+
+        models.Model.save(self, *args, **kwargs)

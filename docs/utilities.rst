@@ -26,7 +26,7 @@ How to Use It
 
 The webserver is started via the ``manage.py`` script:
 
-.. code:: bash
+.. code-block:: shell-session
 
     $ /path/to/paperless/src/manage.py runserver
 
@@ -64,7 +64,7 @@ How to Use It
 
 The consumer is started via the ``manage.py`` script:
 
-.. code:: bash
+.. code-block:: shell-session
 
     $ /path/to/paperless/src/manage.py document_consumer
 
@@ -95,13 +95,110 @@ How to Use It
 
 This too is done via the ``manage.py`` script:
 
+.. code-block:: shell-session
+
+    $ /path/to/paperless/src/manage.py document_exporter /path/to/somewhere/
+
+This will dump all of your unencrypted PDFs into ``/path/to/somewhere`` for you
+to do with as you please.  The files are accompanied with a special file,
+``manifest.json`` which can be used to
+:ref:`import the files <utilities-importer>` at a later date if you wish.
+
+
+.. _utilities-exporter-howto-docker:
+
+Docker
+______
+
+If you are :ref:`using Docker <setup-installation-docker>`, running the
+expoorter is almost as easy.  To mount a volume for exports, follow the
+instructions in the ``docker-compose.yml.example`` file for the ``/export``
+volume (making the changes in your own ``docker-compose.yml`` file, of course).
+Once you have the volume mounted, the command to run an export is:
+
+.. code-block:: shell-session
+
+   $ docker-compose run --rm consumer document_exporter /export
+
+If you prefer to use ``docker run`` directly, supplying the necessary commandline
+options:
+
+.. code-block:: shell-session
+
+   $ # Identify your containers
+   $ docker-compose ps
+           Name                       Command                State     Ports
+   -------------------------------------------------------------------------
+   paperless_consumer_1    /sbin/docker-entrypoint.sh ...   Exit 0
+   paperless_webserver_1   /sbin/docker-entrypoint.sh ...   Exit 0
+
+   $ # Make sure to replace your passphrase and remove or adapt the id mapping
+   $ docker run --rm \
+       --volumes-from paperless_data_1 \
+       --volume /path/to/arbitrary/place:/export \
+       -e PAPERLESS_PASSPHRASE=YOUR_PASSPHRASE \
+       -e USERMAP_UID=1000 -e USERMAP_GID=1000 \
+       paperless document_exporter /export
+
+
+.. _utilities-importer:
+
+The Importer
+------------
+
+Looking to transfer Paperless data from one instance to another, or just want
+to restore from a backup?  This is your go-to toy.
+
+
+.. _utilities-importer-howto:
+
+How to Use It
+.............
+
+The importer works just like the exporter.  You point it at a directory, and
+the script does the rest of the work:
+
+.. code-block:: shell-session
+
+    $ /path/to/paperless/src/manage.py document_importer /path/to/somewhere/
+
+Docker
+______
+
+Assuming that you've already gone through the steps above in the
+:ref:`export <utilities-exporter-howto-docker>` section, then the easiest thing
+to do is just re-use the ``/export`` path you already setup:
+
+.. code-block:: shell-session
+
+   $ docker-compose run --rm consumer document_importer /export
+
+Similarly, if you're not using docker-compose, you can adjust the export
+instructions above to do the import.
+
+
+.. _utilities-retagger:
+
+The Re-tagger
+-------------
+
+Say you've imported a few hundred documents and now want to introduce a tag
+and apply its matching to all of the currently-imported docs.  This problem is
+common enough that there's a tool for it.
+
+
+.. _utilities-retagger-howto:
+
+How to Use It
+.............
+
+This too is done via the ``manage.py`` script:
+
 .. code:: bash
 
-    $ /path/to/paperless/src/manage.py document_exporter /path/to/somewhere
+    $ /path/to/paperless/src/manage.py document_retagger
 
-This will dump all of your PDFs into ``/path/to/somewhere`` for you to do with
-as you please.  The naming scheme on export is identical to that used for
-import, so should you can now safely delete the entire project directly,
-database, encrypted PDFs and all, and later create it all again simply by
-running the consumer again and dumping all of these files into
-``CONSUMPTION_DIR``.
+That's it.  It'll loop over all of the documents in your database and attempt
+to match all of your tags to them.  If one matches, it'll be applied.  And
+don't worry, you can run this as often as you like, it' won't double-tag
+a document.

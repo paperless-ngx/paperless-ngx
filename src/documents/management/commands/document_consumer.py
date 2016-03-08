@@ -1,10 +1,12 @@
 import datetime
+import logging
 import os
 import time
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
+from ...models import Log
 from ...consumer import Consumer, ConsumerError
 from ...mail import MailFetcher, MailFetcherError
 
@@ -34,7 +36,7 @@ class Command(BaseCommand):
         self.verbosity = options["verbosity"]
 
         try:
-            self.file_consumer = Consumer(verbosity=self.verbosity)
+            self.file_consumer = Consumer()
             self.mail_fetcher = MailFetcher()
         except (ConsumerError, MailFetcherError) as e:
             raise CommandError(e)
@@ -43,6 +45,13 @@ class Command(BaseCommand):
             os.makedirs(self.MEDIA_DOCS)
         except FileExistsError:
             pass
+
+        logging.getLogger(__name__).info(
+            "Starting document consumer at {}".format(
+                settings.CONSUMPTION_DIR
+            ),
+            extra={"component": Log.COMPONENT_CONSUMER}
+        )
 
         try:
             while True:

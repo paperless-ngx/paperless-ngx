@@ -15,15 +15,46 @@ Including another URLconf
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf import settings
-from django.conf.urls import url, static
+from django.conf.urls import url, static, include
 from django.contrib import admin
 
-from documents.views import PdfView, PushView
+from rest_framework.routers import DefaultRouter
+
+from documents.views import (
+    IndexView, FetchView, PushView,
+    CorrespondentViewSet, TagViewSet, DocumentViewSet, LogViewSet
+)
+
+router = DefaultRouter()
+router.register(r'correspondents', CorrespondentViewSet)
+router.register(r'tags', TagViewSet)
+router.register(r'documents', DocumentViewSet)
+router.register(r'logs', LogViewSet)
 
 urlpatterns = [
-    url(r"^fetch/(?P<pk>\d+)$", PdfView.as_view(), name="fetch"),
-    url(r'', admin.site.urls),
+
+    # API
+    url(
+        r"^api/auth/",
+        include('rest_framework.urls', namespace="rest_framework")
+    ),
+    url(r"^api/", include(router.urls, namespace="drf")),
+
+    # Normal pages (coming soon)
+    # url(r"^$", IndexView.as_view(), name="index"),
+
+    # File downloads
+    url(
+        r"^fetch/(?P<kind>doc|thumb)/(?P<pk>\d+)$",
+        FetchView.as_view(),
+        name="fetch"
+    ),
+
+    # The Django admin
+    url(r"admin/", admin.site.urls),
+    url(r"", admin.site.urls),  # This is going away
+
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if settings.UPLOAD_SHARED_SECRET:
+if settings.SHARED_SECRET:
     urlpatterns.insert(0, url(r"^push$", PushView.as_view(), name="push"))

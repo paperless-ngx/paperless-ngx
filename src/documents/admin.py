@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 
-from .models import Sender, Tag, Document
+from .models import Correspondent, Tag, Document, Log
 
 
 class MonthListFilter(admin.SimpleListFilter):
@@ -45,39 +45,73 @@ class DocumentAdmin(admin.ModelAdmin):
             "all": ("paperless.css",)
         }
 
-    search_fields = ("sender__name", "title", "content")
-    list_display = ("created", "sender", "title", "tags_", "document")
-    list_filter = ("tags", "sender", MonthListFilter)
+    search_fields = ("correspondent__name", "title", "content")
+    list_display = ("created_", "correspondent", "title", "tags_", "document")
+    list_filter = ("tags", "correspondent", MonthListFilter)
     list_per_page = 25
+
+    def created_(self, obj):
+        return obj.created.date().strftime("%Y-%m-%d")
 
     def tags_(self, obj):
         r = ""
         for tag in obj.tags.all():
-            r += '<a class="tag" style="background-color: {};" href="{}">{}</a>'.format(
-                tag.get_colour_display(),
-                "{}?tags__id__exact={}".format(
-                    reverse("admin:documents_document_changelist"),
-                    tag.pk
-                ),
-                tag.slug
+            colour = tag.get_colour_display()
+            r += self._html_tag(
+                "a",
+                tag.slug,
+                **{
+                    "class": "tag",
+                    "style": "background-color: {};".format(colour),
+                    "href": "{}?tags__id__exact={}".format(
+                        reverse("admin:documents_document_changelist"),
+                        tag.pk
+                    )
+                }
             )
         return r
     tags_.allow_tags = True
 
     def document(self, obj):
-        return '<a href="{}">' \
-                 '<img src="{}" width="22" height="22" alt="{} icon" title="{}">' \
-               '</a>'.format(
-                    obj.download_url,
-                    static("documents/img/{}.png".format(obj.file_type)),
-                    obj.file_type,
-                    obj.file_name
-                )
+        return self._html_tag(
+            "a",
+            self._html_tag(
+                "img",
+                src=static("documents/img/{}.png".format(obj.file_type)),
+                width=22,
+                height=22,
+                alt=obj.file_type,
+                title=obj.file_name
+            ),
+            href=obj.download_url
+        )
     document.allow_tags = True
 
-admin.site.register(Sender)
+    @staticmethod
+    def _html_tag(kind, inside=None, **kwargs):
+
+        attributes = []
+        for lft, rgt in kwargs.items():
+            attributes.append('{}="{}"'.format(lft, rgt))
+
+        if inside is not None:
+            return "<{kind} {attributes}>{inside}</{kind}>".format(
+                kind=kind, attributes=" ".join(attributes), inside=inside)
+
+        return "<{} {}/>".format(kind, " ".join(attributes))
+
+
+class LogAdmin(admin.ModelAdmin):
+
+    list_display = ("message", "level", "component")
+    list_filter = ("level", "component",)
+
+
+admin.site.register(Correspondent)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Document, DocumentAdmin)
+admin.site.register(Log, LogAdmin)
+
 
 # Unless we implement multi-user, these default registrations don't make sense.
 admin.site.unregister(Group)

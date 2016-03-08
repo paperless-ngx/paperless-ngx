@@ -1,5 +1,8 @@
 import datetime
+import logging
 import tempfile
+import uuid
+
 from multiprocessing.pool import Pool
 
 import itertools
@@ -17,18 +20,12 @@ from PIL import Image
 from django.conf import settings
 from django.utils import timezone
 from django.template.defaultfilters import slugify
+from pyocr.tesseract import TesseractError
 
-from logger.models import Log
 from paperless.db import GnuPG
 
-from .models import Sender, Tag, Document
+from .models import Correspondent, Tag, Document, Log
 from .languages import ISO639
-
-
-def image_to_string(args):
-    self, png, lang = args
-    with Image.open(os.path.join(self.SCRATCH, png)) as f:
-        return self.OCR.image_to_string(f, lang=lang)
 
 
 class OCRError(Exception):
@@ -42,8 +39,8 @@ class ConsumerError(Exception):
 class Consumer(object):
     """
     Loop over every file found in CONSUMPTION_DIR and:
-      1. Convert it to a greyscale png
-      2. Use tesseract on the png
+      1. Convert it to a greyscale pnm
+      2. Use tesseract on the pnm
       3. Encrypt and store the document in the MEDIA_ROOT
       4. Store the OCR'd text in the database
       5. Delete the document and image(s)
@@ -51,28 +48,29 @@ class Consumer(object):
 
     SCRATCH = settings.SCRATCH_DIR
     CONVERT = settings.CONVERT_BINARY
+    UNPAPER = settings.UNPAPER_BINARY
     CONSUME = settings.CONSUMPTION_DIR
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
 
-    OCR = pyocr.get_available_tools()[0]
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
 
     REGEX_TITLE = re.compile(
         r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
-    REGEX_SENDER_TITLE = re.compile(
+    REGEX_CORRESPONDENT_TITLE = re.compile(
         r"^.*/(.+) - (.*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
-    REGEX_SENDER_TITLE_TAGS = re.compile(
+    REGEX_CORRESPONDENT_TITLE_TAGS = re.compile(
         r"^.*/(.*) - (.*) - ([a-z0-9\-,]*)\.(pdf|jpe?g|png|gif|tiff)$",
         flags=re.IGNORECASE
     )
 
-    def __init__(self, verbosity=1):
+    def __init__(self):
 
-        self.verbosity = verbosity
+        self.logger = logging.getLogger(__name__)
+        self.logging_group = None
 
         try:
             os.makedirs(self.SCRATCH)
@@ -92,6 +90,12 @@ class Consumer(object):
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(self.CONSUME))
 
+    def log(self, level, message):
+        getattr(self.logger, level)(message, extra={
+            "group": self.logging_group,
+            "component": Log.COMPONENT_CONSUMER
+        })
+
     def consume(self):
 
         for doc in os.listdir(self.CONSUME):
@@ -110,122 +114,156 @@ class Consumer(object):
             if self._is_ready(doc):
                 continue
 
-            Log.info("Consuming {}".format(doc), Log.COMPONENT_CONSUMER)
+            self.logging_group = uuid.uuid4()
+
+            self.log("info", "Consuming {}".format(doc))
 
             tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
-            pngs = self._get_greyscale(tempdir, doc)
+            imgs = self._get_greyscale(tempdir, doc)
+            thumbnail = self._get_thumbnail(tempdir, doc)
 
             try:
-                text = self._get_ocr(pngs)
-                self._store(text, doc)
-            except OCRError:
+                text = self._get_ocr(imgs)
+                self._store(text, doc, thumbnail)
+            except OCRError as e:
                 self._ignore.append(doc)
-                Log.error("OCR FAILURE: {}".format(doc), Log.COMPONENT_CONSUMER)
+                self.log("error", "OCR FAILURE for {}: {}".format(doc, e))
+                self._cleanup_tempdir(tempdir)
                 continue
-            finally:
-                self._cleanup(tempdir, doc)
+            else:
+                self._cleanup_tempdir(tempdir)
+                self._cleanup_doc(doc)
 
     def _get_greyscale(self, tempdir, doc):
+        """
+        Greyscale images are easier for Tesseract to OCR
+        """
 
-        Log.debug(
-            "Generating greyscale image from {}".format(doc),
-            Log.COMPONENT_CONSUMER
-        )
+        self.log("info", "Generating greyscale image from {}".format(doc))
 
-        png = os.path.join(tempdir, "convert-%04d.jpg")
-
+        # Convert PDF to multiple PNMs
+        pnm = os.path.join(tempdir, "convert-%04d.pnm")
         subprocess.Popen((
             self.CONVERT, "-density", "300", "-depth", "8",
-            "-type", "grayscale", doc, png
+            "-type", "grayscale", doc, pnm
         )).wait()
 
-        pngs = [os.path.join(tempdir, f) for f in os.listdir(tempdir) if f.startswith("convert")]
-        return sorted(filter(lambda f: os.path.isfile(f), pngs))
+        # Get a list of converted images
+        pnms = []
+        for f in os.listdir(tempdir):
+            if f.endswith(".pnm"):
+                pnms.append(os.path.join(tempdir, f))
 
-    @staticmethod
-    def _guess_language(text):
+        # Run unpaper in parallel on converted images
+        with Pool(processes=self.THREADS) as pool:
+            pool.map(run_unpaper, itertools.product([self.UNPAPER], pnms))
+
+        # Return list of converted images, processed with unpaper
+        pnms = []
+        for f in os.listdir(tempdir):
+            if f.endswith(".unpaper.pnm"):
+                pnms.append(os.path.join(tempdir, f))
+
+        return sorted(filter(lambda __: os.path.isfile(__), pnms))
+
+    def _get_thumbnail(self, tempdir, doc):
+        """
+        The thumbnail of a PDF is just a 500px wide image of the first page.
+        """
+
+        self.log("info", "Generating the thumbnail")
+
+        subprocess.Popen((
+            self.CONVERT,
+            "-scale", "500x5000",
+            "-alpha", "remove",
+            doc,
+            os.path.join(tempdir, "convert-%04d.png")
+        )).wait()
+
+        return os.path.join(tempdir, "convert-0000.png")
+
+    def _guess_language(self, text):
         try:
             guess = langdetect.detect(text)
-            Log.debug(
-                "Language detected: {}".format(guess),
-                Log.COMPONENT_CONSUMER
-            )
+            self.log("debug", "Language detected: {}".format(guess))
             return guess
         except Exception as e:
-            Log.warning(
-                "Language detection error: {}".format(e), Log.COMPONENT_MAIL)
+            self.log("warning", "Language detection error: {}".format(e))
 
-    def _get_ocr(self, pngs):
+    def _get_ocr(self, imgs):
         """
         Attempts to do the best job possible OCR'ing the document based on
         simple language detection trial & error.
         """
 
-        if not pngs:
-            raise OCRError
+        if not imgs:
+            raise OCRError("No images found")
 
-        Log.debug("OCRing the document", Log.COMPONENT_CONSUMER)
+        self.log("info", "OCRing the document")
 
         # Since the division gets rounded down by int, this calculation works
         # for every edge-case, i.e. 1
-        middle = int(len(pngs) / 2)
-        raw_text = self._ocr([pngs[middle]], self.DEFAULT_OCR_LANGUAGE)
+        middle = int(len(imgs) / 2)
+        raw_text = self._ocr([imgs[middle]], self.DEFAULT_OCR_LANGUAGE)
 
         guessed_language = self._guess_language(raw_text)
 
         if not guessed_language or guessed_language not in ISO639:
-            Log.warning("Language detection failed!", Log.COMPONENT_CONSUMER)
+            self.log("warning", "Language detection failed!")
             if settings.FORGIVING_OCR:
-                Log.warning(
-                    "As FORGIVING_OCR is enabled, we're going to make the best "
-                    "with what we have.",
-                    Log.COMPONENT_CONSUMER
+                self.log(
+                    "warning",
+                    "As FORGIVING_OCR is enabled, we're going to make the "
+                    "best with what we have."
                 )
-                raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
+                raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
-            raise OCRError
+            raise OCRError("Language detection failed")
 
         if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
-            raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
+            raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
             return raw_text
 
         try:
-            return self._ocr(pngs, ISO639[guessed_language])
+            return self._ocr(imgs, ISO639[guessed_language])
         except pyocr.pyocr.tesseract.TesseractError:
             if settings.FORGIVING_OCR:
-                Log.warning(
+                self.log(
+                    "warning",
                     "OCR for {} failed, but we're going to stick with what "
                     "we've got since FORGIVING_OCR is enabled.".format(
                         guessed_language
-                    ),
-                    Log.COMPONENT_CONSUMER
+                    )
                 )
-                raw_text = self._assemble_ocr_sections(pngs, middle, raw_text)
+                raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
-            raise OCRError
+            raise OCRError(
+                "The guessed language is not available in this instance of "
+                "Tesseract."
+            )
 
-    def _assemble_ocr_sections(self, pngs, middle, text):
+    def _assemble_ocr_sections(self, imgs, middle, text):
         """
         Given a `middle` value and the text that middle page represents, we OCR
         the remainder of the document and return the whole thing.
         """
-        text = self._ocr(pngs[:middle], self.DEFAULT_OCR_LANGUAGE) + text
-        text += self._ocr(pngs[middle+1:], self.DEFAULT_OCR_LANGUAGE)
+        text = self._ocr(imgs[:middle], self.DEFAULT_OCR_LANGUAGE) + text
+        text += self._ocr(imgs[middle + 1:], self.DEFAULT_OCR_LANGUAGE)
         return text
 
-    def _ocr(self, pngs, lang):
+    def _ocr(self, imgs, lang):
         """
         Performs a single OCR attempt.
         """
 
-        if not pngs:
+        if not imgs:
             return ""
 
-        Log.debug("Parsing for {}".format(lang), Log.COMPONENT_CONSUMER)
+        self.log("info", "Parsing for {}".format(lang))
 
         with Pool(processes=self.THREADS) as pool:
-            r = pool.map(
-                image_to_string, itertools.product([self], pngs, [lang]))
+            r = pool.map(image_to_string, itertools.product(imgs, [lang]))
             r = " ".join(r)
 
         # Strip out excess white space to allow matching to go smoother
@@ -233,16 +271,18 @@ class Consumer(object):
 
     def _guess_attributes_from_name(self, parseable):
         """
-        We use a crude naming convention to make handling the sender, title, and
-        tags easier:
-          "<sender> - <title> - <tags>.<suffix>"
-          "<sender> - <title>.<suffix>"
+        We use a crude naming convention to make handling the correspondent,
+        title, and tags easier:
+          "<correspondent> - <title> - <tags>.<suffix>"
+          "<correspondent> - <title>.<suffix>"
           "<title>.<suffix>"
         """
 
-        def get_sender(sender_name):
-            return Sender.objects.get_or_create(
-                name=sender_name, defaults={"slug": slugify(sender_name)})[0]
+        def get_correspondent(correspondent_name):
+            return Correspondent.objects.get_or_create(
+                name=correspondent_name,
+                defaults={"slug": slugify(correspondent_name)}
+            )[0]
 
         def get_tags(tags):
             r = []
@@ -251,40 +291,47 @@ class Consumer(object):
                     Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
             return tuple(r)
 
-        # First attempt: "<sender> - <title> - <tags>.<suffix>"
-        m = re.match(self.REGEX_SENDER_TITLE_TAGS, parseable)
+        def get_suffix(suffix):
+            suffix = suffix.lower()
+            if suffix == "jpeg":
+                return "jpg"
+            return suffix
+
+        # First attempt: "<correspondent> - <title> - <tags>.<suffix>"
+        m = re.match(self.REGEX_CORRESPONDENT_TITLE_TAGS, parseable)
         if m:
             return (
-                get_sender(m.group(1)),
+                get_correspondent(m.group(1)),
                 m.group(2),
                 get_tags(m.group(3)),
-                m.group(4)
+                get_suffix(m.group(4))
             )
 
-        # Second attempt: "<sender> - <title>.<suffix>"
-        m = re.match(self.REGEX_SENDER_TITLE, parseable)
+        # Second attempt: "<correspondent> - <title>.<suffix>"
+        m = re.match(self.REGEX_CORRESPONDENT_TITLE, parseable)
         if m:
-            return get_sender(m.group(1)), m.group(2), (), m.group(3)
+            return (
+                get_correspondent(m.group(1)),
+                m.group(2),
+                (),
+                get_suffix(m.group(3))
+            )
 
-        # That didn't work, so we assume sender and tags are None
+        # That didn't work, so we assume correspondent and tags are None
         m = re.match(self.REGEX_TITLE, parseable)
-        return None, m.group(1), (), m.group(2)
+        return None, m.group(1), (), get_suffix(m.group(2))
 
-    def _store(self, text, doc):
+    def _store(self, text, doc, thumbnail):
 
         sender, title, tags, file_type = self._guess_attributes_from_name(doc)
-        tags = list(tags)
-
-        lower_text = text.lower()
-        relevant_tags = set(
-            [t for t in Tag.objects.all() if t.matches(lower_text)] + tags)
+        relevant_tags = set(list(Tag.match_all(text)) + list(tags))
 
         stats = os.stat(doc)
 
-        Log.debug("Saving record to database", Log.COMPONENT_CONSUMER)
+        self.log("debug", "Saving record to database")
 
         document = Document.objects.create(
-            sender=sender,
+            correspondent=sender,
             title=title,
             content=text,
             file_type=file_type,
@@ -296,22 +343,29 @@ class Consumer(object):
 
         if relevant_tags:
             tag_names = ", ".join([t.slug for t in relevant_tags])
-            Log.debug(
-                "Tagging with {}".format(tag_names), Log.COMPONENT_CONSUMER)
+            self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
+        # Encrypt and store the actual document
         with open(doc, "rb") as unencrypted:
             with open(document.source_path, "wb") as encrypted:
-                Log.debug("Encrypting", Log.COMPONENT_CONSUMER)
+                self.log("debug", "Encrypting the document")
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
-    def _cleanup(self, tempdir, doc):
-        # Remove temporary directory recursively
-        Log.debug("Deleting directory {}".format(tempdir), Log.COMPONENT_CONSUMER)
-        shutil.rmtree(tempdir)
+        # Encrypt and store the thumbnail
+        with open(thumbnail, "rb") as unencrypted:
+            with open(document.thumbnail_path, "wb") as encrypted:
+                self.log("debug", "Encrypting the thumbnail")
+                encrypted.write(GnuPG.encrypted(unencrypted))
 
-        # Remove doc
-        Log.debug("Deleting document {}".format(doc), Log.COMPONENT_CONSUMER)
+        self.log("info", "Completed")
+
+    def _cleanup_tempdir(self, d):
+        self.log("debug", "Deleting directory {}".format(d))
+        shutil.rmtree(d)
+
+    def _cleanup_doc(self, doc):
+        self.log("debug", "Deleting document {}".format(doc))
         os.unlink(doc)
 
     def _is_ready(self, doc):
@@ -329,3 +383,23 @@ class Consumer(object):
         self.stats[doc] = t
 
         return False
+
+
+def image_to_string(args):
+    img, lang = args
+    ocr = pyocr.get_available_tools()[0]
+    with Image.open(os.path.join(Consumer.SCRATCH, img)) as f:
+        if ocr.can_detect_orientation():
+            try:
+                orientation = ocr.detect_orientation(f, lang=lang)
+                f = f.rotate(orientation["angle"], expand=1)
+            except TesseractError:
+                pass
+        return ocr.image_to_string(f, lang=lang)
+
+
+def run_unpaper(args):
+    unpaper, pnm = args
+    subprocess.Popen((
+        unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm")
+    )).wait()

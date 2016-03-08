@@ -3,6 +3,7 @@ Paperless
 
 |Documentation|
 |Chat|
+|Travis|
 
 Scan, index, and archive all of your paper documents
 
@@ -55,6 +56,7 @@ powerful tools.
 
 * `ImageMagick`_ converts the images between colour and greyscale.
 * `Tesseract`_ does the character recognition.
+* `Unpaper`_ despeckles and and deskews the scanned image.
 * `GNU Privacy Guard`_ is used as the encryption backend.
 * `Python 3`_ is the language of the project.
 
@@ -92,6 +94,7 @@ home.
 .. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
 .. _ImageMagick: http://imagemagick.org/
 .. _Tesseract: https://github.com/tesseract-ocr
+.. _Unpaper: https://www.flameeyes.eu/projects/unpaper
 .. _GNU Privacy Guard: https://gnupg.org/
 .. _Python 3: https://python.org/
 .. _Pillow: https://pypi.python.org/pypi/pillowfight/
@@ -105,4 +108,5 @@ home.
 .. |Chat| image:: https://badges.gitter.im/danielquinn/paperless.svg
    :alt: Join the chat at https://gitter.im/danielquinn/paperless
    :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-
+.. |Travis| image:: https://travis-ci.org/danielquinn/paperless.svg?branch=master
+   :target: https://travis-ci.org/danielquinn/paperless

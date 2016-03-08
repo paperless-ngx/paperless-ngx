@@ -30,6 +30,7 @@ Contents
    requirements
    setup
    consumption
+   api
    utilities
    migrating
    changelog

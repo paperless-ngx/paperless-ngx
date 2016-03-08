@@ -1,0 +1,18 @@
+language: python
+
+sudo: false
+
+matrix:
+    include:
+        - python: 3.4
+          env: TOXENV=py34
+        - python: 3.5
+          env: TOXENV=py35
+        - python: 3.5
+          env: TOXENV=pep8
+
+install:
+    - pip install --requirement requirements.txt
+    - pip install tox
+
+script: tox -c src/tox.ini

@@ -10,11 +10,13 @@ should work) that has the following software installed on it:
 * `GNU Privacy Guard`_
 * `Tesseract`_
 * `Imagemagick`_
+* `unpaper`_
 
 .. _Python3: https://python.org/
 .. _GNU Privacy Guard: https://gnupg.org
 .. _Tesseract: https://github.com/tesseract-ocr
 .. _Imagemagick: http://imagemagick.org/
+.. _unpaper: https://www.flameeyes.eu/projects/unpaper
 
 Notably, you should confirm how you access your Python3 installation.  Many
 Linux distributions will install Python3 in parallel to Python2, using the names
@@ -101,3 +103,16 @@ you'd like to generate your own docs locally, you'll need to:
     $ pip install sphinx
 
 and then cd into the ``docs`` directory and type ``make html``.
+
+If you are using Docker, you can use the following commands to build the
+documentation and run a webserver serving it on `port 8001`_:
+
+.. code:: bash
+
+    $ pwd
+    /path/to/paperless
+
+    $ docker build -t paperless:docs -f docs/Dockerfile .
+    $ docker run --rm -it -p "8001:8000" paperless:docs
+
+.. _port 8001: http://127.0.0.1:8001

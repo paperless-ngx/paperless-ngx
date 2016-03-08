@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -42,7 +44,8 @@ INSTALLED_APPS = [
     "django_extensions",
 
     "documents",
-    "logger",
+
+    "rest_framework",
 
 ]
 
@@ -87,12 +90,12 @@ DATABASES = {
         "NAME": os.path.join(BASE_DIR, "..", "data", "db.sqlite3"),
     }
 }
-if os.environ.get("PAPERLESS_DBUSER") and os.environ.get("PAPERLESS_DBPASS"):
+if os.getenv("PAPERLESS_DBUSER") and os.getenv("PAPERLESS_DBPASS"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("PAPERLESS_DBNAME", "paperless"),
-        "USER": os.environ.get("PAPERLESS_DBUSER"),
-        "PASSWORD": os.environ.get("PAPERLESS_DBPASS")
+        "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
+        "USER": os.getenv("PAPERLESS_DBUSER"),
+        "PASSWORD": os.getenv("PAPERLESS_DBPASS")
     }
 
 
@@ -139,55 +142,119 @@ STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 
 
-# Paperless-specific stuffs
-# Change these paths if yours are different
+# Paperless-specific stuff
+# You shouldn't have to edit any of these values.  Rather, you can set these
+# values in /etc/paperless.conf instead.
 # ----------------------------------------------------------------------------
+
+# Tap paperless.conf if it's available
+if os.path.exists("/etc/paperless.conf"):
+    load_dotenv("/etc/paperless.conf")
+
+
+# Logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "consumer": {
+            "class": "documents.loggers.PaperlessLogger",
+        }
+    },
+    "loggers": {
+        "documents": {
+            "handlers": ["consumer"],
+            "level": os.getenv("PAPERLESS_CONSUMER_LOG_LEVEL", "INFO"),
+        },
+    },
+}
+
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 OCR_LANGUAGE = "eng"
 
 # The amount of threads to use for OCR
-OCR_THREADS = os.environ.get("PAPERLESS_OCR_THREADS")
+OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
 
-# If this is true, any failed attempts to OCR a PDF will result in the PDF being
-# indexed anyway, with whatever we could get.  If it's False, the file will
-# simply be left in the CONSUMPTION_DIR.
-FORGIVING_OCR = True
+# If this is true, any failed attempts to OCR a PDF will result in the PDF
+# being indexed anyway, with whatever we could get.  If it's False, the file
+# will simply be left in the CONSUMPTION_DIR.
+FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("yes", "y", "1", "t", "true"))
 
 # GNUPG needs a home directory for some reason
-GNUPG_HOME = os.environ.get("HOME", "/dev/null")
+GNUPG_HOME = os.getenv("HOME", "/tmp")
 
-# Convert is part of the Imagemagick package
-CONVERT_BINARY = "/usr/bin/convert"
+# Convert is part of the ImageMagick package
+CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY")
+
+# Unpaper
+UNPAPER_BINARY = os.getenv("PAPERLESS_UNPAPER_BINARY", "unpaper")
 
 # This will be created if it doesn't exist
-SCRATCH_DIR = "/tmp/paperless"
+SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 
 # This is where Paperless will look for PDFs to index
-CONSUMPTION_DIR = os.environ.get("PAPERLESS_CONSUME")
+CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 
 # If you want to use IMAP mail consumption, populate this with useful values.
-# If you leave HOST set to None, we assume you're not going to use this feature.
+# If you leave HOST set to None, we assume you're not going to use this
+# feature.
 MAIL_CONSUMPTION = {
-    "HOST": os.environ.get("PAPERLESS_CONSUME_MAIL_HOST"),
-    "PORT": os.environ.get("PAPERLESS_CONSUME_MAIL_PORT"),
-    "USERNAME": os.environ.get("PAPERLESS_CONSUME_MAIL_USER"),
-    "PASSWORD": os.environ.get("PAPERLESS_CONSUME_MAIL_PASS"),
+    "HOST": os.getenv("PAPERLESS_CONSUME_MAIL_HOST"),
+    "PORT": os.getenv("PAPERLESS_CONSUME_MAIL_PORT"),
+    "USERNAME": os.getenv("PAPERLESS_CONSUME_MAIL_USER"),
+    "PASSWORD": os.getenv("PAPERLESS_CONSUME_MAIL_PASS"),
     "USE_SSL": True,  # If True, use SSL/TLS to connect
     "INBOX": "INBOX"  # The name of the inbox on the server
 }
 
-# This is used to encrypt the original documents and decrypt them later when you
-# want to download them.  Set it and change the permissions on this file to
+# This is used to encrypt the original documents and decrypt them later when
+# you want to download them.  Set it and change the permissions on this file to
 # 0600, or set it to `None` and you'll be prompted for the passphrase at
 # runtime.  The default looks for an environment variable.
 # DON'T FORGET TO SET THIS as leaving it blank may cause some strange things
 # with GPG, including an interesting case where it may "encrypt" zero-byte
 # files.
-PASSPHRASE = os.environ.get("PAPERLESS_PASSPHRASE")
+PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 
-# If you intend to use the "API" to push files into the consumer, you'll need to
-# provide a shared secret here.  Leaving this as the default will disable the
-# API.
-UPLOAD_SHARED_SECRET = os.environ.get("PAPERLESS_SECRET", "")
+# If you intend to use the "API" to push files into the consumer, you'll need
+# to provide a shared secret here.  Leaving this as the default will disable
+# the API.
+SHARED_SECRET = os.getenv("PAPERLESS_SHARED_SECRET", "")
+
+#
+# TODO: Remove after 1.2
+#
+# This logic is here to address issue #44, wherein we were using inconsistent
+# constant names vs. environment variables.  If you're using Paperless for the
+# first time, you can safely ignore everything from here on, so long as you're
+# correctly defining the variables as per the documentation.
+#
+
+
+def deprecated(before, after):
+    print(
+        "\n\n"
+        "WARNING: {before} has been renamed to {after}.\n"
+        "WARNING: Use of {before} will not work as of version 1.2."
+        "\n\n".format(
+            before=before,
+            after=after
+        )
+    )
+
+if not CONVERT_BINARY:
+    CONVERT_BINARY = "convert"
+    if os.getenv("PAPERLESS_CONVERT"):
+        deprecated("PAPERLESS_CONVERT", "PAPERLESS_CONVERT_BINARY")
+        CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT", CONVERT_BINARY)
+
+if not CONSUMPTION_DIR and os.getenv("PAPERLESS_CONSUME"):
+    deprecated("PAPERLESS_CONSUME", "PAPERLESS_CONSUMPTION_DIR")
+    CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUME")
+
+if not SHARED_SECRET and os.getenv("PAPERLESS_SECRET"):
+    deprecated("PAPERLESS_SECRET", "PAPERLESS_SHARED_SECRET")
+    SHARED_SECRET = os.getenv("PAPERLESS_SECRET", "")
