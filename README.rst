@@ -99,7 +99,7 @@ home.
 .. _Python 3: https://python.org/
 .. _Pillow: https://pypi.python.org/pypi/pillowfight/
 .. _PyOCR: https://github.com/jflesch/pyocr
-.. _Django: https://djangoproject.org/
+.. _Django: https://www.djangoproject.com/
 .. _Python-GNUPG: http://pythonhosted.org/python-gnupg/
 .. _ReadTheDocs: https://paperless.readthedocs.org/
 .. |Documentation| image:: https://readthedocs.org/projects/paperless/badge/?version=latest
