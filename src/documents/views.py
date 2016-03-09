@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, DetailView, TemplateView
 
+from rest_framework import filters
 from rest_framework.mixins import (
     RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
@@ -12,6 +13,7 @@ from rest_framework.viewsets import (
 
 from paperless.db import GnuPG
 
+from .filters import DocumentFilter, CorrespondentFilter, TagFilter
 from .forms import UploadForm
 from .models import Correspondent, Tag, Document, Log
 from .serialisers import (
@@ -92,6 +94,8 @@ class CorrespondentViewSet(ModelViewSet):
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = CorrespondentFilter
 
 
 class TagViewSet(ModelViewSet):
@@ -100,6 +104,8 @@ class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = TagFilter
 
 
 class DocumentViewSet(RetrieveModelMixin,
@@ -112,6 +118,9 @@ class DocumentViewSet(RetrieveModelMixin,
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_class = DocumentFilter
+    search_fields = ("title", "correspondent__name", "content")
 
 
 class LogViewSet(ReadOnlyModelViewSet):
@@ -120,3 +129,4 @@ class LogViewSet(ReadOnlyModelViewSet):
     serializer_class = LogSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
+    filter_backends = (filters.DjangoFilterBackend,)
