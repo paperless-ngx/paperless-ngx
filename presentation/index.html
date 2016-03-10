@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>Paperless</title>
+
+    <meta name="description" content="A breakdown of what's different and why Django is amazeballs">
+    <meta name="author" content="Daniel Quinn">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/league.css" id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName('head')[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <style>
+      .reveal pre code {
+        background-color: rgba(63,63,63,0.8);
+      }
+      li, p {
+        text-shadow: 3px 3px 3px rgb(0, 0, 0);
+      }
+      a.nocolour {
+          color: rgb(255, 255, 255);
+      }
+    </style>
+
+    <link rel="stylesheet" href="contrib/font-awesome-4.3.0/css/font-awesome.min.css">
+
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+
+        <section>
+          <br />
+          <br />
+          <h1>Paperless</h1>
+          <p><small>
+            Daniel Quinn, London UK, March 2015<br />
+            <br />
+            <i class="fa fa-twitter"></i> &nbsp; <a class="nocolour" href="https://twitter.com/searchingfortao">@searchingfortao</a>
+            &nbsp; | &nbsp;
+            <i class="fa fa-github"></i> &nbsp; <a class="nocolour" href="https://github.com/danielquinn">danielquinn</a>
+            &nbsp; | &nbsp;
+            <i class="fa fa-globe"></i> &nbsp; <a class="nocolour" href="http://danielquinn.org/">danielquinn.org</a>
+          </small></p>
+          <br />
+        </section>
+
+        <section>
+          <section>
+            <h2>Paper Sucks</h2>
+          </section>
+          <section>
+            <h2>Paper Loves Being Mysterious</h2>
+            <p>There's No Ctrl+F</p>
+          </section>
+          <section>
+            <h2>Paper Hates Your Spine</h2>
+            <p>It's heavy and takes up space</p>
+          </section>
+          <section>
+            <h2>Paper Wants to Breed</h2>
+            <p>Backups? More Paper!</p>
+          </section>
+          <section>
+            <h2>Paper Hates Mother Earth</h2>
+          </section>
+        </section>
+
+      </div>
+
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'convex', // none/fade/slide/convex/concave/zoom
+        backgroundTransition: 'zoom',
+        loop: true,
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+
+    </script>
+
+  </body>
+</html>
