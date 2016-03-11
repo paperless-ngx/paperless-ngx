@@ -96,6 +96,69 @@
         <section>
           <h2>It's 2016</h2>
           <p>We shouldn't even need to use this stuff anymore</p>
+          <p>So I made Paperless</p>
+        </section>
+
+        <section>
+          <h2>What's it Do?</h2>
+          <ul>
+            <li>Consumes documents from a directory, API, or mailbox</li>
+            <li>OCRs them and puts the text in a database</li>
+            <li>Automatically tags the db record based on user-rules</li>
+            <li>Encrypts and stores the original</li>
+            <li>Generates, encrypts, and stores a thumbnail</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>It's Just a Wrapper</h2>
+          <ul>
+            <li>ImageMagick</li>
+            <li>Tesseract</li>
+            <li>GnuPG</li>
+            <li>Python3/Django</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>How's it Work?</h2>
+          <section>
+            <h3>There's two processes</h3>
+          </section>
+          <section>
+            <h3>1: The Consumer</h3>
+            <p style="padding: 1em;">(Imports documents)</p>
+            <ul>
+              <li>Runs in a loop</li>
+              <li>Reads from a directory</li>
+              <li>Occasionally checking a mailbox</li>
+            </ul>
+          </section>
+          <section>
+            <h3>2: The Webserver</h3>
+            <p style="padding: 1em;">(Lets you find stuff)</p>
+            <ul>
+              <li>Currently the Django Admin (I know)</li>
+              <li>Provides a DRF API</li>
+              <li>Users are building proper UIs</li>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <h2>Demo!</h2>
+          <p>Time to sacrifice a kitten</p>
+        </section>
+
+        <section>
+          <h2>Fork Me</h2>
+          <p>
+            <i class="fa fa-github"></i> &nbsp;
+            <a class="nocolour" href="https://github.com/danielquinn/paperless">https://github.com/danielquinn/paperless</a>
+          </p>
+          <p style="text-align: center;">
+            <img src="img/qr/repo.svg" style="width: 300px;" />
+          </p>
         </section>
 
       </div>
