@@ -5,7 +5,7 @@ The REST API
 
 Paperless makes use of the `Django REST Framework`_ standard API interface
 because of its inherent awesomeness.  Conveniently, the system is also
-self-documenting, so learn more about the access points, schema, what's
+self-documenting, so to learn more about the access points, schema, what's
 accepted and what isn't, you need only visit ``/api`` on your local Paperless
 installation.
 
