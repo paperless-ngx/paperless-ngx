@@ -4,6 +4,7 @@ Paperless
 |Documentation|
 |Chat|
 |Travis|
+|Gratipay|
 
 Scan, index, and archive all of your paper documents
 
@@ -110,3 +111,6 @@ home.
    :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 .. |Travis| image:: https://travis-ci.org/danielquinn/paperless.svg?branch=master
    :target: https://travis-ci.org/danielquinn/paperless
+.. |Gratipay| image:: https://img.shields.io/gratipay/user/danielquinn.svg
+   :alt: Donations always appreciated
+   :target: https://gratipay.com/~danielquinn/
