@@ -4,7 +4,6 @@ Paperless
 |Documentation|
 |Chat|
 |Travis|
-|Gratipay|
 
 Scan, index, and archive all of your paper documents
 
@@ -92,6 +91,21 @@ means that paperless should never be run on an untrusted host.  Instead, I
 recommend that if you do want to use it, run it locally on a server in your own
 home.
 
+
+Donations
+=========
+
+As with all Free software, the power is less in the finances and more in the
+collective efforts.  I really appreciate every pull request and bug report
+offered up by Paperless' users, so please keep that stuff coming.  If however,
+you're not one for coding/design/documentation, and would like to contribute
+financially, I won't say no ;-)
+
+Unfortunately, I can't find a good way to do donations on GitHub that doesn't
+involve PayPal (I *really* hate PayPal) so all I've got at present is Bitcoin.
+So, if you'd like to donate some coin to feed my doughnut habit, by all means
+use `the magic of bitcoins`_ while they're still around.
+
 .. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
 .. _ImageMagick: http://imagemagick.org/
 .. _Tesseract: https://github.com/tesseract-ocr
@@ -103,6 +117,7 @@ home.
 .. _Django: https://www.djangoproject.com/
 .. _Python-GNUPG: http://pythonhosted.org/python-gnupg/
 .. _ReadTheDocs: https://paperless.readthedocs.org/
+.. _the magic of bitcoins: https://blockchain.info/address/16RanUWNTTbR4yhc3FG8pXpq6BfJRPCcUs
 .. |Documentation| image:: https://readthedocs.org/projects/paperless/badge/?version=latest
    :alt: Read the documentation at https://paperless.readthedocs.org/
    :target: https://paperless.readthedocs.org/
@@ -111,6 +126,3 @@ home.
    :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 .. |Travis| image:: https://travis-ci.org/danielquinn/paperless.svg?branch=master
    :target: https://travis-ci.org/danielquinn/paperless
-.. |Gratipay| image:: https://img.shields.io/gratipay/user/danielquinn.svg
-   :alt: Donations always appreciated
-   :target: https://gratipay.com/~danielquinn/
