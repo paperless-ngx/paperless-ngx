@@ -52,6 +52,7 @@ well as ImageMagick:
 
     $ brew install ghostscript
     $ brew install imagemagick
+    $ brew install libmagic
 
 
 .. _requirements-baremetal:
