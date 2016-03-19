@@ -26,8 +26,9 @@ How it Works
 2. Set it up to "scan to FTP" or something similar. It should be able to push
    scanned images to a server without you having to do anything.  If your
    scanner doesn't know how to automatically upload the file somewhere, you can
-   always do that manually.
-3. Have the target server run the *Paperless* consumption script to OCR the PDF
+   always do that manually.  Paperless doesn't care how the documents get into
+   its local consumption directory.
+3. Have the target server run the Paperless consumption script to OCR the PDF
    and index it into a local database.
 4. Use the web frontend to sift through the database and find what you want.
 5. Download the PDF you need/want via the web interface and do whatever you
