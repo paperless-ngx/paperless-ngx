@@ -301,7 +301,7 @@ If you're running on a bare metal system that's using Systemd, you can use the
 service unit files in the ``scripts`` directory to set this up.  You'll need to
 create a user called ``paperless`` and setup Paperless to be in a place that
 this new user can read and write to.  Then, you can just tell Systemd to enable
-the two ``.service`` files:
+the two ``.service`` files::
 
     # systemctl enable /path/to/paperless/scripts/paperless-consumer.service
     # systemctl enable /path/to/paperless/scripts/paperless-webserver.service
