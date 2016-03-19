@@ -11,6 +11,10 @@ services:
             - data:/usr/src/paperless/data
             - media:/usr/src/paperless/media
         env_file: docker-compose.env
+        # The reason the line is here is so that the webserver that doesn't do
+        # any text recognition and doesn't have to install unnecessary
+        # languages the user might have set in the env-file by overwriting the
+        # value with nothing.
         environment:
             - PAPERLESS_OCR_LANGUAGES=
         command: ["runserver", "0.0.0.0:8000"]
