@@ -24,7 +24,7 @@ from pyocr.tesseract import TesseractError
 
 from paperless.db import GnuPG
 
-from .models import Correspondent, Tag, Document, Log
+from .models import Correspondent, Tag, Document, Log, FileInfo
 from .languages import ISO639
 
 
@@ -53,19 +53,6 @@ class Consumer(object):
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
 
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
-
-    REGEX_TITLE = re.compile(
-        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
-        flags=re.IGNORECASE
-    )
-    REGEX_CORRESPONDENT_TITLE = re.compile(
-        r"^.*/(.+) - (.*)\.(pdf|jpe?g|png|gif|tiff)$",
-        flags=re.IGNORECASE
-    )
-    REGEX_CORRESPONDENT_TITLE_TAGS = re.compile(
-        r"^.*/(.*) - (.*) - ([a-z0-9\-,]*)\.(pdf|jpe?g|png|gif|tiff)$",
-        flags=re.IGNORECASE
-    )
 
     def __init__(self):
 
@@ -105,7 +92,7 @@ class Consumer(object):
             if not os.path.isfile(doc):
                 continue
 
-            if not re.match(self.REGEX_TITLE, doc):
+            if not re.match(FileInfo.REGEX_TITLE, doc):
                 continue
 
             if doc in self._ignore:
@@ -269,72 +256,20 @@ class Consumer(object):
         # Strip out excess white space to allow matching to go smoother
         return re.sub(r"\s+", " ", r)
 
-    def _guess_attributes_from_name(self, parseable):
-        """
-        We use a crude naming convention to make handling the correspondent,
-        title, and tags easier:
-          "<correspondent> - <title> - <tags>.<suffix>"
-          "<correspondent> - <title>.<suffix>"
-          "<title>.<suffix>"
-        """
-
-        def get_correspondent(correspondent_name):
-            return Correspondent.objects.get_or_create(
-                name=correspondent_name,
-                defaults={"slug": slugify(correspondent_name)}
-            )[0]
-
-        def get_tags(tags):
-            r = []
-            for t in tags.split(","):
-                r.append(
-                    Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
-            return tuple(r)
-
-        def get_suffix(suffix):
-            suffix = suffix.lower()
-            if suffix == "jpeg":
-                return "jpg"
-            return suffix
-
-        # First attempt: "<correspondent> - <title> - <tags>.<suffix>"
-        m = re.match(self.REGEX_CORRESPONDENT_TITLE_TAGS, parseable)
-        if m:
-            return (
-                get_correspondent(m.group(1)),
-                m.group(2),
-                get_tags(m.group(3)),
-                get_suffix(m.group(4))
-            )
-
-        # Second attempt: "<correspondent> - <title>.<suffix>"
-        m = re.match(self.REGEX_CORRESPONDENT_TITLE, parseable)
-        if m:
-            return (
-                get_correspondent(m.group(1)),
-                m.group(2),
-                (),
-                get_suffix(m.group(3))
-            )
-
-        # That didn't work, so we assume correspondent and tags are None
-        m = re.match(self.REGEX_TITLE, parseable)
-        return None, m.group(1), (), get_suffix(m.group(2))
-
     def _store(self, text, doc, thumbnail):
 
-        sender, title, tags, file_type = self._guess_attributes_from_name(doc)
-        relevant_tags = set(list(Tag.match_all(text)) + list(tags))
+        file_info = FileInfo.from_path(doc)
+        relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
 
         stats = os.stat(doc)
 
         self.log("debug", "Saving record to database")
 
         document = Document.objects.create(
-            correspondent=sender,
-            title=title,
+            correspondent=file_info.correspondent,
+            title=file_info.title,
             content=text,
-            file_type=file_type,
+            file_type=file_info.suffix,
             created=timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime)),
             modified=timezone.make_aware(

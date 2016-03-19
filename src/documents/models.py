@@ -12,6 +12,97 @@ from django.utils import timezone
 from .managers import LogManager
 
 
+class FileInfo(object):
+    def __init__(self, title, suffix,
+                 correspondent=None, tags=None):
+        self._title = title
+        self._suffix = suffix
+        self._correspondent = correspondent
+        self._tags = tags
+
+    REGEX_TITLE = re.compile(
+        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
+        flags=re.IGNORECASE
+    )
+    REGEX_CORRESPONDENT_TITLE = re.compile(
+        r"^.*/(.+) - (.*)\.(pdf|jpe?g|png|gif|tiff)$",
+        flags=re.IGNORECASE
+    )
+    REGEX_CORRESPONDENT_TITLE_TAGS = re.compile(
+        r"^.*/(.*) - (.*) - ([a-z0-9\-,]*)\.(pdf|jpe?g|png|gif|tiff)$",
+        flags=re.IGNORECASE
+    )
+
+    @classmethod
+    def from_path(cls, path):
+        """
+        We use a crude naming convention to make handling the correspondent,
+        title, and tags easier:
+          "<correspondent> - <title> - <tags>.<suffix>"
+          "<correspondent> - <title>.<suffix>"
+          "<title>.<suffix>"
+        """
+
+        def get_correspondent(correspondent_name):
+            return Correspondent.objects.get_or_create(
+                name=correspondent_name,
+                defaults={"slug": slugify(correspondent_name)}
+            )[0]
+
+        def get_tags(tags):
+            r = []
+            for t in tags.split(","):
+                r.append(
+                    Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
+            return tuple(r)
+
+        def get_suffix(suffix):
+            suffix = suffix.lower()
+            if suffix == "jpeg":
+                return "jpg"
+            return suffix
+
+        # First attempt: "<correspondent> - <title> - <tags>.<suffix>"
+        m = re.match(cls.REGEX_CORRESPONDENT_TITLE_TAGS, path)
+        if m:
+            return cls(
+                title=m.group(2),
+                correspondent=get_correspondent(m.group(1)),
+                tags=get_tags(m.group(3)),
+                suffix=get_suffix(m.group(4))
+            )
+
+        # Second attempt: "<correspondent> - <title>.<suffix>"
+        m = re.match(cls.REGEX_CORRESPONDENT_TITLE, path)
+        if m:
+            return cls(
+                title=m.group(2),
+                correspondent=get_correspondent(m.group(1)),
+                tags=(),
+                suffix=get_suffix(m.group(3))
+            )
+
+        # That didn't work, so we assume correspondent and tags are None
+        m = re.match(cls.REGEX_TITLE, path)
+        return FileInfo(
+            title=m.group(1), tags=(), suffix=get_suffix(m.group(2)))
+
+    @property
+    def title(self):
+        return self._title
+
+    @property
+    def correspondent(self):
+        return self._correspondent
+
+    @property
+    def tags(self):
+        return self._tags
+
+    @property
+    def suffix(self):
+        return self._suffix
+
 class SluggedModel(models.Model):
 
     name = models.CharField(max_length=128, unique=True)
