@@ -295,3 +295,56 @@ using Docker, you can set a restart-policy_ in the ``docker-compose.yml`` to
 have the containers automatically start with the Docker daemon.
 
 .. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
+
+.. _auto-init-ubuntu-14.04:
+
+Automatically Start Paperless on Ubuntu 14.04
+.............................................
+
+Ubuntu 14.04 and earlier use the Upstart init system to start services during the boot process. To configure Upstart to run Paperless automatically after restarting your system:
+
+1. Change to the directory where Upstart's configuration files are kept: ``cd /etc/init``
+
+2. Create a new file: ``sudo nano paperless-server.conf``
+
+3. In the newly-created file enter::
+
+    start on (local-filesystems and net-device-up IFACE=eth0)
+    stop on shutdown
+
+    respawn
+    respawn limit 10 5
+
+    script
+      export PAPERLESS_PASSPHRASE=passphrase
+      export PAPERLESS_CONSUMPTION_DIR=/srv/ftp/paperless
+
+      exec /srv/paperless/src/manage.py runserver 0.0.0.0:80
+    end script
+
+  Replace ``passphrase`` with a random value, ``/srv/ftp/paperless`` with the path to your consumption directory and ``/srv/paperless/src/manage.py`` with the path to the ``manage.py`` script in your installation directory.
+
+  If you are using a network interface other than ``eth0``, you will have to change this value. For example, if you are connected via Wi-Fi, you will likely need to replace ``eth0`` above with ``wlan0``. To see all interfaces, run ``ifconfig``.
+
+  Save the file.
+
+4. Create a new file: ``sudo nano paperless-consumer.conf``
+
+5. In the newly-created file enter::
+
+    start on (local-filesystems and net-device-up IFACE=eth0)
+    stop on shutdown
+
+    respawn
+    respawn limit 10 5
+
+    script
+      export PAPERLESS_PASSPHRASE=passphrase
+      export PAPERLESS_CONSUMPTION_DIR=/srv/ftp/paperless
+
+      exec /srv/paperless/src/manage.py document_consumer
+    end script
+
+  Replace ``passphrase``, ``/srv/ftp/paperless`` and ``/srv/paperless/src/manage.py`` with the same values as in step 3 above. Replace ``eth0`` with the appropriate value, if necessary. Save the file.
+
+These two configuration files together will start both the Paperless webserver and document consumer processes when the file system and network interface specified is available after bootup. Furthermore, if either process ever exits unexpectedly, Upstart will try to restart it a maximum of 10 times within a 5 second period.
