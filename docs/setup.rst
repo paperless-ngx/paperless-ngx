@@ -5,7 +5,8 @@ Setup
 
 Paperless isn't a very complicated app, but there are a few components, so some
 basic documentation is in order.  If you go follow along in this document and
-still have trouble, please open an `issue on GitHub`_ so I can fill in the gaps.
+still have trouble, please open an `issue on GitHub`_ so I can fill in the
+gaps.
 
 .. _issue on GitHub: https://github.com/danielquinn/paperless/issues
 
@@ -15,8 +16,8 @@ still have trouble, please open an `issue on GitHub`_ so I can fill in the gaps.
 Download
 --------
 
-The source is currently only available via GitHub, so grab it from there, either
-by using ``git``:
+The source is currently only available via GitHub, so grab it from there,
+either by using ``git``:
 
 .. code:: bash
 
@@ -42,14 +43,15 @@ route`_ is quick & easy, but means you're running a VM which comes with memory
 consumption etc. We also `support Docker`_, which you can use natively under
 Linux and in a VM with `Docker Machine`_ (this guide was written for native
 Docker usage under Linux, you might have to adapt it for Docker Machine.)
-Alternatively the standard, `bare metal`_ approach is a little more complicated,
-but worth it because it makes it easier to should you want to contribute some
-code back.
+Alternatively the standard, `bare metal`_ approach is a little more
+complicated, but worth it because it makes it easier to should you want to
+contribute some code back.
 
 .. _Vagrant route: setup-installation-vagrant_
 .. _support Docker: setup-installation-docker_
 .. _bare metal: setup-installation-standard_
 .. _Docker Machine: https://docs.docker.com/machine/
+
 
 .. _setup-installation-standard:
 
@@ -58,19 +60,16 @@ Standard (Bare Metal)
 
 1. Install the requirements as per the :ref:`requirements <requirements>` page.
 2. Change to the ``src`` directory in this repo.
-3. Edit ``paperless/settings.py`` and be sure to set the values for:
-    * ``CONSUMPTION_DIR``: this is where your documents will be dumped to be
-      consumed by Paperless.
-    * ``PASSPHRASE``: this is the passphrase Paperless uses to encrypt/decrypt
-      the original document.  The default value attempts to source the
-      passphrase from the environment, so if you don't set it to a static value
-      here, you must set ``PAPERLESS_PASSPHRASE=some-secret-string`` on the
-      command line whenever invoking the consumer or webserver.
-    * ``OCR_THREADS``: this is the number of threads the OCR process will spawn
-      to process document pages in parallel. The default value gets sourced from
-      the environment-variable ``PAPERLESS_OCR_THREADS`` and expects it to be an
-      integer. If the variable is not set, Python determines the core-count of
-      your CPU and uses that value.
+3. Copy ``paperless.conf.example`` to ``/etc/paperless.conf`` and open it in
+   your favourite editor.  Set the values for:
+
+    * ``PAPERLESS_CONSUMPTION_DIR``: this is where your documents will be
+      dumped to be consumed by Paperless.
+    * ``PAPERLESS_PASSPHRASE``: this is the passphrase Paperless uses to
+      encrypt/decrypt the original document.
+    * ``PAPERLESS_OCR_THREADS``: this is the number of threads the OCR process
+      will spawn to process document pages in parallel.
+
 4. Initialise the database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
@@ -79,8 +78,8 @@ Standard (Bare Metal)
    You should now be able to visit your (empty) `Paperless webserver`_ at
    ``127.0.0.1:8000`` (or whatever you chose).  You can login with the
    user/pass you created in #5.
-7. In a separate window, change to the ``src`` directory in this repo again, but
-   this time, you should start the consumer script with
+7. In a separate window, change to the ``src`` directory in this repo again,
+   but this time, you should start the consumer script with
    ``./manage.py document_consumer``.
 8. Scan something.  Put it in the ``CONSUMPTION_DIR``.
 9. Wait a few minutes
@@ -100,6 +99,7 @@ Vagrant Method
    provisioned...
 3. Run ``vagrant ssh`` and once inside your new vagrant box, edit
    ``/etc/paperless.conf`` and set the values for:
+
     * ``PAPERLESS_CONSUMPTION_DIR``: this is where your documents will be
       dumped to be consumed by Paperless.
     * ``PAPERLESS_PASSPHRASE``: this is the passphrase Paperless uses to
@@ -107,6 +107,7 @@ Vagrant Method
     * ``PAPERLESS_SHARED_SECRET``: this is the "magic word" used when consuming
       documents from mail or via the API.  If you don't use either, leaving it
       blank is just fine.
+
 4. Exit the vagrant box and re-enter it with ``vagrant ssh`` again.  This
    updates the environment to make use of the changes you made to the config
    file.
@@ -140,9 +141,9 @@ Docker Method
    .. caution::
 
       As mentioned earlier, this guide assumes that you use Docker natively
-      under Linux. If you are using `Docker Machine`_ under Mac OS X or Windows,
-      you will have to adapt IP addresses, volume-mounting, command execution
-      and maybe more.
+      under Linux. If you are using `Docker Machine`_ under Mac OS X or
+      Windows, you will have to adapt IP addresses, volume-mounting, command
+      execution and maybe more.
 
 2. Install `docker-compose`_. [#compose]_
 
@@ -161,14 +162,14 @@ Docker Method
        .. _Docker installation guide: https://docs.docker.com/engine/installation/
        .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
-3. Create a copy of ``docker-compose.yml.example`` as ``docker-compose.yml`` and
-   a copy of ``docker-compose.env.example`` as ``docker-compose.env``. You'll be
-   editing both these files: taking a copy ensures that you can ``git pull`` to
-   receive updates without risking merge conflicts with your modified versions
-   of the configuration files.
-4. Modify ``docker-compose.yml`` to your preferences, following the instructions
-   in comments in the file. The only change that is a hard requirement is to
-   specify where the consumption directory should mount.
+3. Create a copy of ``docker-compose.yml.example`` as ``docker-compose.yml``
+   and a copy of ``docker-compose.env.example`` as ``docker-compose.env``.
+   You'll be editing both these files: taking a copy ensures that you can
+   ``git pull`` to receive updates without risking merge conflicts with your
+   modified versions of the configuration files.
+4. Modify ``docker-compose.yml`` to your preferences, following the
+   instructions in comments in the file. The only change that is a hard
+   requirement is to specify where the consumption directory should mount.
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
    ``PAPERLESS_PASSPHRASE``
@@ -181,10 +182,11 @@ Docker Method
      the core-count of your CPU and uses that value.
 
    ``PAPERLESS_OCR_LANGUAGES``
-     If you want the OCR to recognize other languages in addition to the default
-     English, set this parameter to a space separated list of three-letter
-     language-codes after `ISO 639-2/T`_. For a list of available languages --
-     including their three letter codes -- see the `Debian packagelist`_.
+     If you want the OCR to recognize other languages in addition to the
+     default English, set this parameter to a space separated list of
+     three-letter language-codes after `ISO 639-2/T`_. For a list of available
+     languages -- including their three letter codes -- see the
+     `Debian packagelist`_.
 
    ``USERMAP_UID`` and ``USERMAP_GID``
      If you want to mount the consumption volume (directory ``/consume`` within
@@ -192,11 +194,11 @@ Docker Method
      access rights might be an issue. The default user and group ``paperless``
      in the containers have an id of 1000. The containers will enforce that the
      owning group of the consumption directory will be ``paperless`` to be able
-     to delete consumed documents. If your host-system has a group with an id of
-     1000 and you don't want this group to have access rights to the consumption
-     directory, you can use ``USERMAP_GID`` to change the id in the container
-     and thus the one of the consumption directory. Furthermore, you can change
-     the id of the default user as well using ``USERMAP_UID``.
+     to delete consumed documents. If your host-system has a group with an ID
+     of 1000 and you don't want this group to have access rights to the
+     consumption directory, you can use ``USERMAP_GID`` to change the id in the
+     container and thus the one of the consumption directory. Furthermore, you
+     can change the id of the default user as well using ``USERMAP_UID``.
 
 6. Run ``docker-compose up -d``. This will create and start the necessary
    containers.
@@ -234,14 +236,14 @@ Docker Method
       .. danger::
 
           While the consumption container will ensure at startup that it can
-          **delete** a consumed file from a host-mounted directory, it might not
-          be able to **read** the document in the first place if the access
+          **delete** a consumed file from a host-mounted directory, it might
+          not be able to **read** the document in the first place if the access
           rights to the file are incorrect.
 
           Make sure that the documents you put into the consumption directory
           will either be readable by everyone (``chmod o+r file.pdf``) or
-          readable by the default user or group id 1000 (or the one you have set
-          with ``USERMAP_UID`` or ``USERMAP_GID`` respectively).
+          readable by the default user or group id 1000 (or the one you have
+          set with ``USERMAP_UID`` or ``USERMAP_GID`` respectively).
 
    2. Use ``docker cp`` to copy your files directly into the container:
 
@@ -258,8 +260,8 @@ Docker Method
 
       ``docker cp`` is a one-shot-command, just like ``cp``. This means that
       every time you want to consume a new document, you will have to execute
-      ``docker cp`` again. You can of course automate this process, but option 1
-      is generally the preferred one.
+      ``docker cp`` again. You can of course automate this process, but option
+      1 is generally the preferred one.
 
       .. danger::
 
@@ -267,8 +269,8 @@ Docker Method
           to the acting user at the destination, which will be ``root``.
 
           You therefore need to ensure that the documents you want to copy into
-          the container are readable by everyone (``chmod o+r file.pdf``) before
-          copying them.
+          the container are readable by everyone (``chmod o+r file.pdf``)
+          before copying them.
 
 
 .. _Docker: https://www.docker.com/
@@ -281,32 +283,44 @@ Docker Method
    free to tinker around without using compose!
 
 
-.. _making-things-a-little-more-permanent:
+.. _setup-permanent:
 
 Making Things a Little more Permanent
 -------------------------------------
 
-Once you've tested things and are happy with the work flow, you can automate the
-process of starting the webserver and consumer automatically.  If you're running
-on a bare metal system that's using Systemd, you can use the service unit files
-in the ``scripts`` directory to set this up.  If you're on another startup
-system or are using a Vagrant box, then you're currently on your own. If you are
-using Docker, you can set a restart-policy_ in the ``docker-compose.yml`` to
-have the containers automatically start with the Docker daemon.
+Once you've tested things and are happy with the work flow, you can automate
+the process of starting the webserver and consumer automatically.
 
-.. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
 
-.. _auto-init-ubuntu-14.04:
+.. _setup-permanent-standard-systemd:
 
-Automatically Start Paperless on Ubuntu 14.04
-.............................................
+Standard (Bare Metal, Systemd)
+..............................
 
-Ubuntu 14.04 and earlier use the Upstart init system to start services during the boot process. To configure Upstart to run Paperless automatically after restarting your system:
+If you're running on a bare metal system that's using Systemd, you can use the
+service unit files in the ``scripts`` directory to set this up.  You'll need to
+create a user called ``paperless`` and setup Paperless to be in a place that
+this new user can read and write to.  Then, you can just tell Systemd to enable
+the two ``.service`` files:
 
-1. Change to the directory where Upstart's configuration files are kept: ``cd /etc/init``
+    # systemctl enable /path/to/paperless/scripts/paperless-consumer.service
+    # systemctl enable /path/to/paperless/scripts/paperless-webserver.service
+    # systemctl start /path/to/paperless/scripts/paperless-consumer.service
+    # systemctl start /path/to/paperless/scripts/paperless-webserver.service
 
+
+.. _setup-permanent-standard-ubuntu14:
+
+Ubuntu 14.04 (Bare Metal, Upstart)
+..................................
+
+Ubuntu 14.04 and earlier use the `Upstart`_ init system to start services
+during the boot process. To configure Upstart to run Paperless automatically
+after restarting your system:
+
+1. Change to the directory where Upstart's configuration files are kept:
+   ``cd /etc/init``
 2. Create a new file: ``sudo nano paperless-server.conf``
-
 3. In the newly-created file enter::
 
     start on (local-filesystems and net-device-up IFACE=eth0)
@@ -316,15 +330,16 @@ Ubuntu 14.04 and earlier use the Upstart init system to start services during th
     respawn limit 10 5
 
     script
-      export PAPERLESS_PASSPHRASE=passphrase
-      export PAPERLESS_CONSUMPTION_DIR=/srv/ftp/paperless
-
       exec /srv/paperless/src/manage.py runserver 0.0.0.0:80
     end script
 
-  Replace ``passphrase`` with a random value, ``/srv/ftp/paperless`` with the path to your consumption directory and ``/srv/paperless/src/manage.py`` with the path to the ``manage.py`` script in your installation directory.
+   Note that you'll need to replace ``/srv/paperless/src/manage.py`` with the
+   path to the ``manage.py`` script in your installation directory.
 
-  If you are using a network interface other than ``eth0``, you will have to change this value. For example, if you are connected via Wi-Fi, you will likely need to replace ``eth0`` above with ``wlan0``. To see all interfaces, run ``ifconfig``.
+  If you are using a network interface other than ``eth0``, you will have to
+  change ``IFACE=eth0``. For example, if you are connected via WiFi, you will
+  likely need to replace ``eth0`` above with ``wlan0``. To see all interfaces,
+  run ``ifconfig``.
 
   Save the file.
 
@@ -339,12 +354,37 @@ Ubuntu 14.04 and earlier use the Upstart init system to start services during th
     respawn limit 10 5
 
     script
-      export PAPERLESS_PASSPHRASE=passphrase
-      export PAPERLESS_CONSUMPTION_DIR=/srv/ftp/paperless
-
       exec /srv/paperless/src/manage.py document_consumer
     end script
 
-  Replace ``passphrase``, ``/srv/ftp/paperless`` and ``/srv/paperless/src/manage.py`` with the same values as in step 3 above. Replace ``eth0`` with the appropriate value, if necessary. Save the file.
+  Replace ``/srv/paperless/src/manage.py`` with the same values as in step 3
+  above and replace ``eth0`` with the appropriate value, if necessary. Save the
+  file.
 
-These two configuration files together will start both the Paperless webserver and document consumer processes when the file system and network interface specified is available after bootup. Furthermore, if either process ever exits unexpectedly, Upstart will try to restart it a maximum of 10 times within a 5 second period.
+These two configuration files together will start both the Paperless webserver
+and document consumer processes when the file system and network interface
+specified is available after boot. Furthermore, if either process ever exits
+unexpectedly, Upstart will try to restart it a maximum of 10 times within a 5
+second period.
+
+.. _Upstart: http://upstart.ubuntu.com/
+
+
+.. _setup-permanent-vagrant:
+
+Vagrant
+.......
+
+You're currently on your own, but the Ubuntu explanation above may be enough.
+
+
+.. _setup-permanent-docker:
+
+Docker
+......
+
+If you're using Docker, you can set a restart-policy_ in the
+``docker-compose.yml`` to have the containers automatically start with the
+Docker daemon.
+
+.. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
