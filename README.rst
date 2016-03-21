@@ -59,7 +59,7 @@ powerful tools.
 
 * `ImageMagick`_ converts the images between colour and greyscale.
 * `Tesseract`_ does the character recognition.
-* `Unpaper`_ despeckles and and deskews the scanned image.
+* `Unpaper`_ despeckles and deskews the scanned image.
 * `GNU Privacy Guard`_ is used as the encryption backend.
 * `Python 3`_ is the language of the project.
 

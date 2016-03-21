@@ -33,4 +33,5 @@ Contents
    api
    utilities
    migrating
+   troubleshooting 
    changelog
