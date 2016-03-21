@@ -152,7 +152,7 @@ class Document(models.Model):
     )
     tags = models.ManyToManyField(
         Tag, related_name="documents", blank=True)
-    created = models.DateTimeField(default=timezone.now, editable=False)
+    created = models.DateTimeField(default=timezone.now)
     modified = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta(object):
