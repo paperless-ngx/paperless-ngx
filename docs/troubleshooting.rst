@@ -13,7 +13,7 @@ XX failed, but we're going to stick with what we've got since FORGIVING_OCR is e
 might need to install the `Tesseract language files
 <http://packages.ubuntu.com/search?keywords=tesseract-ocr>`_ marching your documents languages.
 
-As an example, if you are runing Paperless from the Vagrant setup provided (or from any Ubuntu or Debian
+As an example, if you are running Paperless from the Vagrant setup provided (or from any Ubuntu or Debian
 box), and your documents are written in Spanish you may need to run::
 
     apt-get install -y tesseract-ocr-spa
