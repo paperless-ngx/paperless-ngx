@@ -128,7 +128,7 @@ following name/value pairs:
   don't start uploading stuff to your server.  The means of generating this
   signature is defined below.
 
-Specify ``enctype="multipart/form-data"``, and then POST your file with:::
+Specify ``enctype="multipart/form-data"``, and then POST your file with::
 
     Content-Disposition: form-data; name="document"; filename="whatever.pdf"
 
