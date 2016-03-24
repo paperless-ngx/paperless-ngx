@@ -96,11 +96,16 @@ class Command(Renderable, BaseCommand):
 
     @staticmethod
     def _get_legacy_file_name(doc):
-        if doc.correspondent and doc.title:
-            tags = ",".join([t.slug for t in doc.tags.all()])
-            if tags:
-                return "{} - {} - {}.{}".format(
-                    doc.correspondent, doc.title, tags, doc.file_type)
-            return "{} - {}.{}".format(
-                doc.correspondent, doc.title, doc.file_type)
-        return os.path.basename(doc.source_path)
+
+        if not doc.correspondent and not doc.title:
+            return os.path.basename(doc.source_path)
+
+        created = doc.created.strftime("%Y%m%d%H%M%SZ")
+        tags = ",".join([t.slug for t in doc.tags.all()])
+
+        if tags:
+            return "{} - {} - {} - {}.{}".format(
+                created, doc.correspondent, doc.title, tags, doc.file_type)
+
+        return "{} - {} - {}.{}".format(
+            created, doc.correspondent, doc.title, doc.file_type)

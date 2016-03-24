@@ -1,7 +1,10 @@
+import dateutil.parser
 import logging
 import os
 import re
 import uuid
+
+from collections import OrderedDict
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -11,97 +14,6 @@ from django.utils import timezone
 
 from .managers import LogManager
 
-
-class FileInfo(object):
-    def __init__(self, title, suffix,
-                 correspondent=None, tags=None):
-        self._title = title
-        self._suffix = suffix
-        self._correspondent = correspondent
-        self._tags = tags
-
-    REGEX_TITLE = re.compile(
-        r"^.*/(.*)\.(pdf|jpe?g|png|gif|tiff)$",
-        flags=re.IGNORECASE
-    )
-    REGEX_CORRESPONDENT_TITLE = re.compile(
-        r"^.*/(.+) - (.*)\.(pdf|jpe?g|png|gif|tiff)$",
-        flags=re.IGNORECASE
-    )
-    REGEX_CORRESPONDENT_TITLE_TAGS = re.compile(
-        r"^.*/(.*) - (.*) - ([a-z0-9\-,]*)\.(pdf|jpe?g|png|gif|tiff)$",
-        flags=re.IGNORECASE
-    )
-
-    @classmethod
-    def from_path(cls, path):
-        """
-        We use a crude naming convention to make handling the correspondent,
-        title, and tags easier:
-          "<correspondent> - <title> - <tags>.<suffix>"
-          "<correspondent> - <title>.<suffix>"
-          "<title>.<suffix>"
-        """
-
-        def get_correspondent(correspondent_name):
-            return Correspondent.objects.get_or_create(
-                name=correspondent_name,
-                defaults={"slug": slugify(correspondent_name)}
-            )[0]
-
-        def get_tags(tags):
-            r = []
-            for t in tags.split(","):
-                r.append(
-                    Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
-            return tuple(r)
-
-        def get_suffix(suffix):
-            suffix = suffix.lower()
-            if suffix == "jpeg":
-                return "jpg"
-            return suffix
-
-        # First attempt: "<correspondent> - <title> - <tags>.<suffix>"
-        m = re.match(cls.REGEX_CORRESPONDENT_TITLE_TAGS, path)
-        if m:
-            return cls(
-                title=m.group(2),
-                correspondent=get_correspondent(m.group(1)),
-                tags=get_tags(m.group(3)),
-                suffix=get_suffix(m.group(4))
-            )
-
-        # Second attempt: "<correspondent> - <title>.<suffix>"
-        m = re.match(cls.REGEX_CORRESPONDENT_TITLE, path)
-        if m:
-            return cls(
-                title=m.group(2),
-                correspondent=get_correspondent(m.group(1)),
-                tags=(),
-                suffix=get_suffix(m.group(3))
-            )
-
-        # That didn't work, so we assume correspondent and tags are None
-        m = re.match(cls.REGEX_TITLE, path)
-        return FileInfo(
-            title=m.group(1), tags=(), suffix=get_suffix(m.group(2)))
-
-    @property
-    def title(self):
-        return self._title
-
-    @property
-    def correspondent(self):
-        return self._correspondent
-
-    @property
-    def tags(self):
-        return self._tags
-
-    @property
-    def suffix(self):
-        return self._suffix
 
 class SluggedModel(models.Model):
 
@@ -341,3 +253,136 @@ class Log(models.Model):
             self.group = uuid.uuid4()
 
         models.Model.save(self, *args, **kwargs)
+
+
+class FileInfo(object):
+
+    # This epic regex *almost* worked for our needs, so I'm keeping it here for
+    # posterity, in the hopes that we might find a way to make it work one day.
+    ALMOST_REGEX = re.compile(
+        r"^((?P<date>\d\d\d\d\d\d\d\d\d\d\d\d\d\dZ){separator})?"
+        r"((?P<correspondent>{non_separated_word}+){separator})??"
+        r"(?P<title>{non_separated_word}+)"
+        r"({separator}(?P<tags>[a-z,0-9-]+))?"
+        r"\.(?P<extension>[a-zA-Z.-]+)$".format(
+            separator=r"\s+-\s+",
+            non_separated_word=r"([\w,. ]|([^\s]-))"
+        )
+    )
+
+    REGEXES = OrderedDict([
+        ("created-correspondent-title-tags", re.compile(
+            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
+            r"(?P<correspondent>.*) - "
+            r"(?P<title>.*) - "
+            r"(?P<tags>[a-z0-9\-,]*)"
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            flags=re.IGNORECASE
+        )),
+        ("created-title-tags", re.compile(
+            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
+            r"(?P<title>.*) - "
+            r"(?P<tags>[a-z0-9\-,]*)"
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            flags=re.IGNORECASE
+        )),
+        ("created-correspondent-title", re.compile(
+            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
+            r"(?P<correspondent>.*) - "
+            r"(?P<title>.*)"
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            flags=re.IGNORECASE
+        )),
+        ("created-title", re.compile(
+            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
+            r"(?P<title>.*)"
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            flags=re.IGNORECASE
+        )),
+        ("correspondent-title-tags", re.compile(
+            r"(?P<correspondent>.*) - "
+            r"(?P<title>.*) - "
+            r"(?P<tags>[a-z0-9\-,]*)"
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            flags=re.IGNORECASE
+        )),
+        ("correspondent-title", re.compile(
+            r"(?P<correspondent>.*) - "
+            r"(?P<title>.*)?"
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            flags=re.IGNORECASE
+        )),
+        ("title", re.compile(
+            r"(?P<title>.*)"
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            flags=re.IGNORECASE
+        ))
+    ])
+
+    def __init__(self, created=None, correspondent=None, title=None, tags=(),
+                 extension=None):
+
+        self.created = created
+        self.title = title
+        self.extension = extension
+        self.correspondent = correspondent
+        self.tags = tags
+
+    @classmethod
+    def _get_created(cls, created):
+        return dateutil.parser.parse("{:0<14}Z".format(created[:-1]))
+
+    @classmethod
+    def _get_correspondent(cls, name):
+        if not name:
+            return None
+        return Correspondent.objects.get_or_create(name=name, defaults={
+            "slug": slugify(name)
+        })[0]
+
+    @classmethod
+    def _get_title(cls, title):
+        return title
+
+    @classmethod
+    def _get_tags(cls, tags):
+        r = []
+        for t in tags.split(","):
+            r.append(
+                Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
+        return tuple(r)
+
+    @classmethod
+    def _get_extension(cls, extension):
+        r = extension.lower()
+        if r == "jpeg":
+            return "jpg"
+        return r
+
+    @classmethod
+    def _mangle_property(cls, properties, name):
+        if name in properties:
+            properties[name] = getattr(cls, "_get_{}".format(name))(
+                properties[name]
+            )
+
+    @classmethod
+    def from_path(cls, path):
+        """
+        We use a crude naming convention to make handling the correspondent,
+        title, and tags easier:
+          "<correspondent> - <title> - <tags>.<suffix>"
+          "<correspondent> - <title>.<suffix>"
+          "<title>.<suffix>"
+        """
+
+        for regex in cls.REGEXES.values():
+            m = regex.match(os.path.basename(path))
+            if m:
+                properties = m.groupdict()
+                cls._mangle_property(properties, "created")
+                cls._mangle_property(properties, "correspondent")
+                cls._mangle_property(properties, "title")
+                cls._mangle_property(properties, "tags")
+                cls._mangle_property(properties, "extension")
+                return cls(**properties)

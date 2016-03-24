@@ -19,12 +19,11 @@ from PIL import Image
 
 from django.conf import settings
 from django.utils import timezone
-from django.template.defaultfilters import slugify
 from pyocr.tesseract import TesseractError
 
 from paperless.db import GnuPG
 
-from .models import Correspondent, Tag, Document, Log, FileInfo
+from .models import Tag, Document, Log, FileInfo
 from .languages import ISO639
 
 
@@ -92,7 +91,7 @@ class Consumer(object):
             if not os.path.isfile(doc):
                 continue
 
-            if not re.match(FileInfo.REGEX_TITLE, doc):
+            if not re.match(FileInfo.REGEXES["title"], doc):
                 continue
 
             if doc in self._ignore:
@@ -269,7 +268,7 @@ class Consumer(object):
             correspondent=file_info.correspondent,
             title=file_info.title,
             content=text,
-            file_type=file_info.suffix,
+            file_type=file_info.extension,
             created=timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime)),
             modified=timezone.make_aware(

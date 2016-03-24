@@ -1,28 +1,36 @@
 from django.test import TestCase
 
-from ..models import FileInfo
+from ..models import Document, FileInfo
 
 
 class TestAttachment(TestCase):
 
     TAGS = ("tag1", "tag2", "tag3")
-    SUFFIXES = (
+    EXTENSIONS = (
         "pdf", "png", "jpg", "jpeg", "gif",
         "PDF", "PNG", "JPG", "JPEG", "GIF",
         "PdF", "PnG", "JpG", "JPeG", "GiF",
     )
 
     def _test_guess_attributes_from_name(self, path, sender, title, tags):
-        for suffix in self.SUFFIXES:
-            f = path.format(suffix)
+
+        for extension in self.EXTENSIONS:
+
+            f = path.format(extension)
             file_info = FileInfo.from_path(f)
-            self.assertEqual(file_info.correspondent.name, sender, f)
-            self.assertEqual(file_info.title, title, f)
-            self.assertEqual(tuple([t.slug for t in file_info.tags]), tags, f)
-            if suffix.lower() == "jpeg":
-                self.assertEqual(file_info.suffix, "jpg", f)
+
+            if sender:
+                self.assertEqual(file_info.correspondent.name, sender, f)
             else:
-                self.assertEqual(file_info.suffix, suffix.lower(), f)
+                self.assertIsNone(file_info.correspondent, f)
+
+            self.assertEqual(file_info.title, title, f)
+
+            self.assertEqual(tuple([t.slug for t in file_info.tags]), tags, f)
+            if extension.lower() == "jpeg":
+                self.assertEqual(file_info.extension, "jpg", f)
+            else:
+                self.assertEqual(file_info.extension, extension.lower(), f)
 
     def test_guess_attributes_from_name0(self):
         self._test_guess_attributes_from_name(
@@ -96,7 +104,7 @@ class TestAttachment(TestCase):
         self._test_guess_attributes_from_name(
             '/path/to/ - weird empty correspondent but should not break.{}',
             None,
-            ' - weird empty correspondent but should not break',
+            'weird empty correspondent but should not break',
             ()
         )
 
@@ -126,60 +134,171 @@ class TestAttachment(TestCase):
 
 
 class Permutations(TestCase):
-    valid_correspondents = ['timmy', 'Dr. McWheelie',
-                            'Dash Gor-don', 'ο Θερμαστής']
-    valid_titles = ['title', 'Title w Spaces', 'Title a-dash', 'Τίτλος', '']
-    valid_tags = ['tag', 'tig,tag', '-', '0,1,2', '']
-    valid_suffixes = ['pdf', 'png', 'jpg', 'jpeg', 'gif']
 
-    def _test_guessed_attributes(
-            self, filename, title, suffix, correspondent=None, tags=None):
-        file_info = FileInfo.from_path(filename)
+    valid_dates = (
+        "20150102030405Z",
+        "20150102Z",
+    )
+    valid_correspondents = [
+        "timmy",
+        "Dr. McWheelie",
+        "Dash Gor-don",
+        "ο Θερμαστής",
+        ""
+    ]
+    valid_titles = ["title", "Title w Spaces", "Title a-dash", "Τίτλος", ""]
+    valid_tags = ["tag", "tig,tag", "tag1,tag2,tag-3"]
+    valid_extensions = ["pdf", "png", "jpg", "jpeg", "gif"]
 
-        # Required
-        self.assertEqual(file_info.title, title, filename)
-        if suffix == 'jpeg':
-            suffix = 'jpg'
-        self.assertEqual(file_info.suffix, suffix, filename)
-        # Optional
-        if correspondent is None:
-            self.assertEqual(file_info.correspondent,
-                             correspondent, filename)
+    def _test_guessed_attributes(self, filename, created=None,
+                                 correspondent=None, title=None,
+                                 extension=None, tags=None):
+
+        # print(filename)
+        info = FileInfo.from_path(filename)
+
+        # Created
+        if created is None:
+            self.assertIsNone(info.created, filename)
         else:
-            self.assertEqual(file_info.correspondent.name,
-                             correspondent, filename)
+            self.assertEqual(info.created.year, int(created[:4]), filename)
+            self.assertEqual(info.created.month, int(created[4:6]), filename)
+            self.assertEqual(info.created.day, int(created[6:8]), filename)
+
+        # Correspondent
+        if correspondent:
+            self.assertEqual(info.correspondent.name, correspondent, filename)
+        else:
+            self.assertEqual(info.correspondent, None, filename)
+
+        # Title
+        self.assertEqual(info.title, title, filename)
+
+        # Tags
         if tags is None:
-            self.assertEqual(file_info.tags, (), filename)
+            self.assertEqual(info.tags, (), filename)
         else:
-            self.assertEqual([t.slug for t in file_info.tags],
-                             tags.split(','),
-                             filename)
+            self.assertEqual(
+                [t.slug for t in info.tags], tags.split(','),
+                filename
+            )
+
+        # Extension
+        if extension == 'jpeg':
+            extension = 'jpg'
+        self.assertEqual(info.extension, extension, filename)
 
     def test_just_title(self):
-        template = '/path/to/{title}.{suffix}'
+        template = '/path/to/{title}.{extension}'
         for title in self.valid_titles:
-            for suffix in self.valid_suffixes:
-                spec = dict(title=title, suffix=suffix)
+            for extension in self.valid_extensions:
+                spec = dict(title=title, extension=extension)
                 filename = template.format(**spec)
                 self._test_guessed_attributes(filename, **spec)
 
     def test_title_and_correspondent(self):
-        template = '/path/to/{correspondent} - {title}.{suffix}'
+        template = '/path/to/{correspondent} - {title}.{extension}'
         for correspondent in self.valid_correspondents:
             for title in self.valid_titles:
-                for suffix in self.valid_suffixes:
+                for extension in self.valid_extensions:
                     spec = dict(correspondent=correspondent, title=title,
-                                suffix=suffix)
+                                extension=extension)
                     filename = template.format(**spec)
                     self._test_guessed_attributes(filename, **spec)
 
     def test_title_and_correspondent_and_tags(self):
-        template = '/path/to/{correspondent} - {title} - {tags}.{suffix}'
+        template = '/path/to/{correspondent} - {title} - {tags}.{extension}'
         for correspondent in self.valid_correspondents:
             for title in self.valid_titles:
                 for tags in self.valid_tags:
-                    for suffix in self.valid_suffixes:
+                    for extension in self.valid_extensions:
                         spec = dict(correspondent=correspondent, title=title,
-                                    tags=tags, suffix=suffix)
+                                    tags=tags, extension=extension)
                         filename = template.format(**spec)
                         self._test_guessed_attributes(filename, **spec)
+
+    def test_created_and_correspondent_and_title_and_tags(self):
+
+        template = ("/path/to/{created} - "
+                    "{correspondent} - "
+                    "{title} - "
+                    "{tags}"
+                    ".{extension}")
+
+        for created in self.valid_dates:
+            for correspondent in self.valid_correspondents:
+                for title in self.valid_titles:
+                    for tags in self.valid_tags:
+                        for extension in self.valid_extensions:
+                            spec = {
+                                "created": created,
+                                "correspondent": correspondent,
+                                "title": title,
+                                "tags": tags,
+                                "extension": extension
+                            }
+                            self._test_guessed_attributes(
+                                template.format(**spec), **spec)
+
+    def test_created_and_correspondent_and_title(self):
+
+        template = ("/path/to/{created} - "
+                    "{correspondent} - "
+                    "{title}"
+                    ".{extension}")
+
+        for created in self.valid_dates:
+            for correspondent in self.valid_correspondents:
+                for title in self.valid_titles:
+
+                    # Skip cases where title looks like a tag as we can't
+                    # accommodate such cases.
+                    if title.lower() == title:
+                        continue
+
+                    for extension in self.valid_extensions:
+                        spec = {
+                            "created": created,
+                            "correspondent": correspondent,
+                            "title": title,
+                            "extension": extension
+                        }
+                        self._test_guessed_attributes(
+                            template.format(**spec), **spec)
+
+    def test_created_and_title(self):
+
+        template = ("/path/to/{created} - "
+                    "{title}"
+                    ".{extension}")
+
+        for created in self.valid_dates:
+            for title in self.valid_titles:
+                for extension in self.valid_extensions:
+                    spec = {
+                        "created": created,
+                        "title": title,
+                        "extension": extension
+                    }
+                    self._test_guessed_attributes(
+                        template.format(**spec), **spec)
+
+    def test_created_and_title_and_tags(self):
+
+        template = ("/path/to/{created} - "
+                    "{title} - "
+                    "{tags}"
+                    ".{extension}")
+
+        for created in self.valid_dates:
+            for title in self.valid_titles:
+                for tags in self.valid_tags:
+                    for extension in self.valid_extensions:
+                        spec = {
+                            "created": created,
+                            "title": title,
+                            "tags": tags,
+                            "extension": extension
+                        }
+                        self._test_guessed_attributes(
+                            template.format(**spec), **spec)
