@@ -1,6 +1,15 @@
 Changelog
 #########
 
+* 0.2.0
+
+  * Added support for guessing the date from the file name along with the
+    correspondent, title, and tags.  Thanks to `Tikitu de Jager`_ for his pull
+    request that I took forever to merge and to `Pit`_ for his efforts on the
+    regex front.
+  * `#94`_: Restored support for changing the created date in the UI.  Thanks
+    to `Martin Honermeyer`_ and `Tim White`_ for working with me on this.
+
 * 0.1.1
 
   * Potentially **Breaking Change**: All references to "sender" in the code
@@ -86,6 +95,8 @@ Changelog
 .. _Wayne Werner: https://github.com/waynew
 .. _darkmatter: https://github.com/darkmatter
 .. _zedster: https://github.com/zedster
+.. _Martin Honermeyer: https://github.com/djmaze
+.. _Tim White: https://github.com/timwhite
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -99,3 +110,4 @@ Changelog
 .. _#67: https://github.com/danielquinn/paperless/issues/67
 .. _#68: https://github.com/danielquinn/paperless/issues/68
 .. _#71: https://github.com/danielquinn/paperless/issues/71
+.. _#94: https://github.com/danielquinn/paperless/issues/71

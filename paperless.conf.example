@@ -20,7 +20,7 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 #
 # The passphrase you use here will be used when storing your documents in
 # Paperless, but you can always export them in an unencrypted format by using
-# document exporter.  See the documentaiton for more information.
+# document exporter.  See the documentation for more information.
 #
 # One final note about the passphrase.  Once you've consumed a document with
 # one passphrase, DON'T CHANGE IT.  Paperless assumes this to be a constant and
@@ -31,3 +31,8 @@ PAPERLESS_PASSPHRASE="secret"
 # If you intend to consume documents either via HTTP POST or by email, you must
 # have a shared secret here.
 PAPERLESS_SHARED_SECRET=""
+
+# By default, Paperless will attempt to use all available CPU cores to process
+# a document, but if you would like to limit that, you can set this value to
+# an integer:
+#PAPERLESS_OCR_THREADS=1

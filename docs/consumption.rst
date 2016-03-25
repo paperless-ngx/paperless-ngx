@@ -45,19 +45,27 @@ you name the file right, it'll automatically set some values in the database
 for you.  This is is the logic the consumer follows:
 
 1. Try to find the correspondent, title, and tags in the file name following
+   the pattern: ``Date - Correspondent - Title - tag,tag,tag.pdf``.  Note that
+   the format of the date is **rigidly defined** as ``YYYYMMDDHHMMSSZ`` or
+   ``YYYYMMDDZ``.  The ``Z`` is for "Zulu time" AKA "UTC".
+2. If that doesn't work, we skip the date and try this pattern:
    the pattern: ``Correspondent - Title - tag,tag,tag.pdf``.
-2. If that doesn't work, try to find the correspondent and title in the file
+3. If that doesn't work, we try to find the correspondent and title in the file
    name following the pattern:  ``Correspondent - Title.pdf``.
-3. If that doesn't work, just assume that the name of the file is the title.
+4. If that doesn't work, just assume that the name of the file is the title.
 
 So given the above, the following examples would work as you'd expect:
 
+* ``20150314000700Z - Some Company Name - Invoice 2016-01-01 - money,invoices.pdf``
+* ``20150314Z - Some Company Name - Invoice 2016-01-01 - money,invoices.pdf``
 * ``Some Company Name - Invoice 2016-01-01 - money,invoices.pdf``
 * ``Another Company - Letter of Reference.jpg``
 * ``Dad's Recipe for Pancakes.png``
 
 These however wouldn't work:
 
+* ``2015-03-14 00:07:00 UTC - Some Company Name, Invoice 2016-01-01, money, invoices.pdf``
+* ``2015-03-14 - Some Company Name, Invoice 2016-01-01, money, invoices.pdf``
 * ``Some Company Name, Invoice 2016-01-01, money, invoices.pdf``
 * ``Another Company- Letter of Reference.jpg``
 
@@ -128,7 +136,7 @@ following name/value pairs:
   don't start uploading stuff to your server.  The means of generating this
   signature is defined below.
 
-Specify ``enctype="multipart/form-data"``, and then POST your file with:::
+Specify ``enctype="multipart/form-data"``, and then POST your file with::
 
     Content-Disposition: form-data; name="document"; filename="whatever.pdf"
 

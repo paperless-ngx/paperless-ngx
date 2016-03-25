@@ -24,8 +24,11 @@ How it Works
 
 1. Buy a document scanner like `this one`_.
 2. Set it up to "scan to FTP" or something similar. It should be able to push
-   scanned images to a server without you having to do anything.
-3. Have the target server run the *Paperless* consumption script to OCR the PDF
+   scanned images to a server without you having to do anything.  If your
+   scanner doesn't know how to automatically upload the file somewhere, you can
+   always do that manually.  Paperless doesn't care how the documents get into
+   its local consumption directory.
+3. Have the target server run the Paperless consumption script to OCR the PDF
    and index it into a local database.
 4. Use the web frontend to sift through the database and find what you want.
 5. Download the PDF you need/want via the web interface and do whatever you
@@ -56,7 +59,7 @@ powerful tools.
 
 * `ImageMagick`_ converts the images between colour and greyscale.
 * `Tesseract`_ does the character recognition.
-* `Unpaper`_ despeckles and and deskews the scanned image.
+* `Unpaper`_ despeckles and deskews the scanned image.
 * `GNU Privacy Guard`_ is used as the encryption backend.
 * `Python 3`_ is the language of the project.
 

@@ -8,7 +8,7 @@ should work) that has the following software installed on it:
 
 * `Python3`_ (with development libraries, pip and virtualenv)
 * `GNU Privacy Guard`_
-* `Tesseract`_
+* `Tesseract`_, plus its language files matching your document base.
 * `Imagemagick`_
 * `unpaper`_
 
@@ -52,6 +52,7 @@ well as ImageMagick:
 
     $ brew install ghostscript
     $ brew install imagemagick
+    $ brew install libmagic
 
 
 .. _requirements-baremetal:
