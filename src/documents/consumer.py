@@ -166,9 +166,7 @@ class Consumer(object):
             self.CONVERT,
             "-scale", "500x5000",
             "-alpha", "remove",
-            "-limit", "memory", "20MiB",
-            doc,
-            os.path.join(tempdir, "convert-%04d.png")
+            doc, os.path.join(tempdir, "convert-%04d.png")
         )
 
         return os.path.join(tempdir, "convert-0000.png")
