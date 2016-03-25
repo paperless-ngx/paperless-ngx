@@ -129,10 +129,13 @@ class Consumer(object):
 
         # Convert PDF to multiple PNMs
         pnm = os.path.join(tempdir, "convert-%04d.pnm")
-        subprocess.Popen((
-            self.CONVERT, "-density", "300", "-depth", "8",
-            "-type", "grayscale", doc, pnm
-        )).wait()
+        run_convert(
+            self.CONVERT,
+            "-density", "300",
+            "-depth", "8",
+            "-type", "grayscale",
+            doc, pnm,
+        )
 
         # Get a list of converted images
         pnms = []
@@ -159,13 +162,14 @@ class Consumer(object):
 
         self.log("info", "Generating the thumbnail")
 
-        subprocess.Popen((
+        run_convert(
             self.CONVERT,
             "-scale", "500x5000",
             "-alpha", "remove",
+            "-limit", "memory", "20MiB",
             doc,
             os.path.join(tempdir, "convert-%04d.png")
-        )).wait()
+        )
 
         return os.path.join(tempdir, "convert-0000.png")
 
@@ -334,6 +338,16 @@ def image_to_string(args):
 
 def run_unpaper(args):
     unpaper, pnm = args
-    subprocess.Popen((
-        unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm")
-    )).wait()
+    subprocess.Popen(
+        (unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm"))).wait()
+
+
+def run_convert(*args):
+
+    environment = {}
+    if settings.CONVERT_MEMORY_LIMIT:
+        environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
+    if settings.CONVERT_TMPDIR:
+        environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
+
+    subprocess.Popen(args, env=environment).wait()
