@@ -80,8 +80,7 @@ class Consumer(object):
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
-            "group": self.logging_group,
-            "component": Log.COMPONENT_CONSUMER
+            "group": self.logging_group
         })
 
     def consume(self):
@@ -107,7 +106,10 @@ class Consumer(object):
             self.log("info", "Consuming {}".format(doc))
 
             document_consumption_started.send(
-                sender=self.__class__, filename=doc)
+                sender=self.__class__,
+                filename=doc,
+                logging_group=self.logging_group
+            )
 
             tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
             imgs = self._get_greyscale(tempdir, doc)
@@ -131,7 +133,10 @@ class Consumer(object):
                 self._cleanup_doc(doc)
 
                 document_consumption_finished.send(
-                    sender=self.__class__, filename=document)
+                    sender=self.__class__,
+                    document=document,
+                    logging_group=self.logging_group
+                )
 
     def _get_greyscale(self, tempdir, doc):
         """
@@ -271,7 +276,6 @@ class Consumer(object):
     def _store(self, text, doc, thumbnail):
 
         file_info = FileInfo.from_path(doc)
-        relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
 
         stats = os.stat(doc)
 
@@ -288,6 +292,7 @@ class Consumer(object):
                 datetime.datetime.fromtimestamp(stats.st_mtime))
         )
 
+        relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
         if relevant_tags:
             tag_names = ", ".join([t.slug for t in relevant_tags])
             self.log("debug", "Tagging with {}".format(tag_names))
