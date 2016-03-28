@@ -33,8 +33,7 @@ class Loggable(object):
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
-            "group": self.logging_group,
-            "component": Log.COMPONENT_MAIL
+            "group": self.logging_group
         })
 
 

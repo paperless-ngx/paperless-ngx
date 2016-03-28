@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
     "django_extensions",
 
-    "documents",
+    "documents.apps.DocumentsConfig",
 
     "rest_framework",
     "crispy_forms",

@@ -31,6 +31,13 @@ class MonthListFilter(admin.SimpleListFilter):
         return queryset.filter(created__year=year, created__month=month)
 
 
+class CorrespondentAdmin(admin.ModelAdmin):
+
+    list_display = ("name", "match", "matching_algorithm")
+    list_filter = ("matching_algorithm",)
+    list_editable = ("match", "matching_algorithm")
+
+
 class TagAdmin(admin.ModelAdmin):
 
     list_display = ("name", "colour", "match", "matching_algorithm")
@@ -103,11 +110,11 @@ class DocumentAdmin(admin.ModelAdmin):
 
 class LogAdmin(admin.ModelAdmin):
 
-    list_display = ("message", "level", "component")
-    list_filter = ("level", "component",)
+    list_display = ("message", "level",)
+    list_filter = ("level",)
 
 
-admin.site.register(Correspondent)
+admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Log, LogAdmin)

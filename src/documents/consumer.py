@@ -23,8 +23,10 @@ from pyocr.tesseract import TesseractError
 
 from paperless.db import GnuPG
 
-from .models import Tag, Document, Log, FileInfo
+from .models import Tag, Document, FileInfo
 from .languages import ISO639
+from .signals import (
+    document_consumption_started, document_consumption_finished)
 
 
 class OCRError(Exception):
@@ -78,8 +80,7 @@ class Consumer(object):
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
-            "group": self.logging_group,
-            "component": Log.COMPONENT_CONSUMER
+            "group": self.logging_group
         })
 
     def consume(self):
@@ -104,21 +105,38 @@ class Consumer(object):
 
             self.log("info", "Consuming {}".format(doc))
 
+            document_consumption_started.send(
+                sender=self.__class__,
+                filename=doc,
+                logging_group=self.logging_group
+            )
+
             tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
             imgs = self._get_greyscale(tempdir, doc)
             thumbnail = self._get_thumbnail(tempdir, doc)
 
             try:
-                text = self._get_ocr(imgs)
-                self._store(text, doc, thumbnail)
+
+                document = self._store(self._get_ocr(imgs), doc, thumbnail)
+
             except OCRError as e:
+
                 self._ignore.append(doc)
                 self.log("error", "OCR FAILURE for {}: {}".format(doc, e))
                 self._cleanup_tempdir(tempdir)
+
                 continue
+
             else:
+
                 self._cleanup_tempdir(tempdir)
                 self._cleanup_doc(doc)
+
+                document_consumption_finished.send(
+                    sender=self.__class__,
+                    document=document,
+                    logging_group=self.logging_group
+                )
 
     def _get_greyscale(self, tempdir, doc):
         """
@@ -260,7 +278,6 @@ class Consumer(object):
     def _store(self, text, doc, thumbnail):
 
         file_info = FileInfo.from_path(doc)
-        relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
 
         stats = os.stat(doc)
 
@@ -277,6 +294,7 @@ class Consumer(object):
                 datetime.datetime.fromtimestamp(stats.st_mtime))
         )
 
+        relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
         if relevant_tags:
             tag_names = ", ".join([t.slug for t in relevant_tags])
             self.log("debug", "Tagging with {}".format(tag_names))
@@ -295,6 +313,8 @@ class Consumer(object):
                 encrypted.write(GnuPG.encrypted(unencrypted))
 
         self.log("info", "Completed")
+
+        return document
 
     def _cleanup_tempdir(self, d):
         self.log("debug", "Deleting directory {}".format(d))

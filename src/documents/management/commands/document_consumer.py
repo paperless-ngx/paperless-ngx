@@ -47,10 +47,7 @@ class Command(BaseCommand):
             pass
 
         logging.getLogger(__name__).info(
-            "Starting document consumer at {}".format(
-                settings.CONSUMPTION_DIR
-            ),
-            extra={"component": Log.COMPONENT_CONSUMER}
+            "Starting document consumer at {}".format(settings.CONSUMPTION_DIR)
         )
 
         try:
