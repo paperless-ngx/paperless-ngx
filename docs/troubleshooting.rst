@@ -30,7 +30,7 @@ During the consumption process, Paperless invokes ImageMagick's ``convert``
 program to translate the source document into something that the OCR engine can
 understand and this can burn a Very Large amount of memory if the original
 document is rather long.  Similarly, if your system doesn't have a lot of
-memory to begin with (ie. a Rasberry Pi), then this can happen for even
+memory to begin with (ie. a Raspberry Pi), then this can happen for even
 medium-sized documents.
 
 The solution is to tell ImageMagick *not* to Use All The RAM, as is its
