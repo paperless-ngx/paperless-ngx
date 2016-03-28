@@ -73,10 +73,10 @@ immediately start consuming the documents.
 Updates
 -------
 
-For the most part, all you have to do to update *Paperless* is run ``git pull``
-on the directory containing the project files, and then use Django's ``migrate``
-command to execute any database schema updates that might have been rolled in
-as part of the update:
+For the most part, all you have to do to update Paperless is run ``git pull``
+on the directory containing the project files, and then use Django's
+``migrate`` command to execute any database schema updates that might have been
+rolled in as part of the update:
 
 .. code-block:: shell-session
 
@@ -87,6 +87,11 @@ as part of the update:
 
 Note that it's possible (even likely) that while ``git pull`` may update some
 files, the ``migrate`` step may not update anything.  This is totally normal.
+
+Additionally, as new features are added, the ability to control those features
+is typically added by way of an environment variable set in ``paperless.conf``.
+You may want to take a look at the ``paperless.conf.example`` file to see if
+there's anything new in there compared to what you've got int ``/etc``.
 
 If you are :ref:`using Docker <setup-installation-docker>` the update process
 requires only one additional step:
