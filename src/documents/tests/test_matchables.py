@@ -8,7 +8,7 @@ from ..signals import document_consumption_finished
 
 class TestMatching(TestCase):
 
-    def _truefalse(self, text, algorithm, true, false):
+    def _test_matching(self, text, algorithm, true, false):
         for klass in (Tag, Correspondent):
             instance = klass.objects.create(
                 name=str(randint(10000, 99999)),
@@ -22,7 +22,7 @@ class TestMatching(TestCase):
 
     def test_match_all(self):
 
-        self._truefalse(
+        self._test_matching(
             "alpha charlie gamma",
             "MATCH_ALL",
             ("I have alpha, charlie, and gamma in me",),
@@ -37,7 +37,7 @@ class TestMatching(TestCase):
             )
         )
 
-        self._truefalse(
+        self._test_matching(
             "12 34 56",
             "MATCH_ALL",
             (
@@ -56,7 +56,7 @@ class TestMatching(TestCase):
 
     def test_match_any(self):
 
-        self._truefalse(
+        self._test_matching(
             "alpha charlie gamma",
             "MATCH_ANY",
             (
@@ -72,7 +72,7 @@ class TestMatching(TestCase):
             )
         )
 
-        self._truefalse(
+        self._test_matching(
             "12 34 56",
             "MATCH_ANY",
             (
@@ -91,7 +91,7 @@ class TestMatching(TestCase):
 
     def test_match_literal(self):
 
-        self._truefalse(
+        self._test_matching(
             "alpha charlie gamma",
             "MATCH_LITERAL",
             (
@@ -109,7 +109,7 @@ class TestMatching(TestCase):
             )
         )
 
-        self._truefalse(
+        self._test_matching(
             "12 34 56",
             "MATCH_LITERAL",
             (
@@ -130,7 +130,7 @@ class TestMatching(TestCase):
 
     def test_match_regex(self):
 
-        self._truefalse(
+        self._test_matching(
             "alpha\w+gamma",
             "MATCH_REGEX",
             (
