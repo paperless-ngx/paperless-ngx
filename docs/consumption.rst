@@ -48,14 +48,21 @@ Just write a script, put it somewhere that Paperless can read & execute, and
 then put the path to that script in ``paperless.conf`` with the variable name
 ``PAPERLESS_POST_CONSUME_SCRIPT``.
 
+.. important::
+
+    This script is executed in a **blocking** process, which means that if the
+    script takes a long time to run, it can significantly slow down your
+    document consumption flow.  If you want things to run asynchronously,
+    you'll have to fork the process in your script and exit.
+
 
 .. _consumption-directory-hook-variables
 
 What Can This Script Do?
 ........................
 
-It's your script, so you're limited by own imagination and the laws of physics.
-However, the following values are passed to the script in order:
+It's your script, so you're only limited by your imagination and the laws of
+physics.  However, the following values are passed to the script in order:
 
 * Document id
 * Generated file name

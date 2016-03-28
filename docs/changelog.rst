@@ -3,6 +3,8 @@ Changelog
 
 * 0.2.0
 
+  * `#81`_: Added a hook to run an arbitrary script after every document is
+    consumed.
   * `#98`_: Added optional environment variables for ImageMagick so that it
     doesn't explode when handling Very Large Documents or when it's just
     running on a low-memory system.  Thanks to `Florian Harr`_ for his help on
