@@ -32,11 +32,19 @@ PAPERLESS_PASSPHRASE="secret"
 # have a shared secret here.
 PAPERLESS_SHARED_SECRET=""
 
+# After a document is consumed, Paperless can trigger an arbitrary script if
+# you like.  This script will be passed a number of arguments for you to work
+# with.  For more information, please see the documentation.  The default is
+# blank, which means nothing will be executed.
+#PAPERLESS_POST_CONSUME_SCRIPT="/path/to/an/arbitrary/script.sh"
+
+
 #
 # The following values use sensible defaults for modern systems, but if you're
-# running Paperless on a low-resource machine (like a Rasberry Pi), modifying
+# running Paperless on a low-resource machine (like a Raspberry Pi), modifying
 # some of these values may be necessary.
 #
+
 
 # By default, Paperless will attempt to use all available CPU cores to process
 # a document, but if you would like to limit that, you can set this value to

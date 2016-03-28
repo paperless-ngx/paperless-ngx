@@ -35,6 +35,42 @@ appropriate for your use and put some documents in there.  When you're ready,
 follow the :ref:`consumer <utilities-consumer>` instructions to get it running.
 
 
+.. _consumption-directory-hook:
+
+Hooking into the Consumption Process
+------------------------------------
+
+Sometimes you may want to do something arbitrary whenever a document is
+consumed.  Rather than try to predict what you may want to do, Paperless lets
+you execute a script of your own choosing every time a document is consumed.
+
+Just write a script, put it somewhere that Paperless can read & execute, and
+then put the path to that script in ``paperless.conf`` with the variable name
+``PAPERLESS_POST_CONSUME_SCRIPT``.
+
+
+.. _consumption-directory-hook-variables
+
+What Can This Script Do?
+........................
+
+It's your script, so you're limited by own imagination and the laws of physics.
+However, the following values are passed to the script in order:
+
+* Document id
+* Generated file name
+* Source path
+* Thumbnail path
+* Download URL
+* Thumbnail URL
+* Correspondent
+* Tags
+
+The script can be in any language you like, but for a simple shell script
+example, you can take a look at ``post-consumption-example.sh`` in the
+``scripts`` directory in this project.
+
+
 .. _consumption-imap:
 
 IMAP (Email)

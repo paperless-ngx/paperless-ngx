@@ -1,5 +1,9 @@
 import logging
 
+from subprocess import Popen
+
+from django.conf import settings
+
 from ..models import Correspondent, Tag
 
 
@@ -51,3 +55,21 @@ def set_tags(sender, document=None, logging_group=None, **kwargs):
     )
 
     document.tags.add(*relevant_tags)
+
+
+def run_external_script(sender, document, **kwargs):
+
+    if not settings.POST_CONSUME_SCRIPT:
+        return
+
+    Popen((
+        settings.POST_CONSUME_SCRIPT,
+        document.file_name,
+        document.source_path,
+        document.thumbnail_path,
+        document.download_url,
+        document.thumbnail_url,
+        str(document.id),
+        str(document.correspondent),
+        str(",".join(document.tags.all().values_list("slug", flat=True)))
+    )).wait()
