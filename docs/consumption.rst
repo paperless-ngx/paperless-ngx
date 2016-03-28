@@ -19,7 +19,7 @@ loop looking for new additions to this directory and when it finds them, it goes
 about the process of parsing them with the OCR, indexing what it finds, and
 encrypting the PDF, storing it in the media directory.
 
-Getting stuff into this directory is up to you.  If you're running *Paperless*
+Getting stuff into this directory is up to you.  If you're running Paperless
 on your local computer, you might just want to drag and drop files there, but if
 you're running this on a server and want your scanner to automatically push
 files to this directory, you'll need to setup some sort of service to accept the
@@ -85,7 +85,7 @@ IMAP (Email)
 
 Another handy way to get documents into your database is to email them to
 yourself.  The typical use-case would be to be out for lunch and want to send a
-copy of the receipt back to your system at home.  *Paperless* can be taught to
+copy of the receipt back to your system at home.  Paperless can be taught to
 pull emails down from an arbitrary account and dump them into the consumption
 directory where the process :ref:`above <consumption-directory>` will follow the
 usual pattern on consuming the document.
@@ -159,7 +159,7 @@ and store it on the server and the client.  Then use that secret, along with
 the text you want to verify to generate a string that you can use for
 verification.
 
-In the case of *Paperless*, you configure the server with the secret by setting
+In the case of Paperless, you configure the server with the secret by setting
 ``UPLOAD_SHARED_SECRET``.  Then on your client, you generate your signature by
 concatenating the correspondent, title, and the secret, and then using sha256
 to generate a hexdigest.

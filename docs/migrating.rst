@@ -3,7 +3,7 @@
 Migrating, Updates, and Backups
 ===============================
 
-As *Paperless* is still under active development, there's a lot that can change
+As Paperless is still under active development, there's a lot that can change
 as software updates roll out.  You should backup often, so if anything goes
 wrong during an update, you at least have a means of restoring to something
 usable.  Thankfully, there are automated ways of backing up, restoring, and

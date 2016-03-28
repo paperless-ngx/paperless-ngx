@@ -3,7 +3,7 @@
 Utilities
 =========
 
-There's basically three utilities to *Paperless*: the webserver, consumer, and
+There's basically three utilities to Paperless: the webserver, consumer, and
 if needed, the exporter.  They're all detailed here.
 
 
@@ -12,7 +12,7 @@ if needed, the exporter.  They're all detailed here.
 The Webserver
 -------------
 
-At the heart of it, *Paperless* is a simple Django webservice, and the entire
+At the heart of it, Paperless is a simple Django webservice, and the entire
 interface is based on Django's standard admin interface.  Once running, visiting
 the URL for your service delivers the admin, through which you can get a
 detailed listing of all available documents, search for specific files, and
@@ -86,7 +86,7 @@ service files in the ``scripts`` directory.
 The Exporter
 ------------
 
-Tired of fiddling with *Paperless*, or just want to do something stupid and are
+Tired of fiddling with Paperless, or just want to do something stupid and are
 afraid of accidentally damaging your files?  You can export all of your PDFs
 into neatly named, dated, and unencrypted.
 
