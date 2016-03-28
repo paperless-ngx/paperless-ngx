@@ -7,6 +7,8 @@ Changelog
     doesn't explode when handling Very Large Documents or when it's just
     running on a low-memory system.  Thanks to `Florian Harr`_ for his help on
     this one.
+  * `#89`_ Ported the auto-tagging code to correspondents as well.  Thanks to
+    `Justin Snyman`_ for the pointers in the issue queue.
   * Added support for guessing the date from the file name along with the
     correspondent, title, and tags.  Thanks to `Tikitu de Jager`_ for his pull
     request that I took forever to merge and to `Pit`_ for his efforts on the
@@ -102,6 +104,7 @@ Changelog
 .. _Martin Honermeyer: https://github.com/djmaze
 .. _Tim White: https://github.com/timwhite
 .. _Florian Harr: https://github.com/evils
+.. _Justin Snyman: https://github.com/stringlytyped
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -115,5 +118,6 @@ Changelog
 .. _#67: https://github.com/danielquinn/paperless/issues/67
 .. _#68: https://github.com/danielquinn/paperless/issues/68
 .. _#71: https://github.com/danielquinn/paperless/issues/71
+.. _#89: https://github.com/danielquinn/paperless/issues/89
 .. _#94: https://github.com/danielquinn/paperless/issues/71
 .. _#98: https://github.com/danielquinn/paperless/issues/71

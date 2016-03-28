@@ -32,6 +32,7 @@ Contents
    consumption
    api
    utilities
+   guesswork
    migrating
-   troubleshooting 
+   troubleshooting
    changelog
