@@ -52,9 +52,12 @@ for PDF files to parse and index.  The process is pretty straightforward:
    wait 10 seconds and try again.
 2. Parse the PDF with Tesseract
 3. Create a new record in the database with the OCR'd text
-4. Encrypt the PDF and store it in the ``media`` directory under
+4. Attempt to automatically assign document attributes by doing some guesswork.
+   Read up on the :ref:`guesswork documentation<guesswork>` for more
+   information about this process.
+5. Encrypt the PDF and store it in the ``media`` directory under
    ``documents/pdf``.
-5. Go to #1.
+6. Go to #1.
 
 
 .. _utilities-consumer-howto:

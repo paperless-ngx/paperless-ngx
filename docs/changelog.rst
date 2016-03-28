@@ -3,6 +3,8 @@ Changelog
 
 * 0.2.0
 
+  * `#89`_ Ported the auto-tagging code to correspondents as well.  Thanks to
+    `Justin Snyman`_ for the pointers in the issue queue.
   * Added support for guessing the date from the file name along with the
     correspondent, title, and tags.  Thanks to `Tikitu de Jager`_ for his pull
     request that I took forever to merge and to `Pit`_ for his efforts on the
@@ -97,6 +99,7 @@ Changelog
 .. _zedster: https://github.com/zedster
 .. _Martin Honermeyer: https://github.com/djmaze
 .. _Tim White: https://github.com/timwhite
+.. _Justin Snyman: https://github.com/stringlytyped
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -110,4 +113,5 @@ Changelog
 .. _#67: https://github.com/danielquinn/paperless/issues/67
 .. _#68: https://github.com/danielquinn/paperless/issues/68
 .. _#71: https://github.com/danielquinn/paperless/issues/71
+.. _#89: https://github.com/danielquinn/paperless/issues/89
 .. _#94: https://github.com/danielquinn/paperless/issues/71
