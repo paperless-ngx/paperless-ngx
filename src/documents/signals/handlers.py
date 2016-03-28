@@ -14,7 +14,7 @@ def set_correspondent(sender, document=None, logging_group=None, **kwargs):
         return
 
     # No matching correspondents, so no need to continue
-    potential_correspondents = Correspondent.match_all(document.content)
+    potential_correspondents = list(Correspondent.match_all(document.content))
     if not potential_correspondents:
         return
 
@@ -33,7 +33,7 @@ def set_correspondent(sender, document=None, logging_group=None, **kwargs):
     )
 
     document.correspondent = selected
-    document.save(update_fields="correspondent")
+    document.save(update_fields=("correspondent",))
 
 
 def set_tags(sender, document=None, logging_group=None, **kwargs):

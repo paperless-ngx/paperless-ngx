@@ -23,7 +23,7 @@ from pyocr.tesseract import TesseractError
 
 from paperless.db import GnuPG
 
-from .models import Tag, Document, Log, FileInfo
+from .models import Tag, Document, FileInfo
 from .languages import ISO639
 from .signals import (
     document_consumption_started, document_consumption_finished)
