@@ -16,8 +16,24 @@ map_uidgid() {
 
 set_permissions() {
     # Set permissions for consumption directory
-    chgrp paperless "$PAPERLESS_CONSUMPTION_DIR"
-    chmod g+x "$PAPERLESS_CONSUMPTION_DIR"
+    chgrp paperless "$PAPERLESS_CONSUMPTION_DIR" || {
+        echo "Changing group of consumption directory:"
+        echo "  $PAPERLESS_CONSUMPTION_DIR"
+        echo "failed."
+        echo ""
+        echo "Either try to set it on your host-mounted directory"
+        echo "directly, or make sure that the directory has \`o+x\`"
+        echo "permissions and the files in it at least \`o+r\`."
+    } >&2
+    chmod g+x "$PAPERLESS_CONSUMPTION_DIR" || {
+        echo "Changing group permissions of consumption directory:"
+        echo "  $PAPERLESS_CONSUMPTION_DIR"
+        echo "failed."
+        echo ""
+        echo "Either try to set it on your host-mounted directory"
+        echo "directly, or make sure that the directory has \`o+x\`"
+        echo "permissions and the files in it at least \`o+r\`."
+    } >&2
 
     # Set permissions for application directory
     chown -Rh paperless:paperless /usr/src/paperless
