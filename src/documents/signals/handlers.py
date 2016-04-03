@@ -64,7 +64,6 @@ def run_external_script(sender, document, **kwargs):
 
     Popen((
         settings.POST_CONSUME_SCRIPT,
-        settings.PASSPHRASE,
         str(document.id),
         document.file_name,
         document.source_path,

@@ -64,8 +64,6 @@ What Can This Script Do?
 It's your script, so you're only limited by your imagination and the laws of
 physics.  However, the following values are passed to the script in order:
 
-* The value of ``PAPERLESS_PASSPHRASE``, which is used to encrypt your
-  documents
 * Document id
 * Generated file name
 * Source path
