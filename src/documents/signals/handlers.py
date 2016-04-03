@@ -64,12 +64,13 @@ def run_external_script(sender, document, **kwargs):
 
     Popen((
         settings.POST_CONSUME_SCRIPT,
+        settings.PASSPHRASE,
+        str(document.id),
         document.file_name,
         document.source_path,
         document.thumbnail_path,
         document.download_url,
         document.thumbnail_url,
-        str(document.id),
         str(document.correspondent),
         str(",".join(document.tags.all().values_list("slug", flat=True)))
     )).wait()
