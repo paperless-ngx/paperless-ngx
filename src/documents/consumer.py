@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import logging
 import tempfile
 import uuid
@@ -99,6 +100,14 @@ class Consumer(object):
                 continue
 
             if self._is_ready(doc):
+                continue
+
+            if self._is_duplicate(doc):
+                self.log(
+                    "info",
+                    "Skipping {} as it appears to be a duplicate".format(doc)
+                )
+                self._ignore.append(doc)
                 continue
 
             self.logging_group = uuid.uuid4()
@@ -339,6 +348,12 @@ class Consumer(object):
         self.stats[doc] = t
 
         return False
+
+    @staticmethod
+    def _is_duplicate(doc):
+        with open(doc, "rb") as f:
+            checksum = hashlib.md5(f.read()).hexdigest()
+        return Document.objects.filter(checksum=checksum).exists()
 
 
 def image_to_string(args):

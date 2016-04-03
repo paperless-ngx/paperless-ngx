@@ -156,8 +156,20 @@ class Document(models.Model):
     )
     tags = models.ManyToManyField(
         Tag, related_name="documents", blank=True)
-    created = models.DateTimeField(default=timezone.now)
-    modified = models.DateTimeField(auto_now=True, editable=False)
+
+    checksum = models.CharField(
+        max_length=32,
+        editable=False,
+        unique=True,
+        help_text="The checksum of the original document (before it was "
+                  "encrypted).  We use this to prevent duplicate document "
+                  "imports."
+    )
+
+    created = models.DateTimeField(
+        default=timezone.now, db_index=True)
+    modified = models.DateTimeField(
+        auto_now=True, editable=False, db_index=True)
 
     class Meta(object):
         ordering = ("correspondent", "title")
