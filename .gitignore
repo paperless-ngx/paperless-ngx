@@ -75,4 +75,5 @@ docker-compose.env
 
 # Used for development
 scripts/import-for-development
-environment
+scripts/nuke
+
