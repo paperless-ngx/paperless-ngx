@@ -34,6 +34,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "content",
             "file_type",
             "tags",
+            "checksum",
             "created",
             "modified",
             "file_name",
