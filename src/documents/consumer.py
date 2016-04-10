@@ -377,7 +377,7 @@ def run_unpaper(args):
 
 def run_convert(*args):
 
-    environment = {}
+    environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
     if settings.CONVERT_TMPDIR:
