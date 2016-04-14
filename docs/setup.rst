@@ -300,13 +300,19 @@ Standard (Bare Metal, Systemd)
 If you're running on a bare metal system that's using Systemd, you can use the
 service unit files in the ``scripts`` directory to set this up.  You'll need to
 create a user called ``paperless`` and setup Paperless to be in a place that
-this new user can read and write to.  Then, you can just tell Systemd to enable
-the two ``.service`` files::
+this new user can read and write to. Be sure to edit the service scripts to point
+to the proper location of your paperless install. Note that if your system aliased
+``/usr/bin/python`` to python3 you should modify the ``ExecStart`` line to look like
+this: ``ExecStart=/usr/bin/python3 /path/to/paperless/src/manage.py document_consumer``.
+If you don't want to make a new user, you can change the ``Group`` and ``User`` variables
+accordingly.
 
-    # systemctl enable /path/to/paperless/scripts/paperless-consumer.service
-    # systemctl enable /path/to/paperless/scripts/paperless-webserver.service
-    # systemctl start /path/to/paperless/scripts/paperless-consumer.service
-    # systemctl start /path/to/paperless/scripts/paperless-webserver.service
+Then, you can just tell Systemd to enable the two ``.service`` files::
+
+    # sudo systemctl enable /path/to/paperless/scripts/paperless-consumer.service
+    # sudo systemctl enable /path/to/paperless/scripts/paperless-webserver.service
+    # sudo systemctl start paperless-consumer
+    # sudo systemctl start paperless-webserver
 
 
 .. _setup-permanent-standard-ubuntu14:
