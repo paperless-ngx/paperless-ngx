@@ -45,6 +45,40 @@ class TestMessage(TestCase):
                 self.assertEqual(m.id_buffer(data), "application/pdf")
 
 
+class TestInlineMessage(TestCase):
+
+    def __init__(self, *args, **kwargs):
+
+        TestCase.__init__(self, *args, **kwargs)
+        self.sample = os.path.join(
+            settings.BASE_DIR,
+            "documents",
+            "tests",
+            "samples",
+            "inline_mail.txt"
+        )
+
+    def test_init(self):
+
+        with open(self.sample, "rb") as f:
+
+            with mock.patch("logging.StreamHandler.emit") as __:
+                message = Message(f.read())
+
+            self.assertTrue(message)
+            self.assertEqual(message.subject, "Paperless Inline Image")
+
+            data = message.attachment.read()
+
+            self.assertEqual(
+                md5(data).hexdigest(), "30c00a7b42913e65f7fdb0be40b9eef3")
+
+            self.assertEqual(
+                message.attachment.content_type, "image/png")
+            with magic.Magic(flags=magic.MAGIC_MIME_TYPE) as m:
+                self.assertEqual(m.id_buffer(data), "image/png")
+
+
 class TestAttachment(TestCase):
 
     def test_init(self):
