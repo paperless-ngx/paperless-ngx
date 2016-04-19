@@ -82,6 +82,18 @@ Documentation
 It's all available on `ReadTheDocs`_.
 
 
+Similar Projects
+================
+
+There's another project out there called `Mayan EDMS`_ that has a surprising
+amount of technical overlap with Paperless.  Also based on Django and using
+a consumer model with Tesseract and unpaper, Mayan EDMS is *much* more
+featureful and comes with a slick UI as well.  It may be that Paperless is
+better suited for low-resource environments (like a Rasberry Pi), but to be
+honest, this is just a guess as I haven't tested this myself.  One thing's
+for certain though, *Paperless* is a **much** better name.
+
+
 Important Note
 ==============
 
@@ -120,6 +132,7 @@ use `the magic of bitcoins`_ while they're still around.
 .. _Django: https://www.djangoproject.com/
 .. _Python-GNUPG: http://pythonhosted.org/python-gnupg/
 .. _ReadTheDocs: https://paperless.readthedocs.org/
+.. _Mayan EDMS: https://mayan.readthedocs.org/en/latest/
 .. _the magic of bitcoins: https://blockchain.info/address/16RanUWNTTbR4yhc3FG8pXpq6BfJRPCcUs
 .. |Documentation| image:: https://readthedocs.org/projects/paperless/badge/?version=latest
    :alt: Read the documentation at https://paperless.readthedocs.org/
