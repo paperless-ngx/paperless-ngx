@@ -53,7 +53,7 @@ class Consumer(object):
     UNPAPER = settings.UNPAPER_BINARY
     CONSUME = settings.CONSUMPTION_DIR
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
-    DENSITY = int(settings.CONVERT_DENSITY) if settings.CONVERT_DENSITY else 300
+    DENSITY = settings.CONVERT_DENSITY if settings.CONVERT_DENSITY else 300
 
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
 
@@ -159,7 +159,7 @@ class Consumer(object):
         pnm = os.path.join(tempdir, "convert-%04d.pnm")
         run_convert(
             self.CONVERT,
-            "-density", self.DENSITY,
+            "-density", str(self.DENSITY),
             "-depth", "8",
             "-type", "grayscale",
             doc, pnm,
