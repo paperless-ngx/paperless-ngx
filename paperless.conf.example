@@ -61,6 +61,17 @@ PAPERLESS_SHARED_SECRET=""
 # the web for "MAGICK_MEMORY_LIMIT".
 #PAPERLESS_CONVERT_MEMORY_LIMIT=0
 
+# By default the conversion density setting for documents is 300DPI, in some
+# cases it has proven useful to configure a lesser value.
+# This setting has a high impact on the physical size of tmp page files,
+# the speed of document conversion, and can affect the accuracy of OCR
+# results. Individual results can vary and this setting should be tested 
+# thoroughly against the documents you are importing to see if it has any 
+# impacts either negative or positive. Testing on limited document sets has
+# shown a setting of 200 can cut the size of tmp files by 1/3, and speed up
+# conversion by up to 4x with little impact to OCR accuracy.
+#PAPERLESS_CONVERT_DENSITY=300
+
 # Similar to the memory limit, if you've got a small system and your OS mounts
 # /tmp as tmpfs, you should set this to a path that's on a physical disk, like
 # /home/your_user/tmp or something.  ImageMagick will use this as scratch space
