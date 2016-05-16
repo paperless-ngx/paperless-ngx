@@ -70,7 +70,7 @@ PAPERLESS_SHARED_SECRET=""
 # impacts either negative or positive. Testing on limited document sets has
 # shown a setting of 200 can cut the size of tmp files by 1/3, and speed up
 # conversion by up to 4x with little impact to OCR accuracy.
-#PAPERLESS_CONVERT_DENSITY=200
+#PAPERLESS_CONVERT_DENSITY=300
 
 # Similar to the memory limit, if you've got a small system and your OS mounts
 # /tmp as tmpfs, you should set this to a path that's on a physical disk, like
