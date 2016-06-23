@@ -230,6 +230,7 @@ SHARED_SECRET = os.getenv("PAPERLESS_SHARED_SECRET", "")
 
 # Trigger a script after every successful document consumption?
 POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
+PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
 
 #
 # TODO: Remove after 0.2
