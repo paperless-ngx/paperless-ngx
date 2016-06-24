@@ -57,7 +57,18 @@ def set_tags(sender, document=None, logging_group=None, **kwargs):
     document.tags.add(*relevant_tags)
 
 
-def run_external_script(sender, document, **kwargs):
+def run_pre_consume_script(sender, filename, **kwargs):
+
+    if not settings.PRE_CONSUME_SCRIPT:
+        return
+
+    Popen((
+        settings.PRE_CONSUME_SCRIPT,
+        filename
+    )).wait()
+
+
+def run_post_consume_script(sender, document, **kwargs):
 
     if not settings.POST_CONSUME_SCRIPT:
         return
