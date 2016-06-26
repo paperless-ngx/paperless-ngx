@@ -100,7 +100,7 @@ class Consumer(object):
             if doc in self._ignore:
                 continue
 
-            if self._is_ready(doc):
+            if not self._is_ready(doc):
                 continue
 
             if self._is_duplicate(doc):
