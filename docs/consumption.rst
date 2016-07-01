@@ -42,27 +42,44 @@ Hooking into the Consumption Process
 
 Sometimes you may want to do something arbitrary whenever a document is
 consumed.  Rather than try to predict what you may want to do, Paperless lets
-you execute a script of your own choosing every time a document is consumed.
+you execute scripts of your own choosing just before or after a document is
+consumed using a couple simple hooks.
 
 Just write a script, put it somewhere that Paperless can read & execute, and
 then put the path to that script in ``paperless.conf`` with the variable name
-``PAPERLESS_POST_CONSUME_SCRIPT``.
+of either ``PAPERLESS_PRE_CONSUME_SCRIPT`` or
+``PAPERLESS_POST_CONSUME_SCRIPT``.  The script will be executed before or
+or after the document is consumed respectively.
 
 .. important::
 
-    This script is executed in a **blocking** process, which means that if the
-    script takes a long time to run, it can significantly slow down your
+    These scripts are executed in a **blocking** process, which means that if
+    a script takes a long time to run, it can significantly slow down your
     document consumption flow.  If you want things to run asynchronously,
     you'll have to fork the process in your script and exit.
 
 
 .. _consumption-directory-hook-variables
 
-What Can This Script Do?
-........................
+What Can These Scripts Do?
+..........................
 
 It's your script, so you're only limited by your imagination and the laws of
-physics.  However, the following values are passed to the script in order:
+physics.  However, the following values are passed to the scripts in order:
+
+
+.. _consumption-director-hook-variables-pre
+
+Pre-consumption script
+::::::::::::::::::::::
+
+* Document file name
+
+
+.. _consumption-director-hook-variables-post
+
+Post-consumption script
+:::::::::::::::::::::::
 
 * Document id
 * Generated file name
