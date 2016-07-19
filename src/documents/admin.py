@@ -53,7 +53,7 @@ class DocumentAdmin(admin.ModelAdmin):
         }
 
     search_fields = ("correspondent__name", "title", "content")
-    list_display = ("created_", "correspondent", "title", "tags_", "document")
+    list_display = ("created", "correspondent", "title", "tags_", "document")
     list_filter = ("tags", "correspondent", MonthListFilter)
     list_per_page = 25
 
@@ -110,8 +110,8 @@ class DocumentAdmin(admin.ModelAdmin):
 
 class LogAdmin(admin.ModelAdmin):
 
-    list_display = ("message", "level",)
-    list_filter = ("level",)
+    list_display = ("created", "message", "level",)
+    list_filter = ("level", "created",)
 
 
 admin.site.register(Correspondent, CorrespondentAdmin)
