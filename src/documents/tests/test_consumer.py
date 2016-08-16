@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from ..models import Document, FileInfo
+from ..models import FileInfo
 
 
 class TestAttachment(TestCase):
