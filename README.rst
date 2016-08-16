@@ -4,6 +4,7 @@ Paperless
 |Documentation|
 |Chat|
 |Travis|
+|Dependencies|
 
 Scan, index, and archive all of your paper documents
 
@@ -142,3 +143,5 @@ use `the magic of bitcoins`_ while they're still around.
    :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 .. |Travis| image:: https://travis-ci.org/danielquinn/paperless.svg?branch=master
    :target: https://travis-ci.org/danielquinn/paperless
+.. |Dependencies| image:: https://www.versioneye.com/user/projects/57b33b81d9f1b00016faa500/badge.svg?style=flat-square
+   :target: https://www.versioneye.com/user/projects/57b33b81d9f1b00016faa500
