@@ -1,4 +1,4 @@
-FROM python:3.5.1
+FROM python:3.5
 MAINTAINER Pit Kleyersburg <pitkley@googlemail.com>
 
 # Install dependencies
