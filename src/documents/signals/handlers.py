@@ -1,4 +1,5 @@
 import logging
+import os
 
 from subprocess import Popen
 
@@ -62,10 +63,7 @@ def run_pre_consume_script(sender, filename, **kwargs):
     if not settings.PRE_CONSUME_SCRIPT:
         return
 
-    Popen((
-        settings.PRE_CONSUME_SCRIPT,
-        filename
-    )).wait()
+    Popen((settings.PRE_CONSUME_SCRIPT, filename)).wait()
 
 
 def run_post_consume_script(sender, document, **kwargs):
@@ -84,3 +82,10 @@ def run_post_consume_script(sender, document, **kwargs):
         str(document.correspondent),
         str(",".join(document.tags.all().values_list("slug", flat=True)))
     )).wait()
+
+
+def cleanup_document_deletion(sender, instance, using, **kwargs):
+    try:
+        os.unlink(instance.source_path)
+    except FileNotFoundError:
+        pass  # The file's already gone, so we're cool with it.
