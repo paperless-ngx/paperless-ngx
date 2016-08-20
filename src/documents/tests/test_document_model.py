@@ -15,6 +15,9 @@ class TestDocument(TestCase):
             checksum="checksum",
         )
         file_path = document.source_path
+        thumb_path = document.thumbnail_path
         with mock.patch("documents.signals.handlers.os.unlink") as mock_unlink:
             document.delete()
-            mock_unlink.assert_called_with(file_path)
+            mock_unlink.assert_any_call(file_path)
+            mock_unlink.assert_any_call(thumb_path)
+            self.assertEqual(mock_unlink.call_count, 2)
