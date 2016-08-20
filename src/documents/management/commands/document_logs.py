@@ -2,8 +2,6 @@ from django.core.management.base import BaseCommand
 
 from documents.models import Log
 
-from ...mixins import Renderable
-
 
 class Command(BaseCommand):
 
@@ -12,4 +10,3 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for l in Log.objects.order_by("pk"):
             print(l)
-
