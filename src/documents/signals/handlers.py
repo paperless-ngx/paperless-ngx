@@ -85,7 +85,8 @@ def run_post_consume_script(sender, document, **kwargs):
 
 
 def cleanup_document_deletion(sender, instance, using, **kwargs):
-    try:
-        os.unlink(instance.source_path)
-    except FileNotFoundError:
-        pass  # The file's already gone, so we're cool with it.
+    for f in (instance.source_path, instance.thumbnail_path):
+        try:
+            os.unlink(f)
+        except FileNotFoundError:
+            pass  # The file's already gone, so we're cool with it.
