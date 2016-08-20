@@ -293,6 +293,9 @@ class Consumer(object):
 
         self.log("debug", "Saving record to database")
 
+        created = file_info.created or timezone.make_aware(
+                    datetime.datetime.fromtimestamp(stats.st_mtime))
+
         with open(doc, "rb") as f:
             document = Document.objects.create(
                 correspondent=file_info.correspondent,
@@ -300,10 +303,8 @@ class Consumer(object):
                 content=text,
                 file_type=file_info.extension,
                 checksum=hashlib.md5(f.read()).hexdigest(),
-                created=timezone.make_aware(
-                    datetime.datetime.fromtimestamp(stats.st_mtime)),
-                modified=timezone.make_aware(
-                    datetime.datetime.fromtimestamp(stats.st_mtime))
+                created=created,
+                modified=created
             )
 
         relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
