@@ -376,6 +376,7 @@ class FileInfo(object):
         """
         We use a crude naming convention to make handling the correspondent,
         title, and tags easier:
+          "<date> - <correspondent> - <title> - <tags>.<suffix>"
           "<correspondent> - <title> - <tags>.<suffix>"
           "<correspondent> - <title>.<suffix>"
           "<title>.<suffix>"

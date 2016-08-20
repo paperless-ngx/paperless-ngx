@@ -3,7 +3,7 @@ from django.test import TestCase
 from ..models import FileInfo
 
 
-class TestAttachment(TestCase):
+class TestAttributes(TestCase):
 
     TAGS = ("tag1", "tag2", "tag3")
     EXTENSIONS = (
@@ -154,7 +154,6 @@ class Permutations(TestCase):
                                  correspondent=None, title=None,
                                  extension=None, tags=None):
 
-        # print(filename)
         info = FileInfo.from_path(filename)
 
         # Created
