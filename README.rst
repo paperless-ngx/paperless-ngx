@@ -70,12 +70,6 @@ powerful tools.
   * `Python-GNUPG`_ decrypts the PDFs on-the-fly to allow you to download
     unencrypted files, leaving the encrypted ones on-disk.
 
-The keen eye might have noticed that we're converting a PDF to an image to be
-read by Tesseract, and to do this we're using a chain of: scanned PDF >
-Imagemagick > Pillow > PyOCR > Tesseract > text.  It's not ideal, but
-apparently, Pillow lacks the ability to read PDFs, and PyOCR requires a Pillow
-object, so we're sort of stuck.
-
 
 Documentation
 =============
