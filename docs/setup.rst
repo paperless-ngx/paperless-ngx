@@ -377,6 +377,176 @@ second period.
 
 .. _setup-permanent-vagrant:
 
+
+Using a Real Webserver
+......................
+
+The default is to use Django's development server, as that's easy and does the
+job well enough on a home network.  However, if you want to do things right,
+it's probably a good idea to use a webserver capable of handling more than one
+thread.
+
+Apache
+~~~~~~
+
+This is a configuration supplied by `steckerhalter`_ on GitHub.  It uses Apache
+and mod_wsgi, with a Paperless installation in /home/paperless/:
+
+.. code:: apache
+
+    <VirtualHost *:80>
+        ServerName example.com
+
+        Alias /static/ /home/paperless/paperless/static/
+        <Directory /home/paperless/paperless/static>
+            Require all granted
+        </Directory>
+
+        WSGIScriptAlias / /home/paperless/paperless/src/paperless/wsgi.py
+        WSGIDaemonProcess example.com user=paperless group=paperless threads=5 python-path=/home/paperless/paperless/src:/home/paperless/.env/lib/python3.4/site-packages
+        WSGIProcessGroup example.com
+
+        <Directory /home/paperless/paperless/src/paperless>
+            <Files wsgi.py>
+                Require all granted
+            </Files>
+        </Directory>
+    </VirtualHost>
+
+.. _steckerhalter: https://github.com/steckerhalter
+
+
+Nginx + Gunicorn
+~~~~~~~~~~~~~~~~
+
+If you're using Nginx, the most common setup is to combine it with a
+Python-based server like Gunicorn so that Nginx is acting as a proxy.  Below is
+a copy of a simple Nginx configuration fragment making use of SSL and IPv6 to
+refer to a gunicorn instance listening on a local Unix socket:
+
+.. code:: nginx
+
+    upstream transfer_server {
+      server unix:/run/example.com/gunicorn.sock fail_timeout=0;
+    }
+
+    # Redirect requests on port 80 to 443
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name example.com;
+      rewrite ^ https://$server_name$request_uri? permanent;
+    }
+
+    server {
+
+      listen 443 ssl;
+      listen [::]:443;
+      client_max_body_size 4G;
+      server_name example.com;
+      keepalive_timeout 5;
+      root /var/www/example.com;
+
+      ssl on;
+
+      ssl_certificate         /etc/letsencrypt/live/example.com/fullchain.pem;
+      ssl_certificate_key     /etc/letsencrypt/live/example.com/privkey.pem;
+      ssl_trusted_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+      ssl_session_timeout 1d;
+      ssl_session_cache shared:SSL:50m;
+
+      # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
+      # Generate with:
+      #   openssl dhparam -out /etc/nginx/dhparam.pem 2048
+      ssl_dhparam /etc/nginx/dhparam.pem;
+
+      # What Mozilla calls "Intermediate configuration"
+      # Copied from https://mozilla.github.io/server-side-tls/ssl-config-generator/
+      ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+      ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+      ssl_prefer_server_ciphers on;
+
+      add_header Strict-Transport-Security max-age=15768000;
+
+      ssl_stapling on;
+      ssl_stapling_verify on;
+
+      access_log /var/log/nginx/example.com.log main;
+      error_log /var/log/nginx/example.com.err info;
+
+      location / {
+        try_files $uri @proxy_to_app;
+      }
+
+      location @proxy_to_app {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+        proxy_pass http://transfer_server;
+      }
+
+    }
+
+Once you've got Nginx configured, you'll want to have a configuration file for
+your gunicorn instance.  This should do the trick:
+
+.. code:: python
+
+    import os
+
+    bind = 'unix:/run/example.com/gunicorn.sock'
+    backlog = 2048
+    workers = 6
+    worker_class = 'sync'
+    worker_connections = 1000
+    timeout = 30
+    keepalive = 2
+    debug = False
+    spew = False
+    daemon = False
+    pidfile = None
+    umask = 0
+    user = None
+    group = None
+    tmp_upload_dir = None
+    errorlog = '/var/log/example.com/gunicorn.err'
+    loglevel = 'warning'
+    accesslog = '/var/log/example.com/gunicorn.log'
+    proc_name = None
+
+    def post_fork(server, worker):
+        server.log.info("Worker spawned (pid: %s)", worker.pid)
+
+    def pre_fork(server, worker):
+        pass
+
+    def pre_exec(server):
+        server.log.info("Forked child, re-executing.")
+
+    def when_ready(server):
+        server.log.info("Server is ready. Spawning workers")
+
+    def worker_int(worker):
+        worker.log.info("worker received INT or QUIT signal")
+
+        ## get traceback info
+        import threading, sys, traceback
+        id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
+        code = []
+        for threadId, stack in sys._current_frames().items():
+            code.append("\n# Thread: %s(%d)" % (id2name.get(threadId,""),
+                threadId))
+            for filename, lineno, name, line in traceback.extract_stack(stack):
+                code.append('File: "%s", line %d, in %s' % (filename,
+                    lineno, name))
+                if line:
+                    code.append("  %s" % (line.strip()))
+        worker.log.debug("\n".join(code))
+
+    def worker_abort(worker):
+        worker.log.info("worker received SIGABRT signal")
+
 Vagrant
 .......
 
