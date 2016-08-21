@@ -3,6 +3,10 @@ Changelog
 
 * 0.2.0
 
+  * `#131`_: Document files are now automatically removed from disk when
+    they're deleted in Paperless.
+  * `#121`_: Fixed a bug where Paperless wasn't setting document creation time
+    based on the file naming scheme.
   * `#81`_: Added a hook to run an arbitrary script after every document is
     consumed.
   * `#98`_: Added optional environment variables for ImageMagick so that it
@@ -120,6 +124,9 @@ Changelog
 .. _#67: https://github.com/danielquinn/paperless/issues/67
 .. _#68: https://github.com/danielquinn/paperless/issues/68
 .. _#71: https://github.com/danielquinn/paperless/issues/71
+.. _#81: https://github.com/danielquinn/paperless/issues/81
 .. _#89: https://github.com/danielquinn/paperless/issues/89
-.. _#94: https://github.com/danielquinn/paperless/issues/71
-.. _#98: https://github.com/danielquinn/paperless/issues/71
+.. _#94: https://github.com/danielquinn/paperless/issues/94
+.. _#98: https://github.com/danielquinn/paperless/issues/98
+.. _#121: https://github.com/danielquinn/paperless/issues/121
+.. _#131: https://github.com/danielquinn/paperless/issues/131
