@@ -59,7 +59,7 @@ or after the document is consumed respectively.
     you'll have to fork the process in your script and exit.
 
 
-.. _consumption-directory-hook-variables
+.. _consumption-directory-hook-variables:
 
 What Can These Scripts Do?
 ..........................
@@ -68,7 +68,7 @@ It's your script, so you're only limited by your imagination and the laws of
 physics.  However, the following values are passed to the scripts in order:
 
 
-.. _consumption-director-hook-variables-pre
+.. _consumption-director-hook-variables-pre:
 
 Pre-consumption script
 ::::::::::::::::::::::
@@ -76,7 +76,7 @@ Pre-consumption script
 * Document file name
 
 
-.. _consumption-director-hook-variables-post
+.. _consumption-director-hook-variables-post:
 
 Post-consumption script
 :::::::::::::::::::::::
