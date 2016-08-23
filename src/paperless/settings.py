@@ -98,7 +98,7 @@ DATABASES = {
         "NAME": os.path.join(os.getenv("PAPERLESS_DBLOCATION",os.path.join(BASE_DIR, "..", "data")), "db.sqlite3")
     }
 }
-print(DATABASES)
+
 if os.getenv("PAPERLESS_DBUSER") and os.getenv("PAPERLESS_DBPASS"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
