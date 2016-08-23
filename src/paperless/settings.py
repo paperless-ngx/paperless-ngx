@@ -31,6 +31,11 @@ LOGIN_URL = '/admin/login'
 
 ALLOWED_HOSTS = []
 
+# Tap paperless.conf if it's available
+if os.path.exists("/etc/paperless.conf"):
+    load_dotenv("/etc/paperless.conf")
+
+
 
 # Application definition
 
@@ -90,9 +95,16 @@ WSGI_APPLICATION = 'paperless.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "..", "data", "db.sqlite3"),
+        "NAME": os.path.join(
+                    os.getenv(
+                        "PAPERLESS_DBDIR",
+                        os.path.join(BASE_DIR, "..", "data")
+                    ),
+                    "db.sqlite3"
+                )
     }
 }
+
 if os.getenv("PAPERLESS_DBUSER") and os.getenv("PAPERLESS_DBPASS"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -149,11 +161,6 @@ MEDIA_URL = "/media/"
 # You shouldn't have to edit any of these values.  Rather, you can set these
 # values in /etc/paperless.conf instead.
 # ----------------------------------------------------------------------------
-
-# Tap paperless.conf if it's available
-if os.path.exists("/etc/paperless.conf"):
-    load_dotenv("/etc/paperless.conf")
-
 
 # Logging
 
