@@ -31,7 +31,7 @@ class IndexView(TemplateView):
         return TemplateView.get_context_data(self, **kwargs)
 
 
-class FetchView(DetailView):
+class FetchView(LoginRequiredMixin, DetailView):
 
     model = Document
 
