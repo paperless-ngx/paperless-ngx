@@ -83,5 +83,5 @@ PAPERLESS_SHARED_SECRET=""
 
 # You can specify where you want the SQLite database to be stored instead of 
 # the default location
-#PAPERLESS_DBLOCATION=/path/to/database/file
+#PAPERLESS_DBDIR=/path/to/database/file
 
