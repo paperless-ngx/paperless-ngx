@@ -3,6 +3,8 @@ Changelog
 
 * 0.2.0
 
+  * `#150`_: The media root is now a variable you can set in
+    ``paperless.conf``.
   * `#148`_: The database location (sqlite) is now a variable you can set in
     ``paperless.conf``.
   * `#146`_: Fixed a bug that allowed unauthorised access to the `/fetch` URL.
@@ -135,3 +137,4 @@ Changelog
 .. _#131: https://github.com/danielquinn/paperless/issues/131
 .. _#146: https://github.com/danielquinn/paperless/issues/146
 .. _#148: https://github.com/danielquinn/paperless/pull/148
+.. _#150: https://github.com/danielquinn/paperless/pull/150
