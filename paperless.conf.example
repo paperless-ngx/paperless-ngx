@@ -85,3 +85,5 @@ PAPERLESS_SHARED_SECRET=""
 # the default location
 #PAPERLESS_DBDIR=/path/to/database/file
 
+# Override the default MEDIA_ROOT here.  This is where all files are stored.
+#PAPERLESS_MEDIADIR=/path/to/media
