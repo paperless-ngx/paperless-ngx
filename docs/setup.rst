@@ -550,8 +550,7 @@ your gunicorn instance.  This should do the trick:
 Vagrant
 .......
 
-You're currently on your own, but the Ubuntu explanation above may be enough.
-
+You may use the Ubuntu explanation above. Replace ``(local-filesystems and net-device-up IFACE=eth0)`` with ``vagrant-mounted``.
 
 .. _setup-permanent-docker:
 
