@@ -80,3 +80,10 @@ PAPERLESS_SHARED_SECRET=""
 # For more information on how to use this value, you should probably search
 # the web for "MAGICK_TMPDIR".
 #PAPERLESS_CONVERT_TMPDIR=/var/tmp/paperless
+
+# You can specify where you want the SQLite database to be stored instead of 
+# the default location
+#PAPERLESS_DBDIR=/path/to/database/file
+
+# Override the default MEDIA_ROOT here.  This is where all files are stored.
+#PAPERLESS_MEDIADIR=/path/to/media

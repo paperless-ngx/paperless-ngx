@@ -27,7 +27,14 @@ SECRET_KEY = 'e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+LOGIN_URL = '/admin/login'
+
 ALLOWED_HOSTS = []
+
+# Tap paperless.conf if it's available
+if os.path.exists("/etc/paperless.conf"):
+    load_dotenv("/etc/paperless.conf")
+
 
 
 # Application definition
@@ -88,9 +95,16 @@ WSGI_APPLICATION = 'paperless.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "..", "data", "db.sqlite3"),
+        "NAME": os.path.join(
+                    os.getenv(
+                        "PAPERLESS_DBDIR",
+                        os.path.join(BASE_DIR, "..", "data")
+                    ),
+                    "db.sqlite3"
+                )
     }
 }
+
 if os.getenv("PAPERLESS_DBUSER") and os.getenv("PAPERLESS_DBPASS"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -137,7 +151,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
-MEDIA_ROOT = os.path.join(BASE_DIR, "..", "media")
+MEDIA_ROOT = os.getenv(
+                "PAPERLESS_MEDIADIR",
+                os.path.join(BASE_DIR, "..", "media")
+             )
 
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
@@ -147,11 +164,6 @@ MEDIA_URL = "/media/"
 # You shouldn't have to edit any of these values.  Rather, you can set these
 # values in /etc/paperless.conf instead.
 # ----------------------------------------------------------------------------
-
-# Tap paperless.conf if it's available
-if os.path.exists("/etc/paperless.conf"):
-    load_dotenv("/etc/paperless.conf")
-
 
 # Logging
 

@@ -5,7 +5,7 @@ from subprocess import Popen
 
 from django.conf import settings
 
-from ..models import Correspondent, Tag
+from ..models import Correspondent, Document, Tag
 
 
 def logger(message, group):
@@ -85,6 +85,10 @@ def run_post_consume_script(sender, document, **kwargs):
 
 
 def cleanup_document_deletion(sender, instance, using, **kwargs):
+
+    if not isinstance(instance, Document):
+        return
+
     for f in (instance.source_path, instance.thumbnail_path):
         try:
             os.unlink(f)
