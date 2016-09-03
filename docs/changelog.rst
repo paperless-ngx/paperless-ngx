@@ -3,6 +3,11 @@ Changelog
 
 * 0.2.0
 
+  * `#150`_: The media root is now a variable you can set in
+    ``paperless.conf``.
+  * `#148`_: The database location (sqlite) is now a variable you can set in
+    ``paperless.conf``.
+  * `#146`_: Fixed a bug that allowed unauthorised access to the `/fetch` URL.
   * `#131`_: Document files are now automatically removed from disk when
     they're deleted in Paperless.
   * `#121`_: Fixed a bug where Paperless wasn't setting document creation time
@@ -130,3 +135,6 @@ Changelog
 .. _#98: https://github.com/danielquinn/paperless/issues/98
 .. _#121: https://github.com/danielquinn/paperless/issues/121
 .. _#131: https://github.com/danielquinn/paperless/issues/131
+.. _#146: https://github.com/danielquinn/paperless/issues/146
+.. _#148: https://github.com/danielquinn/paperless/pull/148
+.. _#150: https://github.com/danielquinn/paperless/pull/150
