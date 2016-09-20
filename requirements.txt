@@ -12,3 +12,4 @@ python-dateutil>=2.4.2
 python-dotenv>=0.3.0
 python-gnupg>=0.3.8
 pytz>=2015.7
+gunicorn==19.6.0
