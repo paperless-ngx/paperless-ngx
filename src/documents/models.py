@@ -47,6 +47,8 @@ class MatchingModel(models.Model):
         )
     )
 
+    is_insensitive = models.BooleanField(default=True)
+
     class Meta(object):
         abstract = True
 
@@ -71,27 +73,32 @@ class MatchingModel(models.Model):
 
     def matches(self, text):
 
+        search_kwargs = {}
+
         # Check that match is not empty
         if self.match.strip() == "":
             return False
 
+        if self.is_insensitive:
+            search_kwargs = {"flags": re.IGNORECASE}
+
         if self.matching_algorithm == self.MATCH_ALL:
             for word in self.match.split(" "):
-                if not re.search(r"\b{}\b".format(word), text):
+                if not re.search(r"\b{}\b".format(word), text, **search_kwargs):
                     return False
             return True
 
         if self.matching_algorithm == self.MATCH_ANY:
             for word in self.match.split(" "):
-                if re.search(r"\b{}\b".format(word), text):
+                if re.search(r"\b{}\b".format(word), text, **search_kwargs):
                     return True
             return False
 
         if self.matching_algorithm == self.MATCH_LITERAL:
-            return bool(re.search(r"\b{}\b".format(self.match), text))
+            return bool(re.search(r"\b{}\b".format(self.match), text, **search_kwargs))
 
         if self.matching_algorithm == self.MATCH_REGEX:
-            return bool(re.search(re.compile(self.match), text))
+            return bool(re.search(re.compile(self.match), text, **search_kwargs))
 
         raise NotImplementedError("Unsupported matching algorithm")
 
