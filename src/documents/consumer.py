@@ -283,7 +283,7 @@ class Consumer(object):
             r = " ".join(r)
 
         # Strip out excess white space to allow matching to go smoother
-        return re.sub(r"\s+", " ", r)
+        return strip_excess_whitespace(r)
 
     def _store(self, text, doc, thumbnail):
 
@@ -358,6 +358,13 @@ class Consumer(object):
         with open(doc, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
         return Document.objects.filter(checksum=checksum).exists()
+
+
+def strip_excess_whitespace(text):
+    collapsed_spaces = re.sub(r"([^\S\r\n]+)", " ", text)
+    no_leading_whitespace = re.sub("([\n\r]+)([^\S\n\r]+)", '\\1', collapsed_spaces)
+    no_trailing_whitespace = re.sub("([^\S\n\r]+)$", '', no_leading_whitespace)
+    return no_trailing_whitespace
 
 
 def image_to_string(args):
