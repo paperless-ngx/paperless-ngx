@@ -142,6 +142,11 @@ class Consumer(object):
                 self._cleanup_tempdir(tempdir)
                 self._cleanup_doc(doc)
 
+                self.log(
+                    "info",
+                    "Document {} consumption finished".format(document)
+                )
+
                 document_consumption_finished.send(
                     sender=self.__class__,
                     document=document,
