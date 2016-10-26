@@ -84,7 +84,9 @@ class MatchingModel(models.Model):
 
         if self.matching_algorithm == self.MATCH_ALL:
             for word in self.match.split(" "):
-                if not re.search(r"\b{}\b".format(word), text, **search_kwargs):
+                search_result = re.search(
+                    r"\b{}\b".format(word), text, **search_kwargs)
+                if not search_result:
                     return False
             return True
 
@@ -95,10 +97,12 @@ class MatchingModel(models.Model):
             return False
 
         if self.matching_algorithm == self.MATCH_LITERAL:
-            return bool(re.search(r"\b{}\b".format(self.match), text, **search_kwargs))
+            return bool(re.search(
+                r"\b{}\b".format(self.match), text, **search_kwargs))
 
         if self.matching_algorithm == self.MATCH_REGEX:
-            return bool(re.search(re.compile(self.match), text, **search_kwargs))
+            return bool(re.search(
+                re.compile(self.match, **search_kwargs), text))
 
         raise NotImplementedError("Unsupported matching algorithm")
 
