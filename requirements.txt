@@ -18,4 +18,6 @@ gunicorn==19.6.0
 pytest
 pytest-django
 pytest-sugar
+pep8
+flake8
 tox
