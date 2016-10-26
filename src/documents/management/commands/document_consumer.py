@@ -6,7 +6,6 @@ import time
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from ...models import Log
 from ...consumer import Consumer, ConsumerError
 from ...mail import MailFetcher, MailFetcherError
 

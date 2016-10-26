@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from ..consumer import strip_excess_whitespace
 from ..models import FileInfo
 
 
@@ -133,7 +134,7 @@ class TestAttributes(TestCase):
         )
 
 
-class Permutations(TestCase):
+class TestFieldPermutations(TestCase):
 
     valid_dates = (
         "20150102030405Z",
@@ -301,3 +302,31 @@ class Permutations(TestCase):
                         }
                         self._test_guessed_attributes(
                             template.format(**spec), **spec)
+
+
+class TestOCR(TestCase):
+
+    text_cases = [
+        ("simple     string", "simple string"),
+        (
+            "simple    newline\n   testing string",
+            "simple newline\ntesting string"
+        ),
+        (
+            "utf-8   строка с пробелами в конце  ",
+            "utf-8 строка с пробелами в конце"
+        )
+    ]
+
+    def test_strip_excess_whitespace(self):
+        for source, result in self.text_cases:
+            actual_result = strip_excess_whitespace(source)
+            self.assertEqual(
+                result,
+                actual_result,
+                "strip_exceess_whitespace({}) != '{}', but '{}'".format(
+                    source,
+                    result,
+                    actual_result
+                )
+            )
