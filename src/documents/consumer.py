@@ -362,7 +362,8 @@ class Consumer(object):
 
 def strip_excess_whitespace(text):
     collapsed_spaces = re.sub(r"([^\S\r\n]+)", " ", text)
-    no_leading_whitespace = re.sub("([\n\r]+)([^\S\n\r]+)", '\\1', collapsed_spaces)
+    no_leading_whitespace = re.sub(
+        "([\n\r]+)([^\S\n\r]+)", '\\1', collapsed_spaces)
     no_trailing_whitespace = re.sub("([^\S\n\r]+)$", '', no_leading_whitespace)
     return no_trailing_whitespace
 
