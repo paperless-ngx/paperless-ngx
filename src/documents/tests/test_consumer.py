@@ -345,7 +345,7 @@ class TestOCR(TestCase):
             "utf-8 строка с пробелами в конце"
         )
     ]
-    
+
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
     TESSERACT_INSTALLED = bool(pyocr.get_available_tools())
 
