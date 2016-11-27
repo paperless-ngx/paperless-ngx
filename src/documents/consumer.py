@@ -1,33 +1,31 @@
-import datetime
-import hashlib
-import logging
-import tempfile
-import uuid
-
-from multiprocessing.pool import Pool
-
-import itertools
-
-import langdetect
 import os
 import re
+import uuid
+import shutil
+import hashlib
+import logging
+import datetime
+import tempfile
+import itertools
 import subprocess
+from multiprocessing.pool import Pool
 
 import pyocr
-import shutil
-
+import langdetect
 from PIL import Image
-
 from django.conf import settings
 from django.utils import timezone
-from pyocr.tesseract import TesseractError
-
 from paperless.db import GnuPG
+from pyocr.tesseract import TesseractError
+from pyocr.libtesseract.tesseract_raw import \
+    TesseractError as OtherTesseractError
 
 from .models import Tag, Document, FileInfo
-from .languages import ISO639
 from .signals import (
-    document_consumption_started, document_consumption_finished)
+    document_consumption_started,
+    document_consumption_finished
+)
+from .languages import ISO639
 
 
 class OCRError(Exception):
@@ -381,7 +379,7 @@ def image_to_string(args):
             try:
                 orientation = ocr.detect_orientation(f, lang=lang)
                 f = f.rotate(orientation["angle"], expand=1)
-            except TesseractError:
+            except (TesseractError, OtherTesseractError):
                 pass
         return ocr.image_to_string(f, lang=lang)
 
