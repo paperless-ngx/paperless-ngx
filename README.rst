@@ -111,10 +111,9 @@ offered up by Paperless' users, so please keep that stuff coming.  If however,
 you're not one for coding/design/documentation, and would like to contribute
 financially, I won't say no ;-)
 
-Unfortunately, I can't find a good way to do donations on GitHub that doesn't
-involve PayPal (I *really* hate PayPal) so all I've got at present is Bitcoin.
-So, if you'd like to donate some coin to feed my doughnut habit, by all means
-use `the magic of bitcoins`_ while they're still around.
+The thing is, I'm doing ok for money, so I would instead ask you to donate to
+the `United Nations High Commissioner for Refugees`_.  They're doing important
+work and they need the money a lot more than I do.
 
 .. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
 .. _ImageMagick: http://imagemagick.org/
@@ -128,7 +127,7 @@ use `the magic of bitcoins`_ while they're still around.
 .. _Python-GNUPG: http://pythonhosted.org/python-gnupg/
 .. _ReadTheDocs: https://paperless.readthedocs.org/
 .. _Mayan EDMS: https://mayan.readthedocs.org/en/latest/
-.. _the magic of bitcoins: https://blockchain.info/address/16RanUWNTTbR4yhc3FG8pXpq6BfJRPCcUs
+.. _United Nations High Commissioner for Refugees: https://donate.unhcr.org/int-en/general
 .. |Documentation| image:: https://readthedocs.org/projects/paperless/badge/?version=latest
    :alt: Read the documentation at https://paperless.readthedocs.org/
    :target: https://paperless.readthedocs.org/
