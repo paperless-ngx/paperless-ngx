@@ -16,7 +16,7 @@ class Command(BaseCommand):
     consumption directory, and fetch any mail available.
     """
 
-    LOOP_TIME = 10  # Seconds
+    LOOP_TIME = settings.CONSUMER_LOOP_TIME
     MAIL_DELTA = datetime.timedelta(minutes=10)
 
     ORIGINAL_DOCS = os.path.join(settings.MEDIA_ROOT, "documents", "originals")

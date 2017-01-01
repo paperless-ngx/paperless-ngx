@@ -87,3 +87,8 @@ PAPERLESS_SHARED_SECRET=""
 
 # Override the default MEDIA_ROOT here.  This is where all files are stored.
 #PAPERLESS_MEDIADIR=/path/to/media
+
+# The number of seconds that Paperless will wait between checking
+# PAPERLESS_CONSUMPTION_DIR.  If you tend to write documents to this directory
+# very slowly, you may want to use a higher value than the default (10).
+# PAPERLESS_CONSUMER_LOOP_TIME=10
