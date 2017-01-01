@@ -95,12 +95,12 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(
-                    os.getenv(
-                        "PAPERLESS_DBDIR",
-                        os.path.join(BASE_DIR, "..", "data")
-                    ),
-                    "db.sqlite3"
-                )
+            os.getenv(
+                "PAPERLESS_DBDIR",
+                os.path.join(BASE_DIR, "..", "data")
+            ),
+            "db.sqlite3"
+        )
     }
 }
 
@@ -151,9 +151,7 @@ USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
 MEDIA_ROOT = os.getenv(
-                "PAPERLESS_MEDIADIR",
-                os.path.join(BASE_DIR, "..", "media")
-             )
+    "PAPERLESS_MEDIADIR", os.path.join(BASE_DIR, "..", "media"))
 
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
