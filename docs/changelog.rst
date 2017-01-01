@@ -1,6 +1,9 @@
 Changelog
 #########
 
+* 0.3.1
+  * Added a default value for ``CONVERT_BINARY``
+
 * 0.3.0
   * Updated to using django-filter 1.x
   * Added some system checks so new users aren't confused by misconfigurations.
