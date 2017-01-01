@@ -1,23 +1,33 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, DetailView, TemplateView
-
-from rest_framework import filters
+from django.views.generic import DetailView, FormView, TemplateView
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from paperless.db import GnuPG
 from rest_framework.mixins import (
-    RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin)
+    DestroyModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin
+)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import (
-    ModelViewSet, ReadOnlyModelViewSet, GenericViewSet)
+    GenericViewSet,
+    ModelViewSet,
+    ReadOnlyModelViewSet
+)
 
-from paperless.db import GnuPG
-
-from .filters import DocumentFilterSet, CorrespondentFilterSet, TagFilterSet
+from .filters import CorrespondentFilterSet, DocumentFilterSet, TagFilterSet
 from .forms import UploadForm
-from .models import Correspondent, Tag, Document, Log
+from .models import Correspondent, Document, Log, Tag
 from .serialisers import (
-    CorrespondentSerializer, TagSerializer, DocumentSerializer, LogSerializer)
+    CorrespondentSerializer,
+    DocumentSerializer,
+    LogSerializer,
+    TagSerializer
+)
 
 
 class IndexView(TemplateView):
@@ -94,7 +104,7 @@ class CorrespondentViewSet(ModelViewSet):
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
-    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = CorrespondentFilterSet
     ordering_fields = ("name", "slug")
 
@@ -105,7 +115,7 @@ class TagViewSet(ModelViewSet):
     serializer_class = TagSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
-    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = TagFilterSet
     ordering_fields = ("name", "slug")
 
@@ -120,11 +130,7 @@ class DocumentViewSet(RetrieveModelMixin,
     serializer_class = DocumentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
-    filter_backends = (
-        filters.DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter
-    )
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filter_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
@@ -137,5 +143,5 @@ class LogViewSet(ReadOnlyModelViewSet):
     serializer_class = LogSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
-    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
     ordering_fields = ("time",)

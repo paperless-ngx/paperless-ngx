@@ -36,7 +36,6 @@ if os.path.exists("/etc/paperless.conf"):
     load_dotenv("/etc/paperless.conf")
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
