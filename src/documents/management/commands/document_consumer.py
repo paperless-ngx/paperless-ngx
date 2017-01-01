@@ -19,7 +19,8 @@ class Command(BaseCommand):
     LOOP_TIME = 10  # Seconds
     MAIL_DELTA = datetime.timedelta(minutes=10)
 
-    MEDIA_DOCS = os.path.join(settings.MEDIA_ROOT, "documents")
+    ORIGINAL_DOCS = os.path.join(settings.MEDIA_ROOT, "documents", "originals")
+    THUMB_DOCS = os.path.join(settings.MEDIA_ROOT, "documents", "thumbnails")
 
     def __init__(self, *args, **kwargs):
 
@@ -40,10 +41,11 @@ class Command(BaseCommand):
         except (ConsumerError, MailFetcherError) as e:
             raise CommandError(e)
 
-        try:
-            os.makedirs(self.MEDIA_DOCS)
-        except FileExistsError:
-            pass
+        for path in (self.ORIGINAL_DOCS, self.THUMB_DOCS):
+            try:
+                os.makedirs(path)
+            except FileExistsError:
+                pass
 
         logging.getLogger(__name__).info(
             "Starting document consumer at {}".format(settings.CONSUMPTION_DIR)
