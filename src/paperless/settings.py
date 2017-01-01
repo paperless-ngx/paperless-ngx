@@ -197,7 +197,7 @@ FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("ye
 GNUPG_HOME = os.getenv("HOME", "/tmp")
 
 # Convert is part of the ImageMagick package
-CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY")
+CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY", "convert")
 CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
 CONVERT_DENSITY = os.getenv("PAPERLESS_CONVERT_DENSITY")
