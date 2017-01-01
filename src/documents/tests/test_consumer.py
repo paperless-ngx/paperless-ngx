@@ -375,4 +375,4 @@ class TestOCR(TestCase):
         text-free pages are now handled correctly so long as we work around
         this weird exception.
         """
-        image_to_string(["text.png", "en"])
+        image_to_string(["no-text.png", "en"])
