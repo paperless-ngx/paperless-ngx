@@ -44,7 +44,7 @@ consumption etc. We also `support Docker`_, which you can use natively under
 Linux and in a VM with `Docker Machine`_ (this guide was written for native
 Docker usage under Linux, you might have to adapt it for Docker Machine.)
 Alternatively the standard, `bare metal`_ approach is a little more
-complicated, but worth it because it makes it easier to should you want to
+complicated, but worth it because it makes it easier should you want to
 contribute some code back.
 
 .. _Vagrant route: setup-installation-vagrant_

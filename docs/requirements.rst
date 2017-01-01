@@ -9,7 +9,7 @@ should work) that has the following software installed on it:
 * `Python3`_ (with development libraries, pip and virtualenv)
 * `GNU Privacy Guard`_
 * `Tesseract`_, plus its language files matching your document base.
-* `Imagemagick`_
+* `Imagemagick`_ version 6.7.5 or higher
 * `unpaper`_
 
 .. _Python3: https://python.org/
