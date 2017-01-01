@@ -1,6 +1,17 @@
 Changelog
 #########
 
+* 0.3.0
+  * Updated to using django-filter 1.x
+  * Added some system checks so new users aren't confused by misconfigurations.
+  * Consumer loop time is now configurable for systems with slow writes.  Just
+    set ``PAPERLESS_CONSUMER_LOOP_TIME`` to a number of seconds.  The default
+    is 10.
+  * As per `#44`_, we've removed support for ``PAPERLESS_CONVERT``,
+    ``PAPERLESS_CONSUME``, and ``PAPERLESS_SECRET``.  Please use
+    ``PAPERLESS_CONVERT_BINARY``, ``PAPERLESS_CONSUMPTION_DIR``, and
+    ``PAPERLESS_SHARED_SECRET`` respectively instead.
+
 * 0.2.0
 
   * `#150`_: The media root is now a variable you can set in

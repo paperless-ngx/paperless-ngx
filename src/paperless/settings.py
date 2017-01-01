@@ -245,38 +245,3 @@ SHARED_SECRET = os.getenv("PAPERLESS_SHARED_SECRET", "")
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
 POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
-
-#
-# TODO: Remove after 0.2
-#
-# This logic is here to address issue #44, wherein we were using inconsistent
-# constant names vs. environment variables.  If you're using Paperless for the
-# first time, you can safely ignore everything from here on, so long as you're
-# correctly defining the variables as per the documentation.
-#
-
-
-def deprecated(before, after):
-    print(
-        "\n\n"
-        "WARNING: {before} has been renamed to {after}.\n"
-        "WARNING: Use of {before} will not work as of version 1.2."
-        "\n\n".format(
-            before=before,
-            after=after
-        )
-    )
-
-if not CONVERT_BINARY:
-    CONVERT_BINARY = "convert"
-    if os.getenv("PAPERLESS_CONVERT"):
-        deprecated("PAPERLESS_CONVERT", "PAPERLESS_CONVERT_BINARY")
-        CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT", CONVERT_BINARY)
-
-if not CONSUMPTION_DIR and os.getenv("PAPERLESS_CONSUME"):
-    deprecated("PAPERLESS_CONSUME", "PAPERLESS_CONSUMPTION_DIR")
-    CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUME")
-
-if not SHARED_SECRET and os.getenv("PAPERLESS_SECRET"):
-    deprecated("PAPERLESS_SECRET", "PAPERLESS_SHARED_SECRET")
-    SHARED_SECRET = os.getenv("PAPERLESS_SECRET", "")
