@@ -1,6 +1,11 @@
 Changelog
 #########
 
+* 0.3.2
+  * Fix for `#172`_: defaulting ALLOWED_HOSTS to ``["*"]`` and allowing the user
+    to set her own value via ``PAPERLESS_ALLOWED_HOSTS`` should the need
+    arise.
+
 * 0.3.1
   * Added a default value for ``CONVERT_BINARY``
 
@@ -152,3 +157,5 @@ Changelog
 .. _#146: https://github.com/danielquinn/paperless/issues/146
 .. _#148: https://github.com/danielquinn/paperless/pull/148
 .. _#150: https://github.com/danielquinn/paperless/pull/150
+.. _#172: https://github.com/danielquinn/paperless/issues/172
+

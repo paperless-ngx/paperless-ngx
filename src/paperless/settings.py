@@ -29,7 +29,11 @@ DEBUG = True
 
 LOGIN_URL = '/admin/login'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+_allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
+if _allowed_hosts:
+    ALLOWED_HOSTS = _allowed_hosts.split(",")
 
 # Tap paperless.conf if it's available
 if os.path.exists("/etc/paperless.conf"):
