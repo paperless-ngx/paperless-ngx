@@ -1,6 +1,11 @@
 Changelog
 #########
 
+* 0.3.2
+  * Fix for #172: defaulting ALLOWED_HOSTS to ``["*"]`` and allowing the user
+    to set her own value via ``PAPERLESS_ALLOWED_HOSTS`` should the need
+    arise.
+
 * 0.3.1
   * Added a default value for ``CONVERT_BINARY``
 

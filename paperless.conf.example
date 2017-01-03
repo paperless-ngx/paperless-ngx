@@ -92,3 +92,11 @@ PAPERLESS_SHARED_SECRET=""
 # PAPERLESS_CONSUMPTION_DIR.  If you tend to write documents to this directory
 # very slowly, you may want to use a higher value than the default (10).
 # PAPERLESS_CONSUMER_LOOP_TIME=10
+
+# If you're planning on putting Paperless on the open internet, then you
+# really should set this value to the domain name you're using.  Failing to do
+# so leaves you open to XSS attacks.
+# Just remember that this is a comma-separated list, so "example.com" is fine,
+# as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
+#PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
+
