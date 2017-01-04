@@ -95,7 +95,9 @@ PAPERLESS_SHARED_SECRET=""
 
 # If you're planning on putting Paperless on the open internet, then you
 # really should set this value to the domain name you're using.  Failing to do
-# so leaves you open to XSS attacks.
+# so leaves you open to HTTP host header attacks:
+# https://docs.djangoproject.com/en/1.10/topics/security/#host-headers-virtual-hosting
+#
 # Just remember that this is a comma-separated list, so "example.com" is fine,
 # as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 #PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
