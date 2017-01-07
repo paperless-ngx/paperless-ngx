@@ -102,3 +102,6 @@ PAPERLESS_SHARED_SECRET=""
 # as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 #PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
 
+# Override the default UTC time zone here
+#PAPERLESS_TIME_ZONE=America/Los_Angeles
+
