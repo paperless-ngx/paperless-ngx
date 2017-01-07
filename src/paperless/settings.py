@@ -44,6 +44,7 @@ if os.path.exists("/etc/paperless.conf"):
 
 INSTALLED_APPS = [
 
+    'suit',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +60,21 @@ INSTALLED_APPS = [
     "crispy_forms",
 
 ]
+
+SUIT_CONFIG = {
+    'ADMIN_NAME': 'Paperless',
+    'SEARCH_URL': '',
+    'LIST_PER_PAGE': 100,
+    'HEADER_DATE_FORMAT': 'D m-d-Y',
+    'MENU': (
+        'sites',
+        { 'app': 'documents',
+          'label': 'Paperless',
+          'icon': 'icon-file',
+          'models': ('Document', 'Tag', 'Correspondent', 'log')
+        },
+    )
+}
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
