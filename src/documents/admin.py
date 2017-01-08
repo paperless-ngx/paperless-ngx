@@ -62,11 +62,12 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def thumbnail(self, obj):
         png_img = self._html_tag(
-                    "img",
-                    src="/fetch/thumb/{}".format(obj.id),
-                    width=275,
-                    alt="thumbnail",
-                    title=obj.file_name)
+            "img",
+            src="/fetch/thumb/{}".format(obj.id),
+            width=275,
+            alt="thumbnail",
+            title=obj.file_name
+        )
         return self._html_tag("a", png_img, href=obj.download_url)
     thumbnail.allow_tags = True
 

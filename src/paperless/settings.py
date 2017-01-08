@@ -61,18 +61,18 @@ INSTALLED_APPS = [
 
 ]
 
-_list_per_page = int(os.getenv("PAPERLESS_LIST_PER_PAGE", 25))
 SUIT_CONFIG = {
     'ADMIN_NAME': 'Paperless',
     'SEARCH_URL': '',
-    'LIST_PER_PAGE': _list_per_page,
+    'LIST_PER_PAGE': int(os.getenv("PAPERLESS_LIST_PER_PAGE", 25)),
     'HEADER_DATE_FORMAT': 'D m-d-Y',
     'MENU': (
         'sites',
-        { 'app': 'documents',
-          'label': 'Paperless',
-          'icon': 'icon-file',
-          'models': ('Document', 'Tag', 'Correspondent', 'log')
+        {
+            'app': 'documents',
+            'label': 'Paperless',
+            'icon': 'icon-file',
+            'models': ('Document', 'Tag', 'Correspondent', 'log')
         },
     )
 }
