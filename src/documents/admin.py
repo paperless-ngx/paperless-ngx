@@ -56,7 +56,6 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = ("created", "title", "thumbnail", "correspondent", "tags_")
     list_filter = ("tags", "correspondent", MonthListFilter)
     ordering = ["-created", "correspondent"]
-    list_per_page = 25
 
     def created_(self, obj):
         return obj.created.date().strftime("%Y-%m-%d")
