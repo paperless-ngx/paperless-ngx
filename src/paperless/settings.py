@@ -204,7 +204,7 @@ LOGGING = {
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
-OCR_LANGUAGE = "eng"
+OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
 # The amount of threads to use for OCR
 OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")

@@ -108,3 +108,7 @@ PAPERLESS_SHARED_SECRET=""
 # Customize number of list items to show per page
 #PAPERLESS_LIST_PER_PAGE=50
 
+# Customize the default language that tesseract will attempt to use when parsing
+# documents.  It should be a 3-letter language code consistent with ISO 639.
+#PAPERLESS_OCR_LANGUAGE=eng
+
