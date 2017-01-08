@@ -48,8 +48,8 @@ class SessionOrBasicAuthMixin(AccessMixin):
                             login(request, user)
                             request.user = user
                             return super(
-								SessionOrBasicAuthMixin, self
-							).dispatch(
+                                SessionOrBasicAuthMixin, self
+                            ).dispatch(
                                 request, *args, **kwargs
                             )
 
