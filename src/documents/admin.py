@@ -53,12 +53,23 @@ class DocumentAdmin(admin.ModelAdmin):
         }
 
     search_fields = ("correspondent__name", "title", "content")
-    list_display = ("created", "correspondent", "title", "tags_", "document")
+    list_display = ("created", "title", "thumbnail", "correspondent", "tags_")
     list_filter = ("tags", "correspondent", MonthListFilter)
-    list_per_page = 25
+    ordering = ["-created", "correspondent"]
 
     def created_(self, obj):
         return obj.created.date().strftime("%Y-%m-%d")
+
+    def thumbnail(self, obj):
+        png_img = self._html_tag(
+            "img",
+            src="/fetch/thumb/{}".format(obj.id),
+            width=275,
+            alt="thumbnail",
+            title=obj.file_name
+        )
+        return self._html_tag("a", png_img, href=obj.download_url)
+    thumbnail.allow_tags = True
 
     def tags_(self, obj):
         r = ""

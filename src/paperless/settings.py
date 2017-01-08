@@ -44,6 +44,7 @@ if os.path.exists("/etc/paperless.conf"):
 
 INSTALLED_APPS = [
 
+    'suit',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +60,22 @@ INSTALLED_APPS = [
     "crispy_forms",
 
 ]
+
+SUIT_CONFIG = {
+    'ADMIN_NAME': 'Paperless',
+    'SEARCH_URL': '',
+    'LIST_PER_PAGE': int(os.getenv("PAPERLESS_LIST_PER_PAGE", 25)),
+    'HEADER_DATE_FORMAT': 'D m-d-Y',
+    'MENU': (
+        'sites',
+        {
+            'app': 'documents',
+            'label': 'Paperless',
+            'icon': 'icon-file',
+            'models': ('Document', 'Tag', 'Correspondent', 'log')
+        },
+    )
+}
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -141,7 +158,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
 USE_I18N = True
 
@@ -187,7 +204,7 @@ LOGGING = {
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
-OCR_LANGUAGE = "eng"
+OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
 # The amount of threads to use for OCR
 OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
