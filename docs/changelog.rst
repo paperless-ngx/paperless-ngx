@@ -1,6 +1,10 @@
 Changelog
 #########
 
+* 0.3.4
+  * BasicAuth support for document and thumbnail downloads, as well as the Push
+    API thanks to @thomasbrueggemann.  See `#179`_.
+
 * 0.3.3
   * Thumbnails in the UI and a Django-suit -based face-lift courtesy of @ekw!
   * Timezone, items per page, and default language are now all configurable,
@@ -163,4 +167,4 @@ Changelog
 .. _#148: https://github.com/danielquinn/paperless/pull/148
 .. _#150: https://github.com/danielquinn/paperless/pull/150
 .. _#172: https://github.com/danielquinn/paperless/issues/172
-
+.. _#179: https://github.com/danielquinn/paperless/pull/179
