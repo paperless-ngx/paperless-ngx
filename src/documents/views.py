@@ -1,4 +1,3 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, FormView, TemplateView
@@ -28,6 +27,7 @@ from .serialisers import (
     LogSerializer,
     TagSerializer
 )
+from .mixins import SessionOrBasicAuthMixin
 
 
 class IndexView(TemplateView):
@@ -41,7 +41,7 @@ class IndexView(TemplateView):
         return TemplateView.get_context_data(self, **kwargs)
 
 
-class FetchView(LoginRequiredMixin, DetailView):
+class FetchView(SessionOrBasicAuthMixin, DetailView):
 
     model = Document
 
@@ -74,7 +74,7 @@ class FetchView(LoginRequiredMixin, DetailView):
         return response
 
 
-class PushView(LoginRequiredMixin, FormView):
+class PushView(SessionOrBasicAuthMixin, FormView):
     """
     A crude REST-ish API for creating documents.
     """
