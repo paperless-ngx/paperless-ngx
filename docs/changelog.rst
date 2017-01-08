@@ -2,8 +2,8 @@ Changelog
 #########
 
 * 0.3.2
-  * Fix for `#172`_: defaulting ALLOWED_HOSTS to ``["*"]`` and allowing the user
-    to set her own value via ``PAPERLESS_ALLOWED_HOSTS`` should the need
+  * Fix for `#172`_: defaulting ALLOWED_HOSTS to ``["*"]`` and allowing the
+    user to set her own value via ``PAPERLESS_ALLOWED_HOSTS`` should the need
     arise.
 
 * 0.3.1
