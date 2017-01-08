@@ -64,7 +64,7 @@ class DocumentAdmin(admin.ModelAdmin):
         png_img = self._html_tag(
             "img",
             src="/fetch/thumb/{}".format(obj.id),
-            width=275,
+            width=180,
             alt="thumbnail",
             title=obj.file_name
         )
