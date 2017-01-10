@@ -2,6 +2,13 @@ Changelog
 #########
 
 * 0.3.4
+  * Removal of django-suit due to a licensing conflict I bumped into in 0.3.3.
+    Note that you *can* use Django Suit with Paperless, but only in a
+    non-profit situation as their free license prohibits for-profit use.  As a
+    result, I can't bundle Suit with Paperless without conflicting with the
+    GPL.  Further development will be done against the stock Django admin.
+  * I shrunk the thumbnails a little 'cause they were too big for me, even on
+    my high-DPI monitor.
   * BasicAuth support for document and thumbnail downloads, as well as the Push
     API thanks to @thomasbrueggemann.  See `#179`_.
 
