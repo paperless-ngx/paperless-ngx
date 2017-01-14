@@ -14,6 +14,12 @@ import os
 
 from dotenv import load_dotenv
 
+
+# Tap paperless.conf if it's available
+if os.path.exists("/etc/paperless.conf"):
+    load_dotenv("/etc/paperless.conf")
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,6 +35,7 @@ SECRET_KEY = os.getenv(
     "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee"
 )
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -39,10 +46,6 @@ ALLOWED_HOSTS = ["*"]
 _allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
 if _allowed_hosts:
     ALLOWED_HOSTS = _allowed_hosts.split(",")
-
-# Tap paperless.conf if it's available
-if os.path.exists("/etc/paperless.conf"):
-    load_dotenv("/etc/paperless.conf")
 
 
 # Application definition
