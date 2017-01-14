@@ -249,3 +249,8 @@ SHARED_SECRET = os.getenv("PAPERLESS_SHARED_SECRET", "")
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
 POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
+
+# The number of items on each page in the web UI.  This value must be a
+# positive integer, but if you don't define one in paperless.conf, a default of
+# 100 will be used.
+PAPERLESS_LIST_PER_PAGE = int(os.getenv("PAPERLESS_LIST_PER_PAGE", 100))

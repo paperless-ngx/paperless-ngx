@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
@@ -31,21 +32,25 @@ class MonthListFilter(admin.SimpleListFilter):
         return queryset.filter(created__year=year, created__month=month)
 
 
-class CorrespondentAdmin(admin.ModelAdmin):
+class CommonAdmin(admin.ModelAdmin):
+    list_per_page = settings.PAPERLESS_LIST_PER_PAGE
+
+
+class CorrespondentAdmin(CommonAdmin):
 
     list_display = ("name", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
 
-class TagAdmin(admin.ModelAdmin):
+class TagAdmin(CommonAdmin):
 
     list_display = ("name", "colour", "match", "matching_algorithm")
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
 
-class DocumentAdmin(admin.ModelAdmin):
+class DocumentAdmin(CommonAdmin):
 
     class Media:
         css = {
@@ -119,7 +124,7 @@ class DocumentAdmin(admin.ModelAdmin):
         return "<{} {}/>".format(kind, " ".join(attributes))
 
 
-class LogAdmin(admin.ModelAdmin):
+class LogAdmin(CommonAdmin):
 
     list_display = ("created", "message", "level",)
     list_filter = ("level", "created",)

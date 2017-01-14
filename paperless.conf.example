@@ -65,8 +65,8 @@ PAPERLESS_SHARED_SECRET=""
 # cases it has proven useful to configure a lesser value.
 # This setting has a high impact on the physical size of tmp page files,
 # the speed of document conversion, and can affect the accuracy of OCR
-# results. Individual results can vary and this setting should be tested 
-# thoroughly against the documents you are importing to see if it has any 
+# results. Individual results can vary and this setting should be tested
+# thoroughly against the documents you are importing to see if it has any
 # impacts either negative or positive. Testing on limited document sets has
 # shown a setting of 200 can cut the size of tmp files by 1/3, and speed up
 # conversion by up to 4x with little impact to OCR accuracy.
@@ -81,7 +81,7 @@ PAPERLESS_SHARED_SECRET=""
 # the web for "MAGICK_TMPDIR".
 #PAPERLESS_CONVERT_TMPDIR=/var/tmp/paperless
 
-# You can specify where you want the SQLite database to be stored instead of 
+# You can specify where you want the SQLite database to be stored instead of
 # the default location
 #PAPERLESS_DBDIR=/path/to/database/file
 
@@ -112,3 +112,7 @@ PAPERLESS_SHARED_SECRET=""
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 #PAPERLESS_OCR_LANGUAGE=eng
 
+# The number of items on each page in the web UI.  This value must be a
+# positive integer, but if you don't define one in paperless.conf, a default of
+# 100 will be used.
+#PAPERLESS_LIST_PER_PAGE=100
