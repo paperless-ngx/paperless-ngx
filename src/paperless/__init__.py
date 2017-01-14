@@ -1,1 +1,1 @@
-from .checks import paths_check
+from .checks import paths_check, binaries_check

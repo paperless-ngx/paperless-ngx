@@ -1,10 +1,15 @@
 import os
+import shutil
 
+from django.conf import settings
 from django.core.checks import Error, register, Warning
 
 
 @register()
 def paths_check(app_configs, **kwargs):
+    """
+    Check the various paths for existence, readability and writeability
+    """
 
     check_messages = []
 
@@ -43,5 +48,25 @@ def paths_check(app_configs, **kwargs):
                     writeable_message.format("PAPERLESS_MEDIADIR"),
                     writeable_hint.format(directory)
                 ))
+
+    return check_messages
+
+
+@register()
+def binaries_check(app_configs, **kwargs):
+    """
+    Paperless requires the existence of a few binaries, so we do some checks
+    for those here.
+    """
+
+    error = "Paperless can't find {}. Without it, consumption is impossible."
+    hint = "Either it's not in your ${PATH} or it's not installed."
+
+    binaries = (settings.CONVERT_BINARY, settings.UNPAPER_BINARY, "tesseract")
+
+    check_messages = []
+    for binary in binaries:
+        if shutil.which(binary) is None:
+            check_messages.append(Warning(error.format(binary), hint))
 
     return check_messages
