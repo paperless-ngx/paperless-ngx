@@ -21,8 +21,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee'
+# The secret key has a default that should be fine so long as you're hosting
+# Paperless on a closed network.  However, if you're putting this anywhere
+# public, you should change the key to something unique and verbose.
+SECRET_KEY = os.getenv(
+    "PAPERLESS_SECRET_KEY",
+    "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

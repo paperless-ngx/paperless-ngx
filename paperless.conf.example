@@ -116,3 +116,8 @@ PAPERLESS_SHARED_SECRET=""
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
 #PAPERLESS_LIST_PER_PAGE=100
+
+# The secret key has a default that should be fine so long as you're hosting
+# Paperless on a closed network.  However, if you're putting this anywhere
+# public, you should change the key to something unique and verbose.
+#PAPERLESS_SECRET_KEY="change-me"
