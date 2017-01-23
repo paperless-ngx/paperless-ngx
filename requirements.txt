@@ -12,6 +12,7 @@ python-dotenv>=0.3.0
 python-gnupg>=0.3.8
 pytz>=2015.7
 gunicorn==19.6.0
+django-flat-responsive==1.2.0
 
 # For the tests
 pytest
