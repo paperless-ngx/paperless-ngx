@@ -52,6 +52,7 @@ if _allowed_hosts:
 
 INSTALLED_APPS = [
 
+    'flat_responsive',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
