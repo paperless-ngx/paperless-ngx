@@ -52,17 +52,18 @@ if _allowed_hosts:
 
 INSTALLED_APPS = [
 
-    'flat_responsive',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
     "django_extensions",
 
     "documents.apps.DocumentsConfig",
+
+    "flat_responsive",
+    "django.contrib.admin",
 
     "rest_framework",
     "crispy_forms",

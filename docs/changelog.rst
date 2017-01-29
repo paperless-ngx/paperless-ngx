@@ -1,6 +1,15 @@
 Changelog
 #########
 
+* 0.3.5
+  * A serious facelift for the documents listing page wherein we drop the
+    tabular layout in favour of a tiled interface.
+  * Users can now configure the number of items per page.
+  * Fix for `#171`_: Allow users to specify their own ``SECRET_KEY`` value.
+  * Moved the dotenv loading to the top of settings.py
+  * Fix for `#112`_: Added checks for binaries required for document
+    consumption.
+
 * 0.3.4
   * Removal of django-suit due to a licensing conflict I bumped into in 0.3.3.
     Note that you *can* use Django Suit with Paperless, but only in a
@@ -42,7 +51,8 @@ Changelog
     ``paperless.conf``.
   * `#148`_: The database location (sqlite) is now a variable you can set in
     ``paperless.conf``.
-  * `#146`_: Fixed a bug that allowed unauthorised access to the `/fetch` URL.
+  * `#146`_: Fixed a bug that allowed unauthorised access to the ``/fetch``
+    URL.
   * `#131`_: Document files are now automatically removed from disk when
     they're deleted in Paperless.
   * `#121`_: Fixed a bug where Paperless wasn't setting document creation time
@@ -168,10 +178,12 @@ Changelog
 .. _#89: https://github.com/danielquinn/paperless/issues/89
 .. _#94: https://github.com/danielquinn/paperless/issues/94
 .. _#98: https://github.com/danielquinn/paperless/issues/98
+.. _#112: https://github.com/danielquinn/paperless/issues/112
 .. _#121: https://github.com/danielquinn/paperless/issues/121
 .. _#131: https://github.com/danielquinn/paperless/issues/131
 .. _#146: https://github.com/danielquinn/paperless/issues/146
 .. _#148: https://github.com/danielquinn/paperless/pull/148
 .. _#150: https://github.com/danielquinn/paperless/pull/150
+.. _#171: https://github.com/danielquinn/paperless/issues/171
 .. _#172: https://github.com/danielquinn/paperless/issues/172
 .. _#179: https://github.com/danielquinn/paperless/pull/179
