@@ -58,7 +58,7 @@ class DocumentAdmin(CommonAdmin):
         }
 
     search_fields = ("correspondent__name", "title", "content")
-    list_display = ("created", "title", "thumbnail", "correspondent", "tags_")
+    list_display = ("title", "created", "thumbnail", "correspondent", "tags_")
     list_filter = ("tags", "correspondent", MonthListFilter)
     ordering = ["-created", "correspondent"]
 
