@@ -6,12 +6,11 @@ from ...mixins import Renderable
 
 
 class Command(Renderable, BaseCommand):
-
     help = """
         Using the current set of correspondent rules, apply said rules to all
         documents in the database, effectively allowing you to back-tag all
-        previously indexed documents with correspondent created (or modified) after
-        their initial import.
+        previously indexed documents with correspondent created (or modified)
+        after their initial import.
     """.replace("    ", "")
 
     def __init__(self, *args, **kwargs):
@@ -27,7 +26,8 @@ class Command(Renderable, BaseCommand):
             if document.correspondent:
                 continue
 
-            potential_correspondents = list(Correspondent.match_all(document.content))
+            potential_correspondents = list(
+                Correspondent.match_all(document.content))
             if not potential_correspondents:
                 continue
 
@@ -35,9 +35,11 @@ class Command(Renderable, BaseCommand):
 
             selected = potential_correspondents[0]
             if potential_count > 1:
-                message = "Detected {} potential correspondents for {}, so we've opted for {}"
+                message = "Detected {} potential correspondents for {}, " \
+                          "so we've opted for {}"
                 print(message.format(potential_count, document, selected))
 
-            print('Tagging {} with correspondent "{}"'.format(document, selected))
+            print('Tagging {} with correspondent "{}"'.format(document,
+                                                              selected))
             document.correspondent = selected
             document.save(update_fields=("correspondent",))
