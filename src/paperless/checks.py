@@ -49,6 +49,20 @@ def paths_check(app_configs, **kwargs):
                     writeable_hint.format(directory)
                 ))
 
+    directory = os.getenv("PAPERLESS_STATICDIR")
+    if directory:
+        if not os.path.exists(directory):
+            check_messages.append(Error(
+                exists_message.format("PAPERLESS_STATICDIR"),
+                exists_hint.format(directory)
+            ))
+        if not check_messages:
+            if not os.access(directory, os.W_OK | os.X_OK):
+                check_messages.append(Error(
+                    writeable_message.format("PAPERLESS_STATICDIR"),
+                    writeable_hint.format(directory)
+                ))
+
     return check_messages
 
 
