@@ -47,7 +47,11 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.RunPython(move_sender_strings_to_sender_model),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='document',
+            name='sender',
+        ),
+        migrations.AddField(
             model_name='document',
             name='sender',
             field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='documents.Sender'),
