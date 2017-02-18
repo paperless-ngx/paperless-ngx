@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -19,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('sender', models.CharField(blank=True, db_index=True, max_length=128)),
                 ('title', models.CharField(blank=True, db_index=True, max_length=128)),
-                ('content', models.TextField(db_index=True)),
+                ('content', models.TextField(db_index=("mysql" not in settings.DATABASES["default"]["ENGINE"]))),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
             ],
