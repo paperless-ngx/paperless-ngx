@@ -70,7 +70,7 @@ class DocumentAdmin(CommonAdmin):
             "img",
             src="/fetch/thumb/{}".format(obj.id),
             width=180,
-            alt="thumbnail",
+            alt="Thumbnail of {}".format(obj.file_name),
             title=obj.file_name
         )
         return self._html_tag("a", png_img, href=obj.download_url)
