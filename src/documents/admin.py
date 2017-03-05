@@ -62,6 +62,9 @@ class DocumentAdmin(CommonAdmin):
     list_filter = ("tags", "correspondent", MonthListFilter)
     ordering = ["-created", "correspondent"]
 
+    def has_add_permission(self, request):
+        return False
+
     def created_(self, obj):
         return obj.created.date().strftime("%Y-%m-%d")
 
