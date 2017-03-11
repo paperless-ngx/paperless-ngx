@@ -301,5 +301,3 @@ class TestFieldPermutations(TestCase):
                         }
                         self._test_guessed_attributes(
                             template.format(**spec), **spec)
-
-
