@@ -4,6 +4,14 @@ Changelog
 * 0.3.6
   * Fix for `#200`_ (!!) where the API wasn't configured to allow updating the
     correspondent or the tags for a document.
+  * The ``content`` field is now optional, to allow for the edge case of a
+    purely graphical document.
+  * You can no longer add documents via the admin.  This never worked in the
+    first place, so all I've done here is remove the link to the broken form.
+  * The consumer code has been heavily refactored to support a pluggable
+    interface.  Install a paperless consumer via pip and tell paperless about
+    it with an environment variable, and you're good to go.  Proper
+    documentation is on its way.
 
 * 0.3.5
   * A serious facelift for the documents listing page wherein we drop the
