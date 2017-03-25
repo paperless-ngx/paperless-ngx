@@ -18,12 +18,21 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
             "id", "slug", "name", "colour", "match", "matching_algorithm")
 
 
+class CorrespondentField(serializers.HyperlinkedRelatedField):
+    def get_queryset(self):
+        return Correspondent.objects.all()
+
+
+class TagsField(serializers.HyperlinkedRelatedField):
+    def get_queryset(self):
+        return Tag.objects.all()
+
+
 class DocumentSerializer(serializers.ModelSerializer):
 
-    correspondent = serializers.HyperlinkedRelatedField(
-        read_only=True, view_name="drf:correspondent-detail", allow_null=True)
-    tags = serializers.HyperlinkedRelatedField(
-        read_only=True, view_name="drf:tag-detail", many=True)
+    correspondent = CorrespondentField(
+        view_name="drf:correspondent-detail", allow_null=True)
+    tags = TagsField(view_name="drf:tag-detail", many=True)
 
     class Meta(object):
         model = Document
