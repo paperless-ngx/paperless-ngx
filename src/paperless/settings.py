@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "django_extensions",
 
     "documents.apps.DocumentsConfig",
+    "reminders.apps.RemindersConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
 
     "flat_responsive",

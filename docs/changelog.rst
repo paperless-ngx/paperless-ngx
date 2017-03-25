@@ -1,6 +1,14 @@
 Changelog
 #########
 
+* 0.4.0
+  * Introducing reminders.  See `#199`_ for more information, but the short
+    explanation is that you can now attach simple notes & times to documents
+    which are made available via the API.  Currently, the default API
+    (basically just the Django admin) doesn't really make use of this, but
+    `Thomas Brueggemann`_ over at `Paperless Desktop`_ has said that he would
+    like to make use of this feature in his project.
+
 * 0.3.6
   * Fix for `#200`_ (!!) where the API wasn't configured to allow updating the
     correspondent or the tags for a document.
@@ -173,6 +181,8 @@ Changelog
 .. _Tim White: https://github.com/timwhite
 .. _Florian Harr: https://github.com/evils
 .. _Justin Snyman: https://github.com/stringlytyped
+.. _Thomas Brueggemann: https://github.com/thomasbrueggemann
+.. _Paperless Desktop: https://github.com/thomasbrueggemann/paperless-desktop
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -199,4 +209,5 @@ Changelog
 .. _#171: https://github.com/danielquinn/paperless/issues/171
 .. _#172: https://github.com/danielquinn/paperless/issues/172
 .. _#179: https://github.com/danielquinn/paperless/pull/179
+.. _#199: https://github.com/danielquinn/paperless/issues/199
 .. _#200: https://github.com/danielquinn/paperless/issues/200
