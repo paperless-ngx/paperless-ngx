@@ -1,6 +1,10 @@
 Changelog
 #########
 
+* 0.3.6
+  * Fix for `#200`_ (!!) where the API wasn't configured to allow updating the
+    correspondent or the tags for a document.
+
 * 0.3.5
   * A serious facelift for the documents listing page wherein we drop the
     tabular layout in favour of a tiled interface.
@@ -187,3 +191,4 @@ Changelog
 .. _#171: https://github.com/danielquinn/paperless/issues/171
 .. _#172: https://github.com/danielquinn/paperless/issues/172
 .. _#179: https://github.com/danielquinn/paperless/pull/179
+.. _#200: https://github.com/danielquinn/paperless/issues/200
