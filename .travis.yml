@@ -8,7 +8,9 @@ matrix:
           env: TOXENV=py34
         - python: 3.5
           env: TOXENV=py35
-        - python: 3.5
+        - python: 3.6
+          env: TOXENV=py36
+        - python: 3.6
           env: TOXENV=pep8
 
 install:

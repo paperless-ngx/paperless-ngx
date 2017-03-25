@@ -158,13 +158,22 @@ class Document(models.Model):
 
     correspondent = models.ForeignKey(
         Correspondent, blank=True, null=True, related_name="documents")
+
     title = models.CharField(max_length=128, blank=True, db_index=True)
-    content = models.TextField(db_index=True)
+
+    content = models.TextField(
+        db_index=True,
+        blank=True,
+        help_text="The raw, text-only data of the document.  This field is "
+                  "primarily used for searching."
+    )
+
     file_type = models.CharField(
         max_length=4,
         editable=False,
         choices=tuple([(t, t.upper()) for t in TYPES])
     )
+
     tags = models.ManyToManyField(
         Tag, related_name="documents", blank=True)
 

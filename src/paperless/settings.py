@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "django_extensions",
 
     "documents.apps.DocumentsConfig",
+    "paperless_tesseract.apps.PaperlessTesseractConfig",
 
     "flat_responsive",
     "django.contrib.admin",
@@ -69,6 +70,9 @@ INSTALLED_APPS = [
     "crispy_forms",
 
 ]
+
+if os.getenv("PAPERLESS_INSTALLED_APPS"):
+    INSTALLED_APPS += os.getenv("PAPERLESS_INSTALLED_APPS").split(",")
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
