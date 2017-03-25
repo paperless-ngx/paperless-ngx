@@ -8,7 +8,7 @@ class CorrespondentFilterSet(FilterSet):
     class Meta(object):
         model = Correspondent
         fields = {
-            'name': [
+            "name": [
                 "startswith", "endswith", "contains",
                 "istartswith", "iendswith", "icontains"
             ],
@@ -21,7 +21,7 @@ class TagFilterSet(FilterSet):
     class Meta(object):
         model = Tag
         fields = {
-            'name': [
+            "name": [
                 "startswith", "endswith", "contains",
                 "istartswith", "iendswith", "icontains"
             ],
