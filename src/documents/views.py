@@ -2,15 +2,16 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
 from paperless.db import GnuPG
+from paperless.mixins import SessionOrBasicAuthMixin
+from paperless.views import StandardPagination
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.mixins import (
     DestroyModelMixin,
     ListModelMixin,
     RetrieveModelMixin,
     UpdateModelMixin
 )
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import (
     GenericViewSet,
@@ -27,7 +28,6 @@ from .serialisers import (
     LogSerializer,
     TagSerializer
 )
-from .mixins import SessionOrBasicAuthMixin
 
 
 class IndexView(TemplateView):
@@ -90,12 +90,6 @@ class PushView(SessionOrBasicAuthMixin, FormView):
 
     def form_invalid(self, form):
         return HttpResponse("0")
-
-
-class StandardPagination(PageNumberPagination):
-    page_size = 25
-    page_size_query_param = "page-size"
-    max_page_size = 100000
 
 
 class CorrespondentViewSet(ModelViewSet):
