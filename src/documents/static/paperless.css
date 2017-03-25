@@ -10,3 +10,14 @@ td a.tag {
   margin: 1px;
   display: inline-block;
 }
+
+#result_list th.column-note {
+  text-align: right;
+}
+#result_list td.field-note {
+  text-align: right;
+}
+#result_list td textarea {
+  width: 90%;
+  height: 5em;
+}
