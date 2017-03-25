@@ -67,6 +67,7 @@ class DocumentAdmin(CommonAdmin):
 
     def created_(self, obj):
         return obj.created.date().strftime("%Y-%m-%d")
+    created_.short_description = "Created"
 
     def thumbnail(self, obj):
         png_img = self._html_tag(

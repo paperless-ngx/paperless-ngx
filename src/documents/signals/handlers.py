@@ -1,6 +1,5 @@
 import logging
 import os
-
 from subprocess import Popen
 
 from django.conf import settings
