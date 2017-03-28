@@ -16,6 +16,7 @@ class TestConsumer(TestCase):
             self.DummyParser
         )
 
+    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
@@ -34,6 +35,7 @@ class TestConsumer(TestCase):
 
         self.assertEqual(Consumer()._get_parser_class("doc.pdf"), DummyParser2)
 
+    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
@@ -41,6 +43,7 @@ class TestConsumer(TestCase):
         m.return_value = ((None, lambda _: None),)
         self.assertIsNone(Consumer()._get_parser_class("doc.pdf"))
 
+    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
