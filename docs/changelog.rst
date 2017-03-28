@@ -1,6 +1,10 @@
 Changelog
 #########
 
+* 0.4.1
+  * Fix for `#206`_ wherein the pluggable parser didn't recognise files with
+    all-caps suffixes like ``.PDF``
+
 * 0.4.0
   * Introducing reminders.  See `#199`_ for more information, but the short
     explanation is that you can now attach simple notes & times to documents
@@ -211,3 +215,4 @@ Changelog
 .. _#179: https://github.com/danielquinn/paperless/pull/179
 .. _#199: https://github.com/danielquinn/paperless/issues/199
 .. _#200: https://github.com/danielquinn/paperless/issues/200
+.. _#206: https://github.com/danielquinn/paperless/issues/206

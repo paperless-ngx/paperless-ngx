@@ -1,6 +1,54 @@
 from django.test import TestCase
+from unittest import mock
 
+from ..consumer import Consumer
 from ..models import FileInfo
+
+
+class TestConsumer(TestCase):
+
+    class DummyParser(object):
+        pass
+
+    def test__get_parser_class_1_parser(self):
+        self.assertEqual(
+            self._get_consumer()._get_parser_class("doc.pdf"),
+            self.DummyParser
+        )
+
+    @mock.patch("documents.consumer.os.makedirs")
+    @mock.patch("documents.consumer.os.path.exists", return_value=True)
+    @mock.patch("documents.consumer.document_consumer_declaration.send")
+    def test__get_parser_class_n_parsers(self, m, *args):
+
+        class DummyParser1(object):
+            pass
+
+        class DummyParser2(object):
+            pass
+
+        m.return_value = (
+            (None, lambda _: {"weight": 0, "parser": DummyParser1}),
+            (None, lambda _: {"weight": 1, "parser": DummyParser2}),
+        )
+
+        self.assertEqual(Consumer()._get_parser_class("doc.pdf"), DummyParser2)
+
+    @mock.patch("documents.consumer.os.makedirs")
+    @mock.patch("documents.consumer.os.path.exists", return_value=True)
+    @mock.patch("documents.consumer.document_consumer_declaration.send")
+    def test__get_parser_class_0_parsers(self, m, *args):
+        m.return_value = ((None, lambda _: None),)
+        self.assertIsNone(Consumer()._get_parser_class("doc.pdf"))
+
+    @mock.patch("documents.consumer.os.makedirs")
+    @mock.patch("documents.consumer.os.path.exists", return_value=True)
+    @mock.patch("documents.consumer.document_consumer_declaration.send")
+    def _get_consumer(self, m, *args):
+        m.return_value = (
+            (None, lambda _: {"weight": 0, "parser": self.DummyParser}),
+        )
+        return Consumer()
 
 
 class TestAttributes(TestCase):
