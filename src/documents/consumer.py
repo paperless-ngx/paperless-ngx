@@ -102,7 +102,7 @@ class Consumer(object):
             parser_class = self._get_parser_class(doc)
             if not parser_class:
                 self.log(
-                    "info", "No parsers could be found for {}".format(doc))
+                    "error", "No parsers could be found for {}".format(doc))
                 self._ignore.append(doc)
                 continue
 
@@ -159,6 +159,16 @@ class Consumer(object):
             result = parser(doc)
             if result:
                 options.append(result)
+
+        self.log(
+            "info",
+            "Parsers available: {}".format(
+                ", ".join([str(o["parser"].__name__) for o in options])
+            )
+        )
+
+        if not options:
+            return None
 
         # Return the parser with the highest weight.
         return sorted(
