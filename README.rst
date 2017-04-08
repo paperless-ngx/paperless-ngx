@@ -23,7 +23,8 @@ it... because paper.  I wrote this to make my life easier.
 How it Works
 ============
 
-1. Buy a document scanner like `this one`_.
+1. Buy a document scanner like `this one`_ (used by me) or `this other one`_
+   recommended by another user.
 2. Set it up to "scan to FTP" or something similar. It should be able to push
    scanned images to a server without you having to do anything.  If your
    scanner doesn't know how to automatically upload the file somewhere, you can
@@ -116,6 +117,7 @@ the `United Nations High Commissioner for Refugees`_.  They're doing important
 work and they need the money a lot more than I do.
 
 .. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
+.. _this other one: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 .. _ImageMagick: http://imagemagick.org/
 .. _Tesseract: https://github.com/tesseract-ocr
 .. _Unpaper: https://www.flameeyes.eu/projects/unpaper
