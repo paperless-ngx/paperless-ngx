@@ -50,7 +50,7 @@ class GroupConcat(models.Aggregate):
 
     def _get_template(self, separator):
         if self.engine == self.ENGINE_MYSQL:
-            return "%(function)s(%(expressions)s, SEPARATOR '{}')".format(
+            return "%(function)s(%(expressions)s SEPARATOR '{}')".format(
                 separator)
         return "%(function)s(%(expressions)s, '{}')".format(separator)
 
