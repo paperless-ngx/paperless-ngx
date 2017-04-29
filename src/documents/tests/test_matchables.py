@@ -149,6 +149,22 @@ class TestMatching(TestCase):
             )
         )
 
+    def test_match_fuzzy(self):
+
+        self._test_matching(
+            "Springfield, Miss.",
+            "MATCH_FUZZY",
+            (
+                "1220 Main Street, Springf eld, Miss.",
+                "1220 Main Street, Spring field, Miss.",
+                "1220 Main Street, Springfeld, Miss.",
+                "1220 Main Street Springfield Miss",
+            ),
+            (
+                "1220 Main Street, Springfield, Mich.",
+            )
+        )
+
 
 class TestApplications(TestCase):
     """
