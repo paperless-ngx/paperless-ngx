@@ -47,11 +47,9 @@ class MatchingModel(models.Model):
             "the PDF exactly as you've entered it, and \"regular expression\" "
             "uses a regex to match the PDF.  (If you don't know what a regex "
             "is, you probably don't want this option.)  Finally, a \"fuzzy "
-            "match\" strips all punctuation from both the match candidate "
-            "and the OCR'd text and looks for a Levenshtein \"partial ratio\" "
-            "(as implemented in the Python package \"FuzzyWuzzy\") of >= 90, "
-            "which can be useful for matching against documents with "
-            "imperfections that foil accurate OCR."
+            "match\" looks for words or phrases that are mostly—but not "
+            "exactly—the same, which can be useful for matching against "
+            "documents containg imperfections that foil accurate OCR."
         )
     )
 
