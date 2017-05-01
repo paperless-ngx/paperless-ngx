@@ -5,6 +5,7 @@ import re
 import uuid
 
 from collections import OrderedDict
+from fuzzywuzzy import fuzz
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -21,11 +22,13 @@ class MatchingModel(models.Model):
     MATCH_ALL = 2
     MATCH_LITERAL = 3
     MATCH_REGEX = 4
+    MATCH_FUZZY = 5
     MATCHING_ALGORITHMS = (
         (MATCH_ANY, "Any"),
         (MATCH_ALL, "All"),
         (MATCH_LITERAL, "Literal"),
         (MATCH_REGEX, "Regular Expression"),
+        (MATCH_FUZZY, "Fuzzy Match"),
     )
 
     name = models.CharField(max_length=128, unique=True)
@@ -42,8 +45,11 @@ class MatchingModel(models.Model):
             "provided appear in the PDF, albeit not in the order provided.  A "
             "\"literal\" match means that the text you enter must appear in "
             "the PDF exactly as you've entered it, and \"regular expression\" "
-            "uses a regex to match the PDF.  If you don't know what a regex "
-            "is, you probably don't want this option."
+            "uses a regex to match the PDF.  (If you don't know what a regex "
+            "is, you probably don't want this option.)  Finally, a \"fuzzy "
+            "match\" looks for words or phrases that are mostly—but not "
+            "exactly—the same, which can be useful for matching against "
+            "documents containg imperfections that foil accurate OCR."
         )
     )
 
@@ -103,6 +109,15 @@ class MatchingModel(models.Model):
         if self.matching_algorithm == self.MATCH_REGEX:
             return bool(re.search(
                 re.compile(self.match, **search_kwargs), text))
+
+        if self.matching_algorithm == self.MATCH_FUZZY:
+            match = re.sub(r'[^\w\s]', '', self.match)
+            text = re.sub(r'[^\w\s]', '', text)
+            if self.is_insensitive:
+                match = match.lower()
+                text = text.lower()
+
+            return True if fuzz.partial_ratio(match, text) >= 90 else False
 
         raise NotImplementedError("Unsupported matching algorithm")
 
