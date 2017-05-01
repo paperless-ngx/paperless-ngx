@@ -1,6 +1,10 @@
 Changelog
 #########
 
+* 0.5.0
+  * Support for fuzzy matching in the auto-tagger & auto-correspondent systems
+    thanks to `Jake Gysland`_'s patch `#220`_.
+
 * 0.4.1
   * Fix for `#206`_ wherein the pluggable parser didn't recognise files with
     all-caps suffixes like ``.PDF``
@@ -186,6 +190,7 @@ Changelog
 .. _Florian Harr: https://github.com/evils
 .. _Justin Snyman: https://github.com/stringlytyped
 .. _Thomas Brueggemann: https://github.com/thomasbrueggemann
+.. _Jake Gysland: https://github.com/jgysland
 .. _Paperless Desktop: https://github.com/thomasbrueggemann/paperless-desktop
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
@@ -216,3 +221,4 @@ Changelog
 .. _#199: https://github.com/danielquinn/paperless/issues/199
 .. _#200: https://github.com/danielquinn/paperless/issues/200
 .. _#206: https://github.com/danielquinn/paperless/issues/206
+.. _#220: https://github.com/danielquinn/paperless/pull/220
