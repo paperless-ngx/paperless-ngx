@@ -1,10 +1,29 @@
 # Sample paperless.conf
 # Copy this file to /etc/paperless.conf and modify it to suit your needs.
+# Because this file contains passwords it should only be readable by user 
+# root and paperless !
 
+
+###############################################################
+####                 path‘s  and folders                   ####
+###############################################################
 # This where your documents should go to be consumed.  Make sure that it exists
 # and that the user running the paperless service can read/write its contents
 # before you start Paperless.
 PAPERLESS_CONSUMPTION_DIR=""
+
+# You can specify where you want the SQLite database to be stored instead of
+# the default location.
+# Default location is  /data/  within the install folder.
+#PAPERLESS_DBDIR=/path/to/database/file
+
+# Override the default MEDIA_ROOT here.  This is where all files are stored.
+# Default location is  /media/documents/  within the install folder.
+#PAPERLESS_MEDIADIR=/path/to/media
+
+# Override the default STATIC_ROOT here.  This is where all static files created
+# using "collectstatic" manager command are stored.
+#PAPERLESS_STATICDIR=""
 
 # These values are required if you want paperless to check a particular email
 # box every 10 minutes and attempt to consume documents from there.  If you
@@ -14,6 +33,10 @@ PAPERLESS_CONSUME_MAIL_PORT=""
 PAPERLESS_CONSUME_MAIL_USER=""
 PAPERLESS_CONSUME_MAIL_PASS=""
 
+
+###############################################################
+####                 SECURITY                              ####
+###############################################################
 # You must have a passphrase in order for Paperless to work at all.  If you set
 # this to "", GNUGPG will "encrypt" your PDF by writing it out as a zero-byte
 # file.
@@ -32,24 +55,46 @@ PAPERLESS_PASSPHRASE="secret"
 # have a shared secret here.
 PAPERLESS_SHARED_SECRET=""
 
+# The secret key has a default that should be fine so long as you're hosting
+# Paperless on a closed network.  However, if you're putting this anywhere
+# public, you should change the key to something unique and verbose.
+#PAPERLESS_SECRET_KEY="change-me"
+
+# If you're planning on putting Paperless on the open internet, then you
+# really should set this value to the domain name you're using.  Failing to do
+# so leaves you open to HTTP host header attacks:
+# https://docs.djangoproject.com/en/1.10/topics/security/#host-headers-virtual-hosting
+#
+# Just remember that this is a comma-separated list, so "example.com" is fine,
+# as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
+#PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
+
+
+###############################################################
+####                 Software Tweaks                       ####
+###############################################################
 # After a document is consumed, Paperless can trigger an arbitrary script if
 # you like.  This script will be passed a number of arguments for you to work
 # with.  The default is blank, which means nothing will be executed.  For more
 # information, take a look at the docs: http://paperless.readthedocs.org/en/latest/consumption.html#hooking-into-the-consumption-process
 #PAPERLESS_POST_CONSUME_SCRIPT="/path/to/an/arbitrary/script.sh"
 
-
 #
 # The following values use sensible defaults for modern systems, but if you're
-# running Paperless on a low-resource machine (like a Raspberry Pi), modifying
+# running Paperless on a low-resource device (like a Raspberry Pi), modifying
 # some of these values may be necessary.
 #
-
 
 # By default, Paperless will attempt to use all available CPU cores to process
 # a document, but if you would like to limit that, you can set this value to
 # an integer:
 #PAPERLESS_OCR_THREADS=1
+
+# Customize the default language that tesseract will attempt to use when parsing
+# documents.  It should be a 3-letter language code consistent with ISO 639.
+# https://www.loc.gov/standards/iso639-2/php/code_list.php
+#PAPERLESS_OCR_LANGUAGE=eng
+
 
 # On smaller systems, or even in the case of Very Large Documents, the consumer
 # may explode, complaining about how it's "unable to extent pixel cache".  In
@@ -61,17 +106,6 @@ PAPERLESS_SHARED_SECRET=""
 # the web for "MAGICK_MEMORY_LIMIT".
 #PAPERLESS_CONVERT_MEMORY_LIMIT=0
 
-# By default the conversion density setting for documents is 300DPI, in some
-# cases it has proven useful to configure a lesser value.
-# This setting has a high impact on the physical size of tmp page files,
-# the speed of document conversion, and can affect the accuracy of OCR
-# results. Individual results can vary and this setting should be tested
-# thoroughly against the documents you are importing to see if it has any
-# impacts either negative or positive. Testing on limited document sets has
-# shown a setting of 200 can cut the size of tmp files by 1/3, and speed up
-# conversion by up to 4x with little impact to OCR accuracy.
-#PAPERLESS_CONVERT_DENSITY=300
-
 # Similar to the memory limit, if you've got a small system and your OS mounts
 # /tmp as tmpfs, you should set this to a path that's on a physical disk, like
 # /home/your_user/tmp or something.  ImageMagick will use this as scratch space
@@ -81,44 +115,32 @@ PAPERLESS_SHARED_SECRET=""
 # the web for "MAGICK_TMPDIR".
 #PAPERLESS_CONVERT_TMPDIR=/var/tmp/paperless
 
-# You can specify where you want the SQLite database to be stored instead of
-# the default location
-#PAPERLESS_DBDIR=/path/to/database/file
 
-# Override the default MEDIA_ROOT here.  This is where all files are stored.
-#PAPERLESS_MEDIADIR=/path/to/media
-
-# Override the default STATIC_ROOT here. This is where all static files created
-# using "collectstatic" manager command are stored.
-#PAPERLESS_STATICDIR=""
+# By default the conversion density setting for documents is 300DPI, in some
+# cases it has proven useful to configure a lesser value.
+# This setting has a high impact on the physical size of tmp page files,
+# the speed of document conversion, and can affect the accuracy of OCR
+# results. Individual results can vary and this setting should be tested
+# thoroughly against the documents you are importing to see if it has any
+# impacts either negative or positive. 
+# Testing on limited document sets has shown a setting of 200 can cut the 
+# size of tmp files by 1/3, and speed up conversion by up to 4x 
+# with little impact to OCR accuracy.
+#PAPERLESS_CONVERT_DENSITY=300
 
 # The number of seconds that Paperless will wait between checking
 # PAPERLESS_CONSUMPTION_DIR.  If you tend to write documents to this directory
-# very slowly, you may want to use a higher value than the default (10).
-# PAPERLESS_CONSUMER_LOOP_TIME=10
+# rarely, you may want to use a higher value than the default (10).
+#PAPERLESS_CONSUMER_LOOP_TIME=10
 
-# If you're planning on putting Paperless on the open internet, then you
-# really should set this value to the domain name you're using.  Failing to do
-# so leaves you open to HTTP host header attacks:
-# https://docs.djangoproject.com/en/1.10/topics/security/#host-headers-virtual-hosting
-#
-# Just remember that this is a comma-separated list, so "example.com" is fine,
-# as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
-#PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
 
+###############################################################
+####                 Design Tweaks                         ####
+###############################################################
 # Override the default UTC time zone here
 #PAPERLESS_TIME_ZONE=UTC
-
-# Customize the default language that tesseract will attempt to use when parsing
-# documents.  It should be a 3-letter language code consistent with ISO 639.
-#PAPERLESS_OCR_LANGUAGE=eng
 
 # The number of items on each page in the web UI.  This value must be a
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
 #PAPERLESS_LIST_PER_PAGE=100
-
-# The secret key has a default that should be fine so long as you're hosting
-# Paperless on a closed network.  However, if you're putting this anywhere
-# public, you should change the key to something unique and verbose.
-#PAPERLESS_SECRET_KEY="change-me"
