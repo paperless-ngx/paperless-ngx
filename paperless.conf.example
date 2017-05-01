@@ -1,29 +1,33 @@
 # Sample paperless.conf
 # Copy this file to /etc/paperless.conf and modify it to suit your needs.
-# Because this file contains passwords it should only be readable by user 
-# root and paperless !
+# As this file contains passwords it should only be readable by the user
+# running paperless.
 
 
-###############################################################
-####                 path‘s  and folders                   ####
-###############################################################
+###############################################################################
+####                       Paths  and folders                              ####
+###############################################################################
+
 # This where your documents should go to be consumed.  Make sure that it exists
 # and that the user running the paperless service can read/write its contents
 # before you start Paperless.
 PAPERLESS_CONSUMPTION_DIR=""
 
+
 # You can specify where you want the SQLite database to be stored instead of
-# the default location.
-# Default location is  /data/  within the install folder.
+# the default location of /data/ within the install directory.
 #PAPERLESS_DBDIR=/path/to/database/file
 
+
 # Override the default MEDIA_ROOT here.  This is where all files are stored.
-# Default location is  /media/documents/  within the install folder.
+# The default location is /media/documents/ within the install folder.
 #PAPERLESS_MEDIADIR=/path/to/media
 
-# Override the default STATIC_ROOT here.  This is where all static files created
-# using "collectstatic" manager command are stored.
+
+# Override the default STATIC_ROOT here.  This is where all static files
+# created using "collectstatic" manager command are stored.
 #PAPERLESS_STATICDIR=""
+
 
 # These values are required if you want paperless to check a particular email
 # box every 10 minutes and attempt to consume documents from there.  If you
@@ -34,9 +38,10 @@ PAPERLESS_CONSUME_MAIL_USER=""
 PAPERLESS_CONSUME_MAIL_PASS=""
 
 
-###############################################################
-####                 SECURITY                              ####
-###############################################################
+###############################################################################
+####                              Security                                 ####
+###############################################################################
+
 # You must have a passphrase in order for Paperless to work at all.  If you set
 # this to "", GNUGPG will "encrypt" your PDF by writing it out as a zero-byte
 # file.
@@ -51,14 +56,17 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 # you've since changed it to a new one.
 PAPERLESS_PASSPHRASE="secret"
 
+
 # If you intend to consume documents either via HTTP POST or by email, you must
 # have a shared secret here.
 PAPERLESS_SHARED_SECRET=""
+
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
 # public, you should change the key to something unique and verbose.
 #PAPERLESS_SECRET_KEY="change-me"
+
 
 # If you're planning on putting Paperless on the open internet, then you
 # really should set this value to the domain name you're using.  Failing to do
@@ -70,14 +78,17 @@ PAPERLESS_SHARED_SECRET=""
 #PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
 
 
-###############################################################
-####                 Software Tweaks                       ####
-###############################################################
+###############################################################################
+####                          Software Tweaks                              ####
+###############################################################################
+
 # After a document is consumed, Paperless can trigger an arbitrary script if
 # you like.  This script will be passed a number of arguments for you to work
 # with.  The default is blank, which means nothing will be executed.  For more
-# information, take a look at the docs: http://paperless.readthedocs.org/en/latest/consumption.html#hooking-into-the-consumption-process
+# information, take a look at the docs:
+# http://paperless.readthedocs.org/en/latest/consumption.html#hooking-into-the-consumption-process
 #PAPERLESS_POST_CONSUME_SCRIPT="/path/to/an/arbitrary/script.sh"
+
 
 #
 # The following values use sensible defaults for modern systems, but if you're
@@ -85,19 +96,21 @@ PAPERLESS_SHARED_SECRET=""
 # some of these values may be necessary.
 #
 
+
 # By default, Paperless will attempt to use all available CPU cores to process
 # a document, but if you would like to limit that, you can set this value to
 # an integer:
 #PAPERLESS_OCR_THREADS=1
 
-# Customize the default language that tesseract will attempt to use when parsing
-# documents.  It should be a 3-letter language code consistent with ISO 639.
-# https://www.loc.gov/standards/iso639-2/php/code_list.php
+
+# Customize the default language that tesseract will attempt to use when
+# parsing documents.  It should be a 3-letter language code consistent with ISO
+# 639: https://www.loc.gov/standards/iso639-2/php/code_list.php
 #PAPERLESS_OCR_LANGUAGE=eng
 
 
 # On smaller systems, or even in the case of Very Large Documents, the consumer
-# may explode, complaining about how it's "unable to extent pixel cache".  In
+# may explode, complaining about how it's "unable to extend pixel cache".  In
 # such cases, try setting this to a reasonably low value, like 32000000.  The
 # default is to use whatever is necessary to do everything without writing to
 # disk, and units are in megabytes.
@@ -105,6 +118,7 @@ PAPERLESS_SHARED_SECRET=""
 # For more information on how to use this value, you should probably search
 # the web for "MAGICK_MEMORY_LIMIT".
 #PAPERLESS_CONVERT_MEMORY_LIMIT=0
+
 
 # Similar to the memory limit, if you've got a small system and your OS mounts
 # /tmp as tmpfs, you should set this to a path that's on a physical disk, like
@@ -122,11 +136,12 @@ PAPERLESS_SHARED_SECRET=""
 # the speed of document conversion, and can affect the accuracy of OCR
 # results. Individual results can vary and this setting should be tested
 # thoroughly against the documents you are importing to see if it has any
-# impacts either negative or positive. 
-# Testing on limited document sets has shown a setting of 200 can cut the 
-# size of tmp files by 1/3, and speed up conversion by up to 4x 
+# impacts either negative or positive.
+# Testing on limited document sets has shown a setting of 200 can cut the
+# size of tmp files by 1/3, and speed up conversion by up to 4x
 # with little impact to OCR accuracy.
 #PAPERLESS_CONVERT_DENSITY=300
+
 
 # The number of seconds that Paperless will wait between checking
 # PAPERLESS_CONSUMPTION_DIR.  If you tend to write documents to this directory
@@ -134,11 +149,13 @@ PAPERLESS_SHARED_SECRET=""
 #PAPERLESS_CONSUMER_LOOP_TIME=10
 
 
-###############################################################
-####                 Design Tweaks                         ####
-###############################################################
+###############################################################################
+####                            Interface                                  ####
+###############################################################################
+
 # Override the default UTC time zone here
 #PAPERLESS_TIME_ZONE=UTC
+
 
 # The number of items on each page in the web UI.  This value must be a
 # positive integer, but if you don't define one in paperless.conf, a default of
