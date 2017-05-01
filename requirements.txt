@@ -6,6 +6,7 @@ django-filter>=1.0
 django-flat-responsive>=1.2.0
 djangorestframework>=3.5.3
 filemagic>=1.6
+fuzzywuzzy[speedup]==0.15.0
 langdetect>=1.0.7
 pyocr>=0.4.6
 python-dateutil>=2.6.0
