@@ -16,20 +16,21 @@ map_uidgid() {
 
 set_permissions() {
     # Set permissions for consumption and export directory
-    for i in PAPERLESS_CONSUMPTION_DIR PAPERLESS_EXPORT_DIR; do
-      cur_dir_name=$(sed -e's/PAPERLESS_//; s/_DIR//' <<< $i | tr '[:upper:]' '[:lower:]')
-      chgrp paperless "${!i}" || {
+    for dir in PAPERLESS_CONSUMPTION_DIR PAPERLESS_EXPORT_DIR; do
+      # Extract the name of the current directory from $dir for the error message
+      cur_dir_name=$(echo "$dir" | awk -F'_' '{ print tolower($2); }')
+      chgrp paperless "${!dir}" || {
           echo "Changing group of ${cur_dir_name} directory:"
-          echo "  ${!i}"
+          echo "  ${!dir}"
           echo "failed."
           echo ""
           echo "Either try to set it on your host-mounted directory"
           echo "directly, or make sure that the directory has \`o+x\`"
           echo "permissions and the files in it at least \`o+r\`."
       } >&2
-      chmod g+x "${!i}" || {
+      chmod g+x "${!dir}" || {
           echo "Changing group permissions of ${cur_dir_name} directory:"
-          echo "  ${!i}"
+          echo "  ${!dir}"
           echo "failed."
           echo ""
           echo "Either try to set it on your host-mounted directory"
