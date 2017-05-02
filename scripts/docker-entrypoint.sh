@@ -15,26 +15,28 @@ map_uidgid() {
 }
 
 set_permissions() {
-    # Set permissions for consumption directory
-    chgrp paperless "$PAPERLESS_CONSUMPTION_DIR" || {
-        echo "Changing group of consumption directory:"
-        echo "  $PAPERLESS_CONSUMPTION_DIR"
-        echo "failed."
-        echo ""
-        echo "Either try to set it on your host-mounted directory"
-        echo "directly, or make sure that the directory has \`o+x\`"
-        echo "permissions and the files in it at least \`o+r\`."
-    } >&2
-    chmod g+x "$PAPERLESS_CONSUMPTION_DIR" || {
-        echo "Changing group permissions of consumption directory:"
-        echo "  $PAPERLESS_CONSUMPTION_DIR"
-        echo "failed."
-        echo ""
-        echo "Either try to set it on your host-mounted directory"
-        echo "directly, or make sure that the directory has \`o+x\`"
-        echo "permissions and the files in it at least \`o+r\`."
-    } >&2
-
+    # Set permissions for consumption and export directory
+    for i in PAPERLESS_CONSUMPTION_DIR PAPERLESS_EXPORT_DIR; do
+      cur_dir_name=$(sed -e's/PAPERLESS_//; s/_DIR//' <<< $i | tr '[:upper:]' '[:lower:]')
+      chgrp paperless "${!i}" || {
+          echo "Changing group of ${cur_dir_name} directory:"
+          echo "  ${!i}"
+          echo "failed."
+          echo ""
+          echo "Either try to set it on your host-mounted directory"
+          echo "directly, or make sure that the directory has \`o+x\`"
+          echo "permissions and the files in it at least \`o+r\`."
+      } >&2
+      chmod g+x "${!i}" || {
+          echo "Changing group permissions of ${cur_dir_name} directory:"
+          echo "  ${!i}"
+          echo "failed."
+          echo ""
+          echo "Either try to set it on your host-mounted directory"
+          echo "directly, or make sure that the directory has \`o+x\`"
+          echo "permissions and the files in it at least \`o+r\`."
+      } >&2
+    done
     # Set permissions for application directory
     chown -Rh paperless:paperless /usr/src/paperless
 }
