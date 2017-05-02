@@ -6,7 +6,7 @@ Paperless
 |Travis|
 |Dependencies|
 
-Scan, index, and archive all of your paper documents
+Index and archive all of your scaned paper documents
 
 I hate paper.  Environmental issues aside, it's a tech person's nightmare:
 
@@ -23,17 +23,18 @@ it... because paper.  I wrote this to make my life easier.
 How it Works
 ============
 
-1. Buy a document scanner like `this one`_ (used by me) or `this other one`_
+1. Paperless does not run your scanner.
+2. Buy a document scanner like `this one`_ (used by me) or `this other one`_
    recommended by another user.
-2. Set it up to "scan to FTP" or something similar. It should be able to push
+3. Set it up to "scan to FTP" or something similar. It should be able to push
    scanned images to a server without you having to do anything.  If your
    scanner doesn't know how to automatically upload the file somewhere, you can
    always do that manually.  Paperless doesn't care how the documents get into
    its local consumption directory.
-3. Have the target server run the Paperless consumption script to OCR the PDF
+4. Have the target server run the Paperless consumption script to OCR the file
    and index it into a local database.
-4. Use the web frontend to sift through the database and find what you want.
-5. Download the PDF you need/want via the web interface and do whatever you
+5. Use the web frontend to sift through the database and find what you want.
+6. Download the PDF you need/want via the web interface and do whatever you
    like with it.  You can even print it and send it as if it's the original.
    In most cases, no one will care or notice.
 
@@ -48,9 +49,8 @@ Stability
 =========
 
 Paperless is still under active development (just look at the git commit
-history) so don't expect it to be 100% stable.  I'm using it for my own
-documents, but I'm crazy like that.  If you use this and it breaks something,
-you get to keep all the shiny pieces.
+history) so don't expect it to be 100% stable.  You can backup the sqlite3 
+database, media directory and your configuration file to be on the safe side.
 
 
 Requirements
@@ -84,10 +84,10 @@ Similar Projects
 There's another project out there called `Mayan EDMS`_ that has a surprising
 amount of technical overlap with Paperless.  Also based on Django and using
 a consumer model with Tesseract and unpaper, Mayan EDMS is *much* more
-featureful and comes with a slick UI as well.  It may be that Paperless is
-better suited for low-resource environments (like a Rasberry Pi), but to be
-honest, this is just a guess as I haven't tested this myself.  One thing's
-for certain though, *Paperless* is a **much** better name.
+featureful and comes with a slick UI as well, but still in Python 2. It may be 
+that Paperless consumes less resources, but to be honest, this is just a guess 
+as I haven't tested this myself.  One thing's for certain though, *Paperless* 
+is a **much** better name.
 
 
 Important Note
@@ -95,7 +95,7 @@ Important Note
 
 Document scanners are typically used to scan sensitive documents.  Things like
 your social insurance number, tax records, invoices, etc.  While paperless
-encrypts the original PDFs via the consumption script, the OCR'd text is *not*
+encrypts the original files via the consumption script, the OCR'd text is *not*
 encrypted and is therefore stored in the clear (it needs to be searchable, so
 if someone has ideas on how to do that on encrypted data, I'm all ears).  This
 means that paperless should never be run on an untrusted host.  Instead, I
