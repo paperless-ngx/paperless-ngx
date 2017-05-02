@@ -38,7 +38,6 @@ RUN groupadd -g 1000 paperless \
 # Set export directory
 ENV PAPERLESS_EXPORT_DIR /export
 RUN mkdir -p $PAPERLESS_EXPORT_DIR
-RUN chown -Rh paperless:paperless $PAPERLESS_EXPORT_DIR
 
 # Setup entrypoint
 COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
