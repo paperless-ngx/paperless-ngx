@@ -35,12 +35,16 @@ RUN groupadd -g 1000 paperless \
     && useradd -u 1000 -g 1000 -d /usr/src/paperless paperless \
     && chown -Rh paperless:paperless /usr/src/paperless
 
+# Set export directory
+ENV PAPERLESS_EXPORT_DIR /export
+RUN mkdir -p $PAPERLESS_EXPORT_DIR
+
 # Setup entrypoint
 COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 RUN chmod 755 /sbin/docker-entrypoint.sh
 
 # Mount volumes
-VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/consume"]
+VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/consume", "/export"]
 
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 CMD ["--help"]
