@@ -24,7 +24,6 @@ How it Works
 ============
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces
-
 1. Buy a document scanner like `this one`_ (used by me) or `this other one`_
    recommended by another user.
 2. Set it up to "scan to FTP" or something similar. It should be able to push
