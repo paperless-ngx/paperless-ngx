@@ -77,7 +77,7 @@ class Command(Renderable, BaseCommand):
                 )
 
             doc_file = record["__exported_file_name__"]
-            if not os.path.exists(os.path.join(self.source, doc_file)):
+            if not os.path.exists(doc_file):
                 raise CommandError(
                     'The manifest file refers to "{}" which does not '
                     'appear to be in the source directory.'.format(doc_file)
