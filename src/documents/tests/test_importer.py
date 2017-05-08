@@ -3,6 +3,8 @@ from django.test import TestCase
 
 from ..management.commands.document_importer import Command
 
+from documents.settings import EXPORTER_FILE_NAME
+
 
 class TestImporter(TestCase):
 
@@ -27,7 +29,7 @@ class TestImporter(TestCase):
 
         cmd.manifest = [{
             "model": "documents.document",
-            "__exported_file_name__": "noexist.pdf"
+            EXPORTER_FILE_NAME: "noexist.pdf"
         }]
         # self.assertRaises(CommandError, cmd._check_manifest)
         with self.assertRaises(CommandError) as cm:

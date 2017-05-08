@@ -10,6 +10,7 @@ from documents.models import Document, Correspondent, Tag
 from paperless.db import GnuPG
 
 from ...mixins import Renderable
+from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME
 
 
 class Command(Renderable, BaseCommand):
@@ -63,8 +64,8 @@ class Command(Renderable, BaseCommand):
 
             target = os.path.join(self.target, document.file_name)
             thumbnail_target = target + "-tumbnail.png"
-            document_dict["__exported_file_name__"] = target
-            document_dict["__exported_thumbnail_name__"] = thumbnail_target
+            document_dict[EXPORTER_FILE_NAME] = target
+            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_target
 
             print("Exporting: {}".format(target))
 
