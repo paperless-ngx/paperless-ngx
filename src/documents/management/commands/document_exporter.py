@@ -69,15 +69,14 @@ class Command(Renderable, BaseCommand):
 
             print("Exporting: {}".format(target))
 
+            t = int(time.mktime(document.created.timetuple()))
             with open(target, "wb") as f:
                 f.write(GnuPG.decrypted(document.source_file))
-                t = int(time.mktime(document.created.timetuple()))
                 os.utime(target, times=(t, t))
 
             with open(thumbnail_target, "wb") as f:
                 f.write(GnuPG.decrypted(document.thumbnail_file))
-                t = int(time.mktime(document.created.timetuple()))
-                os.utime(target, times=(t, t))
+                os.utime(thumbnail_target, times=(t, t))
 
         manifest += json.loads(
             serializers.serialize("json", Correspondent.objects.all()))
