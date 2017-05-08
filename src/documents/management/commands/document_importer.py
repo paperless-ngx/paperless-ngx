@@ -79,7 +79,7 @@ class Command(Renderable, BaseCommand):
                 )
 
             doc_file = record[EXPORTER_FILE_NAME]
-            if not os.path.exists(doc_file):
+            if not os.path.exists(os.path.join(self.source, doc_file)):
                 raise CommandError(
                     'The manifest file refers to "{}" which does not '
                     'appear to be in the source directory.'.format(doc_file)
@@ -96,13 +96,16 @@ class Command(Renderable, BaseCommand):
             thumb_file = record[EXPORTER_THUMBNAIL_NAME]
             document = Document.objects.get(pk=record["pk"])
 
-            with open(doc_file, "rb") as unencrypted:
+            document_path = os.path.join(self.source, doc_file)
+            thumbnail_path = os.path.join(self.source, thumb_file)
+
+            with open(document_path, "rb") as unencrypted:
                 with open(document.source_path, "wb") as encrypted:
                     print("Encrypting {} and saving it to {}".format(
                         doc_file, document.source_path))
                     encrypted.write(GnuPG.encrypted(unencrypted))
 
-            with open(thumb_file, "rb") as unencrypted:
+            with open(thumbnail_path, "rb") as unencrypted:
                 with open(document.thumbnail_path, "wb") as encrypted:
                     print("Encrypting {} and saving it to {}".format(
                         thumb_file, document.thumbnail_path))
