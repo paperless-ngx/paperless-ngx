@@ -62,17 +62,20 @@ class Command(Renderable, BaseCommand):
 
             document = document_map[document_dict["pk"]]
 
-            target = os.path.join(self.target, document.file_name)
-            thumbnail_target = target + "-tumbnail.png"
-            document_dict[EXPORTER_FILE_NAME] = target
-            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_target
+            file_target = os.path.join(self.target, document.file_name)
 
-            print("Exporting: {}".format(target))
+            thumbnail_name = document.file_name + "-tumbnail.png"
+            thumbnail_target = os.path.join(self.target, thumbnail_name)
+
+            document_dict[EXPORTER_FILE_NAME] = document.file_name
+            document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+
+            print("Exporting: {}".format(file_target))
 
             t = int(time.mktime(document.created.timetuple()))
-            with open(target, "wb") as f:
+            with open(file_target, "wb") as f:
                 f.write(GnuPG.decrypted(document.source_file))
-                os.utime(target, times=(t, t))
+                os.utime(file_target, times=(t, t))
 
             with open(thumbnail_target, "wb") as f:
                 f.write(GnuPG.decrypted(document.thumbnail_file))
