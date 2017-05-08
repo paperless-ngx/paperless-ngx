@@ -10,6 +10,8 @@ from paperless.db import GnuPG
 
 from ...mixins import Renderable
 
+from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME
+
 
 class Command(Renderable, BaseCommand):
 
@@ -70,13 +72,13 @@ class Command(Renderable, BaseCommand):
             if not record["model"] == "documents.document":
                 continue
 
-            if "__exported_file_name__" not in record:
+            if EXPORTER_FILE_NAME not in record:
                 raise CommandError(
                     'The manifest file contains a record which does not '
                     'refer to an actual document file.'
                 )
 
-            doc_file = record["__exported_file_name__"]
+            doc_file = record[EXPORTER_FILE_NAME]
             if not os.path.exists(doc_file):
                 raise CommandError(
                     'The manifest file refers to "{}" which does not '
@@ -90,8 +92,8 @@ class Command(Renderable, BaseCommand):
             if not record["model"] == "documents.document":
                 continue
 
-            doc_file = record["__exported_file_name__"]
-            thumb_file = record["__exported_thumbnail_name__"]
+            doc_file = record[EXPORTER_FILE_NAME]
+            thumb_file = record[EXPORTER_THUMBNAIL_NAME]
             document = Document.objects.get(pk=record["pk"])
             with open(doc_file, "rb") as unencrypted:
                 with open(document.source_path, "wb") as encrypted:
