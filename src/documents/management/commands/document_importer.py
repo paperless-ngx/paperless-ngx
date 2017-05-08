@@ -95,11 +95,13 @@ class Command(Renderable, BaseCommand):
             doc_file = record[EXPORTER_FILE_NAME]
             thumb_file = record[EXPORTER_THUMBNAIL_NAME]
             document = Document.objects.get(pk=record["pk"])
+
             with open(doc_file, "rb") as unencrypted:
                 with open(document.source_path, "wb") as encrypted:
                     print("Encrypting {} and saving it to {}".format(
                         doc_file, document.source_path))
                     encrypted.write(GnuPG.encrypted(unencrypted))
+
             with open(thumb_file, "rb") as unencrypted:
                 with open(document.thumbnail_path, "wb") as encrypted:
                     print("Encrypting {} and saving it to {}".format(
