@@ -7,6 +7,9 @@ Changelog
   * Modified the Dockerfile to prepare an export directory (`#212`_).  Thanks
     to combined efforts from `Pit`_ and `Strubbl`_ in working out the kinks on
     this one.
+  * Updated the import/export scripts to include support for thumbnails.  Big
+    thanks to `CkuT`_ for finding this shortcoming and doing the work to get
+    it fixed in `#224`_.
 
 * 0.4.1
   * Fix for `#206`_ wherein the pluggable parser didn't recognise files with
@@ -195,6 +198,7 @@ Changelog
 .. _Thomas Brueggemann: https://github.com/thomasbrueggemann
 .. _Jake Gysland: https://github.com/jgysland
 .. _Strubbl: https://github.com/strubbl
+.. _CkuT: https://github.com/CkuT
 .. _Paperless Desktop: https://github.com/thomasbrueggemann/paperless-desktop
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
@@ -227,3 +231,5 @@ Changelog
 .. _#206: https://github.com/danielquinn/paperless/issues/206
 .. _#212: https://github.com/danielquinn/paperless/pull/212
 .. _#220: https://github.com/danielquinn/paperless/pull/220
+.. _#224: https://github.com/danielquinn/paperless/pull/224
+
