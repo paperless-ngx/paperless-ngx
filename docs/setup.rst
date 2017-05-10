@@ -4,9 +4,8 @@ Setup
 =====
 
 Paperless isn't a very complicated app, but there are a few components, so some
-basic documentation is in order.  If you go follow along in this document and
-still have trouble, please open an `issue on GitHub`_ so I can fill in the
-gaps.
+basic documentation is in order.  If you follow along in this document and still 
+have trouble, please open an `issue on GitHub`_ so I can fill in the gaps.
 
 .. _issue on GitHub: https://github.com/danielquinn/paperless/issues
 
@@ -28,6 +27,7 @@ or just download the tarball and go that route:
 
 .. code:: bash
 
+    $ cd to the directory where you want to run Paperless
     $ wget https://github.com/danielquinn/paperless/archive/master.zip
     $ unzip master.zip
     $ cd paperless-master
@@ -42,8 +42,10 @@ You can go multiple routes with setting up and running Paperless. The `Vagrant
 route`_ is quick & easy, but means you're running a VM which comes with memory
 consumption etc. We also `support Docker`_, which you can use natively under
 Linux and in a VM with `Docker Machine`_ (this guide was written for native
-Docker usage under Linux, you might have to adapt it for Docker Machine.)
-Alternatively the standard, `bare metal`_ approach is a little more
+Docker usage under Linux, you might have to adapt it for Docker Machine.) 
+Not to forget the virtualenv, this is similar to `bare metal`_ with the exception
+that you have to activate the virtualenv first.
+Last but not least, the standard `bare metal`_ approach is a little more
 complicated, but worth it because it makes it easier should you want to
 contribute some code back.
 
@@ -59,9 +61,11 @@ Standard (Bare Metal)
 .....................
 
 1. Install the requirements as per the :ref:`requirements <requirements>` page.
-2. Change to the ``src`` directory in this repo.
-3. Copy ``paperless.conf.example`` to ``/etc/paperless.conf`` and open it in
-   your favourite editor.  Set the values for:
+2. Within the extract of master.zip go to the ``src`` directory.
+3. Copy ``paperless.conf.example`` to ``/etc/paperless.conf`` also the virtual 
+   envrionment look there for it and open it in your favourite editor.  
+   Because this file contains passwords it should only be readable by user root
+   and paperless !  Set the values for:
 
     * ``PAPERLESS_CONSUMPTION_DIR``: this is where your documents will be
       dumped to be consumed by Paperless.
@@ -70,18 +74,18 @@ Standard (Bare Metal)
     * ``PAPERLESS_OCR_THREADS``: this is the number of threads the OCR process
       will spawn to process document pages in parallel.
 
-4. Initialise the database with ``./manage.py migrate``.
+4. Initialise the SQLite database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
 6. Start the webserver with ``./manage.py runserver <IP>:<PORT>``.
-   If no specifc IP or port are given, the default is ``127.0.0.1:8000``.
-   You should now be able to visit your (empty) `Paperless webserver`_ at
-   ``127.0.0.1:8000`` (or whatever you chose).  You can login with the
-   user/pass you created in #5.
+   If no specifc IP or port are given, the default is ``127.0.0.1:8000`` 
+   also known as http://localhost:8000/.
+   You should now be able to visit your (empty) at `Paperless webserver`_ or 
+   whatever you chose before.  You can login with the user/pass you created in #5.
 7. In a separate window, change to the ``src`` directory in this repo again,
    but this time, you should start the consumer script with
    ``./manage.py document_consumer``.
-8. Scan something.  Put it in the ``CONSUMPTION_DIR``.
+8. Scan something or put a file into the  ``CONSUMPTION_DIR``.
 9. Wait a few minutes
 10. Visit the document list on your webserver, and it should be there, indexed
     and downloadable.
@@ -299,10 +303,11 @@ Standard (Bare Metal, Systemd)
 
 If you're running on a bare metal system that's using Systemd, you can use the
 service unit files in the ``scripts`` directory to set this up.  You'll need to
-create a user called ``paperless`` and setup Paperless to be in a place that
-this new user can read and write to. Be sure to edit the service scripts to point
-to the proper location of your paperless install, referencing the appropriate Python
-binary. For example: ``ExecStart=/path/to/python3 /path/to/paperless/src/manage.py document_consumer``.
+create a user called ``paperless`` (without login (if not already done so #5)) and 
+setup Paperless to be in a place that this new user can read and write to. Be sure 
+to edit the service  scripts to point to the proper location of your paperless install, 
+referencing the appropriate Python binary. For example: 
+``ExecStart=/path/to/python3 /path/to/paperless/src/manage.py document_consumer``.
 If you don't want to make a new user, you can change the ``Group`` and ``User`` variables
 accordingly.
 
@@ -344,7 +349,7 @@ after restarting your system:
   If you are using a network interface other than ``eth0``, you will have to
   change ``IFACE=eth0``. For example, if you are connected via WiFi, you will
   likely need to replace ``eth0`` above with ``wlan0``. To see all interfaces,
-  run ``ifconfig``.
+  run ``ifconfig -a``.
 
   Save the file.
 
