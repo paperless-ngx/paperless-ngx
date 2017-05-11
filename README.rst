@@ -23,7 +23,8 @@ it... because paper.  I wrote this to make my life easier.
 How it Works
 ============
 
-Paperless does not control your scanner, it only helps you deal with what your scanner produces
+Paperless does not control your scanner, it only helps you deal with what your
+scanner produces
 
 1. Buy a document scanner like `this one`_ (used by me) or `this other one`_
    recommended by another user.
@@ -50,15 +51,15 @@ Stability
 =========
 
 Paperless is still under active development (just look at the git commit
-history) so don't expect it to be 100% stable.  You can backup the sqlite3 
+history) so don't expect it to be 100% stable.  You can backup the sqlite3
 database, media directory and your configuration file to be on the safe side.
 
 
 Requirements
 ============
 
-This is all really a quite simple, shiny, user-friendly wrapper around some very
-powerful tools.
+This is all really a quite simple, shiny, user-friendly wrapper around some
+very powerful tools.
 
 * `ImageMagick`_ converts the images between colour and greyscale.
 * `Tesseract`_ does the character recognition.
@@ -85,9 +86,9 @@ Similar Projects
 There's another project out there called `Mayan EDMS`_ that has a surprising
 amount of technical overlap with Paperless.  Also based on Django and using
 a consumer model with Tesseract and Unpaper, Mayan EDMS is *much* more
-featureful and comes with a slick UI as well, but still in Python 2. It may be 
-that Paperless consumes fewer resources, but to be honest, this is just a guess 
-as I haven't tested this myself.  One thing's for certain though, *Paperless* 
+featureful and comes with a slick UI as well, but still in Python 2. It may be
+that Paperless consumes fewer resources, but to be honest, this is just a guess
+as I haven't tested this myself.  One thing's for certain though, *Paperless*
 is a **much** better name.
 
 
