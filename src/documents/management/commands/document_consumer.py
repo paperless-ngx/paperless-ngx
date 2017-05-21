@@ -28,6 +28,7 @@ class Command(BaseCommand):
 
         self.file_consumer = None
         self.mail_fetcher = None
+        self.first_iteration = True
 
         BaseCommand.__init__(self, *args, **kwargs)
 
@@ -66,6 +67,9 @@ class Command(BaseCommand):
         self.file_consumer.consume()
 
         # Occasionally fetch mail and store it to be consumed on the next loop
+        # We fetch email when we first start up so that it is not necessary to
+        # wait for 10 minutes after making changes to the config file.
         delta = self.mail_fetcher.last_checked + self.MAIL_DELTA
-        if delta < datetime.datetime.now():
+        if self.first_iteration or delta < datetime.datetime.now():
+            self.first_iteration = False
             self.mail_fetcher.pull()
