@@ -84,7 +84,7 @@ class UploadForm(forms.Form):
 
     def clean(self):
 
-        corresp = self.clened_data.get("correspondent")
+        corresp = self.cleaned_data.get("correspondent")
         title = self.cleaned_data.get("title")
         signature = self.cleaned_data.get("signature")
 
@@ -100,7 +100,7 @@ class UploadForm(forms.Form):
         form do that as well.  Think of it as a poor-man's queue server.
         """
 
-        correspondent = self.clened_data.get("correspondent")
+        correspondent = self.cleaned_data.get("correspondent")
         title = self.cleaned_data.get("title")
         document = self.cleaned_data.get("document")
 
