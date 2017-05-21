@@ -134,6 +134,8 @@ So, with all that in mind, here's what you do to get it running:
    so if you set the subject to ``Correspondent - Title - tag,tag,tag``, you'll
    get what you expect.  Also, you must include the aforementioned secret
    string in every email so the fetcher knows that it's safe to import.
+   Note that Paperless only allows the email title to consist of safe characters
+   to be imported. These consist of alpha-numeric characters and ``-_ ,.'``.
 5. After a few minutes, the consumer will poll your mailbox, pull down the
    message, and place the attachment in the consumption directory with the
    appropriate name.  A few minutes later, the consumer will import it like any
