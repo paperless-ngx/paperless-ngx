@@ -313,11 +313,13 @@ paperless install, referencing the appropriate Python binary. For example:
 If you don't want to make a new user, you can change the ``Group`` and ``User``
 variables accordingly.
 
-Then, you can just tell Systemd as ``root`` (or using ``sudo``) to enable the
-two ``.service`` files::
+Then, as ``root`` (or using ``sudo``) you can just copy the ``.service`` files
+to the Systemd directory and tell it to enable the two services::
 
-    # systemctl enable /path/to/paperless/scripts/paperless-consumer.service
-    # systemctl enable /path/to/paperless/scripts/paperless-webserver.service
+    # cp /path/to/paperless/scripts/paperless-consumer.service /etc/systemd/system/
+    # cp /path/to/paperless/scripts/paperless-webserver.service /etc/systemd/system/
+    # systemctl enable paperless-consumer
+    # systemctl enable paperless-webserver
     # systemctl start paperless-consumer
     # systemctl start paperless-webserver
 
