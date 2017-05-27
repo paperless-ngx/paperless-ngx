@@ -1,7 +1,7 @@
 """paperless URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.9/topics/http/urls/
+    https://docs.djangoproject.com/en/1.10/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -60,3 +60,10 @@ urlpatterns = [
 
 if settings.SHARED_SECRET:
     urlpatterns.insert(0, url(r"^push$", PushView.as_view(), name="push"))
+
+# Text in each page's <h1> (and above login form).
+admin.site.site_header = 'Paperless'
+# Text at the end of each page's <title>.
+admin.site.site_title = 'Paperless'
+# Text at the top of the admin index page.
+admin.site.index_title = 'Paperless administration'
