@@ -219,7 +219,7 @@ class MailFetcher(Loggable):
         if not login[0] == "OK":
             raise MailFetcherError("Can't log into mail: {}".format(login[1]))
 
-        inbox = self._connection.select("INBOX")
+        inbox = self._connection.select(self._inbox)
         if not inbox[0] == "OK":
             raise MailFetcherError("Can't find the inbox: {}".format(inbox[1]))
 

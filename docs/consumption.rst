@@ -121,18 +121,21 @@ So, with all that in mind, here's what you do to get it running:
 
 1. Setup a new email account somewhere, or if you're feeling daring, create a
    folder in an existing email box and note the path to that folder.
-2. In ``settings.py`` set all of the appropriate values in ``MAIL_CONSUMPTION``.
+2. In ``/etc/paperless.conf`` set all of the appropriate values in
+   ``PATHS AND FOLDERS`` and ``SECURITY``.
    If you decided to use a subfolder of an existing account, then make sure you
-   set ``INBOX`` accordingly here.  You also have to set the
-   ``UPLOAD_SHARED_SECRET`` to something you can remember 'cause you'll have to
-   include that in every email you send.
+   set ``PAPERLESS_CONSUME_MAIL_INBOX`` accordingly here.  You also have to set
+   the ``PAPERLESS_SHARED_SECRET`` to something you can remember 'cause you'll
+   have to include that in every email you send.
 3. Restart the :ref:`consumer <utilities-consumer>`.  The consumer will check
-   the configured email account every 10 minutes for something new and pull down
-   whatever it finds.
+   the configured email account at startup and from then on every 10 minutes
+   for something new and pulls down whatever it finds.
 4. Send yourself an email!  Note that the subject is treated as the file name,
    so if you set the subject to ``Correspondent - Title - tag,tag,tag``, you'll
    get what you expect.  Also, you must include the aforementioned secret
    string in every email so the fetcher knows that it's safe to import.
+   Note that Paperless only allows the email title to consist of safe characters
+   to be imported. These consist of alpha-numeric characters and ``-_ ,.'``.
 5. After a few minutes, the consumer will poll your mailbox, pull down the
    message, and place the attachment in the consumption directory with the
    appropriate name.  A few minutes later, the consumer will import it like any

@@ -37,6 +37,10 @@ PAPERLESS_CONSUME_MAIL_PORT=""
 PAPERLESS_CONSUME_MAIL_USER=""
 PAPERLESS_CONSUME_MAIL_PASS=""
 
+# Override the default IMAP inbox here. If not set Paperless defaults to
+# "INBOX".
+#PAPERLESS_CONSUME_MAIL_INBOX=""
+
 
 ###############################################################################
 ####                              Security                                 ####
