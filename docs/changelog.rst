@@ -1,6 +1,12 @@
 Changelog
 #########
 
+* 0.5.1
+  * All of these changes, thanks to `David Martin`_:
+    * Bumped the dependency on pyocr to 0.4.7 so new users can make use of Tesseract 4 if they so prefer (`#226`_).
+    * Fixed a number of issues with the automated mail handler (`#227`_, `#228`_)
+    * Amended the documentation for better handling of systemd service files (`#229`_)
+    * Amended the Django Admin configuration to have nice headers (`#230`_)
 * 0.5.0
   * Support for fuzzy matching in the auto-tagger & auto-correspondent systems
     thanks to `Jake Gysland`_'s patch `#220`_.
@@ -199,6 +205,7 @@ Changelog
 .. _Jake Gysland: https://github.com/jgysland
 .. _Strubbl: https://github.com/strubbl
 .. _CkuT: https://github.com/CkuT
+.. _David Martin: https://github.com/ddddavidmartin
 .. _Paperless Desktop: https://github.com/thomasbrueggemann/paperless-desktop
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
@@ -232,4 +239,9 @@ Changelog
 .. _#212: https://github.com/danielquinn/paperless/pull/212
 .. _#220: https://github.com/danielquinn/paperless/pull/220
 .. _#224: https://github.com/danielquinn/paperless/pull/224
+.. _#226: https://github.com/danielquinn/paperless/pull/226
+.. _#227: https://github.com/danielquinn/paperless/pull/227
+.. _#228: https://github.com/danielquinn/paperless/pull/228
+.. _#229: https://github.com/danielquinn/paperless/pull/229
+.. _#230: https://github.com/danielquinn/paperless/pull/230
 
