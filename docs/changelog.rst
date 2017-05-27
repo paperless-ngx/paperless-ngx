@@ -1,12 +1,6 @@
 Changelog
 #########
 
-* 0.5.1
-  * All of these changes, thanks to `David Martin`_:
-    * Bumped the dependency on pyocr to 0.4.7 so new users can make use of Tesseract 4 if they so prefer (`#226`_).
-    * Fixed a number of issues with the automated mail handler (`#227`_, `#228`_)
-    * Amended the documentation for better handling of systemd service files (`#229`_)
-    * Amended the Django Admin configuration to have nice headers (`#230`_)
 * 0.5.0
   * Support for fuzzy matching in the auto-tagger & auto-correspondent systems
     thanks to `Jake Gysland`_'s patch `#220`_.
@@ -16,6 +10,11 @@ Changelog
   * Updated the import/export scripts to include support for thumbnails.  Big
     thanks to `CkuT`_ for finding this shortcoming and doing the work to get
     it fixed in `#224`_.
+  * All of the following changes are thanks to `David Martin`_:
+    * Bumped the dependency on pyocr to 0.4.7 so new users can make use of Tesseract 4 if they so prefer (`#226`_).
+    * Fixed a number of issues with the automated mail handler (`#227`_, `#228`_)
+    * Amended the documentation for better handling of systemd service files (`#229`_)
+    * Amended the Django Admin configuration to have nice headers (`#230`_)
 
 * 0.4.1
   * Fix for `#206`_ wherein the pluggable parser didn't recognise files with
