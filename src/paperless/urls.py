@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls import url, static, include
 from django.contrib import admin
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.routers import DefaultRouter
 
@@ -40,7 +41,10 @@ urlpatterns = [
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.SHARED_SECRET:
-    urlpatterns.insert(0, url(r"^push$", PushView.as_view(), name="push"))
+    urlpatterns.insert(
+        0,
+        url(r"^push$", csrf_exempt(PushView.as_view()), name="push")
+    )
 
 # Text in each page's <h1> (and above login form).
 admin.site.site_header = 'Paperless'
