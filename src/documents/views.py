@@ -1,5 +1,4 @@
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from paperless.db import GnuPG
@@ -81,15 +80,12 @@ class PushView(SessionOrBasicAuthMixin, FormView):
 
     form_class = UploadForm
 
-    @classmethod
-    def as_view(cls, **kwargs):
-        return csrf_exempt(FormView.as_view(**kwargs))
-
     def form_valid(self, form):
-        return HttpResponse("1")
+        form.save()
+        return HttpResponse("1", status=202)
 
     def form_invalid(self, form):
-        return HttpResponse("0")
+        return HttpResponseBadRequest(str(form.errors))
 
 
 class CorrespondentViewSet(ModelViewSet):
