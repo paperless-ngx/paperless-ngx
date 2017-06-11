@@ -2,7 +2,6 @@ import magic
 import os
 
 from datetime import datetime
-from hashlib import sha256
 from time import mktime
 
 from django import forms
@@ -32,10 +31,9 @@ class UploadForm(forms.Form):
         required=False
     )
     document = forms.FileField()
-    signature = forms.CharField(max_length=256)
 
     def __init__(self, *args, **kwargs):
-        forms.Form.__init__(*args, **kwargs)
+        forms.Form.__init__(self, *args, **kwargs)
         self._file_type = None
 
     def clean_correspondent(self):
@@ -82,17 +80,6 @@ class UploadForm(forms.Form):
 
         return document
 
-    def clean(self):
-
-        corresp = self.cleaned_data.get("correspondent")
-        title = self.cleaned_data.get("title")
-        signature = self.cleaned_data.get("signature")
-
-        if sha256(corresp + title + self.SECRET).hexdigest() == signature:
-            return self.cleaned_data
-
-        raise forms.ValidationError("The signature provided did not validate")
-
     def save(self):
         """
         Since the consumer already does a lot of work, it's easier just to save
@@ -104,7 +91,7 @@ class UploadForm(forms.Form):
         title = self.cleaned_data.get("title")
         document = self.cleaned_data.get("document")
 
-        t = int(mktime(datetime.now()))
+        t = int(mktime(datetime.now().timetuple()))
         file_name = os.path.join(
             Consumer.CONSUME,
             "{} - {}.{}".format(correspondent, title, self._file_type)
