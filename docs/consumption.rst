@@ -147,46 +147,83 @@ So, with all that in mind, here's what you do to get it running:
 HTTP POST
 =========
 
-You can also submit a document via HTTP POST.  It doesn't do tags yet, and the
-URL schema isn't concrete, but it's a start.
-
-To push your document to Paperless, send an HTTP POST to the server with the
-following name/value pairs:
+You can also submit a document via HTTP POST, so long as you do so after
+authenticating.  To push your document to Paperless, send an HTTP POST to the
+server with the following name/value pairs:
 
 * ``correspondent``: The name of the document's correspondent.  Note that there
   are restrictions on what characters you can use here.  Specifically,
-  alphanumeric characters, `-`, `,`, `.`, and `'` are ok, everything else it
+  alphanumeric characters, `-`, `,`, `.`, and `'` are ok, everything else is
   out.  You also can't use the sequence ` - ` (space, dash, space).
 * ``title``: The title of the document.  The rules for characters is the same
   here as the correspondent.
-* ``signature``: For security reasons, we have the correspondent send a
-  signature using a "shared secret" method to make sure that random strangers
-  don't start uploading stuff to your server.  The means of generating this
-  signature is defined below.
+* ``document``: The file you're uploading
 
 Specify ``enctype="multipart/form-data"``, and then POST your file with::
 
     Content-Disposition: form-data; name="document"; filename="whatever.pdf"
 
+An example of this in HTML is a typical form:
 
-.. _consumption-http-signature:
+.. code:: html
 
-Generating the Signature
-------------------------
+    <form method="post" enctype="multipart/form-data">
+        <input type="text" name="correspondent" value="My Correspondent" />
+        <input type="text" name="title" value="My Title" />
+        <input type="file" name="document" />
+        <input type="submit" name="go" value="Do the thing" />
+    </form>
 
-Generating a signature based a shared secret is pretty simple: define a secret,
-and store it on the server and the client.  Then use that secret, along with
-the text you want to verify to generate a string that you can use for
-verification.
-
-In the case of Paperless, you configure the server with the secret by setting
-``UPLOAD_SHARED_SECRET``.  Then on your client, you generate your signature by
-concatenating the correspondent, title, and the secret, and then using sha256
-to generate a hexdigest.
-
-If you're using Python, this is what that looks like:
+But a potentially more useful way to do this would be in Python.  Here we use
+the requests library to handle basic authentication and to send the POST data
+to the URL.
 
 .. code:: python
 
+    import os
+
     from hashlib import sha256
-    signature = sha256(correspondent + title + secret).hexdigest()
+
+    import requests
+    from requests.auth import HTTPBasicAuth
+
+    # You authenticate via BasicAuth or with a session id.
+    # We use BasicAuth here
+    username = "my-username"
+    password = "my-super-secret-password"
+
+    # Where you have Paperless installed and listening
+    url = "http://localhost:8000/push"
+
+    # Document metadata
+    correspondent = "Test Correspondent"
+    title = "Test Title"
+
+    # The local file you want to push
+    path = "/path/to/some/directory/my-document.pdf"
+
+
+    with open(path, "rb") as f:
+
+        response = requests.post(
+            url=url,
+            data={"title": title,  "correspondent": correspondent},
+            files={"document": (os.path.basename(path), f, "application/pdf")},
+            auth=HTTPBasicAuth(username, password),
+            allow_redirects=False
+        )
+
+        if response.status_code == 202:
+
+            # Everything worked out ok
+            print("Upload successful")
+
+        else:
+
+            # If you don't get a 202, it's probably because your credentials
+            # are wrong or something.  This will give you a rough idea of what
+            # happened.
+
+            print("We got HTTP status code: {}".format(response.status_code))
+            for k, v in response.headers.items():
+                print("{}: {}".format(k, v))
