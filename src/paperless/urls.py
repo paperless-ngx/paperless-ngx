@@ -34,17 +34,14 @@ urlpatterns = [
         name="fetch"
     ),
 
+    # File uploads
+    url(r"^push$", csrf_exempt(PushView.as_view()), name="push"),
+
     # The Django admin
     url(r"admin/", admin.site.urls),
     url(r"", admin.site.urls),  # This is going away
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-if settings.SHARED_SECRET:
-    urlpatterns.insert(
-        0,
-        url(r"^push$", csrf_exempt(PushView.as_view()), name="push")
-    )
 
 # Text in each page's <h1> (and above login form).
 admin.site.site_header = 'Paperless'

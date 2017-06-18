@@ -1,6 +1,17 @@
 Changelog
 #########
 
+* 0.6.0
+  * Abandon the shared-secret trick we were using for the POST API in favour
+    of BasicAuth or Django session.
+  * Fix the POST API so it actually works.  `#236`_
+  * **Breaking change**: We've dropped the use of ``PAPERLESS_SHARED_SECRET``
+    as it was being used both for the API (now replaced with a normal auth)
+    and form email polling.  Now that we're only using it for email, this
+    variable has been renamed to ``PAPERLESS_EMAIL_SECRET``.  The old value
+    will still work for a while, but you should change your config if you've
+    been using the email polling feature.  Thanks to `Joshua Gilman`_ for all
+    the help with this feature.
 * 0.5.0
   * Support for fuzzy matching in the auto-tagger & auto-correspondent systems
     thanks to `Jake Gysland`_'s patch `#220`_.
@@ -11,7 +22,8 @@ Changelog
     thanks to `CkuT`_ for finding this shortcoming and doing the work to get
     it fixed in `#224`_.
   * All of the following changes are thanks to `David Martin`_:
-    * Bumped the dependency on pyocr to 0.4.7 so new users can make use of Tesseract 4 if they so prefer (`#226`_).
+    * Bumped the dependency on pyocr to 0.4.7 so new users can make use of
+    Tesseract 4 if they so prefer (`#226`_).
     * Fixed a number of issues with the automated mail handler (`#227`_, `#228`_)
     * Amended the documentation for better handling of systemd service files (`#229`_)
     * Amended the Django Admin configuration to have nice headers (`#230`_)
@@ -206,6 +218,7 @@ Changelog
 .. _CkuT: https://github.com/CkuT
 .. _David Martin: https://github.com/ddddavidmartin
 .. _Paperless Desktop: https://github.com/thomasbrueggemann/paperless-desktop
+.. _Joshua Gilman: https://github.com/jmgilman
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -243,4 +256,5 @@ Changelog
 .. _#228: https://github.com/danielquinn/paperless/pull/228
 .. _#229: https://github.com/danielquinn/paperless/pull/229
 .. _#230: https://github.com/danielquinn/paperless/pull/230
+.. _#236: https://github.com/danielquinn/paperless/issues/236
 

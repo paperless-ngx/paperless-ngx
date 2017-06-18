@@ -237,20 +237,6 @@ CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 # slowly, you may want to use a higher value than the default.
 CONSUMER_LOOP_TIME = int(os.getenv("PAPERLESS_CONSUMER_LOOP_TIME", 10))
 
-# If you want to use IMAP mail consumption, populate this with useful values.
-# If you leave HOST set to None, we assume you're not going to use this
-# feature.
-MAIL_CONSUMPTION = {
-    "HOST": os.getenv("PAPERLESS_CONSUME_MAIL_HOST"),
-    "PORT": os.getenv("PAPERLESS_CONSUME_MAIL_PORT"),
-    "USERNAME": os.getenv("PAPERLESS_CONSUME_MAIL_USER"),
-    "PASSWORD": os.getenv("PAPERLESS_CONSUME_MAIL_PASS"),
-    # If True, use SSL/TLS to connect
-    "USE_SSL": os.getenv("PAPERLESS_CONSUME_MAIL_USE_SSL", "y").lower() == "y",
-    # The name of the inbox on the server
-    "INBOX": os.getenv("PAPERLESS_CONSUME_MAIL_INBOX", "INBOX")
-}
-
 # This is used to encrypt the original documents and decrypt them later when
 # you want to download them.  Set it and change the permissions on this file to
 # 0600, or set it to `None` and you'll be prompted for the passphrase at
@@ -259,11 +245,6 @@ MAIL_CONSUMPTION = {
 # with GPG, including an interesting case where it may "encrypt" zero-byte
 # files.
 PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
-
-# If you intend to use the "API" to push files into the consumer, you'll need
-# to provide a shared secret here.  Leaving this as the default will disable
-# the API.
-SHARED_SECRET = os.getenv("PAPERLESS_SHARED_SECRET", "")
 
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
