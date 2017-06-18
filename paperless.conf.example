@@ -5,7 +5,7 @@
 
 
 ###############################################################################
-####                       Paths  and folders                              ####
+####                         Paths & Folders                               ####
 ###############################################################################
 
 # This where your documents should go to be consumed.  Make sure that it exists
@@ -39,7 +39,11 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 
 # Override the default IMAP inbox here. If not set Paperless defaults to
 # "INBOX".
-#PAPERLESS_CONSUME_MAIL_INBOX=""
+#PAPERLESS_CONSUME_MAIL_INBOX="INBOX"
+
+# Any email sent to the target account that does not contain this text will be
+# ignored.
+PAPERLESS_EMAIL_SECRET=""
 
 
 ###############################################################################
@@ -59,11 +63,6 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 # can't properly export documents that were encrypted with an old passphrase if
 # you've since changed it to a new one.
 PAPERLESS_PASSPHRASE="secret"
-
-
-# If you intend to consume documents either via HTTP POST or by email, you must
-# have a shared secret here.
-PAPERLESS_SHARED_SECRET=""
 
 
 # The secret key has a default that should be fine so long as you're hosting
