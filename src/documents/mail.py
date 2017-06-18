@@ -43,7 +43,10 @@ class Message(Loggable):
     and n attachments, and that we don't care about the message body.
     """
 
-    SECRET = settings.SHARED_SECRET
+    SECRET = os.getenv(
+        "PAPERLESS_EMAIL_SECRET",
+        os.getenv("PAPERLESS_SHARED_SECRET")  # TODO: Remove after 2017/09
+    )
 
     def __init__(self, data, group=None):
         """
@@ -153,15 +156,16 @@ class MailFetcher(Loggable):
         Loggable.__init__(self)
 
         self._connection = None
-        self._host = settings.MAIL_CONSUMPTION["HOST"]
-        self._port = settings.MAIL_CONSUMPTION["PORT"]
-        self._username = settings.MAIL_CONSUMPTION["USERNAME"]
-        self._password = settings.MAIL_CONSUMPTION["PASSWORD"]
-        self._inbox = settings.MAIL_CONSUMPTION["INBOX"]
+        self._host = os.getenv("PAPERLESS_CONSUME_MAIL_HOST")
+        self._port = os.getenv("PAPERLESS_CONSUME_MAIL_PORT")
+        self._username = os.getenv("PAPERLESS_CONSUME_MAIL_USER")
+        self._password = os.getenv("PAPERLESS_CONSUME_MAIL_PASS")
+        self._inbox = os.getenv("PAPERLESS_CONSUME_MAIL_INBOX", "INBOX")
 
         self._enabled = bool(self._host)
 
         self.last_checked = datetime.datetime.now()
+        print(self._connection, self._host, self._port, self._username, self._password, self._inbox, self._enabled, self.last_checked)
 
     def pull(self):
         """

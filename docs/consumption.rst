@@ -125,7 +125,7 @@ So, with all that in mind, here's what you do to get it running:
    ``PATHS AND FOLDERS`` and ``SECURITY``.
    If you decided to use a subfolder of an existing account, then make sure you
    set ``PAPERLESS_CONSUME_MAIL_INBOX`` accordingly here.  You also have to set
-   the ``PAPERLESS_SHARED_SECRET`` to something you can remember 'cause you'll
+   the ``PAPERLESS_EMAIL_SECRET`` to something you can remember 'cause you'll
    have to include that in every email you send.
 3. Restart the :ref:`consumer <utilities-consumer>`.  The consumer will check
    the configured email account at startup and from then on every 10 minutes
