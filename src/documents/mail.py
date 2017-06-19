@@ -165,7 +165,6 @@ class MailFetcher(Loggable):
         self._enabled = bool(self._host)
 
         self.last_checked = datetime.datetime.now()
-        print(self._connection, self._host, self._port, self._username, self._password, self._inbox, self._enabled, self.last_checked)
 
     def pull(self):
         """
