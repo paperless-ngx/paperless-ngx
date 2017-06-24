@@ -156,7 +156,9 @@ PAPERLESS_PASSPHRASE="secret"
 ####                            Interface                                  ####
 ###############################################################################
 
-# Override the default UTC time zone here
+# Override the default UTC time zone here.
+# See https://docs.djangoproject.com/en/1.10/ref/settings/#std:setting-TIME_ZONE
+# for details on how to set it.
 #PAPERLESS_TIME_ZONE=UTC
 
 
