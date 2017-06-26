@@ -394,7 +394,10 @@ Using a Real Webserver
 The default is to use Django's development server, as that's easy and does the
 job well enough on a home network.  However, if you want to do things right,
 it's probably a good idea to use a webserver capable of handling more than one
-thread.
+thread. You will also have to let the webserver serve the static files (CSS,
+JavaScript) from the directory configured in ``PAPERLESS_STATICDIR``. For that,
+you need to run ``./manage.py collectstatic`` in the ``src`` directory.  The
+default static files directory is ``../static``.
 
 Apache
 ~~~~~~
