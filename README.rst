@@ -140,5 +140,5 @@ work and they need the money a lot more than I do.
    :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 .. |Travis| image:: https://travis-ci.org/danielquinn/paperless.svg?branch=master
    :target: https://travis-ci.org/danielquinn/paperless
-.. |Dependencies| image:: https://www.versioneye.com/user/projects/57b33b81d9f1b00016faa500/badge.svg?style=flat-square
+.. |Dependencies| image:: https://www.versioneye.com/user/projects/57b33b81d9f1b00016faa500/badge.svg
    :target: https://www.versioneye.com/user/projects/57b33b81d9f1b00016faa500
