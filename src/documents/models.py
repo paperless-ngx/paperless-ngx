@@ -316,45 +316,45 @@ class FileInfo(object):
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*) - "
             r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
             flags=re.IGNORECASE
         )),
         ("created-title-tags", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<title>.*) - "
             r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
             flags=re.IGNORECASE
         )),
         ("created-correspondent-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
             flags=re.IGNORECASE
         )),
         ("created-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<title>.*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
             flags=re.IGNORECASE
         )),
         ("correspondent-title-tags", re.compile(
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*) - "
             r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
             flags=re.IGNORECASE
         )),
         ("correspondent-title", re.compile(
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*)?"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
             flags=re.IGNORECASE
         )),
         ("title", re.compile(
             r"(?P<title>.*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff)$",
+            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
             flags=re.IGNORECASE
         ))
     ])
@@ -397,6 +397,8 @@ class FileInfo(object):
         r = extension.lower()
         if r == "jpeg":
             return "jpg"
+        if r == "tif":
+            return "tiff"
         return r
 
     @classmethod
