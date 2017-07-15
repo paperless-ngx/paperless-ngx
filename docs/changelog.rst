@@ -2,6 +2,11 @@ Changelog
 #########
 
 * 0.7.0
+  * **Potentially breaking change**: As per `#235`_, Paperless will no longer
+    automatically delete documents attached to correspondents when those
+    correspondents are themselves deleted.  This was Django's default
+    behaviour, but didn't make much sense in Paperless' case.  Thanks to
+    `Thomas Brueggemann`_ and `David Martin`_ for their input on this one.
   * Fix for `#232`_ wherein Paperless wasn't recognising ``.tif`` files
     properly.  Thanks to `ayounggun`_ for reporting this one and to
     `Kusti Skytén`_ for posting the correct solution in the Github issue.
@@ -264,5 +269,5 @@ Changelog
 .. _#229: https://github.com/danielquinn/paperless/pull/229
 .. _#230: https://github.com/danielquinn/paperless/pull/230
 .. _#232: https://github.com/danielquinn/paperless/issues/232
+.. _#235: https://github.com/danielquinn/paperless/issues/235
 .. _#236: https://github.com/danielquinn/paperless/issues/236
-
