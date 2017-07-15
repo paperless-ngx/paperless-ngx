@@ -172,7 +172,12 @@ class Document(models.Model):
     TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,)
 
     correspondent = models.ForeignKey(
-        Correspondent, blank=True, null=True, related_name="documents")
+        Correspondent,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL
+    )
 
     title = models.CharField(max_length=128, blank=True, db_index=True)
 
