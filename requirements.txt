@@ -16,6 +16,7 @@ pytz>=2016.10
 gunicorn==19.6.0
 
 # For the tests
+factory-boy
 pytest
 pytest-django
 pytest-sugar
