@@ -58,9 +58,9 @@ class TestAttributes(TestCase):
 
     TAGS = ("tag1", "tag2", "tag3")
     EXTENSIONS = (
-        "pdf", "png", "jpg", "jpeg", "gif",
-        "PDF", "PNG", "JPG", "JPEG", "GIF",
-        "PdF", "PnG", "JpG", "JPeG", "GiF",
+        "pdf", "png", "jpg", "jpeg", "gif", "tiff", "tif",
+        "PDF", "PNG", "JPG", "JPEG", "GIF", "TIFF", "TIF",
+        "PdF", "PnG", "JpG", "JPeG", "GiF", "TiFf", "TiF",
     )
 
     def _test_guess_attributes_from_name(self, path, sender, title, tags):
@@ -80,6 +80,8 @@ class TestAttributes(TestCase):
             self.assertEqual(tuple([t.slug for t in file_info.tags]), tags, f)
             if extension.lower() == "jpeg":
                 self.assertEqual(file_info.extension, "jpg", f)
+            elif extension.lower() == "tif":
+                self.assertEqual(file_info.extension, "tiff", f)
             else:
                 self.assertEqual(file_info.extension, extension.lower(), f)
 

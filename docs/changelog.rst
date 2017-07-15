@@ -1,6 +1,11 @@
 Changelog
 #########
 
+* 0.7.0
+  * Fix for `#232`_ wherein Paperless wasn't recognising ``.tif`` files
+    properly.  Thanks to `ayounggun`_ for reporting this one and to
+    `Kusti Skytén`_ for posting the correct solution in the Github issue.
+
 * 0.6.0
   * Abandon the shared-secret trick we were using for the POST API in favour
     of BasicAuth or Django session.
@@ -219,6 +224,8 @@ Changelog
 .. _David Martin: https://github.com/ddddavidmartin
 .. _Paperless Desktop: https://github.com/thomasbrueggemann/paperless-desktop
 .. _Joshua Gilman: https://github.com/jmgilman
+.. _ayounggun: https://github.com/ayounggun
+.. _Kusti Skytén: https://github.com/kskyten
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -256,5 +263,6 @@ Changelog
 .. _#228: https://github.com/danielquinn/paperless/pull/228
 .. _#229: https://github.com/danielquinn/paperless/pull/229
 .. _#230: https://github.com/danielquinn/paperless/pull/230
+.. _#232: https://github.com/danielquinn/paperless/issues/232
 .. _#236: https://github.com/danielquinn/paperless/issues/236
 
