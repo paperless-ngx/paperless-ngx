@@ -259,6 +259,7 @@ CONSUMER_LOOP_TIME = int(os.getenv("PAPERLESS_CONSUMER_LOOP_TIME", 10))
 # with GPG, including an interesting case where it may "encrypt" zero-byte
 # files.
 PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
+ENABLE_ENCRYPTION = os.getenv('DISABLE_ENCRYPTION') != 'true'
 
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
