@@ -11,7 +11,7 @@ if __name__ == "__main__":
     # The runserver and consumer need to have access to the passphrase, so it
     # must be entered at start time to keep it safe.
     if "runserver" in sys.argv or "document_consumer" in sys.argv:
-        if not settings.PASSPHRASE:
+        if(settings.ENABLE_ENCRYPTION and not settings.PASSPHRASE):
             settings.PASSPHRASE = input(
                 "settings.PASSPHRASE is unset.  Input passphrase: ")
 
