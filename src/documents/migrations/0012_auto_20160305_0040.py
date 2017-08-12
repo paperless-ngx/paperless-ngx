@@ -38,6 +38,9 @@ class GnuPG(object):
 
 def move_documents_and_create_thumbnails(apps, schema_editor):
 
+    os.makedirs(os.path.join(settings.MEDIA_ROOT, "documents", "originals"), exist_ok=True)
+    os.makedirs(os.path.join(settings.MEDIA_ROOT, "documents", "thumbnails"), exist_ok=True)
+
     documents = os.listdir(os.path.join(settings.MEDIA_ROOT, "documents"))
 
     if set(documents) == {"originals", "thumbnails"}:
