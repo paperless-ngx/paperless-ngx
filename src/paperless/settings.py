@@ -47,7 +47,11 @@ _allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
 if _allowed_hosts:
     ALLOWED_HOSTS = _allowed_hosts.split(",")
 
-
+FORCE_SCRIPT_NAME = None
+_force_script_name = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
+if _force_script_name:
+    FORCE_SCRIPT_NAME = _force_script_name
+    
 # Application definition
 
 INSTALLED_APPS = [
