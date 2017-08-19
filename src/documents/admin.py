@@ -70,9 +70,13 @@ class DocumentAdmin(CommonAdmin):
     created_.short_description = "Created"
 
     def thumbnail(self, obj):
+        if settings.FORCE_SCRIPT_NAME:
+            _src="{}/fetch/thumb/{}".format(settings.FORCE_SCRIPT_NAME,obj.id)
+        else:
+            _src="/fetch/thumb/{}".format(obj.id)
         png_img = self._html_tag(
             "img",
-            src="/fetch/thumb/{}".format(obj.id),
+            src=_src,
             width=180,
             alt="Thumbnail of {}".format(obj.file_name),
             title=obj.file_name
