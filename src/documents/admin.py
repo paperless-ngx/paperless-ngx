@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
@@ -32,6 +34,50 @@ class MonthListFilter(admin.SimpleListFilter):
         return queryset.filter(created__year=year, created__month=month)
 
 
+class FinancialYearFilter(admin.SimpleListFilter):
+
+    title = "Financial Year"
+    parameter_name = "fy"
+
+    def _fy_start(self, year):
+        """Return date of the start of financial year for the given year."""
+        fy_start = "{}-07-01".format(str(year))
+        return datetime.strptime(fy_start, "%Y-%m-%d").date()
+
+    def _fy_end(self, year):
+        """Return date of the end of financial year for the given year."""
+        fy_end = "{}-06-30".format(str(year))
+        return datetime.strptime(fy_end, "%Y-%m-%d").date()
+
+    def _determine_fy(self, date):
+        """Return a (query, display) financial year tuple of the given date."""
+        fy_start = self._fy_start(date.year)
+
+        if date.date() >= fy_start:
+            query = "{}-{}".format(date.year, date.year + 1)
+        else:
+            query = "{}-{}".format(date.year - 1, date.year)
+
+        # To keep it simple we use the same String for both query parameters
+        # and the display.
+        return (query, query)
+
+    def lookups(self, request, model_admin):
+        r = []
+        for document in Document.objects.all():
+            r.append(self._determine_fy(document.created))
+
+        return sorted(set(r), key=lambda x: x[0], reverse=True)
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return None
+
+        start, end = self.value().split("-")
+        return queryset.filter(created__gte=self._fy_start(start),
+                               created__lte=self._fy_end(end))
+
+
 class CommonAdmin(admin.ModelAdmin):
     list_per_page = settings.PAPERLESS_LIST_PER_PAGE
 
@@ -59,7 +105,7 @@ class DocumentAdmin(CommonAdmin):
 
     search_fields = ("correspondent__name", "title", "content")
     list_display = ("title", "created", "thumbnail", "correspondent", "tags_")
-    list_filter = ("tags", "correspondent", MonthListFilter)
+    list_filter = ("tags", "correspondent", FinancialYearFilter, MonthListFilter)
     ordering = ["-created", "correspondent"]
 
     def has_add_permission(self, request):
