@@ -41,12 +41,14 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
     def _fy_start(self, year):
         """Return date of the start of financial year for the given year."""
-        fy_start = "{}-07-01".format(str(year))
+        assert settings.FY_START
+        fy_start = "{}-{}".format(str(year), settings.FY_START)
         return datetime.strptime(fy_start, "%Y-%m-%d").date()
 
     def _fy_end(self, year):
         """Return date of the end of financial year for the given year."""
-        fy_end = "{}-06-30".format(str(year))
+        assert settings.FY_END
+        fy_end = "{}-{}".format(str(year), settings.FY_END)
         return datetime.strptime(fy_end, "%Y-%m-%d").date()
 
     def _determine_fy(self, date):
@@ -105,7 +107,11 @@ class DocumentAdmin(CommonAdmin):
 
     search_fields = ("correspondent__name", "title", "content")
     list_display = ("title", "created", "thumbnail", "correspondent", "tags_")
-    list_filter = ("tags", "correspondent", FinancialYearFilter, MonthListFilter)
+    list_filter = ("tags", "correspondent")
+    if settings.FY_START and settings.FY_END:
+        list_filter += (FinancialYearFilter,)
+    list_filter += (MonthListFilter,)
+
     ordering = ["-created", "correspondent"]
 
     def has_add_permission(self, request):
