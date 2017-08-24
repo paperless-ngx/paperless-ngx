@@ -162,6 +162,12 @@ PAPERLESS_PASSPHRASE="secret"
 #PAPERLESS_TIME_ZONE=UTC
 
 
+# If set, Paperless will show document filters per financial year.
+# The dates must be in the format "mm-dd", for example "07-15" for July 15.
+#PAPERLESS_FINANCIAL_YEAR_START="mm-dd"
+#PAPERLESS_FINANCIAL_YEAR_END="mm-dd"
+
+
 # The number of items on each page in the web UI.  This value must be a
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
