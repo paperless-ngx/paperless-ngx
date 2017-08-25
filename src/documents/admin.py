@@ -41,13 +41,11 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
     def _fy_start(self, year):
         """Return date of the start of financial year for the given year."""
-        assert settings.FY_START
         fy_start = "{}-{}".format(str(year), settings.FY_START)
         return datetime.strptime(fy_start, "%Y-%m-%d").date()
 
     def _fy_end(self, year):
         """Return date of the end of financial year for the given year."""
-        assert settings.FY_END
         fy_end = "{}-{}".format(str(year), settings.FY_END)
         return datetime.strptime(fy_end, "%Y-%m-%d").date()
 
@@ -65,6 +63,9 @@ class FinancialYearFilter(admin.SimpleListFilter):
         return (query, query)
 
     def lookups(self, request, model_admin):
+        if not settings.FY_START or not settings.FY_END:
+            return None
+
         r = []
         for document in Document.objects.all():
             r.append(self._determine_fy(document.created))
@@ -72,7 +73,7 @@ class FinancialYearFilter(admin.SimpleListFilter):
         return sorted(set(r), key=lambda x: x[0], reverse=True)
 
     def queryset(self, request, queryset):
-        if not self.value():
+        if not self.value() or not settings.FY_START or not settings.FY_END:
             return None
 
         start, end = self.value().split("-")
@@ -107,10 +108,8 @@ class DocumentAdmin(CommonAdmin):
 
     search_fields = ("correspondent__name", "title", "content")
     list_display = ("title", "created", "thumbnail", "correspondent", "tags_")
-    list_filter = ("tags", "correspondent")
-    if settings.FY_START and settings.FY_END:
-        list_filter += (FinancialYearFilter,)
-    list_filter += (MonthListFilter,)
+    list_filter = ("tags", "correspondent", FinancialYearFilter,
+                   MonthListFilter)
 
     ordering = ["-created", "correspondent"]
 
