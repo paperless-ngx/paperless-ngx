@@ -49,18 +49,33 @@ class FinancialYearFilter(admin.SimpleListFilter):
         fy_end = "{}-{}".format(str(year), settings.FY_END)
         return datetime.strptime(fy_end, "%Y-%m-%d").date()
 
+    def _fy_does_wrap(self):
+        """Return whether the financial year spans across two years."""
+        start = "{}".format(settings.FY_START)
+        start = datetime.strptime(start, "%m-%d").date()
+        end = "{}".format(settings.FY_END)
+        end = datetime.strptime(end, "%m-%d").date()
+
+        return end < start
+
     def _determine_fy(self, date):
         """Return a (query, display) financial year tuple of the given date."""
         fy_start = self._fy_start(date.year)
 
-        if date.date() >= fy_start:
-            query = "{}-{}".format(date.year, date.year + 1)
-        else:
-            query = "{}-{}".format(date.year - 1, date.year)
+        if self._fy_does_wrap():
+            if date.date() >= fy_start:
+                query = "{}-{}".format(date.year, date.year + 1)
+            else:
+                query = "{}-{}".format(date.year - 1, date.year)
 
-        # To keep it simple we use the same String for both query parameters
-        # and the display.
-        return (query, query)
+            # To keep it simple we use the same string for both
+            # query parameter and the display.
+            return (query, query)
+
+        else:
+            query = "{0}-{0}".format(date.year)
+            display = "{}".format(date.year)
+            return (query, display)
 
     def lookups(self, request, model_admin):
         if not settings.FY_START or not settings.FY_END:
