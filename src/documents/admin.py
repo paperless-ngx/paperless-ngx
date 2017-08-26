@@ -38,6 +38,7 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
     title = "Financial Year"
     parameter_name = "fy"
+    _fy_wraps = None
 
     def _fy_start(self, year):
         """Return date of the start of financial year for the given year."""
@@ -51,12 +52,14 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
     def _fy_does_wrap(self):
         """Return whether the financial year spans across two years."""
-        start = "{}".format(settings.FY_START)
-        start = datetime.strptime(start, "%m-%d").date()
-        end = "{}".format(settings.FY_END)
-        end = datetime.strptime(end, "%m-%d").date()
+        if self._fy_wraps is None:
+            start = "{}".format(settings.FY_START)
+            start = datetime.strptime(start, "%m-%d").date()
+            end = "{}".format(settings.FY_END)
+            end = datetime.strptime(end, "%m-%d").date()
+            self._fy_wraps = end < start
 
-        return end < start
+        return self._fy_wraps
 
     def _determine_fy(self, date):
         """Return a (query, display) financial year tuple of the given date."""
