@@ -63,9 +63,9 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
     def _determine_fy(self, date):
         """Return a (query, display) financial year tuple of the given date."""
-        fy_start = self._fy_start(date.year)
-
         if self._fy_does_wrap():
+            fy_start = self._fy_start(date.year)
+
             if date.date() >= fy_start:
                 query = "{}-{}".format(date.year, date.year + 1)
             else:
