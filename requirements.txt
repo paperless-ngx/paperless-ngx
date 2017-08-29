@@ -13,7 +13,7 @@ python-dateutil>=2.6.0
 python-dotenv>=0.6.2
 python-gnupg>=0.3.9
 pytz>=2016.10
-gunicorn==19.6.0
+gunicorn==19.7.1
 
 # For the tests
 factory-boy
