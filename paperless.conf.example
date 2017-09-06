@@ -80,6 +80,11 @@ PAPERLESS_PASSPHRASE="secret"
 # as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 #PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
 
+# To host paperless under a subpath url like example.com/paperless you set
+# this value to /paperless. No trailing slash!
+#
+# https://docs.djangoproject.com/en/1.11/ref/settings/#force-script-name
+#PAPERLESS_FORCE_SCRIPT_NAME=""
 
 ###############################################################################
 ####                          Software Tweaks                              ####
