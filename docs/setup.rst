@@ -575,3 +575,28 @@ If you're using Docker, you can set a restart-policy_ in the
 Docker daemon.
 
 .. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
+
+
+.. _setup-subdirectory
+
+Hosting Paperless in a Subdirectory
+-----------------------------------
+
+Paperless was designed to run off the root of the hosting domain,
+(ie: ``https://example.com/``) but with a few changes, you can configure
+it to run in a subdirectory on your server
+(ie: ``https://example.com/paperless/``).
+
+Thanks to the efforts of `maphy-psd`_ on `Github`_, running Paperless in a
+subdirectory is now as easy as setting a config variable.  Simply set
+``PAPERLESS_FORCE_SCRIPT_NAME`` in your environment or
+``/etc/paperless.conf`` to the path you want Paperless hosted at, configure
+Nginx/Apache for your needs and you're done.  So, if you want Paperless to live
+at ``https://example.com/arbitrary/path/to/paperless`` then you just set
+``PAPERLESS_FORCE_SCRIPT_NAME`` to ``/arbitrary/path/to/paperless``.  Note the
+leading ``/`` there.
+
+As to how to configure Nginx or Apache for this, that's on you :-)
+
+.. _maphy-psd: https://github.com/maphy-psd
+.. _Github: https://github.com/danielquinn/paperless/pull/255
