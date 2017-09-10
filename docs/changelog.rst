@@ -1,6 +1,11 @@
 Changelog
 #########
 
+* 0.8.0
+  * Paperless can now run in a subdirectory on a host (``/paperless``), rather
+    than always running in the root (``/``) thanks to `maphy-psd`_'s work on
+    `#255`_.
+
 * 0.7.0
   * **Potentially breaking change**: As per `#235`_, Paperless will no longer
     automatically delete documents attached to correspondents when those
@@ -231,6 +236,7 @@ Changelog
 .. _Joshua Gilman: https://github.com/jmgilman
 .. _ayounggun: https://github.com/ayounggun
 .. _Kusti Skytén: https://github.com/kskyten
+.. _maphy-psd: https://github.com/maphy-psd
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -271,3 +277,4 @@ Changelog
 .. _#232: https://github.com/danielquinn/paperless/issues/232
 .. _#235: https://github.com/danielquinn/paperless/issues/235
 .. _#236: https://github.com/danielquinn/paperless/issues/236
+.. _#255: https://github.com/danielquinn/paperless/pull/255 
