@@ -5,7 +5,7 @@ from .parsers import RasterisedDocumentParser
 
 class ConsumerDeclaration(object):
 
-    MATCHING_FILES = re.compile("^.*\.(pdf|jpg|gif|png|tiff?|pnm|bmp)$")
+    MATCHING_FILES = re.compile("^.*\.(pdf|jpe?g|gif|png|tiff?|pnm|bmp)$")
 
     @classmethod
     def handle(cls, sender, **kwargs):
