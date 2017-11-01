@@ -25,16 +25,16 @@ set_permissions() {
           echo "failed."
           echo ""
           echo "Either try to set it on your host-mounted directory"
-          echo "directly, or make sure that the directory has \`o+x\`"
+          echo "directly, or make sure that the directory has \`g+wx\`"
           echo "permissions and the files in it at least \`o+r\`."
       } >&2
-      chmod g+x "${!dir}" || {
+      chmod g+wx "${!dir}" || {
           echo "Changing group permissions of ${cur_dir_name} directory:"
           echo "  ${!dir}"
           echo "failed."
           echo ""
           echo "Either try to set it on your host-mounted directory"
-          echo "directly, or make sure that the directory has \`o+x\`"
+          echo "directly, or make sure that the directory has \`g+wx\`"
           echo "permissions and the files in it at least \`o+r\`."
       } >&2
     done
