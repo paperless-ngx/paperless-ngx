@@ -277,4 +277,4 @@ Changelog
 .. _#232: https://github.com/danielquinn/paperless/issues/232
 .. _#235: https://github.com/danielquinn/paperless/issues/235
 .. _#236: https://github.com/danielquinn/paperless/issues/236
-.. _#255: https://github.com/danielquinn/paperless/pull/255 
+.. _#255: https://github.com/danielquinn/paperless/pull/255
