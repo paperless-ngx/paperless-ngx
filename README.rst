@@ -26,7 +26,8 @@ How it Works
 Paperless does not control your scanner, it only helps you deal with what your
 scanner produces
 
-1. Buy a document scanner like `this one`_ (used by me) or `this other one`_
+1. Buy a document scanner that can write to a place on your network.  If you
+   need some inspiration, have a look at the `scanner recommendations`_ page.
    recommended by another user.
 2. Set it up to "scan to FTP" or something similar. It should be able to push
    scanned images to a server without you having to do anything.  If your
@@ -118,8 +119,7 @@ The thing is, I'm doing ok for money, so I would instead ask you to donate to
 the `United Nations High Commissioner for Refugees`_.  They're doing important
 work and they need the money a lot more than I do.
 
-.. _this one: http://www.brother.ca/en-CA/Scanners/11/ProductDetail/ADS1500W?ProductDetail=productdetail
-.. _this other one: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
+.. _scanner recommendations: https://paperless.readthedocs.io/en/latest/scanners.html
 .. _ImageMagick: http://imagemagick.org/
 .. _Tesseract: https://github.com/tesseract-ocr
 .. _Unpaper: https://www.flameeyes.eu/projects/unpaper

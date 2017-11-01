@@ -17,8 +17,13 @@ that works right for you based on recommentations from other Paperless users.
 +---------+----------------+-----+-----+-----+----------------+
 | Brother | `MFC-J6930DW`_ | yes |     |     | `ayounggun`_   |
 +---------+----------------+-----+-----+-----+----------------+
+| Fujitsu | `ix500`_       | yes |     | yes | `eonist`_      |
++---------+----------------+-----+-----+-----+----------------+
 
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
+.. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
+
 .. _danielquinn: https://github.com/danielquinn
 .. _ayounggun: https://github.com/ayounggun
+.. _eonist: https://github.com/eonist
