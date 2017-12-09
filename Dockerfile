@@ -1,18 +1,17 @@
-FROM python:3.5
-MAINTAINER Pit Kleyersburg <pitkley@googlemail.com>
+FROM alpine:latest
 
 # Install dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        sudo \
-        tesseract-ocr tesseract-ocr-eng imagemagick ghostscript unpaper \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk --no-cache --update add \
+        python3 python3-dev gcc musl-dev gnupg zlib-dev jpeg-dev libmagic \
+        sudo tesseract-ocr imagemagick ghostscript unpaper
 
-# Install python dependencies
-RUN mkdir -p /usr/src/paperless
+## Install python dependencies
+RUN python3 -m ensurepip && \
+    rm -r /usr/lib/python*/ensurepip && \
+    mkdir -p /usr/src/paperless
 WORKDIR /usr/src/paperless
 COPY requirements.txt /usr/src/paperless/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copy application
 RUN mkdir -p /usr/src/paperless/src
@@ -31,8 +30,8 @@ WORKDIR /usr/src/paperless/src
 RUN ./manage.py migrate
 
 # Create user
-RUN groupadd -g 1000 paperless \
-    && useradd -u 1000 -g 1000 -d /usr/src/paperless paperless \
+RUN addgroup -g 1000 paperless \
+    && adduser -D -u 1000 -G paperless -h /usr/src/paperless paperless \
     && chown -Rh paperless:paperless /usr/src/paperless
 
 # Set export directory
