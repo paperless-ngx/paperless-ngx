@@ -2,8 +2,10 @@ FROM alpine:latest
 
 # Install dependencies
 RUN apk --no-cache --update add \
-        python3 python3-dev gcc musl-dev gnupg zlib-dev jpeg-dev libmagic \
-        sudo tesseract-ocr imagemagick ghostscript unpaper
+        python3 gnupg libmagic bash \
+        sudo tesseract-ocr imagemagick ghostscript unpaper && \
+    apk --no-cache add --virtual .build-dependencies \
+        python3-dev gcc musl-dev zlib-dev jpeg-dev
 
 ## Install python dependencies
 RUN python3 -m ensurepip && \
@@ -46,4 +48,7 @@ RUN chmod 755 /sbin/docker-entrypoint.sh
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/consume", "/export"]
 
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
+
+# Remove build dependencies
+RUN apk del .build-dependencies
 CMD ["--help"]
