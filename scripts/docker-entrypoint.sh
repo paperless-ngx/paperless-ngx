@@ -9,7 +9,7 @@ map_uidgid() {
     USERMAP_UID=${USERMAP_UID:-$USERMAP_ORIG_UID}
     if [[ ${USERMAP_UID} != "${USERMAP_ORIG_UID}" || ${USERMAP_GID} != "${USERMAP_ORIG_GID}" ]]; then
         echo "Mapping UID and GID for paperless:paperless to $USERMAP_UID:$USERMAP_GID"
-        groupmod -g "${USERMAP_GID}" paperless
+        addgroup -g "${USERMAP_GID}" paperless
         sed -i -e "s|:${USERMAP_ORIG_UID}:${USERMAP_GID}:|:${USERMAP_UID}:${USERMAP_GID}:|" /etc/passwd
     fi
 }
@@ -56,25 +56,24 @@ install_languages() {
         return
     fi
 
-    # Update apt-lists
-    apt-get update
-
     # Loop over languages to be installed
     for lang in "${langs[@]}"; do
-        pkg="tesseract-ocr-$lang"
-        if dpkg -s "$pkg" > /dev/null 2>&1; then
+        pkg="tesseract-ocr-data-$lang"
+
+        # English is installed by default
+        if [ "$lang" ==  "eng" ]; then
+            continue
+        fi
+        
+        if apk info -e "$pkg" > /dev/null 2>&1; then
+            continue
+        fi
+        if ! apk info "$pkg" > /dev/null 2>&1; then
             continue
         fi
 
-        if ! apt-cache show "$pkg" > /dev/null 2>&1; then
-            continue
-        fi
-
-        apt-get install "$pkg"
+        apk --no-cache --update add "$pkg"
     done
-
-    # Remove apt lists
-    rm -rf /var/lib/apt/lists/*
 }
 
 
