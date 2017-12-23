@@ -128,11 +128,11 @@ class MatchingModel(models.Model):
         Example:
         '  some random  words "with   quotes  " and   spaces'
             ==>
-        ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
+        ['some', 'random', 'words', 'with\s+quotes', 'and', 'spaces']
         '''
         findterms = re.compile(r'"([^"]+)"|(\S+)').findall
-        normspace = re.compile(r'\s{2,}').sub
-        return [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(self.match)]
+        normspace = re.compile(r'\s+').sub
+        return [normspace(r'\s+', (t[0] or t[1]).strip()) for t in findterms(self.match)]
 
     def save(self, *args, **kwargs):
 

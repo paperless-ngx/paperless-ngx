@@ -16,9 +16,9 @@ class TestMatching(TestCase):
                 matching_algorithm=getattr(klass, algorithm)
             )
             for string in true:
-                self.assertTrue(instance.matches(string))
+                self.assertTrue(instance.matches(string), '"%s" should match "%s" but it does not' % (text, string))
             for string in false:
-                self.assertFalse(instance.matches(string))
+                self.assertFalse(instance.matches(string), '"%s" should not match "%s" but it does' % (text, string))
 
     def test_match_all(self):
 
@@ -54,6 +54,21 @@ class TestMatching(TestCase):
             )
         )
 
+        self._test_matching(
+            'brown fox "lazy dogs"',
+            "MATCH_ALL",
+            (
+                "the quick brown fox jumped over the lazy dogs",
+                "the quick brown fox jumped over the lazy  dogs",
+            ),
+            (
+                "the quick fox jumped over the lazy dogs",
+                "the quick brown wolf jumped over the lazy dogs",
+                "the quick brown fox jumped over the fat dogs",
+                "the quick brown fox jumped over the lazy... dogs",
+            )
+        )
+
     def test_match_any(self):
 
         self._test_matching(
@@ -86,6 +101,18 @@ class TestMatching(TestCase):
             (
                 "I have 123456 in me",
                 "I have 01234567 in me",
+            )
+        )
+
+        self._test_matching(
+            '"brown fox" " lazy  dogs "',
+            "MATCH_ANY",
+            (
+                "the quick brown fox",
+                "jumped over the lazy  dogs.",
+            ),
+            (
+                "the lazy fox jumped over the brown dogs",
             )
         )
 
