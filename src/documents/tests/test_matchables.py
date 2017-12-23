@@ -16,11 +16,15 @@ class TestMatching(TestCase):
                 matching_algorithm=getattr(klass, algorithm)
             )
             for string in true:
-                self.assertTrue(instance.matches(string),
-                    '"%s" should match "%s" but it does not' % (text, string))
+                self.assertTrue(
+                    instance.matches(string),
+                    '"%s" should match "%s" but it does not' % (text, string)
+                )
             for string in false:
-                self.assertFalse(instance.matches(string),
-                    '"%s" should not match "%s" but it does' % (text, string))
+                self.assertFalse(
+                    instance.matches(string),
+                    '"%s" should not match "%s" but it does' % (text, string)
+                )
 
     def test_match_all(self):
 
