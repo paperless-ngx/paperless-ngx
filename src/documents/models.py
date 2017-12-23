@@ -132,7 +132,8 @@ class MatchingModel(models.Model):
         '''
         findterms = re.compile(r'"([^"]+)"|(\S+)').findall
         normspace = re.compile(r'\s+').sub
-        return [normspace(r'\s+', (t[0] or t[1]).strip()) for t in findterms(self.match)]
+        return [normspace(r'\s+', (t[0] or t[1]).strip())
+                for t in findterms(self.match)]
 
     def save(self, *args, **kwargs):
 
