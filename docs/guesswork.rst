@@ -80,6 +80,12 @@ text and matching algorithm.  From the help info there:
     uses a regex to match the PDF.  If you don't know what a regex is, you
     probably don't want this option.
 
+When using the "any" or "all" matching algorithms, you can search for terms that
+consist of multiple words by enclosing them in double quotes. For example, defining
+a match text of ``"Bank of America" BofA`` using the "any" algorithm, will match
+documents that contain either "Bank of America" or "BofA", but will not match
+documents containing "Bank of South America".
+
 Then just save your tag/correspondent and run another document through the
 consumer.  Once complete, you should see the newly-created document,
 automatically tagged with the appropriate data.
