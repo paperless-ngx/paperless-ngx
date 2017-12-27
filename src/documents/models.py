@@ -89,7 +89,7 @@ class MatchingModel(models.Model):
             search_kwargs = {"flags": re.IGNORECASE}
 
         if self.matching_algorithm == self.MATCH_ALL:
-            for word in self.match.split(" "):
+            for word in self._split_match():
                 search_result = re.search(
                     r"\b{}\b".format(word), text, **search_kwargs)
                 if not search_result:
@@ -97,7 +97,7 @@ class MatchingModel(models.Model):
             return True
 
         if self.matching_algorithm == self.MATCH_ANY:
-            for word in self.match.split(" "):
+            for word in self._split_match():
                 if re.search(r"\b{}\b".format(word), text, **search_kwargs):
                     return True
             return False
@@ -120,6 +120,20 @@ class MatchingModel(models.Model):
             return True if fuzz.partial_ratio(match, text) >= 90 else False
 
         raise NotImplementedError("Unsupported matching algorithm")
+
+    def _split_match(self):
+        '''
+        Splits the match to invidual keywords, getting rid of unecessary spaces
+        and grouping quoted words together.
+        Example:
+        '  some random  words "with   quotes  " and   spaces'
+            ==>
+        ['some', 'random', 'words', 'with\s+quotes', 'and', 'spaces']
+        '''
+        findterms = re.compile(r'"([^"]+)"|(\S+)').findall
+        normspace = re.compile(r'\s+').sub
+        return [normspace(r'\s+', (t[0] or t[1]).strip())
+                for t in findterms(self.match)]
 
     def save(self, *args, **kwargs):
 
