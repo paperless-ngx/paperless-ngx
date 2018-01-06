@@ -1,13 +1,17 @@
 from django.conf import settings
-from django.conf.urls import url, static, include
+from django.conf.urls import include, static, url
 from django.contrib import admin
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
 
 from documents.views import (
-    FetchView, PushView,
-    CorrespondentViewSet, TagViewSet, DocumentViewSet, LogViewSet
+    CorrespondentViewSet,
+    DocumentViewSet,
+    FetchView,
+    LogViewSet,
+    PushView,
+    TagViewSet
 )
 from reminders.views import ReminderViewSet
 
