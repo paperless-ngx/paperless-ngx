@@ -1,6 +1,23 @@
 Changelog
 #########
 
+* 1.0.0
+  * Upgrade to Django 1.11.  **You'll need to run
+    ``pip install -r requirements.txt`` to after the usual ``git pull`` to
+    properly update**.
+  * Replace the templatetag-based hack we had for document listing in favour of
+    a slightly less ugly solution in the form of another template tag with less
+    copypasta.
+  * Support for multi-word-matches for auto-tagging thanks to an excellent
+    patch from `ishirav`_ `#277`_.
+  * Fixed a CSS bug reported by `Stefan Hagen`_ that caused an overlapping of
+    the text and checkboxes under some resolutions `#272`_.
+  * Patched the Docker config to force the serving of static files.  Credit for
+    this one goes to `dev-rke`_ via `#248`_.
+  * Fix file permissions during Docker start up thanks to `Pit`_ on `#268`_.
+  * Date fields in the admin are now expressed as HTML5 date fields thanks to
+    `Lukas Winkler`_'s issue `#278`_
+
 * 0.8.0
   * Paperless can now run in a subdirectory on a host (``/paperless``), rather
     than always running in the root (``/``) thanks to `maphy-psd`_'s work on
@@ -237,6 +254,10 @@ Changelog
 .. _ayounggun: https://github.com/ayounggun
 .. _Kusti Skytén: https://github.com/kskyten
 .. _maphy-psd: https://github.com/maphy-psd
+.. _ishirav: https://github.com/ishirav
+.. _Stefan Hagen: https://github.com/xkpd3
+.. _dev-rke: https://github.com/dev-rke
+.. _Lukas Winkler: https://github.com/Findus23
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -278,3 +299,8 @@ Changelog
 .. _#235: https://github.com/danielquinn/paperless/issues/235
 .. _#236: https://github.com/danielquinn/paperless/issues/236
 .. _#255: https://github.com/danielquinn/paperless/pull/255
+.. _#268: https://github.com/danielquinn/paperless/pull/268
+.. _#277: https://github.com/danielquinn/paperless/pull/277
+.. _#272: https://github.com/danielquinn/paperless/issues/272
+.. _#248: https://github.com/danielquinn/paperless/issues/248
+.. _#278: https://github.com/danielquinn/paperless/issues/248
