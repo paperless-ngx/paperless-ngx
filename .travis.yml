@@ -11,7 +11,7 @@ matrix:
         - python: 3.6
           env: TOXENV=py36
         - python: 3.6
-          env: TOXENV=pep8
+          env: TOXENV=pycodestyle
 
 install:
     - pip install --requirement requirements.txt
