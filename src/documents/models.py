@@ -122,17 +122,18 @@ class MatchingModel(models.Model):
         raise NotImplementedError("Unsupported matching algorithm")
 
     def _split_match(self):
-        '''
-        Splits the match to invidual keywords, getting rid of unecessary spaces
-        and grouping quoted words together.
+        """
+        Splits the match to individual keywords, getting rid of unnecessary
+        spaces and grouping quoted words together.
+
         Example:
-        '  some random  words "with   quotes  " and   spaces'
+          '  some random  words "with   quotes  " and   spaces'
             ==>
-        ['some', 'random', 'words', 'with\s+quotes', 'and', 'spaces']
-        '''
+          ["some", "random", "words", "with\s+quotes", "and", "spaces"]
+        """
         findterms = re.compile(r'"([^"]+)"|(\S+)').findall
-        normspace = re.compile(r'\s+').sub
-        return [normspace(r'\s+', (t[0] or t[1]).strip())
+        normspace = re.compile(r"\s+").sub
+        return [normspace(r"\s+", (t[0] or t[1]).strip())
                 for t in findterms(self.match)]
 
     def save(self, *args, **kwargs):
