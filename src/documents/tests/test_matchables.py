@@ -1,6 +1,6 @@
 from random import randint
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from ..models import Correspondent, Document, Tag
 from ..signals import document_consumption_finished
@@ -199,7 +199,8 @@ class TestMatching(TestCase):
         )
 
 
-class TestApplications(TestCase):
+@override_settings(POST_CONSUME_SCRIPT=None)
+class TestDocumentConsumptionFinishedSignal(TestCase):
     """
     We make use of document_consumption_finished, so we should test that it's
     doing what we expect wrt to tag & correspondent matching.
