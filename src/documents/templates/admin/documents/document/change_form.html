@@ -1,0 +1,13 @@
+{% extends 'admin/change_form.html' %}
+
+
+{% block footer %}
+
+	{{ block.super }}
+
+	{# Hack to force Django to make the created date a date input rather than `text` (the default) #}
+	<script>
+		django.jQuery(".field-created input").first().attr("type", "date")
+	</script>
+
+{% endblock footer %}
