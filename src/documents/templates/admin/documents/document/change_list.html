@@ -1,0 +1,12 @@
+{% extends 'admin/change_list.html' %}
+
+
+{% load admin_actions from admin_list%}
+{% load result_list from hacks %}
+
+
+{% block result_list %}
+	{% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+	{% result_list cl %}
+	{% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+{% endblock %}
