@@ -43,7 +43,9 @@ urlpatterns = [
 
     # The Django admin
     url(r"admin/", admin.site.urls),
-    url(r"", admin.site.urls),  # This is going away
+
+    # Catch all redirect back to /admin
+    url(r"", RedirectView.as_view(permanent=True, url="/admin/")),
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
