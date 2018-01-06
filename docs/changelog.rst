@@ -3,7 +3,7 @@ Changelog
 
 * 1.0.0
   * Upgrade to Django 1.11.  **You'll need to run
-    ``pip install -r requirements.txt`` to after the usual ``git pull`` to
+    ``pip install -r requirements.txt`` after the usual ``git pull`` to
     properly update**.
   * Replace the templatetag-based hack we had for document listing in favour of
     a slightly less ugly solution in the form of another template tag with less
