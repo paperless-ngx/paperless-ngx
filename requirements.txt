@@ -21,6 +21,6 @@ pytest
 pytest-django
 pytest-sugar
 pytest-env
-pep8
+pycodestyle
 flake8
 tox
