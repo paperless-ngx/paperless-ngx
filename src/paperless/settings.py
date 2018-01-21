@@ -255,3 +255,6 @@ POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
 PAPERLESS_LIST_PER_PAGE = int(os.getenv("PAPERLESS_LIST_PER_PAGE", 100))
+
+FY_START = os.getenv("PAPERLESS_FINANCIAL_YEAR_START")
+FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
