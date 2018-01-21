@@ -1,6 +1,14 @@
 Changelog
 #########
 
+* 1.1.0
+  * Fix for `#283`_, a redirect bug which broke interactions with
+    paperless-desktop.  Thanks to `chris-aeviator`_ for reporting it.
+  * Addition of an optional new financial year filter, courtesy of
+    `David Martin`_ `#256`_
+  * Fixed a typo in how thumbnails were named in exports `#285`_, courtesy of
+    `Dan Panzarella`_
+
 * 1.0.0
   * Upgrade to Django 1.11.  **You'll need to run
     ``pip install -r requirements.txt`` after the usual ``git pull`` to
@@ -258,6 +266,8 @@ Changelog
 .. _Stefan Hagen: https://github.com/xkpd3
 .. _dev-rke: https://github.com/dev-rke
 .. _Lukas Winkler: https://github.com/Findus23
+.. _chris-aeviator: https://github.com/chris-aeviator
+.. _Dan Panzarella: https://github.com/pzl
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -304,3 +314,6 @@ Changelog
 .. _#272: https://github.com/danielquinn/paperless/issues/272
 .. _#248: https://github.com/danielquinn/paperless/issues/248
 .. _#278: https://github.com/danielquinn/paperless/issues/248
+.. _#283: https://github.com/danielquinn/paperless/issues/283
+.. _#256: https://github.com/danielquinn/paperless/pull/256
+.. _#285: https://github.com/danielquinn/paperless/pull/285
