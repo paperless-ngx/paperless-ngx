@@ -64,7 +64,7 @@ class Command(Renderable, BaseCommand):
 
             file_target = os.path.join(self.target, document.file_name)
 
-            thumbnail_name = document.file_name + "-tumbnail.png"
+            thumbnail_name = document.file_name + "-thumbnail.png"
             thumbnail_target = os.path.join(self.target, thumbnail_name)
 
             document_dict[EXPORTER_FILE_NAME] = document.file_name
