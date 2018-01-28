@@ -35,6 +35,12 @@ class DocumentParser(object):
         """
         raise NotImplementedError()
 
+    def get_date(self):
+        """
+        Returns the date of the document.
+        """
+        raise NotImplementedError()
+
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
             "group": self.logging_group
