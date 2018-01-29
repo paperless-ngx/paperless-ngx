@@ -175,7 +175,7 @@ Docker Method
    modified versions of the configuration files.
 4. Modify ``docker-compose.yml`` to your preferences, following the
    instructions in comments in the file. The only change that is a hard
-   requirement is to specify where the consumption directory should mount. [#docker-compose]_
+   requirement is to specify where the consumption directory should mount. _. [#docker-compose.yml]_
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
    ``PAPERLESS_PASSPHRASE``
@@ -288,9 +288,9 @@ Docker Method
    simplifies deployment immensely. If you know your way around Docker, feel
    free to tinker around without using compose!
 
-.. [#docker-compose] If you're upgrading your docker-compse images from version
-   1.1.0 or earlier, you might need to change in the ``docker-compose.yml` 
-   file the ``image: pitkley/paperless`` in both the ``webserver`` and ``consumer``
+.. [#docker-compose.yml] If you're upgrading your docker-compse images from version
+   1.1.0 or earlier, you might need to change in the ``docker-compose.yml`` 
+   file the ``image: pitkley/paperless`` directive in both the ``webserver`` and ``consumer``
    sections to ``build: ./`` as per the newer ``docker-compose.yml.example`` file
 
 .. _setup-permanent:
