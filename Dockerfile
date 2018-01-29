@@ -1,5 +1,9 @@
 FROM alpine:3.7
 
+LABEL maintainer="The Paperless Project https://github.com/danielquinn/paperless" \
+      contributors="Guy Addadi <addadi@gmail.com>, Pit Kleyersburg <pitkley@googlemail.com>, \
+        Sven Fischer <git-dev@linux4tw.de>"
+
 # Copy application
 COPY requirements.txt /usr/src/paperless/
 COPY src/ /usr/src/paperless/src/
