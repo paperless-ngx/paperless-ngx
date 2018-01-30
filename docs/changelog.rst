@@ -1,6 +1,9 @@
 Changelog
 #########
 
+* 1.2.0
+  * New Docker image, now based on Alpine, thanks to the efforts of `addadi`_
+  and `Pit`_.
 * 1.1.0
   * Fix for `#283`_, a redirect bug which broke interactions with
     paperless-desktop.  Thanks to `chris-aeviator`_ for reporting it.
@@ -268,6 +271,7 @@ Changelog
 .. _Lukas Winkler: https://github.com/Findus23
 .. _chris-aeviator: https://github.com/chris-aeviator
 .. _Dan Panzarella: https://github.com/pzl
+.. _addadi: https://github.com/addadi
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -317,3 +321,5 @@ Changelog
 .. _#283: https://github.com/danielquinn/paperless/issues/283
 .. _#256: https://github.com/danielquinn/paperless/pull/256
 .. _#285: https://github.com/danielquinn/paperless/pull/285
+
+.. _pipenv: https://docs.pipenv.org/
