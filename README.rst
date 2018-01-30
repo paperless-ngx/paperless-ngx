@@ -4,7 +4,6 @@ Paperless
 |Documentation|
 |Chat|
 |Travis|
-|Dependencies|
 
 Index and archive all of your scanned paper documents
 
@@ -28,12 +27,11 @@ scanner produces
 
 1. Buy a document scanner that can write to a place on your network.  If you
    need some inspiration, have a look at the `scanner recommendations`_ page.
-   recommended by another user.
 2. Set it up to "scan to FTP" or something similar. It should be able to push
-   scanned images to a server without you having to do anything.  If your
-   scanner doesn't know how to automatically upload the file somewhere, you can
-   always do that manually.  Paperless doesn't care how the documents get into
-   its local consumption directory.
+   scanned images to a server without you having to do anything.  Of course if
+   your scanner doesn't know how to automatically upload the file somewhere,
+   you can always do that manually.  Paperless doesn't care how the documents
+   get into its local consumption directory.
 3. Have the target server run the Paperless consumption script to OCR the file
    and index it into a local database.
 4. Use the web frontend to sift through the database and find what you want.
@@ -140,5 +138,3 @@ work and they need the money a lot more than I do.
    :target: https://gitter.im/danielquinn/paperless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 .. |Travis| image:: https://travis-ci.org/danielquinn/paperless.svg?branch=master
    :target: https://travis-ci.org/danielquinn/paperless
-.. |Dependencies| image:: https://www.versioneye.com/user/projects/57b33b81d9f1b00016faa500/badge.svg
-   :target: https://www.versioneye.com/user/projects/57b33b81d9f1b00016faa500
