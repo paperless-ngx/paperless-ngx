@@ -2,7 +2,7 @@ version: '2'
 
 services:
     webserver:
-        image: pitkley/paperless
+        build: ./
         ports:
             # You can adapt the port you want Paperless to listen on by
             # modifying the part before the `:`.
@@ -20,7 +20,7 @@ services:
         command: ["runserver", "--insecure", "0.0.0.0:8000"]
 
     consumer:
-        image: pitkley/paperless
+        build: ./
         volumes:
             - data:/usr/src/paperless/data
             - media:/usr/src/paperless/media
