@@ -86,6 +86,11 @@ PAPERLESS_PASSPHRASE="secret"
 # https://docs.djangoproject.com/en/1.11/ref/settings/#force-script-name
 #PAPERLESS_FORCE_SCRIPT_NAME=""
 
+# If you are using alternative authentication means or are just using paperless
+# as a single user on a small private network, this option allows you to disable
+# user authentication if you set it to "true"
+#PAPERLESS_DISABLE_LOGIN=""
+
 ###############################################################################
 ####                          Software Tweaks                              ####
 ###############################################################################
