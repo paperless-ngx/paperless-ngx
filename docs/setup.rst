@@ -175,7 +175,8 @@ Docker Method
    modified versions of the configuration files.
 4. Modify ``docker-compose.yml`` to your preferences, following the
    instructions in comments in the file. The only change that is a hard
-   requirement is to specify where the consumption directory should mount.
+   requirement is to specify where the consumption directory should
+   mount.[#dockercomposeyml]_
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
    ``PAPERLESS_PASSPHRASE``
@@ -192,7 +193,7 @@ Docker Method
      default English, set this parameter to a space separated list of
      three-letter language-codes after `ISO 639-2/T`_. For a list of available
      languages -- including their three letter codes -- see the
-     `Debian packagelist`_.
+     `Alpine packagelist`_.
 
    ``USERMAP_UID`` and ``USERMAP_GID``
      If you want to mount the consumption volume (directory ``/consume`` within
@@ -282,12 +283,17 @@ Docker Method
 .. _Docker: https://www.docker.com/
 .. _docker-compose: https://docs.docker.com/compose/install/
 .. _ISO 639-2/T: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-.. _Debian packagelist: https://packages.debian.org/search?suite=jessie&searchon=names&keywords=tesseract-ocr-
+.. _Alpine packagelist: https://pkgs.alpinelinux.org/packages?name=tesseract-ocr-data*&arch=x86_64
 
 .. [#compose] You of course don't have to use docker-compose, but it
    simplifies deployment immensely. If you know your way around Docker, feel
    free to tinker around without using compose!
 
+.. [#dockercomposeyml] If you're upgrading your docker-compose images from
+   version 1.1.0 or earlier, you might need to change in the
+   ``docker-compose.yml`` file the ``image: pitkley/paperless`` directive in
+   both the ``webserver`` and ``consumer`` sections to ``build: ./`` as per the
+   newer ``docker-compose.yml.example`` file
 
 .. _setup-permanent:
 
