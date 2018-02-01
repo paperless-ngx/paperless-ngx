@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 from multiprocessing.pool import Pool
+import pdftotext
 
 import langdetect
 import pyocr
@@ -31,6 +32,7 @@ class RasterisedDocumentParser(DocumentParser):
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
+    OCR_ALWAYS = settings.OCR_ALWAYS
 
     def get_thumbnail(self):
         """
@@ -46,7 +48,21 @@ class RasterisedDocumentParser(DocumentParser):
 
         return os.path.join(self.tempdir, "convert-0000.png")
 
+    def _is_ocred(self):
+        # Extract text from PDF using pdftotext
+        text = get_text_from_pdf(self.document_path)
+
+        # We assume, that a PDF with at least 50 characters contains text
+        # (so no OCR required)
+        if len(text) > 50:
+            return True
+
+        return False
+
     def get_text(self):
+        if not self.OCR_ALWAYS and self._is_ocred():
+            self.log("info", "Skipping OCR, using Text from PDF")
+            return get_text_from_pdf(self.document_path)
 
         images = self._get_greyscale()
 
@@ -212,3 +228,13 @@ def image_to_string(args):
             except (TesseractError, OtherTesseractError):
                 pass
         return ocr.image_to_string(f, lang=lang)
+
+
+def get_text_from_pdf(pdf_file):
+    with open(pdf_file, "rb") as f:
+        try:
+            pdf = pdftotext.PDF(f)
+        except pdftotext.Error:
+            return False
+
+    return "\n".join(pdf)
