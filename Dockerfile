@@ -45,3 +45,4 @@ WORKDIR /usr/src/paperless/src
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/consume", "/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 CMD ["--help"]
+
