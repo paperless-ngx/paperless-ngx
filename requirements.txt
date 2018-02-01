@@ -17,7 +17,7 @@ gunicorn==19.7.1
 
 # For the tests
 factory-boy
-pytest
+pytest==3.3.2  # Newer versions break with pytest-sugar
 pytest-django
 pytest-sugar
 pytest-env
