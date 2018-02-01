@@ -77,14 +77,21 @@ INSTALLED_APPS = [
 if os.getenv("PAPERLESS_INSTALLED_APPS"):
     INSTALLED_APPS += os.getenv("PAPERLESS_INSTALLED_APPS").split(",")
 
+
+AUTH_CLASSES = [\
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware']
+
+if bool(os.getenv("PAPERLESS_DISABLE_AUTH","true").lower() in ("yes", "y", "1", "t", "true")):
+  AUTH_CLASSES = ['auto_auth.Middleware']   
+
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware']\
+    + AUTH_CLASSES + \
+    ['django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
