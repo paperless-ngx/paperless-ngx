@@ -3,7 +3,15 @@ Changelog
 
 * 1.2.0
   * New Docker image, now based on Alpine, thanks to the efforts of `addadi`_
-  and `Pit`_.
+    and `Pit`_.
+  * `BastianPoe`_ has added the long-awaited feature to automatically skip the
+    OCR step when the PDF already contains text. This can be overridden by
+    setting ``PAPERLESS_OCR_ALWAYS=YES`` either in your ``paperless.conf`` or
+    in the environment.  Note that this also means that Paperless now requires
+    ``libpoppler-cpp-dev`` to be installed. **You'll need to run
+    ``pip install -r requirements.txt`` after the usual ``git pull`` to
+    properly update**.
+
 * 1.1.0
   * Fix for `#283`_, a redirect bug which broke interactions with
     paperless-desktop.  Thanks to `chris-aeviator`_ for reporting it.
@@ -272,6 +280,7 @@ Changelog
 .. _chris-aeviator: https://github.com/chris-aeviator
 .. _Dan Panzarella: https://github.com/pzl
 .. _addadi: https://github.com/addadi
+.. _BastianPoe: https://github.com/BastianPoe
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44

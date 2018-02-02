@@ -18,9 +18,9 @@ ENV PAPERLESS_EXPORT_DIR=/export \
 # Install dependencies
 RUN apk --no-cache --update add \
         python3 gnupg libmagic bash \
-        sudo tesseract-ocr imagemagick ghostscript unpaper && \
+        sudo poppler tesseract-ocr imagemagick ghostscript unpaper && \
     apk --no-cache add --virtual .build-dependencies \
-        python3-dev gcc musl-dev zlib-dev jpeg-dev && \
+        python3-dev poppler-dev gcc g++ musl-dev zlib-dev jpeg-dev && \
 # Install python dependencies
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \

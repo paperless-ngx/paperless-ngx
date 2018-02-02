@@ -15,6 +15,7 @@ python-gnupg>=0.3.9
 pytz>=2016.10
 dateparser>=0.6.0
 gunicorn==19.7.1
+pdftotext>=2.0.1
 
 # For the tests
 factory-boy
