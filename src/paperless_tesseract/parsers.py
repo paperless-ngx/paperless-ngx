@@ -260,6 +260,6 @@ def get_text_from_pdf(pdf_file):
         try:
             pdf = pdftotext.PDF(f)
         except pdftotext.Error:
-            return False
+            return ""
 
     return "\n".join(pdf)
