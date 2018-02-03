@@ -28,9 +28,9 @@ Here's what you get:
 ![The before and after](https://raw.githubusercontent.com/danielquinn/paperless/master/docs/_static/screenshot.png)
 
 
-## Stability
+## Documentation
 
-Paperless is still under active development (just look at the git commit history) so don't expect it to be 100% stable.  You can backup the sqlite3 database, media directory and your configuration file to be on the safe side.
+It's all available on [ReadTheDocs](https://paperless.readthedocs.org/).
 
 
 ## Requirements
@@ -48,9 +48,9 @@ This is all really a quite simple, shiny, user-friendly wrapper around some very
   * [Python-GNUPG](http://pythonhosted.org/python-gnupg/) decrypts the PDFs on-the-fly to allow you to download unencrypted files, leaving the encrypted ones on-disk.
 
 
-## Documentation
+## Stability
 
-It's all available on [ReadTheDocs](https://paperless.readthedocs.org/).
+This project has been around since 2015, and there's lots of people using it, however it's still under active development (just look at the git commit history) so don't expect it to be 100% stable.  You can backup the sqlite3 database, media directory and your configuration file to be on the safe side.
 
 
 ## Similar Projects
