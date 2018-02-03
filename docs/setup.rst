@@ -570,7 +570,8 @@ your gunicorn instance.  This should do the trick:
 Vagrant
 .......
 
-You may use the Ubuntu explanation above. Replace ``(local-filesystems and net-device-up IFACE=eth0)`` with ``vagrant-mounted``.
+You may use the Ubuntu explanation above. Replace
+``(local-filesystems and net-device-up IFACE=eth0)`` with ``vagrant-mounted``.
 
 .. _setup-permanent-docker:
 
@@ -584,7 +585,7 @@ Docker daemon.
 .. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
 
 
-.. _setup-subdirectory
+.. _setup-subdirectory:
 
 Hosting Paperless in a Subdirectory
 -----------------------------------
