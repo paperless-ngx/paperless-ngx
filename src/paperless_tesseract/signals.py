@@ -3,7 +3,7 @@ import re
 from .parsers import RasterisedDocumentParser
 
 
-class ConsumerDeclaration(object):
+class ConsumerDeclaration:
 
     MATCHING_FILES = re.compile("^.*\.(pdf|jpe?g|gif|png|tiff?|pnm|bmp)$")
 
