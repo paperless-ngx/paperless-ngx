@@ -5,7 +5,10 @@ Changelog
 =====
 
 * New Docker image, now based on Alpine, thanks to the efforts of `addadi`_
-  and `Pit`_.
+  and `Pit`_.  This new image is dramatically smaller than the Debian-based
+  one, and it also has `a new home on Docker Hub`_.  A proper thank-you to
+  `Pit`_ for hosting the image on his Docker account all this time, but after
+  some discussion, we decided the image needed a more *official-looking* home.
 * `BastianPoe`_ has added the long-awaited feature to automatically skip the
   OCR step when the PDF already contains text. This can be overridden by
   setting ``PAPERLESS_OCR_ALWAYS=YES`` either in your ``paperless.conf`` or
@@ -13,6 +16,9 @@ Changelog
   ``libpoppler-cpp-dev`` to be installed. **Important**: You'll need to run
   ``pip install -r requirements.txt`` after the usual ``git pull`` to
   properly update.
+* `BastianPoe`_ has also contributed a monumental amount of work (`#291`_) to
+  solving `#158`_: setting the document creation date based on finding a date
+  in the document text.
 
 1.1.0
 =====
@@ -346,6 +352,7 @@ Changelog
 .. _#146: https://github.com/danielquinn/paperless/issues/146
 .. _#148: https://github.com/danielquinn/paperless/pull/148
 .. _#150: https://github.com/danielquinn/paperless/pull/150
+.. _#158: https://github.com/danielquinn/paperless/issues/158
 .. _#171: https://github.com/danielquinn/paperless/issues/171
 .. _#172: https://github.com/danielquinn/paperless/issues/172
 .. _#179: https://github.com/danielquinn/paperless/pull/179
@@ -372,5 +379,7 @@ Changelog
 .. _#283: https://github.com/danielquinn/paperless/issues/283
 .. _#256: https://github.com/danielquinn/paperless/pull/256
 .. _#285: https://github.com/danielquinn/paperless/pull/285
+.. _#291: https://github.com/danielquinn/paperless/pull/291
 
 .. _pipenv: https://docs.pipenv.org/
+.. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
