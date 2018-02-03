@@ -1,8 +1,6 @@
 # Paperless
 
-![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)
-![Chat](https://badges.gitter.im/danielquinn/paperless.svg)
-![Travis](https://travis-ci.org/danielquinn/paperless.svg?branch=master)
+![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest) ![Chat](https://badges.gitter.im/danielquinn/paperless.svg) ![Travis](https://travis-ci.org/danielquinn/paperless.svg?branch=master)
 
 Index and archive all of your scanned paper documents
 
@@ -40,7 +38,7 @@ scanner produces
 
 Here's what you get:
 
-![The before and after](docs/_static/screenshot.png?raw=true)
+![The before and after](https://raw.githubusercontent.com/danielquinn/paperless/master/docs/_static/screenshot.png)
 
 
 ## Stability
