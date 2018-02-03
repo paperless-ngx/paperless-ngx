@@ -118,12 +118,14 @@ class Consumer(object):
 
             parsed_document = parser_class(doc)
             thumbnail = parsed_document.get_thumbnail()
+            date = parsed_document.get_date()
 
             try:
                 document = self._store(
                     parsed_document.get_text(),
                     doc,
-                    thumbnail
+                    thumbnail,
+                    date
                 )
             except ParseError as e:
 
@@ -174,7 +176,7 @@ class Consumer(object):
         return sorted(
             options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
 
-    def _store(self, text, doc, thumbnail):
+    def _store(self, text, doc, thumbnail, date):
 
         file_info = FileInfo.from_path(doc)
 
@@ -182,7 +184,7 @@ class Consumer(object):
 
         self.log("debug", "Saving record to database")
 
-        created = file_info.created or timezone.make_aware(
+        created = file_info.created or date or timezone.make_aware(
                     datetime.datetime.fromtimestamp(stats.st_mtime))
 
         with open(doc, "rb") as f:
