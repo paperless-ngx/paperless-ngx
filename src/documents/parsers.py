@@ -19,7 +19,7 @@ class DocumentParser:
 
     def __init__(self, path):
         self.document_path = path
-        self.tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
+        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=self.SCRATCH)
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
