@@ -9,7 +9,7 @@ class ParseError(Exception):
     pass
 
 
-class DocumentParser(object):
+class DocumentParser:
     """
     Subclass this to make your own parser.  Have a look at
     `paperless_tesseract.parsers` for inspiration.
