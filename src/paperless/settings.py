@@ -251,6 +251,14 @@ CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 # slowly, you may want to use a higher value than the default.
 CONSUMER_LOOP_TIME = int(os.getenv("PAPERLESS_CONSUMER_LOOP_TIME", 10))
 
+# By default, Paperless will attempt to GPG encrypt your PDF files using the
+# PASSPHRASE specified below.  If however you're not concerned about encrypting
+# these files (for example if you have disk encryption locally) then
+# you don't need this and can safely turn it off by setting STORAGE_TYPE to
+# "unencrypted" here.  In such a case, the PASSPHRASE value set below will be
+# ignored.
+STORAGE_TYPE = os.getenv("PAPERLESS_STORAGE_TYPE", "gpg")
+
 # This is used to encrypt the original documents and decrypt them later when
 # you want to download them.  Set it and change the permissions on this file to
 # 0600, or set it to `None` and you'll be prompted for the passphrase at
@@ -259,7 +267,6 @@ CONSUMER_LOOP_TIME = int(os.getenv("PAPERLESS_CONSUMER_LOOP_TIME", 10))
 # with GPG, including an interesting case where it may "encrypt" zero-byte
 # files.
 PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
-ENABLE_ENCRYPTION = os.getenv('DISABLE_ENCRYPTION') != 'true'
 
 # Trigger a script after every successful document consumption?
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
