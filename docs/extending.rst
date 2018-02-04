@@ -50,9 +50,19 @@ this:
 
 1. Consumer finds a file in the consumption directory.
 2. It asks all the available parsers: *"Hey, can you handle this file?"*
-3. The first parser that says yes gets to handle the file.  The order in which
-   the parsers are asked is handled by sorting ``INSTALLED_APPS`` in
-   ``settings.py``.
+3. Each parser responds with either ``None`` meaning they can't handle the
+   file, or a dictionary in the following format:
+
+.. code:: python
+
+    {
+        "parser": <the class name>,
+        "weight": <an integer>
+    }
+
+The consumer compares the ``weight`` values from all respondents and uses the
+class with the highest value to consume the document.  The default parser,
+``RasterisedDocumentParser`` has a weight of ``0``.
 
 
 .. _extending-parsers-appspy:
@@ -61,7 +71,7 @@ apps.py
 .......
 
 This is a standard Django file, but you'll need to add some code to it to
-register your parser as being able to handle particular files.
+connect your parser to the ``document_consumer_declaration`` signal.
 
 
 .. _extending-parsers-finally:
@@ -79,14 +89,12 @@ the list like this:
     INSTALLED_APPS = [
         ...
         "my_module.apps.MyModuleConfig",
-        "paperless_tesseract.apps.PaperlessTesseractConfig",
         ...
     ]
 
-Note that we're placing our module *above* ``PaperlessTesseractConfig``.  This
-is to ensure that if your module wants to handle any files typically handled by
-the default module, yours will win instead.  If there's no conflict between
-what your module does and the default, then order doesn't matter.
+Order doesn't matter, but generally it's a good idea to place your module lower
+in the list so that you don't end up accidentally overriding project defaults
+somewhere.
 
 
 .. _extending-parsers-example:
