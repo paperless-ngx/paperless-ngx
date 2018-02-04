@@ -221,12 +221,12 @@ OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
 
 # OCR all documents?
-OCR_ALWAYS = bool(os.getenv("PAPERLESS_OCR_ALWAYS", "NO").lower() in ("yes", "y", "1", "t", "true"))
+OCR_ALWAYS = bool(os.getenv("PAPERLESS_OCR_ALWAYS", "NO").lower() in ("yes", "y", "1", "t", "true"))  # NOQA
 
 # If this is true, any failed attempts to OCR a PDF will result in the PDF
 # being indexed anyway, with whatever we could get.  If it's False, the file
 # will simply be left in the CONSUMPTION_DIR.
-FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("yes", "y", "1", "t", "true"))
+FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("yes", "y", "1", "t", "true"))  # NOQA
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
