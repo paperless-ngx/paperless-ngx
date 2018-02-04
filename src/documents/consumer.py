@@ -48,6 +48,19 @@ class Consumer:
         except FileExistsError:
             pass
 
+        acceptable_storage_types = [_[0] for _ in Document.STORAGE_TYPES]
+        if settings.STORAGE_TYPE not in acceptable_storage_types:
+            raise ConsumerError(
+                'Invalid STORAGE_TYPE "{}" defined.  It must be one of {}.  '
+                'Exiting.'.format(
+                    settings.STORAGE_TYPE,
+                    ", ".join(acceptable_storage_types)
+                )
+            )
+
+        self.stats = {}
+        self._ignore = []
+
         if not self.consume:
             raise ConsumerError(
                 "The CONSUMPTION_DIR settings variable does not appear to be "
@@ -195,7 +208,8 @@ class Consumer:
                 file_type=file_info.extension,
                 checksum=hashlib.md5(f.read()).hexdigest(),
                 created=created,
-                modified=created
+                modified=created,
+                storage_type=settings.STORAGE_TYPE
             )
 
         relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
@@ -204,21 +218,21 @@ class Consumer:
             self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
-        # Encrypt and store the actual document
-        with open(doc, "rb") as unencrypted:
-            with open(document.source_path, "wb") as encrypted:
-                self.log("debug", "Encrypting the document")
-                encrypted.write(GnuPG.encrypted(unencrypted))
-
-        # Encrypt and store the thumbnail
-        with open(thumbnail, "rb") as unencrypted:
-            with open(document.thumbnail_path, "wb") as encrypted:
-                self.log("debug", "Encrypting the thumbnail")
-                encrypted.write(GnuPG.encrypted(unencrypted))
+        self._write(document, doc, document.source_path)
+        self._write(document, thumbnail, document.thumbnail_path)
 
         self.log("info", "Completed")
 
         return document
+
+    def _write(self, document, source, target):
+        with open(source, "rb") as read_file:
+            with open(target, "wb") as write_file:
+                if document.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
+                    write_file.write(read_file.read())
+                    return
+                self.log("debug", "Encrypting the thumbnail")
+                write_file.write(GnuPG.encrypted(read_file))
 
     def _cleanup_doc(self, doc):
         self.log("debug", "Deleting document {}".format(doc))
