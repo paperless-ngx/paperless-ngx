@@ -30,14 +30,7 @@ from .serialisers import (
 
 
 class IndexView(TemplateView):
-
     template_name = "documents/index.html"
-
-    def get_context_data(self, **kwargs):
-        print(kwargs)
-        print(self.request.GET)
-        print(self.request.POST)
-        return TemplateView.get_context_data(self, **kwargs)
 
 
 class FetchView(SessionOrBasicAuthMixin, DetailView):
