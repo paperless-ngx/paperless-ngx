@@ -59,6 +59,14 @@ PAPERLESS_EMAIL_SECRET=""
 ####                              Security                                 ####
 ###############################################################################
 
+# By default, Paperless will attempt to GPG encrypt your PDF files using the
+# PAPERLESS_PASSPHRASE specified below.  If however you're not concerned about
+# encrypting these files (for example if you have disk encryption locally) then
+# you don't need this and can safely turn it off by setting
+# PAPERLESS_STORAGE_TYPE="unencrypted" here.  In such a case, the PASSPHRASE
+# value set below will be ignored.
+#PAPERLESS_STORAGE_TYPE="gpg"
+
 # You must have a passphrase in order for Paperless to work at all.  If you set
 # this to "", GNUGPG will "encrypt" your PDF by writing it out as a zero-byte
 # file.
