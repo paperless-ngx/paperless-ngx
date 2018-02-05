@@ -9,7 +9,7 @@ class ParseError(Exception):
     pass
 
 
-class DocumentParser(object):
+class DocumentParser:
     """
     Subclass this to make your own parser.  Have a look at
     `paperless_tesseract.parsers` for inspiration.
@@ -19,7 +19,7 @@ class DocumentParser(object):
 
     def __init__(self, path):
         self.document_path = path
-        self.tempdir = tempfile.mkdtemp(prefix="paperless", dir=self.SCRATCH)
+        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=self.SCRATCH)
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
@@ -32,6 +32,12 @@ class DocumentParser(object):
     def get_text(self):
         """
         Returns the text from the document and only the text.
+        """
+        raise NotImplementedError()
+
+    def get_date(self):
+        """
+        Returns the date of the document.
         """
         raise NotImplementedError()
 
