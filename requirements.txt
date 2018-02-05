@@ -1,5 +1,6 @@
 Django>=1.11,<2.0
 Pillow>=3.1.1
+dateparser>=0.6.0
 django-crispy-forms>=1.6.1
 django-extensions>=1.7.6
 django-filter>=1.0
@@ -7,21 +8,21 @@ django-flat-responsive>=1.2.0
 djangorestframework>=3.5.3
 filemagic>=1.6
 fuzzywuzzy[speedup]==0.15.0
+gunicorn>=19.7.1
 langdetect>=1.0.7
+pdftotext>=2.0.1
 pyocr>=0.4.7
 python-dateutil>=2.6.0
 python-dotenv>=0.6.2
 python-gnupg>=0.3.9
 pytz>=2016.10
-gunicorn==19.7.1
-pdftotext>=2.0.1
 
 # For the tests
 factory-boy
+flake8
 pytest==3.3.2  # Newer versions break with pytest-sugar
 pytest-django
 pytest-sugar
 pytest-env
 pycodestyle
-flake8
 tox
