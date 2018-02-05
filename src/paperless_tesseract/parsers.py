@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 from multiprocessing.pool import Pool
+import dateparser
 import pdftotext
 
 import langdetect
@@ -31,8 +32,10 @@ class RasterisedDocumentParser(DocumentParser):
     DENSITY = settings.CONVERT_DENSITY if settings.CONVERT_DENSITY else 300
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
+    DATE_ORDER = settings.DATE_ORDER
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
     OCR_ALWAYS = settings.OCR_ALWAYS
+    TEXT_CACHE = None
 
     def get_thumbnail(self):
         """
@@ -60,15 +63,20 @@ class RasterisedDocumentParser(DocumentParser):
         return False
 
     def get_text(self):
+        if self.TEXT_CACHE is not None:
+            return self.TEXT_CACHE
+
         if not self.OCR_ALWAYS and self._is_ocred():
             self.log("info", "Skipping OCR, using Text from PDF")
-            return get_text_from_pdf(self.document_path)
+            self.TEXT_CACHE = get_text_from_pdf(self.document_path)
+            return self.TEXT_CACHE
 
         images = self._get_greyscale()
 
         try:
 
-            return self._get_ocr(images)
+            self.TEXT_CACHE = self._get_ocr(images)
+            return self.TEXT_CACHE
         except OCRError as e:
             raise ParseError(e)
 
@@ -191,6 +199,29 @@ class RasterisedDocumentParser(DocumentParser):
         text += self._ocr(imgs[middle + 1:], self.DEFAULT_OCR_LANGUAGE)
         return text
 
+    def get_date(self):
+        text = self.get_text()
+
+        # This regular expression will try to find dates in the document at
+        # hand and will match the following formats:
+        # - XX.YY.ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
+        # - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
+        # - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
+        # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
+        # - MONTH ZZZZ
+        m = re.search(
+            r'\b([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})\b|' +
+            r'\b([0-9]{1,2}\. [^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
+            r'\b([^ ]{3,9} [0-9]{4})\b', text)
+
+        if m is None:
+            return None
+
+        return dateparser.parse(m.group(0),
+                                settings={'DATE_ORDER': self.DATE_ORDER,
+                                          'PREFER_DAY_OF_MONTH': 'first',
+                                          'RETURN_AS_TIMEZONE_AWARE': True})
+
 
 def run_convert(*args):
 
@@ -235,6 +266,6 @@ def get_text_from_pdf(pdf_file):
         try:
             pdf = pdftotext.PDF(f)
         except pdftotext.Error:
-            return False
+            return ""
 
     return "\n".join(pdf)
