@@ -89,7 +89,7 @@ PAPERLESS_PASSPHRASE="secret"
 # If you are using alternative authentication means or are just using paperless
 # as a single user on a small private network, this option allows you to disable
 # user authentication if you set it to "true"
-#PAPERLESS_DISABLE_LOGIN=""
+#PAPERLESS_DISABLE_LOGIN="false"
 
 ###############################################################################
 ####                          Software Tweaks                              ####
