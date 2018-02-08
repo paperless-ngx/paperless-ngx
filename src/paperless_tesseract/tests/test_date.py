@@ -204,3 +204,29 @@ class TestDate(TestCase):
         self.assertEqual(document.get_date(),
                          datetime.datetime(2018, 4, 1, 0, 0,
                                            tzinfo=tz.tzutc()))
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SAMPLE_FILES
+    )
+    def test_get_text_8_pdf(self):
+        input_file = os.path.join(self.SAMPLE_FILES, "tests_date_8.pdf")
+        document = RasterisedDocumentParser(input_file)
+        document.get_text()
+        self.assertEqual(document._is_ocred(), True)
+        self.assertEqual(document.get_date(),
+                         datetime.datetime(2017, 12, 31, 0, 0,
+                                           tzinfo=tz.tzutc()))
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SAMPLE_FILES
+    )
+    def test_get_text_9_pdf(self):
+        input_file = os.path.join(self.SAMPLE_FILES, "tests_date_9.pdf")
+        document = RasterisedDocumentParser(input_file)
+        document.get_text()
+        self.assertEqual(document._is_ocred(), True)
+        self.assertEqual(document.get_date(),
+                         datetime.datetime(2017, 12, 31, 0, 0,
+                                           tzinfo=tz.tzutc()))
