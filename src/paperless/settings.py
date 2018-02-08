@@ -78,24 +78,23 @@ if os.getenv("PAPERLESS_INSTALLED_APPS"):
     INSTALLED_APPS += os.getenv("PAPERLESS_INSTALLED_APPS").split(",")
 
 
-#Default Django authentication middleware (requires a username/password)
-AUTH_CLASSES = [\
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware']
-
-#If AUTH is disabled, we just use our "bypass" authentication middleware
-if bool(os.getenv("PAPERLESS_DISABLE_LOGIN","false").lower() in ("yes", "y", "1", "t", "true")):  
-    AUTH_CLASSES = ['paperless.auto_auth.Middleware']   
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware']\
-    + AUTH_CLASSES + \
-    ['django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+#If AUTH is disabled, we just use our "bypass" authentication middleware
+if  bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
+    _index = MIDDLEWARE_CLASSES.index('django.contrib.auth.middleware.AuthenticationMiddleware')
+    MIDDLEWARE_CLASSES[_index] = 'paperless.middleware.Middleware'
+    MIDDLEWARE_CLASSES.remove('django.contrib.auth.middleware.SessionAuthenticationMiddleware')
 
 ROOT_URLCONF = 'paperless.urls'
 
