@@ -208,11 +208,13 @@ class RasterisedDocumentParser(DocumentParser):
         # - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
         # - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
         # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - MONTH ZZZZ
+        # - MONTH ZZZZ, with ZZZZ being 4 digits
+        # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
         m = re.search(
             r'\b([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})\b|' +
-            r'\b([0-9]{1,2}\. [^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
-            r'\b([^ ]{3,9} [0-9]{4})\b', text)
+            r'\b([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
+            r'\b([\w]{3,9} [0-9]{1,2}, ([0-9]{4}))\b|' +
+            r'\b([\w]{3,9} [0-9]{4})\b', text)
 
         if m is None:
             return None
