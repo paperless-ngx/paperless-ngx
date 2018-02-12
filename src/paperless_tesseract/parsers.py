@@ -219,10 +219,18 @@ class RasterisedDocumentParser(DocumentParser):
         if m is None:
             return None
 
-        return dateparser.parse(m.group(0),
+        date = dateparser.parse(m.group(0),
                                 settings={'DATE_ORDER': self.DATE_ORDER,
                                           'PREFER_DAY_OF_MONTH': 'first',
                                           'RETURN_AS_TIMEZONE_AWARE': True})
+
+        if date is not None:
+            self.log("info", "Detected document date " + date.strftime("%x") +
+                             " based on string " + m.group(0))
+        else:
+            self.log("info", "Unable to detect date for document")
+
+        return date
 
 
 def run_convert(*args):
