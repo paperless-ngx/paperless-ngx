@@ -200,7 +200,10 @@ class RasterisedDocumentParser(DocumentParser):
         return text
 
     def get_date(self):
-        text = self.get_text()
+        try:
+            text = self.get_text()
+        except ParseError as e:
+            return None
 
         # This regular expression will try to find dates in the document at
         # hand and will match the following formats:
