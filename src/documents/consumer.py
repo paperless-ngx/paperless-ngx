@@ -22,7 +22,7 @@ class ConsumerError(Exception):
     pass
 
 
-class Consumer(object):
+class Consumer:
     """
     Loop over every file found in CONSUMPTION_DIR and:
       1. Convert it to a greyscale pnm
