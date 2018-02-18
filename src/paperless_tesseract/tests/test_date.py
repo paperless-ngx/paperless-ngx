@@ -28,9 +28,9 @@ class TestDate(TestCase):
     def test_date_format_1(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
-        document.TEXT_CACHE = "lorem ipsum 130218 lorem ipsum"
         self.assertEqual(document.get_date(),
                          None)
+        document._text = "lorem ipsum 130218 lorem ipsum"
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -39,9 +39,9 @@ class TestDate(TestCase):
     def test_date_format_2(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
-        document.TEXT_CACHE = "lorem ipsum 2018 lorem ipsum"
         self.assertEqual(document.get_date(),
                          None)
+        document._text = "lorem ipsum 2018 lorem ipsum"
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -50,9 +50,9 @@ class TestDate(TestCase):
     def test_date_format_3(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
-        document.TEXT_CACHE = "lorem ipsum 20180213 lorem ipsum"
         self.assertEqual(document.get_date(),
                          None)
+        document._text = "lorem ipsum 20180213 lorem ipsum"
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -61,10 +61,10 @@ class TestDate(TestCase):
     def test_date_format_4(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
-        document.TEXT_CACHE = "lorem ipsum 13.02.2018 lorem ipsum"
         self.assertEqual(document.get_date(),
                          datetime.datetime(2018, 2, 13, 0, 0,
                                            tzinfo=tz.tzutc()))
+        document._text = "lorem ipsum 13.02.2018 lorem ipsum"
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -73,11 +73,11 @@ class TestDate(TestCase):
     def test_date_format_5(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
-        document.TEXT_CACHE = ("lorem ipsum 130218, 2018, 20180213 and "
-                               "13.02.2018 lorem ipsum")
         self.assertEqual(document.get_date(),
                          datetime.datetime(2018, 2, 13, 0, 0,
                                            tzinfo=tz.tzutc()))
+        document._text = (
+            "lorem ipsum 130218, 2018, 20180213 and 13.02.2018 lorem ipsum")
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -86,17 +86,19 @@ class TestDate(TestCase):
     def test_date_format_6(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
-        document.TEXT_CACHE = ("lorem ipsum\n"
-                               "Wohnort\n"
-                               "3100\n"
-                               "IBAN\n"
-                               "AT87 4534\n"
-                               "1234\n"
-                               "1234 5678\n"
-                               "BIC\n"
-                               "lorem ipsum")
         self.assertEqual(document.get_date(),
                          None)
+        document._text = (
+            "lorem ipsum\n"
+            "Wohnort\n"
+            "3100\n"
+            "IBAN\n"
+            "AT87 4534\n"
+            "1234\n"
+            "1234 5678\n"
+            "BIC\n"
+            "lorem ipsum"
+        )
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -105,12 +107,14 @@ class TestDate(TestCase):
     def test_date_format_7(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
-        document.TEXT_CACHE = ("lorem ipsum\n"
-                               "März 2019\n"
-                               "lorem ipsum")
         self.assertEqual(document.get_date(),
                          datetime.datetime(2019, 3, 1, 0, 0,
                                            tzinfo=tz.tzutc()))
+        document._text = (
+            "lorem ipsum\n"
+            "März 2019\n"
+            "lorem ipsum"
+        )
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
