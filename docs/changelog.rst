@@ -1,6 +1,14 @@
 Changelog
 #########
 
+1.3.0 (Unreleased)
+==================
+
+* Fix for `#303`_ where sketchily-formatted documents could cause the consumer
+  to break and insert half-records into the database breaking all sorts of
+  things.  We now capture the return codes of both ``convert`` and ``unpaper``
+  and fail-out nicely.
+
 1.2.0
 =====
 
@@ -380,6 +388,7 @@ Changelog
 .. _#256: https://github.com/danielquinn/paperless/pull/256
 .. _#285: https://github.com/danielquinn/paperless/pull/285
 .. _#291: https://github.com/danielquinn/paperless/pull/291
+.. _#303: https://github.com/danielquinn/paperless/issues/303
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
