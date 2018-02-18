@@ -13,6 +13,8 @@ Changelog
   `#295`_.  Note that logins are still required by default, and that you need
   to disable them by setting ``PAPERLESS_DISABLE_LOGIN="true"`` in your
   environment or in ``/etc/paperless.conf``.
+* Fix for additional date types thanks to input from `Isaac`_ and code from
+  `BastianPoe`_ (`#301`_).
 
 1.2.0
 =====
@@ -343,6 +345,7 @@ Changelog
 .. _addadi: https://github.com/addadi
 .. _BastianPoe: https://github.com/BastianPoe
 .. _matthewmoto: https://github.com/BastianPoe
+.. _Isaac: https://github.com/isaacsando
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -395,6 +398,7 @@ Changelog
 .. _#285: https://github.com/danielquinn/paperless/pull/285
 .. _#291: https://github.com/danielquinn/paperless/pull/291
 .. _#295: https://github.com/danielquinn/paperless/pull/295
+.. _#301: https://github.com/danielquinn/paperless/issues/301
 .. _#303: https://github.com/danielquinn/paperless/issues/303
 
 .. _pipenv: https://docs.pipenv.org/
