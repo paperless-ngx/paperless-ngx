@@ -8,6 +8,11 @@ Changelog
   to break and insert half-records into the database breaking all sorts of
   things.  We now capture the return codes of both ``convert`` and ``unpaper``
   and fail-out nicely.
+* You can now run Paperless without a login, though you'll still have to create
+  at least one user.  This is thanks to a pull-request from `matthewmoto`_:
+  `#295`_.  Note that logins are still required by default, and that you need
+  to disable them by setting ``PAPERLESS_DISABLE_LOGIN="true"`` in your
+  environment or in ``/etc/paperless.conf``.
 
 1.2.0
 =====
@@ -337,6 +342,7 @@ Changelog
 .. _Dan Panzarella: https://github.com/pzl
 .. _addadi: https://github.com/addadi
 .. _BastianPoe: https://github.com/BastianPoe
+.. _matthewmoto: https://github.com/BastianPoe
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -388,6 +394,7 @@ Changelog
 .. _#256: https://github.com/danielquinn/paperless/pull/256
 .. _#285: https://github.com/danielquinn/paperless/pull/285
 .. _#291: https://github.com/danielquinn/paperless/pull/291
+.. _#295: https://github.com/danielquinn/paperless/pull/295
 .. _#303: https://github.com/danielquinn/paperless/issues/303
 
 .. _pipenv: https://docs.pipenv.org/
