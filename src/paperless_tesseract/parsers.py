@@ -36,7 +36,10 @@ class RasterisedDocumentParser(DocumentParser):
     DATE_ORDER = settings.DATE_ORDER
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
     OCR_ALWAYS = settings.OCR_ALWAYS
-    TEXT_CACHE = None
+
+    def __init__(self, path):
+        super().__init__(path)
+        self._text = None
 
     def get_thumbnail(self):
         """
@@ -62,19 +65,20 @@ class RasterisedDocumentParser(DocumentParser):
         return len(text) > 50
 
     def get_text(self):
-        if self.TEXT_CACHE is not None:
-            return self.TEXT_CACHE
+
+        if self._text is not None:
+            return self._text
 
         if not self.OCR_ALWAYS and self._is_ocred():
             self.log("info", "Skipping OCR, using Text from PDF")
-            self.TEXT_CACHE = get_text_from_pdf(self.document_path)
-            return self.TEXT_CACHE
+            self._text = get_text_from_pdf(self.document_path)
+            return self._text
 
         images = self._get_greyscale()
 
         try:
-            self.TEXT_CACHE = self._get_ocr(images)
-            return self.TEXT_CACHE
+            self._text = self._get_ocr(images)
+            return self._text
         except OCRError as e:
             raise ParseError(e)
 
