@@ -3,17 +3,18 @@ import os
 import re
 import subprocess
 from multiprocessing.pool import Pool
-import dateparser
-import pdftotext
 
+import dateparser
 import langdetect
 import pyocr
 from django.conf import settings
-from documents.parsers import DocumentParser, ParseError
 from PIL import Image
 from pyocr.libtesseract.tesseract_raw import \
     TesseractError as OtherTesseractError
 from pyocr.tesseract import TesseractError
+
+import pdftotext
+from documents.parsers import DocumentParser, ParseError
 
 from .languages import ISO639
 
