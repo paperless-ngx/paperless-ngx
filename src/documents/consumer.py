@@ -117,10 +117,10 @@ class Consumer:
             )
 
             parsed_document = parser_class(doc)
-            thumbnail = parsed_document.get_thumbnail()
-            date = parsed_document.get_date()
 
             try:
+                thumbnail = parsed_document.get_thumbnail()
+                date = parsed_document.get_date()
                 document = self._store(
                     parsed_document.get_text(),
                     doc,

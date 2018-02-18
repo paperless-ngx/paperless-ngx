@@ -233,13 +233,15 @@ def run_convert(*args):
     if settings.CONVERT_TMPDIR:
         environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
 
-    subprocess.Popen(args, env=environment).wait()
+    if not subprocess.Popen(args, env=environment).wait() == 0:
+        raise ParseError("Convert failed at {}".format(args))
 
 
 def run_unpaper(args):
     unpaper, pnm = args
-    subprocess.Popen(
-        (unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm"))).wait()
+    command_args = unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm")
+    if not subprocess.Popen(command_args).wait() == 0:
+        raise ParseError("Unpaper failed at {}".format(command_args))
 
 
 def strip_excess_whitespace(text):
