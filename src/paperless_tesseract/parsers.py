@@ -52,15 +52,13 @@ class RasterisedDocumentParser(DocumentParser):
         return os.path.join(self.tempdir, "convert-0000.png")
 
     def _is_ocred(self):
+
         # Extract text from PDF using pdftotext
         text = get_text_from_pdf(self.document_path)
 
         # We assume, that a PDF with at least 50 characters contains text
         # (so no OCR required)
-        if len(text) > 50:
-            return True
-
-        return False
+        return len(text) > 50
 
     def get_text(self):
         if self.TEXT_CACHE is not None:
@@ -74,7 +72,6 @@ class RasterisedDocumentParser(DocumentParser):
         images = self._get_greyscale()
 
         try:
-
             self.TEXT_CACHE = self._get_ocr(images)
             return self.TEXT_CACHE
         except OCRError as e:
@@ -262,6 +259,7 @@ def image_to_string(args):
 
 
 def get_text_from_pdf(pdf_file):
+
     with open(pdf_file, "rb") as f:
         try:
             pdf = pdftotext.PDF(f)
