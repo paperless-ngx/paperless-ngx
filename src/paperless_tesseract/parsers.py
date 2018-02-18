@@ -202,7 +202,13 @@ class RasterisedDocumentParser(DocumentParser):
         return text
 
     def get_date(self):
-        text = self.get_text()
+        date = None
+        datestring = None
+
+        try:
+            text = self.get_text()
+        except ParseError as e:
+            return None
 
         # This regular expression will try to find dates in the document at
         # hand and will match the following formats:
@@ -210,19 +216,38 @@ class RasterisedDocumentParser(DocumentParser):
         # - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
         # - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
         # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - MONTH ZZZZ
-        m = re.search(
+        # - MONTH ZZZZ, with ZZZZ being 4 digits
+        # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
+        pattern = re.compile(
             r'\b([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})\b|' +
-            r'\b([0-9]{1,2}\. [^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
-            r'\b([^ ]{3,9} [0-9]{4})\b', text)
+            r'\b([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
+            r'\b([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))\b|' +
+            r'\b([^\W\d_]{3,9} [0-9]{4})\b')
 
-        if m is None:
-            return None
+        # Iterate through all regex matches and try to parse the date
+        for m in re.finditer(pattern, text):
+            datestring = m.group(0)
 
-        return dateparser.parse(m.group(0),
-                                settings={'DATE_ORDER': self.DATE_ORDER,
-                                          'PREFER_DAY_OF_MONTH': 'first',
-                                          'RETURN_AS_TIMEZONE_AWARE': True})
+            try:
+                date = dateparser.parse(
+                           datestring,
+                           settings={'DATE_ORDER': self.DATE_ORDER,
+                                     'PREFER_DAY_OF_MONTH': 'first',
+                                     'RETURN_AS_TIMEZONE_AWARE': True})
+            except TypeError:
+                # Skip all matches that do not parse to a proper date
+                continue
+
+            if date is not None:
+                break
+
+        if date is not None:
+            self.log("info", "Detected document date " + date.strftime("%x") +
+                             " based on string " + datestring)
+        else:
+            self.log("info", "Unable to detect date for document")
+
+        return date
 
 
 def run_convert(*args):
