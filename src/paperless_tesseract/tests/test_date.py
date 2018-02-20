@@ -119,6 +119,42 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
         SAMPLE_FILES
     )
+    def test_date_format_8(self):
+        input_file = os.path.join(self.SAMPLE_FILES, "")
+        document = RasterisedDocumentParser(input_file)
+        document._text = ("lorem ipsum\n"
+                          "Wohnort\n"
+                          "3100\n"
+                          "IBAN\n"
+                          "AT87 4534\n"
+                          "1234\n"
+                          "1234 5678\n"
+                          "BIC\n"
+                          "lorem ipsum\n"
+                          "März 2020")
+        self.assertEqual(document.get_date(),
+                         datetime.datetime(2020, 3, 1, 0, 0,
+                                           tzinfo=tz.tzutc()))
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SAMPLE_FILES
+    )
+    def test_date_format_9(self):
+        input_file = os.path.join(self.SAMPLE_FILES, "")
+        document = RasterisedDocumentParser(input_file)
+        document._text = ("lorem ipsum\n"
+                          "27. Nullmonth 2020\n"
+                          "März 2020\n"
+                          "lorem ipsum")
+        self.assertEqual(document.get_date(),
+                         datetime.datetime(2020, 3, 1, 0, 0,
+                                           tzinfo=tz.tzutc()))
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SAMPLE_FILES
+    )
     def test_get_text_1_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_1.pdf")
         document = RasterisedDocumentParser(input_file)
