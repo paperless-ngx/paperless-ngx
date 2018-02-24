@@ -92,7 +92,7 @@ class UploadForm(forms.Form):
 
         t = int(mktime(datetime.now().timetuple()))
         file_name = os.path.join(
-            Consumer.CONSUME,
+            settings.CONSUMPTION_DIR,
             "{} - {}.{}".format(correspondent, title, self._file_type)
         )
 
