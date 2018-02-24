@@ -32,31 +32,30 @@ class Consumer:
       5. Delete the document and image(s)
     """
 
-    SCRATCH = settings.SCRATCH_DIR
-    CONSUME = settings.CONSUMPTION_DIR
-
-    def __init__(self):
+    def __init__(self, consume=settings.CONSUMPTION_DIR, scratch=settings.SCRATCH_DIR):
 
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
+        self.stats = {}
+        self._ignore = []
+        self.consume = consume
+        self.scratch = scratch
+
         try:
-            os.makedirs(self.SCRATCH)
+            os.makedirs(self.scratch)
         except FileExistsError:
             pass
 
-        self.stats = {}
-        self._ignore = []
-
-        if not self.CONSUME:
+        if not self.consume:
             raise ConsumerError(
                 "The CONSUMPTION_DIR settings variable does not appear to be "
                 "set."
             )
 
-        if not os.path.exists(self.CONSUME):
+        if not os.path.exists(self.consume):
             raise ConsumerError(
-                "Consumption directory {} does not exist".format(self.CONSUME))
+                "Consumption directory {} does not exist".format(self.consume))
 
         self.parsers = []
         for response in document_consumer_declaration.send(self):
@@ -73,11 +72,11 @@ class Consumer:
             "group": self.logging_group
         })
 
-    def consume(self):
+    def run(self):
 
-        for doc in os.listdir(self.CONSUME):
+        for doc in os.listdir(self.consume):
 
-            doc = os.path.join(self.CONSUME, doc)
+            doc = os.path.join(self.consume, doc)
 
             if not os.path.isfile(doc):
                 continue
