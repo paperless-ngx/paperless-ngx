@@ -18,6 +18,8 @@ install:
 
 script:
     - cd src/
-    - pytest
+    - pytest --cov
     - pycodestyle
+
+after_success:
     - coveralls
