@@ -17,6 +17,7 @@ install:
     - pip install --requirement requirements.txt
 
 script:
-    - pytest src/
-    - pycodestyle src/
+    - cd src/
+    - pytest
+    - pycodestyle
     - coveralls
