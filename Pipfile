@@ -1,0 +1,39 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+django = "<2.0,>=1.11"
+pillow = "*"
+coveralls = "*"
+dateparser = "*"
+django-crispy-forms = "*"
+django-extensions = "*"
+django-filter = "*"
+django-flat-responsive = "*"
+djangorestframework = "*"
+factory-boy = "*"
+"flake8" = "*"
+filemagic = "*"
+fuzzywuzzy = {extras = ["speedup"], version = "==0.15.0"}
+gunicorn = "*"
+langdetect = "*"
+pdftotext = "*"
+pyocr = "*"
+python-dateutil = "*"
+python-dotenv = "*"
+python-gnupg = "*"
+pytz = "*"
+pycodestyle = "*"
+pytest = "*"
+pytest-django = "*"
+pytest-sugar = "*"
+pytest-env = "*"
+pytest-xdist = "*"
+
+
+[dev-packages]
