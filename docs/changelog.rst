@@ -20,6 +20,9 @@ Changelog
 * Fix for Docker cases where the issuing user is not UID 1000.  This was a
   collaborative fix between `Jeffrey Portman`_ and `Pit`_ in `#311`_ and
   `#312`_ to fix `#306`_.
+* Patch the historical migrations to support MySQL's um, *interesting* way of
+  handing indexes (`#308`_).  Thanks to `Simon Taddiken`_ for reporting the
+  problem and helping me find where to fix it.
 
 1.2.0
 =====
@@ -353,6 +356,7 @@ Changelog
 .. _Isaac: https://github.com/isaacsando
 .. _Georgi Todorov: https://github.com/TeraHz
 .. _Jeffrey Portman: https://github.com/ChromoX
+.. _Simon Taddiken: https://github.com/skuzzle
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -410,6 +414,7 @@ Changelog
 .. _#301: https://github.com/danielquinn/paperless/issues/301
 .. _#303: https://github.com/danielquinn/paperless/issues/303
 .. _#306: https://github.com/danielquinn/paperless/issues/306
+.. _#308: https://github.com/danielquinn/paperless/issues/308
 .. _#311: https://github.com/danielquinn/paperless/pull/311
 .. _#312: https://github.com/danielquinn/paperless/pull/312
 
