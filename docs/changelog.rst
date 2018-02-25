@@ -1,8 +1,16 @@
 Changelog
 #########
 
-1.3.0 (Unreleased)
-==================
+1.4.0
+=====
+
+* Refactor the use of travis/tox/pytest/coverage into two files:
+  ``.travis.yml`` and ``setup.cfg``.
+* Start generating requirements.txt from a Pipfile.  I'll probably switch over
+  to just using pipenv in the future.
+
+1.3.0
+=====
 
 * You can now run Paperless without a login, though you'll still have to create
   at least one user.  This is thanks to a pull-request from `matthewmoto`_:
