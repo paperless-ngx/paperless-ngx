@@ -15,6 +15,11 @@ Changelog
   environment or in ``/etc/paperless.conf``.
 * Fix for additional date types thanks to input from `Isaac`_ and code from
   `BastianPoe`_ (`#301`_).
+* Fix for running migrations in the Docker container (`#299`_).  Thanks to
+  `Georgi Todorov`_ for the fix (`#300`_) and to `Pit`_ for the review.
+* Fix for Docker cases where the issuing user is not UID 1000.  This was a
+  collaborative fix between `Jeffrey Portman`_ and `Pit`_ in `#311`_ and
+  `#312`_ to fix `#306`_.
 
 1.2.0
 =====
@@ -346,6 +351,8 @@ Changelog
 .. _BastianPoe: https://github.com/BastianPoe
 .. _matthewmoto: https://github.com/BastianPoe
 .. _Isaac: https://github.com/isaacsando
+.. _Georgi Todorov: https://github.com/TeraHz
+.. _Jeffrey Portman: https://github.com/ChromoX
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -398,8 +405,13 @@ Changelog
 .. _#285: https://github.com/danielquinn/paperless/pull/285
 .. _#291: https://github.com/danielquinn/paperless/pull/291
 .. _#295: https://github.com/danielquinn/paperless/pull/295
+.. _#299: https://github.com/danielquinn/paperless/issues/299
+.. _#300: https://github.com/danielquinn/paperless/pull/300
 .. _#301: https://github.com/danielquinn/paperless/issues/301
 .. _#303: https://github.com/danielquinn/paperless/issues/303
+.. _#306: https://github.com/danielquinn/paperless/issues/306
+.. _#311: https://github.com/danielquinn/paperless/pull/311
+.. _#312: https://github.com/danielquinn/paperless/pull/312
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
