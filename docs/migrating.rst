@@ -94,7 +94,7 @@ You may want to take a look at the ``paperless.conf.example`` file to see if
 there's anything new in there compared to what you've got int ``/etc``.
 
 If you are :ref:`using Docker <setup-installation-docker>` the update process
-requires only one additional step:
+is similar:
 
 .. code-block:: shell-session
 
@@ -102,7 +102,6 @@ requires only one additional step:
     $ git pull
     $ docker build -t paperless .
     $ docker-compose up -d
-    $ docker-compose run --rm webserver migrate
 
 If ``git pull`` doesn't report any changes, there is no need to continue with
 the remaining steps.
