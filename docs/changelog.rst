@@ -4,15 +4,15 @@ Changelog
 1.3.0 (Unreleased)
 ==================
 
-* Fix for `#303`_ where sketchily-formatted documents could cause the consumer
-  to break and insert half-records into the database breaking all sorts of
-  things.  We now capture the return codes of both ``convert`` and ``unpaper``
-  and fail-out nicely.
 * You can now run Paperless without a login, though you'll still have to create
   at least one user.  This is thanks to a pull-request from `matthewmoto`_:
   `#295`_.  Note that logins are still required by default, and that you need
   to disable them by setting ``PAPERLESS_DISABLE_LOGIN="true"`` in your
   environment or in ``/etc/paperless.conf``.
+* Fix for `#303`_ where sketchily-formatted documents could cause the consumer
+  to break and insert half-records into the database breaking all sorts of
+  things.  We now capture the return codes of both ``convert`` and ``unpaper``
+  and fail-out nicely.
 * Fix for additional date types thanks to input from `Isaac`_ and code from
   `BastianPoe`_ (`#301`_).
 * Fix for running migrations in the Docker container (`#299`_).  Thanks to
