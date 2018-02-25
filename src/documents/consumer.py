@@ -32,7 +32,8 @@ class Consumer:
       5. Delete the document and image(s)
     """
 
-    def __init__(self, consume=settings.CONSUMPTION_DIR, scratch=settings.SCRATCH_DIR):
+    def __init__(self, consume=settings.CONSUMPTION_DIR,
+                 scratch=settings.SCRATCH_DIR):
 
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
