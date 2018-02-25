@@ -42,9 +42,24 @@ set_permissions() {
     chown -Rh paperless:paperless /usr/src/paperless
 }
 
+migrations() {
+    # A simple lock file in case other containers use this startup
+    LOCKFILE="/usr/src/paperless/data/db.sqlite3.migration"
+
+    set -o noclobber
+    # check for and create lock file in one command 
+    (> ${LOCKFILE}) &> /dev/null
+    if [ $? -eq 0 ]
+    then
+        sudo -HEu paperless "/usr/src/paperless/src/manage.py" "migrate"
+        rm ${LOCKFILE}
+    fi
+}
+
 initialize() {
     map_uidgid
     set_permissions
+    migrations
 }
 
 install_languages() {

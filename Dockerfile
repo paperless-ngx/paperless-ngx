@@ -30,8 +30,6 @@ RUN apk --no-cache --update add \
     apk del .build-dependencies && \
 # Create the consumption directory
     mkdir -p $PAPERLESS_CONSUMPTION_DIR && \
-# Migrate database
-    ./src/manage.py migrate && \
 # Create user
     addgroup -g 1000 paperless && \
     adduser -D -u 1000 -G paperless -h /usr/src/paperless paperless && \
