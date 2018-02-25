@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
@@ -15,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='document',
             name='content',
-            field=models.TextField(blank=True, db_index=True, help_text='The raw, text-only data of the document.  This field is primarily used for searching.'),
+            field=models.TextField(blank=True, db_index=("mysql" not in settings.DATABASES["default"]["ENGINE"]), help_text='The raw, text-only data of the document.  This field is primarily used for searching.'),
         ),
     ]
