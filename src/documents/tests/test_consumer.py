@@ -16,7 +16,6 @@ class TestConsumer(TestCase):
             self.DummyParser
         )
 
-    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
@@ -33,17 +32,16 @@ class TestConsumer(TestCase):
             (None, lambda _: {"weight": 1, "parser": DummyParser2}),
         )
 
-        self.assertEqual(Consumer()._get_parser_class("doc.pdf"), DummyParser2)
+        self.assertEqual(Consumer(consume=".")._get_parser_class("doc.pdf"),
+                         DummyParser2)
 
-    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
     def test__get_parser_class_0_parsers(self, m, *args):
         m.return_value = ((None, lambda _: None),)
-        self.assertIsNone(Consumer()._get_parser_class("doc.pdf"))
+        self.assertIsNone(Consumer(consume=".")._get_parser_class("doc.pdf"))
 
-    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
@@ -51,7 +49,7 @@ class TestConsumer(TestCase):
         m.return_value = (
             (None, lambda _: {"weight": 0, "parser": self.DummyParser}),
         )
-        return Consumer()
+        return Consumer(consume=".")
 
 
 class TestAttributes(TestCase):
