@@ -1,6 +1,6 @@
 # Paperless
 
-![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest) ![Chat](https://badges.gitter.im/danielquinn/paperless.svg) ![Travis](https://travis-ci.org/danielquinn/paperless.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master)
+[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) ![Chat](https://badges.gitter.im/danielquinn/paperless.svg) [![Travis](https://travis-ci.org/danielquinn/paperless.svg?branch=master)](https://travis-ci.org/danielquinn/paperless) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master)
 
 Index and archive all of your scanned paper documents
 
