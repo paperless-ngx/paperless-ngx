@@ -33,15 +33,26 @@ class Command(BaseCommand):
         parser.add_argument(
             "directory",
             default=settings.CONSUMPTION_DIR,
-            nargs="?"
+            nargs="?",
+            help="The consumption directory."
         )
         parser.add_argument(
             "--loop-time",
             default=settings.CONSUMER_LOOP_TIME,
-            type=int
+            type=int,
+            help="Wait time between each loop (in seconds)."
         )
-        parser.add_argument("--mail-delta", default=10, type=int)
-        parser.add_argument("--oneshot", action="store_true")
+        parser.add_argument(
+            "--mail-delta",
+            default=10,
+            type=int,
+            help="Wait time between each mail fetch (in minutes)."
+        )
+        parser.add_argument(
+            "--oneshot",
+            action="store_true",
+            help="Run only once."
+        )
 
     def handle(self, *args, **options):
 
