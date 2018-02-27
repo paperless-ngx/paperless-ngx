@@ -80,7 +80,7 @@ you'll need to have it start in the background -- something you'll need to
 figure out for your own system.  To get you started though, there are Systemd
 service files in the ``scripts`` directory.
 
-Some command line argument are available to customize the behavior of the
+Some command line arguments are available to customize the behavior of the
 consumer. By default it will use ``/etc/paperless.conf`` values. Display the
 help with:
 
