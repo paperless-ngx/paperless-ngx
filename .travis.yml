@@ -15,11 +15,12 @@ matrix:
 
 install:
     - pip install --requirement requirements.txt
-
+    - pip install sphinx
 script:
     - cd src/
     - pytest --cov
     - pycodestyle
+    - sphinx-build -b html docs docs/_build -W
 
 after_success:
     - coveralls
