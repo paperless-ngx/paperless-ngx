@@ -1,5 +1,6 @@
 from django.test import TestCase
 from unittest import mock
+from tempfile import TemporaryDirectory
 
 from ..consumer import Consumer
 from ..models import FileInfo
@@ -16,7 +17,6 @@ class TestConsumer(TestCase):
             self.DummyParser
         )
 
-    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
@@ -32,18 +32,22 @@ class TestConsumer(TestCase):
             (None, lambda _: {"weight": 0, "parser": DummyParser1}),
             (None, lambda _: {"weight": 1, "parser": DummyParser2}),
         )
+        with TemporaryDirectory() as tmpdir:
+            self.assertEqual(
+                Consumer(consume=tmpdir)._get_parser_class("doc.pdf"),
+                DummyParser2
+            )
 
-        self.assertEqual(Consumer()._get_parser_class("doc.pdf"), DummyParser2)
-
-    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
     def test__get_parser_class_0_parsers(self, m, *args):
         m.return_value = ((None, lambda _: None),)
-        self.assertIsNone(Consumer()._get_parser_class("doc.pdf"))
+        with TemporaryDirectory() as tmpdir:
+            self.assertIsNone(
+                Consumer(consume=tmpdir)._get_parser_class("doc.pdf")
+            )
 
-    @mock.patch("documents.consumer.Consumer.CONSUME")
     @mock.patch("documents.consumer.os.makedirs")
     @mock.patch("documents.consumer.os.path.exists", return_value=True)
     @mock.patch("documents.consumer.document_consumer_declaration.send")
@@ -51,7 +55,8 @@ class TestConsumer(TestCase):
         m.return_value = (
             (None, lambda _: {"weight": 0, "parser": self.DummyParser}),
         )
-        return Consumer()
+        with TemporaryDirectory() as tmpdir:
+            return Consumer(consume=tmpdir)
 
 
 class TestAttributes(TestCase):

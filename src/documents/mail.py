@@ -151,7 +151,7 @@ class Attachment(object):
 
 class MailFetcher(Loggable):
 
-    def __init__(self):
+    def __init__(self, consume=settings.CONSUMPTION_DIR):
 
         Loggable.__init__(self)
 
@@ -165,6 +165,7 @@ class MailFetcher(Loggable):
         self._enabled = bool(self._host)
 
         self.last_checked = datetime.datetime.now()
+        self.consume = consume
 
     def pull(self):
         """
@@ -185,7 +186,7 @@ class MailFetcher(Loggable):
                 self.log("info", 'Storing email: "{}"'.format(message.subject))
 
                 t = int(time.mktime(message.time.timetuple()))
-                file_name = os.path.join(Consumer.CONSUME, message.file_name)
+                file_name = os.path.join(self.consume, message.file_name)
                 with open(file_name, "wb") as f:
                     f.write(message.attachment.data)
                     os.utime(file_name, times=(t, t))
