@@ -4,6 +4,11 @@ Changelog
 1.4.0
 =====
 
+* `Quentin Dawans`_ has refactored the document consumer to allow for some
+  command-line options.  Notably, you can now direct it to consume from a
+  particular ``--directory``, limit the ``--loop-time``, set the time between
+  mail server checks with ``--mail-delta`` or just run it as a one-off with
+  ``--one-shot``.  See `#305`_ & `#313`_ for more information.
 * Refactor the use of travis/tox/pytest/coverage into two files:
   ``.travis.yml`` and ``setup.cfg``.
 * Start generating requirements.txt from a Pipfile.  I'll probably switch over
@@ -365,6 +370,7 @@ Changelog
 .. _Georgi Todorov: https://github.com/TeraHz
 .. _Jeffrey Portman: https://github.com/ChromoX
 .. _Simon Taddiken: https://github.com/skuzzle
+.. _Quentin Dawans: https://github.com/ovv
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -421,10 +427,12 @@ Changelog
 .. _#300: https://github.com/danielquinn/paperless/pull/300
 .. _#301: https://github.com/danielquinn/paperless/issues/301
 .. _#303: https://github.com/danielquinn/paperless/issues/303
+.. _#305: https://github.com/danielquinn/paperless/issues/305
 .. _#306: https://github.com/danielquinn/paperless/issues/306
 .. _#308: https://github.com/danielquinn/paperless/issues/308
 .. _#311: https://github.com/danielquinn/paperless/pull/311
 .. _#312: https://github.com/danielquinn/paperless/pull/312
+.. _#313: https://github.com/danielquinn/paperless/pull/313
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
