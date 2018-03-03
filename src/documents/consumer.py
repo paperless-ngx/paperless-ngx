@@ -226,8 +226,8 @@ class Consumer:
 
     def _is_ready(self, doc):
         """
-        Detect whether `doc` is ready to consume or if it's still being written
-        to by the uploader.
+        Detect whether ``doc`` is ready to consume or if it's still being
+        written to by the uploader.
         """
 
         t = os.stat(doc).st_mtime
