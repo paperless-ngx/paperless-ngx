@@ -18,6 +18,8 @@ from dotenv import load_dotenv
 # Tap paperless.conf if it's available
 if os.path.exists("/etc/paperless.conf"):
     load_dotenv("/etc/paperless.conf")
+elif os.path.exists("/usr/local/etc/paperless.conf"):
+    load_dotenv("/usr/local/etc/paperless.conf")
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
