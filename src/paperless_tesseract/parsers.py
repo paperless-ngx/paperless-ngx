@@ -242,7 +242,7 @@ class RasterisedDocumentParser(DocumentParser):
                 break
 
         if date is not None:
-            self.log("info", "Detected document date " + date.strftime("%x") +
+            self.log("info", "Detected document date " + date.isoformat() +
                              " based on string " + datestring)
         else:
             self.log("info", "Unable to detect date for document")
