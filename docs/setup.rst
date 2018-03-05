@@ -63,7 +63,7 @@ Standard (Bare Metal)
 
 1. Install the requirements as per the :ref:`requirements <requirements>` page.
 2. Within the extract of master.zip go to the ``src`` directory.
-3. Copy ``paperless.conf.example`` to ``/etc/paperless.conf`` also the virtual
+3. Copy ``../paperless.conf.example`` to ``/etc/paperless.conf`` also the virtual
    envrionment look there for it and open it in your favourite editor.
    Because this file contains passwords it should only be readable by user root
    and paperless !  Set the values for:
