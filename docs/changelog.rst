@@ -13,6 +13,8 @@ Changelog
   ``.travis.yml`` and ``setup.cfg``.
 * Start generating requirements.txt from a Pipfile.  I'll probably switch over
   to just using pipenv in the future.
+* All for a alternative FreeBSD-friendly location for ``paperless.conf``.
+  Thanks to `Martin Arendtsen`_ who provided this (`#322`_).
 
 1.3.0
 =====
@@ -371,6 +373,7 @@ Changelog
 .. _Jeffrey Portman: https://github.com/ChromoX
 .. _Simon Taddiken: https://github.com/skuzzle
 .. _Quentin Dawans: https://github.com/ovv
+.. _Martin Arendtsen: https://github.com/Arendtsen
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -433,6 +436,7 @@ Changelog
 .. _#311: https://github.com/danielquinn/paperless/pull/311
 .. _#312: https://github.com/danielquinn/paperless/pull/312
 .. _#313: https://github.com/danielquinn/paperless/pull/313
+.. _#322: https://github.com/danielquinn/paperless/pull/322
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
