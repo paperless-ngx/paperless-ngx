@@ -15,7 +15,7 @@
 
 ## Πως δουλεύει
 
-Paperless does not control your scanner, it only helps you deal with what your scanner produces
+Η εφαρμογή Paperless δεν ελέγχει το scanner σας, αλλά σας βοηθάει με τα αποτελέσματα του scanner σας.
 
 1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless.readthedocs.io/en/latest/scanners.html) page.
 2. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually.  Paperless doesn't care how the documents get into its local consumption directory.
@@ -23,14 +23,14 @@ Paperless does not control your scanner, it only helps you deal with what your s
 4. Use the web frontend to sift through the database and find what you want.
 5. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
 
-Here's what you get:
+Αυτό είναι που θα πάρετε:
 
-![The before and after](https://raw.githubusercontent.com/danielquinn/paperless/master/docs/_static/screenshot.png)
+![Το πριν και το μετά](https://raw.githubusercontent.com/danielquinn/paperless/master/docs/_static/screenshot.png)
 
 
 ## Documentation
 
-It's all available on [ReadTheDocs](https://paperless.readthedocs.org/).
+Είναι όλα διαθέσιμα εδώ [ReadTheDocs](https://paperless.readthedocs.org/).
 
 
 ## Requirements
@@ -50,12 +50,12 @@ This is all really a quite simple, shiny, user-friendly wrapper around some very
 
 ## Σταθερότητα
 
-This project has been around since 2015, and there's lots of people using it, however it's still under active development (just look at the git commit history) so don't expect it to be 100% stable.  You can backup the sqlite3 database, media directory and your configuration file to be on the safe side.
+Αυτό το project υπάρχει από το 2015 και υπάρχουν αρκετοί άνθρωποι που το χρησιμοποιούν, παρόλα αυτά βρίσκεται σε διαρκή ανάπτυξη (απλά δείτε πότε commit έχουν γίνει στο git history) οπότε μην περιμένετε να είναι 100% σταθερό. Μπορείτε να κάνετε backup την βάση δεδομένων sqlite3, τον φάκελο media και το configuration αρχείο σας ώστε να είστε ασφαλείς.
 
 
 ## Affiliated Projects
 
-Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
+Το Paperless υπάρχει εδώ και κάποιο καιρό και άνθρωποι έχουν αρχήσει να φτιάχνουν πράγματα γύρω από αυτό. Αν είσαι ένας από αυτούς τους ανθρώπους, μπορούμε να βάλουμε το project σου σε αυτήν την λίστα:
 
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
@@ -73,6 +73,6 @@ Document scanners are typically used to scan sensitive documents.  Things like y
 
 ## Δωρεές
 
-As with all Free software, the power is less in the finances and more in the collective efforts.  I really appreciate every pull request and bug report offered up by Paperless' users, so please keep that stuff coming.  If however, you're not one for coding/design/documentation, and would like to contribute financially, I won't say no ;-)
+Όπως με όλα τα δωρεάν λογισμικά, η δύναμη δεν βρίσκεται στα οικονομικά αλλά στην συλλογική προσπάθεια. Αλήθεια εκτιμώ κάθε pull request και bug report που προσφέρεται από τους χρήστες του Paperless, οπότε σας παρακαλώ συνεχίστε. Αν παρόλα αυτά, δεν μπορείτε να γράψετε κώδικα/να κάνέτε design/να γράψετε documentation, και θέλετε να συνεισφέρετε οικονομικά, δεν θα πω όχι ;-)
 
-The thing is, I'm doing ok for money, so I would instead ask you to donate to the [United Nations High Commissioner for Refugees](https://donate.unhcr.org/int-en/general). They're doing important work and they need the money a lot more than I do.
+Το θέμα είναι ότι είμαι οικονομικά εντάξει, οπότε θα σας ζητήσω να δωρίσετε τα χρήματα σας εδώ [United Nations High Commissioner for Refugees](https://donate.unhcr.org/int-en/general). Κάνουν σημαντική δουλειά και χρειάζονται τα χρήματα πολύ περισσότερο από ότι εγώ.
