@@ -1,5 +1,7 @@
 from random import randint
 
+from django.contrib.admin.models import LogEntry
+from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 
 from ..models import Correspondent, Document, Tag
@@ -208,6 +210,7 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
 
     def setUp(self):
         TestCase.setUp(self)
+        User.objects.create_user(username='testuser', password='12345')
         self.doc_contains = Document.objects.create(
             content="I contain the keyword.", file_type="pdf")
 
@@ -244,3 +247,9 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
         document_consumption_finished.send(
             sender=self.__class__, document=self.doc_contains)
         self.assertEqual(self.doc_contains.correspondent, None)
+
+    def test_logentry_created(self):
+        document_consumption_finished.send(
+            sender=self.__class__, document=self.doc_contains)
+
+        self.assertEqual(LogEntry.objects.count(), 1)
