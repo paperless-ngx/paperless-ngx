@@ -33,19 +33,19 @@
 Είναι όλα διαθέσιμα εδώ [ReadTheDocs](https://paperless.readthedocs.org/).
 
 
-## Requirements
+## Απαιτήσεις
 
-This is all really a quite simple, shiny, user-friendly wrapper around some very powerful tools.
+Όλα αυτά είναι πολύ απλά, και φιλικά προς τον χρήστη, μια συλλογή με πολύτιμα εργαλεία.
 
-* [ImageMagick](http://imagemagick.org/) converts the images between colour and greyscale.
-* [Tesseract](https://github.com/tesseract-ocr) does the character recognition.
+* [ImageMagick](http://imagemagick.org/) μετατρέπει τις εικόνες σε έγχρωμες και ασπρόμαυρες.
+* [Tesseract](https://github.com/tesseract-ocr) κάνει την αναγώρηση των χαρακτήρων.
 * [Unpaper](https://www.flameeyes.eu/projects/unpaper) despeckles and deskews the scanned image.
-* [GNU Privacy Guard](https://gnupg.org/) is used as the encryption backend.
-* [Python 3](https://python.org/) is the language of the project.
-  * [Pillow](https://pypi.python.org/pypi/pillowfight/) loads the image data as a python object to be used with PyOCR.
+* [GNU Privacy Guard](https://gnupg.org/) χρησιμοποιείται για κρυπτογράφηση στο backend.
+* [Python 3](https://python.org/) είναι η γλώσσα του project.
+  * [Pillow](https://pypi.python.org/pypi/pillowfight/) Φορτώνει την εικόνα σαν αντικείμενο στην python και μπορεί να χρησιμοποιηθεί με PyOCR
   * [PyOCR](https://github.com/jflesch/pyocr) is a slick programmatic wrapper around tesseract.
-  * [Django](https://www.djangoproject.com/) is the framework this project is written against.
-  * [Python-GNUPG](http://pythonhosted.org/python-gnupg/) decrypts the PDFs on-the-fly to allow you to download unencrypted files, leaving the encrypted ones on-disk.
+  * [Django](https://www.djangoproject.com/) το framework με το οποίο έγινε το project.
+  * [Python-GNUPG](http://pythonhosted.org/python-gnupg/) Αποκρυπτογραφεί τα PDF αρχεία στη στιγμή ώστε να κατεβάζετε αποκρυπτογραφημένα αρχεία, αφήνωντας τα κρυπτογραφημένα στον δίσκο.
 
 
 ## Σταθερότητα
@@ -68,7 +68,7 @@ There's another project out there called [Mayan EDMS](https://mayan.readthedocs.
 
 ## Σημαντική Σημείωση
 
-Document scanners are typically used to scan sensitive documents.  Things like your social insurance number, tax records, invoices, etc.  While Paperless encrypts the original files via the consumption script, the OCR'd text is *not* encrypted and is therefore stored in the clear (it needs to be searchable, so if someone has ideas on how to do that on encrypted data, I'm all ears).  This means that Paperless should never be run on an untrusted host.  Instead, I recommend that if you do want to use it, run it locally on a server in your own home.
+Τα scanner για αρχεία συνήθως χρησιμοποιούνται για ευαίσθητα αρχεία. Πράγματα όπως το ΑΜΚΑ, φορολογικά αρχεία, τιμολόγια κτλπ. Παρόλο που το Paperless κρυπτογραφεί τα αρχικά αρχεία μέσω του consumption script, το κείμενο OCR * δεν είναι* κρυπρογραφημένο και για αυτό αποθηκεύεται (πρέπει να είναι αναζητήσιμο, οπότε αν κάποιος ξέρει να το κάνει αυτό με κρυπτογραφημένα δεδομένα είμαι όλος αυτιά). Αυτό σημάνει ότι το Paperless δεν πρέπει ποτέ να τρέχει σε μη αξιόπιστο πάροχο. Για αυτό συστήνω αν θέλετε να το τρέξετε να το τρέξετε σε έναν τοπικό server σπίτι σας.
 
 
 ## Δωρεές
