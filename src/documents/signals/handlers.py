@@ -3,9 +3,11 @@ import os
 from subprocess import Popen
 
 from django.conf import settings
-from django.contrib.admin.models import LogEntry, ADDITION
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+
+from datetime import datetime
 
 from ..models import Correspondent, Document, Tag
 
@@ -105,7 +107,7 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
 
     LogEntry.objects.create(
         action_flag=ADDITION,
-        action_time=document.created,
+        action_time=datetime.now(),
         content_type=ct,
         object_id=document.id,
         user=user,
