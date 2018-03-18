@@ -3,6 +3,7 @@ import os
 import sys
 
 if __name__ == "__main__":
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
 
     from django.conf import settings
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     # must be entered at start time to keep it safe.
     if "runserver" in sys.argv or "document_consumer" in sys.argv:
         if not settings.STORAGE_TYPE == "unencrypted":
-            if not settings.PASSPHRASE:
+            while not settings.PASSPHRASE:
                 settings.PASSPHRASE = input(
                     "settings.PASSPHRASE is unset.  Input passphrase: "
                 )
