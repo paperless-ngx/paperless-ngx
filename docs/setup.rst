@@ -269,7 +269,7 @@ Vagrant Method
       dumped to be consumed by Paperless.
     * ``PAPERLESS_PASSPHRASE``: this is the passphrase Paperless uses to
       encrypt/decrypt the original document.
-    * ``PAPERLESS_SHARED_SECRET``: this is the "magic word" used when consuming
+    * ``PAPERLESS_EMAIL_SECRET``: this is the "magic word" used when consuming
       documents from mail or via the API.  If you don't use either, leaving it
       blank is just fine.
 
