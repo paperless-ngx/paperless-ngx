@@ -13,7 +13,6 @@ from dateutil import parser
 
 from django.conf import settings
 
-from .consumer import Consumer
 from .models import Correspondent
 
 
