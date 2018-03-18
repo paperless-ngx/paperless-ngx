@@ -2,7 +2,7 @@ import os
 import shutil
 
 from django.conf import settings
-from django.core.checks import Error, register, Warning
+from django.core.checks import Error, Warning, register
 
 
 @register()
@@ -84,20 +84,3 @@ def binaries_check(app_configs, **kwargs):
             check_messages.append(Warning(error.format(binary), hint))
 
     return check_messages
-
-
-@register()
-def config_check(app_configs, **kwargs):
-    warning = (
-        "It looks like you have PAPERLESS_SHARED_SECRET defined.  Note that "
-        "in the \npast, this variable was used for both API authentication "
-        "and as the mail \nkeyword.  As the API no no longer uses it, this "
-        "variable has been renamed to \nPAPERLESS_EMAIL_SECRET, so if you're "
-        "using the mail feature, you'd best update \nyour variable name.\n\n"
-        "The old variable will stop working in a few months."
-    )
-
-    if os.getenv("PAPERLESS_SHARED_SECRET"):
-        return [Warning(warning)]
-
-    return []
