@@ -15,6 +15,10 @@ Changelog
   to just using pipenv in the future.
 * All for a alternative FreeBSD-friendly location for ``paperless.conf``.
   Thanks to `Martin Arendtsen`_ who provided this (`#322`_).
+* Document consumption events are now logged in the Django admin events log.
+  Thanks to `CkuT`_ for doing the legwork on this one and to `Quentin Dawans`_
+  & `David Martin`_ for helping to coordinate & work out how the feature would
+  be developed.
 
 1.3.0
 =====
@@ -367,7 +371,7 @@ Changelog
 .. _Dan Panzarella: https://github.com/pzl
 .. _addadi: https://github.com/addadi
 .. _BastianPoe: https://github.com/BastianPoe
-.. _matthewmoto: https://github.com/BastianPoe
+.. _matthewmoto: https://github.com/matthewmoto
 .. _Isaac: https://github.com/isaacsando
 .. _Georgi Todorov: https://github.com/TeraHz
 .. _Jeffrey Portman: https://github.com/ChromoX
