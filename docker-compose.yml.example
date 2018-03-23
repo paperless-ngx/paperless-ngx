@@ -24,7 +24,7 @@ services:
         # value with nothing.
         environment:
             - PAPERLESS_OCR_LANGUAGES=
-        command: ["runserver", "--insecure", "0.0.0.0:8000"]
+        command: ["runserver", "--insecure", "--noreload", "0.0.0.0:8000"]
 
     consumer:
         build: ./
