@@ -19,6 +19,9 @@ Changelog
   Thanks to `CkuT`_ for doing the legwork on this one and to `Quentin Dawans`_
   & `David Martin`_ for helping to coordinate & work out how the feature would
   be developed.
+* `erikarvstedt`_ contributed a pull request (`#328`_) to add ``--noreload``
+  to the default server start process.  This helps reduce the load imposed
+  by the running webservice.
 
 1.3.0
 =====
@@ -378,6 +381,7 @@ Changelog
 .. _Simon Taddiken: https://github.com/skuzzle
 .. _Quentin Dawans: https://github.com/ovv
 .. _Martin Arendtsen: https://github.com/Arendtsen
+.. _erikarvstedt: https://github.com/erikarvstedt
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -441,6 +445,7 @@ Changelog
 .. _#312: https://github.com/danielquinn/paperless/pull/312
 .. _#313: https://github.com/danielquinn/paperless/pull/313
 .. _#322: https://github.com/danielquinn/paperless/pull/322
+.. _#328: https://github.com/danielquinn/paperless/pull/328
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
