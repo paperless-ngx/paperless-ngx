@@ -352,7 +352,7 @@ after restarting your system:
     respawn limit 10 5
 
     script
-      exec /srv/paperless/src/manage.py runserver 0.0.0.0:80
+      exec /srv/paperless/src/manage.py runserver --noreload 0.0.0.0:80
     end script
 
    Note that you'll need to replace ``/srv/paperless/src/manage.py`` with the
