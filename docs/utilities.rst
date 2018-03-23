@@ -33,8 +33,11 @@ The webserver is started via the ``manage.py`` script:
 By default, the server runs on localhost, port 8000, but you can change this
 with a few arguments, run ``manage.py --help`` for more information.
 
-Note that this command runs continuously, so exiting it will mean your webserver
-disappears.  If you want to run this full-time (which is kind of the point)
+Add the option ``--noreload`` to reduce resource usage. Otherwise, the server
+continuously polls all source files for changes to auto-reload them.
+
+Note that when exiting this command your webserver will disappear.
+If you want to run this full-time (which is kind of the point)
 you'll need to have it start in the background -- something you'll need to
 figure out for your own system.  To get you started though, there are Systemd
 service files in the ``scripts`` directory.
