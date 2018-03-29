@@ -6,8 +6,7 @@ from django.conf import settings
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-
-from datetime import datetime
+from django.utils import timezone
 
 from ..models import Correspondent, Document, Tag
 
@@ -107,7 +106,7 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
 
     LogEntry.objects.create(
         action_flag=ADDITION,
-        action_time=datetime.now(),
+        action_time=timezone.now(),
         content_type=ct,
         object_id=document.id,
         user=user,
