@@ -210,7 +210,7 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
 
     def setUp(self):
         TestCase.setUp(self)
-        User.objects.create_user(username='testuser', password='12345')
+        User.objects.create_user(username='test_consumer', password='12345')
         self.doc_contains = Document.objects.create(
             content="I contain the keyword.", file_type="pdf")
 
