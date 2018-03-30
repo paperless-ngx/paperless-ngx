@@ -102,7 +102,7 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
 
     ct = ContentType.objects.get(model="document")
-    user = User.objects.first()
+    user = User.objects.get(username="consumer")
 
     LogEntry.objects.create(
         action_flag=ADDITION,
