@@ -17,7 +17,7 @@
 
 Η εφαρμογή Paperless δεν ελέγχει το scanner σας, αλλά σας βοηθάει με τα αποτελέσματα του scanner σας.
 
-1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless.readthedocs.io/en/latest/scanners.html) page.
+1. Αγοράστε ένα scanner με πρόσβαση στο δύκτιο σας.  Αν χρειάζεστε έμπνευση, δείτε την σελίδα με τα[προτεινώμενα scanner](https://paperless.readthedocs.io/en/latest/scanners.html).
 2. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually.  Paperless doesn't care how the documents get into its local consumption directory.
 3. Have the target server run the Paperless consumption script to OCR the file and index it into a local database.
 4. Use the web frontend to sift through the database and find what you want.
@@ -57,13 +57,13 @@
 
 Το Paperless υπάρχει εδώ και κάποιο καιρό και άνθρωποι έχουν αρχήσει να φτιάχνουν πράγματα γύρω από αυτό. Αν είσαι ένας από αυτούς τους ανθρώπους, μπορούμε να βάλουμε το project σου σε αυτήν την λίστα:
 
-* [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
-* [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
+* [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): Μια desktop εφαρμογή για εγκατάσταση του Paperless.  Τρέχει σε Mac, Linux, και Windows.
+* [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): Ένας εύκολο τρόπος για να τρέχει το Paperless μέσω Ansible.
 
 
 ## Παρόμοια Projects
 
-There's another project out there called [Mayan EDMS](https://mayan.readthedocs.org/en/latest/) that has a surprising amount of technical overlap with Paperless.  Also based on Django and using a consumer model with Tesseract and Unpaper, Mayan EDMS is *much* more featureful and comes with a slick UI as well, but still in Python 2. It may be that Paperless consumes fewer resources, but to be honest, this is just a guess as I haven't tested this myself.  One thing's for certain though, *Paperless* is a **way** better name.
+Υπάρχει ένα άλλο ṕroject που λέγεται [Mayan EDMS](https://mayan.readthedocs.org/en/latest/) το οποίο έχει παρόμοια τεχνικά χαρακτηριστικά με το Paperless σε εντυπωσιακό βαθμό.  Επίσης βασισμένο στο Django και χρησιμοποιόντας το consumer model με Tesseract και Unpaper, Mayan EDMS έχει *πολλά* περισσότερα χαρακτηριστικά και έρχεται με ένα επιδέξειο UI, αλλά είναι ακόμα σε Python 2. Μπορεί να είναι ότι το Paperless καταναλώνει λιγότερους πόρους, αλλά για να είμαι ειληκρινής, αυτό είναι μια εικασία την οποία δεν έχω επιβεβαιώσει μόνος μου.  Ένα πράγμα είναι σίγουρο, το *Paperless* έχει **πολύ** καλύτερο όνομα.
 
 
 ## Σημαντική Σημείωση
