@@ -1,4 +1,4 @@
-*[Greek](README-el.md)
+*[Greek](README-el.md)*
 
 # Paperless
 
