@@ -22,6 +22,10 @@ Changelog
 * `erikarvstedt`_ contributed a pull request (`#328`_) to add ``--noreload``
   to the default server start process.  This helps reduce the load imposed
   by the running webservice.
+* Through some discussion on `#253`_ and `#323`_, we've removed a few of the
+  hardcoded URL values to make it easier for people to host Paperless on a
+  subdirectory.  Thanks to `Quentin Dawans`_ and `Kyle Lucy`_ for helping to
+  work this out.
 
 1.3.0
 =====
@@ -382,6 +386,7 @@ Changelog
 .. _Quentin Dawans: https://github.com/ovv
 .. _Martin Arendtsen: https://github.com/Arendtsen
 .. _erikarvstedt: https://github.com/erikarvstedt
+.. _Kyle Lucy: https://github.com/kmlucy
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -446,6 +451,8 @@ Changelog
 .. _#313: https://github.com/danielquinn/paperless/pull/313
 .. _#322: https://github.com/danielquinn/paperless/pull/322
 .. _#328: https://github.com/danielquinn/paperless/pull/328
+.. _#253: https://github.com/danielquinn/paperless/issues/253
+.. _#323: https://github.com/danielquinn/paperless/issues/323
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
