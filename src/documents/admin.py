@@ -139,19 +139,17 @@ class DocumentAdmin(CommonAdmin):
     created_.short_description = "Created"
 
     def thumbnail(self, obj):
-        if settings.FORCE_SCRIPT_NAME:
-            src_link = "{}/fetch/thumb/{}".format(
-                settings.FORCE_SCRIPT_NAME, obj.id)
-        else:
-            src_link = "/fetch/thumb/{}".format(obj.id)
-        png_img = self._html_tag(
-            "img",
-            src=src_link,
-            width=180,
-            alt="Thumbnail of {}".format(obj.file_name),
-            title=obj.file_name
+        return self._html_tag(
+            "a",
+            self._html_tag(
+                "img",
+                src=reverse("fetch", kwargs={"kind": "thumb", "pk": obj.pk}),
+                width=180,
+                alt="Thumbnail of {}".format(obj.file_name),
+                title=obj.file_name
+            ),
+            href=obj.download_url
         )
-        return self._html_tag("a", png_img, href=obj.download_url)
     thumbnail.allow_tags = True
 
     def tags_(self, obj):
