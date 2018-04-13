@@ -41,7 +41,7 @@ SECRET_KEY = os.getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-LOGIN_URL = '/admin/login'
+LOGIN_URL = "admin:login"
 
 ALLOWED_HOSTS = ["*"]
 
