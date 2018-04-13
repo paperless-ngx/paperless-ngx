@@ -29,6 +29,15 @@ PAPERLESS_CONSUMPTION_DIR=""
 #PAPERLESS_STATICDIR=""
 
 
+# Override the MEDIA_URL here.  Unless you're hosting Paperless off a subdomain
+# like /paperless/, you probably don't need to change this.
+#PAPERLESS_MEDIA_URL="/media/"
+
+# Override the STATIC_URL here.  Unless you're hosting Paperless off a
+# subdomain like /paperless/, you probably don't need to change this.
+#PAPERLESS_STATIC_URL="/static/"
+
+
 # These values are required if you want paperless to check a particular email
 # box every 10 minutes and attempt to consume documents from there.  If you
 # don't define a HOST, mail checking will just be disabled.
