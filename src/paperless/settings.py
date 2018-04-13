@@ -185,8 +185,8 @@ STATIC_ROOT = os.getenv(
 MEDIA_ROOT = os.getenv(
     "PAPERLESS_MEDIADIR", os.path.join(BASE_DIR, "..", "media"))
 
-STATIC_URL = '/static/'
-MEDIA_URL = "/media/"
+STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
+MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
 
 
 # Paperless-specific stuff
