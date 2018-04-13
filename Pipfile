@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 django = "<2.0,>=1.11"
 pillow = "*"
 coveralls = "*"
@@ -36,5 +33,5 @@ pytest-sugar = "*"
 pytest-env = "*"
 pytest-xdist = "*"
 
-
 [dev-packages]
+ipython = "*"
