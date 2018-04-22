@@ -319,7 +319,7 @@ class Log(models.Model):
         models.Model.save(self, *args, **kwargs)
 
 
-class FileInfo(object):
+class FileInfo:
 
     # This epic regex *almost* worked for our needs, so I'm keeping it here for
     # posterity, in the hopes that we might find a way to make it work one day.
