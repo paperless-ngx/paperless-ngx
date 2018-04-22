@@ -359,3 +359,8 @@ class TestFieldPermutations(TestCase):
                         }
                         self._test_guessed_attributes(
                             template.format(**spec), **spec)
+
+    def test_invalid_date_format(self):
+        info = FileInfo.from_path("/path/to/06112017Z - title.pdf")
+        self.assertEqual(info.title, "title")
+        self.assertIsNone(info.created)
