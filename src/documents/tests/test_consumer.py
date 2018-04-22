@@ -276,11 +276,13 @@ class TestFieldPermutations(TestCase):
 
     def test_created_and_correspondent_and_title_and_tags(self):
 
-        template = ("/path/to/{created} - "
-                    "{correspondent} - "
-                    "{title} - "
-                    "{tags}"
-                    ".{extension}")
+        template = (
+            "/path/to/{created} - "
+            "{correspondent} - "
+            "{title} - "
+            "{tags}"
+            ".{extension}"
+        )
 
         for created in self.valid_dates:
             for correspondent in self.valid_correspondents:
@@ -299,10 +301,7 @@ class TestFieldPermutations(TestCase):
 
     def test_created_and_correspondent_and_title(self):
 
-        template = ("/path/to/{created} - "
-                    "{correspondent} - "
-                    "{title}"
-                    ".{extension}")
+        template = "/path/to/{created} - {correspondent} - {title}.{extension}"
 
         for created in self.valid_dates:
             for correspondent in self.valid_correspondents:
@@ -325,9 +324,7 @@ class TestFieldPermutations(TestCase):
 
     def test_created_and_title(self):
 
-        template = ("/path/to/{created} - "
-                    "{title}"
-                    ".{extension}")
+        template = "/path/to/{created} - {title}.{extension}"
 
         for created in self.valid_dates:
             for title in self.valid_titles:
@@ -342,10 +339,7 @@ class TestFieldPermutations(TestCase):
 
     def test_created_and_title_and_tags(self):
 
-        template = ("/path/to/{created} - "
-                    "{title} - "
-                    "{tags}"
-                    ".{extension}")
+        template = "/path/to/{created} - {title} - {tags}.{extension}"
 
         for created in self.valid_dates:
             for title in self.valid_titles:
