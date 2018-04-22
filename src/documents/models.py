@@ -394,7 +394,10 @@ class FileInfo(object):
 
     @classmethod
     def _get_created(cls, created):
-        return dateutil.parser.parse("{:0<14}Z".format(created[:-1]))
+        try:
+            return dateutil.parser.parse("{:0<14}Z".format(created[:-1]))
+        except ValueError:
+            return None
 
     @classmethod
     def _get_correspondent(cls, name):
