@@ -125,7 +125,9 @@ class DocumentAdmin(CommonAdmin):
         }
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
-    list_display = ("title", "created", "thumbnail", "correspondent", "tags_")
+    readonly_fields = ("added",)
+    list_display = ("title", "created", "added", "thumbnail", "correspondent",
+                    "tags_")
     list_filter = ("tags", "correspondent", FinancialYearFilter,
                    MonthListFilter)
 
