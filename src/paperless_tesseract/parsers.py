@@ -285,7 +285,7 @@ def image_to_string(args):
             try:
                 orientation = ocr.detect_orientation(f, lang=lang)
                 f = f.rotate(orientation["angle"], expand=1)
-            except (TesseractError, OtherTesseractError, KeyError):
+            except (TesseractError, OtherTesseractError, AttributeError):
                 pass
         return ocr.image_to_string(f, lang=lang)
 
