@@ -161,7 +161,7 @@ class MailFetcher(Loggable):
 
         self._enabled = bool(self._host)
 
-        self.last_checked = datetime.datetime.now()
+        self.last_checked = time.time()
         self.consume = consume
 
     def pull(self):
@@ -188,7 +188,7 @@ class MailFetcher(Loggable):
                     f.write(message.attachment.data)
                     os.utime(file_name, times=(t, t))
 
-        self.last_checked = datetime.datetime.now()
+        self.last_checked = time.time()
 
     def _get_messages(self):
 
