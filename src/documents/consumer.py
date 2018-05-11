@@ -75,80 +75,82 @@ class Consumer:
         docs_old_to_new = sorted(docs, key=lambda doc: os.path.getmtime(doc))
 
         for doc in docs_old_to_new:
+            self.try_consume_file(doc)
 
-            doc = os.path.join(self.consume, doc)
+    def try_consume_file(self, doc):
+        doc = os.path.join(self.consume, doc)
 
-            if not os.path.isfile(doc):
-                continue
+        if not os.path.isfile(doc):
+            return
 
-            if not re.match(FileInfo.REGEXES["title"], doc):
-                continue
+        if not re.match(FileInfo.REGEXES["title"], doc):
+            return
 
-            if doc in self._ignore:
-                continue
+        if doc in self._ignore:
+            return
 
-            if not self._is_ready(doc):
-                continue
+        if not self._is_ready(doc):
+            return
 
-            if self._is_duplicate(doc):
-                self.log(
-                    "info",
-                    "Skipping {} as it appears to be a duplicate".format(doc)
-                )
-                self._ignore.append(doc)
-                continue
+        if self._is_duplicate(doc):
+            self.log(
+                "info",
+                "Skipping {} as it appears to be a duplicate".format(doc)
+            )
+            self._ignore.append(doc)
+            return
 
-            parser_class = self._get_parser_class(doc)
-            if not parser_class:
-                self.log(
-                    "error", "No parsers could be found for {}".format(doc))
-                self._ignore.append(doc)
-                continue
+        parser_class = self._get_parser_class(doc)
+        if not parser_class:
+            self.log(
+                "error", "No parsers could be found for {}".format(doc))
+            self._ignore.append(doc)
+            return
 
-            self.logging_group = uuid.uuid4()
+        self.logging_group = uuid.uuid4()
 
-            self.log("info", "Consuming {}".format(doc))
+        self.log("info", "Consuming {}".format(doc))
 
-            document_consumption_started.send(
-                sender=self.__class__,
-                filename=doc,
-                logging_group=self.logging_group
+        document_consumption_started.send(
+            sender=self.__class__,
+            filename=doc,
+            logging_group=self.logging_group
+        )
+
+        parsed_document = parser_class(doc)
+
+        try:
+            thumbnail = parsed_document.get_thumbnail()
+            date = parsed_document.get_date()
+            document = self._store(
+                parsed_document.get_text(),
+                doc,
+                thumbnail,
+                date
+            )
+        except ParseError as e:
+
+            self._ignore.append(doc)
+            self.log("error", "PARSE FAILURE for {}: {}".format(doc, e))
+            parsed_document.cleanup()
+
+            return
+
+        else:
+
+            parsed_document.cleanup()
+            self._cleanup_doc(doc)
+
+            self.log(
+                "info",
+                "Document {} consumption finished".format(document)
             )
 
-            parsed_document = parser_class(doc)
-
-            try:
-                thumbnail = parsed_document.get_thumbnail()
-                date = parsed_document.get_date()
-                document = self._store(
-                    parsed_document.get_text(),
-                    doc,
-                    thumbnail,
-                    date
-                )
-            except ParseError as e:
-
-                self._ignore.append(doc)
-                self.log("error", "PARSE FAILURE for {}: {}".format(doc, e))
-                parsed_document.cleanup()
-
-                continue
-
-            else:
-
-                parsed_document.cleanup()
-                self._cleanup_doc(doc)
-
-                self.log(
-                    "info",
-                    "Document {} consumption finished".format(document)
-                )
-
-                document_consumption_finished.send(
-                    sender=self.__class__,
-                    document=document,
-                    logging_group=self.logging_group
-                )
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=document,
+                logging_group=self.logging_group
+            )
 
     def _get_parser_class(self, doc):
         """
