@@ -95,9 +95,11 @@ class Consumer:
         for file, mtime in files_old_to_new:
             if mtime == os.path.getmtime(file):
                 # File has not been modified and can be consumed
-                self.try_consume_file(file)
+                if not self.try_consume_file(file):
+                    self._ignore.append(file)
 
     def try_consume_file(self, file):
+        "Return True if file was consumed"
 
         if not re.match(FileInfo.REGEXES["title"], file):
             return False
@@ -109,15 +111,13 @@ class Consumer:
                 "info",
                 "Skipping {} as it appears to be a duplicate".format(doc)
             )
-            self._ignore.append(doc)
-            return
+            return False
 
         parser_class = self._get_parser_class(doc)
         if not parser_class:
             self.log(
                 "error", "No parsers could be found for {}".format(doc))
-            self._ignore.append(doc)
-            return
+            return False
 
         self.logging_group = uuid.uuid4()
 
@@ -141,15 +141,10 @@ class Consumer:
                 date
             )
         except ParseError as e:
-
-            self._ignore.append(doc)
             self.log("error", "PARSE FAILURE for {}: {}".format(doc, e))
             parsed_document.cleanup()
-
-            return
-
+            return False
         else:
-
             parsed_document.cleanup()
             self._cleanup_doc(doc)
 
@@ -163,6 +158,7 @@ class Consumer:
                 document=document,
                 logging_group=self.logging_group
             )
+            return True
 
     def _get_parser_class(self, doc):
         """
