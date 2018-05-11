@@ -42,7 +42,7 @@ class Message(Loggable):
     and n attachments, and that we don't care about the message body.
     """
 
-    SECRET = os.getenv("PAPERLESS_EMAIL_SECRET")
+    SECRET = os.getenv("PAPERLESS_EMAIL_SECRET", "")
 
     def __init__(self, data, group=None):
         """
