@@ -59,7 +59,7 @@ class Command(BaseCommand):
         self.verbosity = options["verbosity"]
         directory = options["directory"]
         loop_time = options["loop_time"]
-        mail_delta = datetime.timedelta(minutes=options["mail_delta"])
+        mail_delta = options["mail_delta"] * 60
 
         try:
             self.file_consumer = Consumer(consume=directory)
@@ -83,18 +83,20 @@ class Command(BaseCommand):
 
     def loop(self, loop_time, mail_delta):
         while True:
-            self.loop_step(mail_delta)
-            time.sleep(loop_time)
+            start_time = time.time()
             if self.verbosity > 1:
-                print(".", int(time.time()))
+                print(".", int(start_time))
+            self.loop_step(mail_delta, start_time)
+            # Sleep until the start of the next loop step
+            time.sleep(max(0, start_time + loop_time - time.time()))
 
-    def loop_step(self, mail_delta):
+    def loop_step(self, mail_delta, time_now=None):
 
         # Occasionally fetch mail and store it to be consumed on the next loop
         # We fetch email when we first start up so that it is not necessary to
         # wait for 10 minutes after making changes to the config file.
         next_mail_time = self.mail_fetcher.last_checked + mail_delta
-        if self.first_iteration or datetime.datetime.now() > next_mail_time:
+        if self.first_iteration or time_now > next_mail_time:
             self.first_iteration = False
             self.mail_fetcher.pull()
 
