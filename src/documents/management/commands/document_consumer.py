@@ -74,24 +74,27 @@ class Command(BaseCommand):
         )
 
         if options["oneshot"]:
-            self.loop(mail_delta=mail_delta)
+            self.loop_step(mail_delta)
         else:
             try:
-                while True:
-                    self.loop(mail_delta=mail_delta)
-                    time.sleep(loop_time)
-                    if self.verbosity > 1:
-                        print(".", int(time.time()))
+                self.loop(loop_time, mail_delta)
             except KeyboardInterrupt:
                 print("Exiting")
 
-    def loop(self, mail_delta):
+    def loop(self, loop_time, mail_delta):
+        while True:
+            self.loop_step(mail_delta)
+            time.sleep(loop_time)
+            if self.verbosity > 1:
+                print(".", int(time.time()))
+
+    def loop_step(self, mail_delta):
 
         # Occasionally fetch mail and store it to be consumed on the next loop
         # We fetch email when we first start up so that it is not necessary to
         # wait for 10 minutes after making changes to the config file.
-        delta = self.mail_fetcher.last_checked + mail_delta
-        if self.first_iteration or delta < datetime.datetime.now():
+        next_mail_time = self.mail_fetcher.last_checked + mail_delta
+        if self.first_iteration or datetime.datetime.now() > next_mail_time:
             self.first_iteration = False
             self.mail_fetcher.pull()
 
