@@ -80,13 +80,22 @@ class Consumer:
         Find non-ignored files in consumption dir and consume them if they have
         been unmodified for FILES_MIN_UNMODIFIED_DURATION.
         """
+        ignored_files = []
         files = []
         for entry in os.scandir(self.consume):
-            if entry.is_file() and entry.path not in self._ignore:
-                files.append((entry.path, entry.stat().st_mtime))
+            if entry.is_file():
+                file = (entry.path, entry.stat().st_mtime)
+                if file in self._ignore:
+                    ignored_files.append(file)
+                else:
+                    files.append(file)
 
         if not files:
             return
+
+        # Set _ignore to only include files that still exist.
+        # This keeps it from growing indefinitely.
+        self._ignore[:] = ignored_files
 
         files_old_to_new = sorted(files, key=itemgetter(1))
 
@@ -96,7 +105,7 @@ class Consumer:
             if mtime == os.path.getmtime(file):
                 # File has not been modified and can be consumed
                 if not self.try_consume_file(file):
-                    self._ignore.append(file)
+                    self._ignore.append((file, mtime))
 
     def try_consume_file(self, file):
         "Return True if file was consumed"
