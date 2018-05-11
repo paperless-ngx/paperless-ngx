@@ -20,7 +20,7 @@ class MailFetcherError(Exception):
     pass
 
 
-class InvalidMessageError(Exception):
+class InvalidMessageError(MailFetcherError):
     pass
 
 
@@ -205,7 +205,7 @@ class MailFetcher(Loggable):
             self._connection.close()
             self._connection.logout()
 
-        except Exception as e:
+        except MailFetcherError as e:
             self.log("error", str(e))
 
         return r
