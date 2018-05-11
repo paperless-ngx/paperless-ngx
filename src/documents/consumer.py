@@ -71,8 +71,11 @@ class Consumer:
         })
 
     def run(self):
+        docs = [os.path.join(self.consume, entry)
+                for entry in os.listdir(self.consume)]
+        docs_old_to_new = sorted(docs, key=lambda doc: os.path.getmtime(doc))
 
-        for doc in os.listdir(self.consume):
+        for doc in docs_old_to_new:
 
             doc = os.path.join(self.consume, doc)
 
