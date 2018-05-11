@@ -95,7 +95,4 @@ class Command(BaseCommand):
             self.first_iteration = False
             self.mail_fetcher.pull()
 
-        # Consume whatever files we can.
-        # We have to run twice as the first run checks for file readiness
-        for i in range(2):
-            self.file_consumer.run()
+        self.file_consumer.consume_new_files()
