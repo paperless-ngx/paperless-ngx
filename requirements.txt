@@ -20,6 +20,7 @@ flake8==3.5.0
 fuzzywuzzy==0.15.0
 gunicorn==19.7.1
 idna==2.6
+inotify_simple==1.1.7; sys_platform == 'linux'
 langdetect==1.0.7
 mccabe==0.6.1
 more-itertools==4.1.0

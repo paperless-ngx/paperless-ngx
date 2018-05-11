@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import sys
 import time
 
 from django.conf import settings
@@ -8,6 +9,11 @@ from django.core.management.base import BaseCommand, CommandError
 
 from ...consumer import Consumer, ConsumerError, make_dirs
 from ...mail import MailFetcher, MailFetcherError
+
+try:
+    from inotify_simple import INotify, flags
+except ImportError:
+    pass
 
 
 class Command(BaseCommand):
@@ -53,6 +59,11 @@ class Command(BaseCommand):
             action="store_true",
             help="Run only once."
         )
+        parser.add_argument(
+            "--no-inotify",
+            action="store_true",
+            help="Don't use inotify, even if it's available."
+        )
 
     def handle(self, *args, **options):
 
@@ -60,6 +71,8 @@ class Command(BaseCommand):
         directory = options["directory"]
         loop_time = options["loop_time"]
         mail_delta = options["mail_delta"] * 60
+        use_inotify = (not options["no_inotify"]
+                       and "inotify_simple" in sys.modules)
 
         try:
             self.file_consumer = Consumer(consume=directory)
@@ -70,14 +83,20 @@ class Command(BaseCommand):
         make_dirs(self.ORIGINAL_DOCS, self.THUMB_DOCS)
 
         logging.getLogger(__name__).info(
-            "Starting document consumer at {}".format(directory)
+            "Starting document consumer at {}{}".format(
+                directory,
+                " with inotify" if use_inotify else ""
+            )
         )
 
         if options["oneshot"]:
             self.loop_step(mail_delta)
         else:
             try:
-                self.loop(loop_time, mail_delta)
+                if use_inotify:
+                    self.loop_inotify(mail_delta)
+                else:
+                    self.loop(loop_time, mail_delta)
             except KeyboardInterrupt:
                 print("Exiting")
 
@@ -101,3 +120,27 @@ class Command(BaseCommand):
             self.mail_fetcher.pull()
 
         self.file_consumer.consume_new_files()
+
+    def loop_inotify(self, mail_delta):
+        directory = self.file_consumer.consume
+        inotify = INotify()
+        inotify.add_watch(directory, flags.CLOSE_WRITE | flags.MOVED_TO)
+
+        # Run initial mail fetch and consume all currently existing documents
+        self.loop_step(mail_delta)
+        next_mail_time = self.mail_fetcher.last_checked + mail_delta
+
+        while True:
+            # Consume documents until next_mail_time
+            while True:
+                delta = next_mail_time - time.time()
+                if delta > 0:
+                    for event in inotify.read(timeout=delta):
+                        file = os.path.join(directory, event.name)
+                        if os.path.isfile(file):
+                            self.file_consumer.try_consume_file(file)
+                else:
+                    break
+
+            self.mail_fetcher.pull()
+            next_mail_time = self.mail_fetcher.last_checked + mail_delta
