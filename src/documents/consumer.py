@@ -48,7 +48,7 @@ class Consumer:
         self.consume = consume
         self.scratch = scratch
 
-        make_dirs(self.scratch)
+        os.makedirs(self.scratch, exists_ok=True)
 
         if not self.consume:
             raise ConsumerError(
@@ -247,11 +247,3 @@ class Consumer:
         with open(doc, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
         return Document.objects.filter(checksum=checksum).exists()
-
-
-def make_dirs(*dirs):
-    for dir in dirs:
-        try:
-            os.makedirs(dir)
-        except FileExistsError:
-            pass
