@@ -7,7 +7,7 @@ import time
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from ...consumer import Consumer, ConsumerError, make_dirs
+from ...consumer import Consumer, ConsumerError
 from ...mail import MailFetcher, MailFetcherError
 
 try:
@@ -80,7 +80,8 @@ class Command(BaseCommand):
         except (ConsumerError, MailFetcherError) as e:
             raise CommandError(e)
 
-        make_dirs(self.ORIGINAL_DOCS, self.THUMB_DOCS)
+        for d in (self.ORIGINAL_DOCS, self.THUMB_DOCS):
+            os.makedirs(d, exists_ok=True)
 
         logging.getLogger(__name__).info(
             "Starting document consumer at {}{}".format(
