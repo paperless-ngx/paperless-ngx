@@ -26,6 +26,8 @@ Changelog
   hardcoded URL values to make it easier for people to host Paperless on a
   subdirectory.  Thanks to `Quentin Dawans`_ and `Kyle Lucy`_ for helping to
   work this out.
+* The clickable area for documents on the listing page has been increased to a
+  more predictable space thanks to a glorious hack from `erikarvstedt`_ in `#344`_
 
 1.3.0
 =====
@@ -453,6 +455,7 @@ Changelog
 .. _#328: https://github.com/danielquinn/paperless/pull/328
 .. _#253: https://github.com/danielquinn/paperless/issues/253
 .. _#323: https://github.com/danielquinn/paperless/issues/323
+.. _#344: https://github.com/danielquinn/paperless/pull/344
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
