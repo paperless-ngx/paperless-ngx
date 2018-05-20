@@ -132,9 +132,10 @@
     {# 3: Image #}
     {# 4: Correspondent #}
     {# 5: Tags #}
+    {# 6: Document edit url #}
     <div class="box">
       <div class="result">
-        <div class="header">
+        <div class="header" onclick="location.href='{{ result.6 }}';" style="cursor: pointer;">
           <div class="checkbox">{{ result.0 }}</div>
           <div class="info">
             {{ result.4 }}<br />

@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.admin.templatetags.admin_list import (
     result_headers,
     result_hidden_fields,
@@ -5,6 +7,8 @@ from django.contrib.admin.templatetags.admin_list import (
 )
 from django.template import Library
 
+
+EXTRACT_URL = re.compile(r'href="(.*?)"')
 
 register = Library()
 
@@ -25,4 +29,15 @@ def result_list(cl):
             'result_hidden_fields': list(result_hidden_fields(cl)),
             'result_headers': headers,
             'num_sorted_fields': num_sorted_fields,
-            'results': list(results(cl))}
+            'results': map(add_doc_edit_url, results(cl))}
+
+
+def add_doc_edit_url(result):
+    """
+    Make the document edit URL accessible to the view as a separate item
+    """
+    title = result[1]
+    match = re.search(EXTRACT_URL, title)
+    edit_doc_url = match[1]
+    result.append(edit_doc_url)
+    return result
