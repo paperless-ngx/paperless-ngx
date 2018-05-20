@@ -46,11 +46,10 @@ migrations() {
     # A simple lock file in case other containers use this startup
     LOCKFILE="/usr/src/paperless/data/db.sqlite3.migration"
 
-    set -o noclobber
     # check for and create lock file in one command 
-    (> ${LOCKFILE}) &> /dev/null
-    if [ $? -eq 0 ]
+    if (set -o noclobber; echo "$$" > "${LOCKFILE}") 2> /dev/null
     then
+        trap 'rm -f "${LOCKFILE}"; exit $?' INT TERM EXIT
         sudo -HEu paperless "/usr/src/paperless/src/manage.py" "migrate"
         rm ${LOCKFILE}
     fi
