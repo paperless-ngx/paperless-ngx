@@ -27,7 +27,12 @@ Changelog
   subdirectory.  Thanks to `Quentin Dawans`_ and `Kyle Lucy`_ for helping to
   work this out.
 * The clickable area for documents on the listing page has been increased to a
-  more predictable space thanks to a glorious hack from `erikarvstedt`_ in `#344`_
+  more predictable space thanks to a glorious hack from `erikarvstedt`_ in
+  `#344`_.
+* `Strubbl`_ noticed an annoying bug in the bash script wrapping the Docker
+  entrypoint and fixed it with some very creating Bash skills: `#352`_.
+* You can now use the search field to find documents by tag thanks to
+  `thinkjk`_'s *first ever issue*: `#354`_.
 
 1.3.0
 =====
@@ -389,6 +394,7 @@ Changelog
 .. _Martin Arendtsen: https://github.com/Arendtsen
 .. _erikarvstedt: https://github.com/erikarvstedt
 .. _Kyle Lucy: https://github.com/kmlucy
+.. _thinkjk: https://github.com/thinkjk
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -456,6 +462,8 @@ Changelog
 .. _#253: https://github.com/danielquinn/paperless/issues/253
 .. _#323: https://github.com/danielquinn/paperless/issues/323
 .. _#344: https://github.com/danielquinn/paperless/pull/344
+.. _#352: https://github.com/danielquinn/paperless/pull/352
+.. _#354: https://github.com/danielquinn/paperless/issues/354
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
