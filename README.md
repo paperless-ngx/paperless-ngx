@@ -50,9 +50,11 @@ This is all really a quite simple, shiny, user-friendly wrapper around some very
   * [Python-GNUPG](http://pythonhosted.org/python-gnupg/) decrypts the PDFs on-the-fly to allow you to download unencrypted files, leaving the encrypted ones on-disk.
 
 
-## Stability
+## Project Status
 
-This project has been around since 2015, and there's lots of people using it, however it's still under active development (just look at the git commit history) so don't expect it to be 100% stable.  You can backup the sqlite3 database, media directory and your configuration file to be on the safe side.
+This project has been around since 2015, and there's lots of people using it.  For some reason, it's really popular in Germany -- maybe someone over there can clue me in as to why?
+
+I am no longer doing new development on Paperless as it does exactly what I need it to and have since turned my attention to my latest project, [Aletheia](https://github.com/danielquinn/aletheia).  However, I'm not abandoning this project.  I am happy to field pull requests and answer questions in the issue queue.  If you're a developer yourself and want a new feature, float it in the issue queue and/or send me a pull request!  I'm happy to add new stuff, but I just don't have the time to do that work myself.
 
 
 ## Affiliated Projects
