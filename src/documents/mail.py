@@ -75,9 +75,11 @@ class Message(Loggable):
                 continue
 
             dispositions = content_disposition.strip().split(";")
-            if len(dispositions) < 2 or \
-               (not dispositions[0].lower() == "attachment" and
-               "filename" not in dispositions[1].lower()):
+            if len(dispositions) < 2:
+                continue
+
+            if not dispositions[0].lower() == "attachment" and \
+               "filename" not in dispositions[1].lower():
                 continue
 
             file_data = part.get_payload()
