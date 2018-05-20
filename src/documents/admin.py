@@ -124,7 +124,7 @@ class DocumentAdmin(CommonAdmin):
             "all": ("paperless.css",)
         }
 
-    search_fields = ("correspondent__name", "title", "content")
+    search_fields = ("correspondent__name", "title", "content", "tags__name")
     list_display = ("title", "created", "thumbnail", "correspondent", "tags_")
     list_filter = ("tags", "correspondent", FinancialYearFilter,
                    MonthListFilter)
