@@ -42,7 +42,7 @@ class Message(Loggable):
     and n attachments, and that we don't care about the message body.
     """
 
-    SECRET = os.getenv("PAPERLESS_EMAIL_SECRET", "")
+    SECRET = os.getenv("PAPERLESS_EMAIL_SECRET")
 
     def __init__(self, data, group=None):
         """
@@ -162,6 +162,8 @@ class MailFetcher(Loggable):
         self._inbox = os.getenv("PAPERLESS_CONSUME_MAIL_INBOX", "INBOX")
 
         self._enabled = bool(self._host)
+        if self._enabled and Message.SECRET is None:
+            raise MailFetcherError("No PAPERLESS_EMAIL_SECRET defined")
 
         self.last_checked = time.time()
         self.consume = consume
