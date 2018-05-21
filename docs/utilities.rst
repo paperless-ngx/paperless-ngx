@@ -49,17 +49,17 @@ The Consumer
 ------------
 
 The consumer script runs in an infinite loop, constantly looking at a directory
-for PDF files to parse and index.  The process is pretty straightforward:
+for documents to parse and index.  The process is pretty straightforward:
 
-1. Look in ``CONSUMPTION_DIR`` for a PDF.  If one is found, go to #2.  If not,
-   wait 10 seconds and try again.
-2. Parse the PDF with Tesseract
+1. Look in ``CONSUMPTION_DIR`` for a document.  If one is found, go to #2.
+   If not, wait 10 seconds and try again.
+2. Parse the document with Tesseract
 3. Create a new record in the database with the OCR'd text
 4. Attempt to automatically assign document attributes by doing some guesswork.
    Read up on the :ref:`guesswork documentation<guesswork>` for more
    information about this process.
-5. Encrypt the PDF and store it in the ``media`` directory under
-   ``documents/pdf``.
+5. Encrypt the document and store it in the ``media`` directory under
+   ``documents/originals``.
 6. Go to #1.
 
 
@@ -74,7 +74,7 @@ The consumer is started via the ``manage.py`` script:
 
     $ /path/to/paperless/src/manage.py document_consumer
 
-This starts the service that will run in a loop, consuming PDF files as they
+This starts the service that will run in a loop, consuming documents as they
 appear in ``CONSUMPTION_DIR``.
 
 Note that this command runs continuously, so exiting it will mean your webserver
@@ -97,8 +97,8 @@ The Exporter
 ------------
 
 Tired of fiddling with Paperless, or just want to do something stupid and are
-afraid of accidentally damaging your files?  You can export all of your PDFs
-into neatly named, dated, and unencrypted.
+afraid of accidentally damaging your files?  You can export all of your
+documents into neatly named, dated, and unencrypted files.
 
 
 .. _utilities-exporter-howto:
@@ -112,10 +112,10 @@ This too is done via the ``manage.py`` script:
 
     $ /path/to/paperless/src/manage.py document_exporter /path/to/somewhere/
 
-This will dump all of your unencrypted PDFs into ``/path/to/somewhere`` for you
-to do with as you please.  The files are accompanied with a special file,
-``manifest.json`` which can be used to
-:ref:`import the files <utilities-importer>` at a later date if you wish.
+This will dump all of your unencrypted documents into ``/path/to/somewhere``
+for you to do with as you please.  The files are accompanied with a special
+file, ``manifest.json`` which can be used to :ref:`import the files
+<utilities-importer>` at a later date if you wish.
 
 
 .. _utilities-exporter-howto-docker:
