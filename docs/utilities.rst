@@ -52,7 +52,8 @@ The consumer script runs in an infinite loop, constantly looking at a directory
 for documents to parse and index.  The process is pretty straightforward:
 
 1. Look in ``CONSUMPTION_DIR`` for a document.  If one is found, go to #2.
-   If not, wait 10 seconds and try again.
+   If not, wait 10 seconds and try again.  On Linux, new documents are detected
+   instantly via inotify, so there's no waiting involved.
 2. Parse the document with Tesseract
 3. Create a new record in the database with the OCR'd text
 4. Attempt to automatically assign document attributes by doing some guesswork.
@@ -74,8 +75,8 @@ The consumer is started via the ``manage.py`` script:
 
     $ /path/to/paperless/src/manage.py document_consumer
 
-This starts the service that will run in a loop, consuming documents as they
-appear in ``CONSUMPTION_DIR``.
+This starts the service that will consume documents as they appear in
+``CONSUMPTION_DIR``.
 
 Note that this command runs continuously, so exiting it will mean your webserver
 disappears.  If you want to run this full-time (which is kind of the point)
