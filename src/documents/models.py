@@ -239,7 +239,7 @@ class Document(models.Model):
     storage_type = models.CharField(
         max_length=11,
         choices=STORAGE_TYPES,
-        default=STORAGE_TYPE_GPG,
+        default=STORAGE_TYPE_UNENCRYPTED,
         editable=False
     )
 
