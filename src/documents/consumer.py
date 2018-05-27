@@ -48,15 +48,9 @@ class Consumer:
         except FileExistsError:
             pass
 
-        acceptable_storage_types = [_[0] for _ in Document.STORAGE_TYPES]
-        if settings.STORAGE_TYPE not in acceptable_storage_types:
-            raise ConsumerError(
-                'Invalid STORAGE_TYPE "{}" defined.  It must be one of {}.  '
-                'Exiting.'.format(
-                    settings.STORAGE_TYPE,
-                    ", ".join(acceptable_storage_types)
-                )
-            )
+        self.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        if settings.PASSPHRASE:
+            self.storage_type = Document.STORAGE_TYPE_GPG
 
         self.stats = {}
         self._ignore = []
@@ -209,7 +203,7 @@ class Consumer:
                 checksum=hashlib.md5(f.read()).hexdigest(),
                 created=created,
                 modified=created,
-                storage_type=settings.STORAGE_TYPE
+                storage_type=self.storage_type
             )
 
         relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
@@ -231,7 +225,7 @@ class Consumer:
                 if document.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
                     write_file.write(read_file.read())
                     return
-                self.log("debug", "Encrypting the thumbnail")
+                self.log("debug", "Encrypting")
                 write_file.write(GnuPG.encrypted(read_file))
 
     def _cleanup_doc(self, doc):
