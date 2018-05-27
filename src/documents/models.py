@@ -57,7 +57,7 @@ class MatchingModel(models.Model):
 
     is_insensitive = models.BooleanField(default=True)
 
-    class Meta(object):
+    class Meta:
         abstract = True
 
     def __str__(self):
@@ -156,7 +156,7 @@ class Correspondent(MatchingModel):
     # better safe than sorry.
     SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
 
-    class Meta(object):
+    class Meta:
         ordering = ("name",)
 
 
@@ -243,7 +243,7 @@ class Document(models.Model):
         editable=False
     )
 
-    class Meta(object):
+    class Meta:
         ordering = ("correspondent", "title")
 
     def __str__(self):
@@ -322,7 +322,7 @@ class Log(models.Model):
 
     objects = LogManager()
 
-    class Meta(object):
+    class Meta:
         ordering = ("-modified",)
 
     def __str__(self):
