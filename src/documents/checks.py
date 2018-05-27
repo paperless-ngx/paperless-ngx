@@ -1,4 +1,5 @@
 from django.core.checks import Warning, register
+from django.db.utils import OperationalError
 
 
 @register()
@@ -17,10 +18,12 @@ def changed_password_check(app_configs, **kwargs):
         "re-import them."
     )
 
-    document = Document.objects.order_by("-pk").filter(
-        storage_type=Document.STORAGE_TYPE_GPG
-    ).first()
+    try:
+        document = Document.objects.order_by("-pk").filter(
+            storage_type=Document.STORAGE_TYPE_GPG).first()
+        if document and not GnuPG.decrypted(document.source_file):
+            return [Warning(warning.format(document))]
+    except OperationalError:
+        pass  # No documents table yet
 
-    if document and not GnuPG.decrypted(document.source_file):
-        return [Warning(warning.format(document))]
     return []
