@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.checks import Warning, register
 from django.db.utils import OperationalError
 
@@ -7,6 +8,9 @@ def changed_password_check(app_configs, **kwargs):
 
     from documents.models import Document
     from paperless.db import GnuPG
+
+    if not settings.PASSPHRASE:
+        return []
 
     warning = (
         "At least one document:\n\n  {}\n\nin your data store was encrypted "
