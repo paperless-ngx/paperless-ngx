@@ -59,8 +59,8 @@ target/
 
 # Stored PDFs
 media/documents/*.gpg
-media/documents/thumbnails/*.gpg
-media/documents/originals/*.gpg
+media/documents/thumbnails/*
+media/documents/originals/*
 
 # Sqlite database
 db.sqlite3
