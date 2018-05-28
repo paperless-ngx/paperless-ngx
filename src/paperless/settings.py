@@ -92,11 +92,11 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-#If AUTH is disabled, we just use our "bypass" authentication middleware
-if  bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
-    _index = MIDDLEWARE_CLASSES.index('django.contrib.auth.middleware.AuthenticationMiddleware')
-    MIDDLEWARE_CLASSES[_index] = 'paperless.middleware.Middleware'
-    MIDDLEWARE_CLASSES.remove('django.contrib.auth.middleware.SessionAuthenticationMiddleware')
+# If auth is disabled, we just use our "bypass" authentication middleware
+if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
+    _index = MIDDLEWARE_CLASSES.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    MIDDLEWARE_CLASSES[_index] = "paperless.middleware.Middleware"
+    MIDDLEWARE_CLASSES.remove("django.contrib.auth.middleware.SessionAuthenticationMiddleware")
 
 ROOT_URLCONF = 'paperless.urls'
 
