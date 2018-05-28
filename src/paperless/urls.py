@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
+from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
@@ -45,7 +46,8 @@ urlpatterns = [
     url(r"admin/", admin.site.urls),
 
     # Redirect / to /admin
-    url(r"^$", RedirectView.as_view(permanent=True, url="/admin/")),
+    url(r"^$", RedirectView.as_view(
+        permanent=True, url=reverse_lazy("admin:index"))),
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
