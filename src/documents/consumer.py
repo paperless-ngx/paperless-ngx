@@ -3,8 +3,10 @@ import hashlib
 import logging
 import os
 import re
+import time
 import uuid
 
+from operator import itemgetter
 from django.conf import settings
 from django.utils import timezone
 from paperless.db import GnuPG
@@ -32,21 +34,21 @@ class Consumer:
       5. Delete the document and image(s)
     """
 
+    # Files are considered ready for consumption if they have been unmodified
+    # for this duration
+    FILES_MIN_UNMODIFIED_DURATION = 0.5
+
     def __init__(self, consume=settings.CONSUMPTION_DIR,
                  scratch=settings.SCRATCH_DIR):
 
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
-        self.stats = {}
         self._ignore = []
         self.consume = consume
         self.scratch = scratch
 
-        try:
-            os.makedirs(self.scratch)
-        except FileExistsError:
-            pass
+        os.makedirs(self.scratch, exists_ok=True)
 
         if not self.consume:
             raise ConsumerError(
@@ -73,83 +75,99 @@ class Consumer:
             "group": self.logging_group
         })
 
-    def run(self):
+    def consume_new_files(self):
+        """
+        Find non-ignored files in consumption dir and consume them if they have
+        been unmodified for FILES_MIN_UNMODIFIED_DURATION.
+        """
+        ignored_files = []
+        files = []
+        for entry in os.scandir(self.consume):
+            if entry.is_file():
+                file = (entry.path, entry.stat().st_mtime)
+                if file in self._ignore:
+                    ignored_files.append(file)
+                else:
+                    files.append(file)
 
-        for doc in os.listdir(self.consume):
+        if not files:
+            return
 
-            doc = os.path.join(self.consume, doc)
+        # Set _ignore to only include files that still exist.
+        # This keeps it from growing indefinitely.
+        self._ignore[:] = ignored_files
 
-            if not os.path.isfile(doc):
-                continue
+        files_old_to_new = sorted(files, key=itemgetter(1))
 
-            if not re.match(FileInfo.REGEXES["title"], doc):
-                continue
+        time.sleep(self.FILES_MIN_UNMODIFIED_DURATION)
 
-            if doc in self._ignore:
-                continue
+        for file, mtime in files_old_to_new:
+            if mtime == os.path.getmtime(file):
+                # File has not been modified and can be consumed
+                if not self.try_consume_file(file):
+                    self._ignore.append((file, mtime))
 
-            if not self._is_ready(doc):
-                continue
+    def try_consume_file(self, file):
+        "Return True if file was consumed"
 
-            if self._is_duplicate(doc):
-                self.log(
-                    "info",
-                    "Skipping {} as it appears to be a duplicate".format(doc)
-                )
-                self._ignore.append(doc)
-                continue
+        if not re.match(FileInfo.REGEXES["title"], file):
+            return False
 
-            parser_class = self._get_parser_class(doc)
-            if not parser_class:
-                self.log(
-                    "error", "No parsers could be found for {}".format(doc))
-                self._ignore.append(doc)
-                continue
+        doc = file
 
-            self.logging_group = uuid.uuid4()
+        if self._is_duplicate(doc):
+            self.log(
+                "info",
+                "Skipping {} as it appears to be a duplicate".format(doc)
+            )
+            return False
 
-            self.log("info", "Consuming {}".format(doc))
+        parser_class = self._get_parser_class(doc)
+        if not parser_class:
+            self.log(
+                "error", "No parsers could be found for {}".format(doc))
+            return False
 
-            document_consumption_started.send(
-                sender=self.__class__,
-                filename=doc,
-                logging_group=self.logging_group
+        self.logging_group = uuid.uuid4()
+
+        self.log("info", "Consuming {}".format(doc))
+
+        document_consumption_started.send(
+            sender=self.__class__,
+            filename=doc,
+            logging_group=self.logging_group
+        )
+
+        parsed_document = parser_class(doc)
+
+        try:
+            thumbnail = parsed_document.get_thumbnail()
+            date = parsed_document.get_date()
+            document = self._store(
+                parsed_document.get_text(),
+                doc,
+                thumbnail,
+                date
+            )
+        except ParseError as e:
+            self.log("error", "PARSE FAILURE for {}: {}".format(doc, e))
+            parsed_document.cleanup()
+            return False
+        else:
+            parsed_document.cleanup()
+            self._cleanup_doc(doc)
+
+            self.log(
+                "info",
+                "Document {} consumption finished".format(document)
             )
 
-            parsed_document = parser_class(doc)
-
-            try:
-                thumbnail = parsed_document.get_thumbnail()
-                date = parsed_document.get_date()
-                document = self._store(
-                    parsed_document.get_text(),
-                    doc,
-                    thumbnail,
-                    date
-                )
-            except ParseError as e:
-
-                self._ignore.append(doc)
-                self.log("error", "PARSE FAILURE for {}: {}".format(doc, e))
-                parsed_document.cleanup()
-
-                continue
-
-            else:
-
-                parsed_document.cleanup()
-                self._cleanup_doc(doc)
-
-                self.log(
-                    "info",
-                    "Document {} consumption finished".format(document)
-                )
-
-                document_consumption_finished.send(
-                    sender=self.__class__,
-                    document=document,
-                    logging_group=self.logging_group
-                )
+            document_consumption_finished.send(
+                sender=self.__class__,
+                document=document,
+                logging_group=self.logging_group
+            )
+            return True
 
     def _get_parser_class(self, doc):
         """
@@ -223,22 +241,6 @@ class Consumer:
     def _cleanup_doc(self, doc):
         self.log("debug", "Deleting document {}".format(doc))
         os.unlink(doc)
-
-    def _is_ready(self, doc):
-        """
-        Detect whether ``doc`` is ready to consume or if it's still being
-        written to by the uploader.
-        """
-
-        t = os.stat(doc).st_mtime
-
-        if self.stats.get(doc) == t:
-            del(self.stats[doc])
-            return True
-
-        self.stats[doc] = t
-
-        return False
 
     @staticmethod
     def _is_duplicate(doc):

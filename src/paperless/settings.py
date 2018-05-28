@@ -246,6 +246,8 @@ SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 # This is where Paperless will look for PDFs to index
 CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 
+# (This setting is ignored on Linux where inotify is used instead of a
+# polling loop.)
 # The number of seconds that Paperless will wait between checking
 # CONSUMPTION_DIR.  If you tend to write documents to this directory very
 # slowly, you may want to use a higher value than the default.
