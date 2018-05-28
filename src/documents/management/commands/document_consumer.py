@@ -81,7 +81,7 @@ class Command(BaseCommand):
             raise CommandError(e)
 
         for d in (self.ORIGINAL_DOCS, self.THUMB_DOCS):
-            os.makedirs(d, exists_ok=True)
+            os.makedirs(d, exist_ok=True)
 
         logging.getLogger(__name__).info(
             "Starting document consumer at {}{}".format(
