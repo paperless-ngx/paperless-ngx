@@ -33,6 +33,8 @@ Changelog
   entrypoint and fixed it with some very creating Bash skills: `#352`_.
 * You can now use the search field to find documents by tag thanks to
   `thinkjk`_'s *first ever issue*: `#354`_.
+* Inotify is now being used to detect additions to the consume directory thanks
+  to some excellent work from `erikarvstedt`_ on `#351`_
 
 1.3.0
 =====
@@ -462,6 +464,7 @@ Changelog
 .. _#253: https://github.com/danielquinn/paperless/issues/253
 .. _#323: https://github.com/danielquinn/paperless/issues/323
 .. _#344: https://github.com/danielquinn/paperless/pull/344
+.. _#351: https://github.com/danielquinn/paperless/pull/351
 .. _#352: https://github.com/danielquinn/paperless/pull/352
 .. _#354: https://github.com/danielquinn/paperless/issues/354
 
