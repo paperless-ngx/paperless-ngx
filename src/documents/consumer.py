@@ -48,7 +48,7 @@ class Consumer:
         self.consume = consume
         self.scratch = scratch
 
-        os.makedirs(self.scratch, exists_ok=True)
+        os.makedirs(self.scratch, exist_ok=True)
 
         if not self.consume:
             raise ConsumerError(
