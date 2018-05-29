@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.checks import Warning, register
+from django.core.checks import Error, register
 from django.db.utils import OperationalError
 
 
@@ -9,25 +9,28 @@ def changed_password_check(app_configs, **kwargs):
     from documents.models import Document
     from paperless.db import GnuPG
 
-    if not settings.PASSPHRASE:
-        return []
-
-    warning = (
-        "At least one document:\n\n  {}\n\nin your data store was encrypted "
-        "with a password other than the one currently\nin use.  This means "
-        "that this file, and others encrypted with the other\npassword are no "
-        "longer acessible, which is probably not what you want.  If\nyou "
-        "intend to change your Paperless password, you must first export all "
-        "of\nthe old documents, start fresh with the new password and then "
-        "re-import them."
-    )
-
     try:
-        document = Document.objects.order_by("-pk").filter(
+        encrypted_doc = Document.objects.filter(
             storage_type=Document.STORAGE_TYPE_GPG).first()
-        if document and not GnuPG.decrypted(document.source_file):
-            return [Warning(warning.format(document))]
     except OperationalError:
-        pass  # No documents table yet
+        return []  # No documents table yet
+
+    if encrypted_doc:
+        if not settings.PASSPHRASE:
+            return [Error(
+                "The database contains encrypted documents but no password "
+                "is set."
+            )]
+        elif not GnuPG.decrypted(encrypted_doc.source_file):
+            import textwrap
+            return [Error(textwrap.dedent(
+                """
+                The current password doesn't match the password of the
+                existing documents.
+
+                If you intend to change your password, you must first export
+                all of the old documents, start fresh with the new password
+                and then re-import them."
+                """))]
 
     return []
