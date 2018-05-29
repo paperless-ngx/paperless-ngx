@@ -29,7 +29,7 @@ class Consumer:
     Loop over every file found in CONSUMPTION_DIR and:
       1. Convert it to a greyscale pnm
       2. Use tesseract on the pnm
-      3. Encrypt and store the document in the MEDIA_ROOT
+      3. Store the document in the MEDIA_ROOT with optional encryption
       4. Store the OCR'd text in the database
       5. Delete the document and image(s)
     """
