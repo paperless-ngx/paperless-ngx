@@ -29,13 +29,32 @@
   .result .header {
     padding: 5px;
     background-color: #79AEC8;
+    position: relative;
   }
-  .result .header .checkbox{
+  .result .header .checkbox {
     width: 5%;
     float: left;
+    position: absolute;
+    z-index: 2;
   }
   .result .header .info {
     margin-left: 10%;
+    position: relative;
+  }
+  .headerLink {
+    cursor: pointer;
+    opacity: 0;
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .header > a {
+    z-index: 2;
+    margin-left: 10%;
+    position: relative;
   }
   .result .header a,
   .result a.tag {
@@ -136,12 +155,23 @@
     {# 7: Document edit url #}
     <div class="box">
       <div class="result">
-        <div class="header" onclick="location.href='{{ result.7 }}';" style="cursor: pointer;">
+        <div class="header">
+          {% comment %}
+            The purpose of 'headerLink' is to make the whole header
+            background clickable.
+            We use an onclick handler here instead of a native link ('<a>')
+            to allow selecting (and copying) the overlying doc title text
+            with the mouse cursor.
+            If the title link were layered upon another link ('<a>'), title text
+            selection would not be possible with mouse click + drag. Instead,
+            the underlying link would be dragged.
+          {% endcomment %}
+          <div class="headerLink" onclick="location.href='{{ result.7 }}';"></div>
           <div class="checkbox">{{ result.0 }}</div>
           <div class="info">
-            {{ result.5 }}<br />
-            {{ result.1 }}
+            {{ result.5 }}
           </div>
+          {{ result.1 }}
           <div style="clear: both;"></div>
         </div>
         <div class="tags">{{ result.6 }}</div>
