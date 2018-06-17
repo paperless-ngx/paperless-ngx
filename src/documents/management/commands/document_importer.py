@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -45,12 +46,6 @@ class Command(Renderable, BaseCommand):
             self.manifest = json.load(f)
 
         self._check_manifest()
-
-        if not settings.PASSPHRASE:
-            raise CommandError(
-                "You need to define a passphrase before continuing.  Please "
-                "consult the documentation for setting up Paperless."
-            )
 
         # Fill up the database with whatever is in the manifest
         call_command("loaddata", manifest_path)
@@ -99,14 +94,21 @@ class Command(Renderable, BaseCommand):
             document_path = os.path.join(self.source, doc_file)
             thumbnail_path = os.path.join(self.source, thumb_file)
 
-            with open(document_path, "rb") as unencrypted:
-                with open(document.source_path, "wb") as encrypted:
-                    print("Encrypting {} and saving it to {}".format(
-                        doc_file, document.source_path))
-                    encrypted.write(GnuPG.encrypted(unencrypted))
+            if document.storage_type == Document.STORAGE_TYPE_GPG:
 
-            with open(thumbnail_path, "rb") as unencrypted:
-                with open(document.thumbnail_path, "wb") as encrypted:
-                    print("Encrypting {} and saving it to {}".format(
-                        thumb_file, document.thumbnail_path))
-                    encrypted.write(GnuPG.encrypted(unencrypted))
+                with open(document_path, "rb") as unencrypted:
+                    with open(document.source_path, "wb") as encrypted:
+                        print("Encrypting {} and saving it to {}".format(
+                            doc_file, document.source_path))
+                        encrypted.write(GnuPG.encrypted(unencrypted))
+
+                with open(thumbnail_path, "rb") as unencrypted:
+                    with open(document.thumbnail_path, "wb") as encrypted:
+                        print("Encrypting {} and saving it to {}".format(
+                            thumb_file, document.thumbnail_path))
+                        encrypted.write(GnuPG.encrypted(unencrypted))
+
+            else:
+
+                shutil.copy(document_path, document.source_path)
+                shutil.copy(thumbnail_path, document.thumbnail_path)
