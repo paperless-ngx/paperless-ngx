@@ -17,7 +17,8 @@ The primary method of getting documents into your database is by putting them in
 the consumption directory.  The ``document_consumer`` script runs in an infinite
 loop looking for new additions to this directory and when it finds them, it goes
 about the process of parsing them with the OCR, indexing what it finds, and
-encrypting the PDF, storing it in the media directory.
+encrypting the PDF (if ``PAPERLESS_PASSPHRASE`` is set), storing it in the
+media directory.
 
 Getting stuff into this directory is up to you.  If you're running Paperless
 on your local computer, you might just want to drag and drop files there, but if
