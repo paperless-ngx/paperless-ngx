@@ -1,6 +1,35 @@
 Changelog
 #########
 
+2.0.0
+=====
+
+This is a big release as we've changed a core-functionality of Paperless: we no
+longer encrypt files with GPG by default.
+
+The reasons for this are many, but it boils down to that the encryption wasn't
+really all that useful, as files on-disk were still accessible so long as you
+had the key, and the key was most typically stored in the config file.  In
+other words, your files are only as safe as the ``paperless`` user is.  In
+addition to that, *the contents of the documents were never encrypted*, so
+important numbers etc. were always accessible simply by querying the database.
+Still, it was better than nothing, but the consensus from users appears to be
+that it was more an annoyance than anything else, so this feature is now turned
+off unless you explicitly set a passphrase in your config file.
+
+Migrating from 1.x
+------------------
+
+Encryption isn't gone, it's just off for new users.  So long as you have
+``PAPERLESS_PASSPHRASE`` set in your config or your environment, Paperless
+should continue to operate as it always has.  If however, you want to drop
+encryption too, you only need to do two things:
+
+1. Run ``./manage.py migrate && ./manage.py change_storage_type gpg unencrypted``.
+   This will go through your entire database and Decrypt  All The Things.
+2. Remove ``PAPERLESS_PASSPHRASE`` from your ``paperless.conf`` file, or simply
+   stop declaring it in your environment.
+
 1.4.0
 =====
 

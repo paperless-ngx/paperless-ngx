@@ -59,19 +59,19 @@ PAPERLESS_EMAIL_SECRET=""
 ####                              Security                                 ####
 ###############################################################################
 
-# You must have a passphrase in order for Paperless to work at all.  If you set
-# this to "", GNUGPG will "encrypt" your PDF by writing it out as a zero-byte
-# file.
-#
-# The passphrase you use here will be used when storing your documents in
-# Paperless, but you can always export them in an unencrypted format by using
-# document exporter.  See the documentation for more information.
+# Paperless can be instructed to attempt to encrypt your PDF files with GPG
+# using the PAPERLESS_PASSPHRASE specified below.  If however you're not
+# concerned about encrypting these files (for example if you have disk
+# encryption locally) then you don't need this and can safely leave this value
+# un-set.
 #
 # One final note about the passphrase.  Once you've consumed a document with
 # one passphrase, DON'T CHANGE IT.  Paperless assumes this to be a constant and
 # can't properly export documents that were encrypted with an old passphrase if
 # you've since changed it to a new one.
-PAPERLESS_PASSPHRASE="secret"
+#
+# The default is to not use encryption at all.
+#PAPERLESS_PASSPHRASE="secret"
 
 
 # The secret key has a default that should be fine so long as you're hosting
