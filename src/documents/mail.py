@@ -20,7 +20,7 @@ class MailFetcherError(Exception):
     pass
 
 
-class InvalidMessageError(Exception):
+class InvalidMessageError(MailFetcherError):
     pass
 
 
@@ -75,6 +75,9 @@ class Message(Loggable):
                 continue
 
             dispositions = content_disposition.strip().split(";")
+            if len(dispositions) < 2:
+                continue
+
             if not dispositions[0].lower() == "attachment" and \
                "filename" not in dispositions[1].lower():
                 continue
@@ -159,8 +162,10 @@ class MailFetcher(Loggable):
         self._inbox = os.getenv("PAPERLESS_CONSUME_MAIL_INBOX", "INBOX")
 
         self._enabled = bool(self._host)
+        if self._enabled and Message.SECRET is None:
+            raise MailFetcherError("No PAPERLESS_EMAIL_SECRET defined")
 
-        self.last_checked = datetime.datetime.now()
+        self.last_checked = time.time()
         self.consume = consume
 
     def pull(self):
@@ -187,7 +192,7 @@ class MailFetcher(Loggable):
                     f.write(message.attachment.data)
                     os.utime(file_name, times=(t, t))
 
-        self.last_checked = datetime.datetime.now()
+        self.last_checked = time.time()
 
     def _get_messages(self):
 
@@ -205,7 +210,7 @@ class MailFetcher(Loggable):
             self._connection.close()
             self._connection.logout()
 
-        except Exception as e:
+        except MailFetcherError as e:
             self.log("error", str(e))
 
         return r

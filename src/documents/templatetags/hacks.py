@@ -38,6 +38,6 @@ def add_doc_edit_url(result):
     """
     title = result[1]
     match = re.search(EXTRACT_URL, title)
-    edit_doc_url = match[1]
+    edit_doc_url = match.group(1)
     result.append(edit_doc_url)
     return result
