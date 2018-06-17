@@ -1,3 +1,5 @@
+import textwrap
+
 from django.conf import settings
 from django.core.checks import Error, register
 from django.db.utils import OperationalError
@@ -16,13 +18,14 @@ def changed_password_check(app_configs, **kwargs):
         return []  # No documents table yet
 
     if encrypted_doc:
+
         if not settings.PASSPHRASE:
             return [Error(
                 "The database contains encrypted documents but no password "
                 "is set."
             )]
-        elif not GnuPG.decrypted(encrypted_doc.source_file):
-            import textwrap
+
+        if not GnuPG.decrypted(encrypted_doc.source_file):
             return [Error(textwrap.dedent(
                 """
                 The current password doesn't match the password of the
