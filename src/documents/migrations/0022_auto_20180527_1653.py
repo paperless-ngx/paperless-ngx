@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0020_document_storage_type'),
+        ('documents', '0021_document_storage_type'),
     ]
 
     operations = [
