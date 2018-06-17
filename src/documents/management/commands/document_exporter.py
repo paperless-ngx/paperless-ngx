@@ -1,8 +1,8 @@
 import json
 import os
 import time
+import shutil
 
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 
@@ -45,9 +45,6 @@ class Command(Renderable, BaseCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
-        if not settings.PASSPHRASE:
-            settings.PASSPHRASE = input("Please enter the passphrase: ")
-
         if options["legacy"]:
             self.dump_legacy()
         else:
@@ -73,13 +70,20 @@ class Command(Renderable, BaseCommand):
             print("Exporting: {}".format(file_target))
 
             t = int(time.mktime(document.created.timetuple()))
-            with open(file_target, "wb") as f:
-                f.write(GnuPG.decrypted(document.source_file))
-                os.utime(file_target, times=(t, t))
+            if document.storage_type == Document.STORAGE_TYPE_GPG:
 
-            with open(thumbnail_target, "wb") as f:
-                f.write(GnuPG.decrypted(document.thumbnail_file))
-                os.utime(thumbnail_target, times=(t, t))
+                with open(file_target, "wb") as f:
+                    f.write(GnuPG.decrypted(document.source_file))
+                    os.utime(file_target, times=(t, t))
+
+                with open(thumbnail_target, "wb") as f:
+                    f.write(GnuPG.decrypted(document.thumbnail_file))
+                    os.utime(thumbnail_target, times=(t, t))
+
+            else:
+
+                shutil.copy(document.source_path, file_target)
+                shutil.copy(document.thumbnail_path, thumbnail_target)
 
         manifest += json.loads(
             serializers.serialize("json", Correspondent.objects.all()))
