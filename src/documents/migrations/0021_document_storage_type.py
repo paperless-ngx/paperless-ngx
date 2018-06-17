@@ -12,9 +12,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+
+        # Add the field with the default GPG-encrypted value
         migrations.AddField(
             model_name='document',
             name='storage_type',
             field=models.CharField(choices=[('unencrypted', 'Unencrypted'), ('gpg', 'Encrypted with GNU Privacy Guard')], default='gpg', editable=False, max_length=11),
         ),
+
+        # Now that the field is added, change the default to unencrypted
+        migrations.AlterField(
+            model_name='document',
+            name='storage_type',
+            field=models.CharField(choices=[('unencrypted', 'Unencrypted'), ('gpg', 'Encrypted with GNU Privacy Guard')], default='unencrypted', editable=False, max_length=11),
+        ),
+
     ]
