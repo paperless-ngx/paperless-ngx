@@ -54,9 +54,6 @@ class Consumer:
         if settings.PASSPHRASE:
             self.storage_type = Document.STORAGE_TYPE_GPG
 
-        self.stats = {}
-        self._ignore = []
-
         if not self.consume:
             raise ConsumerError(
                 "The CONSUMPTION_DIR settings variable does not appear to be "
