@@ -221,12 +221,12 @@ OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
 
 # OCR all documents?
-OCR_ALWAYS = bool(os.getenv("PAPERLESS_OCR_ALWAYS", "NO").lower() in ("yes", "y", "1", "t", "true"))
+OCR_ALWAYS = bool(os.getenv("PAPERLESS_OCR_ALWAYS", "NO").lower() in ("yes", "y", "1", "t", "true"))  # NOQA
 
 # If this is true, any failed attempts to OCR a PDF will result in the PDF
 # being indexed anyway, with whatever we could get.  If it's False, the file
 # will simply be left in the CONSUMPTION_DIR.
-FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("yes", "y", "1", "t", "true"))
+FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("yes", "y", "1", "t", "true"))  # NOQA
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
@@ -253,13 +253,17 @@ CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 # slowly, you may want to use a higher value than the default.
 CONSUMER_LOOP_TIME = int(os.getenv("PAPERLESS_CONSUMER_LOOP_TIME", 10))
 
-# This is used to encrypt the original documents and decrypt them later when
-# you want to download them.  Set it and change the permissions on this file to
-# 0600, or set it to `None` and you'll be prompted for the passphrase at
-# runtime.  The default looks for an environment variable.
-# DON'T FORGET TO SET THIS as leaving it blank may cause some strange things
-# with GPG, including an interesting case where it may "encrypt" zero-byte
-# files.
+# Pre-2.x versions of Paperless stored your documents locally with GPG
+# encryption, but that is no longer the default.  This behaviour is still
+# available, but it must be explicitly enabled by setting
+# `PAPERLESS_PASSPHRASE` in your environment or config file.  The default is to
+# store these files unencrypted.
+#
+# Translation:
+# * If you're a new user, you can safely ignore this setting.
+# * If you're upgrading from 1.x, this must be set, OR you can run
+#   `./manage.py change_storage_type gpg unencrypted` to decrypt your files,
+#   after which you can unset this value.
 PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 
 # Trigger a script after every successful document consumption?

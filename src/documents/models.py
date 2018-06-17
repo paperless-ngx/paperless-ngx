@@ -57,7 +57,7 @@ class MatchingModel(models.Model):
 
     is_insensitive = models.BooleanField(default=True)
 
-    class Meta(object):
+    class Meta:
         abstract = True
 
     def __str__(self):
@@ -156,7 +156,7 @@ class Correspondent(MatchingModel):
     # better safe than sorry.
     SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
 
-    class Meta(object):
+    class Meta:
         ordering = ("name",)
 
 
@@ -189,6 +189,13 @@ class Document(models.Model):
     TYPE_GIF = "gif"
     TYPE_TIF = "tiff"
     TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,)
+
+    STORAGE_TYPE_UNENCRYPTED = "unencrypted"
+    STORAGE_TYPE_GPG = "gpg"
+    STORAGE_TYPES = (
+        (STORAGE_TYPE_UNENCRYPTED, "Unencrypted"),
+        (STORAGE_TYPE_GPG, "Encrypted with GNU Privacy Guard")
+    )
 
     correspondent = models.ForeignKey(
         Correspondent,
@@ -229,10 +236,18 @@ class Document(models.Model):
         default=timezone.now, db_index=True)
     modified = models.DateTimeField(
         auto_now=True, editable=False, db_index=True)
+
+    storage_type = models.CharField(
+        max_length=11,
+        choices=STORAGE_TYPES,
+        default=STORAGE_TYPE_UNENCRYPTED,
+        editable=False
+    )
+
     added = models.DateTimeField(
         default=timezone.now, editable=False, db_index=True)
 
-    class Meta(object):
+    class Meta:
         ordering = ("correspondent", "title")
 
     def __str__(self):
@@ -246,11 +261,16 @@ class Document(models.Model):
 
     @property
     def source_path(self):
+
+        file_name = "{:07}.{}".format(self.pk, self.file_type)
+        if self.storage_type == self.STORAGE_TYPE_GPG:
+            file_name += ".gpg"
+
         return os.path.join(
             settings.MEDIA_ROOT,
             "documents",
             "originals",
-            "{:07}.{}.gpg".format(self.pk, self.file_type)
+            file_name
         )
 
     @property
@@ -267,11 +287,16 @@ class Document(models.Model):
 
     @property
     def thumbnail_path(self):
+
+        file_name = "{:07}.png".format(self.pk)
+        if self.storage_type == self.STORAGE_TYPE_GPG:
+            file_name += ".gpg"
+
         return os.path.join(
             settings.MEDIA_ROOT,
             "documents",
             "thumbnails",
-            "{:07}.png.gpg".format(self.pk)
+            file_name
         )
 
     @property
@@ -301,7 +326,7 @@ class Log(models.Model):
 
     objects = LogManager()
 
-    class Meta(object):
+    class Meta:
         ordering = ("-modified",)
 
     def __str__(self):

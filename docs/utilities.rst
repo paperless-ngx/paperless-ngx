@@ -59,8 +59,8 @@ for documents to parse and index.  The process is pretty straightforward:
 4. Attempt to automatically assign document attributes by doing some guesswork.
    Read up on the :ref:`guesswork documentation<guesswork>` for more
    information about this process.
-5. Encrypt the document and store it in the ``media`` directory under
-   ``documents/originals``.
+5. Encrypt the document (if you have a passphrase set) and store it in the
+   ``media`` directory under ``documents/originals``.
 6. Go to #1.
 
 

@@ -29,7 +29,7 @@ class Consumer:
     Loop over every file found in CONSUMPTION_DIR and:
       1. Convert it to a greyscale pnm
       2. Use tesseract on the pnm
-      3. Encrypt and store the document in the MEDIA_ROOT
+      3. Store the document in the MEDIA_ROOT with optional encryption
       4. Store the OCR'd text in the database
       5. Delete the document and image(s)
     """
@@ -49,6 +49,10 @@ class Consumer:
         self.scratch = scratch
 
         os.makedirs(self.scratch, exist_ok=True)
+
+        self.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        if settings.PASSPHRASE:
+            self.storage_type = Document.STORAGE_TYPE_GPG
 
         if not self.consume:
             raise ConsumerError(
@@ -213,7 +217,8 @@ class Consumer:
                 file_type=file_info.extension,
                 checksum=hashlib.md5(f.read()).hexdigest(),
                 created=created,
-                modified=created
+                modified=created,
+                storage_type=self.storage_type
             )
 
         relevant_tags = set(list(Tag.match_all(text)) + list(file_info.tags))
@@ -222,21 +227,21 @@ class Consumer:
             self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
-        # Encrypt and store the actual document
-        with open(doc, "rb") as unencrypted:
-            with open(document.source_path, "wb") as encrypted:
-                self.log("debug", "Encrypting the document")
-                encrypted.write(GnuPG.encrypted(unencrypted))
-
-        # Encrypt and store the thumbnail
-        with open(thumbnail, "rb") as unencrypted:
-            with open(document.thumbnail_path, "wb") as encrypted:
-                self.log("debug", "Encrypting the thumbnail")
-                encrypted.write(GnuPG.encrypted(unencrypted))
+        self._write(document, doc, document.source_path)
+        self._write(document, thumbnail, document.thumbnail_path)
 
         self.log("info", "Completed")
 
         return document
+
+    def _write(self, document, source, target):
+        with open(source, "rb") as read_file:
+            with open(target, "wb") as write_file:
+                if document.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
+                    write_file.write(read_file.read())
+                    return
+                self.log("debug", "Encrypting")
+                write_file.write(GnuPG.encrypted(read_file))
 
     def _cleanup_doc(self, doc):
         self.log("debug", "Deleting document {}".format(doc))

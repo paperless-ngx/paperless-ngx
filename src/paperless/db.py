@@ -3,7 +3,7 @@ import gnupg
 from django.conf import settings
 
 
-class GnuPG(object):
+class GnuPG:
     """
     A handy singleton to use when handling encrypted files.
     """
@@ -11,15 +11,22 @@ class GnuPG(object):
     gpg = gnupg.GPG(gnupghome=settings.GNUPG_HOME)
 
     @classmethod
-    def decrypted(cls, file_handle):
-        return cls.gpg.decrypt_file(
-            file_handle, passphrase=settings.PASSPHRASE).data
+    def decrypted(cls, file_handle, passphrase=None):
+
+        if not passphrase:
+            passphrase = settings.PASSPHRASE
+
+        return cls.gpg.decrypt_file(file_handle, passphrase=passphrase).data
 
     @classmethod
-    def encrypted(cls, file_handle):
+    def encrypted(cls, file_handle, passphrase=None):
+
+        if not passphrase:
+            passphrase = settings.PASSPHRASE
+
         return cls.gpg.encrypt_file(
             file_handle,
             recipients=None,
-            passphrase=settings.PASSPHRASE,
+            passphrase=passphrase,
             symmetric=True
         ).data
