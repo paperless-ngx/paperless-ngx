@@ -30,6 +30,9 @@ encryption too, you only need to do two things:
 2. Remove ``PAPERLESS_PASSPHRASE`` from your ``paperless.conf`` file, or simply
    stop declaring it in your environment.
 
+Special thanks to `erikarvstedt`_, `matthewmoto`_, and `mcronce`_ who did the
+bulk of the work on this big change.
+
 1.4.0
 =====
 
@@ -426,6 +429,7 @@ encryption too, you only need to do two things:
 .. _erikarvstedt: https://github.com/erikarvstedt
 .. _Kyle Lucy: https://github.com/kmlucy
 .. _thinkjk: https://github.com/thinkjk
+.. _mcronce: https://github.com/mcronce
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
