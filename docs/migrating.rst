@@ -16,7 +16,7 @@ Backing Up
 ----------
 
 So you're bored of this whole project, or you want to make a remote backup of
-the unencrypted files for whatever reason.  This is easy to do, simply use the
+your files for whatever reason.  This is easy to do, simply use the
 :ref:`exporter <utilities-exporter>` to dump your documents and database out
 into an arbitrary directory.
 

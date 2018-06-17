@@ -63,17 +63,18 @@ Standard (Bare Metal)
 
 1. Install the requirements as per the :ref:`requirements <requirements>` page.
 2. Within the extract of master.zip go to the ``src`` directory.
-3. Copy ``../paperless.conf.example`` to ``/etc/paperless.conf`` also the virtual
-   envrionment look there for it and open it in your favourite editor.
-   Because this file contains passwords it should only be readable by user root
-   and paperless !  Set the values for:
+3. Copy ``../paperless.conf.example`` to ``/etc/paperless.conf`` and open it in
+   your favourite editor.  Because this file contains passwords it should only
+   be readable by user root and paperless!  Set the values for:
 
     * ``PAPERLESS_CONSUMPTION_DIR``: this is where your documents will be
       dumped to be consumed by Paperless.
-    * ``PAPERLESS_PASSPHRASE``: this is the passphrase Paperless uses to
-      encrypt/decrypt the original document.
     * ``PAPERLESS_OCR_THREADS``: this is the number of threads the OCR process
       will spawn to process document pages in parallel.
+    * ``PAPERLESS_PASSPHRASE``: this is only required if you want to use GPG to
+      encrypt your document files.  This is the passphrase Paperless uses to
+      encrypt/decrypt the original documents.  Don't worry about defining this
+      if you don't want to use encryption (the default).
 
 4. Initialise the SQLite database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
@@ -139,7 +140,8 @@ Docker Method
 
    ``PAPERLESS_PASSPHRASE``
      This is the passphrase Paperless uses to encrypt/decrypt the original
-     document.
+     document.  If you aren't planning on using GPG encryption, you can just
+     leave this undefined.
 
    ``PAPERLESS_OCR_THREADS``
      This is the number of threads the OCR process will spawn to process
@@ -265,10 +267,11 @@ Vagrant Method
 3. Run ``vagrant ssh`` and once inside your new vagrant box, edit
    ``/etc/paperless.conf`` and set the values for:
 
-    * ``PAPERLESS_CONSUMPTION_DIR``: this is where your documents will be
+    * ``PAPERLESS_CONSUMPTION_DIR``: This is where your documents will be
       dumped to be consumed by Paperless.
-    * ``PAPERLESS_PASSPHRASE``: this is the passphrase Paperless uses to
-      encrypt/decrypt the original document.
+    * ``PAPERLESS_PASSPHRASE``: This is the passphrase Paperless uses to
+      encrypt/decrypt the original document.  It's only required if you want
+      your original files to be encrypted, otherwise, just leave it unset.
     * ``PAPERLESS_EMAIL_SECRET``: this is the "magic word" used when consuming
       documents from mail or via the API.  If you don't use either, leaving it
       blank is just fine.
