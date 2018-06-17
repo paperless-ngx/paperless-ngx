@@ -165,6 +165,8 @@ PAPERLESS_EMAIL_SECRET=""
 #PAPERLESS_CONVERT_DENSITY=300
 
 
+# (This setting is ignored on Linux where inotify is used instead of a
+# polling loop.)
 # The number of seconds that Paperless will wait between checking
 # PAPERLESS_CONSUMPTION_DIR.  If you tend to write documents to this directory
 # rarely, you may want to use a higher value than the default (10).

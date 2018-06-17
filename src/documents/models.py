@@ -236,12 +236,16 @@ class Document(models.Model):
         default=timezone.now, db_index=True)
     modified = models.DateTimeField(
         auto_now=True, editable=False, db_index=True)
+
     storage_type = models.CharField(
         max_length=11,
         choices=STORAGE_TYPES,
         default=STORAGE_TYPE_UNENCRYPTED,
         editable=False
     )
+
+    added = models.DateTimeField(
+        default=timezone.now, editable=False, db_index=True)
 
     class Meta:
         ordering = ("correspondent", "title")
