@@ -75,7 +75,7 @@ class Command(BaseCommand):
 
         for document in encrypted_files:
 
-            print(coloured("🔓 Decrypting {}".format(document), "green"))
+            print(coloured("Decrypting {}".format(document), "green"))
 
             old_paths = [document.source_path, document.thumbnail_path]
             raw_document = GnuPG.decrypted(document.source_file, passphrase)
@@ -102,7 +102,7 @@ class Command(BaseCommand):
 
         for document in unencrypted_files:
 
-            print(coloured("🔒 Encrypting {}".format(document), "green"))
+            print(coloured("Encrypting {}".format(document), "green"))
 
             old_paths = [document.source_path, document.thumbnail_path]
             with open(document.source_path, "rb") as raw_document:
