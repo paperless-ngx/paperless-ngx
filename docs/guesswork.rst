@@ -20,6 +20,8 @@ for you.  This is is the logic the consumer follows:
    the pattern: ``Date - Correspondent - Title - tag,tag,tag.pdf``.  Note that
    the format of the date is **rigidly defined** as ``YYYYMMDDHHMMSSZ`` or
    ``YYYYMMDDZ``.  The ``Z`` refers "Zulu time" AKA "UTC".
+   The tags are optional, so the format ``Date - Correspondent - Title.pdf``
+   works as well.
 2. If that doesn't work, we skip the date and try this pattern:
    ``Correspondent - Title - tag,tag,tag.pdf``.
 3. If that doesn't work, we try to find the correspondent and title in the file
