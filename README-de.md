@@ -1,4 +1,4 @@
-*[German](README-de.md)*<br/>
+*[English](README.md)*<br/>
 *[Greek](README-el.md)*
 
 # Paperless
