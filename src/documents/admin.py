@@ -10,31 +10,6 @@ from django.utils.safestring import mark_safe
 from .models import Correspondent, Tag, Document, Log
 
 
-class MonthListFilter(admin.SimpleListFilter):
-
-    title = "Month"
-
-    # Parameter for the filter that will be used in the URL query.
-    parameter_name = "month"
-
-    def lookups(self, request, model_admin):
-        r = []
-        for document in Document.objects.all():
-            r.append((
-                document.created.strftime("%Y-%m"),
-                document.created.strftime("%B %Y")
-            ))
-        return sorted(set(r), key=lambda x: x[0], reverse=True)
-
-    def queryset(self, request, queryset):
-
-        if not self.value():
-            return None
-
-        year, month = self.value().split("-")
-        return queryset.filter(created__year=year, created__month=month)
-
-
 class FinancialYearFilter(admin.SimpleListFilter):
 
     title = "Financial Year"
@@ -129,10 +104,11 @@ class DocumentAdmin(CommonAdmin):
     readonly_fields = ("added",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
                     "tags_")
-    list_filter = ("tags", "correspondent", FinancialYearFilter,
-                   MonthListFilter)
+    list_filter = ("tags", "correspondent", FinancialYearFilter)
 
     ordering = ["-created", "correspondent"]
+
+    date_hierarchy = 'created'
 
     def has_add_permission(self, request):
         return False
