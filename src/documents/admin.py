@@ -3,8 +3,9 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.templatetags.static import static
+from django.utils.safestring import mark_safe
 
 from .models import Correspondent, Tag, Document, Log
 
@@ -140,6 +141,7 @@ class DocumentAdmin(CommonAdmin):
         return obj.created.date().strftime("%Y-%m-%d")
     created_.short_description = "Created"
 
+    @mark_safe
     def thumbnail(self, obj):
         return self._html_tag(
             "a",
@@ -152,8 +154,8 @@ class DocumentAdmin(CommonAdmin):
             ),
             href=obj.download_url
         )
-    thumbnail.allow_tags = True
 
+    @mark_safe
     def tags_(self, obj):
         r = ""
         for tag in obj.tags.all():
@@ -171,9 +173,10 @@ class DocumentAdmin(CommonAdmin):
                 }
             )
         return r
-    tags_.allow_tags = True
 
+    @mark_safe
     def document(self, obj):
+        # TODO: is this method even used anymore?
         return self._html_tag(
             "a",
             self._html_tag(
@@ -186,7 +189,6 @@ class DocumentAdmin(CommonAdmin):
             ),
             href=obj.download_url
         )
-    document.allow_tags = True
 
     @staticmethod
     def _html_tag(kind, inside=None, **kwargs):
