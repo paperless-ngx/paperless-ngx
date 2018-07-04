@@ -30,7 +30,8 @@ urlpatterns = [
         r"^api/auth/",
         include('rest_framework.urls', namespace="rest_framework")
     ),
-    url(r"^api/", include(router.urls, namespace="drf")),
+    # TODO: this does not work in django 2.0!
+    # url(r"^api/", include(router.urls, namespace="drf")),
 
     # File downloads
     url(
