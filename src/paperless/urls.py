@@ -6,6 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
 
+from djangodav.acls import FullAcl
+from djangodav.locks import DummyLock
+
 from documents.views import (
     CorrespondentViewSet,
     DocumentViewSet,
@@ -14,6 +17,7 @@ from documents.views import (
     PushView,
     TagViewSet
 )
+from paperless.dav import PaperlessDavResource, SecuredDavView
 from reminders.views import ReminderViewSet
 
 router = DefaultRouter()
@@ -45,6 +49,8 @@ urlpatterns = [
 
     # The Django admin
     url(r"admin/", admin.site.urls),
+
+    url(r'^dav(?P<path>.*)$', SecuredDavView.as_view(resource_class=PaperlessDavResource, lock_class=DummyLock, acl_class=FullAcl)),
 
     # Redirect / to /admin
     url(r"^$", RedirectView.as_view(
