@@ -115,7 +115,8 @@ class CorrespondentAdmin(CommonAdmin):
 
 class TagAdmin(CommonAdmin):
 
-    list_display = ("name", "colour", "match", "matching_algorithm", "document_count")
+    list_display = ("name", "colour", "match", "matching_algorithm",
+                    "document_count")
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
