@@ -104,7 +104,12 @@ class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
 
     def __init__(self, path, **kwargs):
         super(PaperlessDavResource, self).__init__(path)
-        self.documents, self.document, self.children = parse_path(path)
+        if 'document' in kwargs:
+            print("using document from kwargs")
+            # this greatly reduces the amount of database requests.
+            self.document = kwargs.pop('document')
+        else:
+            self.documents, self.document, self.children = parse_path(path)
 
     @property
     def getcontentlength(self):
@@ -144,7 +149,7 @@ class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
                 yield PaperlessDavResource(url_join(*(self.path + [child])))
 
             for doc in self.documents:
-                yield PaperlessDavResource(url_join(*(self.path + [doc.title])), document=doc)
+                yield PaperlessDavResource(url_join(*(self.path + [doc.title + "." + doc.file_type])), document=doc)
 
     def write(self, content, temp_file=None):
         raise NotImplementedError
@@ -167,7 +172,7 @@ class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
 
 def parse_path(path):
     used_tags = []
-    used_correspondents = []
+    used_correspondent = None
     year_selected = False
     month_selected = False
     day_selected = False
@@ -181,7 +186,8 @@ def parse_path(path):
             filters.append('month')
         elif not day_selected:
             filters.append('day')
-        filters.append('correspondent')
+        if used_correspondent is None:
+            filters.append('correspondent')
         filters.append('tag')
         return filters
 
@@ -196,13 +202,6 @@ def parse_path(path):
     print("path",path_queue)
     while len(path_queue) > 0:
         path_segment = path_queue.pop(0)
-        # 1. check if path_segment exists / is allowed
-        # 2. determine what path_segment does
-        # 3. determine
-
-        print("segment", path_segment)
-        print("rule   ", current_rule)
-        print("---")
 
         if current_rule == 'select_filter':
             show_documents = False
@@ -217,10 +216,10 @@ def parse_path(path):
                 children = [str(d.day) for d in filter.dates('created', 'day')]
             elif path_segment == 'correspondent':
                 next_rule = 'select_correspondent'
-                children = [c.name for c in Correspondent.objects.all()]
+                children = [c.name for c in Correspondent.objects.filter(documents__in=filter)]
             elif path_segment == 'tag':
                 next_rule = 'select_tag'
-                children = [t.name for t in Tag.objects.all()]
+                children = [t.name for t in Tag.objects.filter(documents__in=filter) if t.name not in used_tags]
             else:
                 next_rule = 'document'
                 children = []
@@ -234,7 +233,7 @@ def parse_path(path):
         elif current_rule == 'select_correspondent':
             next_rule = 'select_filter'
             filter = filter.filter(correspondent__name=path_segment)
-            used_tags.append(path_segment)
+            used_correspondent = path_segment
             children = get_filter_children()
             show_documents = True
         elif current_rule == 'select_year':
@@ -262,4 +261,5 @@ def parse_path(path):
 
     print("ok")
     print("children", children)
+    print("used tags", used_tags)
     return filter if show_documents else [], document, children
