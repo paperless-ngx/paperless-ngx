@@ -22,7 +22,7 @@ class Command(Renderable, BaseCommand):
 
         self.verbosity = options["verbosity"]
 
-        for document in Document.objects.all():
+        for document in Document.objects.all().exclude(tags__is_archived_tag=True):
 
             tags = Tag.objects.exclude(
                 pk__in=document.tags.values_list("pk", flat=True))

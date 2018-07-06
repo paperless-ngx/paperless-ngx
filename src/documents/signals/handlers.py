@@ -47,7 +47,7 @@ def set_correspondent(sender, document=None, logging_group=None, **kwargs):
 def set_tags(sender, document=None, logging_group=None, **kwargs):
 
     current_tags = set(document.tags.all())
-    relevant_tags = set(Tag.match_all(document.content)) - current_tags
+    relevant_tags = (set(Tag.match_all(document.content)) | set(Tag.objects.filter(is_inbox_tag=True))) - current_tags
 
     if not relevant_tags:
         return
