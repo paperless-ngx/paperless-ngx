@@ -1,10 +1,7 @@
 import base64
 import binascii
-import datetime
 import os
-import shutil
 from functools import wraps
-from sys import getfilesystemencoding
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponse
@@ -101,6 +98,7 @@ class SecuredDavView(DavView):
 class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
 
     document = None
+    _exists = True
 
     def __init__(self, path, **kwargs):
         super(PaperlessDavResource, self).__init__(path)
@@ -109,7 +107,7 @@ class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
             # this greatly reduces the amount of database requests.
             self.document = kwargs.pop('document')
         else:
-            self.documents, self.document, self.children = parse_path(path)
+            self._exists, self.documents, self.document, self.children = parse_path(path)
 
     @property
     def getcontentlength(self):
@@ -133,46 +131,56 @@ class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
 
     @property
     def is_collection(self):
-        return not self.document
+        return self.exists and not self.document
 
     @property
     def is_object(self):
-        return self.document
+        return self.exists and self.document
 
     @property
     def exists(self):
-        return True
+        return self._exists
 
     def get_children(self):
         if not self.document:
             for child in self.children:
-                yield PaperlessDavResource(url_join(*(self.path + [child])))
+                yield self.clone(url_join(*(self.path + [child])))
 
             for doc in self.documents:
-                yield PaperlessDavResource(url_join(*(self.path + [doc.title + "." + doc.file_type])), document=doc)
+                yield self.clone(url_join(*(self.path + [doc.title])), document=doc)
 
     def write(self, content, temp_file=None):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def read(self):
-        print("calling read!!!")
         return self.document.source_file
 
     def delete(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def create_collection(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def copy_object(self, destination, depth=0):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def move_object(self, destination):
-        raise NotImplementedError
+        raise NotImplementedError()
 
 def parse_path(path):
+    """
+    This method serves multiple purposes:
+    1. validate the path and ensure that it valid (i.e., conforms to the specification provided above).
+    2. provide a database filter that returns a set of documents to be displayed, applying filters if necessary.
+    3. provide a set of "folders" that act as filters to narrow down the list of documents.
+
+    This is achieved by implementing a state machine. This machine processes the path segment by segment and switched
+    states as the path is processed. Depending on the state, only certain path segments are allowed.
+    :param path:
+    :return:
+    """
     used_tags = []
-    used_correspondent = None
+    correspondent_selected = False
     year_selected = False
     month_selected = False
     day_selected = False
@@ -186,8 +194,9 @@ def parse_path(path):
             filters.append('month')
         elif not day_selected:
             filters.append('day')
-        if used_correspondent is None:
+        if not correspondent_selected:
             filters.append('correspondent')
+        #TODO: this should probably not get displayed if the resulting list of tags is empty, but it would result in even more database queries.
         filters.append('tag')
         return filters
 
@@ -196,10 +205,10 @@ def parse_path(path):
     filter = Document.objects.all()
     children = get_filter_children()
     document = None
+    exists = True
 
     current_rule = 'select_filter'
 
-    print("path",path_queue)
     while len(path_queue) > 0:
         path_segment = path_queue.pop(0)
 
@@ -223,7 +232,10 @@ def parse_path(path):
             else:
                 next_rule = 'document'
                 children = []
-                document = Document.objects.get(title=path_segment)
+                try:
+                    document = Document.objects.get(title=path_segment)
+                except:
+                    exists = False
         elif current_rule == 'select_tag':
             next_rule = 'select_filter'
             filter = filter.filter(tags__name=path_segment)
@@ -233,7 +245,7 @@ def parse_path(path):
         elif current_rule == 'select_correspondent':
             next_rule = 'select_filter'
             filter = filter.filter(correspondent__name=path_segment)
-            used_correspondent = path_segment
+            correspondent_selected = True
             children = get_filter_children()
             show_documents = True
         elif current_rule == 'select_year':
@@ -259,7 +271,4 @@ def parse_path(path):
 
         current_rule = next_rule
 
-    print("ok")
-    print("children", children)
-    print("used tags", used_tags)
-    return filter if show_documents else [], document, children
+    return exists, filter if show_documents else [], document, children
