@@ -110,12 +110,26 @@ class CorrespondentAdmin(CommonAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        for document in Document.objects.filter(correspondent__isnull=True).exclude(tags__is_archived_tag=True):
+            if obj.matches(document.content):
+                document.correspondent = obj
+                document.save(update_fields=("correspondent",))
 
 class TagAdmin(CommonAdmin):
 
     list_display = ("name", "colour", "match", "matching_algorithm")
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        for document in Document.objects.all().exclude(tags__is_archived_tag=True):
+            if obj.matches(document.content):
+                document.tags.add(obj)
 
 
 class DocumentAdmin(CommonAdmin):
