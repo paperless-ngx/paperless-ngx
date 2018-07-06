@@ -142,7 +142,7 @@ class DocumentAdmin(CommonAdmin):
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = ("added",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
-                    "tags_")
+                    "tags_", "archive_serial_number")
     list_filter = ("tags", "correspondent", FinancialYearFilter,
                    MonthListFilter)
 
