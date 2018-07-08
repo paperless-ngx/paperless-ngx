@@ -25,3 +25,18 @@ the default, ``<project root>/media/``) for two files:
 If it finds either or both of those files, they'll be loaded into the page: the
 CSS in the ``<head>``, and the Javascript stuffed into the last line of the
 ``<body>``.
+
+
+.. _customising-overrides-note:
+
+An important note about customisation
+-------------------------------------
+
+Any changes you make to the site with your CSS or Javascript are likely to
+depend on the structure of the current HTML and/or the existing CSS rules.  For
+the most part it's safe to assume that these bits won't change, but *sometimes
+they do* as features are added or bugs are fixed.
+
+If you make a change that you think others would appreciate though, submit it
+as a pull request and maybe we can find a way to work it into the project by
+default!
