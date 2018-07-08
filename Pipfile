@@ -35,3 +35,4 @@ pytest-xdist = "*"
 
 [dev-packages]
 ipython = "*"
+sphinx = "*"
