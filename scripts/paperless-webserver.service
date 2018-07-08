@@ -4,7 +4,7 @@ Description=Paperless webserver
 [Service]
 User=paperless
 Group=paperless
-ExecStart=/home/paperless/project/virtualenv/bin/python /home/paperless/project/src/manage.py runserver --noreload 0.0.0.0:8000
+ExecStart=/home/paperless/project/virtualenv/bin/gunicorn /home/paperless/project/src/paperless.wsgi -w 2
 
 [Install]
 WantedBy=multi-user.target
