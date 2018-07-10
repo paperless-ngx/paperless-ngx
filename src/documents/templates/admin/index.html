@@ -4,6 +4,24 @@
 {% load i18n static %}
 
 
+{# This block adds a search form on the admin start page and on the module start page so that #}
+{# the user can quickly search for documents #}
+{% block pretitle %}
+<div>
+    <h3>{% trans 'Search documents' %}</h3>
+
+    <div id="toolbar"><form id="changelist-search" method="get" action="{% url 'admin:documents_document_changelist' %}">
+            <div><!-- DIV needed for valid HTML -->
+                <label for="searchbar"><img src="{% static "admin/img/search.svg" %}" alt="Search"></label>
+                <input type="text" size="40" name="q" value="" id="searchbar" autofocus="">
+                <input type="submit" value="{% trans 'Search' %}">
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
 {# This whole block is here just to override the `get_admin_log` line so #}
 {# that the log entries aren't limited to the current user #}
 {% block sidebar %}

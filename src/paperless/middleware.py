@@ -2,7 +2,7 @@ from django.utils.deprecation import MiddlewareMixin
 from .models import User
 
 
-class Middleware (MiddlewareMixin):
+class Middleware(MiddlewareMixin):
     """
       This is a dummy authentication middleware class that creates what
       is roughly an Anonymous authenticated user so we can disable login

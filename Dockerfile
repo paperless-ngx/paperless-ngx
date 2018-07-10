@@ -4,11 +4,8 @@ LABEL maintainer="The Paperless Project https://github.com/danielquinn/paperless
       contributors="Guy Addadi <addadi@gmail.com>, Pit Kleyersburg <pitkley@googlemail.com>, \
         Sven Fischer <git-dev@linux4tw.de>"
 
-# Copy application
+# Copy requirements file and init script
 COPY requirements.txt /usr/src/paperless/
-COPY src/ /usr/src/paperless/src/
-COPY data/ /usr/src/paperless/data/
-COPY media/ /usr/src/paperless/media/
 COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 
 # Set export and consumption directories
@@ -43,4 +40,9 @@ WORKDIR /usr/src/paperless/src
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/consume", "/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 CMD ["--help"]
+
+# Copy application
+COPY src/ /usr/src/paperless/src/
+COPY data/ /usr/src/paperless/data/
+COPY media/ /usr/src/paperless/media/
 
