@@ -1,6 +1,25 @@
 Changelog
 #########
 
+2.1.0
+=====
+
+* `Enno Lohmeier`_ added three simple features that make Paperless a lot more
+  user (and developer) friendly:
+
+  1. There's a new search box on the front page: `#374`_.
+  2. The correspondents & tags pages now have a column showing the number of
+     relevant documents: `#375`_.
+  3. The Dockerfile has been tweaked to build faster for those of us who are
+     doing active development on Paperless using the Docker environment:
+     `#376`_.
+
+* You now also have the ability to customise the interface to your heart's
+  content by creating a file called ``overrides.css`` and/or ``overrides.js``
+  in the root of your media directory.  Thanks to `Mark McFate`_ for this
+  idea: `#371`_
+
+
 2.0.0
 =====
 
@@ -430,6 +449,8 @@ bulk of the work on this big change.
 .. _Kyle Lucy: https://github.com/kmlucy
 .. _thinkjk: https://github.com/thinkjk
 .. _mcronce: https://github.com/mcronce
+.. _Enno Lohmeier: https://github.com/elohmeier
+.. _Mark McFate: https://github.com/SummittDweller
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -500,6 +521,10 @@ bulk of the work on this big change.
 .. _#351: https://github.com/danielquinn/paperless/pull/351
 .. _#352: https://github.com/danielquinn/paperless/pull/352
 .. _#354: https://github.com/danielquinn/paperless/issues/354
+.. _#371: https://github.com/danielquinn/paperless/issues/371
+.. _#374: https://github.com/danielquinn/paperless/pull/374
+.. _#375: https://github.com/danielquinn/paperless/pull/375
+.. _#376: https://github.com/danielquinn/paperless/pull/376
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
