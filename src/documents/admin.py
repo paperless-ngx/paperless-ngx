@@ -110,7 +110,7 @@ class CommonAdmin(admin.ModelAdmin):
 
 class CorrespondentAdmin(CommonAdmin):
 
-    list_display = ("name", "match", "matching_algorithm")
+    list_display = ("name", "match", "matching_algorithm", "document_count")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
@@ -122,9 +122,14 @@ class CorrespondentAdmin(CommonAdmin):
                 document.correspondent = obj
                 document.save(update_fields=("correspondent",))
 
+    def document_count(self, obj):
+        return obj.documents.count()
+
+
 class TagAdmin(CommonAdmin):
 
-    list_display = ("name", "colour", "match", "matching_algorithm")
+    list_display = ("name", "colour", "match", "matching_algorithm",
+                    "document_count")
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
@@ -134,6 +139,9 @@ class TagAdmin(CommonAdmin):
         for document in Document.objects.all().exclude(tags__is_archived_tag=True):
             if obj.matches(document.content):
                 document.tags.add(obj)
+
+    def document_count(self, obj):
+        return obj.documents.count()
 
 
 def add_tag_to_selected(modeladmin, request, queryset):

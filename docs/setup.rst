@@ -39,33 +39,38 @@ or just download the tarball and go that route:
 Installation & Configuration
 ----------------------------
 
-You can go multiple routes with setting up and running Paperless. The `Vagrant
-route`_ is quick & easy, but means you're running a VM which comes with memory
-consumption etc. We also `support Docker`_, which you can use natively under
-Linux and in a VM with `Docker Machine`_ (this guide was written for native
-Docker usage under Linux, you might have to adapt it for Docker Machine.)
-Not to forget the virtualenv, this is similar to `bare metal`_ with the
-exception that you have to activate the virtualenv first.
-Last but not least, the standard `bare metal`_ approach is a little more
-complicated, but worth it because it makes it easier should you want to
-contribute some code back.
+You can go multiple routes with setting up and running Paperless:
+
+ * The `bare metal route`_
+ * The `vagrant route`_
+ * The `docker route`_
+
+
+The `Vagrant route`_ is quick & easy, but means you're running a VM which comes
+with memory consumption, cpu overhead etc. The `docker route`_ offers the same
+simplicity as Vagrant with lower resource consumption.
+
+The `bare metal route`_ is a bit more complicated to setup but makes it easier
+should you want to contribute some code back.
 
 .. _Vagrant route: setup-installation-vagrant_
-.. _support Docker: setup-installation-docker_
-.. _bare metal: setup-installation-standard_
+.. _docker route: setup-installation-docker_
+.. _bare metal route: setup-installation-bare-metal_
 .. _Docker Machine: https://docs.docker.com/machine/
 
 
-.. _setup-installation-standard:
+.. _setup-installation-bare-metal:
 
 Standard (Bare Metal)
-.....................
++++++++++++++++++++++
 
 1. Install the requirements as per the :ref:`requirements <requirements>` page.
 2. Within the extract of master.zip go to the ``src`` directory.
 3. Copy ``../paperless.conf.example`` to ``/etc/paperless.conf`` and open it in
-   your favourite editor.  Because this file contains passwords it should only
-   be readable by user root and paperless!  Set the values for:
+   your favourite editor.  As this file contains passwords.  It should only be
+   readable by user root and paperless!  Set the values for:
+
+   Set the values for:
 
     * ``PAPERLESS_CONSUMPTION_DIR``: this is where your documents will be
       dumped to be consumed by Paperless.
@@ -82,9 +87,10 @@ Standard (Bare Metal)
 6. Start the webserver with ``./manage.py runserver <IP>:<PORT>``.
    If no specifc IP or port are given, the default is ``127.0.0.1:8000``
    also known as http://localhost:8000/.
-   You should now be able to visit your (empty) at `Paperless webserver`_ or
-   whatever you chose before.  You can login with the user/pass you created in
-   #5.
+   You should now be able to visit your (empty) installation at
+   `Paperless webserver`_ or whatever you chose before.  You can login with the
+   user/pass you created in #5.
+
 7. In a separate window, change to the ``src`` directory in this repo again,
    but this time, you should start the consumer script with
    ``./manage.py document_consumer``.
@@ -93,13 +99,18 @@ Standard (Bare Metal)
 10. Visit the document list on your webserver, and it should be there, indexed
     and downloadable.
 
-.. _Paperless webserver: http://127.0.0.1:8000
+.. caution::
 
+    This installation is not secure. Once everything is working head over to
+    `Making things more permanent`_
+
+.. _Paperless webserver: http://127.0.0.1:8000
+.. _Making things more permanent: setup-permanent_
 
 .. _setup-installation-docker:
 
 Docker Method
-.............
++++++++++++++
 
 1. Install `Docker`_.
 
@@ -259,7 +270,7 @@ Docker Method
 .. _setup-installation-vagrant:
 
 Vagrant Method
-..............
+++++++++++++++
 
 1. Install `Vagrant`_.  How you do that is really between you and your OS.
 2. Run ``vagrant up``.  An instance will start up for you.  When it's ready and
@@ -295,6 +306,11 @@ Vagrant Method
 11. Visit the document list on your webserver, and it should be there, indexed
     and downloadable.
 
+.. caution::
+
+    This installation is not secure. Once everything is working head up to
+    `Making things more permanent`_
+
 .. _Vagrant: https://vagrantup.com/
 .. _Paperless server: http://172.28.128.4:8000
 
@@ -304,116 +320,39 @@ Vagrant Method
 Making Things a Little more Permanent
 -------------------------------------
 
-Once you've tested things and are happy with the work flow, you can automate
-the process of starting the webserver and consumer automatically.
+Once you've tested things and are happy with the work flow, you should secure
+the installation and automate the process of starting the webserver and
+consumer.
 
 
-.. _setup-permanent-standard-systemd:
-
-Standard (Bare Metal, Systemd)
-..............................
-
-If you're running on a bare metal system that's using Systemd, you can use the
-service unit files in the ``scripts`` directory to set this up.  You'll need to
-create a user called ``paperless`` (without login (if not already done so #5))
-and setup Paperless to be in a place that this new user can read and write to.
-Be sure to edit the service  scripts to point to the proper location of your
-paperless install, referencing the appropriate Python binary. For example:
-``ExecStart=/path/to/python3 /path/to/paperless/src/manage.py document_consumer``.
-If you don't want to make a new user, you can change the ``Group`` and ``User``
-variables accordingly.
-
-Then, as ``root`` (or using ``sudo``) you can just copy the ``.service`` files
-to the Systemd directory and tell it to enable the two services::
-
-    # cp /path/to/paperless/scripts/paperless-consumer.service /etc/systemd/system/
-    # cp /path/to/paperless/scripts/paperless-webserver.service /etc/systemd/system/
-    # systemctl enable paperless-consumer
-    # systemctl enable paperless-webserver
-    # systemctl start paperless-consumer
-    # systemctl start paperless-webserver
-
-
-.. _setup-permanent-standard-ubuntu14:
-
-Ubuntu 14.04 (Bare Metal, Upstart)
-..................................
-
-Ubuntu 14.04 and earlier use the `Upstart`_ init system to start services
-during the boot process. To configure Upstart to run Paperless automatically
-after restarting your system:
-
-1. Change to the directory where Upstart's configuration files are kept:
-   ``cd /etc/init``
-2. Create a new file: ``sudo nano paperless-server.conf``
-3. In the newly-created file enter::
-
-    start on (local-filesystems and net-device-up IFACE=eth0)
-    stop on shutdown
-
-    respawn
-    respawn limit 10 5
-
-    script
-      exec /srv/paperless/src/manage.py runserver --noreload 0.0.0.0:80
-    end script
-
-   Note that you'll need to replace ``/srv/paperless/src/manage.py`` with the
-   path to the ``manage.py`` script in your installation directory.
-
-  If you are using a network interface other than ``eth0``, you will have to
-  change ``IFACE=eth0``. For example, if you are connected via WiFi, you will
-  likely need to replace ``eth0`` above with ``wlan0``. To see all interfaces,
-  run ``ifconfig -a``.
-
-  Save the file.
-
-4. Create a new file: ``sudo nano paperless-consumer.conf``
-
-5. In the newly-created file enter::
-
-    start on (local-filesystems and net-device-up IFACE=eth0)
-    stop on shutdown
-
-    respawn
-    respawn limit 10 5
-
-    script
-      exec /srv/paperless/src/manage.py document_consumer
-    end script
-
-  Replace ``/srv/paperless/src/manage.py`` with the same values as in step 3
-  above and replace ``eth0`` with the appropriate value, if necessary. Save the
-  file.
-
-These two configuration files together will start both the Paperless webserver
-and document consumer processes when the file system and network interface
-specified is available after boot. Furthermore, if either process ever exits
-unexpectedly, Upstart will try to restart it a maximum of 10 times within a 5
-second period.
-
-.. _Upstart: http://upstart.ubuntu.com/
-
-
-.. _setup-permanent-vagrant:
-
+.. _setup-permanent-webserver:
 
 Using a Real Webserver
-......................
+++++++++++++++++++++++
 
 The default is to use Django's development server, as that's easy and does the
-job well enough on a home network.  However, if you want to do things right,
-it's probably a good idea to use a webserver capable of handling more than one
-thread. You will also have to let the webserver serve the static files (CSS,
-JavaScript) from the directory configured in ``PAPERLESS_STATICDIR``. For that,
-you need to run ``./manage.py collectstatic`` in the ``src`` directory.  The
-default static files directory is ``../static``.
+job well enough on a home network. However it is heavily discouraged to use
+it for more than that.
+
+If you want to do things right you should use a real webserver capable of
+handling more than one thread. You will also have to let the webserver serve
+the static files (CSS, JavaScript) from the directory configured in
+``PAPERLESS_STATICDIR``.  The default static files directory is ``../static``.
+
+For that you need to activate your virtual environment and collect the static
+files with the command:
+
+.. code:: bash
+
+    $ cd <paperless directory>/src
+    $ ./manage.py collectstatic
+
 
 Apache
 ~~~~~~
 
 This is a configuration supplied by `steckerhalter`_ on GitHub.  It uses Apache
-and mod_wsgi, with a Paperless installation in /home/paperless/:
+and mod_wsgi, with a Paperless installation in ``/home/paperless/``:
 
 .. code:: apache
 
@@ -444,170 +383,150 @@ Nginx + Gunicorn
 
 If you're using Nginx, the most common setup is to combine it with a
 Python-based server like Gunicorn so that Nginx is acting as a proxy.  Below is
-a copy of a simple Nginx configuration fragment making use of SSL and IPv6 to
-refer to a gunicorn instance listening on a local Unix socket:
+a copy of a simple Nginx configuration fragment making use of a gunicorn
+instance listening on localhost port 8000.
 
 .. code:: nginx
 
-    upstream transfer_server {
-      server unix:/run/example.com/gunicorn.sock fail_timeout=0;
-    }
-
-    # Redirect requests on port 80 to 443
     server {
-      listen 80;
-      listen [::]:80;
-      server_name example.com;
-      rewrite ^ https://$server_name$request_uri? permanent;
+        listen 80;
+
+        index index.html index.htm index.php;
+        access_log /var/log/nginx/paperless_access.log;
+        error_log /var/log/nginx/paperless_error.log;
+
+        location /static {
+
+            autoindex on;
+            alias <path-to-paperless-static-directory>
+
+        }
+
+        location / {
+
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_pass http://127.0.0.1:8000
+        }
     }
 
-    server {
 
-      listen 443 ssl;
-      listen [::]:443;
-      client_max_body_size 4G;
-      server_name example.com;
-      keepalive_timeout 5;
-      root /var/www/example.com;
+The gunicorn server can be started with the command:
 
-      ssl on;
+.. code-block:: shell
 
-      ssl_certificate         /etc/letsencrypt/live/example.com/fullchain.pem;
-      ssl_certificate_key     /etc/letsencrypt/live/example.com/privkey.pem;
-      ssl_trusted_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-      ssl_session_timeout 1d;
-      ssl_session_cache shared:SSL:50m;
+    $ <path-to-paperless-virtual-environment>/bin/gunicorn <path-to-paperless>/src/paperless.wsgi -w 2
 
-      # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
-      # Generate with:
-      #   openssl dhparam -out /etc/nginx/dhparam.pem 2048
-      ssl_dhparam /etc/nginx/dhparam.pem;
 
-      # What Mozilla calls "Intermediate configuration"
-      # Copied from https://mozilla.github.io/server-side-tls/ssl-config-generator/
-      ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-      ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
-      ssl_prefer_server_ciphers on;
+.. _setup-permanent-standard-systemd:
 
-      add_header Strict-Transport-Security max-age=15768000;
+Standard (Bare Metal + Systemd)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ssl_stapling on;
-      ssl_stapling_verify on;
+If you're running on a bare metal system that's using Systemd, you can use the
+service unit files in the ``scripts`` directory to set this up.
 
-      access_log /var/log/nginx/example.com.log main;
-      error_log /var/log/nginx/example.com.err info;
+1. You'll need to create a group and user called ``paperless`` (without login)
+2. Setup Paperless to be in a place that this new user can read and write to.
+3. Ensure ``/etc/paperless`` is readable by the ``paperless`` user.
+4. Copy the service file from the ``scripts`` directory to
+   ``/etc/systemd/system``.
 
-      location / {
-        try_files $uri @proxy_to_app;
-      }
+.. code-block:: bash
 
-      location @proxy_to_app {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_set_header Host $host;
-        proxy_redirect off;
-        proxy_pass http://transfer_server;
-      }
+    $ cp /path/to/paperless/scripts/paperless-consumer.service /etc/systemd/system/
+    $ cp /path/to/paperless/scripts/paperless-webserver.service /etc/systemd/system/
 
-    }
+5. Edit the service file to point the ``ExecStart`` line to the proper location
+   of your paperless install, referencing the appropriate Python binary. For
+   example:
+   ``ExecStart=/path/to/python3 /path/to/paperless/src/manage.py document_consumer``.
+6. Start and enable (so they start on boot) the services.
 
-Once you've got Nginx configured, you'll want to have a configuration file for
-your gunicorn instance.  This should do the trick:
+.. code-block:: bash
 
-.. code:: python
+    $ systemctl enable paperless-consumer
+    $ systemctl enable paperless-webserver
+    $ systemctl start paperless-consumer
+    $ systemctl start paperless-webserver
 
-    import os
 
-    bind = 'unix:/run/example.com/gunicorn.sock'
-    backlog = 2048
-    workers = 6
-    worker_class = 'sync'
-    worker_connections = 1000
-    timeout = 30
-    keepalive = 2
-    debug = False
-    spew = False
-    daemon = False
-    pidfile = None
-    umask = 0
-    user = None
-    group = None
-    tmp_upload_dir = None
-    errorlog = '/var/log/example.com/gunicorn.err'
-    loglevel = 'warning'
-    accesslog = '/var/log/example.com/gunicorn.log'
-    proc_name = None
+.. _setup-permanent-standard-upstart:
 
-    def post_fork(server, worker):
-        server.log.info("Worker spawned (pid: %s)", worker.pid)
+Standard (Bare Metal + Upstart)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def pre_fork(server, worker):
-        pass
+Ubuntu 14.04 and earlier use the `Upstart`_ init system to start services
+during the boot process. To configure Upstart to run Paperless automatically
+after restarting your system:
 
-    def pre_exec(server):
-        server.log.info("Forked child, re-executing.")
+1. Change to the directory where Upstart's configuration files are kept:
+   ``cd /etc/init``
+2. Create a new file: ``sudo nano paperless-server.conf``
+3. In the newly-created file enter::
 
-    def when_ready(server):
-        server.log.info("Server is ready. Spawning workers")
+    start on (local-filesystems and net-device-up IFACE=eth0)
+    stop on shutdown
 
-    def worker_int(worker):
-        worker.log.info("worker received INT or QUIT signal")
+    respawn
+    respawn limit 10 5
 
-        ## get traceback info
-        import threading, sys, traceback
-        id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
-        code = []
-        for threadId, stack in sys._current_frames().items():
-            code.append("\n# Thread: %s(%d)" % (id2name.get(threadId,""),
-                threadId))
-            for filename, lineno, name, line in traceback.extract_stack(stack):
-                code.append('File: "%s", line %d, in %s' % (filename,
-                    lineno, name))
-                if line:
-                    code.append("  %s" % (line.strip()))
-        worker.log.debug("\n".join(code))
+    script
+      exec <path to paperless virtual environment>/bin/gunicorn <path to parperless>/src/paperless.wsgi -w 2
+    end script
 
-    def worker_abort(worker):
-        worker.log.info("worker received SIGABRT signal")
+   Note that you'll need to replace ``/srv/paperless/src/manage.py`` with the
+   path to the ``manage.py`` script in your installation directory.
+
+  If you are using a network interface other than ``eth0``, you will have to
+  change ``IFACE=eth0``. For example, if you are connected via WiFi, you will
+  likely need to replace ``eth0`` above with ``wlan0``. To see all interfaces,
+  run ``ifconfig -a``.
+
+  Save the file.
+
+4. Create a new file: ``sudo nano paperless-consumer.conf``
+
+5. In the newly-created file enter::
+
+    start on (local-filesystems and net-device-up IFACE=eth0)
+    stop on shutdown
+
+    respawn
+    respawn limit 10 5
+
+    script
+      exec <path to paperless virtual environment>/bin/python <path to parperless>/manage.py document_consumer
+    end script
+
+  Replace the path placeholder and ``eth0`` with the appropriate value and save the file.
+
+These two configuration files together will start both the Paperless webserver
+and document consumer processes when the file system and network interface
+specified is available after boot. Furthermore, if either process ever exits
+unexpectedly, Upstart will try to restart it a maximum of 10 times within a 5
+second period.
+
+.. _Upstart: http://upstart.ubuntu.com/
+
 
 Vagrant
-.......
+~~~~~~~
 
 You may use the Ubuntu explanation above. Replace
 ``(local-filesystems and net-device-up IFACE=eth0)`` with ``vagrant-mounted``.
 
+
 .. _setup-permanent-docker:
 
 Docker
-......
+~~~~~~
 
 If you're using Docker, you can set a restart-policy_ in the
 ``docker-compose.yml`` to have the containers automatically start with the
 Docker daemon.
 
 .. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
-
-
-.. _setup-subdirectory:
-
-Hosting Paperless in a Subdirectory
------------------------------------
-
-Paperless was designed to run off the root of the hosting domain,
-(ie: ``https://example.com/``) but with a few changes, you can configure
-it to run in a subdirectory on your server
-(ie: ``https://example.com/paperless/``).
-
-Thanks to the efforts of `maphy-psd`_ on `Github`_, running Paperless in a
-subdirectory is now as easy as setting a config variable.  Simply set
-``PAPERLESS_FORCE_SCRIPT_NAME`` in your environment or
-``/etc/paperless.conf`` to the path you want Paperless hosted at, configure
-Nginx/Apache for your needs and you're done.  So, if you want Paperless to live
-at ``https://example.com/arbitrary/path/to/paperless`` then you just set
-``PAPERLESS_FORCE_SCRIPT_NAME`` to ``/arbitrary/path/to/paperless``.  Note the
-leading ``/`` there.
-
-As to how to configure Nginx or Apache for this, that's on you :-)
-
-.. _maphy-psd: https://github.com/maphy-psd
-.. _Github: https://github.com/danielquinn/paperless/pull/255

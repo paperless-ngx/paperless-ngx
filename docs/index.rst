@@ -40,6 +40,7 @@ Contents
    utilities
    guesswork
    migrating
+   customising
    extending
    troubleshooting
    scanners
