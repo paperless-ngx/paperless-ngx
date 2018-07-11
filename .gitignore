@@ -61,6 +61,8 @@ target/
 media/documents/*.gpg
 media/documents/thumbnails/*
 media/documents/originals/*
+media/overrides.css
+media/overrides.js
 
 # Sqlite database
 db.sqlite3
