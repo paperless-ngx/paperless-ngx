@@ -50,13 +50,14 @@ urlpatterns = [
     # The Django admin
     url(r"admin/", admin.site.urls),
 
-    url(r'^dav(?P<path>.*)$', SecuredDavView.as_view(resource_class=PaperlessDavResource, lock_class=DummyLock, acl_class=FullAcl)),
-
     # Redirect / to /admin
     url(r"^$", RedirectView.as_view(
         permanent=True, url=reverse_lazy("admin:index"))),
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.ENABLE_WEBDAV:
+    urlpatterns.append(url(r'^dav(?P<path>.*)$', SecuredDavView.as_view(resource_class=PaperlessDavResource, lock_class=DummyLock, acl_class=FullAcl)))
 
 # Text in each page's <h1> (and above login form).
 admin.site.site_header = 'Paperless'
