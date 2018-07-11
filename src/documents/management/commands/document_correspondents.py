@@ -41,7 +41,7 @@ class Command(Renderable, BaseCommand):
 
         self.verbosity = options["verbosity"]
 
-        for document in Document.objects.filter(correspondent__isnull=True):
+        for document in Document.objects.filter(correspondent__isnull=True).exclude(tags__is_archived_tag=True):
 
             potential_correspondents = list(
                 Correspondent.match_all(document.content))

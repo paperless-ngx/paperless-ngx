@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 
+from documents.actions import add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, \
+    remove_correspondent_from_selected
 from .models import Correspondent, Tag, Document, Log
 
 
@@ -110,6 +112,14 @@ class CorrespondentAdmin(CommonAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        for document in Document.objects.filter(correspondent__isnull=True).exclude(tags__is_archived_tag=True):
+            if obj.matches(document.content):
+                document.correspondent = obj
+                document.save(update_fields=("correspondent",))
+
     def document_count(self, obj):
         return obj.documents.count()
 
@@ -121,6 +131,13 @@ class TagAdmin(CommonAdmin):
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        for document in Document.objects.all().exclude(tags__is_archived_tag=True):
+            if obj.matches(document.content):
+                document.tags.add(obj)
+
     def document_count(self, obj):
         return obj.documents.count()
 
@@ -130,16 +147,19 @@ class DocumentAdmin(CommonAdmin):
     class Media:
         css = {
             "all": ("paperless.css",)
+
         }
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = ("added",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
-                    "tags_")
+                    "tags_", "archive_serial_number")
     list_filter = ("tags", "correspondent", FinancialYearFilter,
                    MonthListFilter)
 
     ordering = ["-created", "correspondent"]
+
+    actions = [add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, remove_correspondent_from_selected]
 
     def has_add_permission(self, request):
         return False
