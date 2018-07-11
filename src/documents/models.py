@@ -180,6 +180,14 @@ class Tag(MatchingModel):
 
     colour = models.PositiveIntegerField(choices=COLOURS, default=1)
 
+    is_inbox_tag = models.BooleanField(
+        default=False,
+        help_text="Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.")
+
+    is_archived_tag = models.BooleanField(
+        default=False,
+        help_text="Marks this tag as an archive tag: All documents tagged with archive tags will never be modified automatically (i.e., modifying tags by matching rules)")
+
 
 class Document(models.Model):
 
@@ -246,6 +254,13 @@ class Document(models.Model):
 
     added = models.DateTimeField(
         default=timezone.now, editable=False, db_index=True)
+
+    archive_serial_number = models.IntegerField(
+        blank=True,
+        null=True,
+        unique=True,
+        db_index=True,
+        help_text="The position of this document in your physical document archive.")
 
     class Meta:
         ordering = ("correspondent", "title")
