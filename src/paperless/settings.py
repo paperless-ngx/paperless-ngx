@@ -67,7 +67,7 @@ INSTALLED_APPS = [
     "reminders.apps.RemindersConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
 
-    "flat_responsive",
+    "flat_responsive",  # TODO: Remove as of Django 2.x
     "django.contrib.admin",
 
     "rest_framework",

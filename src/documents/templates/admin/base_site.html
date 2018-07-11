@@ -1,0 +1,40 @@
+{% extends 'admin/base_site.html' %}
+
+{# NOTE: This should probably be extending base.html.  See CSS comment below details. #}
+
+
+{% load custom_css from customisation %}
+{% load custom_js from customisation %}
+
+
+{% block blockbots %}
+
+	{% comment %}
+		This really should be extending `extrastyle`, but the the
+		django-flat-responsive package decided that it wanted to put its CSS in
+		this block, so to make sure that overrides are in fact overriding
+		everything else, we have to do the Wrong Thing here.
+
+		Once we switch to Django 2.x and drop django-flat-responsive, we should
+		switch this to `extrastyle` where it should be.
+	{% endcomment %}
+
+	{{ block.super }}
+
+	{% custom_css %}
+
+{% endblock blockbots %}
+
+
+{% block footer %}
+
+	{% comment %}
+		The Django admin doesn't have a block for Javascript you'd want placed in
+		the footer, so we have to use this one instead.
+	{% endcomment %}
+
+	{{ block.super }}
+
+	{% custom_js %}
+
+{% endblock footer %}
