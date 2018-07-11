@@ -103,7 +103,6 @@ class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
     def __init__(self, path, **kwargs):
         super(PaperlessDavResource, self).__init__(path)
         if 'document' in kwargs:
-            print("using document from kwargs")
             # this greatly reduces the amount of database requests.
             self.document = kwargs.pop('document')
         else:
@@ -147,7 +146,7 @@ class PaperlessDavResource(MetaEtagMixIn, BaseDavResource):
                 yield self.clone(url_join(*(self.path + [child])))
 
             for doc in self.documents:
-                yield self.clone(url_join(*(self.path + [doc.title])), document=doc)
+                yield self.clone(url_join(*(self.path + [doc.file_name])), document=doc)
 
     def write(self, content, temp_file=None):
         raise NotImplementedError()
@@ -174,8 +173,8 @@ def parse_path(path):
     2. provide a database filter that returns a set of documents to be displayed, applying filters if necessary.
     3. provide a set of "folders" that act as filters to narrow down the list of documents.
 
-    This is achieved by implementing a state machine. This machine processes the path segment by segment and switched
-    states as the path is processed. Depending on the state, only certain path segments are allowed.
+    This is achieved by implementing a state machine. This machine processes the path segment by segment and switches
+    states as the path is processed. Depending on the state, only certain path segments are allowed
     :param path:
     :return:
     """
@@ -184,10 +183,12 @@ def parse_path(path):
     year_selected = False
     month_selected = False
     day_selected = False
-    show_documents = True
+    show_documents = False
 
-    def get_filter_children():
+    def get_filter_children(is_root=False):
         filters = []
+        if is_root:
+            filters.append("show_all_documents")
         if not year_selected:
             filters.append('year')
         elif not month_selected:
@@ -203,72 +204,72 @@ def parse_path(path):
     path_queue = [x for x in path.split('/') if x]
 
     filter = Document.objects.all()
-    children = get_filter_children()
+    children = get_filter_children(True)
     document = None
     exists = True
 
-    current_rule = 'select_filter'
+    current_state = 'select_filter'
 
     while len(path_queue) > 0:
         path_segment = path_queue.pop(0)
+        show_documents = False
+        children = []
+        next_state = ''
 
-        if current_rule == 'select_filter':
-            show_documents = False
-            if path_segment == 'year':
-                next_rule = 'select_year'
-                children = [str(d.year) for d in filter.dates('created', 'year')]
-            elif path_segment == 'month':
-                next_rule = 'select_month'
-                children = [str(d.month) for d in filter.dates('created', 'month')]
-            elif path_segment == 'day':
-                next_rule = 'select_day'
-                children = [str(d.day) for d in filter.dates('created', 'day')]
-            elif path_segment == 'correspondent':
-                next_rule = 'select_correspondent'
-                children = [c.name for c in Correspondent.objects.filter(documents__in=filter)]
-            elif path_segment == 'tag':
-                next_rule = 'select_tag'
-                children = [t.name for t in Tag.objects.filter(documents__in=filter) if t.name not in used_tags]
-            else:
-                next_rule = 'document'
-                children = []
-                try:
-                    document = Document.objects.get(title=path_segment)
-                except:
-                    exists = False
-        elif current_rule == 'select_tag':
-            next_rule = 'select_filter'
+        if current_state == 'select_filter' and path_segment == 'year':
+            next_state = 'select_year'
+            children = [str(d.year) for d in filter.dates('created', 'year')]
+        elif current_state == 'select_filter' and path_segment == 'month':
+            next_state = 'select_month'
+            children = [str(d.month) for d in filter.dates('created', 'month')]
+        elif current_state == 'select_filter' and path_segment == 'day':
+            next_state = 'select_day'
+            children = [str(d.day) for d in filter.dates('created', 'day')]
+        elif current_state == 'select_filter' and path_segment == 'correspondent':
+            next_state = 'select_correspondent'
+            children = [c.name for c in Correspondent.objects.filter(documents__in=filter).distinct()]
+        elif current_state == 'select_filter' and path_segment == 'tag':
+            next_state = 'select_tag'
+            children = [t.name for t in Tag.objects.filter(documents__in=filter).distinct() if t.name not in used_tags]
+        elif current_state == 'select_filter' and path_segment == 'show_all_documents':
+            show_documents = True
+        elif current_state == 'select_tag':
+            next_state = 'select_filter'
             filter = filter.filter(tags__name=path_segment)
             used_tags.append(path_segment)
             children = get_filter_children()
             show_documents = True
-        elif current_rule == 'select_correspondent':
-            next_rule = 'select_filter'
+        elif current_state == 'select_correspondent':
+            next_state = 'select_filter'
             filter = filter.filter(correspondent__name=path_segment)
             correspondent_selected = True
             children = get_filter_children()
             show_documents = True
-        elif current_rule == 'select_year':
-            next_rule = 'select_filter'
+        elif current_state == 'select_year':
+            next_state = 'select_filter'
             filter = filter.filter(created__year=path_segment)
             year_selected = True
             children = get_filter_children()
             show_documents = True
-        elif current_rule == 'select_month':
-            next_rule = 'select_filter'
+        elif current_state == 'select_month':
+            next_state = 'select_filter'
             filter = filter.filter(created__month=path_segment)
             month_selected = True
             children = get_filter_children()
             show_documents = True
-        elif current_rule == 'select_day':
-            next_rule = 'select_filter'
+        elif current_state == 'select_day':
+            next_state = 'select_filter'
             filter = filter.filter(created__day=path_segment)
             day_selected = True
             children = get_filter_children()
             show_documents = True
         else:
-            raise ValueError()
+            try:
+                #TODO: this is pretty slow and sketchy.
+                document = [d for d in Document.objects.all() if d.file_name == path_segment][0]
+            except IndexError:
+                exists = False
 
-        current_rule = next_rule
+        current_state = next_state
 
     return exists, filter if show_documents else [], document, children
