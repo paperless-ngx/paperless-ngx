@@ -133,9 +133,9 @@ DATABASES = {
     }
 }
 
-if os.getenv("PAPERLESS_DBUSER") and os.getenv("PAPERLESS_DBPASS"):
+if os.getenv("PAPERLESS_DBENGINE"):
     DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": os.getenv("PAPERLESS_DBENGINE"),
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER"),
         "PASSWORD": os.getenv("PAPERLESS_DBPASS")
