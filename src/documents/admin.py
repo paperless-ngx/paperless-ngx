@@ -144,6 +144,15 @@ class DocumentAdmin(CommonAdmin):
         return obj.created.date().strftime("%Y-%m-%d")
     created_.short_description = "Created"
 
+    def change_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        doc = Document.objects.get(id=object_id)
+        extra_context['download_url'] = doc.download_url
+        extra_context['file_type'] = doc.file_type
+        return super(DocumentAdmin, self).change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
     @mark_safe
     def thumbnail(self, obj):
         return self._html_tag(
