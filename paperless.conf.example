@@ -3,6 +3,16 @@
 # As this file contains passwords it should only be readable by the user
 # running paperless.
 
+###############################################################################
+####                        Database Settings                              ####
+###############################################################################
+
+# By default, sqlite is used as the database backend. This can be changed here.
+#PAPERLESS_DBENGINE="django.db.backends.postgresql_psycopg2"
+#PAPERLESS_DBNAME="paperless"
+#PAPERLESS_DBUSER="paperless"
+#PAPERLESS_DBPASS="paperless"
+
 
 ###############################################################################
 ####                         Paths & Folders                               ####
