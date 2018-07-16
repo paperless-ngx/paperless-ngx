@@ -1,10 +1,14 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth.models import User, Group
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.templatetags.static import static
+from django.utils.html import format_html
+from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 
 from .models import Correspondent, Tag, Document, Log
@@ -117,6 +121,8 @@ class DocumentAdmin(CommonAdmin):
 
     date_hierarchy = 'created'
 
+    document_queue = None
+
     def has_add_permission(self, request):
         return False
 
@@ -124,14 +130,55 @@ class DocumentAdmin(CommonAdmin):
         return obj.created.date().strftime("%Y-%m-%d")
     created_.short_description = "Created"
 
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(request, extra_context)
+
+        self.document_queue = [doc.id for doc in response.context_data['cl'].queryset]
+
+        return response
+
     def change_view(self, request, object_id=None, form_url='', extra_context=None):
         extra_context = extra_context or {}
         doc = Document.objects.get(id=object_id)
         extra_context['download_url'] = doc.download_url
         extra_context['file_type'] = doc.file_type
+        if self.document_queue:
+            #There is a queue of documents
+            current_index = self.document_queue.index(int(object_id))
+            if current_index < len(self.document_queue) - 1:
+                #... and there are still documents in the queue
+                next_object = self.document_queue[current_index + 1]
+                extra_context['next_object'] = next_object
         return super(DocumentAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
+
+    def response_change(self, request, obj):
+
+        # This is mostly copied from ModelAdmin.response_change()
+        opts = self.model._meta
+        preserved_filters = self.get_preserved_filters(request)
+
+        msg_dict = {
+            'name': opts.verbose_name,
+            'obj': format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
+        }
+        if "_saveandeditnext" in request.POST:
+            msg = format_html(
+                'The {name} "{obj}" was changed successfully. Editing next object.',
+                **msg_dict
+            )
+            self.message_user(request, msg, messages.SUCCESS)
+            redirect_url = reverse('admin:%s_%s_change' %
+                                   (opts.app_label, opts.model_name),
+                                   args=(request.POST['_next_object'],),
+                                   current_app=self.admin_site.name)
+            redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
+            response = HttpResponseRedirect(redirect_url)
+        else:
+            response = super().response_change(request, obj)
+
+        return response
 
     @mark_safe
     def thumbnail(self, obj):
