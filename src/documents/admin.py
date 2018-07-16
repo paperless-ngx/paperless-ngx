@@ -132,8 +132,8 @@ class DocumentAdmin(CommonAdmin):
 
     def changelist_view(self, request, extra_context=None):
         response = super().changelist_view(request, extra_context)
-
-        self.document_queue = [doc.id for doc in response.context_data['cl'].queryset]
+        if 'cl' in response.context_data:
+            self.document_queue = [doc.id for doc in response.context_data['cl'].queryset]
 
         return response
 
