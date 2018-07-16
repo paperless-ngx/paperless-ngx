@@ -21,3 +21,16 @@ td a.tag {
   width: 90%;
   height: 5em;
 }
+
+#change_form_twocolumn_parent {
+  display: flex;
+}
+#change_form_form_parent {
+  flex:50%;
+  margin-right: 10px;
+}
+#change_form_viewer_parent {
+  flex:50%;
+  margin-left: 10px;
+  text-align: center;
+}
