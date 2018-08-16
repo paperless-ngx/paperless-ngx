@@ -46,7 +46,9 @@ class DocumentFilterSet(FilterSet):
     correspondent__slug = CharFilter(name="correspondent__slug", **CHAR_KWARGS)
     tags__name = CharFilter(name="tags__name", **CHAR_KWARGS)
     tags__slug = CharFilter(name="tags__slug", **CHAR_KWARGS)
-    tags__empty = BooleanFilter(name='tags', lookup_expr='isnull', distinct=True)
+    tags__empty = BooleanFilter(name='tags',
+                                lookup_expr='isnull',
+                                distinct=True)
 
     class Meta(object):
         model = Document
