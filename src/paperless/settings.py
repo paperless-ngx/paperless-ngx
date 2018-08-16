@@ -94,8 +94,12 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# We allow CORS from localhosts
-CORS_ORIGIN_REGEX_WHITELIST = (r'^(https?:\/\/)?localhost(:[0-9]{4})?$', )
+# We allow CORS from localhost:8080
+CORS_ORIGIN_WHITELIST = ("localhost:8080")
+_allowed_cors_hosts = os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS")
+if _allowed_cors_hosts:
+    CORS_ORIGIN_WHITELIST = tuple(_allowed_cors_hosts.split(","))
+
 
 # If auth is disabled, we just use our "bypass" authentication middleware
 if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
