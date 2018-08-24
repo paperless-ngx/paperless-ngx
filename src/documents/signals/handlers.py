@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
-from ..models import Correspondent, Document, Tag
+from ..models import Correspondent, Document, Tag, DocumentType
 
 
 def logger(message, group):
@@ -42,6 +42,35 @@ def set_correspondent(sender, document=None, logging_group=None, **kwargs):
 
     document.correspondent = selected
     document.save(update_fields=("correspondent",))
+
+
+def set_document_type(sender, document=None, logging_group=None, **kwargs):
+
+    # No sense in assigning a correspondent when one is already set.
+    if document.document_type:
+        return
+
+    # No matching document types, so no need to continue
+    potential_document_types = list(DocumentType.match_all(document.content))
+    if not potential_document_types:
+        return
+
+    potential_count = len(potential_document_types)
+    selected = potential_document_types[0]
+    if potential_count > 1:
+        message = "Detected {} potential document types, so we've opted for {}"
+        logger(
+            message.format(potential_count, selected),
+            logging_group
+        )
+
+    logger(
+        'Assigning document type "{}" to "{}" '.format(selected, document),
+        logging_group
+    )
+
+    document.document_type = selected
+    document.save(update_fields=("document_type",))
 
 
 def set_tags(sender, document=None, logging_group=None, **kwargs):
