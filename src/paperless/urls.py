@@ -28,9 +28,9 @@ urlpatterns = [
     # API
     url(
         r"^api/auth/",
-        include('rest_framework.urls', namespace="rest_framework")
+        include(('rest_framework.urls','rest_framework'), namespace="rest_framework")
     ),
-    url(r"^api/", include(router.urls, namespace="drf")),
+    url(r"^api/", include((router.urls, 'drf'), namespace="drf")),
 
     # File downloads
     url(
