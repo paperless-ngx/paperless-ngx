@@ -12,7 +12,7 @@ from fuzzywuzzy import fuzz
 from django.conf import settings
 try:
     from django.core.urlresolvers import reverse
-except:
+except ImportError:
     from django.urls import reverse
 from django.db import models
 from django.template.defaultfilters import slugify

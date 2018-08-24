@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User, Group
 try:
     from django.core.urlresolvers import reverse
-except:
+except ImportError:
     from django.urls import reverse
 from django.templatetags.static import static
 
