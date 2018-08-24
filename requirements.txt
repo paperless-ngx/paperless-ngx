@@ -33,12 +33,12 @@ pycodestyle==2.3.1
 pyflakes==1.6.0
 pyocr==0.5.1
 pytest-cov==2.5.1
-pytest-django==3.2.1
+pytest-django==3.4.2
 pytest-env==0.6.2
 pytest-forked==0.2
 pytest-sugar==0.9.1
-pytest-xdist==1.22.2
-pytest==3.5.1
+pytest-xdist==1.22.5
+pytest==3.7.2
 python-dateutil==2.7.3
 python-dotenv==0.8.2
 python-gnupg==0.4.2
