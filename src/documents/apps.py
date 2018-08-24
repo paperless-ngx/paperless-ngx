@@ -13,6 +13,7 @@ class DocumentsConfig(AppConfig):
         from .signals.handlers import (
             set_correspondent,
             set_tags,
+            set_document_type,
             run_pre_consume_script,
             run_post_consume_script,
             cleanup_document_deletion,
@@ -23,6 +24,7 @@ class DocumentsConfig(AppConfig):
 
         document_consumption_finished.connect(set_tags)
         document_consumption_finished.connect(set_correspondent)
+        document_consumption_finished.connect(set_document_type)
         document_consumption_finished.connect(set_log_entry)
         document_consumption_finished.connect(run_post_consume_script)
 
