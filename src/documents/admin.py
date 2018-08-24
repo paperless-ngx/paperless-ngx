@@ -3,7 +3,10 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except:
+    from django.urls import reverse
 from django.templatetags.static import static
 
 from .models import Correspondent, Tag, Document, Log
