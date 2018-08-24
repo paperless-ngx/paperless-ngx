@@ -12,8 +12,8 @@ from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 
 from documents.actions import add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, \
-    remove_correspondent_from_selected
-from .models import Correspondent, Tag, Document, Log
+    remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected
+from .models import Correspondent, Tag, Document, Log, DocumentType
 
 
 class FinancialYearFilter(admin.SimpleListFilter):
@@ -120,6 +120,22 @@ class TagAdmin(CommonAdmin):
     def document_count(self, obj):
         return obj.documents.count()
 
+class DocumentTypeAdmin(CommonAdmin):
+
+    list_display = ("name", "match", "matching_algorithm", "document_count")
+    list_filter = ("matching_algorithm",)
+    list_editable = ("match", "matching_algorithm")
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        for document in Document.objects.filter(document_type__isnull=True).exclude(tags__is_archived_tag=True):
+            if obj.matches(document.content):
+                document.document_type = obj
+                document.save(update_fields=("document_type",))
+
+    def document_count(self, obj):
+        return obj.documents.count()
 
 class DocumentAdmin(CommonAdmin):
 
@@ -132,12 +148,12 @@ class DocumentAdmin(CommonAdmin):
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = ("added",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
-                    "tags_", "archive_serial_number")
-    list_filter = ("tags", "correspondent", FinancialYearFilter)
+                    "tags_", "archive_serial_number", "document_type")
+    list_filter = ("document_type", "tags", "correspondent", FinancialYearFilter)
 
     ordering = ["-created", "correspondent"]
 
-    actions = [add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, remove_correspondent_from_selected]
+    actions = [add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected]
 
     date_hierarchy = 'created'
 
@@ -273,6 +289,7 @@ class LogAdmin(CommonAdmin):
 
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Log, LogAdmin)
 

@@ -15,6 +15,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 
+from reminders.models import Reminder
 from .managers import LogManager
 
 
@@ -189,6 +190,11 @@ class Tag(MatchingModel):
         help_text="Marks this tag as an archive tag: All documents tagged with archive tags will never be modified automatically (i.e., modifying tags by matching rules)")
 
 
+class DocumentType(MatchingModel):
+
+    pass
+
+
 class Document(models.Model):
 
     TYPE_PDF = "pdf"
@@ -214,6 +220,14 @@ class Document(models.Model):
     )
 
     title = models.CharField(max_length=128, blank=True, db_index=True)
+
+    document_type = models.ForeignKey(
+        DocumentType,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL
+    )
 
     content = models.TextField(
         db_index=True,
