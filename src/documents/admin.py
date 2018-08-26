@@ -137,6 +137,7 @@ class DocumentAdmin(CommonAdmin):
                     "tags_")
     list_filter = ("tags", "correspondent", FinancialYearFilter,
                    MonthListFilter)
+    filter_horizontal = ("tags",)
 
     ordering = ["-created", "correspondent"]
 
