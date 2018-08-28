@@ -6,9 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
 
-from djangodav.acls import FullAcl
-from djangodav.locks import DummyLock
-
 from documents.views import (
     CorrespondentViewSet,
     DocumentViewSet,
@@ -17,7 +14,6 @@ from documents.views import (
     PushView,
     TagViewSet
 )
-from paperless.dav import PaperlessDavResource, SecuredDavView
 from reminders.views import ReminderViewSet
 
 router = DefaultRouter()
@@ -55,9 +51,6 @@ urlpatterns = [
         permanent=True, url=reverse_lazy("admin:index"))),
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-if settings.ENABLE_WEBDAV:
-    urlpatterns.append(url(r'^dav(?P<path>.*)$', SecuredDavView.as_view(resource_class=PaperlessDavResource, lock_class=DummyLock, acl_class=FullAcl)))
 
 # Text in each page's <h1> (and above login form).
 admin.site.site_header = 'Paperless'
