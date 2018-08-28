@@ -1,13 +1,13 @@
-apipkg==1.4
+apipkg==1.5
 attrs==18.1.0
-certifi==2018.4.16
+certifi>=2018.8.24
 chardet==3.0.4
 coverage==4.5.1
-coveralls==1.3.0
+coveralls==1.4.0
 dateparser==0.7.0
 django-cors-headers==2.4.0
 django-crispy-forms==1.7.2
-django-extensions==2.0.7
+django-extensions==2.1.0
 django-filter==2.0.0
 django-flat-responsive==2.0
 django>=2.0
@@ -15,7 +15,7 @@ djangorestframework==3.8.2
 docopt==0.6.2
 execnet==1.5.0
 factory-boy==2.11.1
-faker==0.8.15
+faker==0.9.0
 filemagic==1.6
 flake8==3.5.0
 fuzzywuzzy==0.15.0
@@ -27,7 +27,7 @@ mccabe==0.6.1
 more-itertools==4.1.0
 pdftotext==2.0.2
 pillow==5.1.0
-pluggy==0.6.0
+pluggy==0.7.1
 py==1.5.3
 pycodestyle==2.3.1
 pyflakes==1.6.0
