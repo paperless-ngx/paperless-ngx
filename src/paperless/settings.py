@@ -72,9 +72,7 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "crispy_forms",
-    "django_filters",
-
-    "djangodav"
+    "django_filters"
 
 ]
 
@@ -280,5 +278,3 @@ FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
 
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
-
-ENABLE_WEBDAV = bool(os.getenv("PAPERLESS_ENABLE_WEBDAV", "NO").lower() in ("yes", "y", "1", "t", "true"))
