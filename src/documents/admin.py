@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib import admin, messages
@@ -10,6 +10,7 @@ from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
+from django.db import models
 
 from documents.actions import add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, \
     remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected
@@ -81,13 +82,27 @@ class FinancialYearFilter(admin.SimpleListFilter):
                                created__lte=self._fy_end(end))
 
 
+class RecentCorrespondentFilter(admin.RelatedFieldListFilter):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.title = "correspondent (recent)"
+
+    def field_choices(self, field, request, model_admin):
+        lookups = []
+        date_limit = datetime.now() - timedelta(days=365*settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS)
+        for c in Correspondent.objects.filter(documents__created__gte = date_limit).distinct():
+            lookups.append( (c.id, c.name) )
+        return lookups
+
+
 class CommonAdmin(admin.ModelAdmin):
     list_per_page = settings.PAPERLESS_LIST_PER_PAGE
 
 
 class CorrespondentAdmin(CommonAdmin):
 
-    list_display = ("name", "match", "matching_algorithm", "document_count")
+    list_display = ("name", "match", "matching_algorithm", "document_count", "last_correspondence")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
@@ -99,8 +114,18 @@ class CorrespondentAdmin(CommonAdmin):
                 document.correspondent = obj
                 document.save(update_fields=("correspondent",))
 
+    def get_queryset(self, request):
+        qs = super(CorrespondentAdmin, self).get_queryset(request)
+        qs = qs.annotate(document_count=models.Count("documents"), last_correspondence=models.Max("documents__created"))
+        return qs
+
     def document_count(self, obj):
-        return obj.documents.count()
+        return obj.document_count
+    document_count.admin_order_field = "document_count"
+
+    def last_correspondence(self, obj):
+        return obj.last_correspondence
+    last_correspondence.admin_order_field = "last_correspondence"
 
 
 class TagAdmin(CommonAdmin):
@@ -117,8 +142,15 @@ class TagAdmin(CommonAdmin):
             if obj.matches(document.content):
                 document.tags.add(obj)
 
+    def get_queryset(self, request):
+        qs = super(TagAdmin, self).get_queryset(request)
+        qs = qs.annotate(document_count=models.Count("documents"))
+        return qs
+
     def document_count(self, obj):
-        return obj.documents.count()
+        return obj.document_count
+    document_count.admin_order_field = "document_count"
+
 
 class DocumentTypeAdmin(CommonAdmin):
 
@@ -134,8 +166,14 @@ class DocumentTypeAdmin(CommonAdmin):
                 document.document_type = obj
                 document.save(update_fields=("document_type",))
 
+    def get_queryset(self, request):
+        qs = super(DocumentTypeAdmin, self).get_queryset(request)
+        qs = qs.annotate(document_count=models.Count("documents"))
+        return qs
+
     def document_count(self, obj):
-        return obj.documents.count()
+        return obj.document_count
+    document_count.admin_order_field = "document_count"
 
 class DocumentAdmin(CommonAdmin):
 
@@ -149,7 +187,7 @@ class DocumentAdmin(CommonAdmin):
     readonly_fields = ("added",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
                     "tags_", "archive_serial_number", "document_type")
-    list_filter = ("document_type", "tags", "correspondent", FinancialYearFilter)
+    list_filter = ("document_type", "tags", ('correspondent', RecentCorrespondentFilter), "correspondent", FinancialYearFilter)
 
     ordering = ["-created", "correspondent"]
 
