@@ -15,7 +15,6 @@ def reverse_func(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    atomic = False
     dependencies = [
         ('documents', '0018_auto_20170715_1712'),
     ]
