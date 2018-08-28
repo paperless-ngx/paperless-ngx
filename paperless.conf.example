@@ -204,6 +204,3 @@ PAPERLESS_EMAIL_SECRET=""
 # 100 will be used.
 #PAPERLESS_LIST_PER_PAGE=100
 
-
-# Enable WebDAV support for Paperless. Default is false.
-#PAPERLESS_ENABLE_WEBDAV="true"
