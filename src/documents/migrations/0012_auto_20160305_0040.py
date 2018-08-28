@@ -112,7 +112,6 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    atomic = False
     dependencies = [
         ('documents', '0011_auto_20160303_1929'),
     ]
