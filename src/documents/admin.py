@@ -202,13 +202,11 @@ class DocumentAdmin(CommonAdmin):
 
     @staticmethod
     def _html_tag(kind, inside=None, **kwargs):
-
-        attributes = format_html_join(' ', '{}="{}"', kwargs.items()) 
+        attributes = format_html_join(' ', '{}="{}"', kwargs.items())
 
         if inside is not None:
             return format_html("<{kind} {attributes}>{inside}</{kind}>",
-                kind=kind, attributes=attributes, inside=inside)
-
+                               kind=kind, attributes=attributes, inside=inside)
 
         return format_html("<{} {}/>", kind, attributes)
 
