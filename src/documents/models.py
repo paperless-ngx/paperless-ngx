@@ -442,8 +442,10 @@ class FileInfo:
     def _get_tags(cls, tags):
         r = []
         for t in tags.split(","):
-            r.append(
-                Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
+            r.append(Tag.objects.get_or_create(
+                slug=t.lower(),
+                defaults={"name": t}
+            )[0])
         return tuple(r)
 
     @classmethod
