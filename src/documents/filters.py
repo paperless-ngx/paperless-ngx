@@ -5,7 +5,7 @@ from .models import Correspondent, Document, Tag
 
 class CorrespondentFilterSet(FilterSet):
 
-    class Meta(object):
+    class Meta:
         model = Correspondent
         fields = {
             "name": [
@@ -18,7 +18,7 @@ class CorrespondentFilterSet(FilterSet):
 
 class TagFilterSet(FilterSet):
 
-    class Meta(object):
+    class Meta:
         model = Tag
         fields = {
             "name": [
@@ -50,7 +50,7 @@ class DocumentFilterSet(FilterSet):
                                 lookup_expr='isnull',
                                 distinct=True)
 
-    class Meta(object):
+    class Meta:
         model = Document
         fields = {
             "title": [
