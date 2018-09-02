@@ -12,7 +12,7 @@ django-crispy-forms==1.7.2
 django-extensions==2.1.2
 django-filter==2.0.0
 django-flat-responsive==2.0
-django==1.11.15
+django==2.0.8
 djangorestframework==3.8.2
 docopt==0.6.2
 execnet==1.5.0; python_version != '3.1.*'
