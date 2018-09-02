@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "<2.0,>=1.11"
+django = "<2.1,>=2.0"
 pillow = "*"
 coveralls = "*"
 dateparser = "*"
@@ -12,7 +12,6 @@ django-cors-headers = "*"
 django-crispy-forms = "*"
 django-extensions = "*"
 django-filter = "*"
-django-flat-responsive = "*"
 djangorestframework = "*"
 factory-boy = "*"
 filemagic = "*"
