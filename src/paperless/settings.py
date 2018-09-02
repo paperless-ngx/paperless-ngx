@@ -82,14 +82,13 @@ if os.getenv("PAPERLESS_INSTALLED_APPS"):
 
 
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -99,9 +98,9 @@ CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "localho
 
 # If auth is disabled, we just use our "bypass" authentication middleware
 if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
-    _index = MIDDLEWARE_CLASSES.index("django.contrib.auth.middleware.AuthenticationMiddleware")
-    MIDDLEWARE_CLASSES[_index] = "paperless.middleware.Middleware"
-    MIDDLEWARE_CLASSES.remove("django.contrib.auth.middleware.SessionAuthenticationMiddleware")
+    _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    MIDDLEWARE[_index] = "paperless.middleware.Middleware"
+    MIDDLEWARE.remove("django.contrib.auth.middleware.SessionAuthenticationMiddleware")
 
 ROOT_URLCONF = 'paperless.urls'
 
