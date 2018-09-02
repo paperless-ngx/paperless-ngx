@@ -4,9 +4,10 @@ Changelog
 2.2.0
 =====
 
-* Thanks to `dadosch`_ and `Wolfgang Mader`_, this is the first version of
-  Paperless that supports Django 2.0!  As a result of their hard work, you can
-  now also run Paperless on Python 3.7 as well: `#386`_ & `#390`_.
+* Thanks to `dadosch`_, `Wolfgang Mader`_, and `Tim Brooks`_ this is the first
+  version of Paperless that supports Django 2.0!  As a result of their hard
+  work, you can now also run Paperless on Python 3.7 as well: `#386`_ &
+  `#390`_.
 * `Stéphane Brunner`_ added a few lines of code that made tagging interface a lot
   easier on those of us with lots of different tags: `#391`_.
 * `Kilian Koeltzsch`_ noticed a bug in how we capture & automatically create
@@ -464,6 +465,7 @@ bulk of the work on this big change.
 .. _Mark McFate: https://github.com/SummittDweller
 .. _dadosch: https://github.com/dadosch
 .. _Wolfgang Mader: https://github.com/wmader
+.. _Tim Brooks: https://github.com/brookst
 .. _Stéphane Brunner: https://github.com/sbrunner
 .. _Kilian Koeltzsch: https://github.com/kiliankoe
 
