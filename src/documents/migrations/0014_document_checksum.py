@@ -128,7 +128,6 @@ def do_nothing(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('documents', '0013_auto_20160325_2111'),
     ]

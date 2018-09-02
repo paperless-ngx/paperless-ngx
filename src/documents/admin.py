@@ -3,8 +3,13 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from django.templatetags.static import static
+from django.utils.safestring import mark_safe
+from django.utils.html import format_html, format_html_join
 
 from .models import Correspondent, Tag, Document, Log
 
@@ -178,7 +183,7 @@ class DocumentAdmin(CommonAdmin):
                     )
                 }
             )
-        return r
+        return mark_safe(r)
     tags_.allow_tags = True
 
     def document(self, obj):
@@ -198,16 +203,13 @@ class DocumentAdmin(CommonAdmin):
 
     @staticmethod
     def _html_tag(kind, inside=None, **kwargs):
-
-        attributes = []
-        for lft, rgt in kwargs.items():
-            attributes.append('{}="{}"'.format(lft, rgt))
+        attributes = format_html_join(' ', '{}="{}"', kwargs.items())
 
         if inside is not None:
-            return "<{kind} {attributes}>{inside}</{kind}>".format(
-                kind=kind, attributes=" ".join(attributes), inside=inside)
+            return format_html("<{kind} {attributes}>{inside}</{kind}>",
+                               kind=kind, attributes=attributes, inside=inside)
 
-        return "<{} {}/>".format(kind, " ".join(attributes))
+        return format_html("<{} {}/>", kind, attributes)
 
 
 class LogAdmin(CommonAdmin):
