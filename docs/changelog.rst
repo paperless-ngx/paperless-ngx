@@ -1,6 +1,13 @@
 Changelog
 #########
 
+2.2.1
+=====
+
+* `Kyle Lucy`_ reported a bug quickly after the release of 2.2.0 where we broke
+  the ``DISABLE_LOGIN`` feature: `#392`_.
+
+
 2.2.0
 =====
 
@@ -12,6 +19,7 @@ Changelog
   easier on those of us with lots of different tags: `#391`_.
 * `Kilian Koeltzsch`_ noticed a bug in how we capture & automatically create
   tags, so that's fixed now too: `#384`_.
+
 
 2.1.0
 =====
@@ -546,6 +554,7 @@ bulk of the work on this big change.
 .. _#386: https://github.com/danielquinn/paperless/issues/386
 .. _#391: https://github.com/danielquinn/paperless/pull/391
 .. _#390: https://github.com/danielquinn/paperless/pull/390
+.. _#392: https://github.com/danielquinn/paperless/issues/392
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
