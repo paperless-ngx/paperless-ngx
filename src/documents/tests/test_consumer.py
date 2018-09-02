@@ -3,7 +3,7 @@ from unittest import mock
 from tempfile import TemporaryDirectory
 
 from ..consumer import Consumer
-from ..models import FileInfo
+from ..models import FileInfo, Tag
 
 
 class TestConsumer(TestCase):
@@ -189,6 +189,20 @@ class TestAttributes(TestCase):
             '',
             ()
         )
+
+    def test_case_insensitive_tag_creation(self):
+        """
+        Tags should be detected and created as lower case.
+        :return:
+        """
+
+        path = "Title - Correspondent - tAg1,TAG2.pdf"
+        self.assertEqual(len(FileInfo.from_path(path).tags), 2)
+
+        path = "Title - Correspondent - tag1,tag2.pdf"
+        self.assertEqual(len(FileInfo.from_path(path).tags), 2)
+
+        self.assertEqual(Tag.objects.all().count(), 2)
 
 
 class TestFieldPermutations(TestCase):
