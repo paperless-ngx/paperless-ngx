@@ -79,8 +79,6 @@ INSTALLED_APPS = [
 if os.getenv("PAPERLESS_INSTALLED_APPS"):
     INSTALLED_APPS += os.getenv("PAPERLESS_INSTALLED_APPS").split(",")
 
-
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -99,7 +97,6 @@ CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "localho
 if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
     _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
     MIDDLEWARE[_index] = "paperless.middleware.Middleware"
-    MIDDLEWARE.remove("django.contrib.auth.middleware.SessionAuthenticationMiddleware")
 
 ROOT_URLCONF = 'paperless.urls'
 
