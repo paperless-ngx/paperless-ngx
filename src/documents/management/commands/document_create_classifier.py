@@ -8,18 +8,10 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 
+from documents.classifier import preprocess_content, DocumentClassifier
 from documents.models import Document
+from paperless import settings
 from ...mixins import Renderable
-
-
-def preprocess_content(content):
-    content = content.lower()
-    content = content.strip()
-    content = content.replace("\n", " ")
-    content = content.replace("\r", " ")
-    while content.find("  ") > -1:
-        content = content.replace("  ", " ")
-    return content
 
 
 class Command(Renderable, BaseCommand):
@@ -32,6 +24,8 @@ class Command(Renderable, BaseCommand):
         BaseCommand.__init__(self, *args, **kwargs)
 
     def handle(self, *args, **options):
+        clf = DocumentClassifier()
+
         data = list()
         labels_tags = list()
         labels_correspondent = list()
@@ -48,53 +42,43 @@ class Command(Renderable, BaseCommand):
 
         # Step 2: vectorize data
         logging.getLogger(__name__).info("Vectorizing data...")
-        data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), min_df=0.05)
-        data_vectorized = data_vectorizer.fit_transform(data)
+        clf.data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), min_df=0.05)
+        data_vectorized = clf.data_vectorizer.fit_transform(data)
 
-        tags_binarizer = MultiLabelBinarizer()
-        labels_tags_vectorized = tags_binarizer.fit_transform(labels_tags)
+        clf.tags_binarizer = MultiLabelBinarizer()
+        labels_tags_vectorized = clf.tags_binarizer.fit_transform(labels_tags)
 
-        correspondent_binarizer = LabelEncoder()
-        labels_correspondent_vectorized = correspondent_binarizer.fit_transform(labels_correspondent)
+        clf.correspondent_binarizer = LabelEncoder()
+        labels_correspondent_vectorized = clf.correspondent_binarizer.fit_transform(labels_correspondent)
 
-        type_binarizer = LabelEncoder()
-        labels_type_vectorized = type_binarizer.fit_transform(labels_type)
+        clf.type_binarizer = LabelEncoder()
+        labels_type_vectorized = clf.type_binarizer.fit_transform(labels_type)
 
         # Step 3: train the classifiers
-        if len(tags_binarizer.classes_) > 0:
+        if len(clf.tags_binarizer.classes_) > 0:
             logging.getLogger(__name__).info("Training tags classifier")
-            tags_classifier = OneVsRestClassifier(MultinomialNB())
-            tags_classifier.fit(data_vectorized, labels_tags_vectorized)
+            clf.tags_classifier = OneVsRestClassifier(MultinomialNB())
+            clf.tags_classifier.fit(data_vectorized, labels_tags_vectorized)
         else:
-            tags_classifier = None
+            clf.tags_classifier = None
             logging.getLogger(__name__).info("There are no tags. Not training tags classifier.")
 
-        if len(correspondent_binarizer.classes_) > 0:
+        if len(clf.correspondent_binarizer.classes_) > 0:
             logging.getLogger(__name__).info("Training correspondent classifier")
-            correspondent_classifier = MultinomialNB()
-            correspondent_classifier.fit(data_vectorized, labels_correspondent_vectorized)
+            clf.correspondent_classifier = MultinomialNB()
+            clf.correspondent_classifier.fit(data_vectorized, labels_correspondent_vectorized)
         else:
-            correspondent_classifier = None
+            clf.correspondent_classifier = None
             logging.getLogger(__name__).info("There are no correspondents. Not training correspondent classifier.")
 
-        if len(type_binarizer.classes_) > 0:
+        if len(clf.type_binarizer.classes_) > 0:
             logging.getLogger(__name__).info("Training document type classifier")
-            type_classifier = MultinomialNB()
-            type_classifier.fit(data_vectorized, labels_type_vectorized)
+            clf.type_classifier = MultinomialNB()
+            clf.type_classifier.fit(data_vectorized, labels_type_vectorized)
         else:
-            type_classifier = None
+            clf.type_classifier = None
             logging.getLogger(__name__).info("There are no document types. Not training document type classifier.")
 
-        models_root = os.path.abspath(os.path.join(os.path.dirname(__name__), "..", "models", "models.pickle"))
-        logging.getLogger(__name__).info("Saving models to " + models_root + "...")
+        logging.getLogger(__name__).info("Saving models to " + settings.MODEL_FILE + "...")
 
-        with open(models_root, "wb") as f:
-            pickle.dump(data_vectorizer, f)
-
-            pickle.dump(tags_binarizer, f)
-            pickle.dump(correspondent_binarizer, f)
-            pickle.dump(type_binarizer, f)
-
-            pickle.dump(tags_classifier, f)
-            pickle.dump(correspondent_classifier, f)
-            pickle.dump(type_classifier, f)
+        clf.save_classifier()

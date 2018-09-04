@@ -106,14 +106,6 @@ class CorrespondentAdmin(CommonAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
-        for document in Document.objects.filter(correspondent__isnull=True).exclude(tags__is_archived_tag=True):
-            if obj.matches(document.content):
-                document.correspondent = obj
-                document.save(update_fields=("correspondent",))
-
     def get_queryset(self, request):
         qs = super(CorrespondentAdmin, self).get_queryset(request)
         qs = qs.annotate(document_count=models.Count("documents"), last_correspondence=models.Max("documents__created"))
@@ -135,13 +127,6 @@ class TagAdmin(CommonAdmin):
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
-        for document in Document.objects.all().exclude(tags__is_archived_tag=True):
-            if obj.matches(document.content):
-                document.tags.add(obj)
-
     def get_queryset(self, request):
         qs = super(TagAdmin, self).get_queryset(request)
         qs = qs.annotate(document_count=models.Count("documents"))
@@ -157,14 +142,6 @@ class DocumentTypeAdmin(CommonAdmin):
     list_display = ("name", "match", "matching_algorithm", "document_count")
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
-        for document in Document.objects.filter(document_type__isnull=True).exclude(tags__is_archived_tag=True):
-            if obj.matches(document.content):
-                document.document_type = obj
-                document.save(update_fields=("document_type",))
 
     def get_queryset(self, request):
         qs = super(DocumentTypeAdmin, self).get_queryset(request)

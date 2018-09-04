@@ -1,17 +1,8 @@
 from django.core.management.base import BaseCommand
 
+from documents.classifier import preprocess_content
 from documents.models import Document
 from ...mixins import Renderable
-
-
-def preprocess_content(content):
-    content = content.lower()
-    content = content.strip()
-    content = content.replace("\n", " ")
-    content = content.replace("\r", " ")
-    while content.find("  ") > -1:
-        content = content.replace("  ", " ")
-    return content
 
 
 class Command(Renderable, BaseCommand):

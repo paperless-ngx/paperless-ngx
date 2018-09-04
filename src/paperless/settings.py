@@ -187,6 +187,11 @@ STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
 
 
+# Document classification models location
+MODEL_FILE = os.getenv(
+    "PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "models", "model.pickle"))
+
+
 # Paperless-specific stuff
 # You shouldn't have to edit any of these values.  Rather, you can set these
 # values in /etc/paperless.conf instead.
