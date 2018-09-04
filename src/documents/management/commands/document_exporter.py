@@ -6,7 +6,7 @@ import shutil
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 
-from documents.models import Document, Correspondent, Tag
+from documents.models import Document, Correspondent, Tag, DocumentType
 from paperless.db import GnuPG
 
 from ...mixins import Renderable
@@ -90,6 +90,9 @@ class Command(Renderable, BaseCommand):
 
         manifest += json.loads(serializers.serialize(
             "json", Tag.objects.all()))
+
+        manifest += json.loads(serializers.serialize(
+            "json", DocumentType.objects.all()))
 
         with open(os.path.join(self.target, "manifest.json"), "w") as f:
             json.dump(manifest, f, indent=2)
