@@ -1,7 +1,5 @@
-import datetime
 import logging
 import os
-import sys
 import time
 
 from django.conf import settings
@@ -13,7 +11,7 @@ from ...mail import MailFetcher, MailFetcherError
 try:
     from inotify_simple import INotify, flags
 except ImportError:
-    pass
+    INotify = flags = None
 
 
 class Command(BaseCommand):
@@ -62,7 +60,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--no-inotify",
             action="store_true",
-            help="Don't use inotify, even if it's available."
+            help="Don't use inotify, even if it's available.",
+            default=False
         )
 
     def handle(self, *args, **options):
@@ -71,8 +70,7 @@ class Command(BaseCommand):
         directory = options["directory"]
         loop_time = options["loop_time"]
         mail_delta = options["mail_delta"] * 60
-        use_inotify = (not options["no_inotify"]
-                       and "inotify_simple" in sys.modules)
+        use_inotify = INotify is not None and options["no_inotify"] is False
 
         try:
             self.file_consumer = Consumer(consume=directory)
