@@ -32,7 +32,6 @@ def realign_senders(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('documents', '0002_auto_20151226_1316'),
     ]

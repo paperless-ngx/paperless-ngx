@@ -5,14 +5,14 @@ from .models import Correspondent, Tag, Document, Log
 
 class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
-    class Meta(object):
+    class Meta:
         model = Correspondent
         fields = ("id", "slug", "name")
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
 
-    class Meta(object):
+    class Meta:
         model = Tag
         fields = (
             "id", "slug", "name", "colour", "match", "matching_algorithm")
@@ -34,7 +34,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         view_name="drf:correspondent-detail", allow_null=True)
     tags = TagsField(view_name="drf:tag-detail", many=True)
 
-    class Meta(object):
+    class Meta:
         model = Document
         fields = (
             "id",
@@ -57,7 +57,7 @@ class LogSerializer(serializers.ModelSerializer):
     time = serializers.DateTimeField()
     messages = serializers.CharField()
 
-    class Meta(object):
+    class Meta:
         model = Log
         fields = (
             "time",
