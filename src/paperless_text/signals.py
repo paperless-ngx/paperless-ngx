@@ -5,7 +5,7 @@ from .parsers import TextDocumentParser
 
 class ConsumerDeclaration:
 
-    MATCHING_FILES = re.compile("^.*\.(txt|md)$")
+    MATCHING_FILES = re.compile("^.*\.(te?xt|md|csv)$")
 
     @classmethod
     def handle(cls, sender, **kwargs):
