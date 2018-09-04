@@ -33,7 +33,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_2(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -43,7 +43,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_3(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -53,7 +53,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_4(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -66,7 +66,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_5(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -80,7 +80,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_6(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -100,7 +100,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_7(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -117,7 +117,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_8(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -138,7 +138,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_date_format_9(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
@@ -153,7 +153,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_get_text_1_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_1.pdf")
@@ -359,7 +359,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_get_text_8_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_8.pdf")
@@ -373,7 +373,7 @@ class TestDate(TestCase):
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
+        SCRATCH
     )
     def test_get_text_9_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_9.pdf")
