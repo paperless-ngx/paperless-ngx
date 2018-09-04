@@ -48,20 +48,26 @@ class DocumentClassifier(object):
     def classify_document(self, document, classify_correspondent=False, classify_type=False, classify_tags=False):
         X = self.data_vectorizer.transform([preprocess_content(document.content)])
 
+        update_fields=()
+
         if classify_correspondent:
             y_correspondent = self.correspondent_classifier.predict(X)
             correspondent = self.correspondent_binarizer.inverse_transform(y_correspondent)[0]
             print("Detected correspondent:", correspondent)
             document.correspondent = Correspondent.objects.filter(name=correspondent).first()
+            update_fields = update_fields + ("correspondent",)
 
         if classify_type:
             y_type = self.type_classifier.predict(X)
             type = self.type_binarizer.inverse_transform(y_type)[0]
             print("Detected document type:", type)
-            document.type = DocumentType.objects.filter(name=type).first()
+            document.document_type = DocumentType.objects.filter(name=type).first()
+            update_fields = update_fields + ("document_type",)
 
         if classify_tags:
             y_tags = self.tags_classifier.predict(X)
             tags = self.tags_binarizer.inverse_transform(y_tags)[0]
             print("Detected tags:", tags)
             document.tags.add(*[Tag.objects.filter(name=t).first() for t in tags])
+
+        document.save(update_fields=update_fields)
