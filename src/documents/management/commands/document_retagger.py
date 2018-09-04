@@ -46,7 +46,11 @@ class Command(Renderable, BaseCommand):
             documents = Document.objects.all().exclude(tags__is_archived_tag=True).distinct()
 
         logging.getLogger(__name__).info("Loading classifier")
-        clf = DocumentClassifier.load_classifier()
+        try:
+            clf = DocumentClassifier.load_classifier()
+        except FileNotFoundError:
+            logging.getLogger(__name__).fatal("Cannot classify documents, classifier model file was not found.")
+            return
 
 
         for document in documents:
