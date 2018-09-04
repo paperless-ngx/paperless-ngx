@@ -1,3 +1,4 @@
+import os
 import pickle
 
 from documents.models import Correspondent, DocumentType, Tag
@@ -16,6 +17,18 @@ def preprocess_content(content):
 
 class DocumentClassifier(object):
 
+    classifier_version = None
+
+    data_vectorizer = None
+
+    tags_binarizer = None
+    correspondent_binarizer = None
+    type_binarizer = None
+
+    tags_classifier = None
+    correspondent_classifier = None
+    type_classifier = None
+
     @staticmethod
     def load_classifier():
         clf = DocumentClassifier()
@@ -23,15 +36,18 @@ class DocumentClassifier(object):
         return clf
 
     def reload(self):
-        with open(settings.MODEL_FILE, "rb") as f:
-            self.data_vectorizer = pickle.load(f)
-            self.tags_binarizer = pickle.load(f)
-            self.correspondent_binarizer = pickle.load(f)
-            self.type_binarizer = pickle.load(f)
+        if self.classifier_version is None or os.path.getmtime(settings.MODEL_FILE) > self.classifier_version:
+            print("reloading classifier")
+            with open(settings.MODEL_FILE, "rb") as f:
+                self.data_vectorizer = pickle.load(f)
+                self.tags_binarizer = pickle.load(f)
+                self.correspondent_binarizer = pickle.load(f)
+                self.type_binarizer = pickle.load(f)
 
-            self.tags_classifier = pickle.load(f)
-            self.correspondent_classifier = pickle.load(f)
-            self.type_classifier = pickle.load(f)
+                self.tags_classifier = pickle.load(f)
+                self.correspondent_classifier = pickle.load(f)
+                self.type_classifier = pickle.load(f)
+            self.classifier_version = os.path.getmtime(settings.MODEL_FILE)
 
     def save_classifier(self):
         with open(settings.MODEL_FILE, "wb") as f:

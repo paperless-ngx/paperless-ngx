@@ -102,9 +102,8 @@ class CommonAdmin(admin.ModelAdmin):
 
 class CorrespondentAdmin(CommonAdmin):
 
-    list_display = ("name", "match", "matching_algorithm", "document_count", "last_correspondence")
-    list_filter = ("matching_algorithm",)
-    list_editable = ("match", "matching_algorithm")
+    list_display = ("name", "automatic_classification", "document_count", "last_correspondence")
+    list_editable = ("automatic_classification",)
 
     def get_queryset(self, request):
         qs = super(CorrespondentAdmin, self).get_queryset(request)
@@ -122,10 +121,9 @@ class CorrespondentAdmin(CommonAdmin):
 
 class TagAdmin(CommonAdmin):
 
-    list_display = ("name", "colour", "match", "matching_algorithm",
-                    "document_count")
-    list_filter = ("colour", "matching_algorithm")
-    list_editable = ("colour", "match", "matching_algorithm")
+    list_display = ("name", "colour", "automatic_classification", "document_count")
+    list_filter = ("colour",)
+    list_editable = ("colour", "automatic_classification")
 
     def get_queryset(self, request):
         qs = super(TagAdmin, self).get_queryset(request)
@@ -139,9 +137,8 @@ class TagAdmin(CommonAdmin):
 
 class DocumentTypeAdmin(CommonAdmin):
 
-    list_display = ("name", "match", "matching_algorithm", "document_count")
-    list_filter = ("matching_algorithm",)
-    list_editable = ("match", "matching_algorithm")
+    list_display = ("name", "automatic_classification", "document_count")
+    list_editable = ("automatic_classification",)
 
     def get_queryset(self, request):
         qs = super(DocumentTypeAdmin, self).get_queryset(request)
