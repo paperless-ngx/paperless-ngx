@@ -48,6 +48,9 @@ class FetchView(SessionOrBasicAuthMixin, DetailView):
             Document.TYPE_JPG: "image/jpeg",
             Document.TYPE_GIF: "image/gif",
             Document.TYPE_TIF: "image/tiff",
+            Document.TYPE_CSV: "text/csv",
+            Document.TYPE_MD:  "text/markdown",
+            Document.TYPE_TXT: "text/plain"
         }
 
         if self.kwargs["kind"] == "thumb":
