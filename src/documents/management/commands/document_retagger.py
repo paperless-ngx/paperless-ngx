@@ -1,5 +1,8 @@
+import logging
+
 from django.core.management.base import BaseCommand
 
+from documents.classifier import DocumentClassifier
 from documents.models import Document, Tag
 
 from ...mixins import Renderable
@@ -8,25 +11,44 @@ from ...mixins import Renderable
 class Command(Renderable, BaseCommand):
 
     help = """
-        Using the current set of tagging rules, apply said rules to all
-        documents in the database, effectively allowing you to back-tag all
-        previously indexed documents with tags created (or modified) after
-        their initial import.
+        There is no help. #TODO
     """.replace("    ", "")
 
     def __init__(self, *args, **kwargs):
         self.verbosity = 0
         BaseCommand.__init__(self, *args, **kwargs)
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "-c", "--correspondent",
+            action="store_true"
+        )
+        parser.add_argument(
+            "-T", "--tags",
+            action="store_true"
+        )
+        parser.add_argument(
+            "-t", "--type",
+            action="store_true"
+        )
+        parser.add_argument(
+            "-i", "--inbox-only",
+            action="store_true"
+        )
+
     def handle(self, *args, **options):
 
         self.verbosity = options["verbosity"]
 
-        for document in Document.objects.all().exclude(tags__is_archived_tag=True):
+        if options['inbox_only']:
+            documents = Document.objects.filter(tags__is_inbox_tag=True).distinct()
+        else:
+            documents = Document.objects.all().exclude(tags__is_archived_tag=True).distinct()
 
-            tags = Tag.objects.exclude(
-                pk__in=document.tags.values_list("pk", flat=True))
+        logging.getLogger(__name__).info("Loading classifier")
+        clf = DocumentClassifier.load_classifier()
 
-            for tag in Tag.match_all(document.content, tags):
-                print('Tagging {} with "{}"'.format(document, tag))
-                document.tags.add(tag)
+
+        for document in documents:
+            logging.getLogger(__name__).info("Processing document {}".format(document.title))
+            clf.classify_document(document, classify_type=options['type'], classify_tags=options['tags'], classify_correspondent=options['correspondent'])
