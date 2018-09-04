@@ -16,15 +16,17 @@ def logger(message, group):
     logging.getLogger(__name__).debug(message, extra={"group": group})
 
 
-classifier = None
+classifier = DocumentClassifier()
 
 
 def classify_document(sender, document=None, logging_group=None, **kwargs):
     global classifier
-    if classifier is None:
-        classifier = DocumentClassifier.load_classifier()
+    try:
+        classifier.reload()
+        classifier.classify_document(document, classify_correspondent=True, classify_tags=True, classify_type=True)
+    except FileNotFoundError:
+        logging.getLogger(__name__).fatal("Cannot classify document, classifier model file was not found.")
 
-    classifier.classify_document(document, classify_correspondent=True, classify_tags=True, classify_type=True)
 
 
 

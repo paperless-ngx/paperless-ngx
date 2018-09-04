@@ -42,8 +42,13 @@ class Command(Renderable, BaseCommand):
 
         # Step 2: vectorize data
         logging.getLogger(__name__).info("Vectorizing data...")
-        clf.data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), min_df=0.05)
+        clf.data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 6), min_df=0.1)
         data_vectorized = clf.data_vectorizer.fit_transform(data)
+
+        print(clf.data_vectorizer.vocabulary_)
+
+        logging.getLogger(__name__).info("Shape of vectorized data: {}".format(data_vectorized.shape))
+
 
         clf.tags_binarizer = MultiLabelBinarizer()
         labels_tags_vectorized = clf.tags_binarizer.fit_transform(labels_tags)
