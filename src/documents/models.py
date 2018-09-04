@@ -10,7 +10,10 @@ from collections import OrderedDict
 from fuzzywuzzy import fuzz
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
@@ -59,6 +62,7 @@ class MatchingModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -447,8 +451,10 @@ class FileInfo:
     def _get_tags(cls, tags):
         r = []
         for t in tags.split(","):
-            r.append(
-                Tag.objects.get_or_create(slug=t, defaults={"name": t})[0])
+            r.append(Tag.objects.get_or_create(
+                slug=t.lower(),
+                defaults={"name": t}
+            )[0])
         return tuple(r)
 
     @classmethod
