@@ -1,6 +1,6 @@
 from django_filters.rest_framework import CharFilter, FilterSet
 
-from .models import Correspondent, Document, Tag
+from .models import Correspondent, Document, Tag, DocumentType
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -29,6 +29,19 @@ class TagFilterSet(FilterSet):
         }
 
 
+class DocumentTypeFilterSet(FilterSet):
+
+    class Meta(object):
+        model = DocumentType
+        fields = {
+            "name": [
+                "startswith", "endswith", "contains",
+                "istartswith", "iendswith", "icontains"
+            ],
+            "slug": ["istartswith", "iendswith", "icontains"]
+        }
+
+
 class DocumentFilterSet(FilterSet):
 
     CHAR_KWARGS = {
@@ -46,6 +59,8 @@ class DocumentFilterSet(FilterSet):
     correspondent__slug = CharFilter(name="correspondent__slug", **CHAR_KWARGS)
     tags__name = CharFilter(name="tags__name", **CHAR_KWARGS)
     tags__slug = CharFilter(name="tags__slug", **CHAR_KWARGS)
+    document_type__name = CharFilter(name="document_type__name", **CHAR_KWARGS)
+    document_type__slug = CharFilter(name="document_type__slug", **CHAR_KWARGS)
 
     class Meta(object):
         model = Document
