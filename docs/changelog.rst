@@ -19,6 +19,10 @@ Changelog
   easier on those of us with lots of different tags: `#391`_.
 * `Kilian Koeltzsch`_ noticed a bug in how we capture & automatically create
   tags, so that's fixed now too: `#384`_.
+* `erikarvstedt`_ tweaked the behaviour of the test suite to be better behaved
+  for packaging environments: `#383`_.
+* `Lukasz Soluch`_ added CORS support to make building a new Javascript-based front-end
+  cleaner & easier: `#387`_.
 
 
 2.1.0
@@ -476,6 +480,7 @@ bulk of the work on this big change.
 .. _Tim Brooks: https://github.com/brookst
 .. _Stéphane Brunner: https://github.com/sbrunner
 .. _Kilian Koeltzsch: https://github.com/kiliankoe
+.. _Lukasz Soluch: https://github.com/LukaszSolo
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -550,8 +555,10 @@ bulk of the work on this big change.
 .. _#374: https://github.com/danielquinn/paperless/pull/374
 .. _#375: https://github.com/danielquinn/paperless/pull/375
 .. _#376: https://github.com/danielquinn/paperless/pull/376
+.. _#383: https://github.com/danielquinn/paperless/pull/383
 .. _#384: https://github.com/danielquinn/paperless/issues/384
 .. _#386: https://github.com/danielquinn/paperless/issues/386
+.. _#387: https://github.com/danielquinn/paperless/pull/387
 .. _#391: https://github.com/danielquinn/paperless/pull/391
 .. _#390: https://github.com/danielquinn/paperless/pull/390
 .. _#392: https://github.com/danielquinn/paperless/issues/392
