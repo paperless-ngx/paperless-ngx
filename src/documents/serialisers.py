@@ -14,7 +14,7 @@ class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta(object):
         model = DocumentType
-        fields = ("id", "slug", "name")
+        fields = ("id", "slug", "name", "automatic_classification")
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
