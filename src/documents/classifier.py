@@ -43,7 +43,7 @@ class DocumentClassifier(object):
 
     def reload(self):
         if self.classifier_version is None or os.path.getmtime(settings.MODEL_FILE) > self.classifier_version:
-            print("reloading classifier")
+            logging.getLogger(__name__).info("Reloading classifier models")
             with open(settings.MODEL_FILE, "rb") as f:
                 self.data_vectorizer = pickle.load(f)
                 self.tags_binarizer = pickle.load(f)
@@ -77,10 +77,13 @@ class DocumentClassifier(object):
         logging.getLogger(__name__).info("Gathering data from database...")
         for doc in Document.objects.exclude(tags__is_inbox_tag=True):
             data.append(preprocess_content(doc.content))
-            labels_type.append(doc.document_type.name if doc.document_type is not None else "-")
-            labels_correspondent.append(doc.correspondent.name if doc.correspondent is not None else "-")
-            tags = [tag.name for tag in doc.tags.all()]
+            labels_type.append(doc.document_type.name if doc.document_type is not None and doc.document_type.automatic_classification else "-")
+            labels_correspondent.append(doc.correspondent.name if doc.correspondent is not None and doc.correspondent.automatic_classification else "-")
+            tags = [tag.name for tag in doc.tags.filter(automatic_classification=True)]
             labels_tags.append(tags)
+
+        labels_tags_unique = set([tag for tags in labels_tags for tag in tags])
+        logging.getLogger(__name__).info("{} documents, {} tag(s) {}, {} correspondent(s) {}, {} type(s) {}.".format(len(data), len(labels_tags_unique), labels_tags_unique, len(set(labels_correspondent)), set(labels_correspondent), len(set(labels_type)), set(labels_type)))
 
         # Step 2: vectorize data
         logging.getLogger(__name__).info("Vectorizing data...")
