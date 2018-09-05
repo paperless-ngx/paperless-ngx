@@ -7,7 +7,7 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta(object):
         model = Correspondent
-        fields = ("id", "slug", "name")
+        fields = ("id", "slug", "name", "automatic_classification")
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
@@ -15,7 +15,7 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta(object):
         model = Tag
         fields = (
-            "id", "slug", "name", "colour", "match", "matching_algorithm")
+            "id", "slug", "name", "colour", "automatic_classification")
 
 
 class CorrespondentField(serializers.HyperlinkedRelatedField):
