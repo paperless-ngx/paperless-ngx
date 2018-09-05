@@ -1,11 +1,11 @@
-from django_filters.rest_framework import CharFilter, FilterSet
+from django_filters.rest_framework import CharFilter, FilterSet, BooleanFilter
 
 from .models import Correspondent, Document, Tag, DocumentType
 
 
 class CorrespondentFilterSet(FilterSet):
 
-    class Meta(object):
+    class Meta:
         model = Correspondent
         fields = {
             "name": [
@@ -18,7 +18,7 @@ class CorrespondentFilterSet(FilterSet):
 
 class TagFilterSet(FilterSet):
 
-    class Meta(object):
+    class Meta:
         model = Tag
         fields = {
             "name": [
@@ -55,14 +55,22 @@ class DocumentFilterSet(FilterSet):
         )
     }
 
-    correspondent__name = CharFilter(name="correspondent__name", **CHAR_KWARGS)
-    correspondent__slug = CharFilter(name="correspondent__slug", **CHAR_KWARGS)
-    tags__name = CharFilter(name="tags__name", **CHAR_KWARGS)
-    tags__slug = CharFilter(name="tags__slug", **CHAR_KWARGS)
-    document_type__name = CharFilter(name="document_type__name", **CHAR_KWARGS)
-    document_type__slug = CharFilter(name="document_type__slug", **CHAR_KWARGS)
+    correspondent__name = CharFilter(
+        field_name="correspondent__name", **CHAR_KWARGS)
+    correspondent__slug = CharFilter(
+        field_name="correspondent__slug", **CHAR_KWARGS)
+    tags__name = CharFilter(
+        field_name="tags__name", **CHAR_KWARGS)
+    tags__slug = CharFilter(
+        field_name="tags__slug", **CHAR_KWARGS)
+    tags__empty = BooleanFilter(
+        field_name="tags", lookup_expr="isnull", distinct=True)
+    document_type__name = CharFilter(
+        name="document_type__name", **CHAR_KWARGS)
+    document_type__slug = CharFilter(
+        name="document_type__slug", **CHAR_KWARGS)
 
-    class Meta(object):
+    class Meta:
         model = Document
         fields = {
             "title": [
