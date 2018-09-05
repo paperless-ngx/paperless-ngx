@@ -1,8 +1,14 @@
+import logging
 import os
 import pickle
 
-from documents.models import Correspondent, DocumentType, Tag
+from documents.models import Correspondent, DocumentType, Tag, Document
 from paperless import settings
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
 
 
 def preprocess_content(content):
@@ -61,29 +67,85 @@ class DocumentClassifier(object):
             pickle.dump(self.correspondent_classifier, f)
             pickle.dump(self.type_classifier, f)
 
-    def classify_document(self, document, classify_correspondent=False, classify_type=False, classify_tags=False):
+    def train(self):
+        data = list()
+        labels_tags = list()
+        labels_correspondent = list()
+        labels_type = list()
+
+        # Step 1: Extract and preprocess training data from the database.
+        logging.getLogger(__name__).info("Gathering data from database...")
+        for doc in Document.objects.exclude(tags__is_inbox_tag=True):
+            data.append(preprocess_content(doc.content))
+            labels_type.append(doc.document_type.name if doc.document_type is not None else "-")
+            labels_correspondent.append(doc.correspondent.name if doc.correspondent is not None else "-")
+            tags = [tag.name for tag in doc.tags.all()]
+            labels_tags.append(tags)
+
+        # Step 2: vectorize data
+        logging.getLogger(__name__).info("Vectorizing data...")
+        self.data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 6), min_df=0.1)
+        data_vectorized = self.data_vectorizer.fit_transform(data)
+
+        self.tags_binarizer = MultiLabelBinarizer()
+        labels_tags_vectorized = self.tags_binarizer.fit_transform(labels_tags)
+
+        self.correspondent_binarizer = LabelBinarizer()
+        labels_correspondent_vectorized = self.correspondent_binarizer.fit_transform(labels_correspondent)
+
+        self.type_binarizer = LabelBinarizer()
+        labels_type_vectorized = self.type_binarizer.fit_transform(labels_type)
+
+        # Step 3: train the classifiers
+        if len(self.tags_binarizer.classes_) > 0:
+            logging.getLogger(__name__).info("Training tags classifier...")
+            self.tags_classifier = OneVsRestClassifier(MultinomialNB())
+            self.tags_classifier.fit(data_vectorized, labels_tags_vectorized)
+        else:
+            self.tags_classifier = None
+            logging.getLogger(__name__).info("There are no tags. Not training tags classifier.")
+
+        if len(self.correspondent_binarizer.classes_) > 0:
+            logging.getLogger(__name__).info("Training correspondent classifier...")
+            self.correspondent_classifier = OneVsRestClassifier(MultinomialNB())
+            self.correspondent_classifier.fit(data_vectorized, labels_correspondent_vectorized)
+        else:
+            self.correspondent_classifier = None
+            logging.getLogger(__name__).info("There are no correspondents. Not training correspondent classifier.")
+
+        if len(self.type_binarizer.classes_) > 0:
+            logging.getLogger(__name__).info("Training document type classifier...")
+            self.type_classifier = OneVsRestClassifier(MultinomialNB())
+            self.type_classifier.fit(data_vectorized, labels_type_vectorized)
+        else:
+            self.type_classifier = None
+            logging.getLogger(__name__).info("There are no document types. Not training document type classifier.")
+
+    def classify_document(self, document, classify_correspondent=False, classify_type=False, classify_tags=False, replace_tags=False):
         X = self.data_vectorizer.transform([preprocess_content(document.content)])
 
         update_fields=()
 
-        if classify_correspondent:
+        if classify_correspondent and self.correspondent_classifier is not None:
             y_correspondent = self.correspondent_classifier.predict(X)
             correspondent = self.correspondent_binarizer.inverse_transform(y_correspondent)[0]
             print("Detected correspondent:", correspondent)
             document.correspondent = Correspondent.objects.filter(name=correspondent).first()
             update_fields = update_fields + ("correspondent",)
 
-        if classify_type:
+        if classify_type and self.type_classifier is not None:
             y_type = self.type_classifier.predict(X)
             type = self.type_binarizer.inverse_transform(y_type)[0]
             print("Detected document type:", type)
             document.document_type = DocumentType.objects.filter(name=type).first()
             update_fields = update_fields + ("document_type",)
 
-        if classify_tags:
+        if classify_tags and self.tags_classifier is not None:
             y_tags = self.tags_classifier.predict(X)
             tags = self.tags_binarizer.inverse_transform(y_tags)[0]
             print("Detected tags:", tags)
+            if replace_tags:
+                document.tags.clear()
             document.tags.add(*[Tag.objects.filter(name=t).first() for t in tags])
 
         document.save(update_fields=update_fields)
