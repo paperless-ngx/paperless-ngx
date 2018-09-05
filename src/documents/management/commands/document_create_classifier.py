@@ -22,7 +22,6 @@ class Command(Renderable, BaseCommand):
 
         clf.train()
 
-
         logging.getLogger(__name__).info("Saving models to " + settings.MODEL_FILE + "...")
 
         clf.save_classifier()
