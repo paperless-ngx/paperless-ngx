@@ -13,7 +13,8 @@ from django.utils.safestring import mark_safe
 from django.db import models
 
 from documents.actions import add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, \
-    remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected
+    remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected, \
+    run_document_classifier_on_selected
 from .models import Correspondent, Tag, Document, Log, DocumentType
 
 
@@ -165,7 +166,7 @@ class DocumentAdmin(CommonAdmin):
 
     ordering = ["-created", "correspondent"]
 
-    actions = [add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected]
+    actions = [add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected, run_document_classifier_on_selected]
 
     date_hierarchy = 'created'
 
