@@ -4,6 +4,7 @@ from django.contrib.admin.utils import model_ngettext
 from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
 
+from documents.classifier import DocumentClassifier
 from documents.models import Tag, Correspondent, DocumentType
 
 
@@ -223,3 +224,28 @@ def remove_document_type_from_selected(modeladmin, request, queryset):
 
 
 remove_document_type_from_selected.short_description = "Remove document type from selected documents"
+
+
+def run_document_classifier_on_selected(modeladmin, request, queryset):
+    if not modeladmin.has_change_permission(request):
+        raise PermissionDenied
+
+    try:
+        clf = DocumentClassifier.load_classifier()
+    except FileNotFoundError:
+        modeladmin.message_user(request, "Classifier model file not found.", messages.ERROR)
+        return None
+
+    n = queryset.count()
+    if n:
+        for obj in queryset:
+            clf.classify_document(obj, classify_correspondent=True, classify_tags=True, classify_type=True, replace_tags=True)
+            modeladmin.log_change(request, obj, str(obj))
+        modeladmin.message_user(request, "Successfully applied tags, correspondent and type to %(count)d %(items)s." % {
+            "count": n, "items": model_ngettext(modeladmin.opts, n)
+        }, messages.SUCCESS)
+
+    return None
+
+
+run_document_classifier_on_selected.short_description = "Run document classifier on selected"
