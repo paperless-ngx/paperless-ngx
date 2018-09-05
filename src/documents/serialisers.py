@@ -1,12 +1,19 @@
 from rest_framework import serializers
 
-from .models import Correspondent, Tag, Document, Log
+from .models import Correspondent, Tag, Document, Log, DocumentType
 
 
 class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta(object):
         model = Correspondent
+        fields = ("id", "slug", "name")
+
+
+class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta(object):
+        model = DocumentType
         fields = ("id", "slug", "name")
 
 
@@ -28,17 +35,25 @@ class TagsField(serializers.HyperlinkedRelatedField):
         return Tag.objects.all()
 
 
+class DocumentTypeField(serializers.HyperlinkedRelatedField):
+    def get_queryset(self):
+        return DocumentType.objects.all()
+
+
 class DocumentSerializer(serializers.ModelSerializer):
 
     correspondent = CorrespondentField(
         view_name="drf:correspondent-detail", allow_null=True)
     tags = TagsField(view_name="drf:tag-detail", many=True)
+    document_type = DocumentTypeField(
+        view_name="drf:documenttype-detail", allow_null=True)
 
     class Meta(object):
         model = Document
         fields = (
             "id",
             "correspondent",
+            "document_type",
             "title",
             "content",
             "file_type",
