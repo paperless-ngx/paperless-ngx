@@ -89,9 +89,10 @@ PAPERLESS_EMAIL_SECRET=""
 # as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 #PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
 
-# If you decide to use Paperless APIs in an ajax calls, you need to add your
-# servers to the allowed hosts that can do CORS calls. By default Paperless allows 
-# calls from localhost:8080. The same rules as above how the list should look like.
+# If you decide to use the Paperless API in an ajax call, you need to add your
+# servers to the list of allowed hosts that can do CORS calls. By default
+# Paperless allows calls from localhost:8080, but you'd like to change that,
+# you can set this value to a comma-separated list.
 #PAPERLESS_CORS_ALLOWED_HOSTS="localhost:8080,example.com,localhost:8000"
 
 # To host paperless under a subpath url like example.com/paperless you set
