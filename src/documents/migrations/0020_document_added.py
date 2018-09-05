@@ -11,8 +11,8 @@ def set_added_time_to_created_time(apps, schema_editor):
         doc.added = doc.created
         doc.save()
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
         ('documents', '0019_add_consumer_user'),
     ]

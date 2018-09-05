@@ -112,7 +112,6 @@ def move_documents_and_create_thumbnails(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('documents', '0011_auto_20160303_1929'),
     ]
