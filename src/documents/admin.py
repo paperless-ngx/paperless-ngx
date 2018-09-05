@@ -4,8 +4,10 @@ from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth.models import User, Group
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.http import urlquote
@@ -189,6 +191,8 @@ class DocumentAdmin(CommonAdmin):
                     "tags_", "archive_serial_number", "document_type")
     list_filter = ("document_type", "tags", ('correspondent', RecentCorrespondentFilter), "correspondent", FinancialYearFilter)
 
+    filter_horizontal = ("tags",)
+
     ordering = ["-created", "correspondent"]
 
     actions = [add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected]
@@ -307,16 +311,13 @@ class DocumentAdmin(CommonAdmin):
 
     @staticmethod
     def _html_tag(kind, inside=None, **kwargs):
-
-        attributes = []
-        for lft, rgt in kwargs.items():
-            attributes.append('{}="{}"'.format(lft, rgt))
+        attributes = format_html_join(' ', '{}="{}"', kwargs.items())
 
         if inside is not None:
-            return "<{kind} {attributes}>{inside}</{kind}>".format(
-                kind=kind, attributes=" ".join(attributes), inside=inside)
+            return format_html("<{kind} {attributes}>{inside}</{kind}>",
+                               kind=kind, attributes=attributes, inside=inside)
 
-        return "<{} {}/>".format(kind, " ".join(attributes))
+        return format_html("<{} {}/>", kind, attributes)
 
 
 class LogAdmin(CommonAdmin):
