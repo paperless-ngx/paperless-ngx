@@ -5,14 +5,13 @@ import subprocess
 import dateparser
 from django.conf import settings
 
-from documents.parsers import DocumentParser, ParseError
+from documents.parsers import DocumentParser, ParseError, pattern
 
 
 class TextDocumentParser(DocumentParser):
     """
     This parser directly parses a text document (.txt, .md, or .csv)
     """
-
 
     CONVERT = settings.CONVERT_BINARY
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
@@ -93,20 +92,6 @@ class TextDocumentParser(DocumentParser):
             text = self.get_text()
         except ParseError as e:
             return None
-
-        # This regular expression will try to find dates in the document at
-        # hand and will match the following formats:
-        # - XX.YY.ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - MONTH ZZZZ, with ZZZZ being 4 digits
-        # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
-        pattern = re.compile(
-            r'\b([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})\b|' +
-            r'\b([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
-            r'\b([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))\b|' +
-            r'\b([^\W\d_]{3,9} [0-9]{4})\b')
 
         # Iterate through all regex matches and try to parse the date
         for m in re.finditer(pattern, text):
