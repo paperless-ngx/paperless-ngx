@@ -4,12 +4,13 @@ from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.auth.models import User, Group
+from django.http import HttpResponseRedirect
 try:
     from django.core.urlresolvers import reverse
 except ImportError:
     from django.urls import reverse
 from django.templatetags.static import static
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 from django.db import models
