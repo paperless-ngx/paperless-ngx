@@ -63,7 +63,6 @@ class FetchView(SessionOrBasicAuthMixin, DetailView):
             content_type=content_types[self.object.file_type]
         )
 
-        print("OPEN_DOCUMENT", settings.INLINE_DOC)
         DISPOSITION = 'inline' if settings.INLINE_DOC else 'attachment'
 
         response["Content-Disposition"] = '{}; filename="{}"'.format(
