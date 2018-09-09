@@ -1,6 +1,23 @@
 Changelog
 #########
 
+2.3.0
+=====
+
+* Support for consuming plain text & markdown documents was added by
+  `Joshua Taillon`_!  This was a long-requested feature, and it's addition is
+  likely to be greatly appreciated by the community: `#395`_  Thanks also to
+  `David Martin`_ for his assistance on the issue.
+* `dubit0`_ found & fixed a bug that prevented management commands from running
+  before we had an operational database: `#396`_
+* Joshua also added a simple update to the thumbnail generation process to
+  improve performance: `#399`_
+* As his last bit of effort on this release, Joshua also added some code to
+  allow you to view the documents inline rather than download them as an
+  attachment. `#400`_
+* Finally, `ahyear`_ found a slip in the Docker documentation and patched it. `#401`_
+
+
 2.2.1
 =====
 
@@ -481,6 +498,9 @@ bulk of the work on this big change.
 .. _Stéphane Brunner: https://github.com/sbrunner
 .. _Kilian Koeltzsch: https://github.com/kiliankoe
 .. _Lukasz Soluch: https://github.com/LukaszSolo
+.. _Joshua Taillon: https://github.com/jat255
+.. _dubit0:  https://github.com/dubit0
+.. _ahyear:  https://github.com/ahyear
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -562,6 +582,11 @@ bulk of the work on this big change.
 .. _#391: https://github.com/danielquinn/paperless/pull/391
 .. _#390: https://github.com/danielquinn/paperless/pull/390
 .. _#392: https://github.com/danielquinn/paperless/issues/392
+.. _#395: https://github.com/danielquinn/paperless/pull/395
+.. _#396: https://github.com/danielquinn/paperless/pull/396
+.. _#399: https://github.com/danielquinn/paperless/pull/399
+.. _#400: https://github.com/danielquinn/paperless/pull/400
+.. _#401: https://github.com/danielquinn/paperless/pull/401
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
