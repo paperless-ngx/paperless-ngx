@@ -1,24 +1,24 @@
 # coding=utf-8
 
-import dateutil.parser
 import logging
 import os
 import re
 import uuid
-
 from collections import OrderedDict
+
+import dateutil.parser
+from django.conf import settings
+from django.db import models
+from django.template.defaultfilters import slugify
+from django.utils import timezone
 from fuzzywuzzy import fuzz
 
-from django.conf import settings
+from .managers import LogManager
+
 try:
     from django.core.urlresolvers import reverse
 except ImportError:
     from django.urls import reverse
-from django.db import models
-from django.template.defaultfilters import slugify
-from django.utils import timezone
-
-from .managers import LogManager
 
 
 class MatchingModel(models.Model):
@@ -192,7 +192,11 @@ class Document(models.Model):
     TYPE_JPG = "jpg"
     TYPE_GIF = "gif"
     TYPE_TIF = "tiff"
-    TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,)
+    TYPE_TXT = "txt"
+    TYPE_CSV = "csv"
+    TYPE_MD = "md"
+    TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,
+             TYPE_TXT, TYPE_CSV, TYPE_MD)
 
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
@@ -365,51 +369,52 @@ class FileInfo:
         )
     )
 
+    formats = "pdf|jpe?g|png|gif|tiff?|te?xt|md|csv"
     REGEXES = OrderedDict([
         ("created-correspondent-title-tags", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*) - "
             r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
+            r"\.(?P<extension>{})$".format(formats),
             flags=re.IGNORECASE
         )),
         ("created-title-tags", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<title>.*) - "
             r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
+            r"\.(?P<extension>{})$".format(formats),
             flags=re.IGNORECASE
         )),
         ("created-correspondent-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
+            r"\.(?P<extension>{})$".format(formats),
             flags=re.IGNORECASE
         )),
         ("created-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<title>.*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
+            r"\.(?P<extension>{})$".format(formats),
             flags=re.IGNORECASE
         )),
         ("correspondent-title-tags", re.compile(
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*) - "
             r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
+            r"\.(?P<extension>{})$".format(formats),
             flags=re.IGNORECASE
         )),
         ("correspondent-title", re.compile(
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*)?"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
+            r"\.(?P<extension>{})$".format(formats),
             flags=re.IGNORECASE
         )),
         ("title", re.compile(
             r"(?P<title>.*)"
-            r"\.(?P<extension>pdf|jpe?g|png|gif|tiff?)$",
+            r"\.(?P<extension>{})$".format(formats),
             flags=re.IGNORECASE
         ))
     ])
