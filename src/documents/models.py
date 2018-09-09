@@ -135,7 +135,7 @@ class MatchingModel(models.Model):
         Example:
           '  some random  words "with   quotes  " and   spaces'
             ==>
-          ["some", "random", "words", "with\s+quotes", "and", "spaces"]
+          ["some", "random", "words", "with+quotes", "and", "spaces"]
         """
         findterms = re.compile(r'"([^"]+)"|(\S+)').findall
         normspace = re.compile(r"\s+").sub
