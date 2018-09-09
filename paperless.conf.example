@@ -117,6 +117,10 @@ PAPERLESS_EMAIL_SECRET=""
 # http://paperless.readthedocs.org/en/latest/consumption.html#hooking-into-the-consumption-process
 #PAPERLESS_POST_CONSUME_SCRIPT="/path/to/an/arbitrary/script.sh"
 
+# By default, when clicking on a document within the web interface, the
+# browser will prompt the user to save the document to disk. By setting this to
+# "true", the document will instead be opened in the browser, if possible.
+#PAPERLESS_INLINE_DOC="false"
 
 #
 # The following values use sensible defaults for modern systems, but if you're
