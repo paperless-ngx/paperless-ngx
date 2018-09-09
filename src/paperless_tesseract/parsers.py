@@ -50,10 +50,11 @@ class RasterisedDocumentParser(DocumentParser):
             self.CONVERT,
             "-scale", "500x5000",
             "-alpha", "remove",
-            self.document_path, os.path.join(self.tempdir, "convert-%04d.png")
+            "{}[0]".format(self.document_path),
+            os.path.join(self.tempdir, "convert.png")
         )
 
-        return os.path.join(self.tempdir, "convert-0000.png")
+        return os.path.join(self.tempdir, "convert.png")
 
     def _is_ocred(self):
 
