@@ -5,7 +5,7 @@ import subprocess
 import dateparser
 from django.conf import settings
 
-from documents.parsers import DocumentParser, ParseError, pattern
+from documents.parsers import DocumentParser, ParseError, DATE_REGEX
 
 
 class TextDocumentParser(DocumentParser):
@@ -94,7 +94,7 @@ class TextDocumentParser(DocumentParser):
             return None
 
         # Iterate through all regex matches and try to parse the date
-        for m in re.finditer(pattern, text):
+        for m in re.finditer(DATE_REGEX, text):
             datestring = m.group(0)
 
             try:

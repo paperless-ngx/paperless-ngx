@@ -14,7 +14,7 @@ from pyocr.libtesseract.tesseract_raw import \
 from pyocr.tesseract import TesseractError
 
 import pdftotext
-from documents.parsers import DocumentParser, ParseError, pattern
+from documents.parsers import DocumentParser, ParseError, DATE_REGEX
 
 from .languages import ISO639
 
@@ -211,7 +211,7 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
         # Iterate through all regex matches and try to parse the date
-        for m in re.finditer(pattern, text):
+        for m in re.finditer(DATE_REGEX, text):
             datestring = m.group(0)
 
             try:
