@@ -1,24 +1,24 @@
 # coding=utf-8
 
-import dateutil.parser
 import logging
 import os
 import re
 import uuid
-
 from collections import OrderedDict
+
+import dateutil.parser
+from django.conf import settings
+from django.db import models
+from django.template.defaultfilters import slugify
+from django.utils import timezone
 from fuzzywuzzy import fuzz
 
-from django.conf import settings
+from .managers import LogManager
+
 try:
     from django.core.urlresolvers import reverse
 except ImportError:
     from django.urls import reverse
-from django.db import models
-from django.template.defaultfilters import slugify
-from django.utils import timezone
-
-from .managers import LogManager
 
 
 class MatchingModel(models.Model):
