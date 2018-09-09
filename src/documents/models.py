@@ -194,7 +194,7 @@ class Document(models.Model):
     TYPE_TIF = "tiff"
     TYPE_TXT = "txt"
     TYPE_CSV = "csv"
-    TYPE_MD  = "md"
+    TYPE_MD = "md"
     TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,
              TYPE_TXT, TYPE_CSV, TYPE_MD)
 
