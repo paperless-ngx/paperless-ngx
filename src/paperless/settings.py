@@ -271,6 +271,9 @@ PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
 POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 
+# Whether to display a selected document inline, or download it as attachment:
+INLINE_DOC = os.getenv("PAPERLESS_INLINE_DOC")
+
 # The number of items on each page in the web UI.  This value must be a
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
