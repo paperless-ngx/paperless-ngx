@@ -14,7 +14,7 @@ from pyocr.libtesseract.tesseract_raw import \
 from pyocr.tesseract import TesseractError
 
 import pdftotext
-from documents.parsers import DocumentParser, ParseError
+from documents.parsers import DocumentParser, ParseError, DATE_REGEX
 
 from .languages import ISO639
 
@@ -210,22 +210,8 @@ class RasterisedDocumentParser(DocumentParser):
         except ParseError as e:
             return None
 
-        # This regular expression will try to find dates in the document at
-        # hand and will match the following formats:
-        # - XX.YY.ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
-        # - MONTH ZZZZ, with ZZZZ being 4 digits
-        # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
-        pattern = re.compile(
-            r'\b([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})\b|' +
-            r'\b([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
-            r'\b([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))\b|' +
-            r'\b([^\W\d_]{3,9} [0-9]{4})\b')
-
         # Iterate through all regex matches and try to parse the date
-        for m in re.finditer(pattern, text):
+        for m in re.finditer(DATE_REGEX, text):
             datestring = m.group(0)
 
             try:
