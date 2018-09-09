@@ -1,6 +1,8 @@
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
+
 from paperless.db import GnuPG
 from paperless.mixins import SessionOrBasicAuthMixin
 from paperless.views import StandardPagination
@@ -63,8 +65,11 @@ class FetchView(SessionOrBasicAuthMixin, DetailView):
             self._get_raw_data(self.object.source_file),
             content_type=content_types[self.object.file_type]
         )
-        response["Content-Disposition"] = 'attachment; filename="{}"'.format(
-            self.object.file_name)
+
+        DISPOSITION = 'inline' if settings.INLINE_DOC else 'attachment'
+
+        response["Content-Disposition"] = '{}; filename="{}"'.format(
+            DISPOSITION, self.object.file_name)
 
         return response
 
