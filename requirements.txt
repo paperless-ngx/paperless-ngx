@@ -29,7 +29,7 @@ pillow==5.2.0
 pluggy==0.7.1; python_version != '3.1.*'
 py==1.6.0; python_version != '3.1.*'
 pycodestyle==2.4.0
-pyocr==0.5.2
+pyocr==0.5.3
 pytest-cov==2.5.1
 pytest-django==3.4.2
 pytest-env==0.6.2
