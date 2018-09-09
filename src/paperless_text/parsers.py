@@ -44,7 +44,7 @@ class TextDocumentParser(DocumentParser):
 
         def create_bg():
             work_size = ",".join([str(n - 1) for n in psize])
-            r = str(round(psize[0] / 10));
+            r = str(round(psize[0] / 10))
             rounded = ",".join([r, r])
             run_command(self.CONVERT, "-size ", picsize, ' xc:none -draw ',
                         '"fill ', bg_color, ' roundrectangle 0,0,',
