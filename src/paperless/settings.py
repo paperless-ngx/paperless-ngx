@@ -22,6 +22,14 @@ elif os.path.exists("/usr/local/etc/paperless.conf"):
     load_dotenv("/usr/local/etc/paperless.conf")
 
 
+def __get_boolean(key):
+    """
+    Return a boolean value based on whatever the user has supplied in the
+    environment based on whether the value "looks like" it's True or not.
+    """
+    return bool(os.getenv(key, "NO").lower() in ("yes", "y", "1", "t", "true"))
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -222,12 +230,12 @@ OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
 
 # OCR all documents?
-OCR_ALWAYS = bool(os.getenv("PAPERLESS_OCR_ALWAYS", "NO").lower() in ("yes", "y", "1", "t", "true"))  # NOQA
+OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS")
 
 # If this is true, any failed attempts to OCR a PDF will result in the PDF
 # being indexed anyway, with whatever we could get.  If it's False, the file
 # will simply be left in the CONSUMPTION_DIR.
-FORGIVING_OCR = bool(os.getenv("PAPERLESS_FORGIVING_OCR", "YES").lower() in ("yes", "y", "1", "t", "true"))  # NOQA
+FORGIVING_OCR = __get_boolean("PAPERLESS_FORGIVING_OCR")
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
@@ -272,7 +280,7 @@ PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
 POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 
 # Whether to display a selected document inline, or download it as attachment:
-INLINE_DOC = os.getenv("PAPERLESS_INLINE_DOC")
+INLINE_DOC = __get_boolean("PAPERLESS_INLINE_DOC")
 
 # The number of items on each page in the web UI.  This value must be a
 # positive integer, but if you don't define one in paperless.conf, a default of
