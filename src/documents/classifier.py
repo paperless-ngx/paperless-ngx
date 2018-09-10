@@ -2,12 +2,13 @@ import logging
 import os
 import pickle
 
+from sklearn.neural_network import MLPClassifier
+
 from documents.models import Correspondent, DocumentType, Tag, Document
 from paperless import settings
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
 
 
@@ -87,7 +88,7 @@ class DocumentClassifier(object):
 
         # Step 2: vectorize data
         logging.getLogger(__name__).info("Vectorizing data...")
-        self.data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 6), min_df=0.1)
+        self.data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(3, 5), min_df=0.1)
         data_vectorized = self.data_vectorizer.fit_transform(data)
 
         self.tags_binarizer = MultiLabelBinarizer()
@@ -102,7 +103,7 @@ class DocumentClassifier(object):
         # Step 3: train the classifiers
         if len(self.tags_binarizer.classes_) > 0:
             logging.getLogger(__name__).info("Training tags classifier...")
-            self.tags_classifier = OneVsRestClassifier(MultinomialNB())
+            self.tags_classifier = MLPClassifier(verbose=True)
             self.tags_classifier.fit(data_vectorized, labels_tags_vectorized)
         else:
             self.tags_classifier = None
@@ -110,7 +111,7 @@ class DocumentClassifier(object):
 
         if len(self.correspondent_binarizer.classes_) > 0:
             logging.getLogger(__name__).info("Training correspondent classifier...")
-            self.correspondent_classifier = OneVsRestClassifier(MultinomialNB())
+            self.correspondent_classifier = MLPClassifier(verbose=True)
             self.correspondent_classifier.fit(data_vectorized, labels_correspondent_vectorized)
         else:
             self.correspondent_classifier = None
@@ -118,7 +119,7 @@ class DocumentClassifier(object):
 
         if len(self.type_binarizer.classes_) > 0:
             logging.getLogger(__name__).info("Training document type classifier...")
-            self.type_classifier = OneVsRestClassifier(MultinomialNB())
+            self.type_classifier = MLPClassifier(verbose=True)
             self.type_classifier.fit(data_vectorized, labels_type_vectorized)
         else:
             self.type_classifier = None
