@@ -239,9 +239,9 @@ def run_document_classifier_on_selected(modeladmin, request, queryset):
     n = queryset.count()
     if n:
         for obj in queryset:
-            clf.classify_document(obj, classify_correspondent=True, classify_tags=True, classify_type=True, replace_tags=True)
+            clf.classify_document(obj, classify_correspondent=True, classify_tags=True, classify_document_type=True, replace_tags=True)
             modeladmin.log_change(request, obj, str(obj))
-        modeladmin.message_user(request, "Successfully applied tags, correspondent and type to %(count)d %(items)s." % {
+        modeladmin.message_user(request, "Successfully applied tags, correspondent and document type to %(count)d %(items)s." % {
             "count": n, "items": model_ngettext(modeladmin.opts, n)
         }, messages.SUCCESS)
 
