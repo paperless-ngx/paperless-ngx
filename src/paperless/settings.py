@@ -39,7 +39,7 @@ SECRET_KEY = os.getenv(
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.getenv("PAPERLESS_DEBUG", "YES").lower() in ("yes", "y", "1", "t", "true"))  # NOQA
 
 LOGIN_URL = "admin:login"
 
@@ -191,7 +191,7 @@ MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
 
 # Document classification models location
 MODEL_FILE = os.getenv(
-    "PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "models", "model.pickle"))
+    "PAPERLESS_MODEL_FILE", os.path.join(BASE_DIR, "..", "models", "model.pickle"))
 
 
 # Paperless-specific stuff
