@@ -1,11 +1,11 @@
 import re
 
-from .parsers import RasterisedDocumentParser
+from .parsers import TextDocumentParser
 
 
 class ConsumerDeclaration:
 
-    MATCHING_FILES = re.compile(r"^.*\.(pdf|jpe?g|gif|png|tiff?|pnm|bmp)$")
+    MATCHING_FILES = re.compile(r"^.*\.(te?xt|md|csv)$")
 
     @classmethod
     def handle(cls, sender, **kwargs):
@@ -16,8 +16,8 @@ class ConsumerDeclaration:
 
         if cls.MATCHING_FILES.match(doc.lower()):
             return {
-                "parser": RasterisedDocumentParser,
-                "weight": 0
+                "parser": TextDocumentParser,
+                "weight": 10
             }
 
         return None
