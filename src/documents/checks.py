@@ -2,7 +2,7 @@ import textwrap
 
 from django.conf import settings
 from django.core.checks import Error, register
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 
 
 @register()
@@ -14,7 +14,7 @@ def changed_password_check(app_configs, **kwargs):
     try:
         encrypted_doc = Document.objects.filter(
             storage_type=Document.STORAGE_TYPE_GPG).first()
-    except OperationalError:
+    except (OperationalError, ProgrammingError):
         return []  # No documents table yet
 
     if encrypted_doc:
