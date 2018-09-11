@@ -12,6 +12,7 @@ class DocumentsConfig(AppConfig):
         from .signals import document_consumption_finished
         from .signals.handlers import (
             classify_document,
+            add_inbox_tags,
             run_pre_consume_script,
             run_post_consume_script,
             cleanup_document_deletion,
@@ -21,6 +22,7 @@ class DocumentsConfig(AppConfig):
         document_consumption_started.connect(run_pre_consume_script)
 
         document_consumption_finished.connect(classify_document)
+        document_consumption_finished.connect(add_inbox_tags)
         document_consumption_finished.connect(set_log_entry)
         document_consumption_finished.connect(run_post_consume_script)
 
