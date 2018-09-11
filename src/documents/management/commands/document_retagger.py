@@ -35,6 +35,10 @@ class Command(Renderable, BaseCommand):
             "-i", "--inbox-only",
             action="store_true"
         )
+        parser.add_argument(
+            "-r", "--replace-tags",
+            action="store_true"
+        )
 
     def handle(self, *args, **options):
 
@@ -52,7 +56,6 @@ class Command(Renderable, BaseCommand):
             logging.getLogger(__name__).fatal("Cannot classify documents, classifier model file was not found.")
             return
 
-
         for document in documents:
             logging.getLogger(__name__).info("Processing document {}".format(document.title))
-            clf.classify_document(document, classify_type=options['type'], classify_tags=options['tags'], classify_correspondent=options['correspondent'])
+            clf.classify_document(document, classify_document_type=options['type'], classify_tags=options['tags'], classify_correspondent=options['correspondent'], replace_tags=options['replace_tags'])
