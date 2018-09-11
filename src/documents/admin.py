@@ -198,13 +198,12 @@ class DocumentAdmin(CommonAdmin):
         doc = Document.objects.get(id=object_id)
         extra_context['download_url'] = doc.download_url
         extra_context['file_type'] = doc.file_type
-        if self.document_queue:
+        if self.document_queue and int(object_id) in self.document_queue:
             #There is a queue of documents
             current_index = self.document_queue.index(int(object_id))
             if current_index < len(self.document_queue) - 1:
                 #... and there are still documents in the queue
-                next_object = self.document_queue[current_index + 1]
-                extra_context['next_object'] = next_object
+                extra_context['next_object'] = self.document_queue[current_index + 1]
         return super(DocumentAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
