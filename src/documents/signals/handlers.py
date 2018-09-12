@@ -8,57 +8,29 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
-from ..models import Correspondent, Document, Tag
+from documents.classifier import DocumentClassifier
+from ..models import Document, Tag
 
 
 def logger(message, group):
     logging.getLogger(__name__).debug(message, extra={"group": group})
 
 
-def set_correspondent(sender, document=None, logging_group=None, **kwargs):
-
-    # No sense in assigning a correspondent when one is already set.
-    if document.correspondent:
-        return
-
-    # No matching correspondents, so no need to continue
-    potential_correspondents = list(Correspondent.match_all(document.content))
-    if not potential_correspondents:
-        return
-
-    potential_count = len(potential_correspondents)
-    selected = potential_correspondents[0]
-    if potential_count > 1:
-        message = "Detected {} potential correspondents, so we've opted for {}"
-        logger(
-            message.format(potential_count, selected),
-            logging_group
-        )
-
-    logger(
-        'Assigning correspondent "{}" to "{}" '.format(selected, document),
-        logging_group
-    )
-
-    document.correspondent = selected
-    document.save(update_fields=("correspondent",))
+classifier = DocumentClassifier()
 
 
-def set_tags(sender, document=None, logging_group=None, **kwargs):
+def classify_document(sender, document=None, logging_group=None, **kwargs):
+    global classifier
+    try:
+        classifier.reload()
+        classifier.classify_document(document, classify_correspondent=True, classify_tags=True, classify_document_type=True)
+    except FileNotFoundError:
+        logging.getLogger(__name__).fatal("Cannot classify document, classifier model file was not found.")
 
-    current_tags = set(document.tags.all())
-    relevant_tags = set(Tag.match_all(document.content)) - current_tags
 
-    if not relevant_tags:
-        return
-
-    message = 'Tagging "{}" with "{}"'
-    logger(
-        message.format(document, ", ".join([t.slug for t in relevant_tags])),
-        logging_group
-    )
-
-    document.tags.add(*relevant_tags)
+def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
+    inbox_tags = Tag.objects.filter(is_inbox_tag=True)
+    document.tags.add(*inbox_tags)
 
 
 def run_pre_consume_script(sender, filename, **kwargs):

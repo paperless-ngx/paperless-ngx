@@ -23,42 +23,10 @@ except ImportError:
 
 class MatchingModel(models.Model):
 
-    MATCH_ANY = 1
-    MATCH_ALL = 2
-    MATCH_LITERAL = 3
-    MATCH_REGEX = 4
-    MATCH_FUZZY = 5
-    MATCHING_ALGORITHMS = (
-        (MATCH_ANY, "Any"),
-        (MATCH_ALL, "All"),
-        (MATCH_LITERAL, "Literal"),
-        (MATCH_REGEX, "Regular Expression"),
-        (MATCH_FUZZY, "Fuzzy Match"),
-    )
-
     name = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(blank=True)
 
-    match = models.CharField(max_length=256, blank=True)
-    matching_algorithm = models.PositiveIntegerField(
-        choices=MATCHING_ALGORITHMS,
-        default=MATCH_ANY,
-        help_text=(
-            "Which algorithm you want to use when matching text to the OCR'd "
-            "PDF.  Here, \"any\" looks for any occurrence of any word "
-            "provided in the PDF, while \"all\" requires that every word "
-            "provided appear in the PDF, albeit not in the order provided.  A "
-            "\"literal\" match means that the text you enter must appear in "
-            "the PDF exactly as you've entered it, and \"regular expression\" "
-            "uses a regex to match the PDF.  (If you don't know what a regex "
-            "is, you probably don't want this option.)  Finally, a \"fuzzy "
-            "match\" looks for words or phrases that are mostly—but not "
-            "exactly—the same, which can be useful for matching against "
-            "documents containg imperfections that foil accurate OCR."
-        )
-    )
-
-    is_insensitive = models.BooleanField(default=True)
+    automatic_classification = models.BooleanField(default=False, help_text='Automatically assign to newly added documents based on current usage in your document collection.')
 
     class Meta:
         abstract = True
@@ -67,86 +35,7 @@ class MatchingModel(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def conditions(self):
-        return "{}: \"{}\" ({})".format(
-            self.name, self.match, self.get_matching_algorithm_display())
-
-    @classmethod
-    def match_all(cls, text, tags=None):
-
-        if tags is None:
-            tags = cls.objects.all()
-
-        text = text.lower()
-        for tag in tags:
-            if tag.matches(text):
-                yield tag
-
-    def matches(self, text):
-
-        search_kwargs = {}
-
-        # Check that match is not empty
-        if self.match.strip() == "":
-            return False
-
-        if self.is_insensitive:
-            search_kwargs = {"flags": re.IGNORECASE}
-
-        if self.matching_algorithm == self.MATCH_ALL:
-            for word in self._split_match():
-                search_result = re.search(
-                    r"\b{}\b".format(word), text, **search_kwargs)
-                if not search_result:
-                    return False
-            return True
-
-        if self.matching_algorithm == self.MATCH_ANY:
-            for word in self._split_match():
-                if re.search(r"\b{}\b".format(word), text, **search_kwargs):
-                    return True
-            return False
-
-        if self.matching_algorithm == self.MATCH_LITERAL:
-            return bool(re.search(
-                r"\b{}\b".format(self.match), text, **search_kwargs))
-
-        if self.matching_algorithm == self.MATCH_REGEX:
-            return bool(re.search(
-                re.compile(self.match, **search_kwargs), text))
-
-        if self.matching_algorithm == self.MATCH_FUZZY:
-            match = re.sub(r'[^\w\s]', '', self.match)
-            text = re.sub(r'[^\w\s]', '', text)
-            if self.is_insensitive:
-                match = match.lower()
-                text = text.lower()
-
-            return True if fuzz.partial_ratio(match, text) >= 90 else False
-
-        raise NotImplementedError("Unsupported matching algorithm")
-
-    def _split_match(self):
-        """
-        Splits the match to individual keywords, getting rid of unnecessary
-        spaces and grouping quoted words together.
-
-        Example:
-          '  some random  words "with   quotes  " and   spaces'
-            ==>
-          ["some", "random", "words", "with+quotes", "and", "spaces"]
-        """
-        findterms = re.compile(r'"([^"]+)"|(\S+)').findall
-        normspace = re.compile(r"\s+").sub
-        return [
-            normspace(" ", (t[0] or t[1]).strip()).replace(" ", r"\s+")
-            for t in findterms(self.match)
-        ]
-
     def save(self, *args, **kwargs):
-
-        self.match = self.match.lower()
 
         if not self.slug:
             self.slug = slugify(self.name)
@@ -184,6 +73,19 @@ class Tag(MatchingModel):
 
     colour = models.PositiveIntegerField(choices=COLOURS, default=1)
 
+    is_inbox_tag = models.BooleanField(
+        default=False,
+        help_text="Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.")
+
+    is_archived_tag = models.BooleanField(
+        default=False,
+        help_text="Marks this tag as an archive tag: All documents tagged with archive tags will never be modified automatically (i.e., modifying tags by matching rules)")
+
+
+class DocumentType(MatchingModel):
+
+    pass
+
 
 class Document(models.Model):
 
@@ -214,6 +116,14 @@ class Document(models.Model):
     )
 
     title = models.CharField(max_length=128, blank=True, db_index=True)
+
+    document_type = models.ForeignKey(
+        DocumentType,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL
+    )
 
     content = models.TextField(
         db_index=True,
@@ -254,6 +164,13 @@ class Document(models.Model):
 
     added = models.DateTimeField(
         default=timezone.now, editable=False, db_index=True)
+
+    archive_serial_number = models.IntegerField(
+        blank=True,
+        null=True,
+        unique=True,
+        db_index=True,
+        help_text="The position of this document in your physical document archive.")
 
     class Meta:
         ordering = ("correspondent", "title")

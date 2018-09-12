@@ -1,5 +1,41 @@
 {% extends 'admin/change_form.html' %}
 
+{% block content %}
+
+{{ block.super }}
+
+{% if file_type in "pdf jpg png" %}
+
+	<div id="change_form_twocolumn_parent">
+		<div id="change_form_form_parent"></div>
+		<div id="change_form_viewer_parent">
+			{% if file_type == "pdf" %}
+				{% include "admin/documents/document/viewers/viewer_pdf.html" %}
+			{% endif %}
+			{% if file_type in "jpg png" %}
+				{% include "admin/documents/document/viewers/viewer_image.html" %}
+			{% endif %}
+		</div>
+	</div>
+
+	<script>
+		django.jQuery("#change_form_form_parent").append(django.jQuery("#document_form"));
+		django.jQuery("#content-main").append(django.jQuery("#change_form_twocolumn_parent"));
+	</script>
+
+	{% if next_object %}
+		<script type="text/javascript">//<![CDATA[
+			(function($){
+				$('<input type="submit" value="Save and edit next" name="_saveandeditnext" />')
+				.prependTo('div.submit-row');
+				$('<input type="hidden" value="{{next_object}}" name="_next_object" />')
+				.prependTo('div.submit-row');
+			})(django.jQuery);
+		//]]></script>
+	{% endif %}
+{% endif %}
+
+{% endblock content %}
 
 {% block footer %}
 

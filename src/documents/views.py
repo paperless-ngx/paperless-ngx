@@ -20,15 +20,15 @@ from rest_framework.viewsets import (
     ReadOnlyModelViewSet
 )
 
-from .filters import CorrespondentFilterSet, DocumentFilterSet, TagFilterSet
+from .filters import CorrespondentFilterSet, DocumentFilterSet, TagFilterSet, DocumentTypeFilterSet
 from .forms import UploadForm
-from .models import Correspondent, Document, Log, Tag
+from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
     LogSerializer,
-    TagSerializer
-)
+    TagSerializer,
+    DocumentTypeSerializer)
 
 
 class IndexView(TemplateView):
@@ -113,6 +113,17 @@ class TagViewSet(ModelViewSet):
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = TagFilterSet
+    ordering_fields = ("name", "slug")
+
+
+class DocumentTypeViewSet(ModelViewSet):
+    model = DocumentType
+    queryset = DocumentType.objects.all()
+    serializer_class = DocumentTypeSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_class = DocumentTypeFilterSet
     ordering_fields = ("name", "slug")
 
 
