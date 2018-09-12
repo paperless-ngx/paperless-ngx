@@ -229,4 +229,4 @@ PAPERLESS_DEBUG="false"
 
 # The number of years for which a correspondent will be included in the recent
 # correspondents filter.
-#PAPERLESS_RECENT_CORRESPONDENT_YEARS=2
+#PAPERLESS_RECENT_CORRESPONDENT_YEARS=1
