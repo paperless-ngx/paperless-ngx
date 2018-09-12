@@ -3,6 +3,16 @@
 # As this file contains passwords it should only be readable by the user
 # running paperless.
 
+###############################################################################
+####                        Database Settings                              ####
+###############################################################################
+
+# By default, sqlite is used as the database backend. This can be changed here.
+#PAPERLESS_DBENGINE="django.db.backends.postgresql_psycopg2"
+#PAPERLESS_DBNAME="paperless"
+#PAPERLESS_DBUSER="paperless"
+#PAPERLESS_DBPASS="paperless"
+
 
 ###############################################################################
 ####                         Paths & Folders                               ####
@@ -38,6 +48,13 @@ PAPERLESS_CONSUMPTION_DIR=""
 #PAPERLESS_STATIC_URL="/static/"
 
 
+# You can specify where the document classification model file should be
+# stored. Make sure that this file is writeable by the user executing the
+# management command "document_create_classifier" and that the path exists.
+# The default location is /models/model.pickle wwithin the install folder.
+#PAPERLESS_MODEL_FILE=/path/to/model/file
+
+
 # These values are required if you want paperless to check a particular email
 # box every 10 minutes and attempt to consume documents from there.  If you
 # don't define a HOST, mail checking will just be disabled.
@@ -58,6 +75,11 @@ PAPERLESS_EMAIL_SECRET=""
 ###############################################################################
 ####                              Security                                 ####
 ###############################################################################
+
+# Controls whether django's debug mode is enabled. Disable this on production
+# systems. Debug mode is enabled by default.
+PAPERLESS_DEBUG="false"
+
 
 # Paperless can be instructed to attempt to encrypt your PDF files with GPG
 # using the PAPERLESS_PASSPHRASE specified below.  If however you're not
@@ -203,3 +225,8 @@ PAPERLESS_EMAIL_SECRET=""
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
 #PAPERLESS_LIST_PER_PAGE=100
+
+
+# The number of years for which a correspondent will be included in the recent
+# correspondents filter.
+#PAPERLESS_RECENT_CORRESPONDENT_YEARS=1
