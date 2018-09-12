@@ -198,7 +198,7 @@ class DocumentAdmin(CommonAdmin):
         doc = Document.objects.get(id=object_id)
         extra_context['download_url'] = doc.download_url
         extra_context['file_type'] = doc.file_type
-        if self.document_queue and int(object_id) in self.document_queue:
+        if self.document_queue and object_id and int(object_id) in self.document_queue:
             #There is a queue of documents
             current_index = self.document_queue.index(int(object_id))
             if current_index < len(self.document_queue) - 1:

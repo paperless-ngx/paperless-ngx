@@ -8,7 +8,7 @@ from documents.classifier import DocumentClassifier
 from documents.models import Tag, Correspondent, DocumentType
 
 
-def select_action(modeladmin, request, queryset, title, action, modelclass, message_type='add', document_action=None, queryset_action=None):
+def select_action(modeladmin, request, queryset, title, action, modelclass, success_message="", document_action=None, queryset_action=None):
     opts = modeladmin.model._meta
     app_label = opts.app_label
 
@@ -27,17 +27,8 @@ def select_action(modeladmin, request, queryset, title, action, modelclass, mess
             if queryset_action:
                 queryset_action(queryset, selected_object)
 
-            if message_type == 'add':
-                message = "Successfully added %(model_name)s %(tag)s to %(count)d %(items)s."
-            elif message_type == 'remove':
-                message = "Successfully removed %(model_name)s %(tag)s from %(count)d %(items)s."
-            elif message_type == 'set':
-                message = "Successfully set %(model_name)s %(tag)s on %(count)d %(items)s."
-            else:
-                raise ValueError("Unknown message type")
-
-            modeladmin.message_user(request, message % {
-                "model_name": model_ngettext(modelclass, 1), "tag": selected_object.name, "count": n, "items": model_ngettext(modeladmin.opts, n)
+            modeladmin.message_user(request, success_message % {
+                "selected_object": selected_object.name, "count": n, "items": model_ngettext(modeladmin.opts, n)
             }, messages.SUCCESS)
 
         # Return None to display the change list page again.
@@ -62,7 +53,7 @@ def select_action(modeladmin, request, queryset, title, action, modelclass, mess
     , context)
 
 
-def simple_action(modeladmin, request, queryset, document_action=None, queryset_action=None):
+def simple_action(modeladmin, request, queryset, success_message="", document_action=None, queryset_action=None):
     if not modeladmin.has_change_permission(request):
         raise PermissionDenied
 
@@ -75,7 +66,7 @@ def simple_action(modeladmin, request, queryset, document_action=None, queryset_
             modeladmin.log_change(request, document, document_display)
         if queryset_action:
             queryset_action(queryset)
-        modeladmin.message_user(request, "Successfully edited %(count)d %(items)s." % {
+        modeladmin.message_user(request, success_message % {
             "count": n, "items": model_ngettext(modeladmin.opts, n)
         }, messages.SUCCESS)
 
@@ -87,7 +78,7 @@ def add_tag_to_selected(modeladmin, request, queryset):
                          title="Add tag to multiple documents",
                          action="add_tag_to_selected",
                          modelclass=Tag,
-                         message_type='add',
+                         success_message="Successfully added tag %(selected_object)s to %(count)d %(items)s.",
                          document_action=lambda doc, tag: doc.tags.add(tag))
 add_tag_to_selected.short_description = "Add tag to selected documents"
 
@@ -97,7 +88,7 @@ def remove_tag_from_selected(modeladmin, request, queryset):
                          title="Remove tag from multiple documents",
                          action="remove_tag_from_selected",
                          modelclass=Tag,
-                         message_type='remove',
+                         success_message="Successfully removed tag %(selected_object)s from %(count)d %(items)s.",
                          document_action=lambda doc, tag: doc.tags.remove(tag))
 remove_tag_from_selected.short_description = "Remove tag from selected documents"
 
@@ -107,13 +98,14 @@ def set_correspondent_on_selected(modeladmin, request, queryset):
                          title="Set correspondent on multiple documents",
                          action="set_correspondent_on_selected",
                          modelclass=Correspondent,
-                         message_type='set',
+                         success_message="Successfully set correspondent %(selected_object)s on %(count)d %(items)s.",
                          queryset_action=lambda queryset, correspondent: queryset.update(correspondent=correspondent))
 set_correspondent_on_selected.short_description = "Set correspondent on selected documents"
 
 
 def remove_correspondent_from_selected(modeladmin, request, queryset):
     return simple_action(modeladmin=modeladmin, request=request, queryset=queryset,
+                         success_message="Successfully removed correspondent from %(count)d %(items)s.",
                          queryset_action=lambda qs: qs.update(correspondent=None))
 remove_correspondent_from_selected.short_description = "Remove correspondent from selected documents"
 
@@ -123,13 +115,14 @@ def set_document_type_on_selected(modeladmin, request, queryset):
                          title="Set document type on multiple documents",
                          action="set_document_type_on_selected",
                          modelclass=DocumentType,
-                         message_type='set',
+                         success_message="Successfully set document type %(selected_object)s on %(count)d %(items)s.",
                          queryset_action=lambda queryset, document_type: queryset.update(document_type=document_type))
 set_document_type_on_selected.short_description = "Set document type on selected documents"
 
 
 def remove_document_type_from_selected(modeladmin, request, queryset):
     return simple_action(modeladmin=modeladmin, request=request, queryset=queryset,
+                         success_message="Successfully removed document type from %(count)d %(items)s.",
                          queryset_action=lambda qs: qs.update(document_type=None))
 remove_document_type_from_selected.short_description = "Remove document type from selected documents"
 
@@ -137,10 +130,10 @@ remove_document_type_from_selected.short_description = "Remove document type fro
 def run_document_classifier_on_selected(modeladmin, request, queryset):
     try:
         clf = DocumentClassifier.load_classifier()
+        return simple_action(modeladmin=modeladmin, request=request, queryset=queryset,
+                             success_message="Successfully applied document classifier to %(count)d %(items)s.",
+                             document_action=lambda doc: clf.classify_document(doc, classify_correspondent=True, classify_tags=True, classify_document_type=True))
     except FileNotFoundError:
         modeladmin.message_user(request, "Classifier model file not found.", messages.ERROR)
         return None
-
-    return simple_action(modeladmin=modeladmin, request=request, queryset=queryset,
-                         document_action=lambda doc: clf.classify_document(doc, classify_correspondent=True, classify_tags=True, classify_document_type=True))
 run_document_classifier_on_selected.short_description = "Run document classifier on selected"
