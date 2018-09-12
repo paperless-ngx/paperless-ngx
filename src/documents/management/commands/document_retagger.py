@@ -45,7 +45,7 @@ class Command(Renderable, BaseCommand):
         self.verbosity = options["verbosity"]
 
         if options['inbox_only']:
-            documents = Document.objects.filter(tags__is_inbox_tag=True).distinct()
+            documents = Document.objects.filter(tags__is_inbox_tag=True).exclude(tags__is_archived_tag=True).distinct()
         else:
             documents = Document.objects.all().exclude(tags__is_archived_tag=True).distinct()
 
