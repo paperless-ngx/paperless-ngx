@@ -1,13 +1,20 @@
 from rest_framework import serializers
 
-from .models import Correspondent, Tag, Document, Log
+from .models import Correspondent, Tag, Document, Log, DocumentType
 
 
 class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Correspondent
-        fields = ("id", "slug", "name")
+        fields = ("id", "slug", "name", "automatic_classification")
+
+
+class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta(object):
+        model = DocumentType
+        fields = ("id", "slug", "name", "automatic_classification")
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
@@ -15,7 +22,7 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag
         fields = (
-            "id", "slug", "name", "colour", "match", "matching_algorithm")
+            "id", "slug", "name", "colour", "automatic_classification")
 
 
 class CorrespondentField(serializers.HyperlinkedRelatedField):
@@ -28,17 +35,25 @@ class TagsField(serializers.HyperlinkedRelatedField):
         return Tag.objects.all()
 
 
+class DocumentTypeField(serializers.HyperlinkedRelatedField):
+    def get_queryset(self):
+        return DocumentType.objects.all()
+
+
 class DocumentSerializer(serializers.ModelSerializer):
 
     correspondent = CorrespondentField(
         view_name="drf:correspondent-detail", allow_null=True)
     tags = TagsField(view_name="drf:tag-detail", many=True)
+    document_type = DocumentTypeField(
+        view_name="drf:documenttype-detail", allow_null=True)
 
     class Meta:
         model = Document
         fields = (
             "id",
             "correspondent",
+            "document_type",
             "title",
             "content",
             "file_type",
