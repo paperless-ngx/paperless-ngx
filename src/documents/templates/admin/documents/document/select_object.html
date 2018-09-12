@@ -21,21 +21,21 @@
 {% endblock %}
 
 {% block content %}
-<p>Please select the document type.</p>
+<p>Please select the {{itemname}}.</p>
 <form method="post">{% csrf_token %}
     <div>
         {% for obj in queryset %}
         <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}"/>
         {% endfor %}
         <p>
-            <select name="document_type_id">
-                {% for document_type in document_types %}
-                <option value="{{document_type.id}}">{{document_type.name}}</option>
+            <select name="obj_id">
+                {% for obj in objects %}
+                <option value="{{obj.id}}">{{obj.name}}</option>
                 {% endfor %}
             </select>
         </p>
 
-        <input type="hidden" name="action" value="set_document_type_on_selected"/>
+        <input type="hidden" name="action" value="{{action}}"/>
         <input type="hidden" name="post" value="yes"/>
         <p>
             <input type="submit" value="{% trans " Confirm" %}" />
