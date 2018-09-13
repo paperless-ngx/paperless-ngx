@@ -127,7 +127,7 @@ class DocumentClassifier(object):
     def classify_document(self, document, classify_correspondent=False, classify_document_type=False, classify_tags=False, replace_tags=False):
         X = self.data_vectorizer.transform([preprocess_content(document.content)])
 
-        update_fields=()
+        update_fields = ()
 
         if classify_correspondent and self.correspondent_classifier is not None:
             y_correspondent = self.correspondent_classifier.predict(X)
