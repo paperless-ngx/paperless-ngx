@@ -94,9 +94,10 @@ class RecentCorrespondentFilter(admin.RelatedFieldListFilter):
 
     def field_choices(self, field, request, model_admin):
         lookups = []
-        date_limit = datetime.now() - timedelta(days=365*settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS)
-        for c in Correspondent.objects.filter(documents__created__gte = date_limit).distinct():
-            lookups.append( (c.id, c.name) )
+        if settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS and settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS > 0:
+            date_limit = datetime.now() - timedelta(days=365*settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS)
+            for c in Correspondent.objects.filter(documents__created__gte = date_limit).distinct():
+                lookups.append( (c.id, c.name) )
         return lookups
 
 
