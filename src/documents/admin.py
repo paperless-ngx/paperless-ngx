@@ -94,9 +94,10 @@ class RecentCorrespondentFilter(admin.RelatedFieldListFilter):
 
     def field_choices(self, field, request, model_admin):
         lookups = []
-        date_limit = datetime.now() - timedelta(days=365*settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS)
-        for c in Correspondent.objects.filter(documents__created__gte = date_limit).distinct():
-            lookups.append( (c.id, c.name) )
+        if settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS and settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS > 0:
+            date_limit = datetime.now() - timedelta(days=365*settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS)
+            for c in Correspondent.objects.filter(documents__created__gte=date_limit).distinct():
+                lookups.append((c.id, c.name))
         return lookups
 
 
@@ -153,6 +154,7 @@ class DocumentTypeAdmin(CommonAdmin):
         return obj.document_count
     document_count.admin_order_field = "document_count"
 
+
 class DocumentAdmin(CommonAdmin):
 
     class Media:
@@ -199,10 +201,10 @@ class DocumentAdmin(CommonAdmin):
         extra_context['download_url'] = doc.download_url
         extra_context['file_type'] = doc.file_type
         if self.document_queue and object_id and int(object_id) in self.document_queue:
-            #There is a queue of documents
+            # There is a queue of documents
             current_index = self.document_queue.index(int(object_id))
             if current_index < len(self.document_queue) - 1:
-                #... and there are still documents in the queue
+                # ... and there are still documents in the queue
                 extra_context['next_object'] = self.document_queue[current_index + 1]
         return super(DocumentAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
