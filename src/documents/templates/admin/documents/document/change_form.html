@@ -4,7 +4,7 @@
 
 {{ block.super }}
 
-{% if file_type in "pdf jpg png" %}
+{% if file_type in "asd" %}
 
 	<div id="change_form_twocolumn_parent">
 		<div id="change_form_form_parent"></div>
@@ -23,16 +23,17 @@
 		django.jQuery("#content-main").append(django.jQuery("#change_form_twocolumn_parent"));
 	</script>
 
-	{% if next_object %}
-		<script type="text/javascript">//<![CDATA[
-			(function($){
-				$('<input type="submit" value="Save and edit next" name="_saveandeditnext" />')
-				.prependTo('div.submit-row');
-				$('<input type="hidden" value="{{next_object}}" name="_next_object" />')
-				.prependTo('div.submit-row');
-			})(django.jQuery);
-		//]]></script>
-	{% endif %}
+{% endif %}
+
+{% if next_object %}
+	<script type="text/javascript">//<![CDATA[
+		(function($){
+			$('<input type="submit" value="Save and edit next" name="_saveandeditnext" />')
+			.prependTo('div.submit-row');
+			$('<input type="hidden" value="{{next_object}}" name="_next_object" />')
+			.prependTo('div.submit-row');
+		})(django.jQuery);
+	//]]></script>
 {% endif %}
 
 {% endblock content %}

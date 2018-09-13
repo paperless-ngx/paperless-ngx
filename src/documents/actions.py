@@ -43,14 +43,12 @@ def select_action(modeladmin, request, queryset, title, action, modelclass, succ
         media=modeladmin.media,
         action=action,
         objects=modelclass.objects.all(),
-        itemname=model_ngettext(modelclass,1)
+        itemname=model_ngettext(modelclass, 1)
     )
 
     request.current_app = modeladmin.admin_site.name
 
-    return TemplateResponse(request,
-        "admin/%s/%s/select_object.html" % (app_label, opts.model_name)
-    , context)
+    return TemplateResponse(request, "admin/%s/%s/select_object.html" % (app_label, opts.model_name), context)
 
 
 def simple_action(modeladmin, request, queryset, success_message="", document_action=None, queryset_action=None):
@@ -70,6 +68,7 @@ def simple_action(modeladmin, request, queryset, success_message="", document_ac
             "count": n, "items": model_ngettext(modeladmin.opts, n)
         }, messages.SUCCESS)
 
+    # Return None to display the change list page again.
     return None
 
 
@@ -99,7 +98,7 @@ def set_correspondent_on_selected(modeladmin, request, queryset):
                          action="set_correspondent_on_selected",
                          modelclass=Correspondent,
                          success_message="Successfully set correspondent %(selected_object)s on %(count)d %(items)s.",
-                         queryset_action=lambda queryset, correspondent: queryset.update(correspondent=correspondent))
+                         queryset_action=lambda qs, correspondent: qs.update(correspondent=correspondent))
 set_correspondent_on_selected.short_description = "Set correspondent on selected documents"
 
 
@@ -116,7 +115,7 @@ def set_document_type_on_selected(modeladmin, request, queryset):
                          action="set_document_type_on_selected",
                          modelclass=DocumentType,
                          success_message="Successfully set document type %(selected_object)s on %(count)d %(items)s.",
-                         queryset_action=lambda queryset, document_type: queryset.update(document_type=document_type))
+                         queryset_action=lambda qs, document_type: qs.update(document_type=document_type))
 set_document_type_on_selected.short_description = "Set document type on selected documents"
 
 
