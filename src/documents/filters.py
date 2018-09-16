@@ -66,9 +66,9 @@ class DocumentFilterSet(FilterSet):
     tags__empty = BooleanFilter(
         field_name="tags", lookup_expr="isnull", distinct=True)
     document_type__name = CharFilter(
-        name="document_type__name", **CHAR_KWARGS)
+        field_name="document_type__name", **CHAR_KWARGS)
     document_type__slug = CharFilter(
-        name="document_type__slug", **CHAR_KWARGS)
+        field_name="document_type__slug", **CHAR_KWARGS)
 
     class Meta:
         model = Document
