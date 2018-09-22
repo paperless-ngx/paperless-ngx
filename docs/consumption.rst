@@ -79,14 +79,16 @@ Pre-consumption script
 A simple but common example for this would be creating a simple script like
 this:
 
+``/usr/local/bin/ocr-pdf``
+
 .. code:: bash
-    :name: "/usr/local/bin/ocr-pdf"
 
     #!/usr/bin/env bash
     pdf2pdfocr.py -i ${1}
 
+``/etc/paperless.conf``
+
 .. code:: bash
-    :name: /etc/paperless.conf
 
     ...
     PAPERLESS_PRE_CONSUME_SCRIPT="/usr/local/bin/ocr-pdf"
