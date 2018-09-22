@@ -15,7 +15,8 @@ Changelog
 * As his last bit of effort on this release, Joshua also added some code to
   allow you to view the documents inline rather than download them as an
   attachment. `#400`_
-* Finally, `ahyear`_ found a slip in the Docker documentation and patched it. `#401`_
+* Finally, `ahyear`_ found a slip in the Docker documentation and patched it.
+  `#401`_
 
 
 2.2.1
@@ -32,14 +33,14 @@ Changelog
   version of Paperless that supports Django 2.0!  As a result of their hard
   work, you can now also run Paperless on Python 3.7 as well: `#386`_ &
   `#390`_.
-* `Stéphane Brunner`_ added a few lines of code that made tagging interface a lot
-  easier on those of us with lots of different tags: `#391`_.
+* `Stéphane Brunner`_ added a few lines of code that made tagging interface a
+  lot easier on those of us with lots of different tags: `#391`_.
 * `Kilian Koeltzsch`_ noticed a bug in how we capture & automatically create
   tags, so that's fixed now too: `#384`_.
 * `erikarvstedt`_ tweaked the behaviour of the test suite to be better behaved
   for packaging environments: `#383`_.
-* `Lukasz Soluch`_ added CORS support to make building a new Javascript-based front-end
-  cleaner & easier: `#387`_.
+* `Lukasz Soluch`_ added CORS support to make building a new Javascript-based
+  front-end cleaner & easier: `#387`_.
 
 
 2.1.0
