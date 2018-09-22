@@ -76,6 +76,29 @@ Pre-consumption script
 
 * Document file name
 
+A simple but common example for this would be creating a simple script like
+this:
+
+.. code:: bash
+    :name: "/usr/local/bin/ocr-pdf"
+
+    #!/usr/bin/env bash
+    pdf2pdfocr.py -i ${1}
+
+.. code:: bash
+    :name: /etc/paperless.conf
+
+    ...
+    PAPERLESS_PRE_CONSUME_SCRIPT="/usr/local/bin/ocr-pdf"
+    ...
+
+This will pass the path to the document about to be consumed to ``/usr/local/bin/ocr-pdf``,
+which will in turn call `pdf2pdfocr.py`_ on your document, which will then
+overwrite the file with an OCR'd version of the file and exit.  At which point,
+the consumption process will begin with the newly modified file.
+
+.. _pdf2pdfocr.py: https://github.com/LeoFCardoso/pdf2pdfocr
+
 
 .. _consumption-director-hook-variables-post:
 
