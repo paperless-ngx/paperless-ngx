@@ -24,6 +24,7 @@ idna==2.7
 inotify-simple==1.1.8
 langdetect==1.0.7
 more-itertools==4.3.0
+numpy==1.15.1
 pdftotext==2.1.0
 pillow==5.2.0
 pluggy==0.7.1; python_version != '3.1.*'
@@ -45,6 +46,8 @@ pytz==2018.5
 regex==2018.8.29
 requests==2.19.1
 six==1.11.0
+scikit-learn==0.19.2
+scipy==1.1.0
 termcolor==1.1.0
 text-unidecode==1.2
 tzlocal==1.5.1

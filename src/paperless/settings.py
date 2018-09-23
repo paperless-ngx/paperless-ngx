@@ -22,12 +22,12 @@ elif os.path.exists("/usr/local/etc/paperless.conf"):
     load_dotenv("/usr/local/etc/paperless.conf")
 
 
-def __get_boolean(key):
+def __get_boolean(key, default="NO"):
     """
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
-    return bool(os.getenv(key, "NO").lower() in ("yes", "y", "1", "t", "true"))
+    return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -47,7 +47,7 @@ SECRET_KEY = os.getenv(
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = __get_boolean("PAPERLESS_DEBUG", "YES")
 
 LOGIN_URL = "admin:login"
 
@@ -81,7 +81,7 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "crispy_forms",
-    "django_filters",
+    "django_filters"
 
 ]
 
@@ -292,3 +292,9 @@ FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
 
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
+
+# Specify for how many years a correspondent is considered recent. Recent
+# correspondents will be shown in a separate "Recent correspondents" filter as
+# well. Set to 0 to disable this filter.
+PAPERLESS_RECENT_CORRESPONDENT_YEARS = int(os.getenv(
+    "PAPERLESS_RECENT_CORRESPONDENT_YEARS", 0))
