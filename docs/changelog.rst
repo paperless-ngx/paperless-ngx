@@ -7,6 +7,11 @@ Changelog
 * A new set of actions are now available thanks to `jonaswinkler`_'s very first
   pull request!  You can now do nifty things like tag documents in bulk, or set
   correspondents in bulk.  `#405`_
+* The import/export system is now a little smarter.  By default, documents are
+  tagged as ``unencrypted``, since exports are by their nature unencrypted.
+  It's now in the import step that we decide the storage type.  This allows you
+  to export from an encrypted system and import into an unencrypted one, or
+  vice-versa.
 
 
 2.3.0
