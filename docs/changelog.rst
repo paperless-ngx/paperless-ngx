@@ -12,7 +12,11 @@ Changelog
   It's now in the import step that we decide the storage type.  This allows you
   to export from an encrypted system and import into an unencrypted one, or
   vice-versa.
-
+* The migration history has been slightly modified to accomodate PostgreSQL
+  users.  Additionally, you can now tell paperless to use PostgreSQL simply by
+  declaring ``PAPERLESS_DBUSER`` in your environment.  This will attempt to
+  connect to your Postgres database without a password unless you also set
+  ``PAPERLESS_DBPASS``.
 
 2.3.0
 =====
