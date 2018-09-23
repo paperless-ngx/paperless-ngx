@@ -97,6 +97,34 @@ closing the ``"`` before it should have been.
 That's all there is in terms of guidelines, so I hope it's not too daunting.
 
 
+Indentation & Spacing
+.....................
+
+When it comes to indentation:
+
+* For Python, the rule is: follow pep8 and use 4 spaces.
+* For Javascript, CSS, and HTML, please use 1 tab.
+
+Additionally, Django templates making use of block elements like ``{% if %}``,
+``{% for %}``, and ``{% block %}`` etc. should be indented:
+
+Good:
+
+.. code:: html
+
+    {% block stuff %}
+    	<h1>This is the stuff</h1>
+    {% endblock %}
+
+Bad:
+
+.. code:: html
+
+    {% block stuff %}
+    <h1>This is the stuff</h1>
+    {% endblock %}
+
+
 The Code of Conduct
 ===================
 
