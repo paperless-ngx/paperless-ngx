@@ -1,10 +1,10 @@
 -i https://pypi.python.org/simple
-apipkg==1.5; python_version != '3.1.*'
-atomicwrites==1.2.1; python_version != '3.1.*'
+apipkg==1.5; python_version != '3.3.*'
+atomicwrites==1.2.1; python_version != '3.3.*'
 attrs==18.2.0
 certifi==2018.8.24
 chardet==3.0.4
-coverage==4.5.1; python_version != '3.1.*'
+coverage==4.5.1; python_version < '4'
 coveralls==1.5.0
 dateparser==0.7.0
 django-cors-headers==2.4.0
@@ -14,9 +14,9 @@ django-filter==2.0.0
 django==2.0.8
 djangorestframework==3.8.2
 docopt==0.6.2
-execnet==1.5.0; python_version != '3.1.*'
+execnet==1.5.0; python_version != '3.3.*'
 factory-boy==2.11.1
-faker==0.9.0
+faker==0.9.0; python_version >= '2.7'
 filemagic==1.6
 fuzzywuzzy==0.15.0
 gunicorn==19.9.0
@@ -26,17 +26,17 @@ langdetect==1.0.7
 more-itertools==4.3.0
 pdftotext==2.1.0
 pillow==5.2.0
-pluggy==0.7.1; python_version != '3.1.*'
-py==1.6.0; python_version != '3.1.*'
+pluggy==0.7.1; python_version != '3.3.*'
+py==1.6.0; python_version != '3.3.*'
 pycodestyle==2.4.0
 pyocr==0.5.3
-pytest-cov==2.5.1
+pytest-cov==2.6.0
 pytest-django==3.4.2
 pytest-env==0.6.2
-pytest-forked==0.2
+pytest-forked==0.2; python_version != '3.3.*'
 pytest-sugar==0.9.1
 pytest-xdist==1.23.0
-pytest==3.7.4
+pytest==3.8.0
 python-dateutil==2.7.3
 python-dotenv==0.9.1
 python-gnupg==0.4.3
@@ -48,4 +48,4 @@ six==1.11.0
 termcolor==1.1.0
 text-unidecode==1.2
 tzlocal==1.5.1
-urllib3==1.23; python_version != '3.0.*'
+urllib3==1.23; python_version != '3.3.*'

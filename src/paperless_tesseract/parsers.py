@@ -172,8 +172,8 @@ class RasterisedDocumentParser(DocumentParser):
                 raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
             raise OCRError(
-                "The guessed language is not available in this instance of "
-                "Tesseract."
+                "The guessed language ({}) is not available in this instance "
+                "of Tesseract.".format(guessed_language)
             )
 
     def _ocr(self, imgs, lang):

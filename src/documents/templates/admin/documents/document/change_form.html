@@ -1,5 +1,21 @@
 {% extends 'admin/change_form.html' %}
 
+{% block content %}
+
+{{ block.super }}
+
+{% if next_object %}
+	<script type="text/javascript">//<![CDATA[
+		(function($){
+			$('<input type="submit" value="Save and edit next" name="_saveandeditnext" />')
+			.prependTo('div.submit-row');
+			$('<input type="hidden" value="{{next_object}}" name="_next_object" />')
+			.prependTo('div.submit-row');
+		})(django.jQuery);
+	//]]></script>
+{% endif %}
+
+{% endblock content %}
 
 {% block footer %}
 
