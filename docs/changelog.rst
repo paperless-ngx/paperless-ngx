@@ -17,6 +17,10 @@ Changelog
   declaring ``PAPERLESS_DBUSER`` in your environment.  This will attempt to
   connect to your Postgres database without a password unless you also set
   ``PAPERLESS_DBPASS``.
+* A bug was found in the REST API filter system that was the result of an
+  update of django-filter some time ago.  This has now been patched `#412`_.
+  Thanks to `thepill`_ for spotting it!
+
 
 2.3.0
 =====
@@ -520,6 +524,7 @@ bulk of the work on this big change.
 .. _dubit0: https://github.com/dubit0
 .. _ahyear: https://github.com/ahyear
 .. _jonaswinkler: https://github.com/jonaswinkler
+.. _thepill: https://github.com/thepill
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -607,6 +612,7 @@ bulk of the work on this big change.
 .. _#400: https://github.com/danielquinn/paperless/pull/400
 .. _#401: https://github.com/danielquinn/paperless/pull/401
 .. _#405: https://github.com/danielquinn/paperless/pull/405
+.. _#412: https://github.com/danielquinn/paperless/issues/412
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
