@@ -59,6 +59,11 @@ PAPERLESS_EMAIL_SECRET=""
 ####                              Security                                 ####
 ###############################################################################
 
+# Controls whether django's debug mode is enabled. Disable this on production
+# systems. Debug mode is enabled by default.
+PAPERLESS_DEBUG="false"
+
+
 # Paperless can be instructed to attempt to encrypt your PDF files with GPG
 # using the PAPERLESS_PASSPHRASE specified below.  If however you're not
 # concerned about encrypting these files (for example if you have disk
@@ -203,3 +208,8 @@ PAPERLESS_EMAIL_SECRET=""
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
 #PAPERLESS_LIST_PER_PAGE=100
+
+
+# The number of years for which a correspondent will be included in the recent
+# correspondents filter.
+#PAPERLESS_RECENT_CORRESPONDENT_YEARS=1
