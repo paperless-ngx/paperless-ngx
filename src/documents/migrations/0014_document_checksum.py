@@ -158,9 +158,4 @@ class Migration(migrations.Migration):
             name='modified',
             field=models.DateTimeField(auto_now=True, db_index=True),
         ),
-        migrations.AlterField(
-            model_name='document',
-            name='checksum',
-            field=models.CharField(editable=False, help_text='The checksum of the original document (before it was encrypted).  We use this to prevent duplicate document imports.', max_length=32, unique=True),
-        ),
     ]
