@@ -21,7 +21,7 @@ Pep8
 ----
 
 It's the standard for all Python development, so it's `very well documented`_.
-The version is:
+The short version is:
 
 * Lines should wrap at 79 characters
 * Use ``snake_case`` for variables, ``CamelCase`` for classes, and ``ALL_CAPS``
