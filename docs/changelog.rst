@@ -1,6 +1,14 @@
 Changelog
 #########
 
+2.4.0
+=====
+
+* A new set of actions are now available thanks to `jonaswinkler`_'s very first
+  pull request!  You can now do nifty things like tag documents in bulk, or set
+  correspondents in bulk.  `#405`_
+
+
 2.3.0
 =====
 
@@ -500,8 +508,9 @@ bulk of the work on this big change.
 .. _Kilian Koeltzsch: https://github.com/kiliankoe
 .. _Lukasz Soluch: https://github.com/LukaszSolo
 .. _Joshua Taillon: https://github.com/jat255
-.. _dubit0:  https://github.com/dubit0
-.. _ahyear:  https://github.com/ahyear
+.. _dubit0: https://github.com/dubit0
+.. _ahyear: https://github.com/ahyear
+.. _jonaswinkler: https://github.com/jonaswinkler
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -588,6 +597,7 @@ bulk of the work on this big change.
 .. _#399: https://github.com/danielquinn/paperless/pull/399
 .. _#400: https://github.com/danielquinn/paperless/pull/400
 .. _#401: https://github.com/danielquinn/paperless/pull/401
+.. _#405: https://github.com/danielquinn/paperless/pull/405
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
