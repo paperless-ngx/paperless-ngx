@@ -55,7 +55,12 @@ class Command(Renderable, BaseCommand):
         documents = Document.objects.all()
         document_map = {d.pk: d for d in documents}
         manifest = json.loads(serializers.serialize("json", documents))
-        for document_dict in manifest:
+
+        for index, document_dict in enumerate(manifest):
+
+            # Force output to unencrypted as that will be the current state.
+            # The importer will make the decision to encrypt or not.
+            manifest[index]["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED  # NOQA: E501
 
             document = document_map[document_dict["pk"]]
 
