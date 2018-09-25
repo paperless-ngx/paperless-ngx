@@ -94,7 +94,7 @@ class Command(Renderable, BaseCommand):
             document_path = os.path.join(self.source, doc_file)
             thumbnail_path = os.path.join(self.source, thumb_file)
 
-            if document.storage_type == Document.STORAGE_TYPE_GPG:
+            if settings.PASSPHRASE:
 
                 with open(document_path, "rb") as unencrypted:
                     with open(document.source_path, "wb") as encrypted:
@@ -112,3 +112,15 @@ class Command(Renderable, BaseCommand):
 
                 shutil.copy(document_path, document.source_path)
                 shutil.copy(thumbnail_path, document.thumbnail_path)
+
+        # Reset the storage type to whatever we've used while importing
+
+        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        if settings.PASSPHRASE:
+            storage_type = Document.STORAGE_TYPE_GPG
+
+        Document.objects.filter(
+            pk__in=[r["pk"] for r in self.manifest]
+        ).update(
+            storage_type=storage_type
+        )

@@ -43,5 +43,6 @@ Contents
    customising
    extending
    troubleshooting
+   contributing
    scanners
    changelog

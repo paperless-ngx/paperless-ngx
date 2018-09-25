@@ -149,8 +149,9 @@ if os.getenv("PAPERLESS_DBENGINE"):
         "ENGINE": os.getenv("PAPERLESS_DBENGINE"),
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER"),
-        "PASSWORD": os.getenv("PAPERLESS_DBPASS")
     }
+    if os.getenv("PAPERLESS_DBPASS"):
+        DATABASES["default"]["PASSWORD"] = os.getenv("PAPERLESS_DBPASS")
 
 
 # Password validation
