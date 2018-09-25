@@ -3,22 +3,26 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group, User
+from django.db import models
 from django.http import HttpResponseRedirect
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
 from django.templatetags.static import static
+from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
-from django.db import models
 
-from documents.actions import add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, \
-    remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected, \
+from documents.actions import (
+    add_tag_to_selected,
+    remove_correspondent_from_selected,
+    remove_tag_from_selected,
+    set_correspondent_on_selected,
+    set_document_type_on_selected,
+    remove_document_type_from_selected,
     run_document_classifier_on_selected
-from .models import Correspondent, Tag, Document, Log, DocumentType
+)
+
+from .models import Correspondent, Document, DocumentType, Log, Tag
 
 
 class FinancialYearFilter(admin.SimpleListFilter):
@@ -93,11 +97,18 @@ class RecentCorrespondentFilter(admin.RelatedFieldListFilter):
         self.title = "correspondent (recent)"
 
     def field_choices(self, field, request, model_admin):
+
+        years = settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS
+        days = 365 * years
+
         lookups = []
-        if settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS and settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS > 0:
-            date_limit = datetime.now() - timedelta(days=365*settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS)
-            for c in Correspondent.objects.filter(documents__created__gte=date_limit).distinct():
+        if years and years > 0:
+            correspondents = Correspondent.objects.filter(
+                documents__created__gte=datetime.now() - timedelta(days=days)
+            ).distinct()
+            for c in correspondents:
                 lookups.append((c.id, c.name))
+
         return lookups
 
 
@@ -107,12 +118,20 @@ class CommonAdmin(admin.ModelAdmin):
 
 class CorrespondentAdmin(CommonAdmin):
 
-    list_display = ("name", "automatic_classification", "document_count", "last_correspondence")
-    list_editable = ("automatic_classification",)
+    list_display = (
+        "name",
+        "automatic_classification",
+        "document_count",
+        "last_correspondence"
+    )
+    list_editable = ("automatic_classification")
 
     def get_queryset(self, request):
         qs = super(CorrespondentAdmin, self).get_queryset(request)
-        qs = qs.annotate(document_count=models.Count("documents"), last_correspondence=models.Max("documents__created"))
+        qs = qs.annotate(
+            document_count=models.Count("documents"),
+            last_correspondence=models.Max("documents__created")
+        )
         return qs
 
     def document_count(self, obj):
@@ -160,24 +179,39 @@ class DocumentAdmin(CommonAdmin):
     class Media:
         css = {
             "all": ("paperless.css",)
-
         }
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = ("added",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
                     "tags_", "archive_serial_number", "document_type")
-    list_filter = ("document_type", "tags", ('correspondent', RecentCorrespondentFilter), "correspondent", FinancialYearFilter)
+    list_filter = (
+        "document_type",
+        "tags",
+        ("correspondent", RecentCorrespondentFilter),
+        "correspondent",
+        FinancialYearFilter
+    )
 
     filter_horizontal = ("tags",)
 
     ordering = ["-created", "correspondent"]
 
-    actions = [add_tag_to_selected, remove_tag_from_selected, set_correspondent_on_selected, remove_correspondent_from_selected, set_document_type_on_selected, remove_document_type_from_selected, run_document_classifier_on_selected]
+    actions = [
+        add_tag_to_selected,
+        remove_tag_from_selected,
+        set_correspondent_on_selected,
+        remove_correspondent_from_selected,
+        set_document_type_on_selected,
+        remove_document_type_from_selected,
+        run_document_classifier_on_selected
+    ]
 
-    date_hierarchy = 'created'
+    date_hierarchy = "created"
 
-    document_queue = None
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.document_queue = []
 
     def has_add_permission(self, request):
         return False
@@ -187,27 +221,41 @@ class DocumentAdmin(CommonAdmin):
     created_.short_description = "Created"
 
     def changelist_view(self, request, extra_context=None):
-        response = super().changelist_view(request, extra_context)
 
-        if request.method == 'GET':
+        response = super().changelist_view(
+            request,
+            extra_context=extra_context
+        )
+
+        if request.method == "GET":
             cl = self.get_changelist_instance(request)
             self.document_queue = [doc.id for doc in cl.queryset]
 
         return response
 
-    def change_view(self, request, object_id=None, form_url='', extra_context=None):
+    def change_view(self, request, object_id=None, form_url='',
+                    extra_context=None):
+
         extra_context = extra_context or {}
         doc = Document.objects.get(id=object_id)
         extra_context['download_url'] = doc.download_url
         extra_context['file_type'] = doc.file_type
-        if self.document_queue and object_id and int(object_id) in self.document_queue:
-            # There is a queue of documents
-            current_index = self.document_queue.index(int(object_id))
-            if current_index < len(self.document_queue) - 1:
-                # ... and there are still documents in the queue
-                extra_context['next_object'] = self.document_queue[current_index + 1]
+
+        if self.document_queue and object_id:
+            if int(object_id) in self.document_queue:
+                # There is a queue of documents
+                current_index = self.document_queue.index(int(object_id))
+                if current_index < len(self.document_queue) - 1:
+                    # ... and there are still documents in the queue
+                    extra_context["next_object"] = self.document_queue[
+                        current_index + 1
+                    ]
+
         return super(DocumentAdmin, self).change_view(
-            request, object_id, form_url, extra_context=extra_context,
+            request,
+            object_id,
+            form_url,
+            extra_context=extra_context,
         )
 
     def response_change(self, request, obj):
@@ -217,25 +265,35 @@ class DocumentAdmin(CommonAdmin):
         preserved_filters = self.get_preserved_filters(request)
 
         msg_dict = {
-            'name': opts.verbose_name,
-            'obj': format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
+            "name": opts.verbose_name,
+            "obj": format_html(
+                '<a href="{}">{}</a>',
+                urlquote(request.path),
+                obj
+            ),
         }
         if "_saveandeditnext" in request.POST:
             msg = format_html(
-                'The {name} "{obj}" was changed successfully. Editing next object.',
+                'The {name} "{obj}" was changed successfully. '
+                'Editing next object.',
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
-            redirect_url = reverse('admin:%s_%s_change' %
-                                   (opts.app_label, opts.model_name),
-                                   args=(request.POST['_next_object'],),
-                                   current_app=self.admin_site.name)
-            redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
-            response = HttpResponseRedirect(redirect_url)
-        else:
-            response = super().response_change(request, obj)
+            redirect_url = reverse(
+                "admin:{}_{}_change".format(opts.app_label, opts.model_name),
+                args=(request.POST["_next_object"],),
+                current_app=self.admin_site.name
+            )
+            redirect_url = add_preserved_filters(
+                {
+                    "preserved_filters": preserved_filters,
+                    "opts": opts
+                },
+                redirect_url
+            )
+            return HttpResponseRedirect(redirect_url)
 
-        return response
+        return super().response_change(request, obj)
 
     @mark_safe
     def thumbnail(self, obj):
