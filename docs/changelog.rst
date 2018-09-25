@@ -1,6 +1,27 @@
 Changelog
 #########
 
+2.4.0
+=====
+
+* A new set of actions are now available thanks to `jonaswinkler`_'s very first
+  pull request!  You can now do nifty things like tag documents in bulk, or set
+  correspondents in bulk.  `#405`_
+* The import/export system is now a little smarter.  By default, documents are
+  tagged as ``unencrypted``, since exports are by their nature unencrypted.
+  It's now in the import step that we decide the storage type.  This allows you
+  to export from an encrypted system and import into an unencrypted one, or
+  vice-versa.
+* The migration history has been slightly modified to accomodate PostgreSQL
+  users.  Additionally, you can now tell paperless to use PostgreSQL simply by
+  declaring ``PAPERLESS_DBUSER`` in your environment.  This will attempt to
+  connect to your Postgres database without a password unless you also set
+  ``PAPERLESS_DBPASS``.
+* A bug was found in the REST API filter system that was the result of an
+  update of django-filter some time ago.  This has now been patched `#412`_.
+  Thanks to `thepill`_ for spotting it!
+
+
 2.3.0
 =====
 
@@ -15,7 +36,8 @@ Changelog
 * As his last bit of effort on this release, Joshua also added some code to
   allow you to view the documents inline rather than download them as an
   attachment. `#400`_
-* Finally, `ahyear`_ found a slip in the Docker documentation and patched it. `#401`_
+* Finally, `ahyear`_ found a slip in the Docker documentation and patched it.
+  `#401`_
 
 
 2.2.1
@@ -32,14 +54,14 @@ Changelog
   version of Paperless that supports Django 2.0!  As a result of their hard
   work, you can now also run Paperless on Python 3.7 as well: `#386`_ &
   `#390`_.
-* `Stéphane Brunner`_ added a few lines of code that made tagging interface a lot
-  easier on those of us with lots of different tags: `#391`_.
+* `Stéphane Brunner`_ added a few lines of code that made tagging interface a
+  lot easier on those of us with lots of different tags: `#391`_.
 * `Kilian Koeltzsch`_ noticed a bug in how we capture & automatically create
   tags, so that's fixed now too: `#384`_.
 * `erikarvstedt`_ tweaked the behaviour of the test suite to be better behaved
   for packaging environments: `#383`_.
-* `Lukasz Soluch`_ added CORS support to make building a new Javascript-based front-end
-  cleaner & easier: `#387`_.
+* `Lukasz Soluch`_ added CORS support to make building a new Javascript-based
+  front-end cleaner & easier: `#387`_.
 
 
 2.1.0
@@ -499,8 +521,10 @@ bulk of the work on this big change.
 .. _Kilian Koeltzsch: https://github.com/kiliankoe
 .. _Lukasz Soluch: https://github.com/LukaszSolo
 .. _Joshua Taillon: https://github.com/jat255
-.. _dubit0:  https://github.com/dubit0
-.. _ahyear:  https://github.com/ahyear
+.. _dubit0: https://github.com/dubit0
+.. _ahyear: https://github.com/ahyear
+.. _jonaswinkler: https://github.com/jonaswinkler
+.. _thepill: https://github.com/thepill
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -587,6 +611,8 @@ bulk of the work on this big change.
 .. _#399: https://github.com/danielquinn/paperless/pull/399
 .. _#400: https://github.com/danielquinn/paperless/pull/400
 .. _#401: https://github.com/danielquinn/paperless/pull/401
+.. _#405: https://github.com/danielquinn/paperless/pull/405
+.. _#412: https://github.com/danielquinn/paperless/issues/412
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
