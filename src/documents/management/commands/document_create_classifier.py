@@ -1,6 +1,4 @@
 import logging
-import os.path
-import pickle
 
 from django.core.management.base import BaseCommand
 from documents.classifier import DocumentClassifier
@@ -19,9 +17,7 @@ class Command(Renderable, BaseCommand):
 
     def handle(self, *args, **options):
         clf = DocumentClassifier()
-
         clf.train()
-
-        logging.getLogger(__name__).info("Saving models to " + settings.MODEL_FILE + "...")
-
+        logging.getLogger(__name__).info("Saving models to " +
+                                         settings.MODEL_FILE + "...")
         clf.save_classifier()
