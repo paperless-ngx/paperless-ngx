@@ -48,17 +48,28 @@ class Command(Renderable, BaseCommand):
         self.verbosity = options["verbosity"]
 
         if options["inbox_only"]:
-            documents = Document.objects.filter(tags__is_inbox_tag=True).exclude(tags__is_archived_tag=True).distinct()
+            queryset = Document.objects.filter(tags__is_inbox_tag=True)
         else:
-            documents = Document.objects.all().exclude(tags__is_archived_tag=True).distinct()
+            queryset = Document.objects.all()
+        documents = queryset.exclude(tags__is_archived_tag=True).distinct()
 
         logging.getLogger(__name__).info("Loading classifier")
         try:
             clf = DocumentClassifier.load_classifier()
         except FileNotFoundError:
-            logging.getLogger(__name__).fatal("Cannot classify documents, classifier model file was not found.")
+            logging.getLogger(__name__).fatal("Cannot classify documents, "
+                                              "classifier model file was not "
+                                              "found.")
             return
 
         for document in documents:
-            logging.getLogger(__name__).info("Processing document {}".format(document.title))
-            clf.classify_document(document, classify_document_type=options["type"], classify_tags=options["tags"], classify_correspondent=options["correspondent"], replace_tags=options["replace_tags"])
+            logging.getLogger(__name__).info(
+                "Processing document {}".format(document.title)
+            )
+            clf.classify_document(
+                document,
+                classify_document_type=options["type"],
+                classify_tags=options["tags"],
+                classify_correspondent=options["correspondent"],
+                replace_tags=options["replace_tags"]
+            )
