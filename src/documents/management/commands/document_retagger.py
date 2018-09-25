@@ -51,7 +51,7 @@ class Command(Renderable, BaseCommand):
             queryset = Document.objects.filter(tags__is_inbox_tag=True)
         else:
             queryset = Document.objects.all()
-        documents = queryset.exclude(tags__is_archived_tag=True).distinct()
+        documents = queryset.distinct()
 
         logging.getLogger(__name__).info("Loading classifier")
         try:
