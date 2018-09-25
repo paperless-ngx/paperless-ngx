@@ -17,11 +17,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='tag',
-            name='is_archived_tag',
-            field=models.BooleanField(default=False, help_text='Marks this tag as an archive tag: All documents tagged with archive tags will never be modified automatically (i.e., modifying tags by matching rules)'),
-        ),
-        migrations.AddField(
-            model_name='tag',
             name='is_inbox_tag',
             field=models.BooleanField(default=False, help_text='Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.'),
         ),

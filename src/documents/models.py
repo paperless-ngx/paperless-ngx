@@ -83,13 +83,6 @@ class Tag(MatchingModel):
                   "documents will be tagged with inbox tags."
     )
 
-    is_archived_tag = models.BooleanField(
-        default=False,
-        help_text="Marks this tag as an archive tag: All documents tagged "
-                  "with archive tags will never be modified automatically "
-                  "(i.e., modifying tags by matching rules)"
-    )
-
 
 class DocumentType(MatchingModel):
 
