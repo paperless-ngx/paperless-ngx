@@ -9,7 +9,8 @@ from ...mixins import Renderable
 class Command(Renderable, BaseCommand):
 
     help = """
-        There is no help.
+        Trains the classifier on your data and saves the resulting models to a
+        file. The document consumer will then automatically use this new model.
     """.replace("    ", "")
 
     def __init__(self, *args, **kwargs):
@@ -18,6 +19,7 @@ class Command(Renderable, BaseCommand):
     def handle(self, *args, **options):
         clf = DocumentClassifier()
         clf.train()
-        logging.getLogger(__name__).info("Saving models to " +
-                                         settings.MODEL_FILE + "...")
+        logging.getLogger(__name__).info(
+            "Saving models to {}...".format(settings.MODEL_FILE)
+        )
         clf.save_classifier()
