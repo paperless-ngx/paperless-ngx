@@ -18,9 +18,9 @@ def select_action(
     if not modeladmin.has_change_permission(request):
         raise PermissionDenied
 
-    if request.POST.get('post'):
+    if request.POST.get("post"):
         n = queryset.count()
-        selected_object = modelclass.objects.get(id=request.POST.get('obj_id'))
+        selected_object = modelclass.objects.get(id=request.POST.get("obj_id"))
         if n:
             for document in queryset:
                 if document_action:
@@ -139,28 +139,52 @@ def remove_correspondent_from_selected(modeladmin, request, queryset):
 
 
 def set_document_type_on_selected(modeladmin, request, queryset):
-    return select_action(modeladmin=modeladmin, request=request, queryset=queryset,
-                         title="Set document type on multiple documents",
-                         action="set_document_type_on_selected",
-                         modelclass=DocumentType,
-                         success_message="Successfully set document type %(selected_object)s on %(count)d %(items)s.",
-                         queryset_action=lambda qs, document_type: qs.update(document_type=document_type))
+    return select_action(
+        modeladmin=modeladmin,
+        request=request,
+        queryset=queryset,
+        title="Set document type on multiple documents",
+        action="set_document_type_on_selected",
+        modelclass=DocumentType,
+        success_message="Successfully set document type %(selected_object)s "
+                        "on %(count)d %(items)s.",
+        queryset_action=lambda qs, document_type: qs.update(
+            document_type=document_type)
+    )
 
 
 def remove_document_type_from_selected(modeladmin, request, queryset):
-    return simple_action(modeladmin=modeladmin, request=request, queryset=queryset,
-                         success_message="Successfully removed document type from %(count)d %(items)s.",
-                         queryset_action=lambda qs: qs.update(document_type=None))
+    return simple_action(
+        modeladmin=modeladmin,
+        request=request,
+        queryset=queryset,
+        success_message="Successfully removed document type from %(count)d "
+                        "%(items)s.",
+        queryset_action=lambda qs: qs.update(document_type=None)
+    )
 
 
 def run_document_classifier_on_selected(modeladmin, request, queryset):
     try:
         clf = DocumentClassifier.load_classifier()
-        return simple_action(modeladmin=modeladmin, request=request, queryset=queryset,
-                             success_message="Successfully applied document classifier to %(count)d %(items)s.",
-                             document_action=lambda doc: clf.classify_document(doc, classify_correspondent=True, classify_tags=True, classify_document_type=True))
+        return simple_action(
+            modeladmin=modeladmin,
+            request=request,
+            queryset=queryset,
+            success_message="Successfully applied document classifier to "
+                            "%(count)d %(items)s.",
+            document_action=lambda doc: clf.classify_document(
+                doc,
+                classify_correspondent=True,
+                classify_tags=True,
+                classify_document_type=True)
+        )
     except FileNotFoundError:
-        modeladmin.message_user(request, "Classifier model file not found.", messages.ERROR)
+        modeladmin.message_user(
+            request,
+            "Classifier model file not found.",
+            messages.ERROR
+        )
         return None
 
 
@@ -171,7 +195,10 @@ set_correspondent_on_selected.short_description = \
     "Set correspondent on selected documents"
 remove_correspondent_from_selected.short_description = \
     "Remove correspondent from selected documents"
-set_document_type_on_selected.short_description = "Set document type on selected documents"
-remove_document_type_from_selected.short_description = "Remove document type from selected documents"
-run_document_classifier_on_selected.short_description = "Run document classifier on selected"
+set_document_type_on_selected.short_description = \
+    "Set document type on selected documents"
+remove_document_type_from_selected.short_description = \
+    "Remove document type from selected documents"
+run_document_classifier_on_selected.short_description = \
+    "Run document classifier on selected"
 

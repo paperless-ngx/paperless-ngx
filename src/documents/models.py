@@ -26,7 +26,11 @@ class MatchingModel(models.Model):
     name = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(blank=True)
 
-    automatic_classification = models.BooleanField(default=False, help_text='Automatically assign to newly added documents based on current usage in your document collection.')
+    automatic_classification = models.BooleanField(
+        default=False,
+        help_text="Automatically assign to newly added documents based on "
+                  "current usage in your document collection."
+    )
 
     class Meta:
         abstract = True
@@ -75,11 +79,16 @@ class Tag(MatchingModel):
 
     is_inbox_tag = models.BooleanField(
         default=False,
-        help_text="Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags.")
+        help_text="Marks this tag as an inbox tag: All newly consumed "
+                  "documents will be tagged with inbox tags."
+    )
 
     is_archived_tag = models.BooleanField(
         default=False,
-        help_text="Marks this tag as an archive tag: All documents tagged with archive tags will never be modified automatically (i.e., modifying tags by matching rules)")
+        help_text="Marks this tag as an archive tag: All documents tagged "
+                  "with archive tags will never be modified automatically "
+                  "(i.e., modifying tags by matching rules)"
+    )
 
 
 class DocumentType(MatchingModel):
@@ -170,7 +179,9 @@ class Document(models.Model):
         null=True,
         unique=True,
         db_index=True,
-        help_text="The position of this document in your physical document archive.")
+        help_text="The position of this document in your physical document "
+                  "archive."
+    )
 
     class Meta:
         ordering = ("correspondent", "title")

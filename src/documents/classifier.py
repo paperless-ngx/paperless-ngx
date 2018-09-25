@@ -87,7 +87,7 @@ class DocumentClassifier(object):
 
         # Step 2: vectorize data
         logging.getLogger(__name__).info("Vectorizing data...")
-        self.data_vectorizer = CountVectorizer(analyzer='char', ngram_range=(3, 5), min_df=0.1)
+        self.data_vectorizer = CountVectorizer(analyzer="char", ngram_range=(3, 5), min_df=0.1)
         data_vectorized = self.data_vectorizer.fit_transform(data)
 
         self.tags_binarizer = MultiLabelBinarizer()
