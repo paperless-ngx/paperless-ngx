@@ -28,7 +28,8 @@ from .serialisers import (
     DocumentSerializer,
     LogSerializer,
     TagSerializer,
-    DocumentTypeSerializer)
+    DocumentTypeSerializer
+)
 
 
 class IndexView(TemplateView):

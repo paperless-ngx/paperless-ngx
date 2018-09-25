@@ -23,9 +23,16 @@ def classify_document(sender, document=None, logging_group=None, **kwargs):
     global classifier
     try:
         classifier.reload()
-        classifier.classify_document(document, classify_correspondent=True, classify_tags=True, classify_document_type=True)
+        classifier.classify_document(
+            document,
+            classify_correspondent=True,
+            classify_tags=True,
+            classify_document_type=True
+        )
     except FileNotFoundError:
-        logging.getLogger(__name__).fatal("Cannot classify document, classifier model file was not found.")
+        logging.getLogger(__name__).fatal(
+            "Cannot classify document, classifier model file was not found."
+        )
 
 
 def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):

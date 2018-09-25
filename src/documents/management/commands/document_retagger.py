@@ -11,7 +11,10 @@ from ...mixins import Renderable
 class Command(Renderable, BaseCommand):
 
     help = """
-        There is no help. #TODO
+        Using the current classification model, assigns correspondents, tags
+        and document types to all documents, effectively allowing you to
+        back-tag all previously indexed documents with metadata created (or
+        modified) after their initial import.
     """.replace("    ", "")
 
     def __init__(self, *args, **kwargs):
@@ -44,7 +47,7 @@ class Command(Renderable, BaseCommand):
 
         self.verbosity = options["verbosity"]
 
-        if options['inbox_only']:
+        if options["inbox_only"]:
             documents = Document.objects.filter(tags__is_inbox_tag=True).exclude(tags__is_archived_tag=True).distinct()
         else:
             documents = Document.objects.all().exclude(tags__is_archived_tag=True).distinct()
@@ -58,4 +61,4 @@ class Command(Renderable, BaseCommand):
 
         for document in documents:
             logging.getLogger(__name__).info("Processing document {}".format(document.title))
-            clf.classify_document(document, classify_document_type=options['type'], classify_tags=options['tags'], classify_correspondent=options['correspondent'], replace_tags=options['replace_tags'])
+            clf.classify_document(document, classify_document_type=options["type"], classify_tags=options["tags"], classify_correspondent=options["correspondent"], replace_tags=options["replace_tags"])

@@ -13,7 +13,8 @@ from documents.views import (
     LogViewSet,
     PushView,
     TagViewSet,
-    DocumentTypeViewSet)
+    DocumentTypeViewSet
+)
 from reminders.views import ReminderViewSet
 
 router = DefaultRouter()

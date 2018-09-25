@@ -124,7 +124,7 @@ class CorrespondentAdmin(CommonAdmin):
         "document_count",
         "last_correspondence"
     )
-    list_editable = ("automatic_classification")
+    list_editable = ("automatic_classification",)
 
     def get_queryset(self, request):
         qs = super(CorrespondentAdmin, self).get_queryset(request)
@@ -145,7 +145,11 @@ class CorrespondentAdmin(CommonAdmin):
 
 class TagAdmin(CommonAdmin):
 
-    list_display = ("name", "colour", "automatic_classification", "document_count")
+    list_display = (
+        "name",
+        "colour",
+        "automatic_classification",
+        "document_count")
     list_filter = ("colour",)
     list_editable = ("colour", "automatic_classification")
 
@@ -238,8 +242,8 @@ class DocumentAdmin(CommonAdmin):
 
         extra_context = extra_context or {}
         doc = Document.objects.get(id=object_id)
-        extra_context['download_url'] = doc.download_url
-        extra_context['file_type'] = doc.file_type
+        extra_context["download_url"] = doc.download_url
+        extra_context["file_type"] = doc.file_type
 
         if self.document_queue and object_id:
             if int(object_id) in self.document_queue:
