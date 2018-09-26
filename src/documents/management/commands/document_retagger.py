@@ -54,8 +54,9 @@ class Command(Renderable, BaseCommand):
         documents = queryset.distinct()
 
         logging.getLogger(__name__).info("Loading classifier")
+        clf = DocumentClassifier()
         try:
-            clf = DocumentClassifier.load_classifier()
+            clf.reload()
         except FileNotFoundError:
             logging.getLogger(__name__).fatal("Cannot classify documents, "
                                               "classifier model file was not "

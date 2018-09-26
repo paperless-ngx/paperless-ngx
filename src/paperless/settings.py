@@ -58,7 +58,7 @@ if _allowed_hosts:
     ALLOWED_HOSTS = _allowed_hosts.split(",")
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
-    
+
 # Application definition
 
 INSTALLED_APPS = [

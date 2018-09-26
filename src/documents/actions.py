@@ -165,8 +165,9 @@ def remove_document_type_from_selected(modeladmin, request, queryset):
 
 
 def run_document_classifier_on_selected(modeladmin, request, queryset):
+    clf = DocumentClassifier()
     try:
-        clf = DocumentClassifier.load_classifier()
+        clf.reload()
         return simple_action(
             modeladmin=modeladmin,
             request=request,
@@ -201,4 +202,3 @@ remove_document_type_from_selected.short_description = \
     "Remove document type from selected documents"
 run_document_classifier_on_selected.short_description = \
     "Run document classifier on selected"
-

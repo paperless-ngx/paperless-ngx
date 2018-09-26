@@ -20,7 +20,13 @@ from rest_framework.viewsets import (
     ReadOnlyModelViewSet
 )
 
-from .filters import CorrespondentFilterSet, DocumentFilterSet, TagFilterSet, DocumentTypeFilterSet
+from .filters import (
+    CorrespondentFilterSet,
+    DocumentFilterSet,
+    TagFilterSet,
+    DocumentTypeFilterSet
+)
+
 from .forms import UploadForm
 from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
