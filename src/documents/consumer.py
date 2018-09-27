@@ -221,6 +221,12 @@ class Consumer:
                 storage_type=self.storage_type
             )
 
+        relevant_tags = set(file_info.tags)
+        if relevant_tags:
+            tag_names = ", ".join([t.slug for t in relevant_tags])
+            self.log("debug", "Tagging with {}".format(tag_names))
+            document.tags.add(*relevant_tags)
+
         self._write(document, doc, document.source_path)
         self._write(document, thumbnail, document.thumbnail_path)
 
