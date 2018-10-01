@@ -384,3 +384,16 @@ class TestDate(TestCase):
             document.get_date(),
             datetime.datetime(2017, 12, 31, 0, 0, tzinfo=tz.tzutc())
         )
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="01-07-0590 00:00:00"
+    )
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_crazy_date(self, *args):
+        document = RasterisedDocumentParser("/dev/null")
+        document.get_text()
+        self.assertIsNone(document.get_date())
