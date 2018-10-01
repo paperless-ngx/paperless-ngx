@@ -1,6 +1,15 @@
 Changelog
 #########
 
+2.4.1
+=====
+
+* An annoying bug in the date capture code was causing some bogus dates to be
+  attached to documents, which in turn busted the UI.  Thanks to `Andrew Peng`_
+  for reporting this. `#414`_.
+* A bug in the Dockerfile meant that Tesseract language files weren't being
+  installed correctly.  `euri10`_ was quick to provide a fix: `#406`_, `#413`_.
+
 2.4.0
 =====
 
@@ -525,6 +534,8 @@ bulk of the work on this big change.
 .. _ahyear: https://github.com/ahyear
 .. _jonaswinkler: https://github.com/jonaswinkler
 .. _thepill: https://github.com/thepill
+.. _Andrew Peng: https://github.com/pengc99
+.. _euri10: https://github.com/euri10
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -612,7 +623,10 @@ bulk of the work on this big change.
 .. _#400: https://github.com/danielquinn/paperless/pull/400
 .. _#401: https://github.com/danielquinn/paperless/pull/401
 .. _#405: https://github.com/danielquinn/paperless/pull/405
+.. _#406: https://github.com/danielquinn/paperless/issues/406
 .. _#412: https://github.com/danielquinn/paperless/issues/412
+.. _#413: https://github.com/danielquinn/paperless/pull/413
+.. _#414: https://github.com/danielquinn/paperless/issues/414
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
