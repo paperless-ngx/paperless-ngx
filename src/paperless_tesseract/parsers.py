@@ -203,6 +203,7 @@ class RasterisedDocumentParser(DocumentParser):
         return text
 
     def get_date(self):
+
         date = None
         datestring = None
 
@@ -217,20 +218,30 @@ class RasterisedDocumentParser(DocumentParser):
 
             try:
                 date = dateparser.parse(
-                           datestring,
-                           settings={'DATE_ORDER': self.DATE_ORDER,
-                                     'PREFER_DAY_OF_MONTH': 'first',
-                                     'RETURN_AS_TIMEZONE_AWARE': True})
+                    datestring,
+                    settings={
+                        "DATE_ORDER": self.DATE_ORDER,
+                        "PREFER_DAY_OF_MONTH": "first",
+                        "RETURN_AS_TIMEZONE_AWARE": True
+                    }
+                )
             except TypeError:
                 # Skip all matches that do not parse to a proper date
                 continue
 
-            if date is not None:
+            if date is not None and date.year > 1900:
                 break
+            else:
+                date = None
 
         if date is not None:
-            self.log("info", "Detected document date " + date.isoformat() +
-                             " based on string " + datestring)
+            self.log(
+                "info",
+                "Detected document date {} based on string {}".format(
+                    date.isoformat(),
+                    datestring
+                )
+            )
         else:
             self.log("info", "Unable to detect date for document")
 
