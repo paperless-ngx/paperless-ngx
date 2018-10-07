@@ -10,6 +10,12 @@ Changelog
   been updated on the Docker Hub, so you just need to pull the latest one from
   there if you're a Docker user.
 
+* "Login free" instances of Paperless were breaking whenever you tried to edit
+  objects in the admin: adding/deleting tags or correspondents, or even fixing
+  spelling.  This was due to the "user hack" we were applying to sessions that
+  weren't using a login, as that hack user didn't have a valid id.  The fix was
+  to attribute the first user id in the system to this hack user.  `#394`_
+
 * A problem in how we handle slug values on Tags and Correspondents required a
   few changes to how we handle this field `#393`_:
 
@@ -648,6 +654,7 @@ bulk of the work on this big change.
 .. _#392: https://github.com/danielquinn/paperless/issues/392
 .. _#393: https://github.com/danielquinn/paperless/issues/393
 .. _#395: https://github.com/danielquinn/paperless/pull/395
+.. _#394: https://github.com/danielquinn/paperless/issues/394
 .. _#396: https://github.com/danielquinn/paperless/pull/396
 .. _#399: https://github.com/danielquinn/paperless/pull/399
 .. _#400: https://github.com/danielquinn/paperless/pull/400
