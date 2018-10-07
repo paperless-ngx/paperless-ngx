@@ -171,7 +171,7 @@ class DocumentAdmin(CommonAdmin):
         }
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
-    readonly_fields = ("added",)
+    readonly_fields = ("added", "file_type", "storage_type",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
                     "tags_")
     list_filter = (
