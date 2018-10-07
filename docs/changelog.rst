@@ -9,13 +9,32 @@ Changelog
   its location in ``PAPERLESS_OPTIPNG_BINARY``.  The Docker image has already
   been updated on the Docker Hub, so you just need to pull the latest one from
   there if you're a Docker user.
+
+* A problem in how we handle slug values on Tags and Correspondents required a
+  few changes to how we handle this field `#393`_:
+
+  1. Slugs are no longer editable.  They're derived from the name of the tag or
+     correspondent at save time, so if you wanna change the slug, you have to
+     change the name, and even then you're restricted to the rules of the
+     ``slugify()`` function.  The slug value is still visible in the admin
+     though.
+  2. I've added a migration to go over all existing tags & correspondents and
+     rewrite the ``.slug`` values to ones conforming to the ``slugify()``
+     rules.
+  3. The consumption process now uses the same rules as ``.save()`` in
+     determining a slug and using that to check for an existing
+     tag/correspondent.
+
 * An annoying bug in the date capture code was causing some bogus dates to be
   attached to documents, which in turn busted the UI.  Thanks to `Andrew Peng`_
   for reporting this. `#414`_.
+
 * A bug in the Dockerfile meant that Tesseract language files weren't being
   installed correctly.  `euri10`_ was quick to provide a fix: `#406`_, `#413`_.
+
 * Document consumption is now wrapped in a transaction as per an old ticket
   `#262`_.
+
 * The ``get_date()`` functionality of the parsers has been consolidated onto
   the ``DocumentParser`` class since much of that code was redundant anyway.
 
@@ -627,6 +646,7 @@ bulk of the work on this big change.
 .. _#391: https://github.com/danielquinn/paperless/pull/391
 .. _#390: https://github.com/danielquinn/paperless/pull/390
 .. _#392: https://github.com/danielquinn/paperless/issues/392
+.. _#393: https://github.com/danielquinn/paperless/issues/393
 .. _#395: https://github.com/danielquinn/paperless/pull/395
 .. _#396: https://github.com/danielquinn/paperless/pull/396
 .. _#399: https://github.com/danielquinn/paperless/pull/399
