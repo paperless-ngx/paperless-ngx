@@ -1,11 +1,9 @@
 import os
-import re
 import subprocess
 
-import dateparser
 from django.conf import settings
 
-from documents.parsers import DocumentParser, ParseError, DATE_REGEX
+from documents.parsers import DocumentParser, ParseError
 
 
 class TextDocumentParser(DocumentParser):
@@ -16,7 +14,6 @@ class TextDocumentParser(DocumentParser):
     CONVERT = settings.CONVERT_BINARY
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
-    DATE_ORDER = settings.DATE_ORDER
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
     OCR_ALWAYS = settings.OCR_ALWAYS
 
@@ -26,7 +23,7 @@ class TextDocumentParser(DocumentParser):
 
     def get_thumbnail(self):
         """
-        The thumbnail of a txt is just a 500px wide image of the text
+        The thumbnail of a text file is just a 500px wide image of the text
         rendered onto a letter-sized page.
         """
         # The below is heavily cribbed from https://askubuntu.com/a/590951
@@ -83,40 +80,6 @@ class TextDocumentParser(DocumentParser):
             self._text = f.read()
 
         return self._text
-
-    def get_date(self):
-        date = None
-        datestring = None
-
-        try:
-            text = self.get_text()
-        except ParseError as e:
-            return None
-
-        # Iterate through all regex matches and try to parse the date
-        for m in re.finditer(DATE_REGEX, text):
-            datestring = m.group(0)
-
-            try:
-                date = dateparser.parse(
-                           datestring,
-                           settings={'DATE_ORDER': self.DATE_ORDER,
-                                     'PREFER_DAY_OF_MONTH': 'first',
-                                     'RETURN_AS_TIMEZONE_AWARE': True})
-            except TypeError:
-                # Skip all matches that do not parse to a proper date
-                continue
-
-            if date is not None:
-                break
-
-        if date is not None:
-            self.log("info", "Detected document date " + date.isoformat() +
-                             " based on string " + datestring)
-        else:
-            self.log("info", "Unable to detect date for document")
-
-        return date
 
 
 def run_command(*args):
