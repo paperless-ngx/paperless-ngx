@@ -14,7 +14,7 @@ ENV PAPERLESS_EXPORT_DIR=/export \
 
 
 RUN apk update --no-cache && apk add python3 gnupg libmagic bash shadow curl \
-        sudo poppler tesseract-ocr imagemagick ghostscript unpaper && \
+        sudo poppler tesseract-ocr imagemagick ghostscript unpaper optipng && \
     apk add --virtual .build-dependencies \
         python3-dev poppler-dev gcc g++ musl-dev zlib-dev jpeg-dev && \
 # Install python dependencies

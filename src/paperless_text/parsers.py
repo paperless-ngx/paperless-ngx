@@ -32,7 +32,7 @@ class TextDocumentParser(DocumentParser):
         text_color = "black"  # text color
         psize = [500, 647]  # icon size
         n_lines = 50  # number of lines to show
-        output_file = os.path.join(self.tempdir, "convert-txt.png")
+        out_path = os.path.join(self.tempdir, "convert.png")
 
         temp_bg = os.path.join(self.tempdir, "bg.png")
         temp_txlayer = os.path.join(self.tempdir, "tx.png")
@@ -43,9 +43,13 @@ class TextDocumentParser(DocumentParser):
             work_size = ",".join([str(n - 1) for n in psize])
             r = str(round(psize[0] / 10))
             rounded = ",".join([r, r])
-            run_command(self.CONVERT, "-size ", picsize, ' xc:none -draw ',
-                        '"fill ', bg_color, ' roundrectangle 0,0,',
-                        work_size, ",", rounded, '" ', temp_bg)
+            run_command(
+                self.CONVERT,
+                "-size ", picsize,
+                ' xc:none -draw ',
+                '"fill ', bg_color, ' roundrectangle 0,0,', work_size, ",", rounded, '" ',  # NOQA: E501
+                temp_bg
+            )
 
         def read_text():
             with open(self.document_path, 'r') as src:
@@ -54,22 +58,29 @@ class TextDocumentParser(DocumentParser):
                 return text.replace('"', "'")
 
         def create_txlayer():
-            run_command(self.CONVERT,
-                        "-background none",
-                        "-fill",
-                        text_color,
-                        "-pointsize", "12",
-                        "-border 4 -bordercolor none",
-                        "-size ", txsize,
-                        ' caption:"', read_text(), '" ',
-                        temp_txlayer)
+            run_command(
+                self.CONVERT,
+                "-background none",
+                "-fill",
+                text_color,
+                "-pointsize", "12",
+                "-border 4 -bordercolor none",
+                "-size ", txsize,
+                ' caption:"', read_text(), '" ',
+                temp_txlayer
+            )
 
         create_txlayer()
         create_bg()
-        run_command(self.CONVERT, temp_bg, temp_txlayer,
-                    "-background None -layers merge ", output_file)
+        run_command(
+            self.CONVERT,
+            temp_bg,
+            temp_txlayer,
+            "-background None -layers merge ",
+            out_path
+        )
 
-        return output_file
+        return out_path
 
     def get_text(self):
 

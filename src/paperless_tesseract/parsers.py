@@ -44,15 +44,18 @@ class RasterisedDocumentParser(DocumentParser):
         The thumbnail of a PDF is just a 500px wide image of the first page.
         """
 
+        out_path = os.path.join(self.tempdir, "convert.png")
+
+        # Run convert to get a decent thumbnail
         run_convert(
             self.CONVERT,
             "-scale", "500x5000",
             "-alpha", "remove",
             "{}[0]".format(self.document_path),
-            os.path.join(self.tempdir, "convert.png")
+            out_path
         )
 
-        return os.path.join(self.tempdir, "convert.png")
+        return out_path
 
     def _is_ocred(self):
 

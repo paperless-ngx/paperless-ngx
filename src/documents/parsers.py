@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import shutil
+import subprocess
 import tempfile
 
 import dateparser
@@ -36,6 +37,7 @@ class DocumentParser:
 
     SCRATCH = settings.SCRATCH_DIR
     DATE_ORDER = settings.DATE_ORDER
+    OPTIPNG = settings.OPTIPNG_BINARY
 
     def __init__(self, path):
         self.document_path = path
@@ -48,6 +50,19 @@ class DocumentParser:
         Returns the path to a file we can use as a thumbnail for this document.
         """
         raise NotImplementedError()
+
+    def optimise_thumbnail(self, in_path):
+
+        out_path = os.path.join(self.tempdir, "optipng.png")
+
+        args = (self.OPTIPNG, "-o5", in_path, "-out", out_path)
+        if not subprocess.Popen(args).wait() == 0:
+            raise ParseError("Optipng failed at {}".format(args))
+
+        return out_path
+
+    def get_optimised_thumbnail(self):
+        return self.optimise_thumbnail(self.get_thumbnail())
 
     def get_text(self):
         """
