@@ -393,7 +393,33 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
         SCRATCH
     )
-    def test_crazy_date(self, *args):
+    def test_crazy_date_past(self, *args):
+        document = RasterisedDocumentParser("/dev/null")
+        document.get_text()
+        self.assertIsNone(document.get_date())
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="01-07-2350 00:00:00"
+    )
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_crazy_date_future(self, *args):
+        document = RasterisedDocumentParser("/dev/null")
+        document.get_text()
+        self.assertIsNone(document.get_date())
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="01-07-0590 00:00:00"
+    )
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_crazy_date_past(self, *args):
         document = RasterisedDocumentParser("/dev/null")
         document.get_text()
         self.assertIsNone(document.get_date())

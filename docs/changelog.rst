@@ -9,6 +9,8 @@ Changelog
   for reporting this. `#414`_.
 * A bug in the Dockerfile meant that Tesseract language files weren't being
   installed correctly.  `euri10`_ was quick to provide a fix: `#406`_, `#413`_.
+* The ``get_date()`` functionality of the parsers has been consolidated onto
+  the ``DocumentParser`` class since much of that code was redundant anyway.
 
 2.4.0
 =====

@@ -1,9 +1,12 @@
 import logging
+import os
+import re
 import shutil
 import tempfile
-import re
 
+import dateparser
 from django.conf import settings
+from django.utils import timezone
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -32,6 +35,7 @@ class DocumentParser:
     """
 
     SCRATCH = settings.SCRATCH_DIR
+    DATE_ORDER = settings.DATE_ORDER
 
     def __init__(self, path):
         self.document_path = path
@@ -55,7 +59,52 @@ class DocumentParser:
         """
         Returns the date of the document.
         """
-        raise NotImplementedError()
+
+        date = None
+        date_string = None
+
+        try:
+            text = self.get_text()
+        except ParseError:
+            return None
+
+        next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
+
+        # Iterate through all regex matches and try to parse the date
+        for m in re.finditer(DATE_REGEX, text):
+
+            date_string = m.group(0)
+
+            try:
+                date = dateparser.parse(
+                    date_string,
+                    settings={
+                        "DATE_ORDER": self.DATE_ORDER,
+                        "PREFER_DAY_OF_MONTH": "first",
+                        "RETURN_AS_TIMEZONE_AWARE": True
+                    }
+                )
+            except TypeError:
+                # Skip all matches that do not parse to a proper date
+                continue
+
+            if date is not None and next_year > date.year > 1900:
+                break
+            else:
+                date = None
+
+        if date is not None:
+            self.log(
+                "info",
+                "Detected document date {} based on string {}".format(
+                    date.isoformat(),
+                    date_string
+                )
+            )
+        else:
+            self.log("info", "Unable to detect date for document")
+
+        return date
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
