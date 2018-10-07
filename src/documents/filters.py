@@ -1,4 +1,4 @@
-from django_filters.rest_framework import CharFilter, FilterSet, BooleanFilter, ModelChoiceFilter
+from django_filters.rest_framework import BooleanFilter, FilterSet
 
 from .models import Correspondent, Document, Tag
 
