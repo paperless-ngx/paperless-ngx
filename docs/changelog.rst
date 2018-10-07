@@ -1,9 +1,14 @@
 Changelog
 #########
 
-2.4.1
+2.5.0
 =====
 
+* **New dependency**: Paperless now optimises thumbnail generation with
+  `optipng`_, so you'll need to install that somewhere in your PATH or declare
+  its location in ``PAPERLESS_OPTIPNG_BINARY``.  The Docker image has already
+  been updated on the Docker Hub, so you just need to pull the latest one from
+  there if you're a Docker user.
 * An annoying bug in the date capture code was causing some bogus dates to be
   attached to documents, which in turn busted the UI.  Thanks to `Andrew Peng`_
   for reporting this. `#414`_.
@@ -632,3 +637,4 @@ bulk of the work on this big change.
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
+.. _optipng: http://optipng.sourceforge.net/
