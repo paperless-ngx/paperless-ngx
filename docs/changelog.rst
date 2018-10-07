@@ -14,6 +14,8 @@ Changelog
   for reporting this. `#414`_.
 * A bug in the Dockerfile meant that Tesseract language files weren't being
   installed correctly.  `euri10`_ was quick to provide a fix: `#406`_, `#413`_.
+* Document consumption is now wrapped in a transaction as per an old ticket
+  `#262`_.
 * The ``get_date()`` functionality of the parsers has been consolidated onto
   the ``DocumentParser`` class since much of that code was redundant anyway.
 
@@ -608,6 +610,7 @@ bulk of the work on this big change.
 .. _#322: https://github.com/danielquinn/paperless/pull/322
 .. _#328: https://github.com/danielquinn/paperless/pull/328
 .. _#253: https://github.com/danielquinn/paperless/issues/253
+.. _#262: https://github.com/danielquinn/paperless/issues/262
 .. _#323: https://github.com/danielquinn/paperless/issues/323
 .. _#344: https://github.com/danielquinn/paperless/pull/344
 .. _#351: https://github.com/danielquinn/paperless/pull/351
