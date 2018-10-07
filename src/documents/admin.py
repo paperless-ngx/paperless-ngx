@@ -125,6 +125,8 @@ class CorrespondentAdmin(CommonAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
+    readonly_fields = ("slug",)
+
     def get_queryset(self, request):
         qs = super(CorrespondentAdmin, self).get_queryset(request)
         qs = qs.annotate(
@@ -148,6 +150,8 @@ class TagAdmin(CommonAdmin):
                     "document_count")
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
+
+    readonly_fields = ("slug",)
 
     def get_queryset(self, request):
         qs = super(TagAdmin, self).get_queryset(request)
