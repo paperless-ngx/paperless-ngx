@@ -4,7 +4,6 @@ import re
 import subprocess
 from multiprocessing.pool import Pool
 
-import dateparser
 import langdetect
 import pyocr
 from django.conf import settings
@@ -14,7 +13,7 @@ from pyocr.libtesseract.tesseract_raw import \
 from pyocr.tesseract import TesseractError
 
 import pdftotext
-from documents.parsers import DocumentParser, ParseError, DATE_REGEX
+from documents.parsers import DocumentParser, ParseError
 
 from .languages import ISO639
 
@@ -33,7 +32,6 @@ class RasterisedDocumentParser(DocumentParser):
     DENSITY = settings.CONVERT_DENSITY if settings.CONVERT_DENSITY else 300
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
-    DATE_ORDER = settings.DATE_ORDER
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
     OCR_ALWAYS = settings.OCR_ALWAYS
 
@@ -201,51 +199,6 @@ class RasterisedDocumentParser(DocumentParser):
         text = self._ocr(imgs[:middle], self.DEFAULT_OCR_LANGUAGE) + text
         text += self._ocr(imgs[middle + 1:], self.DEFAULT_OCR_LANGUAGE)
         return text
-
-    def get_date(self):
-
-        date = None
-        datestring = None
-
-        try:
-            text = self.get_text()
-        except ParseError as e:
-            return None
-
-        # Iterate through all regex matches and try to parse the date
-        for m in re.finditer(DATE_REGEX, text):
-            datestring = m.group(0)
-
-            try:
-                date = dateparser.parse(
-                    datestring,
-                    settings={
-                        "DATE_ORDER": self.DATE_ORDER,
-                        "PREFER_DAY_OF_MONTH": "first",
-                        "RETURN_AS_TIMEZONE_AWARE": True
-                    }
-                )
-            except TypeError:
-                # Skip all matches that do not parse to a proper date
-                continue
-
-            if date is not None and date.year > 1900:
-                break
-            else:
-                date = None
-
-        if date is not None:
-            self.log(
-                "info",
-                "Detected document date {} based on string {}".format(
-                    date.isoformat(),
-                    datestring
-                )
-            )
-        else:
-            self.log("info", "Unable to detect date for document")
-
-        return date
 
 
 def run_convert(*args):
