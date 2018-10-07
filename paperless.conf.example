@@ -213,3 +213,23 @@ PAPERLESS_DEBUG="false"
 # The number of years for which a correspondent will be included in the recent
 # correspondents filter.
 #PAPERLESS_RECENT_CORRESPONDENT_YEARS=1
+
+###############################################################################
+####                     Third-Party Binaries                              ####
+###############################################################################
+
+# There are a few external software packages that Paperless expects to find on
+# your system when it starts up.  Unless you've done something creative with
+# their installation, you probably won't need to edit any of these.  However,
+# if you've installed these programs somewhere where simply typing the name of
+# the program doesn't automatically execute it (ie. the program isn't in your
+# $PATH), then you'll need to specify the literal path for that program here.
+
+# Convert (part of the ImageMagick suite)
+#PAPERLESS_CONVERT_BINARY=/usr/bin/convert
+
+# Unpaper
+#PAPERLESS_UNPAPER_BINARY=/usr/bin/unpaper
+
+# Optipng (for optimising thumbnail sizes)
+#PAPERLESS_OPTIPNG_BINARY=/usr/bin/optipng
