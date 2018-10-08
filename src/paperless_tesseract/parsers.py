@@ -218,7 +218,8 @@ def run_convert(*args):
 
 def run_unpaper(args):
     unpaper, pnm = args
-    command_args = unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm")
+    command_args = (unpaper, "--overwrite", pnm,
+                    pnm.replace(".pnm", ".unpaper.pnm"))
     if not subprocess.Popen(command_args).wait() == 0:
         raise ParseError("Unpaper failed at {}".format(command_args))
 
