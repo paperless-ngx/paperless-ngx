@@ -153,7 +153,10 @@ class RasterisedDocumentParser(DocumentParser):
                 )
                 raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
-            raise OCRError("Language detection failed")
+            error_msg = ("Language detection failed. Set "
+                         "PAPERLESS_FORGIVING_OCR in config file to continue "
+                         "anyway.")
+            raise OCRError(error_msg)
 
         if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
             raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
