@@ -21,7 +21,7 @@ filemagic==1.6
 fuzzywuzzy==0.15.0
 gunicorn==19.9.0
 idna==2.7
-inotify-simple==1.1.8
+inotify-simple==1.1.8; sys_platform == 'linux'
 langdetect==1.0.7
 more-itertools==4.3.0
 pdftotext==2.1.0
