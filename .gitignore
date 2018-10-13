@@ -73,7 +73,6 @@ db.sqlite3
 # Other stuff that doesn't belong
 .virtualenv
 virtualenv
-.vagrant
 docker-compose.yml
 docker-compose.env
 
