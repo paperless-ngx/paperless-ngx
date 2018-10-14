@@ -42,18 +42,14 @@ Installation & Configuration
 You can go multiple routes with setting up and running Paperless:
 
  * The `bare metal route`_
- * The `vagrant route`_
  * The `docker route`_
 
 
-The `Vagrant route`_ is quick & easy, but means you're running a VM which comes
-with memory consumption, cpu overhead etc. The `docker route`_ offers the same
-simplicity as Vagrant with lower resource consumption.
+The `docker route`_ is quick & easy.
 
 The `bare metal route`_ is a bit more complicated to setup but makes it easier
 should you want to contribute some code back.
 
-.. _Vagrant route: setup-installation-vagrant_
 .. _docker route: setup-installation-docker_
 .. _bare metal route: setup-installation-bare-metal_
 .. _Docker Machine: https://docs.docker.com/machine/
@@ -267,54 +263,6 @@ Docker Method
    newer ``docker-compose.yml.example`` file
 
 
-.. _setup-installation-vagrant:
-
-Vagrant Method
-++++++++++++++
-
-1. Install `Vagrant`_.  How you do that is really between you and your OS.
-2. Run ``vagrant up``.  An instance will start up for you.  When it's ready and
-   provisioned...
-3. Run ``vagrant ssh`` and once inside your new vagrant box, edit
-   ``/etc/paperless.conf`` and set the values for:
-
-    * ``PAPERLESS_CONSUMPTION_DIR``: This is where your documents will be
-      dumped to be consumed by Paperless.
-    * ``PAPERLESS_PASSPHRASE``: This is the passphrase Paperless uses to
-      encrypt/decrypt the original document.  It's only required if you want
-      your original files to be encrypted, otherwise, just leave it unset.
-    * ``PAPERLESS_EMAIL_SECRET``: this is the "magic word" used when consuming
-      documents from mail or via the API.  If you don't use either, leaving it
-      blank is just fine.
-
-4. Exit the vagrant box and re-enter it with ``vagrant ssh`` again.  This
-   updates the environment to make use of the changes you made to the config
-   file.
-5. Initialise the database with ``/opt/paperless/src/manage.py migrate``.
-6. Still inside your vagrant box, create a user for your Paperless instance
-   with ``/opt/paperless/src/manage.py createsuperuser``. Follow the prompts to
-   create your user.
-7. Start the webserver with
-   ``/opt/paperless/src/manage.py runserver 0.0.0.0:8000``. You should now be
-   able to visit your (empty) `Paperless webserver`_ at ``172.28.128.4:8000``.
-   You can login with the user/pass you created in #6.
-8. In a separate window, run ``vagrant ssh`` again, but this time once inside
-   your vagrant instance, you should start the consumer script with
-   ``/opt/paperless/src/manage.py document_consumer``.
-9. Scan something.  Put it in the ``CONSUMPTION_DIR``.
-10. Wait a few minutes
-11. Visit the document list on your webserver, and it should be there, indexed
-    and downloadable.
-
-.. caution::
-
-    This installation is not secure. Once everything is working head up to
-    `Making things more permanent`_
-
-.. _Vagrant: https://vagrantup.com/
-.. _Paperless server: http://172.28.128.4:8000
-
-
 .. _setup-permanent:
 
 Making Things a Little more Permanent
@@ -511,13 +459,6 @@ unexpectedly, Upstart will try to restart it a maximum of 10 times within a 5
 second period.
 
 .. _Upstart: http://upstart.ubuntu.com/
-
-
-Vagrant
-~~~~~~~
-
-You may use the Ubuntu explanation above. Replace
-``(local-filesystems and net-device-up IFACE=eth0)`` with ``vagrant-mounted``.
 
 
 .. _setup-permanent-docker:
