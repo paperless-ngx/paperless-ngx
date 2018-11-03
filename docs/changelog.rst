@@ -9,6 +9,8 @@ Changelog
 * Fix the ``RecentCorrespondentsFilter`` correspondents filter that was added
   in 2.4 to play nice with the defaults.  Thanks to `tsia`_ and `Sblop`_ who
   pointed this out. `#423`_.
+* Updated dependencies to include (among other things) a security patch to
+  requests.
 
 
 2.5.0
