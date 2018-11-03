@@ -88,25 +88,24 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
 
 class RecentCorrespondentFilter(admin.RelatedFieldListFilter):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.title = "correspondent (recent)"
+    """
+    If PAPERLESS_RECENT_CORRESPONDENT_YEARS is set, we limit the available
+    correspondents to documents sent our way over the past ``n`` years.
+    """
 
     def field_choices(self, field, request, model_admin):
 
         years = settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS
-        days = 365 * years
+        correspondents = Correspondent.objects.all()
 
-        lookups = []
         if years and years > 0:
-            correspondents = Correspondent.objects.filter(
+            self.title = "Correspondent (Recent)"
+            days = 365 * years
+            correspondents = correspondents.filter(
                 documents__created__gte=datetime.now() - timedelta(days=days)
             ).distinct()
-            for c in correspondents:
-                lookups.append((c.id, c.name))
 
-        return lookups
+        return [(c.id, c.name) for c in correspondents]
 
 
 class CommonAdmin(admin.ModelAdmin):
@@ -177,7 +176,6 @@ class DocumentAdmin(CommonAdmin):
     list_filter = (
         "tags",
         ("correspondent", RecentCorrespondentFilter),
-        "correspondent",
         FinancialYearFilter
     )
 
