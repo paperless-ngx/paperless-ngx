@@ -6,6 +6,9 @@ Changelog
 
 * Allow an infinite number of logs to be deleted.  Thanks to `Ulli`_ for noting
   the problem in `#433`_.
+* Fix the ``RecentCorrespondentsFilter`` correspondents filter that was added
+  in 2.4 to play nice with the defaults.  Thanks to `tsia`_ and `Sblop`_ who
+  pointed this out. `#423`_.
 
 
 2.5.0
@@ -579,6 +582,8 @@ bulk of the work on this big change.
 .. _Andrew Peng: https://github.com/pengc99
 .. _euri10: https://github.com/euri10
 .. _Ulli: https://github.com/Ulli2k
+.. _tsia: https://github.com/tsia
+.. _Sblop:  https://github.com/Sblop
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -673,6 +678,7 @@ bulk of the work on this big change.
 .. _#412: https://github.com/danielquinn/paperless/issues/412
 .. _#413: https://github.com/danielquinn/paperless/pull/413
 .. _#414: https://github.com/danielquinn/paperless/issues/414
+.. _#423: https://github.com/danielquinn/paperless/issues/423
 .. _#433: https://github.com/danielquinn/paperless/issues/433
 
 .. _pipenv: https://docs.pipenv.org/
