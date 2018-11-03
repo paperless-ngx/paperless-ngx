@@ -25,8 +25,6 @@ python-dateutil = "*"
 python-dotenv = "*"
 python-gnupg = "*"
 pytz = "*"
-
-[dev-packages]
 ipython = "*"
 sphinx = "*"
 tox = "*"
@@ -37,3 +35,5 @@ pytest-django = "*"
 pytest-sugar = "*"
 pytest-env = "*"
 pytest-xdist = "*"
+
+[dev-packages]
