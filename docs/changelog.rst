@@ -1,6 +1,13 @@
 Changelog
 #########
 
+2.6.0
+=====
+
+* Allow an infinite number of logs to be deleted.  Thanks to `Ulli`_ for noting
+  the problem in `#433`_.
+
+
 2.5.0
 =====
 
@@ -44,6 +51,7 @@ Changelog
 * The ``get_date()`` functionality of the parsers has been consolidated onto
   the ``DocumentParser`` class since much of that code was redundant anyway.
 
+
 2.4.0
 =====
 
@@ -55,13 +63,13 @@ Changelog
   It's now in the import step that we decide the storage type.  This allows you
   to export from an encrypted system and import into an unencrypted one, or
   vice-versa.
-* The migration history has been slightly modified to accomodate PostgreSQL
+* The migration history has been slightly modified to accommodate PostgreSQL
   users.  Additionally, you can now tell paperless to use PostgreSQL simply by
   declaring ``PAPERLESS_DBUSER`` in your environment.  This will attempt to
   connect to your Postgres database without a password unless you also set
   ``PAPERLESS_DBPASS``.
 * A bug was found in the REST API filter system that was the result of an
-  update of django-filter some time ago.  This has now been patched `#412`_.
+  update of django-filter some time ago.  This has now been patched in `#412`_.
   Thanks to `thepill`_ for spotting it!
 
 
@@ -570,6 +578,7 @@ bulk of the work on this big change.
 .. _thepill: https://github.com/thepill
 .. _Andrew Peng: https://github.com/pengc99
 .. _euri10: https://github.com/euri10
+.. _Ulli: https://github.com/Ulli2k
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -664,6 +673,7 @@ bulk of the work on this big change.
 .. _#412: https://github.com/danielquinn/paperless/issues/412
 .. _#413: https://github.com/danielquinn/paperless/pull/413
 .. _#414: https://github.com/danielquinn/paperless/issues/414
+.. _#433: https://github.com/danielquinn/paperless/issues/433
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/

@@ -199,6 +199,16 @@ STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
 
 
+# Other
+
+# Disable Django's artificial limit on the number of form fields to submit at
+# once.  This is a protection against overloading the server, but since this is
+# a self-hosted sort of gig, the benefits of being able to mass-delete a tonne
+# of log entries outweight the benefits of such a safeguard.
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
+
 # Paperless-specific stuff
 # You shouldn't have to edit any of these values.  Rather, you can set these
 # values in /etc/paperless.conf instead.
