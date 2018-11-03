@@ -61,12 +61,12 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
             # To keep it simple we use the same string for both
             # query parameter and the display.
-            return (query, query)
+            return query, query
 
         else:
             query = "{0}-{0}".format(date.year)
             display = "{}".format(date.year)
-            return (query, display)
+            return query, display
 
     def lookups(self, request, model_admin):
         if not settings.FY_START or not settings.FY_END:
@@ -146,8 +146,8 @@ class CorrespondentAdmin(CommonAdmin):
 
 class TagAdmin(CommonAdmin):
 
-    list_display = ("name", "colour", "match", "matching_algorithm",
-                    "document_count")
+    list_display = (
+        "name", "colour", "match", "matching_algorithm", "document_count")
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
