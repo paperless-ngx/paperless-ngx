@@ -39,7 +39,7 @@ more-itertools==4.3.0
 packaging==18.0
 parso==0.3.1
 pdftotext==2.1.1
-pexpect==4.6.0 ; sys_platform != 'win32'
+pexpect==4.6.0 
 pickleshare==0.7.5
 pillow==5.3.0
 pluggy==0.8.0
