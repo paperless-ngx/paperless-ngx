@@ -425,4 +425,72 @@ class TestDate(TestCase):
             datetime.datetime(2017, 12, 31, 0, 0,
                               tzinfo=tz.gettz(settings.TIME_ZONE))
         )
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_filename_date_1_pdf(self):
+        input_file = os.path.join(self.SAMPLE_FILES,
+                                  "tests_date_in_filename_2018-03-20_1.pdf")
+        document = RasterisedDocumentParser(input_file)
+        document.FILENAME_DATE_ORDER = 'YMD'
+        document.get_text()
+        date = document.get_date()
+        self.assertEqual(document._is_ocred(), True)
+        self.assertEqual(
+            date,
+            datetime.datetime(2018, 3, 20, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
+        )
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_filename_date_1_png(self):
+        input_file = os.path.join(self.SAMPLE_FILES,
+                                  "tests_date_in_filename_2018-03-20_1.png")
+        document = RasterisedDocumentParser(input_file)
+        document.FILENAME_DATE_ORDER = 'YMD'
+        date = document.get_date()
+        self.assertEqual(document._is_ocred(), False)
+        self.assertEqual(
+            date,
+            datetime.datetime(2018, 3, 20, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
+        )
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_filename_date_2_pdf(self):
+        input_file = os.path.join(self.SAMPLE_FILES,
+                                  "2013-12-11_tests_date_in_filename_2.pdf")
+        document = RasterisedDocumentParser(input_file)
+        document.FILENAME_DATE_ORDER = 'YMD'
+        date = document.get_date()
+        self.assertEqual(document._is_ocred(), True)
+        self.assertEqual(
+            date,
+            datetime.datetime(2013, 12, 11, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
+        )
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_filename_date_2_png(self):
+        input_file = os.path.join(self.SAMPLE_FILES,
+                                  "2013-12-11_tests_date_in_filename_2.png")
+        document = RasterisedDocumentParser(input_file)
+        document.FILENAME_DATE_ORDER = 'YMD'
+        date = document.get_date()
+        self.assertEqual(document._is_ocred(), False)
+        self.assertEqual(
+            date,
+            datetime.datetime(2013, 12, 11, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )

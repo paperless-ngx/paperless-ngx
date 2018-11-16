@@ -292,3 +292,4 @@ FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
 
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
+FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
