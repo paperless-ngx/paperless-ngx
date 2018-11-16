@@ -34,6 +34,7 @@ class RasterisedDocumentParser(DocumentParser):
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
     DATE_ORDER = settings.DATE_ORDER
+    FILENAME_DATE_ORDER = settings.FILENAME_DATE_ORDER
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
     OCR_ALWAYS = settings.OCR_ALWAYS
 
@@ -206,7 +207,30 @@ class RasterisedDocumentParser(DocumentParser):
         date = None
         datestring = None
 
+        if self.FILENAME_DATE_ORDER:
+            self.log("info", "Checking document title for date")
+            text = os.path.basename(self.document_path)
+            for m in re.finditer(DATE_REGEX, text):
+                datestring = m.group(0)
+                try:
+                    date = dateparser.parse(
+                        datestring,
+                        settings={'DATE_ORDER': self.FILENAME_DATE_ORDER,
+                                  'PREFER_DAY_OF_MONTH': 'first',
+                                  'RETURN_AS_TIMEZONE_AWARE': True})
+                except TypeError:
+                    # Skip all matches that do not parse to a proper date
+                    continue
+
+                if date is not None:
+                    self.log("info",
+                             "Detected document date {} based on string {} "
+                             "from document title"
+                             "".format(date.isoformat(), datestring))
+                    return date
+
         try:
+            self.log('info', "Checking document text for date")
             text = self.get_text()
         except ParseError as e:
             return None
