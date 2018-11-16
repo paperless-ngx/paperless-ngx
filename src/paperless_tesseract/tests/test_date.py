@@ -494,3 +494,42 @@ class TestDate(TestCase):
             datetime.datetime(2013, 12, 11, 0, 0,
                               tzinfo=tz.gettz(settings.TIME_ZONE))
         )
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="01-07-0590 00:00:00"
+    )
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_crazy_date_past(self, *args):
+        document = RasterisedDocumentParser("/dev/null")
+        document.get_text()
+        self.assertIsNone(document.get_date())
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="01-07-2350 00:00:00"
+    )
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_crazy_date_future(self, *args):
+        document = RasterisedDocumentParser("/dev/null")
+        document.get_text()
+        self.assertIsNone(document.get_date())
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="01-07-0590 00:00:00"
+    )
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
+        SCRATCH
+    )
+    def test_crazy_date_past(self, *args):
+        document = RasterisedDocumentParser("/dev/null")
+        document.get_text()
+        self.assertIsNone(document.get_date())
