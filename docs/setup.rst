@@ -366,7 +366,7 @@ The gunicorn server can be started with the command:
 
 .. code-block:: shell
 
-    $ <path-to-paperless-virtual-environment>/bin/gunicorn <path-to-paperless>/src/paperless.wsgi -w 2
+    $ <path-to-paperless-virtual-environment>/bin/gunicorn --pythonpath=<path-to-paperless>/src paperless.wsgi -w 2
 
 
 .. _setup-permanent-standard-systemd:
@@ -423,7 +423,7 @@ after restarting your system:
     respawn limit 10 5
 
     script
-      exec <path to paperless virtual environment>/bin/gunicorn <path to parperless>/src/paperless.wsgi -w 2
+      exec <path to paperless virtual environment>/bin/gunicorn --pythonpath=<path to parperless>/src paperless.wsgi -w 2
     end script
 
    Note that you'll need to replace ``/srv/paperless/src/manage.py`` with the
