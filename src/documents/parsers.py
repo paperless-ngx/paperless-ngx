@@ -1,9 +1,13 @@
 import logging
-import shutil
-import tempfile
+import os
 import re
+import shutil
+import subprocess
+import tempfile
 
+import dateparser
 from django.conf import settings
+from django.utils import timezone
 
 # This regular expression will try to find dates in the document at
 # hand and will match the following formats:
@@ -36,6 +40,9 @@ class DocumentParser:
     """
 
     SCRATCH = settings.SCRATCH_DIR
+    DATE_ORDER = settings.DATE_ORDER
+    FILENAME_DATE_ORDER = settings.FILENAME_DATE_ORDER
+    OPTIPNG = settings.OPTIPNG_BINARY
 
     def __init__(self, path):
         self.document_path = path
@@ -49,6 +56,19 @@ class DocumentParser:
         """
         raise NotImplementedError()
 
+    def optimise_thumbnail(self, in_path):
+
+        out_path = os.path.join(self.tempdir, "optipng.png")
+
+        args = (self.OPTIPNG, "-o5", in_path, "-out", out_path)
+        if not subprocess.Popen(args).wait() == 0:
+            raise ParseError("Optipng failed at {}".format(args))
+
+        return out_path
+
+    def get_optimised_thumbnail(self):
+        return self.optimise_thumbnail(self.get_thumbnail())
+
     def get_text(self):
         """
         Returns the text from the document and only the text.
@@ -59,7 +79,75 @@ class DocumentParser:
         """
         Returns the date of the document.
         """
-        raise NotImplementedError()
+
+        def __parser__(ds, date_order):
+            """
+            Call dateparser.parse with a particular date ordering
+            """
+            return dateparser.parse(ds,
+                                    settings={"DATE_ORDER": date_order,
+                                              "PREFER_DAY_OF_MONTH": "first",
+                                              "RETURN_AS_TIMEZONE_AWARE":
+                                                  True})
+        date = None
+        date_string = None
+
+        next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
+        title = os.path.basename(self.document_path)
+
+        # if filename date parsing is enabled, search there first:
+        if self.FILENAME_DATE_ORDER:
+            self.log("info", "Checking document title for date")
+            for m in re.finditer(DATE_REGEX, title):
+                date_string = m.group(0)
+
+                try:
+                    date = __parser__(date_string, self.FILENAME_DATE_ORDER)
+                except TypeError:
+                    # Skip all matches that do not parse to a proper date
+                    continue
+
+                if date is not None and next_year > date.year > 1900:
+                    self.log("info",
+                             "Detected document date {} based on string {} "
+                             "from document title"
+                             "".format(date.isoformat(), date_string))
+                    return date
+
+        try:
+            # getting text after checking filename will save time if only
+            # looking at the filename instead of the whole text
+            text = self.get_text()
+        except ParseError:
+            return None
+
+        # Iterate through all regex matches in text and try to parse the date
+        for m in re.finditer(DATE_REGEX, text):
+            date_string = m.group(0)
+
+            try:
+                date = __parser__(date_string, self.DATE_ORDER)
+            except TypeError:
+                # Skip all matches that do not parse to a proper date
+                continue
+
+            if date is not None and next_year > date.year > 1900:
+                break
+            else:
+                date = None
+
+        if date is not None:
+            self.log(
+                "info",
+                "Detected document date {} based on string {}".format(
+                    date.isoformat(),
+                    date_string
+                )
+            )
+        else:
+            self.log("info", "Unable to detect date for document")
+
+        return date
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={

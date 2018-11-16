@@ -1,0 +1,50 @@
+{% extends "admin/base_site.html" %}
+
+
+{% load i18n l10n admin_urls static %}
+{% load staticfiles %}
+
+
+{% block extrahead %}
+	{{ block.super }}
+	{{ media }}
+	<script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+{% endblock %}
+
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
+
+
+{% block breadcrumbs %}
+	<div class="breadcrumbs">
+		<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+		&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+		&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+		&rsaquo; {{ title }}
+	</div>
+{% endblock %}
+
+{% block content %}
+	<p>Please select the {{itemname}}.</p>
+	<form method="post">{% csrf_token %}
+		<div>
+			{% for obj in queryset %}
+			<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}"/>
+			{% endfor %}
+			<p>
+				<select name="obj_id">
+					{% for obj in objects %}
+					<option value="{{ obj.id }}">{{ obj.name }}</option>
+					{% endfor %}
+				</select>
+			</p>
+
+			<input type="hidden" name="action" value="{{ action }}"/>
+			<input type="hidden" name="post" value="yes" />
+			<p>
+				<input type="submit" value="{% trans 'Confirm' %}" />
+				<a href="#" class="button cancel-link">{% trans "Go back" %}</a>
+			</p>
+		</div>
+	</form>
+{% endblock %}

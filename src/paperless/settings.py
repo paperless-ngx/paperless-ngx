@@ -22,12 +22,12 @@ elif os.path.exists("/usr/local/etc/paperless.conf"):
     load_dotenv("/usr/local/etc/paperless.conf")
 
 
-def __get_boolean(key):
+def __get_boolean(key, default="NO"):
     """
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
-    return bool(os.getenv(key, "NO").lower() in ("yes", "y", "1", "t", "true"))
+    return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -47,7 +47,7 @@ SECRET_KEY = os.getenv(
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = __get_boolean("PAPERLESS_DEBUG", "YES")
 
 LOGIN_URL = "admin:login"
 
@@ -144,13 +144,14 @@ DATABASES = {
     }
 }
 
-if os.getenv("PAPERLESS_DBUSER") and os.getenv("PAPERLESS_DBPASS"):
+if os.getenv("PAPERLESS_DBUSER"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER"),
-        "PASSWORD": os.getenv("PAPERLESS_DBPASS")
     }
+    if os.getenv("PAPERLESS_DBPASS"):
+        DATABASES["default"]["PASSWORD"] = os.getenv("PAPERLESS_DBPASS")
 
 
 # Password validation
@@ -196,6 +197,16 @@ MEDIA_ROOT = os.getenv(
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
+
+
+# Other
+
+# Disable Django's artificial limit on the number of form fields to submit at
+# once.  This is a protection against overloading the server, but since this is
+# a self-hosted sort of gig, the benefits of being able to mass-delete a tonne
+# of log entries outweight the benefits of such a safeguard.
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 
 # Paperless-specific stuff
@@ -246,6 +257,9 @@ CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
 CONVERT_DENSITY = os.getenv("PAPERLESS_CONVERT_DENSITY")
 
+# OptiPNG
+OPTIPNG_BINARY = os.getenv("PAPERLESS_OPTIPNG_BINARY", "optipng")
+
 # Unpaper
 UNPAPER_BINARY = os.getenv("PAPERLESS_UNPAPER_BINARY", "unpaper")
 
@@ -293,3 +307,9 @@ FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
+
+# Specify for how many years a correspondent is considered recent. Recent
+# correspondents will be shown in a separate "Recent correspondents" filter as
+# well. Set to 0 to disable this filter.
+PAPERLESS_RECENT_CORRESPONDENT_YEARS = int(os.getenv(
+    "PAPERLESS_RECENT_CORRESPONDENT_YEARS", 0))

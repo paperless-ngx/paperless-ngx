@@ -4,7 +4,6 @@ import re
 import subprocess
 from multiprocessing.pool import Pool
 
-import dateparser
 import langdetect
 import pyocr
 from django.conf import settings
@@ -14,7 +13,7 @@ from pyocr.libtesseract.tesseract_raw import \
 from pyocr.tesseract import TesseractError
 
 import pdftotext
-from documents.parsers import DocumentParser, ParseError, DATE_REGEX
+from documents.parsers import DocumentParser, ParseError
 
 from .languages import ISO639
 
@@ -33,8 +32,6 @@ class RasterisedDocumentParser(DocumentParser):
     DENSITY = settings.CONVERT_DENSITY if settings.CONVERT_DENSITY else 300
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
-    DATE_ORDER = settings.DATE_ORDER
-    FILENAME_DATE_ORDER = settings.FILENAME_DATE_ORDER
     DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
     OCR_ALWAYS = settings.OCR_ALWAYS
 
@@ -47,15 +44,18 @@ class RasterisedDocumentParser(DocumentParser):
         The thumbnail of a PDF is just a 500px wide image of the first page.
         """
 
+        out_path = os.path.join(self.tempdir, "convert.png")
+
+        # Run convert to get a decent thumbnail
         run_convert(
             self.CONVERT,
             "-scale", "500x5000",
             "-alpha", "remove",
             "{}[0]".format(self.document_path),
-            os.path.join(self.tempdir, "convert.png")
+            out_path
         )
 
-        return os.path.join(self.tempdir, "convert.png")
+        return out_path
 
     def _is_ocred(self):
 
@@ -153,7 +153,10 @@ class RasterisedDocumentParser(DocumentParser):
                 )
                 raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
-            raise OCRError("Language detection failed")
+            error_msg = ("Language detection failed. Set "
+                         "PAPERLESS_FORGIVING_OCR in config file to continue "
+                         "anyway.")
+            raise OCRError(error_msg)
 
         if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
             raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
@@ -173,8 +176,8 @@ class RasterisedDocumentParser(DocumentParser):
                 raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
                 return raw_text
             raise OCRError(
-                "The guessed language is not available in this instance of "
-                "Tesseract."
+                "The guessed language ({}) is not available in this instance "
+                "of Tesseract.".format(guessed_language)
             )
 
     def _ocr(self, imgs, lang):
@@ -203,63 +206,6 @@ class RasterisedDocumentParser(DocumentParser):
         text += self._ocr(imgs[middle + 1:], self.DEFAULT_OCR_LANGUAGE)
         return text
 
-    def get_date(self):
-        date = None
-        datestring = None
-
-        if self.FILENAME_DATE_ORDER:
-            self.log("info", "Checking document title for date")
-            text = os.path.basename(self.document_path)
-            for m in re.finditer(DATE_REGEX, text):
-                datestring = m.group(0)
-                try:
-                    date = dateparser.parse(
-                        datestring,
-                        settings={'DATE_ORDER': self.FILENAME_DATE_ORDER,
-                                  'PREFER_DAY_OF_MONTH': 'first',
-                                  'RETURN_AS_TIMEZONE_AWARE': True})
-                except TypeError:
-                    # Skip all matches that do not parse to a proper date
-                    continue
-
-                if date is not None:
-                    self.log("info",
-                             "Detected document date {} based on string {} "
-                             "from document title"
-                             "".format(date.isoformat(), datestring))
-                    return date
-
-        try:
-            self.log('info', "Checking document text for date")
-            text = self.get_text()
-        except ParseError as e:
-            return None
-
-        # Iterate through all regex matches and try to parse the date
-        for m in re.finditer(DATE_REGEX, text):
-            datestring = m.group(0)
-
-            try:
-                date = dateparser.parse(
-                           datestring,
-                           settings={'DATE_ORDER': self.DATE_ORDER,
-                                     'PREFER_DAY_OF_MONTH': 'first',
-                                     'RETURN_AS_TIMEZONE_AWARE': True})
-            except TypeError:
-                # Skip all matches that do not parse to a proper date
-                continue
-
-            if date is not None:
-                break
-
-        if date is not None:
-            self.log("info", "Detected document date " + date.isoformat() +
-                             " based on string " + datestring)
-        else:
-            self.log("info", "Unable to detect date for document")
-
-        return date
-
 
 def run_convert(*args):
 
@@ -275,7 +221,8 @@ def run_convert(*args):
 
 def run_unpaper(args):
     unpaper, pnm = args
-    command_args = unpaper, pnm, pnm.replace(".pnm", ".unpaper.pnm")
+    command_args = (unpaper, "--overwrite", pnm,
+                    pnm.replace(".pnm", ".unpaper.pnm"))
     if not subprocess.Popen(command_args).wait() == 0:
         raise ParseError("Unpaper failed at {}".format(command_args))
 

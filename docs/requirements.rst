@@ -33,7 +33,7 @@ In addition to the above, there are a number of Python requirements, all of
 which are listed in a file called ``requirements.txt`` in the project root
 directory.
 
-If you're not working on a virtual environment (like Vagrant or Docker), you
+If you're not working on a virtual environment (like Docker), you
 should probably be using a virtualenv, but that's your call.  The reasons why
 you might choose a virtualenv or not aren't really within the scope of this
 document.  Needless to say if you don't know what a virtualenv is, you should
