@@ -59,6 +59,11 @@ PAPERLESS_EMAIL_SECRET=""
 ####                              Security                                 ####
 ###############################################################################
 
+# Controls whether django's debug mode is enabled. Disable this on production
+# systems. Debug mode is enabled by default.
+PAPERLESS_DEBUG="false"
+
+
 # Paperless can be instructed to attempt to encrypt your PDF files with GPG
 # using the PAPERLESS_PASSPHRASE specified below.  If however you're not
 # concerned about encrypting these files (for example if you have disk
@@ -191,6 +196,11 @@ PAPERLESS_EMAIL_SECRET=""
 #PAPERLESS_CONSUMER_LOOP_TIME=10
 
 
+# By default Paperless stops consuming a document if no language can be detected.
+# Set to true to consume documents even if the language detection fails.
+#PAPERLESS_FORGIVING_OCR="false"
+
+
 ###############################################################################
 ####                            Interface                                  ####
 ###############################################################################
@@ -211,3 +221,28 @@ PAPERLESS_EMAIL_SECRET=""
 # positive integer, but if you don't define one in paperless.conf, a default of
 # 100 will be used.
 #PAPERLESS_LIST_PER_PAGE=100
+
+
+# The number of years for which a correspondent will be included in the recent
+# correspondents filter.
+#PAPERLESS_RECENT_CORRESPONDENT_YEARS=1
+
+###############################################################################
+####                     Third-Party Binaries                              ####
+###############################################################################
+
+# There are a few external software packages that Paperless expects to find on
+# your system when it starts up.  Unless you've done something creative with
+# their installation, you probably won't need to edit any of these.  However,
+# if you've installed these programs somewhere where simply typing the name of
+# the program doesn't automatically execute it (ie. the program isn't in your
+# $PATH), then you'll need to specify the literal path for that program here.
+
+# Convert (part of the ImageMagick suite)
+#PAPERLESS_CONVERT_BINARY=/usr/bin/convert
+
+# Unpaper
+#PAPERLESS_UNPAPER_BINARY=/usr/bin/unpaper
+
+# Optipng (for optimising thumbnail sizes)
+#PAPERLESS_OPTIPNG_BINARY=/usr/bin/optipng
