@@ -8,6 +8,7 @@ from dateutil import tz
 from django.test import TestCase
 
 from ..parsers import RasterisedDocumentParser
+from django.conf import settings
 
 
 class TestDate(TestCase):
@@ -59,9 +60,11 @@ class TestDate(TestCase):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
         document._text = "lorem ipsum 13.02.2018 lorem ipsum"
+        date = document.get_date()
         self.assertEqual(
-            document.get_date(),
-            datetime.datetime(2018, 2, 13, 0, 0, tzinfo=tz.tzutc())
+            date,
+            datetime.datetime(2018, 2, 13, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -72,10 +75,13 @@ class TestDate(TestCase):
         input_file = os.path.join(self.SAMPLE_FILES, "")
         document = RasterisedDocumentParser(input_file)
         document._text = (
-            "lorem ipsum 130218, 2018, 20180213 and 13.02.2018 lorem ipsum")
+            "lorem ipsum 130218, 2018, 20180213 and lorem 13.02.2018 lorem "
+            "ipsum")
+        date = document.get_date()
         self.assertEqual(
-            document.get_date(),
-            datetime.datetime(2018, 2, 13, 0, 0, tzinfo=tz.tzutc())
+            date,
+            datetime.datetime(2018, 2, 13, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -110,9 +116,11 @@ class TestDate(TestCase):
             "März 2019\n"
             "lorem ipsum"
         )
+        date = document.get_date()
         self.assertEqual(
-            document.get_date(),
-            datetime.datetime(2019, 3, 1, 0, 0, tzinfo=tz.tzutc())
+            date,
+            datetime.datetime(2019, 3, 1, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -134,7 +142,8 @@ class TestDate(TestCase):
                           "März 2020")
         self.assertEqual(document.get_date(),
                          datetime.datetime(2020, 3, 1, 0, 0,
-                                           tzinfo=tz.tzutc()))
+                                           tzinfo=tz.gettz(
+                                               settings.TIME_ZONE)))
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -149,7 +158,8 @@ class TestDate(TestCase):
                           "lorem ipsum")
         self.assertEqual(document.get_date(),
                          datetime.datetime(2020, 3, 1, 0, 0,
-                                           tzinfo=tz.tzutc()))
+                                           tzinfo=tz.gettz(
+                                               settings.TIME_ZONE)))
 
     @mock.patch(
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
@@ -158,11 +168,14 @@ class TestDate(TestCase):
     def test_get_text_1_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_1.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
+        date = document.get_date()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
-            document.get_date(),
-            datetime.datetime(2018, 4, 1, 0, 0, tzinfo=tz.tzutc())
+            date,
+            datetime.datetime(2018, 4, 1, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -172,11 +185,13 @@ class TestDate(TestCase):
     def test_get_text_1_png(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_1.png")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), False)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 4, 1, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 4, 1, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -186,11 +201,13 @@ class TestDate(TestCase):
     def test_get_text_2_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_2.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2013, 2, 1, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2013, 2, 1, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -200,11 +217,13 @@ class TestDate(TestCase):
     def test_get_text_2_png(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_2.png")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), False)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2013, 2, 1, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2013, 2, 1, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -214,11 +233,13 @@ class TestDate(TestCase):
     def test_get_text_3_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_3.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 10, 5, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 10, 5, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -228,11 +249,13 @@ class TestDate(TestCase):
     def test_get_text_3_png(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_3.png")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), False)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 10, 5, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 10, 5, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -242,11 +265,13 @@ class TestDate(TestCase):
     def test_get_text_4_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_4.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 10, 5, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 10, 5, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -256,11 +281,13 @@ class TestDate(TestCase):
     def test_get_text_4_png(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_4.png")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), False)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 10, 5, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 10, 5, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -270,11 +297,13 @@ class TestDate(TestCase):
     def test_get_text_5_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_5.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 12, 17, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 12, 17, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -284,11 +313,13 @@ class TestDate(TestCase):
     def test_get_text_5_png(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_5.png")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), False)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 12, 17, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 12, 17, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -303,7 +334,8 @@ class TestDate(TestCase):
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 12, 17, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 12, 17, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -318,7 +350,8 @@ class TestDate(TestCase):
         self.assertEqual(document._is_ocred(), False)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 12, 17, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 12, 17, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -328,6 +361,7 @@ class TestDate(TestCase):
     def test_get_text_6_pdf_eu(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_6.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(document.get_date(), None)
@@ -339,6 +373,7 @@ class TestDate(TestCase):
     def test_get_text_6_png_eu(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_6.png")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), False)
         self.assertEqual(document.get_date(), None)
@@ -350,11 +385,13 @@ class TestDate(TestCase):
     def test_get_text_7_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_7.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2018, 4, 1, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2018, 4, 1, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -364,11 +401,13 @@ class TestDate(TestCase):
     def test_get_text_8_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_8.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2017, 12, 31, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2017, 12, 31, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
         )
 
     @mock.patch(
@@ -378,9 +417,12 @@ class TestDate(TestCase):
     def test_get_text_9_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_9.pdf")
         document = RasterisedDocumentParser(input_file)
+        document.DATE_ORDER = 'DMY'
         document.get_text()
         self.assertEqual(document._is_ocred(), True)
         self.assertEqual(
             document.get_date(),
-            datetime.datetime(2017, 12, 31, 0, 0, tzinfo=tz.tzutc())
+            datetime.datetime(2017, 12, 31, 0, 0,
+                              tzinfo=tz.gettz(settings.TIME_ZONE))
+        )
         )
