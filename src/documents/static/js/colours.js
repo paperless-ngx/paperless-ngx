@@ -1,7 +1,6 @@
 // The following jQuery snippet will add a small square next to the selection
 // drop-down on the `Add tag` page that will update to show the selected tag
-// color as the drop-down value is changed. Copy and paste it into
-// ``PAPERLESS_MEDIADIR/overrides.js`` to see the effects.
+// color as the drop-down value is changed.
 
 if (django.jQuery("#id_colour").length) {
 
@@ -30,8 +29,7 @@ if (django.jQuery("#id_colour").length) {
 
 // The following jQuery snippet will add a small square next to each selection
 // drop-down on the `Edit tags` page that will update to show the selected tag
-// color as the drop-down value is changed. Copy and paste it into
-// ``PAPERLESS_MEDIADIR/overrides.js`` to see the effects.
+// color as the drop-down value is changed.
 
 if (django.jQuery('select[id*="-colour"]').length) {
     django.jQuery('select[id*="-colour"]').each(function (index, element) {
