@@ -5,7 +5,7 @@ from unittest import mock
 from uuid import uuid4
 
 from dateutil import tz
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from ..parsers import RasterisedDocumentParser
 
@@ -211,6 +211,7 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
         SCRATCH
     )
+    @override_settings(OCR_LANGUAGE="deu")
     def test_get_text_3_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_3.pdf")
         document = RasterisedDocumentParser(input_file)
@@ -225,6 +226,7 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
         SCRATCH
     )
+    @override_settings(OCR_LANGUAGE="deu")
     def test_get_text_3_png(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_3.png")
         document = RasterisedDocumentParser(input_file)
@@ -239,6 +241,7 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
         SCRATCH
     )
+    @override_settings(OCR_LANGUAGE="eng")
     def test_get_text_4_pdf(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_4.pdf")
         document = RasterisedDocumentParser(input_file)
@@ -253,6 +256,7 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
         SCRATCH
     )
+    @override_settings(OCR_LANGUAGE="eng")
     def test_get_text_4_png(self):
         input_file = os.path.join(self.SAMPLE_FILES, "tests_date_4.png")
         document = RasterisedDocumentParser(input_file)
