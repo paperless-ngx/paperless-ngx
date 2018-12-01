@@ -13,6 +13,11 @@ Changelog
   requests.
 * Fix text in sample data for tests so that the language guesser stops thinking
   that everything is in Catalan because we had *Lorem ipsum* in there.
+* Tweaked the gunicorn sample command to use filesystem paths instead of Python
+  paths. `#441`_
+* Added pretty colour boxes next to the hex values in the Tags section, thanks
+  to a pull request from `Joshua Taillon`_ `#442`_.
+* Added a ``.editorconfig`` file to better specify coding style.
 
 
 2.5.0
@@ -684,6 +689,8 @@ bulk of the work on this big change.
 .. _#414: https://github.com/danielquinn/paperless/issues/414
 .. _#423: https://github.com/danielquinn/paperless/issues/423
 .. _#433: https://github.com/danielquinn/paperless/issues/433
+.. _#441: https://github.com/danielquinn/paperless/pull/441
+.. _#442: https://github.com/danielquinn/paperless/pull/442
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
