@@ -152,6 +152,9 @@ class TagAdmin(CommonAdmin):
 
     readonly_fields = ("slug",)
 
+    class Media:
+        js = ("js/colours.js",)
+
     def get_queryset(self, request):
         qs = super(TagAdmin, self).get_queryset(request)
         qs = qs.annotate(document_count=models.Count("documents"))
