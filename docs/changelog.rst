@@ -11,6 +11,8 @@ Changelog
   pointed this out. `#423`_.
 * Updated dependencies to include (among other things) a security patch to
   requests.
+* Fix text in sample data for tests so that the language guesser stops thinking
+  that everything is in Catalan because we had *Lorem ipsum* in there.
 
 
 2.5.0
