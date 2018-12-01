@@ -127,6 +127,14 @@ PAPERLESS_DEBUG="false"
 # "true", the document will instead be opened in the browser, if possible.
 #PAPERLESS_INLINE_DOC="false"
 
+# By default, paperless will check the document text for document date information.
+# Uncomment the line below to enable checking the document filename for date
+# information. The date order can be set to any option as specified in
+# https://dateparser.readthedocs.io/en/latest/#settings. The filename will be
+# checked first, and if nothing is found, the document text will be checked
+# as normal.
+#PAPERLESS_FILENAME_DATE_ORDER="YMD"
+
 #
 # The following values use sensible defaults for modern systems, but if you're
 # running Paperless on a low-resource device (like a Raspberry Pi), modifying
@@ -188,8 +196,9 @@ PAPERLESS_DEBUG="false"
 #PAPERLESS_CONSUMER_LOOP_TIME=10
 
 
-# By default Paperless stops consuming a document if no language can be detected.
-# Set to true to consume documents even if the language detection fails.
+# By default Paperless stops consuming a document if no language can be
+# detected. Set to true to consume documents even if the language detection
+# fails.
 #PAPERLESS_FORGIVING_OCR="false"
 
 
