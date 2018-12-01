@@ -21,9 +21,9 @@ from django.utils import timezone
 # - MONTH ZZZZ, with ZZZZ being 4 digits
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
 DATE_REGEX = re.compile(
-    r'(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|' +
-    r'(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|' +
-    r'(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|' +
+    r'(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|' +  # NOQA: E501
+    r'(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|' +  # NOQA: E501
+    r'(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|' +  # NOQA: E501
     r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|' +
     r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))'
 )
@@ -80,15 +80,20 @@ class DocumentParser:
         Returns the date of the document.
         """
 
-        def __parser__(ds, date_order):
+        def __parser(ds, date_order):
             """
             Call dateparser.parse with a particular date ordering
             """
-            return dateparser.parse(ds,
-                                    settings={"DATE_ORDER": date_order,
-                                              "PREFER_DAY_OF_MONTH": "first",
-                                              "RETURN_AS_TIMEZONE_AWARE":
-                                                  True})
+            return dateparser.parse(
+                ds,
+                settings={
+                    "DATE_ORDER": date_order,
+                    "PREFER_DAY_OF_MONTH": "first",
+                    "RETURN_AS_TIMEZONE_AWARE":
+                    True
+                }
+            )
+
         date = None
         date_string = None
 
@@ -102,16 +107,18 @@ class DocumentParser:
                 date_string = m.group(0)
 
                 try:
-                    date = __parser__(date_string, self.FILENAME_DATE_ORDER)
+                    date = __parser(date_string, self.FILENAME_DATE_ORDER)
                 except TypeError:
                     # Skip all matches that do not parse to a proper date
                     continue
 
                 if date is not None and next_year > date.year > 1900:
-                    self.log("info",
-                             "Detected document date {} based on string {} "
-                             "from document title"
-                             "".format(date.isoformat(), date_string))
+                    self.log(
+                        "info",
+                        "Detected document date {} based on string {} "
+                        "from document title"
+                        "".format(date.isoformat(), date_string)
+                    )
                     return date
 
         try:
@@ -126,7 +133,7 @@ class DocumentParser:
             date_string = m.group(0)
 
             try:
-                date = __parser__(date_string, self.DATE_ORDER)
+                date = __parser(date_string, self.DATE_ORDER)
             except TypeError:
                 # Skip all matches that do not parse to a proper date
                 continue
