@@ -14,14 +14,18 @@ from django.utils import timezone
 # - XX.YY.ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
 # - XX/YY/ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
 # - XX-YY-ZZZZ with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
+# - ZZZZ.XX.YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
+# - ZZZZ/XX/YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
+# - ZZZZ-XX-YY with XX + YY being 1 or 2 and ZZZZ being 2 or 4 digits
 # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
 # - MONTH ZZZZ, with ZZZZ being 4 digits
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
 DATE_REGEX = re.compile(
-    r'\b([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})\b|' +
-    r'\b([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))\b|' +
-    r'\b([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))\b|' +
-    r'\b([^\W\d_]{3,9} [0-9]{4})\b'
+    r'(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|' +
+    r'(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|' +
+    r'(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|' +
+    r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|' +
+    r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))'
 )
 
 
@@ -37,6 +41,7 @@ class DocumentParser:
 
     SCRATCH = settings.SCRATCH_DIR
     DATE_ORDER = settings.DATE_ORDER
+    FILENAME_DATE_ORDER = settings.FILENAME_DATE_ORDER
     OPTIPNG = settings.OPTIPNG_BINARY
 
     def __init__(self, path):
@@ -75,30 +80,53 @@ class DocumentParser:
         Returns the date of the document.
         """
 
+        def __parser__(ds, date_order):
+            """
+            Call dateparser.parse with a particular date ordering
+            """
+            return dateparser.parse(ds,
+                                    settings={"DATE_ORDER": date_order,
+                                              "PREFER_DAY_OF_MONTH": "first",
+                                              "RETURN_AS_TIMEZONE_AWARE":
+                                                  True})
         date = None
         date_string = None
 
+        next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
+        title = os.path.basename(self.document_path)
+
+        # if filename date parsing is enabled, search there first:
+        if self.FILENAME_DATE_ORDER:
+            self.log("info", "Checking document title for date")
+            for m in re.finditer(DATE_REGEX, title):
+                date_string = m.group(0)
+
+                try:
+                    date = __parser__(date_string, self.FILENAME_DATE_ORDER)
+                except TypeError:
+                    # Skip all matches that do not parse to a proper date
+                    continue
+
+                if date is not None and next_year > date.year > 1900:
+                    self.log("info",
+                             "Detected document date {} based on string {} "
+                             "from document title"
+                             "".format(date.isoformat(), date_string))
+                    return date
+
         try:
+            # getting text after checking filename will save time if only
+            # looking at the filename instead of the whole text
             text = self.get_text()
         except ParseError:
             return None
 
-        next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
-
-        # Iterate through all regex matches and try to parse the date
+        # Iterate through all regex matches in text and try to parse the date
         for m in re.finditer(DATE_REGEX, text):
-
             date_string = m.group(0)
 
             try:
-                date = dateparser.parse(
-                    date_string,
-                    settings={
-                        "DATE_ORDER": self.DATE_ORDER,
-                        "PREFER_DAY_OF_MONTH": "first",
-                        "RETURN_AS_TIMEZONE_AWARE": True
-                    }
-                )
+                date = __parser__(date_string, self.DATE_ORDER)
             except TypeError:
                 # Skip all matches that do not parse to a proper date
                 continue

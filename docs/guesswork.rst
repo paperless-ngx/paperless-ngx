@@ -43,6 +43,16 @@ These however wouldn't work:
 * ``Some Company Name, Invoice 2016-01-01, money, invoices.pdf``
 * ``Another Company- Letter of Reference.jpg``
 
+Do I have to be so strict about naming?
+---------------------------------------
+Rather than using the strict document naming rules, one can also set the option
+``PAPERLESS_FILENAME_DATE_ORDER`` in ``paperless.conf`` to any date order
+that is accepted by dateparser_. Doing so will cause ``paperless`` to default
+to any date format that is found in the title, instead of a date pulled from
+the document's text, without requiring the strict formatting of the document
+filename as described above.
+
+.. _dateparser: https://github.com/scrapinghub/dateparser/blob/v0.7.0/docs/usage.rst#settings
 
 .. _guesswork-content:
 
