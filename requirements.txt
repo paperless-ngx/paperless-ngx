@@ -43,6 +43,7 @@ pexpect==4.6.0
 pickleshare==0.7.5
 pillow==5.3.0
 pluggy==0.8.0
+psycopg2==2.7.6.1
 prompt-toolkit==2.0.7
 ptyprocess==0.6.0
 py==1.7.0
