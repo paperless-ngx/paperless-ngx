@@ -2,7 +2,7 @@ language: python
 
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr tesseract-ocr-eng tesseract-ocr-cat
+- sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr tesseract-ocr-eng tesseract-ocr-cat tesseract-ocr-deu
 
 sudo: false
 
