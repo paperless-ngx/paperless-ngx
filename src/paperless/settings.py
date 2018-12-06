@@ -152,6 +152,10 @@ if os.getenv("PAPERLESS_DBUSER"):
     }
     if os.getenv("PAPERLESS_DBPASS"):
         DATABASES["default"]["PASSWORD"] = os.getenv("PAPERLESS_DBPASS")
+    if os.getenv("PAPERLESS_DBHOST"):
+        DATABASES["default"]["HOST"] = os.getenv("PAPERLESS_DBHOST")
+    if os.getenv("PAPERLESS_DBPORT"):
+        DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
 
 
 # Password validation
