@@ -11,7 +11,7 @@ def re_slug_all_the_things(apps, schema_editor):
     """
 
     Tag = apps.get_model("documents", "Tag")
-    Correspondent = apps.get_model("documents", "Tag")
+    Correspondent = apps.get_model("documents", "Correspondent")
 
     for klass in (Tag, Correspondent):
         for instance in klass.objects.all():
