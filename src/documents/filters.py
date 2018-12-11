@@ -37,7 +37,7 @@ class TagFilterSet(FilterSet):
 
 class DocumentTypeFilterSet(FilterSet):
 
-    class Meta(object):
+    class Meta:
         model = DocumentType
         fields = {
             "name": [
