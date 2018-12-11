@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
 LABEL maintainer="The Paperless Project https://github.com/danielquinn/paperless" \
       contributors="Guy Addadi <addadi@gmail.com>, Pit Kleyersburg <pitkley@googlemail.com>, \
@@ -12,12 +12,11 @@ COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 ENV PAPERLESS_EXPORT_DIR=/export \
     PAPERLESS_CONSUMPTION_DIR=/consume
 
-# Install dependencies
-RUN apk --no-cache --update add \
-        python3 gnupg libmagic bash shadow curl \
-        sudo poppler tesseract-ocr imagemagick ghostscript unpaper && \
-    apk --no-cache add --virtual .build-dependencies \
-        python3-dev poppler-dev gcc g++ musl-dev zlib-dev jpeg-dev && \
+
+RUN apk update --no-cache && apk add python3 gnupg libmagic libpq bash shadow curl \
+        sudo poppler tesseract-ocr imagemagick ghostscript unpaper optipng && \
+    apk add --virtual .build-dependencies \
+        python3-dev poppler-dev postgresql-dev gcc g++ musl-dev zlib-dev jpeg-dev && \
 # Install python dependencies
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
