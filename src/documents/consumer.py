@@ -1,3 +1,4 @@
+from django.db import transaction
 import datetime
 import hashlib
 import logging
@@ -111,8 +112,11 @@ class Consumer:
                 if not self.try_consume_file(file):
                     self._ignore.append((file, mtime))
 
+    @transaction.atomic
     def try_consume_file(self, file):
-        "Return True if file was consumed"
+        """
+        Return True if file was consumed
+        """
 
         if not re.match(FileInfo.REGEXES["title"], file):
             return False
@@ -145,7 +149,7 @@ class Consumer:
         parsed_document = parser_class(doc)
 
         try:
-            thumbnail = parsed_document.get_thumbnail()
+            thumbnail = parsed_document.get_optimised_thumbnail()
             date = parsed_document.get_date()
             document = self._store(
                 parsed_document.get_text(),

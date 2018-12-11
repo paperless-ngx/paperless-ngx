@@ -82,6 +82,7 @@ rolled in as part of the update:
 
     $ cd /path/to/project
     $ git pull
+    $ pip install -r requirements.txt
     $ cd src
     $ ./manage.py migrate
 
