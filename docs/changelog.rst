@@ -1,6 +1,71 @@
 Changelog
 #########
 
+2.6.0
+=====
+
+* Allow an infinite number of logs to be deleted.  Thanks to `Ulli`_ for noting
+  the problem in `#433`_.
+* Fix the ``RecentCorrespondentsFilter`` correspondents filter that was added
+  in 2.4 to play nice with the defaults.  Thanks to `tsia`_ and `Sblop`_ who
+  pointed this out. `#423`_.
+* Updated dependencies to include (among other things) a security patch to
+  requests.
+* Fix text in sample data for tests so that the language guesser stops thinking
+  that everything is in Catalan because we had *Lorem ipsum* in there.
+* Tweaked the gunicorn sample command to use filesystem paths instead of Python
+  paths. `#441`_
+* Added pretty colour boxes next to the hex values in the Tags section, thanks
+  to a pull request from `Joshua Taillon`_ `#442`_.
+* Added a ``.editorconfig`` file to better specify coding style.
+* `Joshua Taillon`_ also added some logic to tie Paperless' date guessing logic
+  into how it parses file names on import. `#440`_
+
+
+2.5.0
+=====
+
+* **New dependency**: Paperless now optimises thumbnail generation with
+  `optipng`_, so you'll need to install that somewhere in your PATH or declare
+  its location in ``PAPERLESS_OPTIPNG_BINARY``.  The Docker image has already
+  been updated on the Docker Hub, so you just need to pull the latest one from
+  there if you're a Docker user.
+
+* "Login free" instances of Paperless were breaking whenever you tried to edit
+  objects in the admin: adding/deleting tags or correspondents, or even fixing
+  spelling.  This was due to the "user hack" we were applying to sessions that
+  weren't using a login, as that hack user didn't have a valid id.  The fix was
+  to attribute the first user id in the system to this hack user.  `#394`_
+
+* A problem in how we handle slug values on Tags and Correspondents required a
+  few changes to how we handle this field `#393`_:
+
+  1. Slugs are no longer editable.  They're derived from the name of the tag or
+     correspondent at save time, so if you wanna change the slug, you have to
+     change the name, and even then you're restricted to the rules of the
+     ``slugify()`` function.  The slug value is still visible in the admin
+     though.
+  2. I've added a migration to go over all existing tags & correspondents and
+     rewrite the ``.slug`` values to ones conforming to the ``slugify()``
+     rules.
+  3. The consumption process now uses the same rules as ``.save()`` in
+     determining a slug and using that to check for an existing
+     tag/correspondent.
+
+* An annoying bug in the date capture code was causing some bogus dates to be
+  attached to documents, which in turn busted the UI.  Thanks to `Andrew Peng`_
+  for reporting this. `#414`_.
+
+* A bug in the Dockerfile meant that Tesseract language files weren't being
+  installed correctly.  `euri10`_ was quick to provide a fix: `#406`_, `#413`_.
+
+* Document consumption is now wrapped in a transaction as per an old ticket
+  `#262`_.
+
+* The ``get_date()`` functionality of the parsers has been consolidated onto
+  the ``DocumentParser`` class since much of that code was redundant anyway.
+
+
 2.4.0
 =====
 
@@ -12,13 +77,13 @@ Changelog
   It's now in the import step that we decide the storage type.  This allows you
   to export from an encrypted system and import into an unencrypted one, or
   vice-versa.
-* The migration history has been slightly modified to accomodate PostgreSQL
+* The migration history has been slightly modified to accommodate PostgreSQL
   users.  Additionally, you can now tell paperless to use PostgreSQL simply by
   declaring ``PAPERLESS_DBUSER`` in your environment.  This will attempt to
   connect to your Postgres database without a password unless you also set
   ``PAPERLESS_DBPASS``.
 * A bug was found in the REST API filter system that was the result of an
-  update of django-filter some time ago.  This has now been patched `#412`_.
+  update of django-filter some time ago.  This has now been patched in `#412`_.
   Thanks to `thepill`_ for spotting it!
 
 
@@ -525,6 +590,11 @@ bulk of the work on this big change.
 .. _ahyear: https://github.com/ahyear
 .. _jonaswinkler: https://github.com/jonaswinkler
 .. _thepill: https://github.com/thepill
+.. _Andrew Peng: https://github.com/pengc99
+.. _euri10: https://github.com/euri10
+.. _Ulli: https://github.com/Ulli2k
+.. _tsia: https://github.com/tsia
+.. _Sblop:  https://github.com/Sblop
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -590,6 +660,7 @@ bulk of the work on this big change.
 .. _#322: https://github.com/danielquinn/paperless/pull/322
 .. _#328: https://github.com/danielquinn/paperless/pull/328
 .. _#253: https://github.com/danielquinn/paperless/issues/253
+.. _#262: https://github.com/danielquinn/paperless/issues/262
 .. _#323: https://github.com/danielquinn/paperless/issues/323
 .. _#344: https://github.com/danielquinn/paperless/pull/344
 .. _#351: https://github.com/danielquinn/paperless/pull/351
@@ -606,13 +677,24 @@ bulk of the work on this big change.
 .. _#391: https://github.com/danielquinn/paperless/pull/391
 .. _#390: https://github.com/danielquinn/paperless/pull/390
 .. _#392: https://github.com/danielquinn/paperless/issues/392
+.. _#393: https://github.com/danielquinn/paperless/issues/393
 .. _#395: https://github.com/danielquinn/paperless/pull/395
+.. _#394: https://github.com/danielquinn/paperless/issues/394
 .. _#396: https://github.com/danielquinn/paperless/pull/396
 .. _#399: https://github.com/danielquinn/paperless/pull/399
 .. _#400: https://github.com/danielquinn/paperless/pull/400
 .. _#401: https://github.com/danielquinn/paperless/pull/401
 .. _#405: https://github.com/danielquinn/paperless/pull/405
+.. _#406: https://github.com/danielquinn/paperless/issues/406
 .. _#412: https://github.com/danielquinn/paperless/issues/412
+.. _#413: https://github.com/danielquinn/paperless/pull/413
+.. _#414: https://github.com/danielquinn/paperless/issues/414
+.. _#423: https://github.com/danielquinn/paperless/issues/423
+.. _#433: https://github.com/danielquinn/paperless/issues/433
+.. _#440: https://github.com/danielquinn/paperless/pull/440
+.. _#441: https://github.com/danielquinn/paperless/pull/441
+.. _#442: https://github.com/danielquinn/paperless/pull/442
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
+.. _optipng: http://optipng.sourceforge.net/

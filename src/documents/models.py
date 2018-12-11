@@ -11,6 +11,7 @@ from django.conf import settings
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+from django.utils.text import slugify
 from fuzzywuzzy import fuzz
 
 from .managers import LogManager
@@ -24,7 +25,7 @@ except ImportError:
 class MatchingModel(models.Model):
 
     name = models.CharField(max_length=128, unique=True)
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, editable=False)
 
     automatic_classification = models.BooleanField(
         default=False,
@@ -41,8 +42,7 @@ class MatchingModel(models.Model):
 
     def save(self, *args, **kwargs):
 
-        if not self.slug:
-            self.slug = slugify(self.name)
+        self.slug = slugify(self.name)
 
         models.Model.save(self, *args, **kwargs)
 
@@ -373,7 +373,7 @@ class FileInfo:
         r = []
         for t in tags.split(","):
             r.append(Tag.objects.get_or_create(
-                slug=t.lower(),
+                slug=slugify(t),
                 defaults={"name": t}
             )[0])
         return tuple(r)
