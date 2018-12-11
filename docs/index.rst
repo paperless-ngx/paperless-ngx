@@ -46,3 +46,4 @@ Contents
    contributing
    scanners
    changelog
+   changelog_jonaswinkler
