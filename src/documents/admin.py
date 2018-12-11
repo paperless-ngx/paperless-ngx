@@ -64,12 +64,12 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
             # To keep it simple we use the same string for both
             # query parameter and the display.
-            return (query, query)
+            return query, query
 
         else:
             query = "{0}-{0}".format(date.year)
             display = "{}".format(date.year)
-            return (query, display)
+            return query, display
 
     def lookups(self, request, model_admin):
         if not settings.FY_START or not settings.FY_END:
@@ -91,25 +91,24 @@ class FinancialYearFilter(admin.SimpleListFilter):
 
 
 class RecentCorrespondentFilter(admin.RelatedFieldListFilter):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.title = "correspondent (recent)"
+    """
+    If PAPERLESS_RECENT_CORRESPONDENT_YEARS is set, we limit the available
+    correspondents to documents sent our way over the past ``n`` years.
+    """
 
     def field_choices(self, field, request, model_admin):
 
         years = settings.PAPERLESS_RECENT_CORRESPONDENT_YEARS
-        days = 365 * years
+        correspondents = Correspondent.objects.all()
 
-        lookups = []
         if years and years > 0:
-            correspondents = Correspondent.objects.filter(
+            self.title = "Correspondent (Recent)"
+            days = 365 * years
+            correspondents = correspondents.filter(
                 documents__created__gte=datetime.now() - timedelta(days=days)
             ).distinct()
-            for c in correspondents:
-                lookups.append((c.id, c.name))
 
-        return lookups
+        return [(c.id, c.name) for c in correspondents]
 
 
 class CommonAdmin(admin.ModelAdmin):
@@ -124,7 +123,9 @@ class CorrespondentAdmin(CommonAdmin):
         "document_count",
         "last_correspondence"
     )
-    list_editable = ("automatic_classification")
+    list_editable = ("automatic_classification",)
+
+    readonly_fields = ("slug",)
 
     def get_queryset(self, request):
         qs = super(CorrespondentAdmin, self).get_queryset(request)
@@ -149,6 +150,11 @@ class TagAdmin(CommonAdmin):
     list_filter = ("colour",)
     list_editable = ("colour", "automatic_classification")
 
+    readonly_fields = ("slug",)
+
+    class Media:
+        js = ("js/colours.js",)
+
     def get_queryset(self, request):
         qs = super(TagAdmin, self).get_queryset(request)
         qs = qs.annotate(document_count=models.Count("documents"))
@@ -163,6 +169,8 @@ class DocumentTypeAdmin(CommonAdmin):
 
     list_display = ("name", "automatic_classification", "document_count")
     list_editable = ("automatic_classification",)
+
+    readonly_fields = ("slug",)
 
     def get_queryset(self, request):
         qs = super(DocumentTypeAdmin, self).get_queryset(request)
@@ -182,14 +190,13 @@ class DocumentAdmin(CommonAdmin):
         }
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
-    readonly_fields = ("added",)
+    readonly_fields = ("added", "file_type", "storage_type",)
     list_display = ("title", "created", "added", "thumbnail", "correspondent",
                     "tags_", "archive_serial_number", "document_type")
     list_filter = (
         "document_type",
         "tags",
         ("correspondent", RecentCorrespondentFilter),
-        "correspondent",
         FinancialYearFilter
     )
 

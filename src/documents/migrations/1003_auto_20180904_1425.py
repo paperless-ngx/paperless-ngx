@@ -18,7 +18,7 @@ def reverse_automatic_classification(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0023_auto_20180823_1155'),
+        ('documents', '1002_auto_20180823_1155'),
     ]
 
     operations = [
