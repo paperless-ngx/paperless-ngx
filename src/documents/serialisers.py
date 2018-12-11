@@ -12,7 +12,7 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
 class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
 
-    class Meta(object):
+    class Meta:
         model = DocumentType
         fields = ("id", "slug", "name", "automatic_classification")
 

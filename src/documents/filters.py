@@ -1,4 +1,4 @@
-from django_filters.rest_framework import CharFilter, FilterSet, BooleanFilter
+from django_filters.rest_framework import BooleanFilter, FilterSet
 
 from .models import Correspondent, Document, Tag, DocumentType
 
@@ -37,7 +37,7 @@ class TagFilterSet(FilterSet):
 
 class DocumentTypeFilterSet(FilterSet):
 
-    class Meta(object):
+    class Meta:
         model = DocumentType
         fields = {
             "name": [

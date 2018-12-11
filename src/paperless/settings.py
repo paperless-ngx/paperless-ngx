@@ -81,7 +81,7 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "crispy_forms",
-    "django_filters"
+    "django_filters",
 
 ]
 
@@ -152,6 +152,10 @@ if os.getenv("PAPERLESS_DBENGINE"):
     }
     if os.getenv("PAPERLESS_DBPASS"):
         DATABASES["default"]["PASSWORD"] = os.getenv("PAPERLESS_DBPASS")
+    if os.getenv("PAPERLESS_DBHOST"):
+        DATABASES["default"]["HOST"] = os.getenv("PAPERLESS_DBHOST")
+    if os.getenv("PAPERLESS_DBPORT"):
+        DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
 
 
 # Password validation
@@ -197,6 +201,16 @@ MEDIA_ROOT = os.getenv(
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
+
+
+# Other
+
+# Disable Django's artificial limit on the number of form fields to submit at
+# once.  This is a protection against overloading the server, but since this is
+# a self-hosted sort of gig, the benefits of being able to mass-delete a tonne
+# of log entries outweight the benefits of such a safeguard.
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 
 # Document classification models location
@@ -255,6 +269,9 @@ CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
 CONVERT_DENSITY = os.getenv("PAPERLESS_CONVERT_DENSITY")
 
+# OptiPNG
+OPTIPNG_BINARY = os.getenv("PAPERLESS_OPTIPNG_BINARY", "optipng")
+
 # Unpaper
 UNPAPER_BINARY = os.getenv("PAPERLESS_UNPAPER_BINARY", "unpaper")
 
@@ -301,6 +318,7 @@ FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
 
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
+FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
 # Specify for how many years a correspondent is considered recent. Recent
 # correspondents will be shown in a separate "Recent correspondents" filter as
