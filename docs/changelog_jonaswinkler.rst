@@ -13,3 +13,8 @@ Changelog (jonaswinkler)
 * Added: Inbox tags (added automatically to newly consumed documents)
 * Added: Document viewer on document edit page
 * Database backend is now configurable
+
+1.0.1
+=====
+
+* Fixed migration order
