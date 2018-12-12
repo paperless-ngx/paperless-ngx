@@ -1,5 +1,14 @@
 {% extends 'admin/change_form.html' %}
 
+{% block object-tools-items %}
+  <li>
+    <a href="{{download_url}}">
+     Download file
+    </a>
+  </li>
+  {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 {{ block.super }}
