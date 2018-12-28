@@ -214,5 +214,5 @@ This too is done via the ``manage.py`` script:
 
 That's it.  It'll loop over all of the documents in your database and attempt
 to match all of your tags to them.  If one matches, it'll be applied.  And
-don't worry, you can run this as often as you like, it' won't double-tag
+don't worry, you can run this as often as you like, it won't double-tag
 a document.
