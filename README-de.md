@@ -1,7 +1,6 @@
-*[English](README.md)*<br/>
-*[Greek](README-el.md)*
+[ [en](README.md) | de | [el](README-el.md) ]
 
-# Paperless
+![Paperless](https://raw.githubusercontent.com/danielquinn/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
 
 [![Dokumentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) [![Chat](https://badges.gitter.im/danielquinn/paperless.svg)](https://gitter.im/danielquinn/paperless) [![Travis](https://travis-ci.org/danielquinn/paperless.svg?branch=master)](https://travis-ci.org/danielquinn/paperless) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master) [![Danke](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/danielquinn/paperless/blob/master/THANKS.md)
 

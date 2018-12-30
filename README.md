@@ -1,5 +1,4 @@
-*[German](README-de.md)*<br/>
-*[Greek](README-el.md)*
+[ en | [de](README-de.md) | [el](README-el.md) ]
 
 ![Paperless](https://raw.githubusercontent.com/danielquinn/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
 
