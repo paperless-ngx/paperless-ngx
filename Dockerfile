@@ -4,8 +4,8 @@ LABEL maintainer="The Paperless Project https://github.com/danielquinn/paperless
       contributors="Guy Addadi <addadi@gmail.com>, Pit Kleyersburg <pitkley@googlemail.com>, \
         Sven Fischer <git-dev@linux4tw.de>"
 
-# Copy requirements file and init script
-COPY requirements.txt /usr/src/paperless/
+# Copy Pipfiles file and init script
+COPY Pipfile* /usr/src/paperless/
 COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 
 # Set export and consumption directories
@@ -21,7 +21,8 @@ RUN apk update --no-cache && apk add python3 gnupg libmagic libpq bash shadow cu
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
     cd /usr/src/paperless && \
-    pip3 install --no-cache-dir -r requirements.txt && \
+    pip3 install --upgrade pip pipenv && \
+    pipenv install --system --deploy && \
 # Remove build dependencies
     apk del .build-dependencies && \
 # Create the consumption directory
