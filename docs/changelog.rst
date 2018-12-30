@@ -1,6 +1,11 @@
 Changelog
 #########
 
+2.6.1
+=====
+
+* We now have a logo, complete with a favicon :-)
+
 2.6.0
 =====
 

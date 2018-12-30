@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_extensions",
 
+    "paperless",
     "documents.apps.DocumentsConfig",
     "reminders.apps.RemindersConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
