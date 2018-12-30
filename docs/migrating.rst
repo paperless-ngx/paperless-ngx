@@ -102,7 +102,7 @@ is similar:
     $ cd /path/to/project
     $ git pull
     $ docker build -t paperless .
-    $ docker-compose run --rm comsumer migrate
+    $ docker-compose run --rm consumer migrate
     $ docker-compose up -d
 
 If ``git pull`` doesn't report any changes, there is no need to continue with
