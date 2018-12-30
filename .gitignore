@@ -81,4 +81,4 @@ scripts/import-for-development
 scripts/nuke
 
 # Static files collected by the collectstatic command
-static/
+./static/
