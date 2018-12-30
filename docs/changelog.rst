@@ -5,6 +5,7 @@ Changelog
 =====
 
 * We now have a logo, complete with a favicon :-)
+* Removed some problematic tests.
 
 2.6.0
 =====
