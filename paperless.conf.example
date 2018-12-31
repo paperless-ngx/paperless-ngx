@@ -202,6 +202,11 @@ PAPERLESS_DEBUG="false"
 #PAPERLESS_FORGIVING_OCR="false"
 
 
+# By default Paperless does not OCR a document if the text can be retrieved from
+# the document directly. Set to true to always OCR documents.
+#PAPERLESS_OCR_ALWAYS="false"
+
+
 ###############################################################################
 ####                            Interface                                  ####
 ###############################################################################
