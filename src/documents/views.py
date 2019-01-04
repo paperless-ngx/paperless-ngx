@@ -130,7 +130,7 @@ class DocumentViewSet(RetrieveModelMixin,
     filter_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
-        "id", "title", "correspondent__name", "created", "modified")
+        "id", "title", "correspondent__name", "created", "modified", "added")
 
 
 class LogViewSet(ReadOnlyModelViewSet):
