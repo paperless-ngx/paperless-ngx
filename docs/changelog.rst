@@ -9,6 +9,9 @@ Changelog
 * Fix the docker-compose example config to include a shared consume volume so
   that using the push API will work for users of the Docker install.  Thanks to
   `Colin Frei`_ for fixing this in `#466`_.
+* `khrise`_ submitted a pull request to include the ``added`` property to the
+  REST API `#471`.
+
 
 2.6.0
 =====
@@ -605,6 +608,7 @@ bulk of the work on this big change.
 .. _tsia: https://github.com/tsia
 .. _Sblop: https://github.com/Sblop
 .. _Colin Frei: https://github.com/colinfrei
+.. _khrise: https://github.com/khrise
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -705,6 +709,7 @@ bulk of the work on this big change.
 .. _#441: https://github.com/danielquinn/paperless/pull/441
 .. _#442: https://github.com/danielquinn/paperless/pull/442
 .. _#466: https://github.com/danielquinn/paperless/pull/466
+.. _#471: https://github.com/danielquinn/paperless/pull/471
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
