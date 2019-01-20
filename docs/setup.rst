@@ -43,6 +43,7 @@ You can go multiple routes with setting up and running Paperless:
 
  * The `bare metal route`_
  * The `docker route`_
+ * The `linux containers route`_
 
 
 The `docker route`_ is quick & easy.
@@ -53,7 +54,7 @@ should you want to contribute some code back.
 .. _docker route: setup-installation-docker_
 .. _bare metal route: setup-installation-bare-metal_
 .. _Docker Machine: https://docs.docker.com/machine/
-
+.. _linux containers route: setup-installation-linux-containers_
 
 .. _setup-installation-bare-metal:
 
@@ -471,3 +472,37 @@ If you're using Docker, you can set a restart-policy_ in the
 Docker daemon.
 
 .. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
+
+
+.. _setup-installation-linux-containers:
+
+Linux Container Method
+++++++++++++++++++++++
+
+1. Install lxc
+
+   .. caution::
+
+      This guide assumes that you use lxc on a ubuntu host, with  
+      networking set-up to get ip addresses on your lan. 
+      However, if this is set-up only two commands are needed.
+
+2. Lanch paperless container
+
+.. code:: bash
+
+    $ lxc launch ubuntu: paperless
+
+3. Run install script within container
+
+.. code:: bash
+
+    $ lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/danielquinn/paperless/master/scripts/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
+
+The script will ask you for an ftpupload password.  
+As well as the super-user for paperless web front-end. 
+After around 10 mins, http://paperless.lan is ready and
+ftp://paperless.lan with user: ftpupload
+
+See the `Installation recording <_static/lxc-install.svg>`_.
+
