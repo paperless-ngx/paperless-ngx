@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
 # Bash script to install paperless in lxc containter
+# paperless.lan
+#
+# Will set-up paperless, apache2 and proftpd
+#
+# lxc launch ubuntu: paperless
+# lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/danielquinn/paperless/master/scripts/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
+#
+#
 
 # Add paperless user with no password
 adduser --disabled-password --gecos "" paperless
@@ -10,6 +18,7 @@ echo "Set ftpupload password: "
 passwd ftpupload
 # Allow paperless group to access
 adduser paperless ftpupload
+chmod g+w /home/ftpupload 
 
 # Get apt up to date
 apt-get update
@@ -20,8 +29,8 @@ apt-get -y install unpaper gnupg libpoppler-cpp-dev python3-pyocr tesseract-ocr 
 # Needed for Apache
 apt-get -y install apache2 libapache2-mod-wsgi-py3
 
-# Instll ftp server and make sure all files are owned by paperless
-apt-get install proftpd
+# Install ftp server and make sure all uplaoded files are owned by paperless
+apt-get -y install proftpd
 cat <<EOF >> /etc/proftpd/proftpd.conf
 <Directory /home/ftpupload/>
   UserOwner   paperless
@@ -38,9 +47,6 @@ su -c "cd /home/paperless ; git clone https://github.com/bmsleight/paperless" pa
 apt-get -y install python3-pip python3-venv
 cd /home/paperless/paperless
 pip3 install -r requirements.txt
-
-#Set up consume directory
-su -c "mkdir /home/paperless/consume" paperless
 
 # Take paperless.conf.example and set consumuption dir (ftp dir)
 sed  -e '/PAPERLESS_CONSUMPTION_DIR=/s/=.*/=\"\/home\/ftpupload\/\"/' \
@@ -73,3 +79,8 @@ sed  -i "s/\/home\/paperless\/project\/src\/manage.py/\/home\/paperless\/paperle
 
 systemctl enable paperless-consumer
 systemctl start paperless-consumer
+
+# convert-im6.q16: not authorized
+# Security risk ?
+# https://stackoverflow.com/questions/42928765/convertnot-authorized-aaaa-error-constitute-c-readimage-453
+mv /etc/ImageMagick-6/policy.xml /etc/ImageMagick-6/policy.xmlout
