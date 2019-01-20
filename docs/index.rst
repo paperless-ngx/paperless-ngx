@@ -45,4 +45,5 @@ Contents
    troubleshooting
    contributing
    scanners
+   screenshots
    changelog
