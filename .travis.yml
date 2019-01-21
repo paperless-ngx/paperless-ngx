@@ -2,19 +2,22 @@ language: python
 
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr tesseract-ocr-eng tesseract-ocr-cat tesseract-ocr-deu
+- sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
 
 sudo: false
 
 matrix:
     include:
-        - python: 3.4
-        - python: 3.5
-        - python: 3.6
+        - python: "3.4"
+        - python: "3.5"
+        - python: "3.6"
+        - python: "3.7-dev"
 
 install:
-    - pip install --requirement requirements.txt
-    - pip install sphinx
+    - pip install --upgrade pip pipenv sphinx
+    - pipenv lock -r > requirements.txt
+    - pip install -r requirements.txt
+
 script:
     - cd src/
     - pytest --cov
@@ -22,4 +25,4 @@ script:
     - sphinx-build -b html ../docs ../docs/_build -W
 
 after_success:
-    - coveralls
+  - coveralls

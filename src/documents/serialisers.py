@@ -61,6 +61,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "checksum",
             "created",
             "modified",
+            "added",
             "file_name",
             "download_url",
             "thumbnail_url",
