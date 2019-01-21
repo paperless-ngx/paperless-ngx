@@ -3,8 +3,61 @@
 {# NOTE: This should probably be extending base.html.  See CSS comment below details. #}
 
 
+{% load static %}
 {% load custom_css from customisation %}
 {% load custom_js from customisation %}
+
+
+{% block extrahead %}
+	<link rel="icon" type="image/x-icon" href="{% url 'favicon' %}" />
+	<style>
+		#header {
+			background-color: #90a9b7;
+			line-height: inherit;
+			height: auto;
+		}
+		#branding h1 {
+			font-weight: inherit;
+			font-size: inherit;
+		}
+		.button,
+		.button:active,
+		.button:focus,
+		.button:hover,
+		a.button,
+		.submit-row input,
+		input[type="submit"],
+		input[type="submit"]:active,
+		input[type="submit"]:focus,
+		input[type="submit"]:hover,
+		input[type="button"],
+		input[type="button"]:active,
+		input[type="button"]:focus,
+		input[type="button"]:hover {
+			background-color: #074f57;
+		}
+		.module h2,
+		.module caption,
+		.inline-group h2 {
+			background-color: #90a9b7;
+		}
+		div.breadcrumbs {
+			background-color: #077187;
+		}
+		.module h2,
+		.module caption,
+		.inline-group h2 {
+			background-color: #077187;
+		}
+	</style>
+{% endblock %}
+
+
+{% block branding %}
+<h1 id="site-name">
+	<a href="{% url 'admin:index' %}"><img src="{% static 'paperless/img/logo-light.png' %}" alt="Paperless" /></a>
+</h1>
+{% endblock %}
 
 
 {% block blockbots %}
