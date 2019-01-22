@@ -143,6 +143,15 @@ Docker Method
    instructions in comments in the file. The only change that is a hard
    requirement is to specify where the consumption directory should
    mount.[#dockercomposeyml]_
+	 
+	 .. caution::
+	 
+	     If you are using NFS mounts for the consume directory you also need to
+			 change the command to turn off inotify as it doesn't work with NFS
+			 
+			 `command: ["document_consumer", "--no-inotify"]`
+			 
+			 
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
    ``PAPERLESS_PASSPHRASE``
