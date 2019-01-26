@@ -17,9 +17,9 @@ services:
         volumes:
             - data:/usr/src/paperless/data
             - media:/usr/src/paperless/media
-						# You have to adapt the local path you want the consumption
+            # You have to adapt the local path you want the consumption
             # directory to mount to by modifying the part before the ':'.
-						- ./consume:/consume
+            - ./consume:/consume
         env_file: docker-compose.env
         # The reason the line is here is so that the webserver that doesn't do
         # any text recognition and doesn't have to install unnecessary
@@ -40,7 +40,7 @@ services:
             - data:/usr/src/paperless/data
             - media:/usr/src/paperless/media
             # This should be set to the same value as the consume directory
-					  # in the webserver service above.
+            # in the webserver service above.
             - ./consume:/consume
             # Likewise, you can add a local path to mount a directory for
             # exporting. This is not strictly needed for paperless to
