@@ -86,6 +86,7 @@ Standard (Bare Metal)
    You should now be able to visit your (empty) installation at
    `Paperless webserver`_ or whatever you chose before.  You can login with the
    user/pass you created in #5.
+   If using runserver within /etc/paperless.conf make sure PAPERLESS_DEBUG="true"
 
 7. In a separate window, change to the ``src`` directory in this repo again,
    but this time, you should start the consumer script with
