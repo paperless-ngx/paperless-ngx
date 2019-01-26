@@ -155,6 +155,13 @@
             "index": "pypi",
             "version": "==2.0.0"
         },
+        "djangoql": {
+            "hashes": [
+                "sha256:7c488ec4e3362e5389ba3c1169d1ff9a27c4222601f32c6dbf6130ce04330d76"
+            ],
+            "index": "pypi",
+            "version": "==0.12.3"
+        },
         "djangorestframework": {
             "hashes": [
                 "sha256:607865b0bb1598b153793892101d881466bd5a991de12bd6229abb18b1c86136",
@@ -364,6 +371,13 @@
                 "sha256:bde19360a8ec4dfd8a20dcb811780a30998101f078fc7ded6162f0076f50508f"
             ],
             "version": "==0.8.0"
+        },
+        "ply": {
+            "hashes": [
+                "sha256:00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3",
+                "sha256:096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce"
+            ],
+            "version": "==3.11"
         },
         "py": {
             "hashes": [

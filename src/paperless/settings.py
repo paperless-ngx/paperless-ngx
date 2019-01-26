@@ -83,7 +83,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "crispy_forms",
     "django_filters",
-
+    "djangoql",
 ]
 
 if os.getenv("PAPERLESS_INSTALLED_APPS"):
