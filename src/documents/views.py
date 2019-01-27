@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
+from django.utils import cache
 
 from paperless.db import GnuPG
 from paperless.mixins import SessionOrBasicAuthMixin
@@ -56,10 +57,12 @@ class FetchView(SessionOrBasicAuthMixin, DetailView):
         }
 
         if self.kwargs["kind"] == "thumb":
-            return HttpResponse(
+            response = HttpResponse(
                 self._get_raw_data(self.object.thumbnail_file),
                 content_type=content_types[Document.TYPE_PNG]
             )
+            cache.patch_cache_control(response, max_age=31536000, private=True)
+            return response
 
         response = HttpResponse(
             self._get_raw_data(self.object.source_file),
