@@ -43,13 +43,17 @@ You can go multiple routes with setting up and running Paperless:
 
  * The `bare metal route`_
  * The `docker route`_
- * The `linux containers route`_
+ * A suggested `linux containers route`_
 
 
 The `docker route`_ is quick & easy.
 
 The `bare metal route`_ is a bit more complicated to setup but makes it easier
 should you want to contribute some code back.
+
+The `linux containers route`_ is quick, but makes alot of assumptions on the 
+set-up, on the other hand the script could be used to install on a base
+debian or ubuntu server.
 
 .. _docker route: setup-installation-docker_
 .. _bare metal route: setup-installation-bare-metal_
@@ -489,16 +493,24 @@ Docker daemon.
 
 .. _setup-installation-linux-containers:
 
-Linux Container Method
-++++++++++++++++++++++
+Suggested way for Linux Container Method
+++++++++++++++++++++++++++++++++++++++++
+
+This method uses some rigid assumptions, for the best set-up:-
+
+ * Ubuntu lts as the container
+ * Apache as the webserver
+ * proftpd as ftp server
+ * ftpupload as the ftp user
+ * paperless as the main user for website 
+ * http://paperless.lan is the desired lan url
+ * LXC set to give ip addresses on your lan
+
+This could also be used as an install on a base debain/ubuntu server, 
+if the above assumptions are acceptable.
 
 1. Install lxc
 
-   .. caution::
-
-      This guide assumes that you use lxc on a ubuntu host, with  
-      networking set-up to get ip addresses on your lan. 
-      However, if this is set-up only two commands are needed.
 
 2. Lanch paperless container
 
@@ -510,7 +522,7 @@ Linux Container Method
 
 .. code:: bash
 
-    $ lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/danielquinn/paperless/master/scripts/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
+    $ lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/danielquinn/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
 
 The script will ask you for an ftpupload password.  
 As well as the super-user for paperless web front-end. 
