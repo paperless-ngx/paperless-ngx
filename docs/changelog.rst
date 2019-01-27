@@ -1,6 +1,23 @@
 Changelog
 #########
 
+2.7.0
+=====
+
+* `syntonym`_ submitted a pull request to catch IMAP connection errors `#475`_.
+* `Stéphane Brunner`_ added ``psycopg2`` to the Pipfile `#489`_.  He also fixed
+  a syntax error in ``docker-compose.yml.example`` `#488`_ and added [DjangoQL](https://github.com/ivelum/djangoql),
+  which allows a litany of handy search functionality `#492`_.
+* `CkuT`_ and `JOKer`_ hacked out a simple, but super-helpful optimisation to
+  how the thumbnails are served up, improving performance considerably `#481`_.
+* `tsia`_ added a few fields to the tags REST API. `#483`_.
+* `Brian Cribbs`_ improved the documentation to help people using Paperless
+  over NFS `#484`_.
+* `Brendan M. Sleight`_ updated the documentation to include a note for setting the
+  ``DEBUG`` value.  The ``paperless.conf.example`` file was also updated to
+  mirror the project defaults.
+
+
 2.6.1
 =====
 
@@ -10,7 +27,7 @@ Changelog
   that using the push API will work for users of the Docker install.  Thanks to
   `Colin Frei`_ for fixing this in `#466`_.
 * `khrise`_ submitted a pull request to include the ``added`` property to the
-  REST API `#471`.
+  REST API `#471`_.
 
 
 2.6.0
@@ -609,6 +626,10 @@ bulk of the work on this big change.
 .. _Sblop: https://github.com/Sblop
 .. _Colin Frei: https://github.com/colinfrei
 .. _khrise: https://github.com/khrise
+.. _syntonym: https://github.com/syntonym
+.. _JOKer: https://github.com/JOKer
+.. _Brian Cribbs: https://github.com/cribbstechnolog
+.. _Brendan M. Sleight: https://github.com/bmsleight
 
 .. _#20: https://github.com/danielquinn/paperless/issues/20
 .. _#44: https://github.com/danielquinn/paperless/issues/44
@@ -710,6 +731,13 @@ bulk of the work on this big change.
 .. _#442: https://github.com/danielquinn/paperless/pull/442
 .. _#466: https://github.com/danielquinn/paperless/pull/466
 .. _#471: https://github.com/danielquinn/paperless/pull/471
+.. _#475: https://github.com/danielquinn/paperless/pull/475
+.. _#481: https://github.com/danielquinn/paperless/pull/481
+.. _#483: https://github.com/danielquinn/paperless/pull/483
+.. _#484: https://github.com/danielquinn/paperless/pull/484
+.. _#488: https://github.com/danielquinn/paperless/pull/488
+.. _#489: https://github.com/danielquinn/paperless/pull/489
+.. _#492: https://github.com/danielquinn/paperless/pull/492
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
