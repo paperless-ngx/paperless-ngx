@@ -40,8 +40,8 @@ EOF
 systemctl restart proftpd
 
 
-#Get Paperless from git (NB: currently fork)
-su -c "cd /home/paperless ; git clone https://github.com/bmsleight/paperless" paperless
+#Get Paperless from git 
+su -c "cd /home/paperless ; git clone https://github.com/danielquinn/paperless" paperless
 
 # Install Pip Requirements
 apt-get -y install python3-pip python3-venv
@@ -64,7 +64,7 @@ su -c "cd /home/paperless/paperless/src/ ; ./manage.py createsuperuser" paperles
 su -c "cd /home/paperless/paperless/src/ ; ./manage.py collectstatic" paperless
 
 # Set-up apache
-cp /home/paperless/paperless/scripts/lxc/paperless.conf /etc/apache2/sites-available/
+cp /home/paperless/paperless/docs/examples/lxc/paperless.conf /etc/apache2/sites-available/
 a2dissite 000-default.conf
 a2ensite paperless.conf
 systemctl reload apache2
