@@ -78,12 +78,16 @@ Standard (Bare Metal)
       encrypt/decrypt the original documents.  Don't worry about defining this
       if you don't want to use encryption (the default).
 
+   Note also that if you're using the ``runserver`` as mentioned below, you
+   should make sure that PAPERLESS_DEBUG="true" or is just commented out as
+   this is the default.
+
 4. Initialise the SQLite database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
 6. Start the webserver with ``./manage.py runserver <IP>:<PORT>``.
-   If no specifc IP or port are given, the default is ``127.0.0.1:8000``
-   also known as http://localhost:8000/.
+   If no specific IP or port is given, the default is ``127.0.0.1:8000`` also
+   known as http://localhost:8000/.
    You should now be able to visit your (empty) installation at
    `Paperless webserver`_ or whatever you chose before.  You can login with the
    user/pass you created in #5.
@@ -144,6 +148,15 @@ Docker Method
    instructions in comments in the file. The only change that is a hard
    requirement is to specify where the consumption directory should
    mount.[#dockercomposeyml]_
+	 
+	 .. caution::
+	 
+	     If you are using NFS mounts for the consume directory you also need to
+			 change the command to turn off inotify as it doesn't work with NFS
+			 
+			 `command: ["document_consumer", "--no-inotify"]`
+			 
+			 
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
    ``PAPERLESS_PASSPHRASE``

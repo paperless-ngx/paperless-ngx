@@ -216,7 +216,11 @@ class MailFetcher(Loggable):
         return r
 
     def _connect(self):
-        self._connection = imaplib.IMAP4_SSL(self._host, self._port)
+        try:
+            self._connection = imaplib.IMAP4_SSL(self._host, self._port)
+        except OSError as e:
+            msg = "Problem connecting to {}: {}".format(self._host, e.strerror)
+            raise MailFetcherError(msg)
 
     def _login(self):
 
