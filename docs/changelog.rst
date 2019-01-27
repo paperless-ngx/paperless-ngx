@@ -627,7 +627,7 @@ bulk of the work on this big change.
 .. _Colin Frei: https://github.com/colinfrei
 .. _khrise: https://github.com/khrise
 .. _syntonym: https://github.com/syntonym
-.. _JOKer: https://github.com/JOKer
+.. _JOKer: https://github.com/MasterofJOKers
 .. _Brian Cribbs: https://github.com/cribbstechnolog
 .. _Brendan M. Sleight: https://github.com/bmsleight
 
