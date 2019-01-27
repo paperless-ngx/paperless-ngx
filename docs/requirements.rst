@@ -12,6 +12,7 @@ should work) that has the following software installed:
 * `Imagemagick`_ version 6.7.5 or higher
 * `unpaper`_
 * `libpoppler-cpp-dev`_ PDF rendering library
+* `optipng`_
 
 .. _Python3: https://python.org/
 .. _GNU Privacy Guard: https://gnupg.org
@@ -19,6 +20,7 @@ should work) that has the following software installed:
 .. _Imagemagick: http://imagemagick.org/
 .. _unpaper: https://www.flameeyes.eu/projects/unpaper
 .. _libpoppler-cpp-dev: https://poppler.freedesktop.org/
+.. _optipng: http://optipng.sourceforge.net/
 
 Notably, you should confirm how you access your Python3 installation.  Many
 Linux distributions will install Python3 in parallel to Python2, using the
