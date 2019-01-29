@@ -45,13 +45,23 @@ class RasterisedDocumentParser(DocumentParser):
         """
 
         out_path = os.path.join(self.tempdir, "convert.png")
+        gs_out_path = os.path.join(self.tempdir, "gs_out.png")
 
         # Run convert to get a decent thumbnail
+
+        # https://github.com/danielquinn/paperless/issues/447
+        # call gs first
+        environment = os.environ.copy()
+        cmd = ["gs", "-q", "-sDEVICE=pngalpha",
+               "-o", gs_out_path, self.document_path]
+        if not subprocess.Popen(cmd, env=environment).wait() == 0:
+            raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
+        # then run convert on the output from gs
         run_convert(
             self.CONVERT,
             "-scale", "500x5000",
             "-alpha", "remove",
-            "{}[0]".format(self.document_path),
+            "gs_out_path",
             out_path
         )
 
