@@ -51,10 +51,9 @@ class RasterisedDocumentParser(DocumentParser):
 
         # https://github.com/danielquinn/paperless/issues/447
         # call gs first
-        environment = os.environ.copy()
         cmd = ["gs", "-q", "-sDEVICE=pngalpha",
                "-o", gs_out_path, self.document_path]
-        if not subprocess.Popen(cmd, env=environment).wait() == 0:
+        if not subprocess.Popen(cmd).wait() == 0:
             raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
         # then run convert on the output from gs
         run_convert(
