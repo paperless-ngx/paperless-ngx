@@ -60,7 +60,7 @@ class RasterisedDocumentParser(DocumentParser):
             self.CONVERT,
             "-scale", "500x5000",
             "-alpha", "remove",
-            "gs_out_path",
+            gs_out_path,
             out_path
         )
 
