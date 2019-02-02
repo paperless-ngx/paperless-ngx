@@ -73,3 +73,14 @@ For more information on this and situations like it, you should take a look
 at `Issue #118`_ as that's where this tip originated.
 
 .. _Issue #118: https://github.com/danielquinn/paperless/issues/118
+
+
+.. _troubleshooting-consumerlogs
+
+
+Viewing Consumer logs
+---------------------
+
+.. code:: bash
+
+    $ sudo journalctl -u paperless-consumer
