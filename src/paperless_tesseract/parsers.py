@@ -29,6 +29,7 @@ class RasterisedDocumentParser(DocumentParser):
     """
 
     CONVERT = settings.CONVERT_BINARY
+    GHOSTSCRIPT = settings.GS_BINARY
     DENSITY = settings.CONVERT_DENSITY if settings.CONVERT_DENSITY else 300
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
@@ -47,12 +48,14 @@ class RasterisedDocumentParser(DocumentParser):
         out_path = os.path.join(self.tempdir, "convert.png")
         gs_out_path = os.path.join(self.tempdir, "gs_out.png")
 
-        # Run convert to get a decent thumbnail
-
+        # Extract the first PDF page as a PNG using Ghostscript  
         # https://github.com/danielquinn/paperless/issues/447
         # call gs first
-        cmd = ["gs", "-q", "-sDEVICE=pngalpha",
-               "-o", gs_out_path, self.document_path]
+        cmd = [self.GHOSTSCRIPT, 
+               "-q",
+               "-sDEVICE=pngalpha",
+               "-o", gs_out_path,
+               self.document_path]
         if not subprocess.Popen(cmd).wait() == 0:
             raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
         # then run convert on the output from gs

@@ -247,6 +247,9 @@ PAPERLESS_EMAIL_SECRET=""
 # Convert (part of the ImageMagick suite)
 #PAPERLESS_CONVERT_BINARY=/usr/bin/convert
 
+# Ghostscript
+#PAPERLESS_GS_BINARY = /usr/bin/gs
+
 # Unpaper
 #PAPERLESS_UNPAPER_BINARY=/usr/bin/unpaper
 
