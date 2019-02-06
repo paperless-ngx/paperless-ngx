@@ -17,13 +17,17 @@ that works right for you based on recommentations from other Paperless users.
 +---------+----------------+-----+-----+-----+----------------+
 | Brother | `MFC-J6930DW`_ | yes |     |     | `ayounggun`_   |
 +---------+----------------+-----+-----+-----+----------------+
+| Brother | `MFC-J5910DW`_ | yes |     |     | `bmsleight`_   |
++---------+----------------+-----+-----+-----+----------------+
 | Fujitsu | `ix500`_       | yes |     | yes | `eonist`_      |
 +---------+----------------+-----+-----+-----+----------------+
 
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
+.. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 
 .. _danielquinn: https://github.com/danielquinn
 .. _ayounggun: https://github.com/ayounggun
+.. _bmsleight: https://github.com/bmsleight
 .. _eonist: https://github.com/eonist
