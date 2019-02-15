@@ -12,11 +12,30 @@ COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 ENV PAPERLESS_EXPORT_DIR=/export \
     PAPERLESS_CONSUMPTION_DIR=/consume
 
-
-RUN apk update --no-cache && apk add python3 gnupg libmagic libpq bash shadow curl \
-        sudo poppler tesseract-ocr imagemagick ghostscript unpaper optipng && \
-    apk add --virtual .build-dependencies \
-        python3-dev poppler-dev postgresql-dev gcc g++ musl-dev zlib-dev jpeg-dev && \
+RUN apk add --no-cache \
+      bash \
+      curl \
+      ghostscript \
+      gnupg \
+      imagemagick \
+      libmagic \
+      libpq \
+      optipng \
+      poppler \
+      python3 \
+      shadow \
+      sudo \
+      tesseract-ocr \
+      unpaper && \
+    apk add --no-cache --virtual .build-dependencies \
+      g++ \
+      gcc \
+      jpeg-dev \
+      musl-dev \
+      poppler-dev \
+      postgresql-dev \
+      python3-dev \
+      zlib-dev && \
 # Install python dependencies
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
