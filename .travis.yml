@@ -12,6 +12,17 @@ matrix:
         - python: "3.5"
         - python: "3.6"
         - python: "3.7-dev"
+        - env: BUILD_DOCKER=1
+          services:
+            - docker
+          before_install:
+            - true
+          install:
+            - true
+          script:
+            - docker build -t paperless .
+          after_success:
+            - true
 
 install:
     - pip install --upgrade pip pipenv sphinx
