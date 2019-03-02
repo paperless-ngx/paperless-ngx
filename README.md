@@ -32,7 +32,7 @@ Here's what you get:
 
 ## Documentation
 
-It's all available on [ReadTheDocs](https://paperless.readthedocs.org/).
+It's all available on [ReadTheDocs](https://paperless.readthedocs.io/).
 
 
 ## Requirements
