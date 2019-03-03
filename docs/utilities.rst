@@ -258,7 +258,7 @@ Enabling Encryption
 
 Basic usage to enable encryption of your document store (**USE A MORE SECURE PASSPHRASE**):
 
-(Note: If PAPERLESS_PASSPHRASE isn't set already, you need to specify it here)
+(Note: If ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
 
 .. code:: bash
 
