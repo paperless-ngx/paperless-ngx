@@ -79,7 +79,7 @@ class RasterisedDocumentParser(DocumentParser):
                 "-alpha", "remove",
                 gs_out_path,
                 out_path
-        )
+            )
 
         return out_path
 
