@@ -268,7 +268,7 @@ Basic usage to enable encryption of your document store (**USE A MORE SECURE PAS
 Disabling Encryption
 ....................
 
-Basic usage to enable encryption of your document store
+Basic usage to enable encryption of your document store:
 
 (Note: Again, if ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
 
