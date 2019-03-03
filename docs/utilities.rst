@@ -270,7 +270,7 @@ Disabling Encryption
 
 Basic usage to enable encryption of your document store
 
-(Note: Again, if PAPERLESS_PASSPHRASE isn't set already, you need to specify it here)
+(Note: Again, if ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
 
 .. code:: bash
 
