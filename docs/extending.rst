@@ -8,7 +8,7 @@ managed by way of modifying the code directly and issuing a pull request on
 `GitHub`_.  However, over time the project has been evolving to be a little
 more "pluggable" so that users can write their own stuff that talks to it.
 
-.. _GitHub: https://github.com/danielquinn/paperless
+.. _GitHub: https://github.com/the-paperless-project/paperless
 
 
 .. _extending-parsers:
@@ -106,7 +106,7 @@ The core Paperless functionality is based on this design, so if you want to see
 what a parser module should look like, have a look at `parsers.py`_,
 `signals.py`_, and `apps.py`_ in the `paperless_tesseract`_ module.
 
-.. _parsers.py: https://github.com/danielquinn/paperless/blob/master/src/paperless_tesseract/parsers.py
-.. _signals.py: https://github.com/danielquinn/paperless/blob/master/src/paperless_tesseract/signals.py
-.. _apps.py: https://github.com/danielquinn/paperless/blob/master/src/paperless_tesseract/apps.py
-.. _paperless_tesseract: https://github.com/danielquinn/paperless/blob/master/src/paperless_tesseract/
+.. _parsers.py: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/parsers.py
+.. _signals.py: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/signals.py
+.. _apps.py: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/apps.py
+.. _paperless_tesseract: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/
