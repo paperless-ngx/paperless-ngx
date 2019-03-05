@@ -2,7 +2,7 @@
 
 ![Paperless](https://raw.githubusercontent.com/the-paperless-project/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
 
-[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) [![Chat](https://badges.gitter.im/the-paperless-project/paperless.svg)](https://gitter.im/the-paperless-project/paperless) [![Travis](https://travis-ci.org/the-paperless-project/paperless.svg?branch=master)](https://travis-ci.org/the-paperless-project/paperless) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master) [![Thanks](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/the-paperless-project/paperless/blob/master/THANKS.md)
+[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) [![Chat](https://badges.gitter.im/the-paperless-project/paperless.svg)](https://gitter.im/danielquinn/paperless) [![Travis](https://travis-ci.org/the-paperless-project/paperless.svg?branch=master)](https://travis-ci.org/the-paperless-project/paperless) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master) [![Thanks](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/the-paperless-project/paperless/blob/master/THANKS.md)
 
 Index and archive all of your scanned paper documents
 
