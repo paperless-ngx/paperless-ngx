@@ -1,8 +1,8 @@
 [ en | [de](README-de.md) | [el](README-el.md) ]
 
-![Paperless](https://raw.githubusercontent.com/danielquinn/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
+![Paperless](https://raw.githubusercontent.com/the-paperless-project/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
 
-[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) [![Chat](https://badges.gitter.im/danielquinn/paperless.svg)](https://gitter.im/danielquinn/paperless) [![Travis](https://travis-ci.org/danielquinn/paperless.svg?branch=master)](https://travis-ci.org/danielquinn/paperless) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master) [![Thanks](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/danielquinn/paperless/blob/master/THANKS.md)
+[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) [![Chat](https://badges.gitter.im/the-paperless-project/paperless.svg)](https://gitter.im/the-paperless-project/paperless) [![Travis](https://travis-ci.org/the-paperless-project/paperless.svg?branch=master)](https://travis-ci.org/the-paperless-project/paperless) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master) [![Thanks](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/the-paperless-project/paperless/blob/master/THANKS.md)
 
 Index and archive all of your scanned paper documents
 
@@ -27,7 +27,7 @@ Paperless does not control your scanner, it only helps you deal with what your s
 
 Here's what you get:
 
-![The before and after](https://raw.githubusercontent.com/danielquinn/paperless/master/docs/_static/screenshot.png)
+![The before and after](https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/_static/screenshot.png)
 
 
 ## Documentation
