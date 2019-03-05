@@ -740,5 +740,5 @@ bulk of the work on this big change.
 .. _#492: https://github.com/the-paperless-project/paperless/pull/492
 
 .. _pipenv: https://docs.pipenv.org/
-.. _a new home on Docker Hub: https://hub.docker.com/r/the-paperless-project/paperless/
+.. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
 .. _optipng: http://optipng.sourceforge.net/
