@@ -216,3 +216,62 @@ That's it.  It'll loop over all of the documents in your database and attempt
 to match all of your tags to them.  If one matches, it'll be applied.  And
 don't worry, you can run this as often as you like, it won't double-tag
 a document.
+
+.. _utilities-encyption:
+
+Enabling Encrpytion
+-------------------
+
+Let's say you've imported a few documents to play around with paperless and now
+you are using it more seriously and want to enable encryption of your files.
+
+.. utilities-encryption-howto:
+
+Basic Syntax
+.............
+
+Again we'll use the ``manage.py`` script, passing ``change_storage_type``:
+
+.. code:: bash
+
+    $ /path/to/paperless/src/manage.py change_storage_type --help
+		usage: manage.py change_storage_type [-h] [--version] [-v {0,1,2,3}]
+                                     [--settings SETTINGS]
+                                     [--pythonpath PYTHONPATH] [--traceback]
+                                     [--no-color] [--passphrase PASSPHRASE]
+                                     {gpg,unencrypted} {gpg,unencrypted}
+
+    This is how you migrate your stored documents from an encrypted state to an
+    unencrypted one (or vice-versa)
+
+    positional arguments:
+      {gpg,unencrypted}     The state you want to change your documents from
+      {gpg,unencrypted}     The state you want to change your documents to
+
+    optional arguments:
+      --passphrase PASSPHRASE
+                            If PAPERLESS_PASSPHRASE isn't set already, you need to
+                            specify it here
+
+Enabling Encryption
+...................
+
+Basic usage to enable encryption of your document store (**USE A MORE SECURE PASSPHRASE**):
+
+(Note: If ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
+
+.. code:: bash
+
+    $ /path/to/paperless/src/manage.py change_storage_type [--passphrase SECR3TP4SSPHRA$E] unencrypted gpg
+
+
+Disabling Encryption
+....................
+
+Basic usage to enable encryption of your document store:
+
+(Note: Again, if ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
+
+.. code:: bash
+
+    $ /path/to/paperless/src/manage.py change_storage_type [--passphrase SECR3TP4SSPHRA$E] gpg unencrypted
