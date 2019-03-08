@@ -29,6 +29,7 @@ class RasterisedDocumentParser(DocumentParser):
     """
 
     CONVERT = settings.CONVERT_BINARY
+    GHOSTSCRIPT = settings.GS_BINARY
     DENSITY = settings.CONVERT_DENSITY if settings.CONVERT_DENSITY else 300
     THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
     UNPAPER = settings.UNPAPER_BINARY
@@ -47,13 +48,38 @@ class RasterisedDocumentParser(DocumentParser):
         out_path = os.path.join(self.tempdir, "convert.png")
 
         # Run convert to get a decent thumbnail
-        run_convert(
-            self.CONVERT,
-            "-scale", "500x5000",
-            "-alpha", "remove",
-            "{}[0]".format(self.document_path),
-            out_path
-        )
+        try:
+            run_convert(
+                self.CONVERT,
+                "-scale", "500x5000",
+                "-alpha", "remove",
+                "{}[0]".format(self.document_path),
+                out_path
+            )
+        except ParseError:
+            # if convert fails, fall back to extracting
+            # the first PDF page as a PNG using Ghostscript
+            self.log(
+                "warning",
+                "Thumbnail generation with ImageMagick failed, "
+                "falling back to Ghostscript."
+            )
+            gs_out_path = os.path.join(self.tempdir, "gs_out.png")
+            cmd = [self.GHOSTSCRIPT,
+                   "-q",
+                   "-sDEVICE=pngalpha",
+                   "-o", gs_out_path,
+                   self.document_path]
+            if not subprocess.Popen(cmd).wait() == 0:
+                raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
+            # then run convert on the output from gs
+            run_convert(
+                self.CONVERT,
+                "-scale", "500x5000",
+                "-alpha", "remove",
+                gs_out_path,
+                out_path
+            )
 
         return out_path
 
