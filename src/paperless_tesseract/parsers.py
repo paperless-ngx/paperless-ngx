@@ -53,6 +53,7 @@ class RasterisedDocumentParser(DocumentParser):
                 self.CONVERT,
                 "-scale", "500x5000",
                 "-alpha", "remove",
+                "-strip", "-trim",
                 "{}[0]".format(self.document_path),
                 out_path
             )
@@ -77,6 +78,7 @@ class RasterisedDocumentParser(DocumentParser):
                 self.CONVERT,
                 "-scale", "500x5000",
                 "-alpha", "remove",
+                "-strip", "-trim",
                 gs_out_path,
                 out_path
             )
