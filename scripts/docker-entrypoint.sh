@@ -82,7 +82,7 @@ install_languages() {
         if apk info -e "$pkg" > /dev/null 2>&1; then
             continue
         fi
-        if ! apk info "$pkg" > /dev/null 2>&1; then
+        if ! apk --no-cache info "$pkg" > /dev/null 2>&1; then
             continue
         fi
 
