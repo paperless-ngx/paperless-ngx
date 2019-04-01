@@ -12,7 +12,11 @@ matrix:
         - python: "3.5"
         - python: "3.6"
         - python: "3.7-dev"
-        - env: BUILD_DOCKER=1
+        - env:
+            - BUILD_DOCKER=1
+            # Variable to add to publish the Docker image:
+            # * DOCKER_USERNAME
+            # * DOCKER_PASSWORD, to be encrypted, use `travis encrypt DOCKER_PASSWORD=<password>`
           services:
             - docker
           before_install:
@@ -20,7 +24,7 @@ matrix:
           install:
             - true
           script:
-            - docker build -t paperless .
+            - docker build --tag=the-paperless-project/paperless .
           after_success:
             - true
 
@@ -37,3 +41,17 @@ script:
 
 after_success:
   - coveralls
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: ci/deploy-docker
+    on:
+      tags: true
+      condition: '"${BUILD_DOCKER}" = 1'
+  - provider: script
+    skip_cleanup: true
+    script: ci/deploy-docker
+    on:
+      branch: master
+      condition: '"${BUILD_DOCKER}" = 1'
