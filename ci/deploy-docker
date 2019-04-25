@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "${DOCKER_USERNAME}" == "" -o "${DOCKER_PASSWORD}" == "" ]
+then
+    exit 0
+fi
+
+docker login --username=${DOCKER_USERNAME} --password=${DOCKER_PASSWORD}
+if [ "${TRAVIS_TAG}" != "" ]
+then
+    docker tag the-paperless-project/paperless the-paperless-project/paperless:${TRAVIS_TAG}
+    docker push the-paperless-project/paperless:${TRAVIS_TAG}
+else
+    docker push the-paperless-project/paperless
+fi
