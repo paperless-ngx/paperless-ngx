@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
+import json
 import os
+import re
 
 from dotenv import load_dotenv
 
@@ -316,6 +318,15 @@ FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
+
+# Transformations applied before filename parsing
+FILENAME_PARSE_TRANSFORMS = []
+_filename_parse_transforms = os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS")
+if _filename_parse_transforms:
+    FILENAME_PARSE_TRANSFORMS = [(
+            re.compile(t["pattern"]), t["repl"])
+        for t in json.loads(_filename_parse_transforms)
+    ]
 
 # Specify for how many years a correspondent is considered recent. Recent
 # correspondents will be shown in a separate "Recent correspondents" filter as
