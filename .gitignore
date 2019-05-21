@@ -66,6 +66,7 @@ media/overrides.js
 
 # Sqlite database
 db.sqlite3
+db.sqlite3-journal
 
 # PyCharm
 .idea
