@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "crispy_forms",
     "django_filters",
+    "djangoql",
 
 ]
 
@@ -269,6 +270,9 @@ CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY", "convert")
 CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
 CONVERT_DENSITY = os.getenv("PAPERLESS_CONVERT_DENSITY")
+
+# Ghostscript
+GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
 
 # OptiPNG
 OPTIPNG_BINARY = os.getenv("PAPERLESS_OPTIPNG_BINARY", "optipng")

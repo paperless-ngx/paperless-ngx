@@ -8,7 +8,7 @@ basic documentation is in order.  If you follow along in this document and
 still have trouble, please open an `issue on GitHub`_ so I can fill in the
 gaps.
 
-.. _issue on GitHub: https://github.com/danielquinn/paperless/issues
+.. _issue on GitHub: https://github.com/the-paperless-project/paperless/issues
 
 
 .. _setup-download:
@@ -21,7 +21,7 @@ either by using ``git``:
 
 .. code:: bash
 
-    $ git clone https://github.com/danielquinn/paperless.git
+    $ git clone https://github.com/the-paperless-project/paperless.git
     $ cd paperless
 
 or just download the tarball and go that route:
@@ -29,7 +29,7 @@ or just download the tarball and go that route:
 .. code:: bash
 
     $ cd to the directory where you want to run Paperless
-    $ wget https://github.com/danielquinn/paperless/archive/master.zip
+    $ wget https://github.com/the-paperless-project/paperless/archive/master.zip
     $ unzip master.zip
     $ cd paperless-master
 
@@ -77,12 +77,16 @@ Standard (Bare Metal)
       encrypt/decrypt the original documents.  Don't worry about defining this
       if you don't want to use encryption (the default).
 
+   Note also that if you're using the ``runserver`` as mentioned below, you
+   should make sure that PAPERLESS_DEBUG="true" or is just commented out as
+   this is the default.
+
 4. Initialise the SQLite database with ``./manage.py migrate``.
 5. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
 6. Start the webserver with ``./manage.py runserver <IP>:<PORT>``.
-   If no specifc IP or port are given, the default is ``127.0.0.1:8000``
-   also known as http://localhost:8000/.
+   If no specific IP or port is given, the default is ``127.0.0.1:8000`` also
+   known as http://localhost:8000/.
    You should now be able to visit your (empty) installation at
    `Paperless webserver`_ or whatever you chose before.  You can login with the
    user/pass you created in #5.
@@ -143,6 +147,15 @@ Docker Method
    instructions in comments in the file. The only change that is a hard
    requirement is to specify where the consumption directory should
    mount.[#dockercomposeyml]_
+
+	 .. caution::
+
+	     If you are using NFS mounts for the consume directory you also need to
+			 change the command to turn off inotify as it doesn't work with NFS
+
+			 `command: ["document_consumer", "--no-inotify"]`
+
+
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
 
    ``PAPERLESS_PASSPHRASE``

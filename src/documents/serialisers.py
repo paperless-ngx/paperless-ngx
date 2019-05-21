@@ -7,14 +7,24 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Correspondent
-        fields = ("id", "slug", "name", "automatic_classification")
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "automatic_classification"
+        )
 
 
 class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = DocumentType
-        fields = ("id", "slug", "name", "automatic_classification")
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "automatic_classification"
+        )
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,7 +32,12 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag
         fields = (
-            "id", "slug", "name", "colour", "automatic_classification")
+            "id",
+            "slug",
+            "name",
+            "colour",
+            "automatic_classification"
+        )
 
 
 class CorrespondentField(serializers.HyperlinkedRelatedField):
