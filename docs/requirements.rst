@@ -52,7 +52,7 @@ with PDFs.  Often this is the case with Apple systems using HomeBrew, but other
 Linuxes have been a problem as well.  The solution appears to be to install
 ghostscript as well as ImageMagick:
 
-.. _run into problems: https://github.com/danielquinn/paperless/issues/25
+.. _run into problems: https://github.com/the-paperless-project/paperless/issues/25
 
 .. code:: bash
 
@@ -92,7 +92,7 @@ enter it, and install the requirements using the ``requirements.txt`` file:
     $ . /path/to/arbitrary/directory/bin/activate
     $ pip install  --requirement /path/to/paperless/requirements.txt
 
-Now you're ready to go.  Just remember to enter (activate) your virtualenv 
+Now you're ready to go.  Just remember to enter (activate) your virtualenv
 whenever you want to use Paperless.
 
 

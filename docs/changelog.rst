@@ -1,6 +1,23 @@
 Changelog
 #########
 
+2.7.0
+=====
+
+* `syntonym`_ submitted a pull request to catch IMAP connection errors `#475`_.
+* `Stéphane Brunner`_ added ``psycopg2`` to the Pipfile `#489`_.  He also fixed
+  a syntax error in ``docker-compose.yml.example`` `#488`_ and added [DjangoQL](https://github.com/ivelum/djangoql),
+  which allows a litany of handy search functionality `#492`_.
+* `CkuT`_ and `JOKer`_ hacked out a simple, but super-helpful optimisation to
+  how the thumbnails are served up, improving performance considerably `#481`_.
+* `tsia`_ added a few fields to the tags REST API. `#483`_.
+* `Brian Cribbs`_ improved the documentation to help people using Paperless
+  over NFS `#484`_.
+* `Brendan M. Sleight`_ updated the documentation to include a note for setting the
+  ``DEBUG`` value.  The ``paperless.conf.example`` file was also updated to
+  mirror the project defaults.
+
+
 2.6.1
 =====
 
@@ -10,7 +27,7 @@ Changelog
   that using the push API will work for users of the Docker install.  Thanks to
   `Colin Frei`_ for fixing this in `#466`_.
 * `khrise`_ submitted a pull request to include the ``added`` property to the
-  REST API `#471`.
+  REST API `#471`_.
 
 
 2.6.0
@@ -609,107 +626,118 @@ bulk of the work on this big change.
 .. _Sblop: https://github.com/Sblop
 .. _Colin Frei: https://github.com/colinfrei
 .. _khrise: https://github.com/khrise
+.. _syntonym: https://github.com/syntonym
+.. _JOKer: https://github.com/MasterofJOKers
+.. _Brian Cribbs: https://github.com/cribbstechnolog
+.. _Brendan M. Sleight: https://github.com/bmsleight
 
-.. _#20: https://github.com/danielquinn/paperless/issues/20
-.. _#44: https://github.com/danielquinn/paperless/issues/44
-.. _#45: https://github.com/danielquinn/paperless/issues/45
-.. _#47: https://github.com/danielquinn/paperless/issues/47
-.. _#48: https://github.com/danielquinn/paperless/issues/48
-.. _#53: https://github.com/danielquinn/paperless/issues/53
-.. _#54: https://github.com/danielquinn/paperless/issues/54
-.. _#57: https://github.com/danielquinn/paperless/issues/57
-.. _#60: https://github.com/danielquinn/paperless/issues/60
-.. _#67: https://github.com/danielquinn/paperless/issues/67
-.. _#68: https://github.com/danielquinn/paperless/issues/68
-.. _#71: https://github.com/danielquinn/paperless/issues/71
-.. _#81: https://github.com/danielquinn/paperless/issues/81
-.. _#89: https://github.com/danielquinn/paperless/issues/89
-.. _#94: https://github.com/danielquinn/paperless/issues/94
-.. _#98: https://github.com/danielquinn/paperless/issues/98
-.. _#112: https://github.com/danielquinn/paperless/issues/112
-.. _#121: https://github.com/danielquinn/paperless/issues/121
-.. _#131: https://github.com/danielquinn/paperless/issues/131
-.. _#146: https://github.com/danielquinn/paperless/issues/146
-.. _#148: https://github.com/danielquinn/paperless/pull/148
-.. _#150: https://github.com/danielquinn/paperless/pull/150
-.. _#158: https://github.com/danielquinn/paperless/issues/158
-.. _#171: https://github.com/danielquinn/paperless/issues/171
-.. _#172: https://github.com/danielquinn/paperless/issues/172
-.. _#179: https://github.com/danielquinn/paperless/pull/179
-.. _#199: https://github.com/danielquinn/paperless/issues/199
-.. _#200: https://github.com/danielquinn/paperless/issues/200
-.. _#206: https://github.com/danielquinn/paperless/issues/206
-.. _#212: https://github.com/danielquinn/paperless/pull/212
-.. _#220: https://github.com/danielquinn/paperless/pull/220
-.. _#224: https://github.com/danielquinn/paperless/pull/224
-.. _#226: https://github.com/danielquinn/paperless/pull/226
-.. _#227: https://github.com/danielquinn/paperless/pull/227
-.. _#228: https://github.com/danielquinn/paperless/pull/228
-.. _#229: https://github.com/danielquinn/paperless/pull/229
-.. _#230: https://github.com/danielquinn/paperless/pull/230
-.. _#232: https://github.com/danielquinn/paperless/issues/232
-.. _#235: https://github.com/danielquinn/paperless/issues/235
-.. _#236: https://github.com/danielquinn/paperless/issues/236
-.. _#255: https://github.com/danielquinn/paperless/pull/255
-.. _#268: https://github.com/danielquinn/paperless/pull/268
-.. _#277: https://github.com/danielquinn/paperless/pull/277
-.. _#272: https://github.com/danielquinn/paperless/issues/272
-.. _#248: https://github.com/danielquinn/paperless/issues/248
-.. _#278: https://github.com/danielquinn/paperless/issues/248
-.. _#283: https://github.com/danielquinn/paperless/issues/283
-.. _#256: https://github.com/danielquinn/paperless/pull/256
-.. _#285: https://github.com/danielquinn/paperless/pull/285
-.. _#291: https://github.com/danielquinn/paperless/pull/291
-.. _#295: https://github.com/danielquinn/paperless/pull/295
-.. _#299: https://github.com/danielquinn/paperless/issues/299
-.. _#300: https://github.com/danielquinn/paperless/pull/300
-.. _#301: https://github.com/danielquinn/paperless/issues/301
-.. _#303: https://github.com/danielquinn/paperless/issues/303
-.. _#305: https://github.com/danielquinn/paperless/issues/305
-.. _#306: https://github.com/danielquinn/paperless/issues/306
-.. _#308: https://github.com/danielquinn/paperless/issues/308
-.. _#311: https://github.com/danielquinn/paperless/pull/311
-.. _#312: https://github.com/danielquinn/paperless/pull/312
-.. _#313: https://github.com/danielquinn/paperless/pull/313
-.. _#322: https://github.com/danielquinn/paperless/pull/322
-.. _#328: https://github.com/danielquinn/paperless/pull/328
-.. _#253: https://github.com/danielquinn/paperless/issues/253
-.. _#262: https://github.com/danielquinn/paperless/issues/262
-.. _#323: https://github.com/danielquinn/paperless/issues/323
-.. _#344: https://github.com/danielquinn/paperless/pull/344
-.. _#351: https://github.com/danielquinn/paperless/pull/351
-.. _#352: https://github.com/danielquinn/paperless/pull/352
-.. _#354: https://github.com/danielquinn/paperless/issues/354
-.. _#371: https://github.com/danielquinn/paperless/issues/371
-.. _#374: https://github.com/danielquinn/paperless/pull/374
-.. _#375: https://github.com/danielquinn/paperless/pull/375
-.. _#376: https://github.com/danielquinn/paperless/pull/376
-.. _#383: https://github.com/danielquinn/paperless/pull/383
-.. _#384: https://github.com/danielquinn/paperless/issues/384
-.. _#386: https://github.com/danielquinn/paperless/issues/386
-.. _#387: https://github.com/danielquinn/paperless/pull/387
-.. _#391: https://github.com/danielquinn/paperless/pull/391
-.. _#390: https://github.com/danielquinn/paperless/pull/390
-.. _#392: https://github.com/danielquinn/paperless/issues/392
-.. _#393: https://github.com/danielquinn/paperless/issues/393
-.. _#395: https://github.com/danielquinn/paperless/pull/395
-.. _#394: https://github.com/danielquinn/paperless/issues/394
-.. _#396: https://github.com/danielquinn/paperless/pull/396
-.. _#399: https://github.com/danielquinn/paperless/pull/399
-.. _#400: https://github.com/danielquinn/paperless/pull/400
-.. _#401: https://github.com/danielquinn/paperless/pull/401
-.. _#405: https://github.com/danielquinn/paperless/pull/405
-.. _#406: https://github.com/danielquinn/paperless/issues/406
-.. _#412: https://github.com/danielquinn/paperless/issues/412
-.. _#413: https://github.com/danielquinn/paperless/pull/413
-.. _#414: https://github.com/danielquinn/paperless/issues/414
-.. _#423: https://github.com/danielquinn/paperless/issues/423
-.. _#433: https://github.com/danielquinn/paperless/issues/433
-.. _#440: https://github.com/danielquinn/paperless/pull/440
-.. _#441: https://github.com/danielquinn/paperless/pull/441
-.. _#442: https://github.com/danielquinn/paperless/pull/442
-.. _#466: https://github.com/danielquinn/paperless/pull/466
-.. _#471: https://github.com/danielquinn/paperless/pull/471
+.. _#20: https://github.com/the-paperless-project/paperless/issues/20
+.. _#44: https://github.com/the-paperless-project/paperless/issues/44
+.. _#45: https://github.com/the-paperless-project/paperless/issues/45
+.. _#47: https://github.com/the-paperless-project/paperless/issues/47
+.. _#48: https://github.com/the-paperless-project/paperless/issues/48
+.. _#53: https://github.com/the-paperless-project/paperless/issues/53
+.. _#54: https://github.com/the-paperless-project/paperless/issues/54
+.. _#57: https://github.com/the-paperless-project/paperless/issues/57
+.. _#60: https://github.com/the-paperless-project/paperless/issues/60
+.. _#67: https://github.com/the-paperless-project/paperless/issues/67
+.. _#68: https://github.com/the-paperless-project/paperless/issues/68
+.. _#71: https://github.com/the-paperless-project/paperless/issues/71
+.. _#81: https://github.com/the-paperless-project/paperless/issues/81
+.. _#89: https://github.com/the-paperless-project/paperless/issues/89
+.. _#94: https://github.com/the-paperless-project/paperless/issues/94
+.. _#98: https://github.com/the-paperless-project/paperless/issues/98
+.. _#112: https://github.com/the-paperless-project/paperless/issues/112
+.. _#121: https://github.com/the-paperless-project/paperless/issues/121
+.. _#131: https://github.com/the-paperless-project/paperless/issues/131
+.. _#146: https://github.com/the-paperless-project/paperless/issues/146
+.. _#148: https://github.com/the-paperless-project/paperless/pull/148
+.. _#150: https://github.com/the-paperless-project/paperless/pull/150
+.. _#158: https://github.com/the-paperless-project/paperless/issues/158
+.. _#171: https://github.com/the-paperless-project/paperless/issues/171
+.. _#172: https://github.com/the-paperless-project/paperless/issues/172
+.. _#179: https://github.com/the-paperless-project/paperless/pull/179
+.. _#199: https://github.com/the-paperless-project/paperless/issues/199
+.. _#200: https://github.com/the-paperless-project/paperless/issues/200
+.. _#206: https://github.com/the-paperless-project/paperless/issues/206
+.. _#212: https://github.com/the-paperless-project/paperless/pull/212
+.. _#220: https://github.com/the-paperless-project/paperless/pull/220
+.. _#224: https://github.com/the-paperless-project/paperless/pull/224
+.. _#226: https://github.com/the-paperless-project/paperless/pull/226
+.. _#227: https://github.com/the-paperless-project/paperless/pull/227
+.. _#228: https://github.com/the-paperless-project/paperless/pull/228
+.. _#229: https://github.com/the-paperless-project/paperless/pull/229
+.. _#230: https://github.com/the-paperless-project/paperless/pull/230
+.. _#232: https://github.com/the-paperless-project/paperless/issues/232
+.. _#235: https://github.com/the-paperless-project/paperless/issues/235
+.. _#236: https://github.com/the-paperless-project/paperless/issues/236
+.. _#255: https://github.com/the-paperless-project/paperless/pull/255
+.. _#268: https://github.com/the-paperless-project/paperless/pull/268
+.. _#277: https://github.com/the-paperless-project/paperless/pull/277
+.. _#272: https://github.com/the-paperless-project/paperless/issues/272
+.. _#248: https://github.com/the-paperless-project/paperless/issues/248
+.. _#278: https://github.com/the-paperless-project/paperless/issues/248
+.. _#283: https://github.com/the-paperless-project/paperless/issues/283
+.. _#256: https://github.com/the-paperless-project/paperless/pull/256
+.. _#285: https://github.com/the-paperless-project/paperless/pull/285
+.. _#291: https://github.com/the-paperless-project/paperless/pull/291
+.. _#295: https://github.com/the-paperless-project/paperless/pull/295
+.. _#299: https://github.com/the-paperless-project/paperless/issues/299
+.. _#300: https://github.com/the-paperless-project/paperless/pull/300
+.. _#301: https://github.com/the-paperless-project/paperless/issues/301
+.. _#303: https://github.com/the-paperless-project/paperless/issues/303
+.. _#305: https://github.com/the-paperless-project/paperless/issues/305
+.. _#306: https://github.com/the-paperless-project/paperless/issues/306
+.. _#308: https://github.com/the-paperless-project/paperless/issues/308
+.. _#311: https://github.com/the-paperless-project/paperless/pull/311
+.. _#312: https://github.com/the-paperless-project/paperless/pull/312
+.. _#313: https://github.com/the-paperless-project/paperless/pull/313
+.. _#322: https://github.com/the-paperless-project/paperless/pull/322
+.. _#328: https://github.com/the-paperless-project/paperless/pull/328
+.. _#253: https://github.com/the-paperless-project/paperless/issues/253
+.. _#262: https://github.com/the-paperless-project/paperless/issues/262
+.. _#323: https://github.com/the-paperless-project/paperless/issues/323
+.. _#344: https://github.com/the-paperless-project/paperless/pull/344
+.. _#351: https://github.com/the-paperless-project/paperless/pull/351
+.. _#352: https://github.com/the-paperless-project/paperless/pull/352
+.. _#354: https://github.com/the-paperless-project/paperless/issues/354
+.. _#371: https://github.com/the-paperless-project/paperless/issues/371
+.. _#374: https://github.com/the-paperless-project/paperless/pull/374
+.. _#375: https://github.com/the-paperless-project/paperless/pull/375
+.. _#376: https://github.com/the-paperless-project/paperless/pull/376
+.. _#383: https://github.com/the-paperless-project/paperless/pull/383
+.. _#384: https://github.com/the-paperless-project/paperless/issues/384
+.. _#386: https://github.com/the-paperless-project/paperless/issues/386
+.. _#387: https://github.com/the-paperless-project/paperless/pull/387
+.. _#391: https://github.com/the-paperless-project/paperless/pull/391
+.. _#390: https://github.com/the-paperless-project/paperless/pull/390
+.. _#392: https://github.com/the-paperless-project/paperless/issues/392
+.. _#393: https://github.com/the-paperless-project/paperless/issues/393
+.. _#395: https://github.com/the-paperless-project/paperless/pull/395
+.. _#394: https://github.com/the-paperless-project/paperless/issues/394
+.. _#396: https://github.com/the-paperless-project/paperless/pull/396
+.. _#399: https://github.com/the-paperless-project/paperless/pull/399
+.. _#400: https://github.com/the-paperless-project/paperless/pull/400
+.. _#401: https://github.com/the-paperless-project/paperless/pull/401
+.. _#405: https://github.com/the-paperless-project/paperless/pull/405
+.. _#406: https://github.com/the-paperless-project/paperless/issues/406
+.. _#412: https://github.com/the-paperless-project/paperless/issues/412
+.. _#413: https://github.com/the-paperless-project/paperless/pull/413
+.. _#414: https://github.com/the-paperless-project/paperless/issues/414
+.. _#423: https://github.com/the-paperless-project/paperless/issues/423
+.. _#433: https://github.com/the-paperless-project/paperless/issues/433
+.. _#440: https://github.com/the-paperless-project/paperless/pull/440
+.. _#441: https://github.com/the-paperless-project/paperless/pull/441
+.. _#442: https://github.com/the-paperless-project/paperless/pull/442
+.. _#466: https://github.com/the-paperless-project/paperless/pull/466
+.. _#471: https://github.com/the-paperless-project/paperless/pull/471
+.. _#475: https://github.com/the-paperless-project/paperless/pull/475
+.. _#481: https://github.com/the-paperless-project/paperless/pull/481
+.. _#483: https://github.com/the-paperless-project/paperless/pull/483
+.. _#484: https://github.com/the-paperless-project/paperless/pull/484
+.. _#488: https://github.com/the-paperless-project/paperless/pull/488
+.. _#489: https://github.com/the-paperless-project/paperless/pull/489
+.. _#492: https://github.com/the-paperless-project/paperless/pull/492
 
 .. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/

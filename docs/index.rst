@@ -45,5 +45,6 @@ Contents
    troubleshooting
    contributing
    scanners
+   screenshots
    changelog
    changelog_jonaswinkler

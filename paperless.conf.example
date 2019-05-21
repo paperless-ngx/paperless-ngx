@@ -78,7 +78,7 @@ PAPERLESS_EMAIL_SECRET=""
 
 # Controls whether django's debug mode is enabled. Disable this on production
 # systems. Debug mode is enabled by default.
-PAPERLESS_DEBUG="false"
+#PAPERLESS_DEBUG="true"
 
 
 # Paperless can be instructed to attempt to encrypt your PDF files with GPG
@@ -263,6 +263,9 @@ PAPERLESS_DEBUG="false"
 
 # Convert (part of the ImageMagick suite)
 #PAPERLESS_CONVERT_BINARY=/usr/bin/convert
+
+# Ghostscript
+#PAPERLESS_GS_BINARY = /usr/bin/gs
 
 # Unpaper
 #PAPERLESS_UNPAPER_BINARY=/usr/bin/unpaper
