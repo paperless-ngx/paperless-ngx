@@ -6,19 +6,21 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0px 10px 10px;
+  }
   .box {
     width: 12.5%;
-    padding: 1em;
-    float: left;
-    opacity: 0.7;
+    padding-right: 10px;
+    padding-bottom: 15px;
+    opacity: 0.8;
     transition: all 0.5s;
   }
   .box:hover {
     opacity: 1;
     transition: all 0.5s;
-  }
-  .box:last-of-type {
-    padding-right: 0;
   }
   .result {
     border: 1px solid #cccccc;
@@ -26,6 +28,7 @@
     overflow: hidden;
     height: 350px;
     position: relative;
+    box-shadow: 1px 1px 4px #cccccc;
   }
   .result .header {
     padding: 5px;
@@ -95,9 +98,6 @@
     background: white;
   }
 
-  .grid {
-    margin-right: 260px;
-  }
   .grid:after {
     content: "";
     display: table;
@@ -135,6 +135,15 @@
 
 
 {# This is just copypasta from the parent change_list_results.html file #}
+
+{% if result_hidden_fields %}
+<div class="hiddenfields">{# DIV for HTML validation #}
+{% for item in result_hidden_fields %}{{ item }}{% endfor %}
+</div>
+{% endif %}
+
+{% if results %}
+<div class="results">
 <table id="result_list">
 <thead>
 <tr>
@@ -155,6 +164,8 @@
 </tr>
 </thead>
 </table>
+{% endif %}
+
 {# /copypasta #}
 
 
@@ -213,3 +224,5 @@
       .prop("checked", this.checked);
   });
 </script>
+
+</div>
