@@ -6,7 +6,7 @@
 # Will set-up paperless, apache2 and proftpd
 #
 # lxc launch ubuntu: paperless
-# lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/danielquinn/paperless/master/scripts/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
+# lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/maur/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
 #
 #
 
@@ -41,7 +41,7 @@ systemctl restart proftpd
 
 
 #Get Paperless from git 
-su -c "cd /home/paperless ; git clone https://github.com/danielquinn/paperless" paperless
+su -c "cd /home/paperless ; git clone https://github.com/maur/paperless" paperless
 
 # Install Pip Requirements
 apt-get -y install python3-pip python3-venv
@@ -54,7 +54,7 @@ sed  -e '/PAPERLESS_CONSUMPTION_DIR=/s/=.*/=\"\/home\/ftpupload\/\"/' \
 
 # Update /etc/paperless.conf with PAPERLESS_SECRET_KEY
 SECRET=$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 30 | tr -d '\n'; echo)
-sed  -i "s/#PAPERLESS_SECRET_KEY.*/PAPERLESS_SECRET_KEY=$SECRET/g" /etc/paperless.conf 
+sed  -i "s/#PAPERLESS_SECRET_KEY.*/PAPERLESS_SECRET_KEY=$SECRET/" /etc/paperless.conf 
 
 #Initialise the SQLite database 
 su -c "cd /home/paperless/paperless/src/ ; ./manage.py migrate" paperless
@@ -69,11 +69,11 @@ a2dissite 000-default.conf
 a2ensite paperless.conf
 systemctl reload apache2
 
-sed -e "s/home\/paperless\/project\/virtualenv\/bin\/python/usr\/bin\/python3/" \
+sed -e "s:home/paperless/project/virtualenv/bin/python:usr/bin/python3:" \
      /home/paperless/paperless/scripts/paperless-consumer.service \
      >/etc/systemd/system/paperless-consumer.service
 
-sed  -i "s/\/home\/paperless\/project\/src\/manage.py/\/home\/paperless\/paperless\/src\/manage.py/" \
+sed -i "s:/home/paperless/project/src/manage.py:/home/paperless/paperless/src/manage.py:" \
       /etc/systemd/system/paperless-consumer.service
 
 
