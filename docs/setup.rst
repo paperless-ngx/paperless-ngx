@@ -522,7 +522,7 @@ if the above assumptions are acceptable.
 
 .. code:: bash
 
-    $ lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/danielquinn/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
+    $ lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/maur/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh"
 
 The script will ask you for an ftpupload password.  
 As well as the super-user for paperless web front-end. 
