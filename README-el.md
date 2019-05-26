@@ -1,8 +1,8 @@
 [ [en](README.md) | [de](README-de.md) | el ]
 
-![Paperless](https://raw.githubusercontent.com/danielquinn/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
+![Paperless](https://raw.githubusercontent.com/the-paperless-project/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
 
-[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) [![Chat](https://badges.gitter.im/danielquinn/paperless.svg)](https://gitter.im/danielquinn/paperless) [![Travis](https://travis-ci.org/danielquinn/paperless.svg?branch=master)](https://travis-ci.org/danielquinn/paperless) [![Coverage Status](https://coveralls.io/repos/github/danielquinn/paperless/badge.svg?branch=master)](https://coveralls.io/github/danielquinn/paperless?branch=master) [![Thanks](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/danielquinn/paperless/blob/master/THANKS.md)
+[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/) [![Chat](https://badges.gitter.im/the-paperless-project/paperless.svg)](https://gitter.im/danielquinn/paperless) [![Travis](https://travis-ci.org/the-paperless-project/paperless.svg?branch=master)](https://travis-ci.org/the-paperless-project/paperless) [![Coverage Status](https://coveralls.io/repos/github/the-paperless-project/paperless/badge.svg?branch=master)](https://coveralls.io/github/the-paperless-project/paperless?branch=master) [![Thanks](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/the-paperless-project/paperless/blob/master/THANKS.md)
 
 Ευρετήριο και αρχείο για όλα σας τα σκαναρισμένα έγγραφα
 
@@ -27,7 +27,7 @@
 
 Αυτό είναι που θα πάρετε:
 
-![Το πριν και το μετά](https://raw.githubusercontent.com/danielquinn/paperless/master/docs/_static/screenshot.png)
+![Το πριν και το μετά](https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/_static/screenshot.png)
 
 
 ## Documentation

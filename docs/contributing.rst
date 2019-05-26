@@ -136,6 +136,6 @@ there, with a few small changes, but basically it boils down to:
 I'm proud to say that the CoC has never had to be enforced because everyone has
 been awesome, friendly, and professional.
 
-.. _GitHub: https://github.com/danielquinn/paperless/issues
+.. _GitHub: https://github.com/the-paperless-project/paperless/issues
 .. _very well documented: https://www.python.org/dev/peps/pep-0008/
-.. _code of conduct: https://github.com/danielquinn/paperless/blob/master/CODE_OF_CONDUCT.md
+.. _code of conduct: https://github.com/the-paperless-project/paperless/blob/master/CODE_OF_CONDUCT.md
