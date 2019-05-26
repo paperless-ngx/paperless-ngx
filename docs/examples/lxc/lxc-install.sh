@@ -7,7 +7,7 @@
 #
 # lxc launch ubuntu: paperless
 # lxc exec paperless -- sh -c "sudo apt-get update && sudo apt-get install -y wget"
-# lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/maur/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh --email "
+# lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh --email "
 #
 #
 set +e
@@ -102,7 +102,7 @@ EOF
 fi
 
 #Get Paperless from git 
-su -c "cd /home/paperless ; git clone https://github.com/maur/paperless" paperless
+su -c "cd /home/paperless ; git clone https://github.com/the-paperless-project/paperless" paperless
 
 # Install Pip Requirements
 apt-get -y install python3-pip python3-venv
