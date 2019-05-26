@@ -55,6 +55,10 @@ if [ -z $EMAIL ]; then
   echo "missing email, try running with -h "
   exit 3
 fi
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+    echo "Not running as root"
+    exit
+fi
 
 if [ $(grep -c paperless /etc/passwd) -eq 0 ]; then
   # Add paperless user with no password
