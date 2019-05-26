@@ -72,15 +72,4 @@ with a DPI of 300, then merging the images into the single PDF with
 For more information on this and situations like it, you should take a look
 at `Issue #118`_ as that's where this tip originated.
 
-.. _Issue #118: https://github.com/danielquinn/paperless/issues/118
-
-
-.. _troubleshooting-consumerlogs
-
-
-Viewing Consumer logs
----------------------
-
-.. code:: bash
-
-    $ sudo journalctl -u paperless-consumer
+.. _Issue #118: https://github.com/the-paperless-project/paperless/issues/118
