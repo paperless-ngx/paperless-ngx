@@ -22,9 +22,9 @@ Paperless steuert nicht deinen Scanner, es hilft nur damit umzugehen, was der Sc
 
 1. Kaufe einen Dokumentenscanner, der an einen Ort in deinem Netzwerk schreiben kann. Wenn du Inspirationen brauchst, schau in die [Scannerempfehlungen](https://paperless.readthedocs.io/en/latest/scanners.html).
 2. Stelle "Scanne zu FTP" oder ähnliches ein. Es sollte möglich sein, eingescannte Bilder ohne etwas tun zu müssen an einen Server hochzuladen. Natürlich kannst du auch die einscannte Datei händisch hochladen, wenn der Scanner automatisches Hochladen nicht unterstützt. Paperless ist es egal, wie die Dokumente in seinen lokalen Konsumordner gelangen.
-3. Besitze einen Zielserver, lasse das Papierless-Konsumskript laufen, um die Datei mit OCR zu versehen und sie in einer lokalen Datenbank zu indexieren.
+3. Besitze einen Zielserver, lasse das Paperless-Konsumskript laufen, um die Datei mit OCR zu versehen und sie in einer lokalen Datenbank zu indexieren.
 4. Benutze die Weboberfläche, um die Datenbank zu durchforsten und zu finden, was du suchst.
-5. Lade die PDF-Datei, die du brauchst/möchtest über die Weboberfläche herunter und mach was auch immer du willst damit.  Du kannst es auch drucken und versenden, so als wäre es das Original. In den meisten Fällen, wird das niemanden interessieren oder bemerken.
+5. Lade die PDF-Datei, die du brauchst/möchtest über die Weboberfläche herunter und mach was auch immer du willst damit.  Du kannst es auch drucken und versenden, so als wäre es das Original. In den meisten Fällen wird das niemanden interessieren oder bemerken.
 
 Hier das, was du bekommt:
 
@@ -58,12 +58,13 @@ Dieses Projekt wurde um 2015 gestartet und es gibt viele Leute, die es verwenden
 Ich entwickle keine neuen Funktionen mehr für Paperless, weil es genau das tut, was ich brauche und meine Aufmerksamkeit meinem neuesten Projekt [Aletheia](https://github.com/danielquinn/aletheia) gewidmet ist. Ich verlasse jedoch nicht das Projekt. Ich bin glücklich damit, Pull Requests zu begutachten und Fragen im Issue-Bereich zu beantworten. Wenn du ein Entwickler bist und eine neue Funktion willst, reihe sie in den Issues ein und/oder sende einen PR! Ich bin glücklich damit, neue Sachen hinzuzufügen, habe aber einfach nicht die Zeit, sie selbst zu erarbeiten.
 
 
-## Verknüpfte Prjekte
+## Verknüpfte Projekte
 
 Paperless gibt es bereits seit einer Weile und Leute haben damit angefangen, Sachen rund um Paperless zu entwickeln. Wenn du einer dieser Menschen bist, kannst du dein Projekt zu dieser Liste hinzufügen:
 
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): Eine Desktop-Oberfläche für deine Paperless-Installation. Läuft auf Mac, Linux und Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): Eine einfache Möglichkeit, Paperless via Ansible laufen zu lassen.
+* [paperless-cli](https://github.com/stgarf/paperless-cli): Ein golang Kommandozeilenprogramm, welches mit Paperless interagiert.
 
 
 ## Ähnliche Projekte
@@ -73,7 +74,7 @@ Es gibt da draußen auch das Projekt [Mayan EDMS](https://mayan.readthedocs.org/
 
 ## Wichtiger Hinweis
 
-Dokumentenscanner werden typerweise verwendet, um sensible Dokumente zu scannen. Dinge wie die Sozialversicherungsnummer, Steueraufzeichnungen, Rechnungen, etc. Während Paperless die Originaldateien über das Konsumskript verschlüsselt, sind die OCR-Texte *nicht* verschlüsselt und demnach in Klartext gespeichert (es muss durchsuchbar sein, also wenn jemand eine Idee hat, wie man das mit verschlüsselten Daten tun kann: Ich bin ganz Ohr). Das bedeutet, dass Paperless niemals auf einem nicht vertrauten Host laufen sollte. Stattdessen empfehle ich, wenn du es verwenden willst, es lokal auf einem Server in deinem Zuhause laufen zu lassen.
+Dokumentenscanner werden typischerweise verwendet, um sensible Dokumente zu scannen. Dinge wie die Sozialversicherungsnummer, Steueraufzeichnungen, Rechnungen, etc. Während Paperless die Originaldateien über das Konsumskript verschlüsselt, sind die OCR-Texte *nicht* verschlüsselt und demnach in Klartext gespeichert (es muss durchsuchbar sein, also wenn jemand eine Idee hat, wie man das mit verschlüsselten Daten tun kann: Ich bin ganz Ohr). Das bedeutet, dass Paperless niemals auf einem nicht vertrauten Host laufen sollte. Stattdessen empfehle ich, wenn du es verwenden willst, es lokal auf einem Server in deinem Zuhause laufen zu lassen.
 
 
 ## Spenden
