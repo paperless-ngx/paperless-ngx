@@ -55,10 +55,15 @@ migrations() {
     fi
 }
 
+collectstatic() {
+    sudo -HEu paperless "/usr/src/paperless/src/manage.py" "collectstatic" "--clear" "--no-input"
+}
+
 initialize() {
     map_uidgid
     set_permissions
     migrations
+    collectstatic
 }
 
 install_languages() {
