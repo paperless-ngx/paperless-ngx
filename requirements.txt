@@ -4,6 +4,7 @@ apipkg==1.5
 atomicwrites==1.2.1
 attrs==18.2.0
 babel==2.6.0
+brotli==1.0.7
 certifi==2018.11.29
 chardet==3.0.4
 coverage==4.5.2
@@ -68,3 +69,4 @@ tox==3.7.0
 tzlocal==1.5.1
 urllib3==1.24.1
 virtualenv==16.3.0
+whitenoise==4.1.3
