@@ -29,7 +29,7 @@ gunicorn==19.9.0
 idna==2.8
 imagesize==1.1.0
 importlib-metadata==0.19
-inotify-simple==1.1.8
+inotify-simple==1.1.8; sys_platform == 'linux'
 jinja2==2.10.1
 langdetect==1.0.7
 markupsafe==1.1.1
