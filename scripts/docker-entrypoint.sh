@@ -99,7 +99,12 @@ if [[ "$1" != "/"* ]]; then
         install_languages "$PAPERLESS_OCR_LANGUAGES"
     fi
 
-    exec sudo -HEu paperless "/usr/src/paperless/src/manage.py" "$@"
+    if [[ "$1" = "gunicorn" ]]; then
+        cd /usr/src/paperless/src/ && \
+            exec sudo -HEu paperless /usr/bin/gunicorn -c gunicorn.conf paperless.wsgi
+    else
+        exec sudo -HEu paperless "/usr/src/paperless/src/manage.py" "$@"
+    fi
 fi
 
 exec "$@"
