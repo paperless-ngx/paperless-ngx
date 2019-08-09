@@ -4,9 +4,10 @@ LABEL maintainer="The Paperless Project https://github.com/the-paperless-project
       contributors="Guy Addadi <addadi@gmail.com>, Pit Kleyersburg <pitkley@googlemail.com>, \
         Sven Fischer <git-dev@linux4tw.de>"
 
-# Copy Pipfiles file and init script
+# Copy Pipfiles file, init script and gunicorn.conf
 COPY Pipfile* /usr/src/paperless/
 COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
+COPY scripts/gunicorn.conf /usr/src/paperless/
 
 # Set export and consumption directories
 ENV PAPERLESS_EXPORT_DIR=/export \
