@@ -327,7 +327,7 @@ and mod_wsgi, with a Paperless installation in ``/home/paperless/``:
         </Directory>
 
         WSGIScriptAlias / /home/paperless/paperless/src/paperless/wsgi.py
-        WSGIDaemonProcess example.com user=paperless group=paperless threads=5 python-path=/home/paperless/paperless/src:/home/paperless/.env/lib/python3.4/site-packages
+        WSGIDaemonProcess example.com user=paperless group=paperless threads=5 python-path=/home/paperless/paperless/src:/home/paperless/.env/lib/python3.6/site-packages
         WSGIProcessGroup example.com
 
         <Directory /home/paperless/paperless/src/paperless>
