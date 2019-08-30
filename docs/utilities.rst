@@ -193,18 +193,19 @@ instructions above to do the import.
 
 .. _utilities-retagger:
 
-The Re-tagger
--------------
+Re-running your tagging and correspondent matchers
+--------------------------------------------------
 
-Say you've imported a few hundred documents and now want to introduce a tag
-and apply its matching to all of the currently-imported docs.  This problem is
-common enough that there's a tool for it.
+Say you've imported a few hundred documents and now want to introduce
+a tag or set up a new correspondent, and apply its matching to all of
+the currently-imported docs.  This problem is common enough that
+there are tools for it.
 
 
 .. _utilities-retagger-howto:
 
-How to Use It
-.............
+How to Do It
+............
 
 This too is done via the ``manage.py`` script:
 
@@ -212,10 +213,16 @@ This too is done via the ``manage.py`` script:
 
     $ /path/to/paperless/src/manage.py document_retagger
 
-That's it.  It'll loop over all of the documents in your database and attempt
-to match all of your tags to them.  If one matches, it'll be applied.  And
-don't worry, you can run this as often as you like, it won't double-tag
-a document.
+Run this after changing or adding tagging rules.  It'll loop over all
+of the documents in your database and attempt to match all of your
+tags to them.  If one matches, it'll be applied.  And don't worry, you
+can run this as often as you like, it won't double-tag a document.
+
+.. code:: bash
+
+    $ /path/to/paperless/src/manage.py document_correspondents
+
+This is the similar command to run after adding or changing a correspondent.
 
 .. _utilities-encyption:
 
