@@ -194,7 +194,7 @@ instructions above to do the import.
 .. _utilities-retagger:
 
 Re-running your tagging and correspondent matchers
--------------
+--------------------------------------------------
 
 Say you've imported a few hundred documents and now want to introduce
 a tag or set up a new correspondent, and apply its matching to all of
@@ -205,7 +205,7 @@ there are tools for it.
 .. _utilities-retagger-howto:
 
 How to Do It
-.............
+............
 
 This too is done via the ``manage.py`` script:
 
