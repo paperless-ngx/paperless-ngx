@@ -43,6 +43,7 @@ You can go multiple routes with setting up and running Paperless:
 
  * The `bare metal route`_
  * The `docker route`_
+ * A suggested `linux containers route`_
 
 
 The `docker route`_ is quick & easy.
@@ -50,10 +51,14 @@ The `docker route`_ is quick & easy.
 The `bare metal route`_ is a bit more complicated to setup but makes it easier
 should you want to contribute some code back.
 
+The `linux containers route`_ is quick, but makes alot of assumptions on the 
+set-up, on the other hand the script could be used to install on a base
+debian or ubuntu server.
+
 .. _docker route: setup-installation-docker_
 .. _bare metal route: setup-installation-bare-metal_
 .. _Docker Machine: https://docs.docker.com/machine/
-
+.. _linux containers route: setup-installation-linux-containers_
 
 .. _setup-installation-bare-metal:
 
@@ -485,3 +490,45 @@ If you're using Docker, you can set a restart-policy_ in the
 Docker daemon.
 
 .. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
+
+
+.. _setup-installation-linux-containers:
+
+Suggested way for Linux Container Method
+++++++++++++++++++++++++++++++++++++++++
+
+This method uses some rigid assumptions, for the best set-up:-
+
+ * Ubuntu lts as the container
+ * Apache as the webserver
+ * proftpd as ftp server
+ * ftpupload as the ftp user
+ * paperless as the main user for website 
+ * http://paperless.lan is the desired lan url
+ * LXC set to give ip addresses on your lan
+
+This could also be used as an install on a base debain/ubuntu server, 
+if the above assumptions are acceptable.
+
+1. Install lxc
+
+
+2. Lanch paperless container
+
+.. code:: bash
+
+    $ lxc launch ubuntu: paperless
+
+3. Run install script within container
+
+.. code:: bash
+
+    $ lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh --email"
+
+The script will ask you for an ftpupload password.  
+As well as the super-user for paperless web front-end. 
+After around 10 mins, http://paperless.lan is ready and
+ftp://paperless.lan with user: ftpupload
+
+See the `Installation recording <_static/lxc-install.svg>`_.
+
