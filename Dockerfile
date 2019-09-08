@@ -65,3 +65,5 @@ COPY src/ /usr/src/paperless/src/
 COPY data/ /usr/src/paperless/data/
 COPY media/ /usr/src/paperless/media/
 
+# Collect static files
+RUN sudo -HEu paperless /usr/src/paperless/src/manage.py collectstatic --clear --no-input

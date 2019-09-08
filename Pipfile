@@ -15,7 +15,7 @@ django-filter = "*"
 djangorestframework = "*"
 factory-boy = "*"
 filemagic = "*"
-fuzzywuzzy = {extras = ["speedup"], version = "==0.15.0"}
+fuzzywuzzy = {extras = ["speedup"],version = "==0.15.0"}
 gunicorn = "*"
 inotify-simple = "*"
 langdetect = "*"
@@ -36,6 +36,8 @@ pytest-env = "*"
 pytest-xdist = "*"
 psycopg2 = "*"
 djangoql = "*"
+whitenoise = "*"
+brotli = "*"
 
 [dev-packages]
 ipython = "*"
