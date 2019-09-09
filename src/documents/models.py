@@ -483,8 +483,18 @@ class FileInfo:
           "<title>.<suffix>"
         """
 
+        filename = os.path.basename(path)
+
+        # Mutate filename in-place before parsing its components
+        # by applying at most one of the configured transformations.
+        for (pattern, repl) in settings.FILENAME_PARSE_TRANSFORMS:
+            (filename, count) = pattern.subn(repl, filename)
+            if count:
+                break
+
+        # Parse filename components.
         for regex in cls.REGEXES.values():
-            m = regex.match(os.path.basename(path))
+            m = regex.match(filename)
             if m:
                 properties = m.groupdict()
                 cls._mangle_property(properties, "created")
