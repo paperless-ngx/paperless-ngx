@@ -135,6 +135,23 @@ PAPERLESS_EMAIL_SECRET=""
 # as normal.
 #PAPERLESS_FILENAME_DATE_ORDER="YMD"
 
+# Sometimes devices won't create filenames which can be parsed properly
+# by the filename parser (see
+# https://paperless.readthedocs.io/en/latest/guesswork.html).
+#
+# This setting allows to specify a list of transformations
+# in regular expression syntax, which are passed in order to re.sub.
+# Transformation stops after the first match, so at most one transformation
+# is applied.
+#
+# Syntax is a JSON array of dictionaries containing "pattern" and "repl"
+# as keys.
+#
+# The example below transforms filenames created by a Brother ADS-2400N
+# document scanner in its standard configuration `Name_Date_Count', so that
+# count is used as title, name as tag and date can be parsed by paperless.
+#PAPERLESS_FILENAME_PARSE_TRANSFORMS=[{"pattern":"^([a-z]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.", "repl":"\\2\\3Z - \\4 - \\1."}]
+
 #
 # The following values use sensible defaults for modern systems, but if you're
 # running Paperless on a low-resource device (like a Raspberry Pi), modifying
