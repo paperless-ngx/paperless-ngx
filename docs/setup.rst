@@ -159,7 +159,7 @@ Docker Method
 	     If you are using NFS mounts for the consume directory you also need to
 			 change the command to turn off inotify as it doesn't work with NFS
 
-			 `command: ["document_consumer", "--no-inotify"]`
+			 ``command: ["document_consumer", "--no-inotify"]``
 
 
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
