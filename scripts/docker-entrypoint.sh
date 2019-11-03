@@ -101,8 +101,14 @@ if [[ "$1" != "/"* ]]; then
 
     if [[ "$1" = "gunicorn" ]]; then
         shift
+        EXTRA_PARAMS=""
+        SSL_KEY_PATH="/usr/src/paperless/data/ssl.key"
+        SSL_CERT_PATH="/usr/src/paperless/data/ssl.cert"
+        if [ "${PAPERLESS_USE_SSL}" = "true" ] && [ -f "${SSL_KEY_PATH}" ] && [ -f "${SSL_CERT_PATH}" ]; then
+            EXTRA_PARAMS="--certfile=${SSL_CERT_PATH} --keyfile=${SSL_KEY_PATH}"
+        fi
         cd /usr/src/paperless/src/ && \
-            exec sudo -HEu paperless /usr/bin/gunicorn -c /usr/src/paperless/gunicorn.conf "$@" paperless.wsgi
+            exec sudo -HEu paperless /usr/bin/gunicorn -c /usr/src/paperless/gunicorn.conf ${EXTRA_PARAMS} "$@" paperless.wsgi
     else
         exec sudo -HEu paperless "/usr/src/paperless/src/manage.py" "$@"
     fi
