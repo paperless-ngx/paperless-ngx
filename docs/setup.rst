@@ -193,10 +193,12 @@ Docker Method
      container and thus the one of the consumption directory. Furthermore, you
      can change the id of the default user as well using ``USERMAP_UID``.
 
-  ``USE_SSL``
+  ``PAPERLESS_USE_SSL``
     If you want Paperless to use SSL for the user interface, set this variable
     to ``true``. You also need to copy your certificate and key to the ``data``
     directory, named ``ssl.cert`` and ``ssl.key``.
+    This is not an ideal solution and, if possible, a reverse proxy with nginx
+    is preferred.
 
 6. Run ``docker-compose up -d``. This will create and start the necessary
    containers.
