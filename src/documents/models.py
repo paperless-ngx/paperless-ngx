@@ -410,6 +410,7 @@ def delete_empty_directory(directory):
             # Directory not empty
             pass
 
+
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
 def update_filename(sender, instance, **kwargs):
@@ -460,7 +461,13 @@ def delete_files(sender, instance, **kwargs):
 
     # Remove the document
     old_file = instance.filename_to_path(instance.filename)
-    os.remove(old_file)
+
+    if os.path.isfile(old_file):
+        os.remove(old_file)
+    else:
+        logger = logging.getLogger(__name__)
+        logger.warning("Deleted document " + str(instance.id) + " but file " +
+                       old_file + " was no longer present")
 
     # And remove the directory (if applicable)
     old_dir = os.path.dirname(instance.filename)
