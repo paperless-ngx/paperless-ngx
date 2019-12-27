@@ -54,6 +54,17 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 # ignored.
 PAPERLESS_EMAIL_SECRET=""
 
+# Specify a filename format for an (optional) subdirectory and the document itself
+# Use the following placefolders:
+# * {correspondent}
+# * {title}
+# * {created}
+# * {added}
+# * {tags[FILTER]}
+# Uniqueness of filenames is ensured, as an incrementing counter is attached
+# to each filename.
+#PAPERLESS_DIRECTORY_FORMAT=""
+#PAPERLESS_FILENAME_FORMAT=""
 
 ###############################################################################
 ####                              Security                                 ####
