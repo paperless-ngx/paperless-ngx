@@ -7,12 +7,14 @@ import uuid
 from collections import OrderedDict
 
 import dateutil.parser
+from django.dispatch import receiver
 from django.conf import settings
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.text import slugify
 from fuzzywuzzy import fuzz
+from collections import defaultdict
 
 from .managers import LogManager
 
@@ -254,6 +256,14 @@ class Document(models.Model):
     added = models.DateTimeField(
         default=timezone.now, editable=False, db_index=True)
 
+    filename = models.CharField(
+        max_length=256,
+        editable=False,
+        default=None,
+        null=True,
+        help_text="Current filename in storage"
+    )
+
     class Meta:
         ordering = ("correspondent", "title")
 
@@ -267,17 +277,90 @@ class Document(models.Model):
         return str(created)
 
     @property
-    def source_path(self):
+    def source_filename(self):
+        if self.filename is None:
+            self.filename = self.source_filename_new()
 
-        file_name = "{:07}.{}".format(self.pk, self.file_type)
+        return self.filename
+
+    def many_to_list(self, field):
+        mylist = []
+        for t in field.all():
+            mylist.append(t.name)
+        return mylist
+
+    def many_to_dictionary(self, field):
+        mydictionary = dict()
+        for t in field.all():
+            delimeter = t.name.find('_')
+
+            if delimeter is -1:
+                continue
+
+            key = t.name[:delimeter]
+            value = t.name[delimeter+1:]
+
+            mydictionary[key] = value
+
+        return mydictionary
+
+    def source_filename_new(self):
+        # Create directory name based on configured format
+        if settings.PAPERLESS_DIRECTORY_FORMAT is not None:
+            directory = settings.PAPERLESS_DIRECTORY_FORMAT.format(
+                        correspondent=self.correspondent,
+                        title=self.title,
+                        created=self.created,
+                        added=self.added,
+                        tags=defaultdict(str,
+                                         self.many_to_dictionary(self.tags)))
+        else:
+            directory = ""
+
+        # Create filename based on configured format
+        if settings.PAPERLESS_FILENAME_FORMAT is not None:
+            filename = settings.PAPERLESS_FILENAME_FORMAT.format(
+                        correspondent=self.correspondent,
+                        title=self.title,
+                        created=self.created,
+                        added=self.added,
+                        tags=defaultdict(str,
+                                         self.many_to_dictionary(self.tags)))
+        else:
+            filename = ""
+
+        path = os.path.join(slugify(directory), slugify(filename))
+
+        # Always append the primary key to guarantee uniqueness of filename
+        if len(path) > 0:
+            filename = "%s-%07i.%s" % (path, self.pk, self.file_type)
+        else:
+            filename = "%07i.%s" % (self.pk, self.file_type)
+
+        # Append .gpg for encrypted files
         if self.storage_type == self.STORAGE_TYPE_GPG:
-            file_name += ".gpg"
+            filename += ".gpg"
 
+        # Create directory for target
+        create_dir = self.filename_to_path(slugify(directory))
+        try:
+            os.makedirs(create_dir)
+        except os.error:
+            # Directory existed already, ignore
+            pass
+
+        return filename
+
+    @property
+    def source_path(self):
+        return self.filename_to_path(self.source_filename)
+
+    def filename_to_path(self, filename):
         return os.path.join(
             settings.MEDIA_ROOT,
             "documents",
             "originals",
-            file_name
+            filename
         )
 
     @property
@@ -313,6 +396,54 @@ class Document(models.Model):
     @property
     def thumbnail_url(self):
         return reverse("fetch", kwargs={"kind": "thumb", "pk": self.pk})
+
+    def set_filename(self, filename):
+        if os.path.isfile(self.filename_to_path(filename)):
+            self.filename = filename
+
+
+@receiver(models.signals.m2m_changed, sender=Document.tags.through)
+@receiver(models.signals.post_save, sender=Document)
+def update_filename(sender, instance, **kwargs):
+        if instance.filename is None:
+            return
+
+        # Build the new filename
+        new_filename = instance.source_filename_new()
+
+        # If the filename is the same, then nothing needs to be done
+        if instance.filename is None or \
+           instance.filename == new_filename:
+            return
+
+        # Check if filename needs changing
+        if new_filename != instance.filename:
+            # Determine the full "target" path
+            path_new = instance.filename_to_path(new_filename)
+            dir_new = instance.filename_to_path(os.path.dirname(new_filename))
+
+            # Determine the full "current" path
+            path_current = instance.filename_to_path(instance.filename)
+
+            # Move file
+            os.rename(path_current, path_new)
+
+            # Delete empty directory
+            old_dir = os.path.dirname(instance.filename)
+            old_path = instance.filename_to_path(old_dir)
+            if len(os.listdir(old_path)) == 0:
+                try:
+                    os.rmdir(old_path)
+                except os.error:
+                    # Directory not empty
+                    pass
+
+            instance.filename = new_filename
+
+            # Save instance
+            # This will not cause a cascade of post_save signals, as next time
+            # nothing needs to be renamed
+            instance.save()
 
 
 class Log(models.Model):
