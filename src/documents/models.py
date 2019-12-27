@@ -256,7 +256,7 @@ class Document(models.Model):
     added = models.DateTimeField(
         default=timezone.now, editable=False, db_index=True)
 
-    filename = models.CharField(
+    filename = models.FilePathField(
         max_length=256,
         editable=False,
         default=None,
@@ -402,48 +402,70 @@ class Document(models.Model):
             self.filename = filename
 
 
+def delete_empty_directory(directory):
+    if len(os.listdir(directory)) == 0:
+        try:
+            os.rmdir(directory)
+        except os.error:
+            # Directory not empty
+            pass
+
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
 def update_filename(sender, instance, **kwargs):
-        if instance.filename is None:
-            return
+    if instance.filename is None:
+        return
 
-        # Build the new filename
-        new_filename = instance.source_filename_new()
+    # Build the new filename
+    new_filename = instance.source_filename_new()
 
-        # If the filename is the same, then nothing needs to be done
-        if instance.filename is None or \
-           instance.filename == new_filename:
-            return
+    # If the filename is the same, then nothing needs to be done
+    if instance.filename is None or \
+       instance.filename == new_filename:
+        return
 
-        # Check if filename needs changing
-        if new_filename != instance.filename:
-            # Determine the full "target" path
-            path_new = instance.filename_to_path(new_filename)
-            dir_new = instance.filename_to_path(os.path.dirname(new_filename))
+    # Check if filename needs changing
+    if new_filename != instance.filename:
+        # Determine the full "target" path
+        path_new = instance.filename_to_path(new_filename)
+        dir_new = instance.filename_to_path(os.path.dirname(new_filename))
 
-            # Determine the full "current" path
-            path_current = instance.filename_to_path(instance.filename)
+        # Determine the full "current" path
+        path_current = instance.filename_to_path(instance.filename)
 
-            # Move file
+        # Move file
+        try:
             os.rename(path_current, path_new)
+        except PermissionError:
+            # Do not update filename in object
+            return
 
-            # Delete empty directory
-            old_dir = os.path.dirname(instance.filename)
-            old_path = instance.filename_to_path(old_dir)
-            if len(os.listdir(old_path)) == 0:
-                try:
-                    os.rmdir(old_path)
-                except os.error:
-                    # Directory not empty
-                    pass
+        # Delete empty directory
+        old_dir = os.path.dirname(instance.filename)
+        old_path = instance.filename_to_path(old_dir)
+        delete_empty_directory(old_path)
 
-            instance.filename = new_filename
+        instance.filename = new_filename
 
-            # Save instance
-            # This will not cause a cascade of post_save signals, as next time
-            # nothing needs to be renamed
-            instance.save()
+        # Save instance
+        # This will not cause a cascade of post_save signals, as next time
+        # nothing needs to be renamed
+        instance.save()
+
+
+@receiver(models.signals.post_delete, sender=Document)
+def delete_files(sender, instance, **kwargs):
+    if instance.filename is None:
+        return
+
+    # Remove the document
+    old_file = instance.filename_to_path(instance.filename)
+    os.remove(old_file)
+
+    # And remove the directory (if applicable)
+    old_dir = os.path.dirname(instance.filename)
+    old_path = instance.filename_to_path(old_dir)
+    delete_empty_directory(old_path)
 
 
 class Log(models.Model):
