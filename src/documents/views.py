@@ -69,7 +69,10 @@ class FetchView(SessionOrBasicAuthMixin, DetailView):
             content_type=content_types[self.object.file_type]
         )
 
-        DISPOSITION = 'inline' if settings.INLINE_DOC else 'attachment'
+        DISPOSITION = (
+            'inline' if settings.INLINE_DOC or self.kwargs["kind"] == 'preview'
+            else 'attachment'
+        )
 
         response["Content-Disposition"] = '{}; filename="{}"'.format(
             DISPOSITION, self.object.file_name)
