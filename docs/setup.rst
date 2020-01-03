@@ -193,6 +193,13 @@ Docker Method
      container and thus the one of the consumption directory. Furthermore, you
      can change the id of the default user as well using ``USERMAP_UID``.
 
+  ``PAPERLESS_USE_SSL``
+    If you want Paperless to use SSL for the user interface, set this variable
+    to ``true``. You also need to copy your certificate and key to the ``data``
+    directory, named ``ssl.cert`` and ``ssl.key``.
+    This is not an ideal solution and, if possible, a reverse proxy with nginx
+    is preferred.
+
 6. Run ``docker-compose up -d``. This will create and start the necessary
    containers.
 7. To be able to login, you will need a super user. To create it, execute the
@@ -206,7 +213,8 @@ Docker Method
    e-mail address and finally a password.
 8. The default ``docker-compose.yml`` exports the webserver on your local port
    8000. If you haven't adapted this, you should now be able to visit your
-   `Paperless webserver`_ at ``http://127.0.0.1:8000``. You can login with the
+   `Paperless webserver`_ at ``http://127.0.0.1:8000`` (or 
+   ``https://127.0.0.1:8000`` if you enabled SSL). You can login with the
    user and password you just created.
 9. Add files to consumption directory the way you prefer to. Following are two
    possible options:
