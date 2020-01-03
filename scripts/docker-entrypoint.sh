@@ -101,8 +101,18 @@ if [[ "$1" != "/"* ]]; then
 
     if [[ "$1" = "gunicorn" ]]; then
         shift
+        EXTRA_PARAMS=""
+        SSL_KEY_PATH="/usr/src/paperless/data/ssl.key"
+        SSL_CERT_PATH="/usr/src/paperless/data/ssl.cert"
+        if [ "${PAPERLESS_USE_SSL}" = "true" ]; then
+            if [ -f "${SSL_KEY_PATH}" ] && [ -f "${SSL_CERT_PATH}" ]; then
+                EXTRA_PARAMS="--certfile=${SSL_CERT_PATH} --keyfile=${SSL_KEY_PATH}"
+            else
+                echo "Error: Could not find certfile in ${SSL_CERT_PATH} or keyfile in ${SSL_KEY_PATH}, but \$PAPERLESS_USE_SSL is true. Starting without SSL enabled."
+            fi
+        fi
         cd /usr/src/paperless/src/ && \
-            exec sudo -HEu paperless /usr/bin/gunicorn -c /usr/src/paperless/gunicorn.conf "$@" paperless.wsgi
+            exec sudo -HEu paperless /usr/bin/gunicorn -c /usr/src/paperless/gunicorn.conf ${EXTRA_PARAMS} "$@" paperless.wsgi
     else
         exec sudo -HEu paperless "/usr/src/paperless/src/manage.py" "$@"
     fi
