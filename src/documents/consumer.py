@@ -94,6 +94,11 @@ class Consumer:
                     ignored_files.append(file)
                 else:
                     files.append(file)
+            else:
+                self.logger.warning(
+                    "Skipping %s as it is not a file",
+                    entry.path
+                )
 
         if not files:
             return
