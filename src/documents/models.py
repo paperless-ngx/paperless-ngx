@@ -341,16 +341,17 @@ class Document(models.Model):
         new_filename = self.generate_source_filename()
 
         # Determine the full "target" path
-        dir_new = self.filename_to_path(os.path.dirname(new_filename))
+        dir_new = Document.filename_to_path(os.path.dirname(new_filename))
 
         # Create new path
         os.makedirs(dir_new, exist_ok=True)
 
     @property
     def source_path(self):
-        return self.filename_to_path(self.source_filename)
+        return Document.filename_to_path(self.source_filename)
 
-    def filename_to_path(self, filename):
+    @staticmethod
+    def filename_to_path(filename):
         return os.path.join(
             settings.MEDIA_ROOT,
             "documents",
@@ -393,7 +394,7 @@ class Document(models.Model):
         return reverse("fetch", kwargs={"kind": "thumb", "pk": self.pk})
 
     def set_filename(self, filename):
-        if os.path.isfile(self.filename_to_path(filename)):
+        if os.path.isfile(Document.filename_to_path(filename)):
             self.filename = filename
 
 
