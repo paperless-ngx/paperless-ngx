@@ -279,7 +279,7 @@ class Document(models.Model):
     @property
     def source_filename(self):
         if self.filename is None:
-            self.filename = self.source_filename_new()
+            self.filename = self.generate_source_filename()
 
         return self.filename
 
@@ -298,7 +298,7 @@ class Document(models.Model):
 
         return mydictionary
 
-    def source_filename_new(self):
+    def generate_source_filename(self):
         # Create directory name based on configured format
         if settings.PAPERLESS_DIRECTORY_FORMAT is not None:
             directory = settings.PAPERLESS_DIRECTORY_FORMAT.format(
@@ -335,11 +335,16 @@ class Document(models.Model):
         if self.storage_type == self.STORAGE_TYPE_GPG:
             filename += ".gpg"
 
-        # Create directory for target (and ignore, if directory exists already)
-        create_dir = self.filename_to_path(slugify(directory))
-        os.makedirs(create_dir, exist_ok=True)
-
         return filename
+
+    def create_source_directory(self):
+        new_filename = self.generate_source_filename()
+
+        # Determine the full "target" path
+        dir_new = self.filename_to_path(os.path.dirname(new_filename))
+
+        # Create new path
+        os.makedirs(dir_new, exist_ok=True)
 
     @property
     def source_path(self):
@@ -408,7 +413,7 @@ def update_filename(sender, instance, **kwargs):
         return
 
     # Build the new filename
-    new_filename = instance.source_filename_new()
+    new_filename = instance.generate_source_filename()
 
     # If the filename is the same, then nothing needs to be done
     if instance.filename is None or \
@@ -420,6 +425,9 @@ def update_filename(sender, instance, **kwargs):
         # Determine the full "target" path
         path_new = instance.filename_to_path(new_filename)
         dir_new = instance.filename_to_path(os.path.dirname(new_filename))
+
+        # Create new path
+        instance.create_source_directory()
 
         # Determine the full "current" path
         path_current = instance.filename_to_path(instance.filename)
