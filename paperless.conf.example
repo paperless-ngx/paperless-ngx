@@ -55,7 +55,7 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 PAPERLESS_EMAIL_SECRET=""
 
 # Specify a filename format for an (optional) subdirectory and the document itself
-# Use the following placefolders:
+# Use the following placeholders:
 # * {correspondent}
 # * {title}
 # * {created}
