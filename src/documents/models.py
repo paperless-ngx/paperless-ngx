@@ -409,6 +409,7 @@ def delete_empty_directory(directory):
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
 @receiver(models.signals.post_save, sender=Document)
 def update_filename(sender, instance, **kwargs):
+    # Skip if document has not been saved yet
     if instance.filename is None:
         return
 
