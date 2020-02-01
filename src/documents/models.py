@@ -416,8 +416,7 @@ def update_filename(sender, instance, **kwargs):
     new_filename = instance.generate_source_filename()
 
     # If the filename is the same, then nothing needs to be done
-    if instance.filename is None or \
-       instance.filename == new_filename:
+    if instance.filename == new_filename:
         return
 
     # Check if filename needs changing
