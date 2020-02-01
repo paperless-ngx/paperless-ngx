@@ -283,10 +283,18 @@ class Document(models.Model):
 
         return self.filename
 
-    def many_to_dictionary(self, field):
+    @staticmethod
+    def many_to_dictionary(field):
+        # Converts ManyToManyField to dictionary by assuming, that field
+        # entries contain an _ or - which will be used as a delimeter
         mydictionary = dict()
+
         for t in field.all():
+            # Find delimeter
             delimeter = t.name.find('_')
+
+            if delimeter is -1:
+                delimeter = t.name.find('-')
 
             if delimeter is -1:
                 continue
@@ -294,9 +302,19 @@ class Document(models.Model):
             key = t.name[:delimeter]
             value = t.name[delimeter+1:]
 
-            mydictionary[key] = slugify(value)
+            mydictionary[slugify(key)] = slugify(value)
 
         return mydictionary
+
+    @staticmethod
+    def many_to_list(field):
+        # Converts ManyToManyField to list
+        mylist = list()
+
+        for t in field.all():
+            mylist.append(slugify(t))
+
+        return mylist
 
     def generate_source_filename(self):
         # Create filename based on configured format
@@ -306,8 +324,8 @@ class Document(models.Model):
                    title=slugify(self.title),
                    created=slugify(self.created),
                    added=slugify(self.added),
-                   tags=defaultdict(str,
-                                    self.many_to_dictionary(self.tags)))
+                   tag=defaultdict(str, self.many_to_dictionary(self.tags)),
+                   tags=self.many_to_list(self.tags))
         else:
             path = ""
 
