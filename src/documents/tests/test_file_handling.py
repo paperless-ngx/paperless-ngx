@@ -145,6 +145,37 @@ class TestDate(TestCase):
                   "/documents/originals/none/none-0000001.pdftest")
         os.rmdir(settings.MEDIA_ROOT + "/documents/originals/none")
 
+
+    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
+                       format(str(uuid4())[:8]))
+    @override_settings(PAPERLESS_DIRECTORY_FORMAT="{correspondent}/{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}")
+    def test_nested_directory_cleanup(self):
+        document = Document()
+        document.file_type = "pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        tmp = document.source_filename
+        self.assertEqual(document.generate_source_filename(),
+                         "none/none/none-0000001.pdf")
+        document.create_source_directory()
+        Path(document.source_path).touch()
+
+        # Check proper handling of files
+        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
+                         "/documents/originals/none/none"), True)
+
+        document.delete()
+
+        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT +
+                         "/documents/originals/none/none/none-0000001.pdf"), False)
+        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
+                         "/documents/originals/none/none"), False)
+        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
+                         "/documents/originals/none"), False)
+
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_DIRECTORY_FORMAT=None)
