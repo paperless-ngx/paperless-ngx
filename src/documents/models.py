@@ -450,9 +450,9 @@ def delete_files(sender, instance, **kwargs):
     # Remove the document
     old_file = instance.filename_to_path(instance.filename)
 
-    if os.path.isfile(old_file):
+    try:
         os.remove(old_file)
-    else:
+    except FileNotFoundError:
         logger = logging.getLogger(__name__)
         logger.warning("Deleted document " + str(instance.id) + " but file " +
                        old_file + " was no longer present")
