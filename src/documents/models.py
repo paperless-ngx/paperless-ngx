@@ -283,12 +283,6 @@ class Document(models.Model):
 
         return self.filename
 
-    def many_to_list(self, field):
-        mylist = []
-        for t in field.all():
-            mylist.append(t.name)
-        return mylist
-
     def many_to_dictionary(self, field):
         mydictionary = dict()
         for t in field.all():
