@@ -335,13 +335,9 @@ class Document(models.Model):
         if self.storage_type == self.STORAGE_TYPE_GPG:
             filename += ".gpg"
 
-        # Create directory for target
+        # Create directory for target (and ignore, if directory exists already)
         create_dir = self.filename_to_path(slugify(directory))
-        try:
-            os.makedirs(create_dir)
-        except os.error:
-            # Directory existed already, ignore
-            pass
+        os.makedirs(create_dir, exist_ok=True)
 
         return filename
 
