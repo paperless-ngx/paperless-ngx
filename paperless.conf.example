@@ -54,7 +54,7 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 # ignored.
 PAPERLESS_EMAIL_SECRET=""
 
-# Specify a filename format for an (optional) subdirectory and the document itself
+# Specify a filename format for the document (directories are supported)
 # Use the following placeholders:
 # * {correspondent}
 # * {title}
@@ -63,7 +63,6 @@ PAPERLESS_EMAIL_SECRET=""
 # * {tags[FILTER]}
 # Uniqueness of filenames is ensured, as an incrementing counter is attached
 # to each filename.
-#PAPERLESS_DIRECTORY_FORMAT=""
 #PAPERLESS_FILENAME_FORMAT=""
 
 ###############################################################################
