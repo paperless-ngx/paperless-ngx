@@ -299,31 +299,17 @@ class Document(models.Model):
         return mydictionary
 
     def generate_source_filename(self):
-        # Create directory name based on configured format
-        if settings.PAPERLESS_DIRECTORY_FORMAT is not None:
-            directory = settings.PAPERLESS_DIRECTORY_FORMAT.format(
-                        correspondent=slugify(self.correspondent),
-                        title=slugify(self.title),
-                        created=slugify(self.created),
-                        added=slugify(self.added),
-                        tags=defaultdict(str,
-                                         self.many_to_dictionary(self.tags)))
-        else:
-            directory = ""
-
         # Create filename based on configured format
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            filename = settings.PAPERLESS_FILENAME_FORMAT.format(
-                        correspondent=slugify(self.correspondent),
-                        title=slugify(self.title),
-                        created=slugify(self.created),
-                        added=slugify(self.added),
-                        tags=defaultdict(str,
-                                         self.many_to_dictionary(self.tags)))
+            path = settings.PAPERLESS_FILENAME_FORMAT.format(
+                   correspondent=slugify(self.correspondent),
+                   title=slugify(self.title),
+                   created=slugify(self.created),
+                   added=slugify(self.added),
+                   tags=defaultdict(str,
+                                    self.many_to_dictionary(self.tags)))
         else:
-            filename = ""
-
-        path = os.path.join(directory, filename)
+            path = ""
 
         # Always append the primary key to guarantee uniqueness of filename
         if len(path) > 0:

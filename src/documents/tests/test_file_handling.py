@@ -14,7 +14,6 @@ from django.conf import settings
 
 
 class TestDate(TestCase):
-    @override_settings(PAPERLESS_DIRECTORY_FORMAT="")
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_source_filename(self):
         document = Document()
@@ -27,7 +26,6 @@ class TestDate(TestCase):
         document.filename = "test.pdf"
         self.assertEqual(document.source_filename, "test.pdf")
 
-    @override_settings(PAPERLESS_DIRECTORY_FORMAT="")
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_generate_source_filename(self):
         document = Document()
@@ -43,8 +41,7 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_DIRECTORY_FORMAT="{correspondent}")
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming(self):
         document = Document()
         document.file_type = "pdf"
@@ -89,8 +86,7 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_DIRECTORY_FORMAT="{correspondent}")
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete(self):
         document = Document()
         document.file_type = "pdf"
@@ -113,8 +109,7 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_DIRECTORY_FORMAT="{correspondent}")
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_directory_not_empty(self):
         document = Document()
         document.file_type = "pdf"
@@ -148,8 +143,7 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_DIRECTORY_FORMAT="{correspondent}/{correspondent}")
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
         document = Document()
         document.file_type = "pdf"
@@ -178,7 +172,6 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_DIRECTORY_FORMAT=None)
     @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def test_format_none(self):
         document = Document()
