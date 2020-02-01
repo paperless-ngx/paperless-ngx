@@ -420,36 +420,34 @@ def update_filename(sender, instance, **kwargs):
     if instance.filename == new_filename:
         return
 
-    # Check if filename needs changing
-    if new_filename != instance.filename:
-        # Determine the full "target" path
-        path_new = instance.filename_to_path(new_filename)
-        dir_new = instance.filename_to_path(os.path.dirname(new_filename))
+    # Determine the full "target" path
+    path_new = instance.filename_to_path(new_filename)
+    dir_new = instance.filename_to_path(os.path.dirname(new_filename))
 
-        # Create new path
-        instance.create_source_directory()
+    # Create new path
+    instance.create_source_directory()
 
-        # Determine the full "current" path
-        path_current = instance.filename_to_path(instance.filename)
+    # Determine the full "current" path
+    path_current = instance.filename_to_path(instance.filename)
 
-        # Move file
-        try:
-            os.rename(path_current, path_new)
-        except PermissionError:
-            # Do not update filename in object
-            return
+    # Move file
+    try:
+        os.rename(path_current, path_new)
+    except PermissionError:
+        # Do not update filename in object
+        return
 
-        # Delete empty directory
-        old_dir = os.path.dirname(instance.filename)
-        old_path = instance.filename_to_path(old_dir)
-        delete_empty_directory(old_path)
+    # Delete empty directory
+    old_dir = os.path.dirname(instance.filename)
+    old_path = instance.filename_to_path(old_dir)
+    delete_empty_directory(old_path)
 
-        instance.filename = new_filename
+    instance.filename = new_filename
 
-        # Save instance
-        # This will not cause a cascade of post_save signals, as next time
-        # nothing needs to be renamed
-        instance.save()
+    # Save instance
+    # This will not cause a cascade of post_save signals, as next time
+    # nothing needs to be renamed
+    instance.save()
 
 
 @receiver(models.signals.post_delete, sender=Document)
