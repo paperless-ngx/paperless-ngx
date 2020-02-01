@@ -29,16 +29,17 @@ class TestDate(TestCase):
 
     @override_settings(PAPERLESS_DIRECTORY_FORMAT="")
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
-    def test_source_filename_new(self):
+    def test_generate_source_filename(self):
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
-        self.assertEqual(document.source_filename_new(), "0000001.pdf")
+        self.assertEqual(document.generate_source_filename(), "0000001.pdf")
 
         document.storage_type = Document.STORAGE_TYPE_GPG
-        self.assertEqual(document.source_filename_new(), "0000001.pdf.gpg")
+        self.assertEqual(document.generate_source_filename(),
+                         "0000001.pdf.gpg")
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
@@ -52,8 +53,9 @@ class TestDate(TestCase):
 
         # Ensure that filename is properly generated
         tmp = document.source_filename
-        self.assertEqual(document.source_filename_new(),
+        self.assertEqual(document.generate_source_filename(),
                          "none/none-0000001.pdf")
+        document.create_source_directory()
         Path(document.source_path).touch()
 
         # Test source_path
@@ -63,7 +65,7 @@ class TestDate(TestCase):
         # Enable encryption and check again
         document.storage_type = Document.STORAGE_TYPE_GPG
         tmp = document.source_filename
-        self.assertEqual(document.source_filename_new(),
+        self.assertEqual(document.generate_source_filename(),
                          "none/none-0000001.pdf.gpg")
         document.save()
 
@@ -82,7 +84,7 @@ class TestDate(TestCase):
                          "/documents/originals/none"), False)
         self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
                          "originals/test/test-0000001.pdf.gpg"), True)
-        self.assertEqual(document.source_filename_new(),
+        self.assertEqual(document.generate_source_filename(),
                          "test/test-0000001.pdf.gpg")
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
@@ -97,8 +99,9 @@ class TestDate(TestCase):
 
         # Ensure that filename is properly generated
         tmp = document.source_filename
-        self.assertEqual(document.source_filename_new(),
+        self.assertEqual(document.generate_source_filename(),
                          "none/none-0000001.pdf")
+        document.create_source_directory()
         Path(document.source_path).touch()
 
         # Ensure file deletion after delete
@@ -120,8 +123,9 @@ class TestDate(TestCase):
 
         # Ensure that filename is properly generated
         tmp = document.source_filename
-        self.assertEqual(document.source_filename_new(),
+        self.assertEqual(document.generate_source_filename(),
                          "none/none-0000001.pdf")
+        document.create_source_directory()
         Path(document.source_path).touch()
         Path(document.source_path + "test").touch()
 
@@ -151,4 +155,4 @@ class TestDate(TestCase):
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
-        self.assertEqual(document.source_filename_new(), "0000001.pdf")
+        self.assertEqual(document.generate_source_filename(), "0000001.pdf")
