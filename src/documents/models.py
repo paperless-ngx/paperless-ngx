@@ -294,7 +294,7 @@ class Document(models.Model):
             key = t.name[:delimeter]
             value = t.name[delimeter+1:]
 
-            mydictionary[key] = value
+            mydictionary[key] = slugify(value)
 
         return mydictionary
 
@@ -302,10 +302,10 @@ class Document(models.Model):
         # Create directory name based on configured format
         if settings.PAPERLESS_DIRECTORY_FORMAT is not None:
             directory = settings.PAPERLESS_DIRECTORY_FORMAT.format(
-                        correspondent=self.correspondent,
-                        title=self.title,
-                        created=self.created,
-                        added=self.added,
+                        correspondent=slugify(self.correspondent),
+                        title=slugify(self.title),
+                        created=slugify(self.created),
+                        added=slugify(self.added),
                         tags=defaultdict(str,
                                          self.many_to_dictionary(self.tags)))
         else:
@@ -314,16 +314,16 @@ class Document(models.Model):
         # Create filename based on configured format
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
             filename = settings.PAPERLESS_FILENAME_FORMAT.format(
-                        correspondent=self.correspondent,
-                        title=self.title,
-                        created=self.created,
-                        added=self.added,
+                        correspondent=slugify(self.correspondent),
+                        title=slugify(self.title),
+                        created=slugify(self.created),
+                        added=slugify(self.added),
                         tags=defaultdict(str,
                                          self.many_to_dictionary(self.tags)))
         else:
             filename = ""
 
-        path = os.path.join(slugify(directory), slugify(filename))
+        path = os.path.join(directory, filename)
 
         # Always append the primary key to guarantee uniqueness of filename
         if len(path) > 0:
@@ -398,13 +398,18 @@ class Document(models.Model):
             self.filename = filename
 
 
-def delete_empty_directory(directory):
-    if len(os.listdir(directory)) == 0:
+def try_delete_empty_directories(directory):
+    # Go up in the directory hierarchy and try to delete all directories
+    while directory != Document.filename_to_path(""):
+        # Try to delete the current directory
         try:
             os.rmdir(directory)
         except os.error:
-            # Directory not empty
-            pass
+            # Directory not empty, no need to go further up
+            return
+
+        # Cut off actual directory and go one level up
+        directory, tmp = os.path.split(directory)
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
@@ -441,7 +446,7 @@ def update_filename(sender, instance, **kwargs):
     # Delete empty directory
     old_dir = os.path.dirname(instance.filename)
     old_path = instance.filename_to_path(old_dir)
-    delete_empty_directory(old_path)
+    try_delete_empty_directories(old_path)
 
     instance.filename = new_filename
 
@@ -469,7 +474,7 @@ def delete_files(sender, instance, **kwargs):
     # And remove the directory (if applicable)
     old_dir = os.path.dirname(instance.filename)
     old_path = instance.filename_to_path(old_dir)
-    delete_empty_directory(old_path)
+    try_delete_empty_directories(old_path)
 
 
 class Log(models.Model):
