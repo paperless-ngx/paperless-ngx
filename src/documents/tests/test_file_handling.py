@@ -206,7 +206,7 @@ class TestDate(TestCase):
         # Ensure that filename is properly generated
         tmp = document.source_filename
         self.assertEqual(document.generate_source_filename(),
-                         "0000001.pdf")
+                         "none-0000001.pdf")
         document.create_source_directory()
         Path(document.source_path).touch()
 
