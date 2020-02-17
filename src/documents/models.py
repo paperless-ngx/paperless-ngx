@@ -413,7 +413,7 @@ def try_delete_empty_directories(directory):
             return
 
         # Cut off actual directory and go one level up
-        directory, tmp = os.path.split(directory)
+        directory, _ = os.path.split(directory)
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
