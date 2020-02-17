@@ -326,6 +326,8 @@ class Document(models.Model):
     def generate_source_filename(self):
         # Create filename based on configured format
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
+            tag = defaultdict(lambda: slugify(None),
+                              self.many_to_dictionary(self.tags))
             list_length = 10
             tags = self.many_to_list(self.tags)
             while True:
@@ -336,7 +338,7 @@ class Document(models.Model):
                            title=slugify(self.title),
                            created=slugify(self.created),
                            added=slugify(self.added),
-                           tag=defaultdict(str, self.many_to_dictionary(self.tags)),
+                           tag=tag,
                            tags=tags)
                     break
                 except IndexError:
