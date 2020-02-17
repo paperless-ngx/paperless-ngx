@@ -312,7 +312,7 @@ class Document(models.Model):
         mylist = list()
 
         for t in field.all():
-            mylist.append(slugify(t))
+            mylist.append(slugify(t.name))
 
         return mylist
 
