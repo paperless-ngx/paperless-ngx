@@ -264,6 +264,8 @@ class TestDate(TestCase):
                          "/documents/originals/none/none"), False)
         self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
                          "/documents/originals/none"), False)
+        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
+                         "/documents/originals"), False)
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
