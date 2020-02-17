@@ -286,21 +286,21 @@ class Document(models.Model):
     @staticmethod
     def many_to_dictionary(field):
         # Converts ManyToManyField to dictionary by assuming, that field
-        # entries contain an _ or - which will be used as a delimeter
+        # entries contain an _ or - which will be used as a delimiter
         mydictionary = dict()
 
         for t in field.all():
-            # Find delimeter
-            delimeter = t.name.find('_')
+            # Find delimiter
+            delimiter = t.name.find('_')
 
-            if delimeter is -1:
-                delimeter = t.name.find('-')
+            if delimiter is -1:
+                delimiter = t.name.find('-')
 
-            if delimeter is -1:
+            if delimiter is -1:
                 continue
 
-            key = t.name[:delimeter]
-            value = t.name[delimeter+1:]
+            key = t.name[:delimiter]
+            value = t.name[delimiter+1:]
 
             mydictionary[slugify(key)] = slugify(value)
 
