@@ -236,6 +236,60 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
+    def test_tags_out_of_bounds_0(self):
+        document = Document()
+        document.file_type = "pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        tmp = document.source_filename
+        self.assertEqual(document.generate_source_filename(),
+                         "none-0000001.pdf")
+        document.create_source_directory()
+        Path(document.source_path).touch()
+
+        document.delete()
+
+    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
+                       format(str(uuid4())[:8]))
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[10000000]}")
+    def test_tags_out_of_bounds_10000000(self):
+        document = Document()
+        document.file_type = "pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        tmp = document.source_filename
+        self.assertEqual(document.generate_source_filename(),
+                         "0000001.pdf")
+        document.create_source_directory()
+        Path(document.source_path).touch()
+
+        document.delete()
+
+    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
+                       format(str(uuid4())[:8]))
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[99]}")
+    def test_tags_out_of_bounds_99(self):
+        document = Document()
+        document.file_type = "pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        tmp = document.source_filename
+        self.assertEqual(document.generate_source_filename(),
+                         "none-0000001.pdf")
+        document.create_source_directory()
+        Path(document.source_path).touch()
+
+        document.delete()
+
+    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
+                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):

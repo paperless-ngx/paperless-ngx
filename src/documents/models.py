@@ -316,16 +316,35 @@ class Document(models.Model):
 
         return mylist
 
+    @staticmethod
+    def fill_list(input_list, length, filler):
+        while len(input_list) < length:
+            input_list.append(slugify(filler))
+
+        return input_list
+
     def generate_source_filename(self):
         # Create filename based on configured format
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            path = settings.PAPERLESS_FILENAME_FORMAT.format(
-                   correspondent=slugify(self.correspondent),
-                   title=slugify(self.title),
-                   created=slugify(self.created),
-                   added=slugify(self.added),
-                   tag=defaultdict(str, self.many_to_dictionary(self.tags)),
-                   tags=self.many_to_list(self.tags))
+            list_length = 10
+            tags = self.many_to_list(self.tags)
+            while True:
+                tags = Document.fill_list(tags, list_length, None)
+                try:
+                    path = settings.PAPERLESS_FILENAME_FORMAT.format(
+                           correspondent=slugify(self.correspondent),
+                           title=slugify(self.title),
+                           created=slugify(self.created),
+                           added=slugify(self.added),
+                           tag=defaultdict(str, self.many_to_dictionary(self.tags)),
+                           tags=tags)
+                    break
+                except IndexError:
+                    list_length *= 10
+
+                if list_length > 1000:
+                    path = ""
+                    break
         else:
             path = ""
 
