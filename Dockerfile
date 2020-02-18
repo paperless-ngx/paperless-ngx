@@ -27,6 +27,7 @@ RUN apk add --no-cache \
       shadow \
       sudo \
       tesseract-ocr \
+			tzdata \
       unpaper && \
     apk add --no-cache --virtual .build-dependencies \
       g++ \
