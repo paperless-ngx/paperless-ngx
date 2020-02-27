@@ -1,7 +1,7 @@
 [Unit]
 Description=Paperless webserver
 After=network.target
-Requires=network.target
+Wants=network.target
 
 [Service]
 User=paperless
