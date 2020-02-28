@@ -239,10 +239,10 @@ Basic Syntax
 
 Again we'll use the ``manage.py`` script, passing ``change_storage_type``:
 
-.. code:: bash
+.. code:: console
 
     $ /path/to/paperless/src/manage.py change_storage_type --help
-		usage: manage.py change_storage_type [-h] [--version] [-v {0,1,2,3}]
+    usage: manage.py change_storage_type [-h] [--version] [-v {0,1,2,3}]
                                      [--settings SETTINGS]
                                      [--pythonpath PYTHONPATH] [--traceback]
                                      [--no-color] [--passphrase PASSPHRASE]
