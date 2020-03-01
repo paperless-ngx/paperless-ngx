@@ -1,4 +1,4 @@
-FROM alpine:3.10
+FROM alpine:3.11
 
 LABEL maintainer="The Paperless Project https://github.com/the-paperless-project/paperless" \
       contributors="Guy Addadi <addadi@gmail.com>, Pit Kleyersburg <pitkley@googlemail.com>, \
@@ -52,6 +52,9 @@ RUN apk add --no-cache \
     adduser -D -u 1000 -G paperless -h /usr/src/paperless paperless && \
     chown -Rh paperless:paperless /usr/src/paperless && \
     mkdir -p $PAPERLESS_EXPORT_DIR && \
+# Avoid setrlimit warnings
+# See: https://gitlab.alpinelinux.org/alpine/aports/issues/11122
+    echo 'Set disable_coredump false' >> /etc/sudo.conf && \
 # Setup entrypoint
     chmod 755 /sbin/docker-entrypoint.sh
 
