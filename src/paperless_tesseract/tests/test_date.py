@@ -172,3 +172,29 @@ class TestDate(TestCase):
         document = RasterisedDocumentParser("/dev/null")
         document.get_text()
         self.assertIsNone(document.get_date())
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="20 408000l 2475"
+    )
+    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    def test_crazy_date_with_spaces(self, *args):
+        document = RasterisedDocumentParser("/dev/null")
+        document.get_text()
+        self.assertIsNone(document.get_date())
+
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
+        return_value="No date in here"
+    )
+    @mock.patch(
+        "paperless_tesseract.parsers.RasterisedDocumentParser."
+        "FILENAME_DATE_ORDER",
+        new_callable=mock.PropertyMock,
+        return_value="YMD"
+    )
+    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    def test_filename_date_parse_invalid(self, *args):
+        document = RasterisedDocumentParser("/tmp/20 408000l 2475 - test.pdf")
+        document.get_text()
+        self.assertIsNone(document.get_date())
