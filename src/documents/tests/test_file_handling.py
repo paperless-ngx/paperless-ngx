@@ -145,7 +145,7 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{tag[type]}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
         document = Document()
         document.file_type = "pdf"
@@ -168,7 +168,7 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{tag[type]}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_dash(self):
         document = Document()
         document.file_type = "pdf"
@@ -191,7 +191,7 @@ class TestDate(TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{tag[type]}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_malformed(self):
         document = Document()
         document.file_type = "pdf"

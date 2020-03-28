@@ -289,7 +289,10 @@ class Document(models.Model):
         # entries contain an _ or - which will be used as a delimiter
         mydictionary = dict()
 
-        for t in field.all():
+        for index, t in enumerate(field.all()):
+            # Populate tag names by index
+            mydictionary[index] = slugify(t.name)
+
             # Find delimiter
             delimiter = t.name.find('_')
 
@@ -307,16 +310,6 @@ class Document(models.Model):
         return mydictionary
 
     @staticmethod
-    def many_to_list(field):
-        # Converts ManyToManyField to list
-        mylist = list()
-
-        for t in field.all():
-            mylist.append(slugify(t.name))
-
-        return mylist
-
-    @staticmethod
     def fill_list(input_list, length, filler):
         while len(input_list) < length:
             input_list.append(slugify(filler))
@@ -326,16 +319,13 @@ class Document(models.Model):
     def generate_source_filename(self):
         # Create filename based on configured format
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tag = defaultdict(lambda: slugify(None),
-                              self.many_to_dictionary(self.tags))
             tags = defaultdict(lambda: slugify(None),
-                               enumerate(self.many_to_list(self.tags)))
+                               self.many_to_dictionary(self.tags))
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
                    correspondent=slugify(self.correspondent),
                    title=slugify(self.title),
                    created=slugify(self.created),
                    added=slugify(self.added),
-                   tag=tag,
                    tags=tags)
         else:
             path = ""
