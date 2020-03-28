@@ -415,7 +415,10 @@ class Document(models.Model):
 
 def try_delete_empty_directories(directory):
     # Go up in the directory hierarchy and try to delete all directories
-    while directory != Document.filename_to_path(""):
+    directory = os.path.normpath(directory)
+    root = os.path.normpath(Document.filename_to_path(""))
+
+    while directory != root:
         # Try to delete the current directory
         try:
             os.rmdir(directory)
@@ -425,6 +428,7 @@ def try_delete_empty_directories(directory):
 
         # Cut off actual directory and go one level up
         directory, _ = os.path.split(directory)
+        directory = os.path.normpath(directory)
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
