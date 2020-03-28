@@ -328,25 +328,15 @@ class Document(models.Model):
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
             tag = defaultdict(lambda: slugify(None),
                               self.many_to_dictionary(self.tags))
-            list_length = 10
-            tags = self.many_to_list(self.tags)
-            while True:
-                tags = Document.fill_list(tags, list_length, None)
-                try:
-                    path = settings.PAPERLESS_FILENAME_FORMAT.format(
-                           correspondent=slugify(self.correspondent),
-                           title=slugify(self.title),
-                           created=slugify(self.created),
-                           added=slugify(self.added),
-                           tag=tag,
-                           tags=tags)
-                    break
-                except IndexError:
-                    list_length *= 10
-
-                if list_length > 1000:
-                    path = ""
-                    break
+            tags = defaultdict(lambda: slugify(None),
+                               enumerate(self.many_to_list(self.tags)))
+            path = settings.PAPERLESS_FILENAME_FORMAT.format(
+                   correspondent=slugify(self.correspondent),
+                   title=slugify(self.title),
+                   created=slugify(self.created),
+                   added=slugify(self.added),
+                   tag=tag,
+                   tags=tags)
         else:
             path = ""
 
