@@ -60,7 +60,7 @@ PAPERLESS_EMAIL_SECRET=""
 # * {title}
 # * {created}
 # * {added}
-# * {tag[KEY]} If your tags conform to key_value or key-value
+# * {tags[KEY]} If your tags conform to key_value or key-value
 # * {tags[INDEX]} If your tags are strings, select the tag by index
 # Uniqueness of filenames is ensured, as an incrementing counter is attached
 # to each filename.
