@@ -309,13 +309,6 @@ class Document(models.Model):
 
         return mydictionary
 
-    @staticmethod
-    def fill_list(input_list, length, filler):
-        while len(input_list) < length:
-            input_list.append(slugify(filler))
-
-        return input_list
-
     def generate_source_filename(self):
         # Create filename based on configured format
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
