@@ -436,7 +436,7 @@ def update_filename(sender, instance, **kwargs):
     instance.create_source_directory()
 
     # Determine the full "current" path
-    path_current = instance.filename_to_path(instance.filename)
+    path_current = instance.filename_to_path(instance.source_filename)
 
     # Move file
     try:
