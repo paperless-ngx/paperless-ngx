@@ -276,10 +276,42 @@ class Document(models.Model):
             return "{}: {}".format(created, self.correspondent or self.title)
         return str(created)
 
+    def find_renamed_document(self, subdirectory=""):
+        suffix = "%07i.%s" % (self.pk, self.file_type)
+
+        # Append .gpg for encrypted files
+        if self.storage_type == self.STORAGE_TYPE_GPG:
+            suffix += ".gpg"
+
+        # Go up in the directory hierarchy and try to delete all directories
+        root = os.path.normpath(Document.filename_to_path(subdirectory))
+
+        for filename in os.listdir(root):
+            if filename.endswith(suffix):
+                return os.path.join(subdirectory, filename)
+
+            fullname = os.path.join(subdirectory, filename)
+            if os.path.isdir(Document.filename_to_path(fullname)):
+                return self.find_renamed_document(fullname)
+
+        return None
+
     @property
     def source_filename(self):
+        # Initial filename generation (for new documents)
         if self.filename is None:
             self.filename = self.generate_source_filename()
+
+        # Check if document is still available under filename
+        elif not os.path.isfile(Document.filename_to_path(self.filename)):
+            recovered_filename = self.find_renamed_document()
+
+            # If we have found the file, save filename and clean up empty dirs
+            if recovered_filename is not None:
+                self.filename = recovered_filename
+                self.save()
+
+                delete_all_empty_subdirectories(Document.filename_to_path(""))
 
         return self.filename
 
@@ -412,6 +444,28 @@ def try_delete_empty_directories(directory):
         # Cut off actual directory and go one level up
         directory, _ = os.path.split(directory)
         directory = os.path.normpath(directory)
+
+
+def delete_all_empty_subdirectories(directory):
+    # Go through all folders and try to delete all directories
+    root = os.path.normpath(Document.filename_to_path(directory))
+
+    for filename in os.listdir(root):
+        fullname = os.path.join(directory, filename)
+
+        if not os.path.isdir(Document.filename_to_path(fullname)):
+            continue
+
+        # Try to delete the directory
+        try:
+            os.rmdir(Document.filename_to_path(fullname))
+            continue
+        except os.error:
+            # Directory not empty, no need to go further up
+            continue
+
+        # Go into subdirectory to see, if there is more to delete
+        delete_all_empty_subdirectories(os.path.join(directory, filename))
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
