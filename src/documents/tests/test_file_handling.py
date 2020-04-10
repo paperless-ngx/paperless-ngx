@@ -4,6 +4,7 @@ import shutil
 from unittest import mock
 from uuid import uuid4
 from pathlib import Path
+from shutil import rmtree
 
 from dateutil import tz
 from django.test import TestCase, override_settings
@@ -14,6 +15,19 @@ from django.conf import settings
 
 
 class TestDate(TestCase):
+    def tearDown(self):
+        # Delete all temporary directories from failed tests
+        root = os.path.normpath("/tmp")
+
+        for filename in os.listdir(root):
+            fullname = os.path.join(root, filename)
+
+            if not os.path.isdir(fullname):
+                continue
+
+            if filename.startswith("paperless-tests-"):
+                shutil.rmtree(fullname, ignore_errors=True)
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_source_filename(self):
         document = Document()
