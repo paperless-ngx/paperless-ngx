@@ -46,7 +46,7 @@ This is all really a quite simple, shiny, user-friendly wrapper around some very
 
 * [ImageMagick](http://imagemagick.org/) converts the images between colour and greyscale.
 * [Tesseract](https://github.com/tesseract-ocr) does the character recognition.
-* [Unpaper](https://www.flameeyes.eu/projects/unpaper) despeckles and deskews the scanned image.
+* [Unpaper](https://github.com/unpaper/unpaper) despeckles and deskews the scanned image.
 * [GNU Privacy Guard](https://gnupg.org/) is used as the encryption backend.
 * [Python 3](https://python.org/) is the language of the project.
   * [Pillow](https://pypi.python.org/pypi/pillowfight/) loads the image data as a python object to be used with PyOCR.

@@ -42,7 +42,7 @@ Dies alles ist eine wirklich ziemlich einfache, glänzende und benutzerfreundlic
 
 * [ImageMagick](http://imagemagick.org/) wandelt Bilder zwischen Farbe und Graustufen um.
 * [Tesseract](https://github.com/tesseract-ocr) erledigt die Buchstabenerkennung.
-* [Unpaper](https://www.flameeyes.eu/projects/unpaper) bereinigt und begradigt das eingescannte Bild.
+* [Unpaper](https://github.com/unpaper/unpaper) bereinigt und begradigt das eingescannte Bild.
 * [GNU Privacy Guard](https://gnupg.org/) wird als Verschlüsselungsbackend genutzt.
 * [Python 3](https://python.org/) ist die Sprache des Projekts.
   * [Pillow](https://pypi.python.org/pypi/pillowfight/) lädt die Bilddaten als Python-Objekt, um sie mit PyOCR zu verwenden.
