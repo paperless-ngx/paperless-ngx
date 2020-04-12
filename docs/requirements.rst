@@ -18,7 +18,7 @@ should work) that has the following software installed:
 .. _GNU Privacy Guard: https://gnupg.org
 .. _Tesseract: https://github.com/tesseract-ocr
 .. _Imagemagick: http://imagemagick.org/
-.. _unpaper: https://www.flameeyes.eu/projects/unpaper
+.. _unpaper: https://github.com/unpaper/unpaper
 .. _libpoppler-cpp-dev: https://poppler.freedesktop.org/
 .. _optipng: http://optipng.sourceforge.net/
 
