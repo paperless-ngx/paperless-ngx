@@ -428,44 +428,46 @@ class Document(models.Model):
             self.filename = filename
 
 
-def try_delete_empty_directories(directory):
-    # Go up in the directory hierarchy and try to delete all directories
-    directory = os.path.normpath(directory)
-    root = os.path.normpath(Document.filename_to_path(""))
-
-    while directory != root:
-        # Try to delete the current directory
-        try:
-            os.rmdir(directory)
-        except os.error:
-            # Directory not empty, no need to go further up
-            return
-
-        # Cut off actual directory and go one level up
-        directory, _ = os.path.split(directory)
+    @staticmethod
+    def try_delete_empty_directories(directory):
+        # Go up in the directory hierarchy and try to delete all directories
         directory = os.path.normpath(directory)
+        root = os.path.normpath(Document.filename_to_path(""))
+
+        while directory != root:
+            # Try to delete the current directory
+            try:
+                os.rmdir(directory)
+            except os.error:
+                # Directory not empty, no need to go further up
+                return
+
+            # Cut off actual directory and go one level up
+            directory, _ = os.path.split(directory)
+            directory = os.path.normpath(directory)
 
 
-def delete_all_empty_subdirectories(directory):
-    # Go through all folders and try to delete all directories
-    root = os.path.normpath(Document.filename_to_path(directory))
+    @staticmethod
+    def delete_all_empty_subdirectories(directory):
+        # Go through all folders and try to delete all directories
+        root = os.path.normpath(Document.filename_to_path(directory))
 
-    for filename in os.listdir(root):
-        fullname = os.path.join(directory, filename)
+        for filename in os.listdir(root):
+            fullname = os.path.join(directory, filename)
 
-        if not os.path.isdir(Document.filename_to_path(fullname)):
-            continue
+            if not os.path.isdir(Document.filename_to_path(fullname)):
+                continue
 
-        # Try to delete the directory
-        try:
-            os.rmdir(Document.filename_to_path(fullname))
-            continue
-        except os.error:
-            # Directory not empty, no need to go further up
-            continue
+            # Go into subdirectory to see, if there is more to delete
+            Document.delete_all_empty_subdirectories(os.path.join(directory, filename))
 
-        # Go into subdirectory to see, if there is more to delete
-        delete_all_empty_subdirectories(os.path.join(directory, filename))
+            # Try to delete the directory
+            try:
+                os.rmdir(Document.filename_to_path(fullname))
+                continue
+            except os.error:
+                # Directory not empty, no need to go further up
+                continue
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
@@ -502,7 +504,7 @@ def update_filename(sender, instance, **kwargs):
     # Delete empty directory
     old_dir = os.path.dirname(instance.filename)
     old_path = instance.filename_to_path(old_dir)
-    try_delete_empty_directories(old_path)
+    Document.try_delete_empty_directories(old_path)
 
     instance.filename = new_filename
 
@@ -530,7 +532,7 @@ def delete_files(sender, instance, **kwargs):
     # And remove the directory (if applicable)
     old_dir = os.path.dirname(instance.filename)
     old_path = instance.filename_to_path(old_dir)
-    try_delete_empty_directories(old_path)
+    Document.try_delete_empty_directories(old_path)
 
 
 class Log(models.Model):
