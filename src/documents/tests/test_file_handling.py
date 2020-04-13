@@ -54,6 +54,8 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_file_renaming(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -100,6 +102,8 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_document_delete(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -124,6 +128,8 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_directory_not_empty(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -157,6 +163,8 @@ class TestDate(TestCase):
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -180,6 +188,8 @@ class TestDate(TestCase):
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_dash(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -203,6 +213,8 @@ class TestDate(TestCase):
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_malformed(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -226,6 +238,8 @@ class TestDate(TestCase):
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
     def test_tags_all(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -248,6 +262,8 @@ class TestDate(TestCase):
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
     def test_tags_out_of_bounds_0(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -266,6 +282,8 @@ class TestDate(TestCase):
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[10000000]}")
     def test_tags_out_of_bounds_10000000(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -284,6 +302,8 @@ class TestDate(TestCase):
                        format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[99]}")
     def test_tags_out_of_bounds_99(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -303,6 +323,8 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -345,6 +367,8 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_document_renamed(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -392,6 +416,8 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_document_renamed_encrypted(self):
+        self.add_to_deletion_list(settings.MEDIA_ROOT)
+
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_GPG
