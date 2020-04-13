@@ -15,18 +15,14 @@ from django.conf import settings
 
 
 class TestDate(TestCase):
+    deletion_list = []
+
+    def add_to_deletion_list(self, dirname):
+        self.deletion_list.append(dirname)
+
     def tearDown(self):
-        # Delete all temporary directories from failed tests
-        root = os.path.normpath("/tmp")
-
-        for filename in os.listdir(root):
-            fullname = os.path.join(root, filename)
-
-            if not os.path.isdir(fullname):
-                continue
-
-            if filename.startswith("paperless-tests-"):
-                shutil.rmtree(fullname, ignore_errors=True)
+        for dirname in self.deletion_list:
+            shutil.rmtree(dirname, ignore_errors=True)
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_source_filename(self):
