@@ -306,13 +306,20 @@ class Document(models.Model):
         elif not os.path.isfile(Document.filename_to_path(self.filename)):
             recovered_filename = self.find_renamed_document()
 
-            # If we have found the file, save filename and clean up empty dirs
+            # If we have found the file so update the filename
             if recovered_filename is not None:
+                logger = logging.getLogger(__name__)
+                logger.warning("Filename of document " + str(self.id) +
+                               " has changed and was successfully updated")
                 self.filename = recovered_filename
-                self.save()
 
+                # Remove all empty subdirectories from MEDIA_ROOT
                 Document.delete_all_empty_subdirectories(
                         Document.filename_to_path(""))
+            else:
+                logger = logging.getLogger(__name__)
+                logger.error("File of document " + str(self.id) + " has " +
+                             "gone and could not be recovered")
 
         return self.filename
 
@@ -477,6 +484,10 @@ def update_filename(sender, instance, **kwargs):
     if instance.filename is None:
         return
 
+    # Check is file exists and update filename otherwise
+    if not os.path.isfile(Document.filename_to_path(instance.filename)):
+        instance.filename = instance.source_filename
+
     # Build the new filename
     new_filename = instance.generate_source_filename()
 
@@ -499,6 +510,11 @@ def update_filename(sender, instance, **kwargs):
         os.rename(path_current, path_new)
     except PermissionError:
         # Do not update filename in object
+        return
+    except FileNotFoundError:
+        logger = logging.getLogger(__name__)
+        logger.error("Renaming of document " + str(instance.id) + " failed " +
+                     "as file " + instance.filename + " was no longer present")
         return
 
     # Delete empty directory
