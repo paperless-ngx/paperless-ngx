@@ -331,8 +331,6 @@ class TestDate(TestCase):
         self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
                          "/documents/originals"), True)
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def test_format_none(self):
         document = Document()
