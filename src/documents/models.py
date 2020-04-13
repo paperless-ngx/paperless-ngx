@@ -311,7 +311,8 @@ class Document(models.Model):
                 self.filename = recovered_filename
                 self.save()
 
-                delete_all_empty_subdirectories(Document.filename_to_path(""))
+                Document.delete_all_empty_subdirectories(
+                        Document.filename_to_path(""))
 
         return self.filename
 
@@ -427,7 +428,6 @@ class Document(models.Model):
         if os.path.isfile(Document.filename_to_path(filename)):
             self.filename = filename
 
-
     @staticmethod
     def try_delete_empty_directories(directory):
         # Go up in the directory hierarchy and try to delete all directories
@@ -446,7 +446,6 @@ class Document(models.Model):
             directory, _ = os.path.split(directory)
             directory = os.path.normpath(directory)
 
-
     @staticmethod
     def delete_all_empty_subdirectories(directory):
         # Go through all folders and try to delete all directories
@@ -459,7 +458,8 @@ class Document(models.Model):
                 continue
 
             # Go into subdirectory to see, if there is more to delete
-            Document.delete_all_empty_subdirectories(os.path.join(directory, filename))
+            Document.delete_all_empty_subdirectories(
+                    os.path.join(directory, filename))
 
             # Try to delete the directory
             try:
