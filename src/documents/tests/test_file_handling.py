@@ -134,7 +134,7 @@ class TestDate(TestCase):
         self.assertEqual(document.source_filename,
                          "none/none-0000001.pdf")
 
-        os.chmod(settings.MEDIA_ROOT + "/documents/originals/none", 0o666)
+        os.chmod(settings.MEDIA_ROOT + "/documents/originals/none", 0o777)
 
     @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
                        format(str(uuid4())[:8]))
