@@ -20,6 +20,13 @@ class TestDate(TestCase):
     def add_to_deletion_list(self, dirname):
         self.deletion_list.append(dirname)
 
+    def setUp(self):
+        folder = "/tmp/paperless-tests-{}".format(str(uuid4())[:8])
+        os.makedirs(folder + "/documents/originals")
+        storage_override = override_settings(MEDIA_ROOT=folder)
+        storage_override.enable()
+        self.add_to_deletion_list(folder)
+
     def tearDown(self):
         for dirname in self.deletion_list:
             shutil.rmtree(dirname, ignore_errors=True)
@@ -49,13 +56,9 @@ class TestDate(TestCase):
         self.assertEqual(document.generate_source_filename(),
                          "0000001.pdf.gpg")
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_file_renaming(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -97,13 +100,9 @@ class TestDate(TestCase):
         self.assertEqual(document.generate_source_filename(),
                          "test/test-0000001.pdf.gpg")
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_file_renaming_missing_permissions(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -136,13 +135,9 @@ class TestDate(TestCase):
 
         os.chmod(settings.MEDIA_ROOT + "/documents/originals/none", 0o777)
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_document_delete(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -172,13 +167,9 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_directory_not_empty(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -208,12 +199,8 @@ class TestDate(TestCase):
                   "/documents/originals/none/none-0000001.pdftest")
         os.rmdir(settings.MEDIA_ROOT + "/documents/originals/none")
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -233,12 +220,8 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_dash(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -258,12 +241,8 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_malformed(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -283,12 +262,8 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
     def test_tags_all(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -307,12 +282,8 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
     def test_tags_out_of_bounds_0(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -327,12 +298,8 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[10000000]}")
     def test_tags_out_of_bounds_10000000(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -347,12 +314,8 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[99]}")
     def test_tags_out_of_bounds_99(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -367,13 +330,9 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -411,13 +370,9 @@ class TestDate(TestCase):
 
         self.assertEqual(document.generate_source_filename(), "0000001.pdf")
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_document_renamed(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -462,13 +417,9 @@ class TestDate(TestCase):
         self.assertEqual(document.generate_source_filename(),
                          "foo/foo-0000001.pdf")
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_document_renamed_encrypted(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_GPG
@@ -550,13 +501,9 @@ class TestDate(TestCase):
         self.assertEqual(os.path.isdir(
             os.path.join(tmp, "notempty", "empty")), False)
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_document_accidentally_deleted(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
@@ -588,13 +535,9 @@ class TestDate(TestCase):
         self.assertEqual(document.source_filename,
                          "none/none-0000001.pdf")
 
-    @override_settings(MEDIA_ROOT="/tmp/paperless-tests-{}".
-                       format(str(uuid4())[:8]))
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
     def test_set_filename(self):
-        self.add_to_deletion_list(settings.MEDIA_ROOT)
-
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
