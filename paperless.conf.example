@@ -54,6 +54,17 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 # ignored.
 PAPERLESS_EMAIL_SECRET=""
 
+# Specify a filename format for the document (directories are supported)
+# Use the following placeholders:
+# * {correspondent}
+# * {title}
+# * {created}
+# * {added}
+# * {tags[KEY]} If your tags conform to key_value or key-value
+# * {tags[INDEX]} If your tags are strings, select the tag by index
+# Uniqueness of filenames is ensured, as an incrementing counter is attached
+# to each filename.
+#PAPERLESS_FILENAME_FORMAT=""
 
 ###############################################################################
 ####                              Security                                 ####
