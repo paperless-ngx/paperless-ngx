@@ -334,3 +334,6 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
 # well. Set to 0 to disable this filter.
 PAPERLESS_RECENT_CORRESPONDENT_YEARS = int(os.getenv(
     "PAPERLESS_RECENT_CORRESPONDENT_YEARS", 0))
+
+# Specify the filename format for out files
+PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
