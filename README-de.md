@@ -62,6 +62,7 @@ Ich entwickle keine neuen Funktionen mehr für Paperless, weil es genau das tut,
 
 Paperless gibt es bereits seit einer Weile und Leute haben damit angefangen, Sachen rund um Paperless zu entwickeln. Wenn du einer dieser Menschen bist, kannst du dein Projekt zu dieser Liste hinzufügen:
 
+* [Paperless App](https://github.com/bauerj/paperless_app): Eine Android/iOS-App für Paperless.
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): Eine Desktop-Oberfläche für deine Paperless-Installation. Läuft auf Mac, Linux und Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): Eine einfache Möglichkeit, Paperless via Ansible laufen zu lassen.
 * [paperless-cli](https://github.com/stgarf/paperless-cli): Ein golang Kommandozeilenprogramm, welches mit Paperless interagiert.
