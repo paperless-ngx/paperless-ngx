@@ -89,9 +89,11 @@ apt-get -y install unpaper gnupg libpoppler-cpp-dev python3-pyocr tesseract-ocr 
 # Needed for Apache
 apt-get -y install apache2 libapache2-mod-wsgi-py3
 
-if [ ! -f /etc/proftpd/proftpd.conf -o $(grep -c paperless /etc/proftpd/proftpd.conf) -eq 0 ]; then
+if [ ! -f /etc/proftpd/proftpd.conf ]; then
   # Install ftp server and make sure all uplaoded files are owned by paperless
   apt-get -y install proftpd
+fi
+if [ $(grep -c paperless /etc/proftpd/proftpd.conf) -eq 0 ]; then
   cat <<EOF >> /etc/proftpd/proftpd.conf
   <Directory /home/ftpupload/>
     UserOwner   paperless
