@@ -108,7 +108,7 @@ class DocumentParser:
 
                 try:
                     date = __parser(date_string, self.FILENAME_DATE_ORDER)
-                except TypeError:
+                except (TypeError, ValueError):
                     # Skip all matches that do not parse to a proper date
                     continue
 
@@ -134,7 +134,7 @@ class DocumentParser:
 
             try:
                 date = __parser(date_string, self.DATE_ORDER)
-            except TypeError:
+            except (TypeError, ValueError):
                 # Skip all matches that do not parse to a proper date
                 continue
 
