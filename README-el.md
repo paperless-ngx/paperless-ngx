@@ -59,6 +59,7 @@
 
 Το Paperless υπάρχει εδώ και κάποιο καιρό και άνθρωποι έχουν αρχίσει να φτιάχνουν πράγματα γύρω από αυτό. Αν είσαι ένας από αυτούς τους ανθρώπους, μπορούμε να βάλουμε το project σου σε αυτήν την λίστα:
 
+* [Paperless App](https://github.com/bauerj/paperless_app): Μια εφαρμογή Android / iOS για Paperless.
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): Μια desktop εφαρμογή για εγκατάσταση του Paperless.  Τρέχει σε Mac, Linux, και Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): Ένας εύκολο τρόπος για να τρέχει το Paperless μέσω Ansible.
 
