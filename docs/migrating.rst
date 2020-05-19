@@ -92,7 +92,7 @@ files, the ``migrate`` step may not update anything.  This is totally normal.
 Additionally, as new features are added, the ability to control those features
 is typically added by way of an environment variable set in ``paperless.conf``.
 You may want to take a look at the ``paperless.conf.example`` file to see if
-there's anything new in there compared to what you've got int ``/etc``.
+there's anything new in there compared to what you've got in ``/etc``.
 
 If you are :ref:`using Docker <setup-installation-docker>` the update process
 is similar:
