@@ -41,7 +41,7 @@
 
 * [ImageMagick](http://imagemagick.org/) μετατρέπει τις εικόνες σε έγχρωμες και ασπρόμαυρες.
 * [Tesseract](https://github.com/tesseract-ocr) κάνει την αναγνώρηση των χαρακτήρων.
-* [Unpaper](https://www.flameeyes.eu/projects/unpaper) despeckles and deskews the scanned image.
+* [Unpaper](https://github.com/unpaper/unpaper) despeckles and deskews the scanned image.
 * [GNU Privacy Guard](https://gnupg.org/) χρησιμοποιείται για κρυπτογράφηση στο backend.
 * [Python 3](https://python.org/) είναι η γλώσσα του project.
   * [Pillow](https://pypi.python.org/pypi/pillowfight/) Φορτώνει την εικόνα σαν αντικείμενο στην python και μπορεί να χρησιμοποιηθεί με PyOCR
