@@ -25,7 +25,7 @@ faker==2.0.0
 filelock==3.0.12
 filemagic==1.6
 fuzzywuzzy[speedup]==0.15.0
-gunicorn==19.9.0
+gunicorn==20.0.4
 idna==2.8
 imagesize==1.1.0
 importlib-metadata==0.19
