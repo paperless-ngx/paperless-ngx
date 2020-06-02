@@ -336,10 +336,10 @@ class Document(models.Model):
             # Find delimiter
             delimiter = t.name.find('_')
 
-            if delimiter is -1:
+            if delimiter == -1:
                 delimiter = t.name.find('-')
 
-            if delimiter is -1:
+            if delimiter == -1:
                 continue
 
             key = t.name[:delimiter]
