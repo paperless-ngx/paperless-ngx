@@ -132,8 +132,8 @@ Docker Method
    .. caution::
 
        If you want to use the included ``docker-compose.yml.example`` file, you
-       need to have at least Docker version **1.10.0** and docker-compose
-       version **1.6.0**.
+       need to have at least Docker version **1.12.0** and docker-compose
+       version **1.9.0**.
 
        See the `Docker installation guide`_ on how to install the current
        version of Docker for your operating system or Linux distribution of
