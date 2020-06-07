@@ -19,15 +19,20 @@ that works right for you based on recommentations from other Paperless users.
 +---------+----------------+-----+-----+-----+----------------+
 | Brother | `MFC-J5910DW`_ | yes |     |     | `bmsleight`_   |
 +---------+----------------+-----+-----+-----+----------------+
+| Brother | `MFC-9142CDN`_ | yes |     | yes | `REOLDEV`_     |
++---------+----------------+-----+-----+-----+----------------+
 | Fujitsu | `ix500`_       | yes |     | yes | `eonist`_      |
 +---------+----------------+-----+-----+-----+----------------+
 
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
+.. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 
 .. _danielquinn: https://github.com/danielquinn
 .. _ayounggun: https://github.com/ayounggun
 .. _bmsleight: https://github.com/bmsleight
 .. _eonist: https://github.com/eonist
+.. _REOLDEV: https://github.com/REOLDEV
+
