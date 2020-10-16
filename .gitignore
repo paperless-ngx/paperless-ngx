@@ -74,6 +74,7 @@ db.sqlite3-journal
 # Other stuff that doesn't belong
 .virtualenv
 virtualenv
+/venv
 docker-compose.yml
 docker-compose.env
 
@@ -86,3 +87,5 @@ static/
 
 # Classification Models
 models/
+
+/paperless.conf
