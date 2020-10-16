@@ -18,7 +18,9 @@ from dotenv import load_dotenv
 
 
 # Tap paperless.conf if it's available
-if os.path.exists("/etc/paperless.conf"):
+if os.path.exists("paperless.conf"):
+    load_dotenv("paperless.conf")
+elif os.path.exists("/etc/paperless.conf"):
     load_dotenv("/etc/paperless.conf")
 elif os.path.exists("/usr/local/etc/paperless.conf"):
     load_dotenv("/usr/local/etc/paperless.conf")
@@ -109,7 +111,7 @@ MIDDLEWARE = [
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # We allow CORS from localhost:8080
-CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8080,https://localhost:8080").split(","))
+CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8080,https://localhost:8080,localhost:4200").split(","))
 
 # If auth is disabled, we just use our "bypass" authentication middleware
 if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
