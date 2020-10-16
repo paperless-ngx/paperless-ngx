@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
+import json
 import os
+import re
 
 from dotenv import load_dotenv
 
@@ -62,6 +64,7 @@ FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
 
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -92,6 +95,7 @@ if os.getenv("PAPERLESS_INSTALLED_APPS"):
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -101,8 +105,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Enable whitenoise compression and caching
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # We allow CORS from localhost:8080
-CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "localhost:8080").split(","))
+CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8080,https://localhost:8080").split(","))
 
 # If auth is disabled, we just use our "bypass" authentication middleware
 if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
@@ -325,8 +332,16 @@ FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 
+# Transformations applied before filename parsing
+FILENAME_PARSE_TRANSFORMS = []
+for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
+    FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
+
 # Specify for how many years a correspondent is considered recent. Recent
 # correspondents will be shown in a separate "Recent correspondents" filter as
 # well. Set to 0 to disable this filter.
 PAPERLESS_RECENT_CORRESPONDENT_YEARS = int(os.getenv(
     "PAPERLESS_RECENT_CORRESPONDENT_YEARS", 0))
+
+# Specify the filename format for out files
+PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")

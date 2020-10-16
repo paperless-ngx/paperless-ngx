@@ -41,7 +41,7 @@
 
 * [ImageMagick](http://imagemagick.org/) μετατρέπει τις εικόνες σε έγχρωμες και ασπρόμαυρες.
 * [Tesseract](https://github.com/tesseract-ocr) κάνει την αναγνώρηση των χαρακτήρων.
-* [Unpaper](https://www.flameeyes.eu/projects/unpaper) despeckles and deskews the scanned image.
+* [Unpaper](https://github.com/unpaper/unpaper) despeckles and deskews the scanned image.
 * [GNU Privacy Guard](https://gnupg.org/) χρησιμοποιείται για κρυπτογράφηση στο backend.
 * [Python 3](https://python.org/) είναι η γλώσσα του project.
   * [Pillow](https://pypi.python.org/pypi/pillowfight/) Φορτώνει την εικόνα σαν αντικείμενο στην python και μπορεί να χρησιμοποιηθεί με PyOCR
@@ -59,6 +59,7 @@
 
 Το Paperless υπάρχει εδώ και κάποιο καιρό και άνθρωποι έχουν αρχίσει να φτιάχνουν πράγματα γύρω από αυτό. Αν είσαι ένας από αυτούς τους ανθρώπους, μπορούμε να βάλουμε το project σου σε αυτήν την λίστα:
 
+* [Paperless App](https://github.com/bauerj/paperless_app): Μια εφαρμογή Android / iOS για Paperless.
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): Μια desktop εφαρμογή για εγκατάσταση του Paperless.  Τρέχει σε Mac, Linux, και Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): Ένας εύκολο τρόπος για να τρέχει το Paperless μέσω Ansible.
 
