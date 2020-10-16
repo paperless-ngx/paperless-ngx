@@ -27,7 +27,7 @@ services:
         # value with nothing.
         environment:
             - PAPERLESS_OCR_LANGUAGES=
-        command: ["runserver", "--insecure", "--noreload", "0.0.0.0:8000"]
+        command: ["gunicorn", "-b", "0.0.0.0:8000"]
 
     consumer:
         build: ./

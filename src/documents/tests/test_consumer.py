@@ -1,3 +1,5 @@
+import re
+
 from django.test import TestCase
 from unittest import mock
 from tempfile import TemporaryDirectory
@@ -372,3 +374,79 @@ class TestFieldPermutations(TestCase):
         info = FileInfo.from_path("/path/to/06112017Z - title.pdf")
         self.assertEqual(info.title, "title")
         self.assertIsNone(info.created)
+
+    def test_filename_parse_transforms(self):
+
+        path = "/some/path/to/tag1,tag2_20190908_180610_0001.pdf"
+        all_patt = re.compile("^.*$")
+        none_patt = re.compile("$a")
+        exact_patt = re.compile("^([a-z0-9,]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.")
+        repl1 = " - \\4 - \\1."    # (empty) corrspondent, title and tags
+        repl2 = "\\2Z - " + repl1  # creation date + repl1
+
+        # No transformations configured (= default)
+        info = FileInfo.from_path(path)
+        self.assertEqual(info.title, "tag1,tag2_20190908_180610_0001")
+        self.assertEqual(info.extension, "pdf")
+        self.assertEqual(info.tags, ())
+        self.assertIsNone(info.created)
+
+        # Pattern doesn't match (filename unaltered)
+        with self.settings(
+                FILENAME_PARSE_TRANSFORMS=[(none_patt, "none.gif")]):
+            info = FileInfo.from_path(path)
+            self.assertEqual(info.title, "tag1,tag2_20190908_180610_0001")
+            self.assertEqual(info.extension, "pdf")
+
+        # Simple transformation (match all)
+        with self.settings(
+                FILENAME_PARSE_TRANSFORMS=[(all_patt, "all.gif")]):
+            info = FileInfo.from_path(path)
+            self.assertEqual(info.title, "all")
+            self.assertEqual(info.extension, "gif")
+
+        # Multiple transformations configured (first pattern matches)
+        with self.settings(
+                FILENAME_PARSE_TRANSFORMS=[
+                    (all_patt, "all.gif"),
+                    (all_patt, "anotherall.gif")]):
+            info = FileInfo.from_path(path)
+            self.assertEqual(info.title, "all")
+            self.assertEqual(info.extension, "gif")
+
+        # Multiple transformations configured (second pattern matches)
+        with self.settings(
+                FILENAME_PARSE_TRANSFORMS=[
+                    (none_patt, "none.gif"),
+                    (all_patt, "anotherall.gif")]):
+            info = FileInfo.from_path(path)
+            self.assertEqual(info.title, "anotherall")
+            self.assertEqual(info.extension, "gif")
+
+        # Complex transformation without date in replacement string
+        with self.settings(
+                FILENAME_PARSE_TRANSFORMS=[(exact_patt, repl1)]):
+            info = FileInfo.from_path(path)
+            self.assertEqual(info.title, "0001")
+            self.assertEqual(info.extension, "pdf")
+            self.assertEqual(len(info.tags), 2)
+            self.assertEqual(info.tags[0].slug, "tag1")
+            self.assertEqual(info.tags[1].slug, "tag2")
+            self.assertIsNone(info.created)
+
+        # Complex transformation with date in replacement string
+        with self.settings(
+            FILENAME_PARSE_TRANSFORMS=[
+                (none_patt, "none.gif"),
+                (exact_patt, repl2),    # <-- matches
+                (exact_patt, repl1),
+                (all_patt, "all.gif")]):
+            info = FileInfo.from_path(path)
+            self.assertEqual(info.title, "0001")
+            self.assertEqual(info.extension, "pdf")
+            self.assertEqual(len(info.tags), 2)
+            self.assertEqual(info.tags[0].slug, "tag1")
+            self.assertEqual(info.tags[1].slug, "tag2")
+            self.assertEqual(info.created.year, 2019)
+            self.assertEqual(info.created.month, 9)
+            self.assertEqual(info.created.day, 8)

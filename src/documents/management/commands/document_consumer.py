@@ -26,6 +26,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
 
         self.verbosity = 0
+        self.logger = logging.getLogger(__name__)
 
         self.file_consumer = None
         self.mail_fetcher = None
@@ -138,6 +139,11 @@ class Command(BaseCommand):
                         file = os.path.join(directory, event.name)
                         if os.path.isfile(file):
                             self.file_consumer.try_consume_file(file)
+                        else:
+                            self.logger.warning(
+                                "Skipping %s as it is not a file",
+                                file
+                            )
                 else:
                     break
 

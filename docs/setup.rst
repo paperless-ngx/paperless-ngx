@@ -43,6 +43,7 @@ You can go multiple routes with setting up and running Paperless:
 
  * The `bare metal route`_
  * The `docker route`_
+ * A suggested `linux containers route`_
 
 
 The `docker route`_ is quick & easy.
@@ -50,10 +51,14 @@ The `docker route`_ is quick & easy.
 The `bare metal route`_ is a bit more complicated to setup but makes it easier
 should you want to contribute some code back.
 
+The `linux containers route`_ is quick, but makes alot of assumptions on the 
+set-up, on the other hand the script could be used to install on a base
+debian or ubuntu server.
+
 .. _docker route: setup-installation-docker_
 .. _bare metal route: setup-installation-bare-metal_
 .. _Docker Machine: https://docs.docker.com/machine/
-
+.. _linux containers route: setup-installation-linux-containers_
 
 .. _setup-installation-bare-metal:
 
@@ -82,21 +87,22 @@ Standard (Bare Metal)
    this is the default.
 
 4. Initialise the SQLite database with ``./manage.py migrate``.
-5. Create a user for your Paperless instance with
+5. Collect the static files for the webserver with ``./manage.py collectstatic``.
+6. Create a user for your Paperless instance with
    ``./manage.py createsuperuser``. Follow the prompts to create your user.
-6. Start the webserver with ``./manage.py runserver <IP>:<PORT>``.
+7. Start the webserver with ``./manage.py runserver <IP>:<PORT>``.
    If no specific IP or port is given, the default is ``127.0.0.1:8000`` also
    known as http://localhost:8000/.
    You should now be able to visit your (empty) installation at
    `Paperless webserver`_ or whatever you chose before.  You can login with the
    user/pass you created in #5.
 
-7. In a separate window, change to the ``src`` directory in this repo again,
+8. In a separate window, change to the ``src`` directory in this repo again,
    but this time, you should start the consumer script with
    ``./manage.py document_consumer``.
-8. Scan something or put a file into the  ``CONSUMPTION_DIR``.
-9. Wait a few minutes
-10. Visit the document list on your webserver, and it should be there, indexed
+9. Scan something or put a file into the  ``CONSUMPTION_DIR``.
+10. Wait a few minutes
+11. Visit the document list on your webserver, and it should be there, indexed
     and downloadable.
 
 .. caution::
@@ -126,8 +132,8 @@ Docker Method
    .. caution::
 
        If you want to use the included ``docker-compose.yml.example`` file, you
-       need to have at least Docker version **1.10.0** and docker-compose
-       version **1.6.0**.
+       need to have at least Docker version **1.12.0** and docker-compose
+       version **1.9.0**.
 
        See the `Docker installation guide`_ on how to install the current
        version of Docker for your operating system or Linux distribution of
@@ -153,7 +159,7 @@ Docker Method
 	     If you are using NFS mounts for the consume directory you also need to
 			 change the command to turn off inotify as it doesn't work with NFS
 
-			 `command: ["document_consumer", "--no-inotify"]`
+			 ``command: ["document_consumer", "--no-inotify"]``
 
 
 5. Modify ``docker-compose.env`` and adapt the following environment variables:
@@ -187,6 +193,13 @@ Docker Method
      container and thus the one of the consumption directory. Furthermore, you
      can change the id of the default user as well using ``USERMAP_UID``.
 
+  ``PAPERLESS_USE_SSL``
+    If you want Paperless to use SSL for the user interface, set this variable
+    to ``true``. You also need to copy your certificate and key to the ``data``
+    directory, named ``ssl.cert`` and ``ssl.key``.
+    This is not an ideal solution and, if possible, a reverse proxy with nginx
+    is preferred.
+
 6. Run ``docker-compose up -d``. This will create and start the necessary
    containers.
 7. To be able to login, you will need a super user. To create it, execute the
@@ -200,7 +213,8 @@ Docker Method
    e-mail address and finally a password.
 8. The default ``docker-compose.yml`` exports the webserver on your local port
    8000. If you haven't adapted this, you should now be able to visit your
-   `Paperless webserver`_ at ``http://127.0.0.1:8000``. You can login with the
+   `Paperless webserver`_ at ``http://127.0.0.1:8000`` (or 
+   ``https://127.0.0.1:8000`` if you enabled SSL). You can login with the
    user and password you just created.
 9. Add files to consumption directory the way you prefer to. Following are two
    possible options:
@@ -326,7 +340,7 @@ and mod_wsgi, with a Paperless installation in ``/home/paperless/``:
         </Directory>
 
         WSGIScriptAlias / /home/paperless/paperless/src/paperless/wsgi.py
-        WSGIDaemonProcess example.com user=paperless group=paperless threads=5 python-path=/home/paperless/paperless/src:/home/paperless/.env/lib/python3.4/site-packages
+        WSGIDaemonProcess example.com user=paperless group=paperless threads=5 python-path=/home/paperless/paperless/src:/home/paperless/.env/lib/python3.6/site-packages
         WSGIProcessGroup example.com
 
         <Directory /home/paperless/paperless/src/paperless>
@@ -484,3 +498,45 @@ If you're using Docker, you can set a restart-policy_ in the
 Docker daemon.
 
 .. _restart-policy: https://docs.docker.com/engine/reference/commandline/run/#restart-policies-restart
+
+
+.. _setup-installation-linux-containers:
+
+Suggested way for Linux Container Method
+++++++++++++++++++++++++++++++++++++++++
+
+This method uses some rigid assumptions, for the best set-up:-
+
+ * Ubuntu lts as the container
+ * Apache as the webserver
+ * proftpd as ftp server
+ * ftpupload as the ftp user
+ * paperless as the main user for website 
+ * http://paperless.lan is the desired lan url
+ * LXC set to give ip addresses on your lan
+
+This could also be used as an install on a base debain/ubuntu server, 
+if the above assumptions are acceptable.
+
+1. Install lxc
+
+
+2. Lanch paperless container
+
+.. code:: bash
+
+    $ lxc launch ubuntu: paperless
+
+3. Run install script within container
+
+.. code:: bash
+
+    $ lxc exec paperless -- sh -c "wget https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/examples/lxc/lxc-install.sh && /bin/bash lxc-install.sh --email"
+
+The script will ask you for an ftpupload password.  
+As well as the super-user for paperless web front-end. 
+After around 10 mins, http://paperless.lan is ready and
+ftp://paperless.lan with user: ftpupload
+
+See the `Installation recording <_static/lxc-install.svg>`_.
+
