@@ -94,6 +94,11 @@ class Consumer:
                     ignored_files.append(file)
                 else:
                     files.append(file)
+            else:
+                self.logger.warning(
+                    "Skipping %s as it is not a file",
+                    entry.path
+                )
 
         if not files:
             return
@@ -233,6 +238,9 @@ class Consumer:
 
         self._write(document, doc, document.source_path)
         self._write(document, thumbnail, document.thumbnail_path)
+
+        document.set_filename(document.source_filename)
+        document.save()
 
         self.log("info", "Completed")
 

@@ -46,7 +46,7 @@ This is all really a quite simple, shiny, user-friendly wrapper around some very
 
 * [ImageMagick](http://imagemagick.org/) converts the images between colour and greyscale.
 * [Tesseract](https://github.com/tesseract-ocr) does the character recognition.
-* [Unpaper](https://www.flameeyes.eu/projects/unpaper) despeckles and deskews the scanned image.
+* [Unpaper](https://github.com/unpaper/unpaper) despeckles and deskews the scanned image.
 * [GNU Privacy Guard](https://gnupg.org/) is used as the encryption backend.
 * [Python 3](https://python.org/) is the language of the project.
   * [Pillow](https://pypi.python.org/pypi/pillowfight/) loads the image data as a python object to be used with PyOCR.
@@ -66,6 +66,7 @@ I am no longer doing new development on Paperless as it does exactly what I need
 
 Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
 
+* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless.
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
 * [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
