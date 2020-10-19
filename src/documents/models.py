@@ -13,7 +13,6 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.text import slugify
-from fuzzywuzzy import fuzz
 from collections import defaultdict
 
 from .managers import LogManager

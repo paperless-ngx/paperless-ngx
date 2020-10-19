@@ -16,14 +16,12 @@ from documents.views import (
     TagViewSet,
     DocumentTypeViewSet
 )
-from reminders.views import ReminderViewSet
 
 router = DefaultRouter()
 router.register(r"correspondents", CorrespondentViewSet)
 router.register(r"document_types", DocumentTypeViewSet)
 router.register(r"documents", DocumentViewSet)
 router.register(r"logs", LogViewSet)
-router.register(r"reminders", ReminderViewSet)
 router.register(r"tags", TagViewSet)
 
 urlpatterns = [
