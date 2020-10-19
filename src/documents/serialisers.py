@@ -36,21 +36,22 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
             "slug",
             "name",
             "colour",
-            "automatic_classification"
+            "automatic_classification",
+            "is_inbox_tag"
         )
 
 
-class CorrespondentField(serializers.HyperlinkedRelatedField):
+class CorrespondentField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Correspondent.objects.all()
 
 
-class TagsField(serializers.HyperlinkedRelatedField):
+class TagsField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return Tag.objects.all()
 
 
-class DocumentTypeField(serializers.HyperlinkedRelatedField):
+class DocumentTypeField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         return DocumentType.objects.all()
 
@@ -58,10 +59,10 @@ class DocumentTypeField(serializers.HyperlinkedRelatedField):
 class DocumentSerializer(serializers.ModelSerializer):
 
     correspondent = CorrespondentField(
-        view_name="drf:correspondent-detail", allow_null=True)
-    tags = TagsField(view_name="drf:tag-detail", many=True)
+        allow_null=True)
+    tags = TagsField(many=True)
     document_type = DocumentTypeField(
-        view_name="drf:documenttype-detail", allow_null=True)
+        allow_null=True)
 
     class Meta:
         model = Document
@@ -80,6 +81,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "file_name",
             "download_url",
             "thumbnail_url",
+            "archive_serial_number"
         )
 
 

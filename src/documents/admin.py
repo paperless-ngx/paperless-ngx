@@ -1,17 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.conf import settings
-from django.contrib import admin, messages
-from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
+from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.db import models
-from django.http import HttpResponseRedirect
-from django.templatetags.static import static
-from django.urls import reverse
 from django.utils.html import format_html, format_html_join
-from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
-from djangoql.admin import DjangoQLSearchMixin
 
 from .models import Correspondent, Document, DocumentType, Log, Tag
 
@@ -156,12 +150,7 @@ class DocumentTypeAdmin(CommonAdmin):
     document_count.admin_order_field = "document_count"
 
 
-class DocumentAdmin(DjangoQLSearchMixin, CommonAdmin):
-
-    class Media:
-        css = {
-            "all": ("paperless.css",)
-        }
+class DocumentAdmin(CommonAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = ("added", "file_type", "storage_type",)
@@ -188,20 +177,6 @@ class DocumentAdmin(DjangoQLSearchMixin, CommonAdmin):
     created_.short_description = "Created"
 
     @mark_safe
-    def thumbnail(self, obj):
-        return self._html_tag(
-            "a",
-            self._html_tag(
-                "img",
-                src=reverse("fetch", kwargs={"kind": "thumb", "pk": obj.pk}),
-                height=100,
-                alt="Thumbnail of {}".format(obj.file_name),
-                title=obj.file_name
-            ),
-            href=obj.download_url
-        )
-
-    @mark_safe
     def tags_(self, obj):
         r = ""
         for tag in obj.tags.all():
@@ -211,22 +186,6 @@ class DocumentAdmin(DjangoQLSearchMixin, CommonAdmin):
                 tag.slug + ", "
             )
         return r
-
-    @mark_safe
-    def document(self, obj):
-        # TODO: is this method even used anymore?
-        return self._html_tag(
-            "a",
-            self._html_tag(
-                "img",
-                src=static("documents/img/{}.png".format(obj.file_type)),
-                width=22,
-                height=22,
-                alt=obj.file_type,
-                title=obj.file_name
-            ),
-            href=obj.download_url
-        )
 
     @staticmethod
     def _html_tag(kind, inside=None, **kwargs):
@@ -253,5 +212,5 @@ admin.site.register(Log, LogAdmin)
 
 
 # Unless we implement multi-user, these default registrations don't make sense.
-#admin.site.unregister(Group)
-#admin.site.unregister(User)
+admin.site.unregister(Group)
+admin.site.unregister(User)
