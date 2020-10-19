@@ -274,10 +274,6 @@ PAPERLESS_EMAIL_SECRET=""
 #PAPERLESS_LIST_PER_PAGE=100
 
 
-# The number of years for which a correspondent will be included in the recent
-# correspondents filter.
-#PAPERLESS_RECENT_CORRESPONDENT_YEARS=1
-
 ###############################################################################
 ####                     Third-Party Binaries                              ####
 ###############################################################################
