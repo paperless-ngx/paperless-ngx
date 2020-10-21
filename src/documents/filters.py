@@ -3,10 +3,8 @@ from django_filters.rest_framework import BooleanFilter, FilterSet
 from .models import Correspondent, Document, Tag, DocumentType
 
 
-CHAR_KWARGS = (
-    "startswith", "endswith", "contains",
-    "istartswith", "iendswith", "icontains"
-)
+CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
+ID_KWARGS = ["in", "exact"]
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -14,11 +12,7 @@ class CorrespondentFilterSet(FilterSet):
     class Meta:
         model = Correspondent
         fields = {
-            "name": [
-                "startswith", "endswith", "contains",
-                "istartswith", "iendswith", "icontains"
-            ],
-            "slug": ["istartswith", "iendswith", "icontains"]
+            "name": CHAR_KWARGS
         }
 
 
@@ -27,11 +21,7 @@ class TagFilterSet(FilterSet):
     class Meta:
         model = Tag
         fields = {
-            "name": [
-                "startswith", "endswith", "contains",
-                "istartswith", "iendswith", "icontains"
-            ],
-            "slug": ["istartswith", "iendswith", "icontains"]
+            "name": CHAR_KWARGS
         }
 
 
@@ -40,11 +30,7 @@ class DocumentTypeFilterSet(FilterSet):
     class Meta:
         model = DocumentType
         fields = {
-            "name": [
-                "startswith", "endswith", "contains",
-                "istartswith", "iendswith", "icontains"
-            ],
-            "slug": ["istartswith", "iendswith", "icontains"]
+            "name": CHAR_KWARGS
         }
 
 
@@ -62,15 +48,15 @@ class DocumentFilterSet(FilterSet):
         fields = {
 
             "title": CHAR_KWARGS,
-            "content": ("contains", "icontains"),
+            "content": CHAR_KWARGS,
 
+            "correspondent__id": ID_KWARGS,
             "correspondent__name": CHAR_KWARGS,
-            "correspondent__slug": CHAR_KWARGS,
 
+            "tags__id": ID_KWARGS,
             "tags__name": CHAR_KWARGS,
-            "tags__slug": CHAR_KWARGS,
 
-            "document_type__name": CHAR_KWARGS,
-            "document_type__slug": CHAR_KWARGS,
+            "document_type__id": ID_KWARGS,
+            "document_type__name": CHAR_KWARGS
 
         }
