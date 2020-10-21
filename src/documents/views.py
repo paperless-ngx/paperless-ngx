@@ -1,3 +1,4 @@
+from django.db.models import Count, Max
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic import DetailView, FormView, TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -109,35 +110,35 @@ class PushView(SessionOrBasicAuthMixin, FormView):
 
 class CorrespondentViewSet(ModelViewSet):
     model = Correspondent
-    queryset = Correspondent.objects.all()
+    queryset = Correspondent.objects.annotate(document_count=Count('documents'), last_correspondence=Max('documents__created'))
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = CorrespondentFilterSet
-    ordering_fields = ("name", "slug")
+    ordering_fields = ("name", "document_count", "last_correspondence")
 
 
 class TagViewSet(ModelViewSet):
     model = Tag
-    queryset = Tag.objects.all()
+    queryset = Tag.objects.annotate(document_count=Count('documents'))
     serializer_class = TagSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = TagFilterSet
-    ordering_fields = ("name", "slug")
+    ordering_fields = ("name", "document_count")
 
 
 class DocumentTypeViewSet(ModelViewSet):
     model = DocumentType
-    queryset = DocumentType.objects.all()
+    queryset = DocumentType.objects.annotate(document_count=Count('documents'))
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = DocumentTypeFilterSet
-    ordering_fields = ("name", "slug")
+    ordering_fields = ("name", "document_count")
 
 
 class DocumentViewSet(RetrieveModelMixin,
