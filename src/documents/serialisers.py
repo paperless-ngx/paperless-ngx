@@ -5,17 +5,25 @@ from .models import Correspondent, Tag, Document, Log, DocumentType
 
 class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
 
+    document_count = serializers.IntegerField(read_only=True)
+
+    last_correspondence = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = Correspondent
         fields = (
             "id",
             "slug",
             "name",
-            "automatic_classification"
+            "automatic_classification",
+            "document_count",
+            "last_correspondence"
         )
 
 
 class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
+
+    document_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = DocumentType
@@ -23,11 +31,14 @@ class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "slug",
             "name",
-            "automatic_classification"
+            "automatic_classification",
+            "document_count"
         )
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
+
+    document_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Tag
@@ -37,7 +48,8 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "colour",
             "automatic_classification",
-            "is_inbox_tag"
+            "is_inbox_tag",
+            "document_count"
         )
 
 

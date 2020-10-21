@@ -83,29 +83,11 @@ class CorrespondentAdmin(CommonAdmin):
 
     list_display = (
         "name",
-        "automatic_classification",
-        "document_count",
-        "last_correspondence"
+        "automatic_classification"
     )
     list_editable = ("automatic_classification",)
 
     readonly_fields = ("slug",)
-
-    def get_queryset(self, request):
-        qs = super(CorrespondentAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            document_count=models.Count("documents"),
-            last_correspondence=models.Max("documents__created")
-        )
-        return qs
-
-    def document_count(self, obj):
-        return obj.document_count
-    document_count.admin_order_field = "document_count"
-
-    def last_correspondence(self, obj):
-        return obj.last_correspondence
-    last_correspondence.admin_order_field = "last_correspondence"
 
 
 class TagAdmin(CommonAdmin):
@@ -113,41 +95,25 @@ class TagAdmin(CommonAdmin):
     list_display = (
         "name",
         "colour",
-        "automatic_classification",
-        "document_count")
+        "automatic_classification"
+    )
+
     list_filter = ("colour",)
     list_editable = ("colour", "automatic_classification")
 
     readonly_fields = ("slug",)
 
-    class Media:
-        js = ("js/colours.js",)
-
-    def get_queryset(self, request):
-        qs = super(TagAdmin, self).get_queryset(request)
-        qs = qs.annotate(document_count=models.Count("documents"))
-        return qs
-
-    def document_count(self, obj):
-        return obj.document_count
-    document_count.admin_order_field = "document_count"
-
 
 class DocumentTypeAdmin(CommonAdmin):
 
-    list_display = ("name", "automatic_classification", "document_count")
+    list_display = (
+        "name",
+        "automatic_classification"
+    )
+
     list_editable = ("automatic_classification",)
 
     readonly_fields = ("slug",)
-
-    def get_queryset(self, request):
-        qs = super(DocumentTypeAdmin, self).get_queryset(request)
-        qs = qs.annotate(document_count=models.Count("documents"))
-        return qs
-
-    def document_count(self, obj):
-        return obj.document_count
-    document_count.admin_order_field = "document_count"
 
 
 class DocumentAdmin(CommonAdmin):
