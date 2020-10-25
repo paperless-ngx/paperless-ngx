@@ -20,9 +20,6 @@ class Command(BaseCommand):
     consumption directory, and fetch any mail available.
     """
 
-    ORIGINAL_DOCS = os.path.join(settings.MEDIA_ROOT, "documents", "originals")
-    THUMB_DOCS = os.path.join(settings.MEDIA_ROOT, "documents", "thumbnails")
-
     def __init__(self, *args, **kwargs):
 
         self.verbosity = 0
@@ -79,7 +76,7 @@ class Command(BaseCommand):
         except (ConsumerError, MailFetcherError) as e:
             raise CommandError(e)
 
-        for d in (self.ORIGINAL_DOCS, self.THUMB_DOCS):
+        for d in (settings.ORIGINALS_DIR, settings.THUMBNAIL_DIR):
             os.makedirs(d, exist_ok=True)
 
         logging.getLogger(__name__).info(
