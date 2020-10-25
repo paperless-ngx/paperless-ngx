@@ -196,9 +196,7 @@ class Document(models.Model):
             file_name += ".gpg"
 
         return os.path.join(
-            settings.MEDIA_ROOT,
-            "documents",
-            "originals",
+            settings.ORIGINALS_DIR,
             file_name
         )
 
@@ -222,9 +220,7 @@ class Document(models.Model):
             file_name += ".gpg"
 
         return os.path.join(
-            settings.MEDIA_ROOT,
-            "documents",
-            "thumbnails",
+            settings.THUMBNAIL_DIR,
             file_name
         )
 
