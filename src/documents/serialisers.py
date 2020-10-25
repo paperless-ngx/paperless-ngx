@@ -93,8 +93,6 @@ class DocumentSerializer(serializers.ModelSerializer):
             "modified",
             "added",
             "file_name",
-            "download_url",
-            "thumbnail_url",
             "archive_serial_number"
         )
 

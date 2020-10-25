@@ -5,6 +5,8 @@ from .models import Correspondent, Document, Tag, DocumentType
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
+INT_KWARGS = ["exact"]
+DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
 
 
 class CorrespondentFilterSet(FilterSet):
@@ -36,7 +38,7 @@ class DocumentTypeFilterSet(FilterSet):
 
 class DocumentFilterSet(FilterSet):
 
-    tags_empty = BooleanFilter(
+    is_tagged = BooleanFilter(
         label="Is tagged",
         field_name="tags",
         lookup_expr="isnull",
@@ -50,6 +52,12 @@ class DocumentFilterSet(FilterSet):
             "title": CHAR_KWARGS,
             "content": CHAR_KWARGS,
 
+            "archive_serial_number": INT_KWARGS,
+
+            "created": DATE_KWARGS,
+            "added": DATE_KWARGS,
+            "modified": DATE_KWARGS,
+
             "correspondent__id": ID_KWARGS,
             "correspondent__name": CHAR_KWARGS,
 
@@ -57,6 +65,6 @@ class DocumentFilterSet(FilterSet):
             "tags__name": CHAR_KWARGS,
 
             "document_type__id": ID_KWARGS,
-            "document_type__name": CHAR_KWARGS
+            "document_type__name": CHAR_KWARGS,
 
         }

@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
 from documents.classifier import DocumentClassifier
+from .. import index
 from ..models import Document, Tag
 
 
@@ -16,7 +17,12 @@ def logger(message, group):
     logging.getLogger(__name__).debug(message, extra={"group": group})
 
 
+#TODO: global? really?
 classifier = DocumentClassifier()
+
+
+def index_document(sender, document=None, logging_group=None, **kwargs):
+    index.add_document_to_index(sender, instance=document)
 
 
 def classify_document(sender, document=None, logging_group=None, **kwargs):

@@ -1,49 +1,34 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
-from django.urls import reverse_lazy
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import RedirectView
+from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
 from paperless.views import FaviconView
 from documents.views import (
     CorrespondentViewSet,
     DocumentViewSet,
-    FetchView,
     LogViewSet,
-    PushView,
     TagViewSet,
-    DocumentTypeViewSet
+    DocumentTypeViewSet,
+    SearchView,
+    IndexView
 )
 
-router = DefaultRouter()
-router.register(r"correspondents", CorrespondentViewSet)
-router.register(r"document_types", DocumentTypeViewSet)
-router.register(r"documents", DocumentViewSet)
-router.register(r"logs", LogViewSet)
-router.register(r"tags", TagViewSet)
+api_router = DefaultRouter()
+api_router.register(r"correspondents", CorrespondentViewSet)
+api_router.register(r"document_types", DocumentTypeViewSet)
+api_router.register(r"documents", DocumentViewSet)
+api_router.register(r"logs", LogViewSet)
+api_router.register(r"tags", TagViewSet)
+
 
 urlpatterns = [
 
     # API
-    url(
-        r"^api/auth/",
-        include(
-            ('rest_framework.urls', 'rest_framework'),
-            namespace="rest_framework")
-    ),
-    url(r"^api/", include((router.urls, 'drf'), namespace="drf")),
-
-    # File downloads
-    url(
-        r"^fetch/(?P<kind>doc|thumb|preview)/(?P<pk>\d+)$",
-        FetchView.as_view(),
-        name="fetch"
-    ),
-
-    # File uploads
-    url(r"^push$", csrf_exempt(PushView.as_view()), name="push"),
+    url(r"^api/auth/",include(('rest_framework.urls', 'rest_framework'), namespace="rest_framework")),
+    url(r"^api/search/", SearchView.as_view(), name="search"),
+    url(r"^api/token/", views.obtain_auth_token), url(r"^api/", include((api_router.urls, 'drf'), namespace="drf")),
 
     # Favicon
     url(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
@@ -51,9 +36,8 @@ urlpatterns = [
     # The Django admin
     url(r"admin/", admin.site.urls),
 
-    # Redirect / to /admin
-    url(r"^$", RedirectView.as_view(
-        permanent=True, url=reverse_lazy("admin:index"))),
+    # Root of the Frontent
+    url(r".*", IndexView.as_view()),
 
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
