@@ -91,17 +91,13 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'paperless.auth.QueryTokenAuthentication'
     ]
 }
 
-if os.getenv("PAPERLESS_INSTALLED_APPS"):
-    INSTALLED_APPS += os.getenv("PAPERLESS_INSTALLED_APPS").split(",")
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -111,8 +107,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Enable whitenoise compression and caching
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # We allow CORS from localhost:8080
 CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8080,https://localhost:8080,http://localhost:4200").split(","))
@@ -299,6 +294,8 @@ SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 # This is where Paperless will look for PDFs to index
 CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 
+INDEX_DIR = os.getenv('PAPERLESS_INDEX_DIR', os.path.join(BASE_DIR, "..", "index"))
+
 # (This setting is ignored on Linux where inotify is used instead of a
 # polling loop.)
 # The number of seconds that Paperless will wait between checking
@@ -323,17 +320,6 @@ PASSPHRASE = os.getenv("PAPERLESS_PASSPHRASE")
 PRE_CONSUME_SCRIPT = os.getenv("PAPERLESS_PRE_CONSUME_SCRIPT")
 POST_CONSUME_SCRIPT = os.getenv("PAPERLESS_POST_CONSUME_SCRIPT")
 
-# Whether to display a selected document inline, or download it as attachment:
-INLINE_DOC = __get_boolean("PAPERLESS_INLINE_DOC")
-
-# The number of items on each page in the web UI.  This value must be a
-# positive integer, but if you don't define one in paperless.conf, a default of
-# 100 will be used.
-PAPERLESS_LIST_PER_PAGE = int(os.getenv("PAPERLESS_LIST_PER_PAGE", 100))
-
-FY_START = os.getenv("PAPERLESS_FINANCIAL_YEAR_START")
-FY_END = os.getenv("PAPERLESS_FINANCIAL_YEAR_END")
-
 # Specify the default date order (for autodetected dates)
 DATE_ORDER = os.getenv("PAPERLESS_DATE_ORDER", "DMY")
 FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
@@ -342,6 +328,3 @@ FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
-
-# Specify the filename format for out files
-PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
