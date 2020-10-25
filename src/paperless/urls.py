@@ -1,5 +1,4 @@
-from django.conf import settings
-from django.conf.urls import include, static, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
@@ -39,7 +38,7 @@ urlpatterns = [
     # Root of the Frontent
     url(r".*", IndexView.as_view()),
 
-] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
 
 # Text in each page's <h1> (and above login form).
 admin.site.site_header = 'Paperless'

@@ -37,6 +37,12 @@ def __get_boolean(key, default="NO"):
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
+
+INDEX_DIR = os.path.join(DATA_DIR, "index")
+ORIGINALS_DIR = os.path.join(DATA_DIR, "documents")
+THUMBNAIL_DIR = os.path.join(DATA_DIR, "thumbnails")
+MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -145,10 +151,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(
-            os.getenv(
-                "PAPERLESS_DBDIR",
-                os.path.join(BASE_DIR, "..", "data")
-            ),
+            DATA_DIR,
             "db.sqlite3"
         )
     }
@@ -206,11 +209,8 @@ USE_TZ = True
 
 STATIC_ROOT = os.getenv(
     "PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "static"))
-MEDIA_ROOT = os.getenv(
-    "PAPERLESS_MEDIADIR", os.path.join(BASE_DIR, "..", "media"))
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
-MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
 
 
 # Other
@@ -221,14 +221,6 @@ MEDIA_URL = os.getenv("PAPERLESS_MEDIA_URL", "/media/")
 # of log entries outweight the benefits of such a safeguard.
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
-
-
-# Document classification models location
-MODEL_FILE = os.getenv(
-    "PAPERLESS_MODEL_FILE", os.path.join(
-        BASE_DIR, "..", "models", "model.pickle"
-    )
-)
 
 
 # Paperless-specific stuff
@@ -294,7 +286,6 @@ SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 # This is where Paperless will look for PDFs to index
 CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 
-INDEX_DIR = os.getenv('PAPERLESS_INDEX_DIR', os.path.join(BASE_DIR, "..", "index"))
 
 # (This setting is ignored on Linux where inotify is used instead of a
 # polling loop.)
