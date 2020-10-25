@@ -1,12 +1,13 @@
 from django.db.models import Count, Max
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.generic import DetailView, FormView, TemplateView
+from django.http import HttpResponse
+from django.views.decorators.cache import cache_control
+from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
-from django.conf import settings
-from django.utils import cache
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from paperless.db import GnuPG
-from paperless.mixins import SessionOrBasicAuthMixin
 from paperless.views import StandardPagination
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.mixins import (
@@ -29,7 +30,7 @@ from .filters import (
     DocumentTypeFilterSet
 )
 
-from .forms import UploadForm
+import documents.index as index
 from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
     CorrespondentSerializer,
@@ -41,71 +42,7 @@ from .serialisers import (
 
 
 class IndexView(TemplateView):
-    template_name = "documents/index.html"
-
-
-class FetchView(SessionOrBasicAuthMixin, DetailView):
-
-    model = Document
-
-    def render_to_response(self, context, **response_kwargs):
-        """
-        Override the default to return the unencrypted image/PDF as raw data.
-        """
-
-        content_types = {
-            Document.TYPE_PDF: "application/pdf",
-            Document.TYPE_PNG: "image/png",
-            Document.TYPE_JPG: "image/jpeg",
-            Document.TYPE_GIF: "image/gif",
-            Document.TYPE_TIF: "image/tiff",
-            Document.TYPE_CSV: "text/csv",
-            Document.TYPE_MD:  "text/markdown",
-            Document.TYPE_TXT: "text/plain"
-        }
-
-        if self.kwargs["kind"] == "thumb":
-            response = HttpResponse(
-                self._get_raw_data(self.object.thumbnail_file),
-                content_type=content_types[Document.TYPE_PNG]
-            )
-            cache.patch_cache_control(response, max_age=31536000, private=True)
-            return response
-
-        response = HttpResponse(
-            self._get_raw_data(self.object.source_file),
-            content_type=content_types[self.object.file_type]
-        )
-
-        DISPOSITION = (
-            'inline' if settings.INLINE_DOC or self.kwargs["kind"] == 'preview'
-            else 'attachment'
-        )
-
-        response["Content-Disposition"] = '{}; filename="{}"'.format(
-            DISPOSITION, self.object.file_name)
-
-        return response
-
-    def _get_raw_data(self, file_handle):
-        if self.object.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
-            return file_handle
-        return GnuPG.decrypted(file_handle)
-
-
-class PushView(SessionOrBasicAuthMixin, FormView):
-    """
-    A crude REST-ish API for creating documents.
-    """
-
-    form_class = UploadForm
-
-    def form_valid(self, form):
-        form.save()
-        return HttpResponse("1", status=202)
-
-    def form_invalid(self, form):
-        return HttpResponseBadRequest(str(form.errors))
+    template_name = "index.html"
 
 
 class CorrespondentViewSet(ModelViewSet):
@@ -155,7 +92,52 @@ class DocumentViewSet(RetrieveModelMixin,
     filter_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
-        "id", "title", "correspondent__name", "created", "modified", "added")
+        "id", "title", "correspondent__name", "created", "modified", "added", "archive_serial_number")
+
+
+    def file_response(self, pk, disposition):
+        #TODO: this should not be necessary here.
+        content_types = {
+            Document.TYPE_PDF: "application/pdf",
+            Document.TYPE_PNG: "image/png",
+            Document.TYPE_JPG: "image/jpeg",
+            Document.TYPE_GIF: "image/gif",
+            Document.TYPE_TIF: "image/tiff",
+            Document.TYPE_CSV: "text/csv",
+            Document.TYPE_MD:  "text/markdown",
+            Document.TYPE_TXT: "text/plain"
+        }
+
+        doc = Document.objects.get(id=pk)
+
+        if doc.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
+            file_handle = doc.source_file
+        else:
+            file_handle = GnuPG.decrypted(doc.source_file)
+
+        response = HttpResponse(file_handle, content_type=content_types[doc.file_type])
+        response["Content-Disposition"] = '{}; filename="{}"'.format(
+            disposition, doc.file_name)
+        return response
+
+    @action(methods=['post'], detail=False)
+    def post_document(self, request, pk=None):
+        #TODO: implement document upload
+        return Response("not implemented yet", status=500)
+
+    @action(methods=['get'], detail=True)
+    def preview(self, request, pk=None):
+        response = self.file_response(pk, "inline")
+        return response
+
+    @action(methods=['get'], detail=True)
+    @cache_control(public=False, max_age=315360000)
+    def thumb(self, request, pk=None):
+        return HttpResponse(Document.objects.get(id=pk).thumbnail_file, content_type='image/png')
+
+    @action(methods=['get'], detail=True)
+    def download(self, request, pk=None):
+        return self.file_response(pk, "attachment")
 
 
 class LogViewSet(ReadOnlyModelViewSet):
@@ -166,3 +148,17 @@ class LogViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     ordering_fields = ("time",)
+
+
+class SearchView(APIView):
+    ix = index.open_index()
+    def get(self, request, format=None):
+        if 'query' in request.query_params:
+            query = request.query_params['query']
+            query_results = index.query_index(self.ix, query)
+            for r in query_results:
+                r['document'] = DocumentSerializer(Document.objects.get(id=r['id'])).data
+
+            return Response(query_results)
+        else:
+            return Response([])

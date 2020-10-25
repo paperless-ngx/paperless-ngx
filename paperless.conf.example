@@ -39,6 +39,10 @@ PAPERLESS_CONSUMPTION_DIR=""
 #PAPERLESS_STATICDIR=""
 
 
+# This is where the whoosh document index is stored
+#PAPERLESS_INDEX_DIR="/path/to/index"
+
+
 # Override the MEDIA_URL here.  Unless you're hosting Paperless off a subdomain
 # like /paperless/, you probably don't need to change this.
 #PAPERLESS_MEDIA_URL="/media/"
@@ -260,18 +264,6 @@ PAPERLESS_EMAIL_SECRET=""
 # See https://docs.djangoproject.com/en/1.10/ref/settings/#std:setting-TIME_ZONE
 # for details on how to set it.
 #PAPERLESS_TIME_ZONE=UTC
-
-
-# If set, Paperless will show document filters per financial year.
-# The dates must be in the format "mm-dd", for example "07-15" for July 15.
-#PAPERLESS_FINANCIAL_YEAR_START="mm-dd"
-#PAPERLESS_FINANCIAL_YEAR_END="mm-dd"
-
-
-# The number of items on each page in the web UI.  This value must be a
-# positive integer, but if you don't define one in paperless.conf, a default of
-# 100 will be used.
-#PAPERLESS_LIST_PER_PAGE=100
 
 
 ###############################################################################
