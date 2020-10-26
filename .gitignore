@@ -57,16 +57,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# Stored PDFs
-media/documents/*.gpg
-media/documents/thumbnails/*
-media/documents/originals/*
-media/overrides.css
-media/overrides.js
-
-# Sqlite database
-db.sqlite3
-db.sqlite3-journal
 
 # PyCharm
 .idea
@@ -85,7 +75,12 @@ scripts/nuke
 # Static files collected by the collectstatic command
 static/
 
-# Classification Models
-models/
+# Stored PDFs
+/data/documents/*
+/data/thumbnails/*
+/data/classification_model.pickle
+/data/db.sqlite3
+/data/index
 
 /paperless.conf
+/consumption/
