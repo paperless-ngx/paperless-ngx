@@ -51,7 +51,8 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             run_convert(
                 self.CONVERT,
-                "-scale", "500x5000",
+                "-density", "300",
+                "-scale", "500x5000>",
                 "-alpha", "remove",
                 "-strip", "-trim",
                 "{}[0]".format(self.document_path),
@@ -76,7 +77,8 @@ class RasterisedDocumentParser(DocumentParser):
             # then run convert on the output from gs
             run_convert(
                 self.CONVERT,
-                "-scale", "500x5000",
+                "-density", "300",
+                "-scale", "500x5000>",
                 "-alpha", "remove",
                 "-strip", "-trim",
                 gs_out_path,
