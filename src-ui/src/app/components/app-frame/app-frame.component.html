@@ -6,7 +6,7 @@
   </button>
   <form (ngSubmit)="search()" class="w-100">
     <input class="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search"
-      [formControl]="searchField">
+      [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)">
   </form>
   <ul class="navbar-nav px-3">
     <li class="nav-item text-nowrap">
