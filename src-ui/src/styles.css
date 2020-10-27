@@ -1,0 +1,31 @@
+
+.toolbaricon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.buttonicon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.sidebaricon {
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+}
+
+body {
+  font-size: .875rem;
+}
+
+.form-control-dark {
+  color: #fff;
+  background-color: rgba(255, 255, 255, .1);
+  border-color: rgba(255, 255, 255, .1);
+}
+
+.form-control-dark:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+}

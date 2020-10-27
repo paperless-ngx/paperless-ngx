@@ -1,0 +1,124 @@
+<app-page-header [(title)]="title">
+    <button type="button" class="btn btn-sm btn-outline-danger mr-2" (click)="delete()">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#trash" />
+        </svg>
+        Delete
+    </button>
+    <a [href]="downloadUrl" class="btn btn-sm btn-outline-secondary mr-2">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#download" />
+        </svg>
+        Download
+    </a>
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="close()">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#x" />
+        </svg>
+        Close
+    </button>
+</app-page-header>
+
+
+<div class="row">
+    <div class="col-xl">
+        <form [formGroup]='documentForm' (ngSubmit)="save()">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" id="title" formControlName='title'>
+            </div>
+            <div class="form-group">
+                <label for="archive_serial_number">Archive Serial Number</label>
+                <input type="number" class="form-control" id="archive_serial_number"
+                    formControlName='archive_serial_number'>
+            </div>
+            <div class="form-row">
+                <div class="form-group col">
+                    <label for="created_date">Date created</label>
+                    <input type="date" class="form-control" id="created_date" formControlName='created_date'>
+                </div>
+                <div class="form-group col">
+                    <label for="created_time">Time created</label>
+                    <input type="time" class="form-control" id="created_time" formControlName='created_time'>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea class="form-control" id="content" rows="5" formControlName='content'></textarea>
+            </div>
+            <div class="form-group">
+                <label for="correspondent">Correspondent</label>
+                <div class="input-group">
+                    <select class="form-control" id="correspondent" formControlName="correspondent_id">
+                        <option [ngValue]="null">---</option>
+                        <option *ngFor='let c of correspondents' [ngValue]="c.id">{{c.name}}</option>
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" (click)="createCorrespondent()">
+                            <svg class="buttonicon" fill="currentColor">
+                                <use xlink:href="assets/bootstrap-icons.svg#plus" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="document_type">Document Type</label>
+                <div class="input-group">
+                    <select class="form-control" id="document_type" formControlName="document_type_id">
+                        <option [ngValue]="null">---</option>
+                        <option *ngFor="let dt of documentTypes" [ngValue]="dt.id">{{dt.name}}</option>
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" (click)="createDocumentType()">
+                            <svg class="buttonicon" fill="currentColor">
+                                <use xlink:href="assets/bootstrap-icons.svg#plus" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Tags</label>
+
+                <div class="input-group">
+                    <div class="form-control">
+                        <span *ngFor="let tag of documentForm.value.tags">
+                            <app-tag [tag]="tag" [clickable]="true" (click)="removeTag(tag)"></app-tag>
+                            &nbsp;
+                        </span>
+                    </div>
+
+                    <div class="input-group-append" ngbDropdown>
+                        <button class="btn btn-outline-secondary" type="button" ngbDropdownToggle></button>
+                        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                            <button type="button" *ngFor="let tag of tags" ngbDropdownItem (click)="addTag(tag)">
+                                <app-tag [tag]="tag"></app-tag>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" (click)="createTag()">
+                            <svg class="buttonicon" fill="currentColor">
+                                <use xlink:href="assets/bootstrap-icons.svg#plus" />
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()">Save & edit next</button>&nbsp;
+            <button type="submit" class="btn btn-primary">Save</button>&nbsp;
+        </form>
+    </div>
+
+    <div class="col-xl">
+        <object [data]="previewUrl | safe" type="application/pdf" width="100%" height="100%">
+            <p>Your browser does not support PDFs.
+                <a href="previewUrl">Download the PDF</a>.</p>
+        </object>
+
+    </div>
+</div>
