@@ -75,6 +75,7 @@ def update_document(writer, doc):
         content=doc.content
     )
 
+
 @receiver(models.signals.post_save, sender=Document)
 def add_document_to_index(sender, instance, **kwargs):
     ix = open_index()
@@ -102,3 +103,13 @@ def query_index(ix, querystr):
              'score': r.score,
              'title': r['title']
              } for r in results]
+
+
+def autocomplete(ix, term, limit=10):
+    with ix.reader() as reader:
+        terms = []
+        for t in reader.expand_prefix("content", term.lower()):
+            terms.append(t)
+            if len(terms) >= limit:
+                break
+        return terms

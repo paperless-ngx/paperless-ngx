@@ -11,7 +11,8 @@ from documents.views import (
     TagViewSet,
     DocumentTypeViewSet,
     SearchView,
-    IndexView
+    IndexView,
+    SearchAutoCompleteView
 )
 
 api_router = DefaultRouter()
@@ -26,6 +27,7 @@ urlpatterns = [
 
     # API
     url(r"^api/auth/",include(('rest_framework.urls', 'rest_framework'), namespace="rest_framework")),
+    url(r"^api/search/autocomplete/", SearchAutoCompleteView.as_view(), name="autocomplete"),
     url(r"^api/search/", SearchView.as_view(), name="search"),
     url(r"^api/token/", views.obtain_auth_token), url(r"^api/", include((api_router.urls, 'drf'), namespace="drf")),
 
