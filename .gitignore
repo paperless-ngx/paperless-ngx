@@ -73,11 +73,11 @@ scripts/import-for-development
 scripts/nuke
 
 # Static files collected by the collectstatic command
-static/
+/static/
 
 # Stored PDFs
-/data/documents/*
-/data/thumbnails/*
+/data/media/documents/*
+/data/media/thumbnails/*
 /data/classification_model.pickle
 /data/db.sqlite3
 /data/index
