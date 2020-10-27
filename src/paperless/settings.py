@@ -118,7 +118,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # We allow CORS from localhost:8080
 CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8080,https://localhost:8080,http://localhost:4200").split(","))
