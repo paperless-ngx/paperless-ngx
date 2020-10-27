@@ -26,4 +26,8 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return this.getResourceUrl(id, 'download') + `?auth_token=${this.auth.getToken()}`
   }
 
+  uploadDocument(formData) {
+    return this.http.post(this.getResourceUrl(null, 'post_document'), formData)
+  }
+
 }
