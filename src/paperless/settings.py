@@ -18,8 +18,8 @@ from dotenv import load_dotenv
 
 
 # Tap paperless.conf if it's available
-if os.path.exists("paperless.conf"):
-    load_dotenv("paperless.conf")
+if os.path.exists("../paperless.conf"):
+    load_dotenv("../paperless.conf")
 elif os.path.exists("/etc/paperless.conf"):
     load_dotenv("/etc/paperless.conf")
 elif os.path.exists("/usr/local/etc/paperless.conf"):
@@ -72,6 +72,8 @@ FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
+
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -104,6 +106,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
