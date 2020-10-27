@@ -151,7 +151,11 @@ class LogViewSet(ReadOnlyModelViewSet):
 
 
 class SearchView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
     ix = index.open_index()
+
     def get(self, request, format=None):
         if 'query' in request.query_params:
             query = request.query_params['query']
@@ -160,5 +164,28 @@ class SearchView(APIView):
                 r['document'] = DocumentSerializer(Document.objects.get(id=r['id'])).data
 
             return Response(query_results)
+        else:
+            return Response([])
+
+
+class SearchAutoCompleteView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    ix = index.open_index()
+
+    def get(self, request, format=None):
+        if 'term' in request.query_params:
+            term = request.query_params['term']
+        else:
+            term = None
+
+        if 'limit' in request.query_params:
+            limit = int(request.query_params['limit'])
+        else:
+            limit = 10
+
+        if term is not None:
+            return Response(index.autocomplete(self.ix, term, limit))
         else:
             return Response([])
