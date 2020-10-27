@@ -21,42 +21,20 @@
 # This where your documents should go to be consumed.  Make sure that it exists
 # and that the user running the paperless service can read/write its contents
 # before you start Paperless.
-PAPERLESS_CONSUMPTION_DIR=""
+#PAPERLESS_CONSUMPTION_DIR=""
 
-
-# You can specify where you want the SQLite database to be stored instead of
-# the default location of /data/ within the install directory.
-#PAPERLESS_DBDIR=/path/to/database/file
-
-
-# Override the default MEDIA_ROOT here.  This is where all files are stored.
-# The default location is /media/documents/ within the install folder.
-#PAPERLESS_MEDIADIR=/path/to/media
-
+# This is where paperless stores all its data (documents, thumbnails, search
+# index, sqlite database, etc).
+#PAPERLESS_DATA_DIR="../data"
 
 # Override the default STATIC_ROOT here.  This is where all static files
 # created using "collectstatic" manager command are stored.
 #PAPERLESS_STATICDIR=""
 
 
-# This is where the whoosh document index is stored
-#PAPERLESS_INDEX_DIR="/path/to/index"
-
-
-# Override the MEDIA_URL here.  Unless you're hosting Paperless off a subdomain
-# like /paperless/, you probably don't need to change this.
-#PAPERLESS_MEDIA_URL="/media/"
-
 # Override the STATIC_URL here.  Unless you're hosting Paperless off a
 # subdomain like /paperless/, you probably don't need to change this.
 #PAPERLESS_STATIC_URL="/static/"
-
-
-# You can specify where the document classification model file should be
-# stored. Make sure that this file is writeable by the user executing the
-# management command "document_create_classifier" and that the path exists.
-# The default location is /models/model.pickle wwithin the install folder.
-#PAPERLESS_MODEL_FILE=/path/to/model/file
 
 
 # These values are required if you want paperless to check a particular email
@@ -75,25 +53,13 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 # ignored.
 PAPERLESS_EMAIL_SECRET=""
 
-# Specify a filename format for the document (directories are supported)
-# Use the following placeholders:
-# * {correspondent}
-# * {title}
-# * {created}
-# * {added}
-# * {tags[KEY]} If your tags conform to key_value or key-value
-# * {tags[INDEX]} If your tags are strings, select the tag by index
-# Uniqueness of filenames is ensured, as an incrementing counter is attached
-# to each filename.
-#PAPERLESS_FILENAME_FORMAT=""
-
 ###############################################################################
 ####                              Security                                 ####
 ###############################################################################
 
 # Controls whether django's debug mode is enabled. Disable this on production
 # systems. Debug mode is enabled by default.
-#PAPERLESS_DEBUG="true"
+#PAPERLESS_DEBUG="false"
 
 
 # Paperless can be instructed to attempt to encrypt your PDF files with GPG
