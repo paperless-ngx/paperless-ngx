@@ -39,9 +39,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
 
+MEDIA_ROOT = os.getenv('PAPERLESS_DATA_DIR', os.path.join(DATA_DIR, "media"))
+
 INDEX_DIR = os.path.join(DATA_DIR, "index")
-ORIGINALS_DIR = os.path.join(DATA_DIR, "documents")
-THUMBNAIL_DIR = os.path.join(DATA_DIR, "thumbnails")
+ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents")
+THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "thumbnails")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
 # Quick-start development settings - unsuitable for production
