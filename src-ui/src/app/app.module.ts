@@ -32,6 +32,7 @@ import { FilterEditorComponent } from './components/filter-editor/filter-editor.
 import { AuthInterceptor } from './services/auth.interceptor';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
+import { NgxFileDropModule } from 'ngx-file-drop';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,8 @@ import { DocumentCardSmallComponent } from './components/document-list/document-
     NgbModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgxFileDropModule
   ],
   providers: [
     DatePipe,

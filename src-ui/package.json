@@ -23,6 +23,7 @@
     "@ng-bootstrap/ng-bootstrap": "^7.0.0",
     "bootstrap": "^4.5.0",
     "ng-bootstrap": "^1.6.3",
+    "ngx-file-drop": "^10.0.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"

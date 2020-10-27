@@ -1,29 +1,26 @@
 
 <app-page-header title="Dashboard">
-  <button type="button" class="btn btn-sm btn-outline-secondary">
-    Show Documents with Tag
-  </button>
 </app-page-header>
 
-<p>This space for rent...</p>
+<p>... This space for rent</p>
+<p>This page will provide more information in the future, such as access to recently scanned documents, etc.</p>
 
 <div class='row'>
-  <div class="col">
-    <h4>Recent Documents</h4>
-    <p>Recent docs</p>
-  </div>
-</div>
-<div class='row'>
-  <div class="col">
-    <h4>Documents with tag <span class="badge badge-danger">TODO</span></h4>
-    <p>...</p>
-  </div>
-</div>
-<div class='row'>
-  <div class="col-4">
+  <div class="col-lg">
     <h4>Statistics</h4>
+    <p>None yet.</p>
   </div>
-  <div class="col-8">
+  <div class="col-lg">
     <h4>Upload new Document</h4>
+    <form>
+      <ngx-file-drop
+        dropZoneLabel="Drop documents here"
+        (onFileDrop)="dropped($event)"
+        (onFileOver)="fileOver($event)"
+        (onFileLeave)="fileLeave($event)"
+        dropZoneClassName="bg-light mt-4 card">
+
+      </ngx-file-drop>
+    </form>
   </div>
 </div>
