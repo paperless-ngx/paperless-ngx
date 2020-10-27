@@ -18,10 +18,11 @@ langdetect = "*"
 pdftotext = "*"
 django-filter = "*"
 python-dateutil = "*"
-psycopg2 = "*"
+psycopg2-binary = "*"
 scikit-learn="*"
 whoosh="*"
 gunicorn = "*"
+whitenoise = "*"
 
 django-extensions = "*"
 
