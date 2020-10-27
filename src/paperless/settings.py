@@ -39,7 +39,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
 
-MEDIA_ROOT = os.getenv('PAPERLESS_DATA_DIR', os.path.join(DATA_DIR, "media"))
+MEDIA_ROOT = os.path.join(DATA_DIR, "media")
 
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents")
@@ -59,15 +59,15 @@ SECRET_KEY = os.getenv(
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = __get_boolean("PAPERLESS_DEBUG", "YES")
+DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
 LOGIN_URL = "admin:login"
-
-ALLOWED_HOSTS = ["*"]
 
 _allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
 if _allowed_hosts:
     ALLOWED_HOSTS = _allowed_hosts.split(",")
+else:
+    ALLOWED_HOSTS = ["*"]
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 
