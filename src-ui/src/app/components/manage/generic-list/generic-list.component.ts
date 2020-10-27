@@ -47,9 +47,13 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
     })
   }
 
+  getObjectName(object: T) {
+    return object.toString()
+  }
+
   openDeleteDialog(object: T) {
     var activeModal = this.modalService.open(DeleteDialogComponent, {backdrop: 'static'})
-    activeModal.componentInstance.message = `Do you really want to delete ${object}?`
+    activeModal.componentInstance.message = `Do you really want to delete ${this.getObjectName(object)}?`
     activeModal.componentInstance.message2 = "Associated documents will not be deleted."
     activeModal.componentInstance.deleteClicked.subscribe(() => {
       this.service.delete(object).subscribe(_ => {

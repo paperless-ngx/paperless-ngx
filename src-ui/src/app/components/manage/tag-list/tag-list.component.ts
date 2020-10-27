@@ -20,4 +20,8 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
   getColor(id) {
     return PaperlessTag.COLOURS.find(c => c.id == id)
   }
+
+  getObjectName(object: PaperlessTag) {
+    return `tag '${object.name}'`
+  }
 }

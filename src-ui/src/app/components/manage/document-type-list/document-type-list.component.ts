@@ -16,4 +16,7 @@ export class DocumentTypeListComponent extends GenericListComponent<PaperlessDoc
     super(service, modalService, DocumentTypeEditDialogComponent)
    }
 
+   getObjectName(object: PaperlessDocumentType) {
+    return `document type '${object.name}'`
+  }
 }
