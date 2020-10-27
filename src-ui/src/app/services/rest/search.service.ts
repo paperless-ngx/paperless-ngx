@@ -34,4 +34,8 @@ export class SearchService {
   search(query: string): Observable<SearchResult[]> {
     return this.http.get<SearchResult[]>(`${environment.apiBaseUrl}search/`, {params: new HttpParams().set('query', query)})
   }
+
+  autocomplete(term: string): Observable<string[]> {
+    return this.http.get<string[]>(`${environment.apiBaseUrl}search/autocomplete/`, {params: new HttpParams().set('term', term)})
+  }
 } 
