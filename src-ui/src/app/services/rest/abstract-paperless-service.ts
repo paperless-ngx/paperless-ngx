@@ -14,9 +14,9 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     let url = `${this.baseUrl}${this.resourceName}/`
     if (id) {
       url += `${id}/`
-      if (action) {
-        url += `${action}/`
-      }
+    }
+    if (action) {
+      url += `${action}/`
     }
     return url
   }
