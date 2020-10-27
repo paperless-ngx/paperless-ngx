@@ -1,0 +1,34 @@
+  <form [formGroup]="objectForm" class="needs-validation" novalidate (ngSubmit)="save()">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="cancel()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" class="form-control" formControlName="name" required ngbAutofocus>
+      </div>
+      <div class="form-group">
+        <label for="colour">Colour</label>
+        <select id="colour" class="form-control" required formControlName="colour" [style.color]="getColor(objectForm.value.colour).textColor" [style.background]="getColor(objectForm.value.colour).value">
+          <option *ngFor="let colour of getColours()" [ngValue]="colour.id" class="form-control">{{colour.name}}</option>
+        </select>
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="is_inbox_tag"
+          formControlName="is_inbox_tag">
+        <label class="form-check-label" for="is_inbox_tag">Inbox Tag</label>
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="automatic_classification"
+          formControlName="automatic_classification">
+        <label class="form-check-label" for="automatic_classification">Automatic Classification</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>

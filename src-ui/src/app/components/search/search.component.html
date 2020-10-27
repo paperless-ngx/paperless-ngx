@@ -1,0 +1,12 @@
+<app-page-header title="Search results">
+</app-page-header>
+
+<p>Search string: <i>{{query}}</i></p>
+
+<app-document-card-large *ngFor="let result of results"
+    [document]="result.document"
+    [details]="result.highlights">
+
+</app-document-card-large>
+
+<p *ngIf="results.length == 0" class="mx-auto">No results</p>
