@@ -17,4 +17,7 @@ export class CorrespondentListComponent extends GenericListComponent<PaperlessCo
       super(correspondentsService,modalService,CorrespondentEditDialogComponent)
     }
 
+    getObjectName(object: PaperlessCorrespondent) {
+      return `correspondent '${object.name}'`
+    }
 }
