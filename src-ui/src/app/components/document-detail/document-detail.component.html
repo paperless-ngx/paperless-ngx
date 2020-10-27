@@ -83,21 +83,9 @@
                 <label for="exampleFormControlTextarea1">Tags</label>
 
                 <div class="input-group">
-                    <div class="form-control">
-                        <span *ngFor="let tag of documentForm.value.tags">
-                            <app-tag [tag]="tag" [clickable]="true" (click)="removeTag(tag)"></app-tag>
-                            &nbsp;
-                        </span>
-                    </div>
-
-                    <div class="input-group-append" ngbDropdown>
-                        <button class="btn btn-outline-secondary" type="button" ngbDropdownToggle></button>
-                        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                            <button type="button" *ngFor="let tag of tags" ngbDropdownItem (click)="addTag(tag)">
-                                <app-tag [tag]="tag"></app-tag>
-                            </button>
-                        </div>
-                    </div>
+                    <select multiple class="form-control" id="tags" formControlName="tags_id">
+                        <option *ngFor="let t of tags" [ngValue]="t.id">{{t.name}}</option>
+                    </select>
 
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" (click)="createTag()">

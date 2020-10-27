@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -42,7 +42,7 @@ export class DocumentDetailComponent implements OnInit {
     correspondent_id: new FormControl(),
     document_type_id: new FormControl(),
     archive_serial_number: new FormControl(),
-    tags: new FormControl([])
+    tags_id: new FormControl([])
   })
 
   constructor(
@@ -84,7 +84,7 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.success.subscribe(newTag => {
       this.tagService.list().subscribe(tags => {
         this.tags = tags.results
-        this.documentForm.get('tags_id').value.push(newTag.id)
+        this.documentForm.get('tags_id').setValue(this.documentForm.get('tags_id').value.concat([newTag.id]))
       })
     })
   }
@@ -126,23 +126,34 @@ export class DocumentDetailComponent implements OnInit {
   }
 
   removeTag(id: number) {
-    var index = this.documentForm.value.tags.indexOf(id)
+    let index = this.documentForm.value.tags.indexOf(id)
     if (index > -1) {
       this.documentForm.value.tags.splice(index, 1)
     }
   }
 
+  getDateCreated() {
+    let newDate = this.documentForm.value.created_date
+    let newTime = this.documentForm.value.created_time
+    return formatDate(newDate + "T" + newTime,"yyyy-MM-ddTHH:mm:ssZZZZZ", "en-us", "UTC")
+    
+  }
+
   save() {
-    var newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
-    console.log(this.document)
-    console.log(newDocument)
+    let newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
+
+    newDocument.created = this.getDateCreated()
+    
     this.documentsService.update(newDocument).subscribe(result => {
       this.close()
     })
   }
 
   saveEditNext() {
-    var newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
+    let newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
+
+    newDocument.created = this.getDateCreated()
+
     this.documentsService.update(newDocument).subscribe(result => {
       this.documentListViewService.getNext(this.document.id).subscribe(nextDocId => {
         if (nextDocId) {
