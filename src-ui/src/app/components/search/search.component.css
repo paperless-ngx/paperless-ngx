@@ -1,0 +1,11 @@
+.result-content {
+    color: darkgray;
+}
+
+.doc-img {
+    object-fit: cover;
+    object-position: top;
+    height: 100%;
+    position: absolute;
+
+}
