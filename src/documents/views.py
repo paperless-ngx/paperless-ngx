@@ -1,5 +1,5 @@
 from django.db.models import Count, Max
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -31,6 +31,7 @@ from .filters import (
 )
 
 import documents.index as index
+from .forms import UploadForm
 from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
     CorrespondentSerializer,
@@ -122,8 +123,13 @@ class DocumentViewSet(RetrieveModelMixin,
 
     @action(methods=['post'], detail=False)
     def post_document(self, request, pk=None):
-        #TODO: implement document upload
-        return Response("not implemented yet", status=500)
+        #TODO: is this a good implementation?
+        form = UploadForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            return Response("OK")
+        else:
+            return HttpResponseBadRequest(str(form.errors))
 
     @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
