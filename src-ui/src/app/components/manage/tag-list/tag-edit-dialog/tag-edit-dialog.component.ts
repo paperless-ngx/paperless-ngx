@@ -22,7 +22,9 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
       name: new FormControl(''),
       colour: new FormControl(1),
       is_inbox_tag: new FormControl(false),
-      automatic_classification: new FormControl(true)
+      matching_algorithm: new FormControl(1),
+      match: new FormControl(""),
+      is_insensitive: new FormControl(true)
     })
   }
 

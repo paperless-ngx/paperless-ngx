@@ -6,7 +6,7 @@
     <div class="col">
       <div class="card-body">
 
-        <h5 class="card-title">{{document.title}}<app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></h5>
+        <h5 class="card-title">{{document.correspondent ? document.correspondent.name + ': ' : ''}}{{document.title}}<app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></h5>
         <p class="card-text">
           <app-result-hightlight *ngIf="getDetailsAsHighlight()" class="result-content" [highlights]="getDetailsAsHighlight()"></app-result-hightlight>
           <span *ngIf="getDetailsAsString()" class="result-content">{{getDetailsAsString()}}</span>

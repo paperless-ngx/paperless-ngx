@@ -2,6 +2,7 @@ import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Form, FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
+import { MatchingModel } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
@@ -43,6 +44,10 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       default:
         break;
     }
+  }
+
+  getMatchingAlgorithms() {
+    return MatchingModel.MATCHING_ALGORITHMS
   }
 
   save() {

@@ -11,20 +11,20 @@
   <thead>
     <tr>
       <th scope="col">Name</th>
-      <th scope="col">Automatic Classification</th>
+      <th scope="col">Matching</th>
       <th scope="col">Document count</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let correspondent of data">
-      <td scope="row">{{ correspondent.name }}</td>
-      <td scope="row">{{ correspondent.automatic_classification }}</td>
-      <td scope="row">{{ correspondent.document_count }}</td>
+    <tr *ngFor="let document_type of data">
+      <td scope="row">{{ document_type.name }}</td>
+      <td scope="row">{{ getMatching(document_type) }}</td>
+      <td scope="row">{{ document_type.document_count }}</td>
       <td scope="row">
         <div class="btn-group">
-          <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(correspondent)">Edit</button>
-          <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(correspondent)">Delete</button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="openEditDialog(document_type)">Edit</button>
+          <button class="btn btn-sm btn-outline-danger" (click)="openDeleteDialog(document_type)">Delete</button>
         </div>
       </td>
     </tr>

@@ -10,7 +10,7 @@
     <thead>
     <tr>
       <th scope="col">Name</th>
-      <th scope="col">Automatic Classification</th>
+      <th scope="col">Matching</th>
       <th scope="col">Document count</th>
       <th scope="col">Last correspondence</th>
       <th scope="col">Actions</th>
@@ -19,7 +19,7 @@
     <tbody>
     <tr *ngFor="let correspondent of data">
       <td scope="row">{{ correspondent.name }}</td>
-      <td scope="row">{{ correspondent.automatic_classification }}</td>
+      <td scope="row">{{ getMatching(correspondent) }}</td>
       <td scope="row">{{ correspondent.document_count }}</td>
       <td scope="row">{{ correspondent.last_correspondence | date }}</td>
         <td scope="row">
