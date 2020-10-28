@@ -209,12 +209,7 @@ class Document(models.Model):
         return slugify(str(self)) + "." + self.file_type
 
     @property
-    def download_url(self):
-        return reverse("fetch", kwargs={"kind": "doc", "pk": self.pk})
-
-    @property
     def thumbnail_path(self):
-
         file_name = "{:07}.png".format(self.pk)
         if self.storage_type == self.STORAGE_TYPE_GPG:
             file_name += ".gpg"
@@ -227,10 +222,6 @@ class Document(models.Model):
     @property
     def thumbnail_file(self):
         return open(self.thumbnail_path, "rb")
-
-    @property
-    def thumbnail_url(self):
-        return reverse("fetch", kwargs={"kind": "thumb", "pk": self.pk})
 
 
 class Log(models.Model):
