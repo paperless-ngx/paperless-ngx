@@ -23,6 +23,8 @@ scikit-learn="*"
 whoosh="*"
 gunicorn = "*"
 whitenoise = "*"
+fuzzywuzzy = "*"
+python-Levenshtein = "*"
 
 django-extensions = "*"
 
