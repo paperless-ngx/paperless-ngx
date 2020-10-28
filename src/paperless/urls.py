@@ -1,5 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import path
+from django.views.generic import RedirectView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
@@ -36,6 +38,9 @@ urlpatterns = [
 
     # The Django admin
     url(r"admin/", admin.site.urls),
+
+    # Frontend assets TODO: this is pretty bad.
+    path('assets/<path:path>', RedirectView.as_view(url='/static/assets/%(path)s')),
 
     # Root of the Frontent
     url(r".*", IndexView.as_view()),
