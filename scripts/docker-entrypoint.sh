@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 # Source: https://github.com/sameersbn/docker-gitlab/
@@ -14,82 +15,71 @@ map_uidgid() {
     fi
 }
 
-set_permissions() {
-    # Set permissions for consumption and export directory
-    for dir in PAPERLESS_CONSUMPTION_DIR PAPERLESS_EXPORT_DIR; do
-      # Extract the name of the current directory from $dir for the error message
-      cur_dir_name=$(echo "$dir" | awk -F'_' '{ print tolower($2); }')
-      chgrp paperless "${!dir}" || {
-          echo "Changing group of ${cur_dir_name} directory:"
-          echo "  ${!dir}"
-          echo "failed."
-          echo ""
-          echo "Either try to set it on your host-mounted directory"
-          echo "directly, or make sure that the directory has \`g+wx\`"
-          echo "permissions and the files in it at least \`o+r\`."
-      } >&2
-      chmod g+wx "${!dir}" || {
-          echo "Changing group permissions of ${cur_dir_name} directory:"
-          echo "  ${!dir}"
-          echo "failed."
-          echo ""
-          echo "Either try to set it on your host-mounted directory"
-          echo "directly, or make sure that the directory has \`g+wx\`"
-          echo "permissions and the files in it at least \`o+r\`."
-      } >&2
-    done
-    # Set permissions for application directory
-    chown -Rh paperless:paperless /usr/src/paperless
-}
-
 migrations() {
     # A simple lock file in case other containers use this startup
     LOCKFILE="/usr/src/paperless/data/db.sqlite3.migration"
 
-    # check for and create lock file in one command 
+    # check for and create lock file in one command
     if (set -o noclobber; echo "$$" > "${LOCKFILE}") 2> /dev/null
     then
         trap 'rm -f "${LOCKFILE}"; exit $?' INT TERM EXIT
-        sudo -HEu paperless "/usr/src/paperless/src/manage.py" "migrate"
+        sudo -HEu paperless python3 manage.py migrate
         rm ${LOCKFILE}
     fi
 }
 
 initialize() {
-    map_uidgid
-    set_permissions
-    migrations
+	map_uidgid
+
+	for data_dir in index media media/documents media/thumbnails; do
+		if [[ ! -d "../data/$data_dir" ]]
+		then
+			echo "creating directory ../data/$data_dir"
+			mkdir ../data/$data_dir
+		fi
+	done
+
+	chown -R paperless:paperless ../
+
+	migrations
+
 }
 
 install_languages() {
-    local langs="$1"
-    read -ra langs <<<"$langs"
+	echo "TEST"
+	local langs="$1"
+	read -ra langs <<<"$langs"
 
-    # Check that it is not empty
-    if [ ${#langs[@]} -eq 0 ]; then
-        return
-    fi
+	# Check that it is not empty
+	if [ ${#langs[@]} -eq 0 ]; then
+		return
+	fi
+	apt-get update
 
-    # Loop over languages to be installed
-    for lang in "${langs[@]}"; do
-        pkg="tesseract-ocr-data-$lang"
-
+	for lang in "${langs[@]}"; do
+        pkg="tesseract-ocr-$lang"
         # English is installed by default
-        if [[ "$lang" ==  "eng" ]]; then
-            continue
+        #if [[ "$lang" ==  "eng" ]]; then
+        #    continue
+        #fi
+
+        if dpkg -s $pkg &> /dev/null; then
+        	echo "package $pkg already installed!"
+        	continue
         fi
 
-        if apk info -e "$pkg" > /dev/null 2>&1; then
-            continue
-        fi
-        if ! apk --no-cache info "$pkg" > /dev/null 2>&1; then
-            continue
+        if ! apt-cache show $pkg &> /dev/null; then
+        	echo "package $pkg not found! :("
+        	continue
         fi
 
-        apk --no-cache --update add "$pkg"
+				echo "Installing package $pkg..."
+				if ! apt-get -y install "$pkg" &> /dev/null; then
+					echo "Could not install $pkg"
+					exit 1
+				fi
     done
 }
-
 
 if [[ "$1" != "/"* ]]; then
     initialize
@@ -101,21 +91,12 @@ if [[ "$1" != "/"* ]]; then
 
     if [[ "$1" = "gunicorn" ]]; then
         shift
-        EXTRA_PARAMS=""
-        SSL_KEY_PATH="/usr/src/paperless/data/ssl.key"
-        SSL_CERT_PATH="/usr/src/paperless/data/ssl.cert"
-        if [ "${PAPERLESS_USE_SSL}" = "true" ]; then
-            if [ -f "${SSL_KEY_PATH}" ] && [ -f "${SSL_CERT_PATH}" ]; then
-                EXTRA_PARAMS="--certfile=${SSL_CERT_PATH} --keyfile=${SSL_KEY_PATH}"
-            else
-                echo "Error: Could not find certfile in ${SSL_CERT_PATH} or keyfile in ${SSL_KEY_PATH}, but \$PAPERLESS_USE_SSL is true. Starting without SSL enabled."
-            fi
-        fi
         cd /usr/src/paperless/src/ && \
-            exec sudo -HEu paperless /usr/bin/gunicorn -c /usr/src/paperless/gunicorn.conf ${EXTRA_PARAMS} "$@" paperless.wsgi
-    else
-        exec sudo -HEu paperless "/usr/src/paperless/src/manage.py" "$@"
+            exec sudo -HEu paperless gunicorn -c /usr/src/paperless/gunicorn.conf.py "$@" paperless.wsgi
     fi
+
+		exec sudo -HEu paperless python3 manage.py "$@"
+
 fi
 
 exec "$@"
