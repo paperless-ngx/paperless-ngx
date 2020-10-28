@@ -1,7 +1,18 @@
 <div class="form-group">
   <label [for]="inputId">{{title}}</label>
-  <select class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled" [style.color]="textColor" [style.background]="backgroundColor">
-    <option *ngFor="let i of items" [ngValue]="i.id" class="form-control">{{i.name}}</option>
-  </select>
+  <div [class.input-group]="showPlusButton()">
+    <select class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()"
+      [disabled]="disabled" [style.color]="textColor" [style.background]="backgroundColor">
+      <option *ngIf="allowNull" [ngValue]="null" class="form-control">---</option>
+      <option *ngFor="let i of items" [ngValue]="i.id" class="form-control">{{i.name}}</option>
+    </select>
+    <div *ngIf="showPlusButton()" class="input-group-append">
+      <button class="btn btn-outline-secondary" type="button" (click)="createNew.emit()">
+        <svg class="buttonicon" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#plus" />
+        </svg>
+      </button>
+    </div>
+  </div>
   <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
 </div>
