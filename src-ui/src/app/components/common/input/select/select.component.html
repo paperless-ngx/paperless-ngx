@@ -1,0 +1,7 @@
+<div class="form-group">
+  <label [for]="inputId">{{title}}</label>
+  <select class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled" [style.color]="textColor" [style.background]="backgroundColor">
+    <option *ngFor="let i of items" [ngValue]="i.id" class="form-control">{{i.name}}</option>
+  </select>
+  <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+</div>

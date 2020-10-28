@@ -33,6 +33,9 @@ import { AuthInterceptor } from './services/auth.interceptor';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
 import { NgxFileDropModule } from 'ngx-file-drop';
+import { TextComponent } from './components/common/input/text/text.component';
+import { SelectComponent } from './components/common/input/select/select.component';
+import { CheckComponent } from './components/common/input/check/check.component';
 
 @NgModule({
   declarations: [
@@ -60,7 +63,10 @@ import { NgxFileDropModule } from 'ngx-file-drop';
     ToastsComponent,
     FilterEditorComponent,
     DocumentCardLargeComponent,
-    DocumentCardSmallComponent
+    DocumentCardSmallComponent,
+    TextComponent,
+    SelectComponent,
+    CheckComponent
   ],
   imports: [
     BrowserModule,
