@@ -8,6 +8,8 @@
 ###############################################################################
 
 # By default, sqlite is used as the database backend. This can be changed here.
+# The docker-compose service definition uses a postgresql server. The
+# configuration for this is already done inside the docker-compose.env file.
 #PAPERLESS_DBENGINE="django.db.backends.postgresql_psycopg2"
 #PAPERLESS_DBNAME="paperless"
 #PAPERLESS_DBUSER="paperless"
@@ -29,7 +31,7 @@
 
 # Override the default STATIC_ROOT here.  This is where all static files
 # created using "collectstatic" manager command are stored.
-#PAPERLESS_STATICDIR=""
+#PAPERLESS_STATICDIR="../static"
 
 
 # Override the STATIC_URL here.  Unless you're hosting Paperless off a
@@ -40,10 +42,10 @@
 # These values are required if you want paperless to check a particular email
 # box every 10 minutes and attempt to consume documents from there.  If you
 # don't define a HOST, mail checking will just be disabled.
-PAPERLESS_CONSUME_MAIL_HOST=""
-PAPERLESS_CONSUME_MAIL_PORT=""
-PAPERLESS_CONSUME_MAIL_USER=""
-PAPERLESS_CONSUME_MAIL_PASS=""
+#PAPERLESS_CONSUME_MAIL_HOST=""
+#PAPERLESS_CONSUME_MAIL_PORT=""
+#PAPERLESS_CONSUME_MAIL_USER=""
+#PAPERLESS_CONSUME_MAIL_PASS=""
 
 # Override the default IMAP inbox here. If not set Paperless defaults to
 # "INBOX".
@@ -51,17 +53,18 @@ PAPERLESS_CONSUME_MAIL_PASS=""
 
 # Any email sent to the target account that does not contain this text will be
 # ignored.
-PAPERLESS_EMAIL_SECRET=""
+#PAPERLESS_EMAIL_SECRET=""
 
 ###############################################################################
 ####                              Security                                 ####
 ###############################################################################
 
 # Controls whether django's debug mode is enabled. Disable this on production
-# systems. Debug mode is enabled by default.
+# systems. Debug mode is disabled by default.
 #PAPERLESS_DEBUG="false"
 
-
+# GnuPG encryption is deprecated and will be removed in future versions.
+#
 # Paperless can be instructed to attempt to encrypt your PDF files with GPG
 # using the PAPERLESS_PASSPHRASE specified below.  If however you're not
 # concerned about encrypting these files (for example if you have disk
@@ -119,11 +122,6 @@ PAPERLESS_EMAIL_SECRET=""
 # information, take a look at the docs:
 # http://paperless.readthedocs.org/en/latest/consumption.html#hooking-into-the-consumption-process
 #PAPERLESS_POST_CONSUME_SCRIPT="/path/to/an/arbitrary/script.sh"
-
-# By default, when clicking on a document within the web interface, the
-# browser will prompt the user to save the document to disk. By setting this to
-# "true", the document will instead be opened in the browser, if possible.
-#PAPERLESS_INLINE_DOC="false"
 
 # By default, paperless will check the document text for document date information.
 # Uncomment the line below to enable checking the document filename for date
