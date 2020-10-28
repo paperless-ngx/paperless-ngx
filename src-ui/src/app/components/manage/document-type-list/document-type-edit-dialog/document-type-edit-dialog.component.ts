@@ -20,7 +20,9 @@ export class DocumentTypeEditDialogComponent extends EditDialogComponent<Paperle
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      automatic_classification: new FormControl(true)
+      matching_algorithm: new FormControl(1),
+      match: new FormControl(""),
+      is_insensitive: new FormControl(true)
     })
   }
 
