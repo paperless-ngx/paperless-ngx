@@ -11,7 +11,7 @@
       <tr>
         <th scope="col">Name</th>
         <th scope="col">Colour</th>
-        <th scope="col">Automatic Classification</th>
+        <th scope="col">Matching</th>
         <th scope="col">Document count</th>
         <th scope="col">Actions</th>
       </tr>
@@ -20,7 +20,7 @@
       <tr *ngFor="let tag of data">
           <td scope="row">{{ tag.name }}</td>
           <td scope="row"><span class="badge" [style.color]="getColor(tag.colour).textColor" [style.background-color]="getColor(tag.colour).value">{{ getColor(tag.colour).name }}</span></td>
-          <td scope="row">{{ tag.automatic_classification }}</td>
+          <td scope="row">{{ getMatching(tag) }}</td>
           <td scope="row">{{ tag.document_count }}</td>
           <td scope="row">
             <div class="btn-group">

@@ -6,15 +6,12 @@
       </button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input id="name" class="form-control" formControlName="name" required ngbAutofocus>
-      </div>
-      <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="automatic_classification"
-          formControlName="automatic_classification">
-        <label class="form-check-label" for="automatic_classification">Automatic Classification</label>
-      </div>
+      
+      <app-input-text title="Name" formControlName="name"></app-input-text>
+      <app-input-text title="Match" formControlName="match"></app-input-text>
+      <app-input-select title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
+      <app-input-check title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
