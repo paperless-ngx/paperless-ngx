@@ -6,6 +6,7 @@ from documents.classifier import DocumentClassifier
 from documents.models import Document, Tag
 
 from ...mixins import Renderable
+from ...signals.handlers import set_correspondent, set_document_type, set_tags
 
 
 class Command(Renderable, BaseCommand):
@@ -24,23 +25,39 @@ class Command(Renderable, BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "-c", "--correspondent",
+            default=False,
             action="store_true"
         )
         parser.add_argument(
             "-T", "--tags",
+            default=False,
             action="store_true"
         )
         parser.add_argument(
-            "-t", "--type",
+            "-t", "--document_type",
+            default=False,
             action="store_true"
         )
         parser.add_argument(
             "-i", "--inbox-only",
+            default=False,
             action="store_true"
         )
         parser.add_argument(
-            "-r", "--replace-tags",
-            action="store_true"
+            "--use-first",
+            default=False,
+            action="store_true",
+            help="By default this command won't try to assign a correspondent "
+                 "if more than one matches the document.  Use this flag if "
+                 "you'd rather it just pick the first one it finds."
+        )
+        parser.add_argument(
+            "-f", "--overwrite",
+            default=False,
+            action="store_true",
+            help="If set, the document retagger will overwrite any previously"
+                 "set correspondent, document and remove correspondents, types"
+                 "and tags that do not match anymore due to changed rules."
         )
 
     def handle(self, *args, **options):
@@ -53,24 +70,41 @@ class Command(Renderable, BaseCommand):
             queryset = Document.objects.all()
         documents = queryset.distinct()
 
-        logging.getLogger(__name__).info("Loading classifier")
-        clf = DocumentClassifier()
+        classifier = DocumentClassifier()
         try:
-            clf.reload()
+            classifier.reload()
         except FileNotFoundError:
-            logging.getLogger(__name__).fatal("Cannot classify documents, "
+            logging.getLogger(__name__).warning("Cannot classify documents, "
                                               "classifier model file was not "
                                               "found.")
-            return
+            classifier = None
 
         for document in documents:
             logging.getLogger(__name__).info(
                 "Processing document {}".format(document.title)
             )
-            clf.classify_document(
-                document,
-                classify_document_type=options["type"],
-                classify_tags=options["tags"],
-                classify_correspondent=options["correspondent"],
-                replace_tags=options["replace_tags"]
-            )
+
+            if classifier:
+                classifier.update(document)
+
+            if options['correspondent']:
+                set_correspondent(
+                    sender=None,
+                    document=document,
+                    classifier=classifier,
+                    replace=options['overwrite'],
+                    use_first=options['use_first'])
+
+            if options['document_type']:
+                set_document_type(sender=None,
+                                  document=document,
+                                  classifier=classifier,
+                                  replace=options['overwrite'],
+                                  use_first=options['use_first'])
+
+            if options['tags']:
+                set_tags(
+                    sender=None,
+                    document=document,
+                    classifier=classifier,
+                    replace=options['overwrite'])

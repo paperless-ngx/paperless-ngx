@@ -15,7 +15,9 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "slug",
             "name",
-            "automatic_classification",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
             "document_count",
             "last_correspondence"
         )
@@ -31,7 +33,9 @@ class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "slug",
             "name",
-            "automatic_classification",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
             "document_count"
         )
 
@@ -47,7 +51,9 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
             "slug",
             "name",
             "colour",
-            "automatic_classification",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
             "is_inbox_tag",
             "document_count"
         )
