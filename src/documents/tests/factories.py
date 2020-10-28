@@ -1,17 +1,18 @@
-import factory
+from factory import Faker
+from factory.django import DjangoModelFactory
 
 from ..models import Document, Correspondent
 
 
-class CorrespondentFactory(factory.DjangoModelFactory):
+class CorrespondentFactory(DjangoModelFactory):
 
     class Meta:
         model = Correspondent
 
-    name = factory.Faker("name")
+    name = Faker("name")
 
 
-class DocumentFactory(factory.DjangoModelFactory):
+class DocumentFactory(DjangoModelFactory):
 
     class Meta:
         model = Document

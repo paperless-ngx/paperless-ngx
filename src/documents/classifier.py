@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
 
-from documents.models import Correspondent, DocumentType, Tag, Document
+from documents.models import Document, MatchingModel
 from paperless import settings
 
 
@@ -34,6 +34,7 @@ class DocumentClassifier(object):
         self.tags_classifier = None
         self.correspondent_classifier = None
         self.document_type_classifier = None
+        self.X = None
 
     def reload(self):
         if os.path.getmtime(settings.MODEL_FILE) > self.classifier_version:
@@ -74,20 +75,23 @@ class DocumentClassifier(object):
 
             y = -1
             if doc.document_type:
-                if doc.document_type.automatic_classification:
+                if doc.document_type.matching_algorithm == MatchingModel.MATCH_AUTO:
                     y = doc.document_type.id
             labels_document_type.append(y)
 
             y = -1
             if doc.correspondent:
-                if doc.correspondent.automatic_classification:
+                if doc.correspondent.matching_algorithm == MatchingModel.MATCH_AUTO:
                     y = doc.correspondent.id
             labels_correspondent.append(y)
 
             tags = [tag.id for tag in doc.tags.filter(
-                automatic_classification=True
+                matching_algorithm=MatchingModel.MATCH_AUTO
             )]
             labels_tags.append(tags)
+
+        if not data:
+            raise ValueError("No training data available.")
 
         labels_tags_unique = set([tag for tags in labels_tags for tag in tags])
         logging.getLogger(__name__).info(
@@ -163,78 +167,37 @@ class DocumentClassifier(object):
                 "classifier."
             )
 
-    def classify_document(
-            self, document, classify_correspondent=False,
-            classify_document_type=False, classify_tags=False,
-            replace_tags=False):
-
-        X = self.data_vectorizer.transform(
+    def update(self, document):
+        self.X = self.data_vectorizer.transform(
             [preprocess_content(document.content)]
         )
 
-        if classify_correspondent and self.correspondent_classifier:
-            self._classify_correspondent(X, document)
-
-        if classify_document_type and self.document_type_classifier:
-            self._classify_document_type(X, document)
-
-        if classify_tags and self.tags_classifier:
-            self._classify_tags(X, document, replace_tags)
-
-        document.save(update_fields=("correspondent", "document_type"))
-
-    def _classify_correspondent(self, X, document):
-        y = self.correspondent_classifier.predict(X)
-        correspondent_id = self.correspondent_binarizer.inverse_transform(y)[0]
-        try:
-            correspondent = None
+    def predict_correspondent(self):
+        if self.correspondent_classifier:
+            y = self.correspondent_classifier.predict(self.X)
+            correspondent_id = self.correspondent_binarizer.inverse_transform(y)[0]
             if correspondent_id != -1:
-                correspondent = Correspondent.objects.get(id=correspondent_id)
-                logging.getLogger(__name__).info(
-                    "Detected correspondent: {}".format(correspondent.name)
-                )
+                return correspondent_id
             else:
-                logging.getLogger(__name__).info("Detected correspondent: -")
-            document.correspondent = correspondent
-        except Correspondent.DoesNotExist:
-            logging.getLogger(__name__).warning(
-                "Detected correspondent with id {} does not exist "
-                "anymore! Did you delete it?".format(correspondent_id)
-            )
+                return None
+        else:
+            return None
 
-    def _classify_document_type(self, X, document):
-        y = self.document_type_classifier.predict(X)
-        document_type_id = self.document_type_binarizer.inverse_transform(y)[0]
-        try:
-            document_type = None
+    def predict_document_type(self):
+        if self.document_type_classifier:
+            y = self.document_type_classifier.predict(self.X)
+            document_type_id = self.document_type_binarizer.inverse_transform(y)[0]
             if document_type_id != -1:
-                document_type = DocumentType.objects.get(id=document_type_id)
-                logging.getLogger(__name__).info(
-                    "Detected document type: {}".format(document_type.name)
-                )
+                return document_type_id
             else:
-                logging.getLogger(__name__).info("Detected document type: -")
-            document.document_type = document_type
-        except DocumentType.DoesNotExist:
-            logging.getLogger(__name__).warning(
-                "Detected document type with id {} does not exist "
-                "anymore! Did you delete it?".format(document_type_id)
-            )
+                return None
+        else:
+            return None
 
-    def _classify_tags(self, X, document, replace_tags):
-        y = self.tags_classifier.predict(X)
-        tags_ids = self.tags_binarizer.inverse_transform(y)[0]
-        if replace_tags:
-            document.tags.clear()
-        for tag_id in tags_ids:
-            try:
-                tag = Tag.objects.get(id=tag_id)
-                logging.getLogger(__name__).info(
-                    "Detected tag: {}".format(tag.name)
-                )
-                document.tags.add(tag)
-            except Tag.DoesNotExist:
-                logging.getLogger(__name__).warning(
-                    "Detected tag with id {} does not exist anymore! Did "
-                    "you delete it?".format(tag_id)
-                )
+    def predict_tags(self):
+        if self.tags_classifier:
+            y = self.tags_classifier.predict(self.X)
+            tags_ids = self.tags_binarizer.inverse_transform(y)[0]
+            return tags_ids
+        else:
+            return []

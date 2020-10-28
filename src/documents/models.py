@@ -7,13 +7,11 @@ import uuid
 from collections import OrderedDict
 
 import dateutil.parser
-from django.dispatch import receiver
 from django.conf import settings
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.text import slugify
-from collections import defaultdict
 
 from .managers import LogManager
 
@@ -25,14 +23,45 @@ except ImportError:
 
 class MatchingModel(models.Model):
 
+    MATCH_ANY = 1
+    MATCH_ALL = 2
+    MATCH_LITERAL = 3
+    MATCH_REGEX = 4
+    MATCH_FUZZY = 5
+    MATCH_AUTO = 6
+
+    MATCHING_ALGORITHMS = (
+        (MATCH_ANY, "Any"),
+        (MATCH_ALL, "All"),
+        (MATCH_LITERAL, "Literal"),
+        (MATCH_REGEX, "Regular Expression"),
+        (MATCH_FUZZY, "Fuzzy Match"),
+        (MATCH_AUTO, "Automatic Classification"),
+    )
+
     name = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(blank=True, editable=False)
 
-    automatic_classification = models.BooleanField(
-        default=False,
-        help_text="Automatically assign to newly added documents based on "
-                  "current usage in your document collection."
+    match = models.CharField(max_length=256, blank=True)
+    matching_algorithm = models.PositiveIntegerField(
+        choices=MATCHING_ALGORITHMS,
+        default=MATCH_ANY,
+        help_text=(
+            "Which algorithm you want to use when matching text to the OCR'd "
+            "PDF.  Here, \"any\" looks for any occurrence of any word "
+            "provided in the PDF, while \"all\" requires that every word "
+            "provided appear in the PDF, albeit not in the order provided.  A "
+            "\"literal\" match means that the text you enter must appear in "
+            "the PDF exactly as you've entered it, and \"regular expression\" "
+            "uses a regex to match the PDF.  (If you don't know what a regex "
+            "is, you probably don't want this option.)  Finally, a \"fuzzy "
+            "match\" looks for words or phrases that are mostly—but not "
+            "exactly—the same, which can be useful for matching against "
+            "documents containg imperfections that foil accurate OCR."
+        )
     )
+
+    is_insensitive = models.BooleanField(default=True)
 
     class Meta:
         abstract = True
@@ -43,6 +72,7 @@ class MatchingModel(models.Model):
 
     def save(self, *args, **kwargs):
 
+        self.match = self.match.lower()
         self.slug = slugify(self.name)
 
         models.Model.save(self, *args, **kwargs)
