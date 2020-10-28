@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import { AbstractInputComponent } from '../abstract-input';
@@ -27,5 +27,15 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   @Input()
   backgroundColor: any
+
+  @Input()
+  allowNull: boolean = false
+
+  @Output()
+  createNew = new EventEmitter()
+  
+  showPlusButton(): boolean {
+    return this.createNew.observers.length > 0
+  }
 
 }
