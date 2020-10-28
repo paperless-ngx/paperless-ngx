@@ -23,15 +23,15 @@
 <div class="row">
     <div class="col-xl">
         <form [formGroup]='documentForm' (ngSubmit)="save()">
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" class="form-control" id="title" formControlName='title'>
-            </div>
+            
+            <app-input-text title="Title" formControlName="title"></app-input-text>
+            
             <div class="form-group">
                 <label for="archive_serial_number">Archive Serial Number</label>
                 <input type="number" class="form-control" id="archive_serial_number"
                     formControlName='archive_serial_number'>
             </div>
+            
             <div class="form-row">
                 <div class="form-group col">
                     <label for="created_date">Date created</label>
@@ -42,43 +42,16 @@
                     <input type="time" class="form-control" id="created_time" formControlName='created_time'>
                 </div>
             </div>
+            
             <div class="form-group">
                 <label for="content">Content</label>
                 <textarea class="form-control" id="content" rows="5" formControlName='content'></textarea>
             </div>
-            <div class="form-group">
-                <label for="correspondent">Correspondent</label>
-                <div class="input-group">
-                    <select class="form-control" id="correspondent" formControlName="correspondent_id">
-                        <option [ngValue]="null">---</option>
-                        <option *ngFor='let c of correspondents' [ngValue]="c.id">{{c.name}}</option>
-                    </select>
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" (click)="createCorrespondent()">
-                            <svg class="buttonicon" fill="currentColor">
-                                <use xlink:href="assets/bootstrap-icons.svg#plus" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="document_type">Document Type</label>
-                <div class="input-group">
-                    <select class="form-control" id="document_type" formControlName="document_type_id">
-                        <option [ngValue]="null">---</option>
-                        <option *ngFor="let dt of documentTypes" [ngValue]="dt.id">{{dt.name}}</option>
-                    </select>
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" (click)="createDocumentType()">
-                            <svg class="buttonicon" fill="currentColor">
-                                <use xlink:href="assets/bootstrap-icons.svg#plus" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
 
-            </div>
+            <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent_id" allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
+
+            <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type_id" allowNull="true" (createNew)="createDocumentType()"></app-input-select>
+
             <div class="form-group">
                 <label for="exampleFormControlTextarea1">Tags</label>
 
