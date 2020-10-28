@@ -11,6 +11,7 @@ from operator import itemgetter
 from django.conf import settings
 from django.utils import timezone
 from paperless.db import GnuPG
+from .classifier import DocumentClassifier
 
 from .models import Document, FileInfo, Tag
 from .parsers import ParseError
@@ -48,6 +49,8 @@ class Consumer:
         self._ignore = []
         self.consume = consume
         self.scratch = scratch
+
+        self.classifier = DocumentClassifier()
 
         os.makedirs(self.scratch, exist_ok=True)
 
@@ -175,10 +178,22 @@ class Consumer:
                 "Document {} consumption finished".format(document)
             )
 
+            classifier = None
+
+            try:
+                self.classifier.reload()
+                self.classifier.update(document)
+                classifier = self.classifier
+            except FileNotFoundError:
+                logging.getLogger(__name__).warning("Cannot classify documents, "
+                                                  "classifier model file was not "
+                                                  "found.")
+
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=document,
-                logging_group=self.logging_group
+                logging_group=self.logging_group,
+                classifier=classifier
             )
             return True
 

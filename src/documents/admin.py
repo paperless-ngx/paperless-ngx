@@ -10,9 +10,11 @@ class CorrespondentAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
-        "automatic_classification"
+        "match",
+        "matching_algorithm"
     )
-    list_editable = ("automatic_classification",)
+    list_filter = ("matching_algorithm",)
+    list_editable = ("match", "matching_algorithm")
 
     readonly_fields = ("slug",)
 
@@ -22,11 +24,11 @@ class TagAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "colour",
-        "automatic_classification"
+        "match",
+        "matching_algorithm"
     )
-
-    list_filter = ("colour",)
-    list_editable = ("colour", "automatic_classification")
+    list_filter = ("colour", "matching_algorithm")
+    list_editable = ("colour", "match", "matching_algorithm")
 
     readonly_fields = ("slug",)
 
@@ -35,10 +37,11 @@ class DocumentTypeAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
-        "automatic_classification"
+        "match",
+        "matching_algorithm"
     )
-
-    list_editable = ("automatic_classification",)
+    list_filter = ("matching_algorithm",)
+    list_editable = ("match", "matching_algorithm")
 
     readonly_fields = ("slug",)
 

@@ -12,9 +12,8 @@ def re_slug_all_the_things(apps, schema_editor):
 
     Tag = apps.get_model("documents", "Tag")
     Correspondent = apps.get_model("documents", "Correspondent")
-    DocumentType = apps.get_model("documents", "DocumentType")
 
-    for klass in (Tag, Correspondent, DocumentType):
+    for klass in (Tag, Correspondent):
         for instance in klass.objects.all():
             klass.objects.filter(
                 pk=instance.pk
@@ -26,7 +25,7 @@ def re_slug_all_the_things(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1003_auto_20180904_1425'),
+        ('documents', '0021_document_storage_type'),
     ]
 
     operations = [
@@ -46,11 +45,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='tag',
-            name='slug',
-            field=models.SlugField(blank=True, editable=False),
-        ),
-        migrations.AlterField(
-            model_name='documenttype',
             name='slug',
             field=models.SlugField(blank=True, editable=False),
         ),

@@ -17,9 +17,14 @@ class Command(Renderable, BaseCommand):
         BaseCommand.__init__(self, *args, **kwargs)
 
     def handle(self, *args, **options):
-        clf = DocumentClassifier()
-        clf.train()
-        logging.getLogger(__name__).info(
-            "Saving models to {}...".format(settings.MODEL_FILE)
-        )
-        clf.save_classifier()
+        classifier = DocumentClassifier()
+        try:
+            classifier.train()
+            logging.getLogger(__name__).info(
+                "Saving models to {}...".format(settings.MODEL_FILE)
+            )
+            classifier.save_classifier()
+        except Exception as e:
+            logging.getLogger(__name__).error(
+                "Classifier error: " + str(e)
+            )
