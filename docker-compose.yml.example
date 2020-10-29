@@ -3,6 +3,8 @@ services:
   db:
     image: postgres:13
     #restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
@@ -23,6 +25,8 @@ services:
       retries: 5
     volumes:
       - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
     env_file: docker-compose.env
     environment:
       - PAPERLESS_OCR_LANGUAGES=
@@ -36,9 +40,12 @@ services:
     restart: on-failure:5
     volumes:
       - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
       - ./consume:/usr/src/paperless/consume
     env_file: docker-compose.env
     command: ["document_consumer"]
 
 volumes:
   data:
+  media:
+  pgdata:
