@@ -182,7 +182,6 @@ class Consumer:
 
             try:
                 self.classifier.reload()
-                self.classifier.update(document)
                 classifier = self.classifier
             except FileNotFoundError:
                 logging.getLogger(__name__).warning("Cannot classify documents, "
