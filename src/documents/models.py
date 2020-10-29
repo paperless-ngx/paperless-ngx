@@ -159,9 +159,8 @@ class Document(models.Model):
     )
 
     content = models.TextField(
-        db_index=True,
         blank=True,
-        help_text="The raw, text-only data of the document.  This field is "
+        help_text="The raw, text-only data of the document. This field is "
                   "primarily used for searching."
     )
 
