@@ -108,8 +108,6 @@ def query_index(ix, querystr):
 def autocomplete(ix, term, limit=10):
     with ix.reader() as reader:
         terms = []
-        for t in reader.expand_prefix("content", term.lower()):
+        for (score, t) in reader.most_distinctive_terms("content", limit, term.lower()):
             terms.append(t)
-            if len(terms) >= limit:
-                break
         return terms
