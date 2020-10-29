@@ -76,8 +76,9 @@ scripts/nuke
 /static/
 
 # Stored PDFs
-/data/media/documents/*
-/data/media/thumbnails/*
+/media/documents/originals/*
+/media/documents/thumbnails/*
+
 /data/classification_model.pickle
 /data/db.sqlite3
 /data/index

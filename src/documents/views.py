@@ -95,7 +95,6 @@ class DocumentViewSet(RetrieveModelMixin,
     ordering_fields = (
         "id", "title", "correspondent__name", "created", "modified", "added", "archive_serial_number")
 
-
     def file_response(self, pk, disposition):
         #TODO: this should not be necessary here.
         content_types = {
