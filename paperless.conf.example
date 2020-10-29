@@ -25,9 +25,12 @@
 # before you start Paperless.
 #PAPERLESS_CONSUMPTION_DIR=""
 
-# This is where paperless stores all its data (documents, thumbnails, search
-# index, sqlite database, etc).
+# This is where paperless stores all its data (search index, sqlite database,
+# classification model, etc).
 #PAPERLESS_DATA_DIR="../data"
+
+# This is where your documents and thumbnails are stored.
+#PAPERLESS_MEDIA_ROOT="../media"
 
 # Override the default STATIC_ROOT here.  This is where all static files
 # created using "collectstatic" manager command are stored.

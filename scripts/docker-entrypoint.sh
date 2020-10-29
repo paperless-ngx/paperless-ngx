@@ -16,26 +16,25 @@ map_uidgid() {
 }
 
 migrations() {
-    # A simple lock file in case other containers use this startup
-    LOCKFILE="/usr/src/paperless/data/db.sqlite3.migration"
 
-    # check for and create lock file in one command
-    if (set -o noclobber; echo "$$" > "${LOCKFILE}") 2> /dev/null
-    then
-        trap 'rm -f "${LOCKFILE}"; exit $?' INT TERM EXIT
-        sudo -HEu paperless python3 manage.py migrate
-        rm ${LOCKFILE}
-    fi
+	(
+		# flock is in place to prevent multiple containers from doing migrations
+		# simultaneously. This also ensures that the db is ready when the command
+		# of the current container starts.
+		flock 200
+		sudo -HEu paperless python3 manage.py migrate
+	)  200>/usr/src/paperless/data/migration_lock
+
 }
 
 initialize() {
 	map_uidgid
 
-	for data_dir in index media media/documents media/thumbnails; do
-		if [[ ! -d "../data/$data_dir" ]]
+	for dir in export data data/index media media/documents media/documents/originals media/documents/thumbnails; do
+		if [[ ! -d "../$dir" ]]
 		then
-			echo "creating directory ../data/$data_dir"
-			mkdir ../data/$data_dir
+			echo "creating directory ../$dir"
+			mkdir ../$dir
 		fi
 	done
 
@@ -46,7 +45,6 @@ initialize() {
 }
 
 install_languages() {
-	echo "TEST"
 	local langs="$1"
 	read -ra langs <<<"$langs"
 
