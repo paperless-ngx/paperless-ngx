@@ -106,6 +106,11 @@ export class FilterEditorComponent implements OnInit {
     this.apply.next()
   }
 
+  clearClicked() {
+    this.ruleSet.rules.splice(0,this.ruleSet.rules.length)
+    this.apply.next()
+  }
+
   ngOnInit(): void {
     this.correspondentService.list().subscribe(result => {this.correspondents = result.results})
     this.tagService.list().subscribe(result => this.tags = result.results)
