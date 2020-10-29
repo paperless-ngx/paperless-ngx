@@ -4,6 +4,8 @@
 
 [Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents. This project extends on the project and modernizes many things.
 
+This project is still under development. There also is no automatic way yet to migrate your current paperless setup to this version. I'm working on that.
+
 # How it Works
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces.
