@@ -66,7 +66,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       this.activeModal.close()
       this.success.emit(result)
     }, error => {
-      this.toastService.showToast(Toast.make("Error", `Could not save ${this.entityName}: ${error.error.name}`))
+      this.toastService.showToast(Toast.makeError(`Could not save ${this.entityName}: ${error.error.name}`))
     })
   }
 

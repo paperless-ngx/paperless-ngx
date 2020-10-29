@@ -1,6 +1,7 @@
 <ngb-toast
   *ngFor="let toast of toasts"
   [header]="toast.title" [autohide]="true" [delay]="toast.delay"
+  [class]="toast.classname"
   (hide)="toastService.closeToast(toast)">
   {{toast.content}}
 </ngb-toast>
