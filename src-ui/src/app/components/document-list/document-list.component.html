@@ -24,7 +24,7 @@
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-secondary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSort(f.field)">{{f.name}}</button>
+        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSort(f.field)" [class.active]="docs.currentSortField == f.field">{{f.name}}</button>
       </div>
     </div>
     <label ngbButtonLabel class="btn-outline-secondary btn-sm">
@@ -55,7 +55,14 @@
   </div>
 </div>
 
-<ngb-pagination [pageSize]="25" [collectionSize]="docs.collectionSize" [(page)]="docs.currentPage" (pageChange)="reload()"
+<ngb-pagination
+  [pageSize]="25"
+  [collectionSize]="docs.collectionSize"
+  [(page)]="docs.currentPage"
+  [maxSize]="5"
+  [rotate]="true"
+  [boundaryLinks]="true"
+  (pageChange)="reload()"
   aria-label="Default pagination"></ngb-pagination>
 
 <div *ngIf="displayMode == 'largeCards'">
