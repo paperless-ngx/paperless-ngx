@@ -33,7 +33,9 @@ def paths_check(app_configs, **kwargs):
     Check the various paths for existence, readability and writeability
     """
 
-    check_messages = path_check("PAPERLESS_DATA_DIR") +\
+    check_messages = path_check("PAPERLESS_DATA_DIR") + \
+                     path_check("PAPERLESS_MEDIA_ROOT") + \
+                     path_check("PAPERLESS_CONSUMPTION_DIR") + \
                      path_check("PAPERLESS_STATICDIR")
 
     return check_messages

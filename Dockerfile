@@ -45,6 +45,7 @@ RUN apt-get update \
 		unpaper \
 	&& pip install --upgrade pipenv \
 	&& pipenv install --system --deploy \
+	&& pipenv --clear \
 	&& apt-get -y purge build-essential \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/*
