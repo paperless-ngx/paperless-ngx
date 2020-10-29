@@ -84,9 +84,6 @@ class Command(Renderable, BaseCommand):
                 "Processing document {}".format(document.title)
             )
 
-            if classifier:
-                classifier.update(document)
-
             if options['correspondent']:
                 set_correspondent(
                     sender=None,
