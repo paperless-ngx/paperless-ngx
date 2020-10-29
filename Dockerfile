@@ -10,7 +10,7 @@ COPY src-ui/package* ./
 RUN npm install
 
 COPY src-ui .
-RUN node_modules/.bin/ng build --prod --output-hashing none
+RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false
 
 ###############################################################################
 ### Back end                                                                ###
