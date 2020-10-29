@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
     this.auth.login(this.loginForm.value.username, this.loginForm.value.password, this.loginForm.value.rememberMe).subscribe(result => {
       this.router.navigate([''])
     }, (error) => {
-      this.toastService.showToast(Toast.make("Error", "result: " + JSON.stringify(error.error)))
+      this.toastService.showToast(Toast.makeError("Unable to log in with provided credentials."))
     }
     )
   }
