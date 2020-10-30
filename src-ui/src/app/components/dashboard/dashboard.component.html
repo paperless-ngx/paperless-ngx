@@ -3,14 +3,33 @@
 </app-page-header>
 
 <p>... This space for rent</p>
-<p>This page will provide more information in the future, such as access to recently scanned documents, etc.</p>
 
 <div class='row'>
   <div class="col-lg">
-    <h4>Statistics</h4>
-    <p>None yet.</p>
+    <ng-container *ngFor="let v of savedDashboardViews">
+      <h4>{{v.viewConfig.title}}</h4>
+
+      <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+          <th scope="col">Document</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let doc of v.documents" routerLink="/documents/{{doc.id}}">
+          <td>{{ doc.title }}</td>
+        </tr>
+        </tbody>
+      </table>
+  
+  
+
+    </ng-container>
+
   </div>
   <div class="col-lg">
+    <h4>Statistics</h4>
+    <p>None yet.</p>
     <h4>Upload new Document</h4>
     <form>
       <ngx-file-drop
@@ -22,5 +41,18 @@
 
       </ngx-file-drop>
     </form>
+    <h5 class="mt-3">Document conumser status</h5>
+    <div class="card bg-light">
+      <div class="card-body">
+        <p class="card-text"><strong>Filename.pdf:</strong> OCR for ger...</p>
+        <p><ngb-progressbar type="info" [value]="50"></ngb-progressbar></p>
+      </div>
+    </div>
+    <div class="card bg-light">
+      <div class="card-body">
+        <p class="card-text"><strong>Filename2.pdf:</strong> FAILED: language ITA not found</p>
+        <p><ngb-progressbar type="danger" [value]="100"></ngb-progressbar></p>
+      </div>
+    </div>
   </div>
 </div>

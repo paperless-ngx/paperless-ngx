@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FileSystemDirectoryEntry, FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
+import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentService } from 'src/app/services/rest/document.service';
+import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -10,10 +12,21 @@ import { Toast, ToastService } from 'src/app/services/toast.service';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor(private documentService: DocumentService, private toastService: ToastService) { }
+  constructor(private documentService: DocumentService, private toastService: ToastService,
+    public savedViewConfigService: SavedViewConfigService) { }
+
+
+  savedDashboardViews = []
 
   ngOnInit(): void {
+    this.savedViewConfigService.getDashboardConfigs().forEach(config => {
+      this.documentService.list(1,10,config.sortField,config.sortDirection,config.filterRules).subscribe(result => {
+        this.savedDashboardViews.push({viewConfig: config, documents: result.results})
+      })
+    })
   }
+
+
 
   public fileOver(event){
     console.log(event);
