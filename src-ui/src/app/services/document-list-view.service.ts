@@ -5,21 +5,21 @@ import { PaperlessDocument } from '../data/paperless-document';
 import { SavedViewConfig } from '../data/saved-view-config';
 import { DocumentService } from './rest/document.service';
 
+export const SORT_FIELDS = [
+  {field: "correspondent__name", name: "Correspondent"},
+  {field: 'title', name: 'Title'},
+  {field: 'archive_serial_number', name: 'ASN'},
+  {field: 'created', name: 'Created'},
+  {field: 'added', name: 'Added'},
+  {field: 'modified', name: 'Modified'}
+]
+
 @Injectable({
   providedIn: 'root'
 })
 export class DocumentListViewService {
 
   static DEFAULT_SORT_FIELD = 'created'
-
-  static SORT_FIELDS = [
-    {field: "correspondent__name", name: "Correspondent"},
-    {field: 'title', name: 'Title'},
-    {field: 'archive_serial_number', name: 'ASN'},
-    {field: 'created', name: 'Created'},
-    {field: 'added', name: 'Added'},
-    {field: 'modified', name: 'Modified'}
-  ]
 
   documents: PaperlessDocument[] = []
   currentPage = 1
@@ -63,14 +63,13 @@ export class DocumentListViewService {
   }
 
   getOrderingQueryParam(sortField: string, sortDirection: string) {
-    if (DocumentListViewService.SORT_FIELDS.find(f => f.field == sortField)) {
+    if (SORT_FIELDS.find(f => f.field == sortField)) {
       return (sortDirection == 'des' ? '-' : '') + sortField
     } else {
       return DocumentListViewService.DEFAULT_SORT_FIELD
     }
   }
 
-  //TODO: refactor
   setFilterRules(filterRules: FilterRule[]) {
     this.currentFilterRules = cloneFilterRules(filterRules)
   }
