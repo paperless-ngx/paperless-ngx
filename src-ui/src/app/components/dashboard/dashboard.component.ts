@@ -1,9 +1,16 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FileSystemDirectoryEntry, FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
-import { SavedViewConfig } from 'src/app/data/saved-view-config';
+import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
+import { Observable } from 'rxjs';
 import { DocumentService } from 'src/app/services/rest/document.service';
 import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
+import { environment } from 'src/environments/environment';
+
+export interface Statistics {
+  documents_total?: number
+  documents_inbox?: number
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -13,10 +20,11 @@ import { Toast, ToastService } from 'src/app/services/toast.service';
 export class DashboardComponent implements OnInit {
 
   constructor(private documentService: DocumentService, private toastService: ToastService,
-    public savedViewConfigService: SavedViewConfigService) { }
+    public savedViewConfigService: SavedViewConfigService, private http: HttpClient) { }
 
 
   savedDashboardViews = []
+  statistics: Statistics = {}
 
   ngOnInit(): void {
     this.savedViewConfigService.getDashboardConfigs().forEach(config => {
@@ -24,8 +32,14 @@ export class DashboardComponent implements OnInit {
         this.savedDashboardViews.push({viewConfig: config, documents: result.results})
       })
     })
+    this.getStatistics().subscribe(statistics => {
+      this.statistics = statistics
+    })
   }
 
+  getStatistics(): Observable<Statistics> {
+    return this.http.get(`${environment.apiBaseUrl}statistics/`)
+  }
 
 
   public fileOver(event){
