@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
@@ -17,6 +17,7 @@ import { DeleteDialogComponent } from '../common/delete-dialog/delete-dialog.com
 import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { TagEditDialogComponent } from '../manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
+
 @Component({
   selector: 'app-document-detail',
   templateUrl: './document-detail.component.html',
@@ -116,7 +117,7 @@ export class DocumentDetailComponent implements OnInit {
   }
 
   getColour(id: number) {
-    return PaperlessTag.COLOURS.find(c => c.id == this.getTag(id).colour)
+    return TAG_COLOURS.find(c => c.id == this.getTag(id).colour)
   }
 
   addTag(id: number) {

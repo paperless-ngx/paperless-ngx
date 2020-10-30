@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
+import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { FilterRuleSet } from '../filter-editor/filter-editor.component';
+import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
+import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
 
 @Component({
   selector: 'app-document-list',
@@ -10,11 +15,14 @@ import { FilterRuleSet } from '../filter-editor/filter-editor.component';
 export class DocumentListComponent implements OnInit {
 
   constructor(
-    public docs: DocumentListViewService) { }
+    public docs: DocumentListViewService,
+    public savedViewConfigService: SavedViewConfigService,
+    public route: ActivatedRoute,
+    public modalService: NgbModal) { }
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
-  filter = new FilterRuleSet()
+  filterRules: FilterRule[] = []
   showFilter = false
 
   getSortFields() {
@@ -34,18 +42,47 @@ export class DocumentListComponent implements OnInit {
     if (localStorage.getItem('document-list:displayMode') != null) {
       this.displayMode = localStorage.getItem('document-list:displayMode')
     }
-    this.filter = this.docs.currentFilter.clone()
-    this.showFilter = this.filter.rules.length > 0
-    this.reload()
+    this.route.paramMap.subscribe(params => {
+      if (params.has('id')) {
+        this.docs.viewConfig = this.savedViewConfigService.getConfig(params.get('id'))
+      } else {
+        this.filterRules = cloneFilterRules(this.docs.currentFilterRules)
+        this.showFilter = this.filterRules.length > 0
+        this.docs.viewConfig = null
+      }
+      this.reload()
+    })
   }
 
   reload() {
     this.docs.reload()
   }
 
-  applyFilter() {
-    this.docs.setFilter(this.filter.clone())
+  applyFilterRules() {
+    this.docs.setFilterRules(this.filterRules)
     this.reload()
   }
 
+  loadViewConfig(config: SavedViewConfig) {
+    this.filterRules = config.filterRules
+    this.docs.setFilterRules(config.filterRules)
+    this.docs.currentSortField = config.sortField
+    this.docs.currentSortDirection = config.sortDirection
+    this.reload()
+  }
+
+  saveViewConfig() {
+    let modal = this.modalService.open(SaveViewConfigDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.saveClicked.subscribe(formValue => {
+      this.savedViewConfigService.saveConfig({
+        filterRules: cloneFilterRules(this.filterRules),
+        title: formValue.title,
+        showInDashboard: formValue.showInDashboard,
+        showInSideBar: formValue.showInSideBar,
+        sortDirection: this.docs.currentSortDirection,
+        sortField: this.docs.currentSortField
+      })
+      modal.close()
+    })
+  }
 }

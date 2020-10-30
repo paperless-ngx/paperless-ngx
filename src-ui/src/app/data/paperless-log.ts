@@ -1,2 +1,2 @@
-export class PaperlessLog {
+export interface PaperlessLog {
 }

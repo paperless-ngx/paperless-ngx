@@ -1,74 +1,83 @@
-<app-page-header title="Documents">
+<app-page-header [title]="docs.viewConfig ? docs.viewConfig.title : 'Documents'">
 
-  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="displayMode" (ngModelChange)="saveDisplayMode()">
+  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="displayMode"
+    (ngModelChange)="saveDisplayMode()">
     <label ngbButtonLabel class="btn-outline-secondary btn-sm">
       <input ngbButton type="radio" class="btn btn-sm" value="details">
       <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#list-ul"/>
+        <use xlink:href="assets/bootstrap-icons.svg#list-ul" />
       </svg>
     </label>
     <label ngbButtonLabel class="btn-outline-secondary btn-sm">
       <input ngbButton type="radio" class="btn btn-sm" value="smallCards">
       <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#grid"/>
+        <use xlink:href="assets/bootstrap-icons.svg#grid" />
       </svg>
     </label>
     <label ngbButtonLabel class="btn-outline-secondary btn-sm">
       <input ngbButton type="radio" class="btn btn-sm" value="largeCards">
       <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#hdd-stack"/>
+        <use xlink:href="assets/bootstrap-icons.svg#hdd-stack" />
       </svg>
     </label>
   </div>
-  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="docs.currentSortDirection" (ngModelChange)="reload()">
+  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="docs.currentSortDirection"
+    (ngModelChange)="reload()"
+    *ngIf="!docs.viewConfig">
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-secondary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSort(f.field)" [class.active]="docs.currentSortField == f.field">{{f.name}}</button>
+        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSort(f.field)"
+          [class.active]="docs.currentSortField == f.field">{{f.name}}</button>
       </div>
     </div>
     <label ngbButtonLabel class="btn-outline-secondary btn-sm">
       <input ngbButton type="radio" class="btn btn-sm" value="asc">
       <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down"/>
+        <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
       </svg>
     </label>
     <label ngbButtonLabel class="btn-outline-secondary btn-sm">
       <input ngbButton type="radio" class="btn btn-sm" value="des">
       <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt"/>
+        <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
       </svg>
     </label>
   </div>
-  <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" (click)="showFilter=!showFilter">
-    <svg class="toolbaricon" fill="currentColor">
-      <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
-    </svg>
-    Filter
-  </button>
+  <div class="btn-group" *ngIf="!docs.viewConfig">
+
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="showFilter=!showFilter">
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#funnel" />
+      </svg>
+      Filter
+    </button>
+
+    <div class="btn-group" ngbDropdown role="group">
+      <button class="btn btn-sm btn-outline-secondary dropdown-toggle-split" ngbDropdownToggle></button>
+      <div class="dropdown-menu" ngbDropdownMenu>
+        <button ngbDropdownItem *ngFor="let config of savedViewConfigService.getConfigs()" (click)="loadViewConfig(config)">{{config.title}}</button>
+        <div class="dropdown-divider" *ngIf="savedViewConfigService.getConfigs().length > 0"></div>
+        <button ngbDropdownItem (click)="saveViewConfig()">Save current view</button>
+      </div>
+    </div>
+
+
+  </div>
 </app-page-header>
 
 <div class="card w-100 mb-3" [hidden]="!showFilter">
   <div class="card-body">
     <h5 class="card-title">Filter</h5>
-    <app-filter-editor [(ruleSet)]="filter" (apply)="applyFilter()"></app-filter-editor>
+    <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()"></app-filter-editor>
   </div>
 </div>
 
-<ngb-pagination
-  [pageSize]="25"
-  [collectionSize]="docs.collectionSize"
-  [(page)]="docs.currentPage"
-  [maxSize]="5"
-  [rotate]="true"
-  [boundaryLinks]="true"
-  (pageChange)="reload()"
-  aria-label="Default pagination"></ngb-pagination>
+<ngb-pagination [pageSize]="25" [collectionSize]="docs.collectionSize" [(page)]="docs.currentPage" [maxSize]="5"
+  [rotate]="true" [boundaryLinks]="true" (pageChange)="reload()" aria-label="Default pagination"></ngb-pagination>
 
 <div *ngIf="displayMode == 'largeCards'">
-  <app-document-card-large *ngFor="let d of docs.documents"
-    [document]="d"
-    [details]="d.content">
+  <app-document-card-large *ngFor="let d of docs.documents" [document]="d" [details]="d.content">
   </app-document-card-large>
 </div>
 
