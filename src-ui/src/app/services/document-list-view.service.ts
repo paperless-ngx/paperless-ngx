@@ -1,18 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { cloneFilterRules, FilterRule, filterRulesToQueryParams } from '../data/filter-rule';
+import { cloneFilterRules, FilterRule } from '../data/filter-rule';
 import { PaperlessDocument } from '../data/paperless-document';
 import { SavedViewConfig } from '../data/saved-view-config';
-import { DocumentService } from './rest/document.service';
+import { DocumentService, SORT_DIRECTION_DESCENDING } from './rest/document.service';
 
-export const SORT_FIELDS = [
-  {field: "correspondent__name", name: "Correspondent"},
-  {field: 'title', name: 'Title'},
-  {field: 'archive_serial_number', name: 'ASN'},
-  {field: 'created', name: 'Created'},
-  {field: 'added', name: 'Added'},
-  {field: 'modified', name: 'Modified'}
-]
 
 @Injectable({
   providedIn: 'root'
@@ -26,27 +18,31 @@ export class DocumentListViewService {
   collectionSize: number
 
   currentFilterRules: FilterRule[] = []
-  currentSortDirection = 'des'
+  currentSortDirection = SORT_DIRECTION_DESCENDING
   currentSortField = DocumentListViewService.DEFAULT_SORT_FIELD
   
   viewConfig: SavedViewConfig
 
   reload(onFinish?) {
-    let ordering: string
+    let sortField: string
+    let sortDirection: string
     let filterRules: FilterRule[]
     if (this.viewConfig) {
-      ordering = this.getOrderingQueryParam(this.viewConfig.sortField, this.viewConfig.sortDirection)
+      sortField = this.viewConfig.sortField
+      sortDirection = this.viewConfig.sortDirection
       filterRules = this.viewConfig.filterRules
     } else {
-      ordering = this.getOrderingQueryParam(this.currentSortField, this.currentSortDirection)
+      sortField = this.currentSortField
+      sortDirection = this.currentSortDirection
       filterRules = this.currentFilterRules
     }
 
     this.documentService.list(
       this.currentPage,
       null,
-      ordering,
-      filterRulesToQueryParams(filterRules)).subscribe(
+      sortField,
+      sortDirection,
+      filterRules).subscribe(
         result => {
           this.collectionSize = result.count
           this.documents = result.results
@@ -62,13 +58,6 @@ export class DocumentListViewService {
         })
   }
 
-  getOrderingQueryParam(sortField: string, sortDirection: string) {
-    if (SORT_FIELDS.find(f => f.field == sortField)) {
-      return (sortDirection == 'des' ? '-' : '') + sortField
-    } else {
-      return DocumentListViewService.DEFAULT_SORT_FIELD
-    }
-  }
 
   setFilterRules(filterRules: FilterRule[]) {
     this.currentFilterRules = cloneFilterRules(filterRules)
