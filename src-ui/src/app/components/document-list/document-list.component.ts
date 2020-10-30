@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
 import { SavedViewConfig } from 'src/app/data/saved-view-config';
-import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { DocumentListViewService, SORT_FIELDS } from 'src/app/services/document-list-view.service';
 import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
 
@@ -26,7 +26,7 @@ export class DocumentListComponent implements OnInit {
   showFilter = false
 
   getSortFields() {
-    return DocumentListViewService.SORT_FIELDS
+    return SORT_FIELDS
   }
 
   setSort(field: string) {
