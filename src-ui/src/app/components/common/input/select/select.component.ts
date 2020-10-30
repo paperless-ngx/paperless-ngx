@@ -1,6 +1,5 @@
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { v4 as uuidv4 } from 'uuid';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AbstractInputComponent } from '../abstract-input';
 
 @Component({

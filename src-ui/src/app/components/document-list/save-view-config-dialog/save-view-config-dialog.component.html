@@ -1,0 +1,17 @@
+<form [formGroup]="saveViewConfigForm" class="needs-validation" novalidate (ngSubmit)="save()">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Save current view</h4>
+    <button type="button" class="close" aria-label="Close" (click)="cancel()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-input-text title="Title" formControlName="title"></app-input-text>
+    <app-input-check title="Show in side bar" formControlName="showInSideBar"></app-input-check>
+    <app-input-check title="Show in dashboard" formControlName="showInDashboard"></app-input-check>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>

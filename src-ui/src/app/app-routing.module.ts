@@ -19,7 +19,7 @@ const routes: Routes = [
   {path: '', component: AppFrameComponent, children: [
     {path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuardService] },
     {path: 'documents', component: DocumentListComponent, canActivate: [AuthGuardService] },
-    {path: 'view/:name', component: DocumentListComponent, canActivate: [AuthGuardService] },
+    {path: 'view/:id', component: DocumentListComponent, canActivate: [AuthGuardService] },
     {path: 'search', component: SearchComponent, canActivate: [AuthGuardService] },
     {path: 'documents/:id', component: DocumentDetailComponent, canActivate: [AuthGuardService] },
   

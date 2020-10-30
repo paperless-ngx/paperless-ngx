@@ -1,4 +1,4 @@
-export class Results<T> {
+export interface Results<T> {
 
   count: number
 

@@ -1,4 +1,4 @@
-<div *ngFor="let rule of ruleSet.rules" class="form-row form-group">
+<div *ngFor="let rule of filterRules" class="form-row form-group">
   <div class="col">
     <select class="form-control form-control-sm" [(ngModel)]="rule.type" (change)="rule.value = null">
       <option *ngFor="let ruleType of getRuleTypes()" [ngValue]="ruleType">{{ruleType.name}}</option>
