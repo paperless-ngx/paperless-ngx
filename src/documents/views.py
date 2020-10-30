@@ -194,3 +194,14 @@ class SearchAutoCompleteView(APIView):
             return Response(index.autocomplete(self.ix, term, limit))
         else:
             return Response([])
+
+
+class StatisticsView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        return Response({
+            'documents_total': Document.objects.all().count(),
+            'documents_inbox': Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+        })
