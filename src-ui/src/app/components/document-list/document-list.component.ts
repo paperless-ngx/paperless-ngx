@@ -64,7 +64,7 @@ export class DocumentListComponent implements OnInit {
   }
 
   loadViewConfig(config: SavedViewConfig) {
-    this.filterRules = config.filterRules
+    this.filterRules = cloneFilterRules(config.filterRules)
     this.docs.setFilterRules(config.filterRules)
     this.docs.currentSortField = config.sortField
     this.docs.currentSortDirection = config.sortDirection
