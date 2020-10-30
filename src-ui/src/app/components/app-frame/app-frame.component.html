@@ -43,6 +43,20 @@
           </li>
         </ul>
 
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" *ngIf='viewConfigService.getSideBarConfigs().length > 0'>
+          <span>Saved filters</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item" *ngFor='let config of viewConfigService.getSideBarConfigs()'>
+            <a class="nav-link" routerLink="view/{{config.id}}" routerLinkActive="active">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
+              </svg>
+              {{config.title}}
+            </a>
+          </li>
+        </ul>
+
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
           <span>Open documents</span>
         </h6>

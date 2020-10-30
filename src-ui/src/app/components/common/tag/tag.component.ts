@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
 
 @Component({
   selector: 'app-tag',
@@ -23,7 +23,7 @@ export class TagComponent implements OnInit {
   }
 
   getColour() {
-    return PaperlessTag.COLOURS.find(c => c.id == this.tag.colour)
+    return TAG_COLOURS.find(c => c.id == this.tag.colour)
   }
 
 }

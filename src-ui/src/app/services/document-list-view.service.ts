@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { FilterRuleSet } from '../components/filter-editor/filter-editor.component';
+import { cloneFilterRules, FilterRule, filterRulesToQueryParams } from '../data/filter-rule';
 import { PaperlessDocument } from '../data/paperless-document';
+import { SavedViewConfig } from '../data/saved-view-config';
 import { DocumentService } from './rest/document.service';
 
 @Injectable({
@@ -24,17 +25,28 @@ export class DocumentListViewService {
   currentPage = 1
   collectionSize: number
 
-  currentFilter = new FilterRuleSet()
-
+  currentFilterRules: FilterRule[] = []
   currentSortDirection = 'des'
   currentSortField = DocumentListViewService.DEFAULT_SORT_FIELD
+  
+  viewConfig: SavedViewConfig
 
   reload(onFinish?) {
+    let ordering: string
+    let filterRules: FilterRule[]
+    if (this.viewConfig) {
+      ordering = this.getOrderingQueryParam(this.viewConfig.sortField, this.viewConfig.sortDirection)
+      filterRules = this.viewConfig.filterRules
+    } else {
+      ordering = this.getOrderingQueryParam(this.currentSortField, this.currentSortDirection)
+      filterRules = this.currentFilterRules
+    }
+
     this.documentService.list(
       this.currentPage,
       null,
-      this.getOrderingQueryParam(),
-      this.currentFilter.toQueryParams()).subscribe(
+      ordering,
+      filterRulesToQueryParams(filterRules)).subscribe(
         result => {
           this.collectionSize = result.count
           this.documents = result.results
@@ -50,16 +62,17 @@ export class DocumentListViewService {
         })
   }
 
-  getOrderingQueryParam() {
-    if (DocumentListViewService.SORT_FIELDS.find(f => f.field == this.currentSortField)) {
-      return (this.currentSortDirection == 'des' ? '-' : '') + this.currentSortField
+  getOrderingQueryParam(sortField: string, sortDirection: string) {
+    if (DocumentListViewService.SORT_FIELDS.find(f => f.field == sortField)) {
+      return (sortDirection == 'des' ? '-' : '') + sortField
     } else {
       return DocumentListViewService.DEFAULT_SORT_FIELD
     }
   }
 
-  setFilter(filter: FilterRuleSet) {
-    this.currentFilter = filter
+  //TODO: refactor
+  setFilterRules(filterRules: FilterRule[]) {
+    this.currentFilterRules = cloneFilterRules(filterRules)
   }
 
   getLastPage(): number {

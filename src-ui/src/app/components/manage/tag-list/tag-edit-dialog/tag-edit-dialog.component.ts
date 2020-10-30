@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -29,11 +29,11 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
   }
 
   getColours() {
-    return PaperlessTag.COLOURS
+    return TAG_COLOURS
   }
 
   getColor(id: number) {
-    return PaperlessTag.COLOURS.find(c => c.id == id)
+    return TAG_COLOURS.find(c => c.id == id)
   }
 
 }
