@@ -28,14 +28,6 @@ class RasterisedDocumentParser(DocumentParser):
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
 
-    CONVERT = settings.CONVERT_BINARY
-    GHOSTSCRIPT = settings.GS_BINARY
-    DENSITY = settings.CONVERT_DENSITY if settings.CONVERT_DENSITY else 300
-    THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
-    UNPAPER = settings.UNPAPER_BINARY
-    DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
-    OCR_ALWAYS = settings.OCR_ALWAYS
-
     def __init__(self, path):
         super().__init__(path)
         self._text = None
@@ -50,7 +42,7 @@ class RasterisedDocumentParser(DocumentParser):
         # Run convert to get a decent thumbnail
         try:
             run_convert(
-                self.CONVERT,
+                settings.CONVERT_BINARY,
                 "-density", "300",
                 "-scale", "500x5000>",
                 "-alpha", "remove",
@@ -67,7 +59,7 @@ class RasterisedDocumentParser(DocumentParser):
                 "falling back to Ghostscript."
             )
             gs_out_path = os.path.join(self.tempdir, "gs_out.png")
-            cmd = [self.GHOSTSCRIPT,
+            cmd = [settings.GS_BINARY,
                    "-q",
                    "-sDEVICE=pngalpha",
                    "-o", gs_out_path,
@@ -76,7 +68,7 @@ class RasterisedDocumentParser(DocumentParser):
                 raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
             # then run convert on the output from gs
             run_convert(
-                self.CONVERT,
+                settings.CONVERT_BINARY,
                 "-density", "300",
                 "-scale", "500x5000>",
                 "-alpha", "remove",
@@ -101,7 +93,7 @@ class RasterisedDocumentParser(DocumentParser):
         if self._text is not None:
             return self._text
 
-        if not self.OCR_ALWAYS and self._is_ocred():
+        if not settings.OCR_ALWAYS and self._is_ocred():
             self.log("info", "Skipping OCR, using Text from PDF")
             self._text = get_text_from_pdf(self.document_path)
             return self._text
@@ -122,8 +114,8 @@ class RasterisedDocumentParser(DocumentParser):
         # Convert PDF to multiple PNMs
         pnm = os.path.join(self.tempdir, "convert-%04d.pnm")
         run_convert(
-            self.CONVERT,
-            "-density", str(self.DENSITY),
+            settings.CONVERT_BINARY,
+            "-density", str(settings.CONVERT_DENSITY),
             "-depth", "8",
             "-type", "grayscale",
             self.document_path, pnm,
@@ -136,8 +128,8 @@ class RasterisedDocumentParser(DocumentParser):
                 pnms.append(os.path.join(self.tempdir, f))
 
         # Run unpaper in parallel on converted images
-        with Pool(processes=self.THREADS) as pool:
-            pool.map(run_unpaper, itertools.product([self.UNPAPER], pnms))
+        with Pool(processes=settings.OCR_THREADS) as pool:
+            pool.map(run_unpaper, itertools.product([settings.UNPAPER_BINARY], pnms))
 
         # Return list of converted images, processed with unpaper
         pnms = []
@@ -162,53 +154,38 @@ class RasterisedDocumentParser(DocumentParser):
         """
 
         if not imgs:
-            raise OCRError("No images found")
+            raise OCRError("Empty document, nothing to do.")
 
         self.log("info", "OCRing the document")
 
         # Since the division gets rounded down by int, this calculation works
         # for every edge-case, i.e. 1
         middle = int(len(imgs) / 2)
-        raw_text = self._ocr([imgs[middle]], self.DEFAULT_OCR_LANGUAGE)
-
+        raw_text = self._ocr([imgs[middle]], settings.OCR_LANGUAGE)
         guessed_language = self._guess_language(raw_text)
 
         if not guessed_language or guessed_language not in ISO639:
             self.log("warning", "Language detection failed!")
-            if settings.FORGIVING_OCR:
-                self.log(
-                    "warning",
-                    "As FORGIVING_OCR is enabled, we're going to make the "
-                    "best with what we have."
-                )
-                raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
-                return raw_text
-            error_msg = ("Language detection failed. Set "
-                         "PAPERLESS_FORGIVING_OCR in config file to continue "
-                         "anyway.")
-            raise OCRError(error_msg)
 
-        if ISO639[guessed_language] == self.DEFAULT_OCR_LANGUAGE:
+            raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
+            return raw_text
+
+        if ISO639[guessed_language] == settings.OCR_LANGUAGE:
             raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
             return raw_text
 
         try:
             return self._ocr(imgs, ISO639[guessed_language])
         except pyocr.pyocr.tesseract.TesseractError:
-            if settings.FORGIVING_OCR:
-                self.log(
-                    "warning",
-                    "OCR for {} failed, but we're going to stick with what "
-                    "we've got since FORGIVING_OCR is enabled.".format(
-                        guessed_language
-                    )
+            self.log(
+                "warning",
+                "OCR for {} failed, but we're going to stick with what "
+                "we've got since FORGIVING_OCR is enabled.".format(
+                    guessed_language
                 )
-                raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
-                return raw_text
-            raise OCRError(
-                "The guessed language ({}) is not available in this instance "
-                "of Tesseract.".format(guessed_language)
             )
+            raw_text = self._assemble_ocr_sections(imgs, middle, raw_text)
+            return raw_text
 
     def _ocr(self, imgs, lang):
         """
@@ -220,7 +197,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         self.log("info", "Parsing for {}".format(lang))
 
-        with Pool(processes=self.THREADS) as pool:
+        with Pool(processes=settings.OCR_THREADS) as pool:
             r = pool.map(image_to_string, itertools.product(imgs, [lang]))
             r = " ".join(r)
 
@@ -232,13 +209,12 @@ class RasterisedDocumentParser(DocumentParser):
         Given a `middle` value and the text that middle page represents, we OCR
         the remainder of the document and return the whole thing.
         """
-        text = self._ocr(imgs[:middle], self.DEFAULT_OCR_LANGUAGE) + text
-        text += self._ocr(imgs[middle + 1:], self.DEFAULT_OCR_LANGUAGE)
+        text = self._ocr(imgs[:middle], settings.OCR_LANGUAGE) + text
+        text += self._ocr(imgs[middle + 1:], settings.OCR_LANGUAGE)
         return text
 
 
 def run_convert(*args):
-
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
@@ -251,7 +227,7 @@ def run_convert(*args):
 
 def run_unpaper(args):
     unpaper, pnm = args
-    command_args = (unpaper, "--overwrite", pnm,
+    command_args = (unpaper, "--overwrite", "--quiet", pnm,
                     pnm.replace(".pnm", ".unpaper.pnm"))
     if not subprocess.Popen(command_args).wait() == 0:
         raise ParseError("Unpaper failed at {}".format(command_args))

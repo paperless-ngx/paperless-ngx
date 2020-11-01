@@ -212,11 +212,6 @@
 #PAPERLESS_CONSUMER_LOOP_TIME=10
 
 
-# By default Paperless stops consuming a document if no language can be
-# detected. Set to true to consume documents even if the language detection
-# fails.
-#PAPERLESS_FORGIVING_OCR="false"
-
 
 # By default Paperless does not OCR a document if the text can be retrieved from
 # the document directly. Set to true to always OCR documents.
