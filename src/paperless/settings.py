@@ -103,9 +103,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'paperless.auth.QueryTokenAuthentication'
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
     ]
 }
 
@@ -260,15 +257,11 @@ LOGGING = {
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
 # The amount of threads to use for OCR
-OCR_THREADS = os.getenv("PAPERLESS_OCR_THREADS")
+OCR_THREADS = int(os.getenv("PAPERLESS_OCR_THREADS", 4))
 
 # OCR all documents?
 OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS")
 
-# If this is true, any failed attempts to OCR a PDF will result in the PDF
-# being indexed anyway, with whatever we could get.  If it's False, the file
-# will simply be left in the CONSUMPTION_DIR.
-FORGIVING_OCR = __get_boolean("PAPERLESS_FORGIVING_OCR")
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
@@ -277,7 +270,7 @@ GNUPG_HOME = os.getenv("HOME", "/tmp")
 CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY", "convert")
 CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
-CONVERT_DENSITY = os.getenv("PAPERLESS_CONVERT_DENSITY")
+CONVERT_DENSITY = int(os.getenv("PAPERLESS_CONVERT_DENSITY", 300))
 
 # Ghostscript
 GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
@@ -327,3 +320,8 @@ FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
+
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1

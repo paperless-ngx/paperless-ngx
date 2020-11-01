@@ -60,7 +60,7 @@ class DocumentParser:
 
         out_path = os.path.join(self.tempdir, "optipng.png")
 
-        args = (self.OPTIPNG, "-o5", in_path, "-out", out_path)
+        args = (self.OPTIPNG, "-silent", "-o5", in_path, "-out", out_path)
         if not subprocess.Popen(args).wait() == 0:
             raise ParseError("Optipng failed at {}".format(args))
 
