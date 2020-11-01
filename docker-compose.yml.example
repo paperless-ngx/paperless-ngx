@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.4"
 services:
   db:
     image: postgres:13
@@ -27,23 +27,12 @@ services:
       - data:/usr/src/paperless/data
       - media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
     env_file: docker-compose.env
     environment:
       - PAPERLESS_OCR_LANGUAGES=
-    command: ["gunicorn", "-b", "0.0.0.0:8000"]
+    command: ["supervisord", "-c", "/etc/supervisord.conf"]
 
-  consumer:
-    image: paperless_app
-    depends_on:
-      - webserver
-      - db
-    restart: on-failure:5
-    volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
-      - ./consume:/usr/src/paperless/consume
-    env_file: docker-compose.env
-    command: ["document_consumer"]
 
 volumes:
   data:
