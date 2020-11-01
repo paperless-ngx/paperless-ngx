@@ -4,10 +4,8 @@ import hashlib
 import logging
 import os
 import re
-import time
 import uuid
 
-from operator import itemgetter
 from django.conf import settings
 from django.utils import timezone
 from paperless.db import GnuPG
@@ -36,17 +34,12 @@ class Consumer:
       5. Delete the document and image(s)
     """
 
-    # Files are considered ready for consumption if they have been unmodified
-    # for this duration
-    FILES_MIN_UNMODIFIED_DURATION = 0.5
-
     def __init__(self, consume=settings.CONSUMPTION_DIR,
                  scratch=settings.SCRATCH_DIR):
 
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
-        self._ignore = []
         self.consume = consume
         self.scratch = scratch
 
@@ -82,43 +75,6 @@ class Consumer:
         getattr(self.logger, level)(message, extra={
             "group": self.logging_group
         })
-
-    def consume_new_files(self):
-        """
-        Find non-ignored files in consumption dir and consume them if they have
-        been unmodified for FILES_MIN_UNMODIFIED_DURATION.
-        """
-        ignored_files = []
-        files = []
-        for entry in os.scandir(self.consume):
-            if entry.is_file():
-                file = (entry.path, entry.stat().st_mtime)
-                if file in self._ignore:
-                    ignored_files.append(file)
-                else:
-                    files.append(file)
-            else:
-                self.logger.warning(
-                    "Skipping %s as it is not a file",
-                    entry.path
-                )
-
-        if not files:
-            return
-
-        # Set _ignore to only include files that still exist.
-        # This keeps it from growing indefinitely.
-        self._ignore[:] = ignored_files
-
-        files_old_to_new = sorted(files, key=itemgetter(1))
-
-        time.sleep(self.FILES_MIN_UNMODIFIED_DURATION)
-
-        for file, mtime in files_old_to_new:
-            if mtime == os.path.getmtime(file):
-                # File has not been modified and can be consumed
-                if not self.try_consume_file(file):
-                    self._ignore.append((file, mtime))
 
     @transaction.atomic
     def try_consume_file(self, file):
