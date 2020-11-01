@@ -39,14 +39,9 @@ class DocumentParser:
     `paperless_tesseract.parsers` for inspiration.
     """
 
-    SCRATCH = settings.SCRATCH_DIR
-    DATE_ORDER = settings.DATE_ORDER
-    FILENAME_DATE_ORDER = settings.FILENAME_DATE_ORDER
-    OPTIPNG = settings.OPTIPNG_BINARY
-
     def __init__(self, path):
         self.document_path = path
-        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=self.SCRATCH)
+        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
@@ -60,7 +55,7 @@ class DocumentParser:
 
         out_path = os.path.join(self.tempdir, "optipng.png")
 
-        args = (self.OPTIPNG, "-silent", "-o5", in_path, "-out", out_path)
+        args = (settings.OPTIPNG_BINARY, "-silent", "-o5", in_path, "-out", out_path)
         if not subprocess.Popen(args).wait() == 0:
             raise ParseError("Optipng failed at {}".format(args))
 
@@ -101,13 +96,13 @@ class DocumentParser:
         title = os.path.basename(self.document_path)
 
         # if filename date parsing is enabled, search there first:
-        if self.FILENAME_DATE_ORDER:
+        if settings.FILENAME_DATE_ORDER:
             self.log("info", "Checking document title for date")
             for m in re.finditer(DATE_REGEX, title):
                 date_string = m.group(0)
 
                 try:
-                    date = __parser(date_string, self.FILENAME_DATE_ORDER)
+                    date = __parser(date_string, settings.FILENAME_DATE_ORDER)
                 except (TypeError, ValueError):
                     # Skip all matches that do not parse to a proper date
                     continue
@@ -133,7 +128,7 @@ class DocumentParser:
             date_string = m.group(0)
 
             try:
-                date = __parser(date_string, self.DATE_ORDER)
+                date = __parser(date_string, settings.DATE_ORDER)
             except (TypeError, ValueError):
                 # Skip all matches that do not parse to a proper date
                 continue
