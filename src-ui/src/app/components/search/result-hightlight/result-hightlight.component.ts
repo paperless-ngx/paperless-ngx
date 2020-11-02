@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SearchResultHighlightedText } from 'src/app/services/rest/search.service';
+import { SearchHitHighlight } from 'src/app/data/search-result';
 
 @Component({
   selector: 'app-result-hightlight',
@@ -11,7 +11,7 @@ export class ResultHightlightComponent implements OnInit {
   constructor() { }
 
   @Input()
-  highlights: SearchResultHighlightedText[][]
+  highlights: SearchHitHighlight[][]
 
   ngOnInit(): void {
   }
