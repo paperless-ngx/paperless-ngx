@@ -6,7 +6,10 @@
     <div class="col">
       <div class="card-body">
 
-        <h5 class="card-title">{{document.correspondent ? document.correspondent.name + ': ' : ''}}{{document.title}}<app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></h5>
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title">{{document.correspondent ? document.correspondent.name + ': ' : ''}}{{document.title}}<app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></h5>
+          <h5 class="card-title" *ngIf="document.archive_serial_number">#{{document.archive_serial_number}}</h5>
+        </div>
         <p class="card-text">
           <app-result-hightlight *ngIf="getDetailsAsHighlight()" class="result-content" [highlights]="getDetailsAsHighlight()"></app-result-hightlight>
           <span *ngIf="getDetailsAsString()" class="result-content">{{getDetailsAsString()}}</span>
@@ -29,7 +32,7 @@
               Download
             </a>
           </div>
-          <small class="text-muted">{{document.created | date}}</small>
+          <small class="text-muted">Created: {{document.created | date}}</small>
         </div>
 
       </div>
