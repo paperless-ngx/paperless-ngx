@@ -29,6 +29,46 @@ DATE_REGEX = re.compile(
 )
 
 
+logger = logging.getLogger(__name__)
+
+
+def run_convert(input, output, density=None, scale=None, alpha=None, strip=False, trim=False, type=None, depth=None, extra=None, logging_group=None):
+    environment = os.environ.copy()
+    if settings.CONVERT_MEMORY_LIMIT:
+        environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
+    if settings.CONVERT_TMPDIR:
+        environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
+
+    args = [settings.CONVERT_BINARY]
+    args += ['-density', str(density)] if density else []
+    args += ['-scale', str(scale)] if scale else []
+    args += ['-alpha', str(alpha)] if alpha else []
+    args += ['-strip'] if strip else []
+    args += ['-trim'] if trim else []
+    args += ['-type', str(type)] if type else []
+    args += ['-depth', str(depth)] if depth else []
+    args += [input, output]
+
+    logger.debug("Execute: " + " ".join(args), extra={'group': logging_group})
+
+    if not subprocess.Popen(args, env=environment).wait() == 0:
+        raise ParseError("Convert failed at {}".format(args))
+
+
+def run_unpaper(pnm, logging_group=None):
+    pnm_out = pnm.replace(".pnm", ".unpaper.pnm")
+
+    command_args = (settings.UNPAPER_BINARY, "--overwrite", "--quiet", pnm,
+                    pnm_out)
+
+    logger.debug("Execute: " + " ".join(command_args), extra={'group': logging_group})
+
+    if not subprocess.Popen(command_args).wait() == 0:
+        raise ParseError("Unpaper failed at {}".format(command_args))
+
+    return pnm_out
+
+
 class ParseError(Exception):
     pass
 
@@ -56,6 +96,9 @@ class DocumentParser:
         out_path = os.path.join(self.tempdir, "optipng.png")
 
         args = (settings.OPTIPNG_BINARY, "-silent", "-o5", in_path, "-out", out_path)
+
+        self.log('debug', 'Execute: ' + " ".join(args))
+
         if not subprocess.Popen(args).wait() == 0:
             raise ParseError("Optipng failed at {}".format(args))
 
