@@ -3,7 +3,6 @@
 import logging
 import os
 import re
-import uuid
 from collections import OrderedDict
 
 import dateutil.parser

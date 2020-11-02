@@ -89,10 +89,12 @@ class Consumer:
 
         if self._is_duplicate(doc):
             self.log(
-                "info",
+                "warning",
                 "Skipping {} as it appears to be a duplicate".format(doc)
             )
             return False
+
+        self.log("info", "Consuming {}".format(doc))
 
         parser_class = self._get_parser_class(doc)
         if not parser_class:
@@ -102,7 +104,6 @@ class Consumer:
 
         self.logging_group = uuid.uuid4()
 
-        self.log("info", "Consuming {}".format(doc))
 
         document_consumption_started.send(
             sender=self.__class__,
@@ -110,23 +111,23 @@ class Consumer:
             logging_group=self.logging_group
         )
 
-        parsed_document = parser_class(doc)
+        document_parser = parser_class(doc, self.logging_group)
 
         try:
-            thumbnail = parsed_document.get_optimised_thumbnail()
-            date = parsed_document.get_date()
+            thumbnail = document_parser.get_optimised_thumbnail()
+            date = document_parser.get_date()
             document = self._store(
-                parsed_document.get_text(),
+                document_parser.get_text(),
                 doc,
                 thumbnail,
                 date
             )
         except ParseError as e:
-            self.log("error", "PARSE FAILURE for {}: {}".format(doc, e))
-            parsed_document.cleanup()
+            self.log("fatal", "PARSE FAILURE for {}: {}".format(doc, e))
+            document_parser.cleanup()
             return False
         else:
-            parsed_document.cleanup()
+            document_parser.cleanup()
             self._cleanup_doc(doc)
 
             self.log(
@@ -140,9 +141,10 @@ class Consumer:
                 self.classifier.reload()
                 classifier = self.classifier
             except FileNotFoundError:
-                logging.getLogger(__name__).warning("Cannot classify documents, "
-                                                  "classifier model file was not "
-                                                  "found.")
+                self.log("warning", "Cannot classify documents, classifier "
+                                    "model file was not found. Consider "
+                                    "running python manage.py "
+                                    "document_create_classifier.")
 
             document_consumption_finished.send(
                 sender=self.__class__,
@@ -211,7 +213,7 @@ class Consumer:
 
         document.save()
 
-        self.log("info", "Completed")
+        self.log("debug", "Completed")
 
         return document
 
