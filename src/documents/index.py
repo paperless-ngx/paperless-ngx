@@ -1,12 +1,8 @@
-from collections import Iterable
-
 from django.db import models
 from django.dispatch import receiver
-from whoosh.fields import Schema, TEXT, NUMERIC, DATETIME, KEYWORD
+from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.highlight import Formatter, get_text
 from whoosh.index import create_in, exists_in, open_dir
-from whoosh.qparser import QueryParser
-from whoosh.query import terms
 from whoosh.writing import AsyncWriter
 
 from documents.models import Document
@@ -57,7 +53,7 @@ def get_schema():
     return Schema(
         id=NUMERIC(stored=True, unique=True, numtype=int),
         title=TEXT(stored=True),
-        content=TEXT(stored=True)
+        content=TEXT()
     )
 
 
@@ -88,21 +84,6 @@ def remove_document_from_index(sender, instance, **kwargs):
     ix = open_index()
     with AsyncWriter(ix) as writer:
         writer.delete_by_term('id', instance.id)
-
-
-def query_index(ix, querystr):
-    with ix.searcher() as searcher:
-        query = QueryParser("content", ix.schema, termclass=terms.FuzzyTerm).parse(querystr)
-        results = searcher.search(query)
-        results.formatter = JsonFormatter()
-        results.fragmenter.surround = 50
-
-        return [
-            {'id': r['id'],
-             'highlights': r.highlights("content"),
-             'score': r.score,
-             'title': r['title']
-             } for r in results]
 
 
 def autocomplete(ix, term, limit=10):
