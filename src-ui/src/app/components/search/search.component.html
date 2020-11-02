@@ -3,10 +3,12 @@
 
 <p>Search string: <i>{{query}}</i></p>
 
+<div [class.result-content-searching]="searching">
 <app-document-card-large *ngFor="let result of results"
     [document]="result.document"
     [details]="result.highlights">
 
 </app-document-card-large>
+</div>
 
 <p *ngIf="results.length == 0" class="mx-auto">No results</p>

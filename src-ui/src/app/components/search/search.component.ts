@@ -13,13 +13,17 @@ export class SearchComponent implements OnInit {
 
   query: string = ""
 
+  searching = false
+
   constructor(private searchService: SearchService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(paramMap => {
       this.query = paramMap.get('query')
+      this.searching = true
       this.searchService.search(this.query).subscribe(result => {
         this.results = result
+        this.searching = false
       })
     })
     

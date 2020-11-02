@@ -9,3 +9,7 @@
     position: absolute;
 
 }
+
+.result-content-searching {
+    opacity: 0.2;
+}
