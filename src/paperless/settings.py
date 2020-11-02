@@ -239,14 +239,14 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {
-        "consumer": {
+        "dblogger": {
             "class": "documents.loggers.PaperlessLogger",
         }
     },
     "loggers": {
         "documents": {
-            "handlers": ["consumer"],
-            "level": os.getenv("PAPERLESS_CONSUMER_LOG_LEVEL", "INFO"),
+            "handlers": ["dblogger"],
+            "level": "DEBUG"
         },
     },
 }
@@ -260,7 +260,7 @@ OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 OCR_THREADS = int(os.getenv("PAPERLESS_OCR_THREADS", 4))
 
 # OCR all documents?
-OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS")
+OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS", False)
 
 
 # GNUPG needs a home directory for some reason

@@ -56,6 +56,7 @@ def set_correspondent(sender, document=None, logging_group=None, classifier=None
         'Assigning correspondent "{}" to "{}" '.format(selected, document),
         logging_group
     )
+    # TODO: during consumption, this saves even though no updates have been made
 
     document.correspondent = selected
     document.save(update_fields=("correspondent",))
