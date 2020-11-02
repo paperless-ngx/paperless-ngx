@@ -323,8 +323,3 @@ FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
-
-
-CELERY_TASK_TRACK_STARTED = True
-CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
-CELERY_WORKER_PREFETCH_MULTIPLIER = 1
