@@ -12,9 +12,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
-import os
-
 __version__ = None
 exec(open("../src/paperless/version.py").read())
 

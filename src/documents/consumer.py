@@ -1,4 +1,3 @@
-from django.db import transaction
 import datetime
 import hashlib
 import logging
@@ -7,11 +6,12 @@ import re
 import uuid
 
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
+
 from paperless.db import GnuPG
 from .classifier import DocumentClassifier
-
-from .models import Document, FileInfo, Tag
+from .models import Document, FileInfo
 from .parsers import ParseError
 from .signals import (
     document_consumer_declaration,
