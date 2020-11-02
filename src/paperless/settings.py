@@ -260,7 +260,7 @@ OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 OCR_THREADS = int(os.getenv("PAPERLESS_OCR_THREADS", 4))
 
 # OCR all documents?
-OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS", False)
+OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS", "false")
 
 
 # GNUPG needs a home directory for some reason

@@ -160,6 +160,7 @@ class RasterisedDocumentParser(DocumentParser):
             guess = langdetect.detect(text)
             return guess
         except Exception as e:
+            self.log('debug', "Language detection failed with: {}".format(e))
             return None
 
     def _ocr(self, imgs, lang):

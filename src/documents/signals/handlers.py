@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
-from documents.classifier import DocumentClassifier
 from .. import index, matching
 from ..models import Document, Tag
 
