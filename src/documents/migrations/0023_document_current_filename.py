@@ -33,5 +33,5 @@ class Migration(migrations.Migration):
                                        help_text='Current filename in storage',
                                        max_length=256),
         ),
-        migrations.RunPython(set_filename, migrations.RunPython.noop)
+        migrations.RunPython(set_filename)
     ]
