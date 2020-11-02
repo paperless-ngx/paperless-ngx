@@ -24,6 +24,7 @@
     "bootstrap": "^4.5.0",
     "ng-bootstrap": "^1.6.3",
     "ngx-file-drop": "^10.0.0",
+    "ngx-infinite-scroll": "^9.1.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "uuid": "^8.3.1",
