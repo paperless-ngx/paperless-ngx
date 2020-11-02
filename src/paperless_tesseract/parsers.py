@@ -11,7 +11,8 @@ from PIL import Image
 from pyocr import PyocrException
 
 import pdftotext
-from documents.parsers import DocumentParser, ParseError
+from documents.parsers import DocumentParser, ParseError, run_unpaper, \
+    run_convert
 
 from .languages import ISO639
 
@@ -39,15 +40,14 @@ class RasterisedDocumentParser(DocumentParser):
 
         # Run convert to get a decent thumbnail
         try:
-            run_convert(
-                settings.CONVERT_BINARY,
-                "-density", "300",
-                "-scale", "500x5000>",
-                "-alpha", "remove",
-                "-strip", "-trim",
-                "{}[0]".format(self.document_path),
-                out_path
-            )
+            run_convert(density=300,
+                        scale="500x5000>",
+                        alpha="remove",
+                        strip=True,
+                        trim=True,
+                        input="{}[0]".format(self.document_path),
+                        output=out_path,
+                        logging_group=self.logging_group)
         except ParseError:
             # if convert fails, fall back to extracting
             # the first PDF page as a PNG using Ghostscript
@@ -61,15 +61,14 @@ class RasterisedDocumentParser(DocumentParser):
             if not subprocess.Popen(cmd).wait() == 0:
                 raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
             # then run convert on the output from gs
-            run_convert(
-                settings.CONVERT_BINARY,
-                "-density", "300",
-                "-scale", "500x5000>",
-                "-alpha", "remove",
-                "-strip", "-trim",
-                gs_out_path,
-                out_path
-            )
+            run_convert(density=300,
+                        scale="500x5000>",
+                        alpha="remove",
+                        strip=True,
+                        trim=True,
+                        input=gs_out_path,
+                        output=out_path,
+                        logging_group=self.logging_group)
 
         return out_path
 
@@ -107,14 +106,17 @@ class RasterisedDocumentParser(DocumentParser):
             if not guessed_language or guessed_language not in ISO639:
                 self.log("warning", "Language detection failed.")
                 ocr_pages = self._complete_ocr_default_language(images, sample_page_index, sample_page_text)
+
             elif ISO639[guessed_language] == settings.OCR_LANGUAGE:
                 self.log("info", "Detected language: {} (default language)".format(guessed_language))
                 ocr_pages = self._complete_ocr_default_language(images, sample_page_index, sample_page_text)
+
             elif not ISO639[guessed_language] in pyocr.get_available_tools()[0].get_available_languages():
-                self.log("warning","Detected language {} is not available on this system.".format(guessed_language))
+                self.log("warning", "Detected language {} is not available on this system.".format(guessed_language))
                 ocr_pages = self._complete_ocr_default_language(images, sample_page_index, sample_page_text)
+
             else:
-                self.log("info","Detected language: {}".format(guessed_language))
+                self.log("info", "Detected language: {}".format(guessed_language))
                 ocr_pages = self._ocr(images, ISO639[guessed_language])
 
             self.log("info", "OCR completed.")
@@ -133,13 +135,13 @@ class RasterisedDocumentParser(DocumentParser):
 
         # Convert PDF to multiple PNMs
         pnm = os.path.join(self.tempdir, "convert-%04d.pnm")
-        run_convert(
-            settings.CONVERT_BINARY,
-            "-density", str(settings.CONVERT_DENSITY),
-            "-depth", "8",
-            "-type", "grayscale",
-            self.document_path, pnm,
-        )
+
+        run_convert(density=settings.CONVERT_DENSITY,
+                    depth="8",
+                    type="grayscale",
+                    input=self.document_path,
+                    output=pnm,
+                    logging_group=self.logging_group)
 
         # Get a list of converted images
         pnms = []
@@ -186,27 +188,6 @@ class RasterisedDocumentParser(DocumentParser):
         else:
             return [sample_page]
 
-
-def run_convert(*args):
-    environment = os.environ.copy()
-    if settings.CONVERT_MEMORY_LIMIT:
-        environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
-    if settings.CONVERT_TMPDIR:
-        environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
-
-    if not subprocess.Popen(args, env=environment).wait() == 0:
-        raise ParseError("Convert failed at {}".format(args))
-
-
-def run_unpaper(pnm):
-    pnm_out = pnm.replace(".pnm", ".unpaper.pnm")
-
-    command_args = (settings.UNPAPER_BINARY, "--overwrite", "--quiet", pnm,
-                    pnm_out)
-    if not subprocess.Popen(command_args).wait() == 0:
-        raise ParseError("Unpaper failed at {}".format(command_args))
-
-    return pnm_out
 
 
 def strip_excess_whitespace(text):
