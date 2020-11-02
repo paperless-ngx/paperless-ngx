@@ -29,8 +29,6 @@ services:
       - ./export:/usr/src/paperless/export
       - ./consume:/usr/src/paperless/consume
     env_file: docker-compose.env
-    environment:
-      - PAPERLESS_OCR_LANGUAGES=
     command: ["supervisord", "-c", "/etc/supervisord.conf"]
 
 
