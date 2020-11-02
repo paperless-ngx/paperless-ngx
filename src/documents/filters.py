@@ -1,11 +1,10 @@
 from django_filters.rest_framework import BooleanFilter, FilterSet
 
-from .models import Correspondent, Document, Tag, DocumentType
-
+from .models import Correspondent, Document, Tag, DocumentType, Log
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
-INT_KWARGS = ["exact"]
+INT_KWARGS = ["exact", "gt", "gte", "lt", "lte"]
 DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
 
 
@@ -66,5 +65,18 @@ class DocumentFilterSet(FilterSet):
 
             "document_type__id": ID_KWARGS,
             "document_type__name": CHAR_KWARGS,
+
+        }
+
+
+class LogFilterSet(FilterSet):
+
+    class Meta:
+        model = Log
+        fields = {
+
+            "level": INT_KWARGS,
+            "created": DATE_KWARGS,
+            "group": ID_KWARGS
 
         }

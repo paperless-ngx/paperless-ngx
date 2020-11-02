@@ -105,12 +105,13 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 class LogSerializer(serializers.ModelSerializer):
 
-    time = serializers.DateTimeField()
-    messages = serializers.CharField()
 
     class Meta:
         model = Log
         fields = (
-            "time",
-            "messages"
+            "id",
+            "created",
+            "message",
+            "group",
+            "level"
         )
