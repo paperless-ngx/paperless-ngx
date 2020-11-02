@@ -239,13 +239,16 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {
-        "dblogger": {
-            "class": "documents.loggers.PaperlessLogger",
+        "dbhandler": {
+            "class": "documents.loggers.PaperlessHandler",
+        },
+        "streamhandler": {
+            "class": "logging.StreamHandler"
         }
     },
     "loggers": {
         "documents": {
-            "handlers": ["dblogger"],
+            "handlers": ["dbhandler", "streamhandler"],
             "level": "DEBUG"
         },
     },
