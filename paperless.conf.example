@@ -23,7 +23,7 @@
 # This where your documents should go to be consumed.  Make sure that it exists
 # and that the user running the paperless service can read/write its contents
 # before you start Paperless.
-#PAPERLESS_CONSUMPTION_DIR=""
+PAPERLESS_CONSUMPTION_DIR="../consume"
 
 # This is where paperless stores all its data (search index, sqlite database,
 # classification model, etc).
@@ -165,7 +165,10 @@
 
 
 # Customize the default language that tesseract will attempt to use when
-# parsing documents.  It should be a 3-letter language code consistent with ISO
+# parsing documents. The default language is used whenever
+#  - No language could be detected on a document
+#  - No tesseract data files are available for the detected language
+# It should be a 3-letter language code consistent with ISO
 # 639: https://www.loc.gov/standards/iso639-2/php/code_list.php
 #PAPERLESS_OCR_LANGUAGE=eng
 
@@ -202,16 +205,6 @@
 # size of tmp files by 1/3, and speed up conversion by up to 4x
 # with little impact to OCR accuracy.
 #PAPERLESS_CONVERT_DENSITY=300
-
-
-# (This setting is ignored on Linux where inotify is used instead of a
-# polling loop.)
-# The number of seconds that Paperless will wait between checking
-# PAPERLESS_CONSUMPTION_DIR.  If you tend to write documents to this directory
-# rarely, you may want to use a higher value than the default (10).
-#PAPERLESS_CONSUMER_LOOP_TIME=10
-
-
 
 # By default Paperless does not OCR a document if the text can be retrieved from
 # the document directly. Set to true to always OCR documents.
