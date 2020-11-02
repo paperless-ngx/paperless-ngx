@@ -51,14 +51,14 @@ def set_correspondent(sender, document=None, logging_group=None, classifier=None
             )
             return
 
-    logger(
-        'Assigning correspondent "{}" to "{}" '.format(selected, document),
-        logging_group
-    )
-    # TODO: during consumption, this saves even though no updates have been made
+    if selected or replace:
+        logger(
+            'Assigning correspondent "{}" to "{}" '.format(selected, document),
+            logging_group
+        )
 
-    document.correspondent = selected
-    document.save(update_fields=("correspondent",))
+        document.correspondent = selected
+        document.save(update_fields=("correspondent",))
 
 
 def set_document_type(sender, document=None, logging_group=None, classifier=None, replace=False, use_first=True, **kwargs):
@@ -88,13 +88,14 @@ def set_document_type(sender, document=None, logging_group=None, classifier=None
             )
             return
 
-    logger(
-        'Assigning document type "{}" to "{}" '.format(selected, document),
-        logging_group
-    )
+    if selected or replace:
+        logger(
+            'Assigning document type "{}" to "{}" '.format(selected, document),
+            logging_group
+        )
 
-    document.document_type = selected
-    document.save(update_fields=("document_type",))
+        document.document_type = selected
+        document.save(update_fields=("document_type",))
 
 
 def set_tags(sender, document=None, logging_group=None, classifier=None, replace=False, **kwargs):
