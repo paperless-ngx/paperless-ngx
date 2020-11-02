@@ -245,7 +245,7 @@ def strip_excess_whitespace(text):
 def image_to_string(args):
     img, lang = args
     ocr = pyocr.get_available_tools()[0]
-    with Image.open(os.path.join(RasterisedDocumentParser.SCRATCH, img)) as f:
+    with Image.open(os.path.join(settings.SCRATCH_DIR, img)) as f:
         if ocr.can_detect_orientation():
             try:
                 orientation = ocr.detect_orientation(f, lang=lang)
