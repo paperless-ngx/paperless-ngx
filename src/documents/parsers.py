@@ -39,11 +39,11 @@ class DocumentParser:
     `paperless_tesseract.parsers` for inspiration.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, logging_group):
         self.document_path = path
         self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
         self.logger = logging.getLogger(__name__)
-        self.logging_group = None
+        self.logging_group = logging_group
 
     def get_thumbnail(self):
         """
