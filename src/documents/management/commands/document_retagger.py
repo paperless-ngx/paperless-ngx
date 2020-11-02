@@ -3,8 +3,7 @@ import logging
 from django.core.management.base import BaseCommand
 
 from documents.classifier import DocumentClassifier
-from documents.models import Document, Tag
-
+from documents.models import Document
 from ...mixins import Renderable
 from ...signals.handlers import set_correspondent, set_document_type, set_tags
 
