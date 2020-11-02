@@ -27,7 +27,8 @@ from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
     TagFilterSet,
-    DocumentTypeFilterSet
+    DocumentTypeFilterSet,
+    LogFilterSet
 )
 
 import documents.index as index
@@ -147,12 +148,14 @@ class DocumentViewSet(RetrieveModelMixin,
 
 class LogViewSet(ReadOnlyModelViewSet):
     model = Log
-    queryset = Log.objects.all().by_group()
+
+    queryset = Log.objects.all()
     serializer_class = LogSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    ordering_fields = ("time",)
+    filter_class = LogFilterSet
+    ordering_fields = ("created",)
 
 
 class SearchView(APIView):

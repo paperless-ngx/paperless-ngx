@@ -13,12 +13,6 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.text import slugify
 
-from .managers import LogManager
-
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
 
 
 class MatchingModel(models.Model):
@@ -263,32 +257,16 @@ class Log(models.Model):
         (logging.CRITICAL, "Critical"),
     )
 
-    group = models.UUIDField(blank=True)
+    group = models.UUIDField(blank=True, null=True)
     message = models.TextField()
     level = models.PositiveIntegerField(choices=LEVELS, default=logging.INFO)
     created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    objects = LogManager()
 
     class Meta:
-        ordering = ("-modified",)
+        ordering = ("-created",)
 
     def __str__(self):
         return self.message
-
-    def save(self, *args, **kwargs):
-        """
-        To allow for the case where we don't want to group the message, we
-        shouldn't force the caller to specify a one-time group value.  However,
-        allowing group=None means that the manager can't differentiate the
-        different un-grouped messages, so instead we set a random one here.
-        """
-
-        if not self.group:
-            self.group = uuid.uuid4()
-
-        models.Model.save(self, *args, **kwargs)
 
 
 class FileInfo:
