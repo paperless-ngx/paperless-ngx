@@ -23,9 +23,11 @@ Here's what you get:
 This is a list of changes that have been made to the original project.
 
 ## Added
-- **A new single page UI** built with bootstrap and Angular. Its much more responsive than the django admin pages. 
-- **Document uploading on the web page.** This is very crude right now, but gets the job done. It simply uploads the documents and stores them in the configured consumer directory. The API for that has always been in the project, there simply was no form on the UI to support it.
-- **Full text search** with a proper document indexer: The search feature sorts documents by relevance to the search query, highlights query terms in the found documents and provides autocomplete while typing the query. This is still very basic but will see extensions in the future.
+- **A new single page UI** built with bootstrap and Angular. Its much more responsive than the django admin pages. It features the follwing improvements over the old django admin interface:
+  - *Document uploading on the web page.* This is very crude right now, but gets the job done. It simply uploads the documents and stores them in the configured consumer directory. The API for that has always been in the project, there simply was no form on the UI to support it.
+  - *Full text search* with a proper document indexer: The search feature sorts documents by relevance to the search query, highlights query terms in the found documents and provides autocomplete while typing the query. This is still very basic but will see extensions in the future.
+  - *Saveable filters.* Save filter and sorting presets and optionally display a couple documents of saved filters (i.e., your inbox sorted descending by added date, or tagged TODO, oldest to newest) on the dash board.
+  - *Statistics.* Provides basic statistics about your document collection.
 - **Document types.** Similar to correspondents, each document may have a type (i.e., invoice, letter, receipt, bank statement, ...). I've initially intented to use this for some individual processing of differently typed documents, however, no such features exists yet.
 - **Inbox tags.** These tags are automatically assigned to every newly scanned document. They are intented to be removed once you have manually edited the meta data of a document.
 - **Automatic matching** for document types, correspondents, and tags. A new matching algorithm has been implemented (Auto), which is based on a classification model (simple feed forward neural nets are used). This classifier is trained on your document collection and learns to assign metadata to new documents based on their similiarity to existing documents.
@@ -34,7 +36,11 @@ This is a list of changes that have been made to the original project.
 - **Archive serial numbers.** These are there to support the recommended workflow for storing physical copies of very important documents. The idea is that if a document has to be kept in physical form, you write a running number on the document before scanning (the archive serial number) and keep these documents sorted by number in a binder. If you need to access a specific physical document at some point in time, search for the document in paperless, identify the ASN and grab the document.
 
 ## Modified
-- **(BREAKING) REST API changes.** In order to support the new UI, changes had to be made to the API. Some filters are not available anymore, other filters were added. Furthermore, foreign key relationships are not expressed with URLs anymore, but with their respective ids. Also, the old urls for fetching documents and thumbnails are not valid anymore. These resources are now served through the api.
+- **(BREAKING) REST API changes.** In order to support the new UI, changes had to be made to the API. Some filters are not available anymore, other filters were added. Furthermore, foreign key relationships are not expressed with URLs anymore, but with their respective ids. Also, the urls for fetching documents and thumbnails have changed. Redirects are in place to support the old urls.
+
+## Internal changes
+- Many improvements to the code. More concise logging of the consumer, better multithreading of the tesseract parser for large documents, less hacks overall.
+- Updated docker image. This image runs everything in a single container. (Except the optional database, of course)
 
 ## Removed
 
@@ -48,8 +54,7 @@ These features were removed each due to two reasons. First, I did not feel these
 
 These features will make it into the application at some point, sorted by priority.
 
-- **Saveable filters.** Save filter and sorting presets and optionally display a couple documents of saved filters (i.e., your inbox sorted descending by added date, or tagged TODO, oldest to newest) on the dash board.
-- **Better tag editor.** The tag editor on the document detail page is not very convenient. This was put in there to get the project working but will be replaced with something nicer.
+- **Better tag editor.** The tag editor on the document detail page is not very convenient. This was put in there to get the project working but will be replaced with something nicer eventually.
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
