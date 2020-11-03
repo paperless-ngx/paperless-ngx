@@ -16,10 +16,6 @@ def logger(message, group):
     logging.getLogger(__name__).debug(message, extra={"group": group})
 
 
-def index_document(sender, document=None, logging_group=None, **kwargs):
-    index.add_document_to_index(sender, instance=document)
-
-
 def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
     inbox_tags = Tag.objects.filter(is_inbox_tag=True)
     document.tags.add(*inbox_tags)
