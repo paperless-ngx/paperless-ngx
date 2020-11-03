@@ -12,9 +12,8 @@ from django.utils import timezone
 from paperless.db import GnuPG
 from .classifier import DocumentClassifier
 from .models import Document, FileInfo
-from .parsers import ParseError
+from .parsers import ParseError, get_parser_class
 from .signals import (
-    document_consumer_declaration,
     document_consumption_finished,
     document_consumption_started
 )
@@ -61,15 +60,6 @@ class Consumer:
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(self.consume))
 
-        self.parsers = []
-        for response in document_consumer_declaration.send(self):
-            self.parsers.append(response[1])
-
-        if not self.parsers:
-            raise ConsumerError(
-                "No parsers could be found, not even the default.  "
-                "This is a problem."
-            )
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
@@ -81,6 +71,8 @@ class Consumer:
         """
         Return True if file was consumed
         """
+
+        self.logging_group = uuid.uuid4()
 
         if not re.match(FileInfo.REGEXES["title"], file):
             return False
@@ -96,13 +88,13 @@ class Consumer:
 
         self.log("info", "Consuming {}".format(doc))
 
-        parser_class = self._get_parser_class(doc)
+        parser_class = get_parser_class(doc)
         if not parser_class:
             self.log(
                 "error", "No parsers could be found for {}".format(doc))
             return False
-
-        self.logging_group = uuid.uuid4()
+        else:
+            self.log("info", "Parser: {}".format(parser_class.__name__))
 
 
         document_consumption_started.send(
@@ -114,6 +106,7 @@ class Consumer:
         document_parser = parser_class(doc, self.logging_group)
 
         try:
+            self.log("info", "Generating thumbnail for {}...".format(doc))
             thumbnail = document_parser.get_optimised_thumbnail()
             date = document_parser.get_date()
             document = self._store(
@@ -154,31 +147,6 @@ class Consumer:
             )
             return True
 
-    def _get_parser_class(self, doc):
-        """
-        Determine the appropriate parser class based on the file
-        """
-
-        options = []
-        for parser in self.parsers:
-            result = parser(doc)
-            if result:
-                options.append(result)
-
-        self.log(
-            "info",
-            "Parsers available: {}".format(
-                ", ".join([str(o["parser"].__name__) for o in options])
-            )
-        )
-
-        if not options:
-            return None
-
-        # Return the parser with the highest weight.
-        return sorted(
-            options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
-
     def _store(self, text, doc, thumbnail, date):
 
         file_info = FileInfo.from_path(doc)
@@ -211,9 +179,8 @@ class Consumer:
         self._write(document, doc, document.source_path)
         self._write(document, thumbnail, document.thumbnail_path)
 
+        #TODO: why do we need to save the document again?
         document.save()
-
-        self.log("debug", "Completed")
 
         return document
 
