@@ -1,4 +1,4 @@
-from django_filters.rest_framework import BooleanFilter, FilterSet
+from django_filters.rest_framework import BooleanFilter, FilterSet, Filter
 
 from .models import Correspondent, Document, Tag, DocumentType, Log
 
@@ -35,6 +35,34 @@ class DocumentTypeFilterSet(FilterSet):
         }
 
 
+class TagsFilter(Filter):
+
+    def filter(self, qs, value):
+        if not value:
+            return qs
+
+        try:
+            tag_ids = [int(x) for x in value.split(',')]
+        except ValueError:
+            return qs
+
+        for tag_id in tag_ids:
+            qs = qs.filter(tags__id=tag_id)
+
+        return qs
+
+
+class InboxFilter(Filter):
+
+    def filter(self, qs, value):
+        if value == 'true':
+            return qs.filter(tags__is_inbox_tag=True)
+        elif value == 'false':
+            return qs.exclude(tags__is_inbox_tag=True)
+        else:
+            return qs
+
+
 class DocumentFilterSet(FilterSet):
 
     is_tagged = BooleanFilter(
@@ -43,6 +71,10 @@ class DocumentFilterSet(FilterSet):
         lookup_expr="isnull",
         exclude=True
     )
+
+    tags__id__all = TagsFilter()
+
+    is_in_inbox = InboxFilter()
 
     class Meta:
         model = Document
