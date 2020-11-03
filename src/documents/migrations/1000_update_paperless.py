@@ -41,6 +41,21 @@ def restore_filenames(apps, schema_editor):
                 pass
 
 
+def initialize_document_classifier(apps, schema_editor):
+    try:
+        print("Initalizing document classifier...")
+        from documents.classifier import DocumentClassifier
+        classifier = DocumentClassifier()
+        try:
+            classifier.train()
+            classifier.save_classifier()
+        except Exception as e:
+            print("Classifier error: {}".format(e))
+    except ImportError:
+        print("Document classifier not found, skipping")
+
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -50,6 +65,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(make_index, migrations.RunPython.noop),
         migrations.RunPython(restore_filenames),
+        migrations.RunPython(initialize_document_classifier, migrations.RunPython.noop),
         migrations.RemoveField(
             model_name='document',
             name='filename',
