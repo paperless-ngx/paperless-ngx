@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 from django.dispatch import receiver
 from whoosh.fields import Schema, TEXT, NUMERIC
@@ -65,6 +67,7 @@ def open_index(recreate=False):
 
 
 def update_document(writer, doc):
+    logging.getLogger(__name__).debug("Updating index with document{}".format(str(doc)))
     writer.update_document(
         id=doc.id,
         title=doc.title,
@@ -81,6 +84,7 @@ def add_document_to_index(sender, instance, **kwargs):
 
 @receiver(models.signals.post_delete, sender=Document)
 def remove_document_from_index(sender, instance, **kwargs):
+    logging.getLogger(__name__).debug("Removing document {} from index".format(str(instance)))
     ix = open_index()
     with AsyncWriter(ix) as writer:
         writer.delete_by_term('id', instance.id)

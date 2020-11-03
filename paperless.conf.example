@@ -10,7 +10,14 @@
 # By default, sqlite is used as the database backend. This can be changed here.
 # The docker-compose service definition uses a postgresql server. The
 # configuration for this is already done inside the docker-compose.env file.
-#PAPERLESS_DBENGINE="django.db.backends.postgresql_psycopg2"
+
+#Set PAPERLESS_DBHOST and postgresql will be used instead of mysql.
+#PAPERLESS_DBHOST="localhost"
+
+#Adjust port if necessary
+#PAPERLESS_DBPORT=
+
+#name, user and pass all default to "paperless"
 #PAPERLESS_DBNAME="paperless"
 #PAPERLESS_DBUSER="paperless"
 #PAPERLESS_DBPASS="paperless"
