@@ -2,7 +2,7 @@
 <app-page-header title="Dashboard">
 </app-page-header>
 
-<p>... This space for rent</p>
+<p>Welcome to paperless!</p>
 
 <div class='row'>
   <div class="col-lg">
@@ -12,18 +12,22 @@
       <table class="table table-striped table-sm">
         <thead>
         <tr>
+          <th>Date created</th>
           <th scope="col">Document</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let doc of v.documents" routerLink="/documents/{{doc.id}}">
-          <td>{{ doc.title }}</td>
-        </tr>
+          <tr *ngFor="let doc of v.documents" routerLink="/documents/{{doc.id}}">
+            <td>{{doc.created | date}}</td>
+            <td>{{doc.title}}<app-tag [tag]="t" *ngFor="let t of doc.tags" class="ml-1"></app-tag>
+          </tr>
         </tbody>
       </table>
-  
-  
 
+    </ng-container>
+    <ng-container *ngIf="savedDashboardViews.length == 0">
+      <h4>Saved views</h4>
+      <p>This space is reserved to display your saved views. Go to your documents and save a view to have it displayed here!</p>
     </ng-container>
 
   </div>
@@ -43,16 +47,17 @@
       </ngx-file-drop>
     </form>
     <h5 class="mt-3">Document conumser status</h5>
-    <div class="card bg-light">
+    <p>This is what it might look like in the future.</p>
+    <div class="card bg-light mb-2">
       <div class="card-body">
-        <p class="card-text"><strong>Filename.pdf:</strong> OCR for ger...</p>
+        <p class="card-text"><strong>Filename.pdf:</strong> Running tesseract on page 4/8...</p>
         <p><ngb-progressbar type="info" [value]="50"></ngb-progressbar></p>
       </div>
     </div>
-    <div class="card bg-light">
+    <div class="card bg-light mb-2">
       <div class="card-body">
-        <p class="card-text"><strong>Filename2.pdf:</strong> FAILED: language ITA not found</p>
-        <p><ngb-progressbar type="danger" [value]="100"></ngb-progressbar></p>
+        <p class="card-text"><strong>Filename2.pdf:</strong> Completed.</p>
+        <p><ngb-progressbar type="success" [value]="100"></ngb-progressbar></p>
       </div>
     </div>
   </div>
