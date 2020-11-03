@@ -1,8 +1,9 @@
 <div *ngFor="let rule of filterRules" class="form-row form-group">
-  <div class="col">
-    <select class="form-control form-control-sm" [(ngModel)]="rule.type" (change)="rule.value = null">
+  <div class="col-md-3 col-form-label">
+    <!-- <select class="form-control form-control-sm" [(ngModel)]="rule.type" (change)="rule.value = null">
       <option *ngFor="let ruleType of getRuleTypes()" [ngValue]="ruleType">{{ruleType.name}}</option>
-    </select>
+    </select> -->
+    <span>{{rule.type.name}}</span>
   </div>
   <div class="col">
     <input *ngIf="rule.type.datatype == 'string'" type="text" class="form-control form-control-sm" [(ngModel)]="rule.value">

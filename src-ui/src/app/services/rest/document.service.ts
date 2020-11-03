@@ -34,7 +34,11 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     if (filterRules) {
       let params = {}
       for (let rule of filterRules) {
-        params[rule.type.filtervar] = rule.value
+        if (rule.type.multi) {
+          params[rule.type.filtervar] = params[rule.type.filtervar] ? params[rule.type.filtervar] + "," + rule.value : rule.value
+        } else {
+          params[rule.type.filtervar] = rule.value
+        }
       }
       return params
     } else {
