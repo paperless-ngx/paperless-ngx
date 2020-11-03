@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
@@ -40,6 +41,21 @@ urlpatterns = [
 
     # The Django admin
     url(r"admin/", admin.site.urls),
+
+    # These redirects are here to support clients that use the old FetchView.
+    url(
+        r"^fetch/doc/(?P<pk>\d+)$",
+        RedirectView.as_view(url='/api/documents/%(pk)s/download/'),
+    ),
+    url(
+        r"^fetch/thumb/(?P<pk>\d+)$",
+        RedirectView.as_view(url='/api/documents/%(pk)s/thumb/'),
+    ),
+    url(
+        r"^fetch/preview/(?P<pk>\d+)$",
+        RedirectView.as_view(url='/api/documents/%(pk)s/preview/'),
+    ),
+    url(r"^push$", csrf_exempt(RedirectView.as_view(url='/api/documents/post_document/'))),
 
     # Frontend assets TODO: this is pretty bad.
     path('assets/<path:path>', RedirectView.as_view(url='/static/assets/%(path)s')),
