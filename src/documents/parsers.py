@@ -20,6 +20,8 @@ from django.utils import timezone
 # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
 # - MONTH ZZZZ, with ZZZZ being 4 digits
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
+from documents.signals import document_consumer_declaration
+
 DATE_REGEX = re.compile(
     r'(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|' +  # NOQA: E501
     r'(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|' +  # NOQA: E501
@@ -30,6 +32,31 @@ DATE_REGEX = re.compile(
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_parser_class(doc):
+    """
+    Determine the appropriate parser class based on the file
+    """
+
+    parsers = []
+    for response in document_consumer_declaration.send(None):
+        parsers.append(response[1])
+
+    #TODO: add a check that checks parser availability.
+
+    options = []
+    for parser in parsers:
+        result = parser(doc)
+        if result:
+            options.append(result)
+
+    if not options:
+        return None
+
+    # Return the parser with the highest weight.
+    return sorted(
+        options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
 
 
 def run_convert(input, output, density=None, scale=None, alpha=None, strip=False, trim=False, type=None, depth=None, extra=None, logging_group=None):
