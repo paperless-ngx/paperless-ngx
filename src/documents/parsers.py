@@ -90,7 +90,7 @@ def run_unpaper(pnm, logging_group=None):
 
     logger.debug("Execute: " + " ".join(command_args), extra={'group': logging_group})
 
-    if not subprocess.Popen(command_args).wait() == 0:
+    if not subprocess.Popen(command_args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait() == 0:
         raise ParseError("Unpaper failed at {}".format(command_args))
 
     return pnm_out
