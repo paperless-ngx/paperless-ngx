@@ -36,6 +36,12 @@ THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
+
+CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR", os.path.join(BASE_DIR, "..", "consume"))
+
+# This will be created if it doesn't exist
+SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
+
 ###############################################################################
 # Application Definition                                                      #
 ###############################################################################
@@ -187,16 +193,14 @@ DATABASES = {
 # This is important when migrating to/from sqlite
 DATABASES['sqlite'] = DATABASES['default'].copy()
 
-if os.getenv("PAPERLESS_DBENGINE"):
+if os.getenv("PAPERLESS_DBHOST"):
     DATABASES["default"] = {
-        "ENGINE": os.getenv("PAPERLESS_DBENGINE"),
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "HOST": os.getenv("PAPERLESS_DBHOST"),
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
-        "USER": os.getenv("PAPERLESS_DBUSER"),
+        "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
+        "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
     }
-    if os.getenv("PAPERLESS_DBPASS"):
-        DATABASES["default"]["PASSWORD"] = os.getenv("PAPERLESS_DBPASS")
-    if os.getenv("PAPERLESS_DBHOST"):
-        DATABASES["default"]["HOST"] = os.getenv("PAPERLESS_DBHOST")
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
 
@@ -264,11 +268,6 @@ GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
 OPTIPNG_BINARY = os.getenv("PAPERLESS_OPTIPNG_BINARY", "optipng")
 UNPAPER_BINARY = os.getenv("PAPERLESS_UNPAPER_BINARY", "unpaper")
 
-# This will be created if it doesn't exist
-SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
-
-# This is where Paperless will look for PDFs to index
-CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR")
 
 # Pre-2.x versions of Paperless stored your documents locally with GPG
 # encryption, but that is no longer the default.  This behaviour is still
