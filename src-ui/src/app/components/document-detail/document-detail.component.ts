@@ -59,9 +59,9 @@ export class DocumentDetailComponent implements OnInit {
     private documentListViewService: DocumentListViewService) { }
 
   ngOnInit(): void {
-    this.correspondentService.list().subscribe(result => this.correspondents = result.results)
-    this.documentTypeService.list().subscribe(result => this.documentTypes = result.results)
-    this.tagService.list().subscribe(result => this.tags = result.results)
+    this.correspondentService.list(1,100000).subscribe(result => this.correspondents = result.results)
+    this.documentTypeService.list(1,100000).subscribe(result => this.documentTypes = result.results)
+    this.tagService.list(1,100000).subscribe(result => this.tags = result.results)
 
     this.route.paramMap.subscribe(paramMap => {
       this.documentId = +paramMap.get('id')
