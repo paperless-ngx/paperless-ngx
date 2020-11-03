@@ -3,7 +3,7 @@ import { ObjectWithId } from './object-with-id'
 import { PaperlessTag } from './paperless-tag'
 import { PaperlessDocumentType } from './paperless-document-type'
 
-export class PaperlessDocument extends ObjectWithId {
+export interface PaperlessDocument extends ObjectWithId {
 
     correspondent?: PaperlessCorrespondent
 

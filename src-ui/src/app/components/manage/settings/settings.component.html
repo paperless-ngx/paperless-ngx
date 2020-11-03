@@ -2,5 +2,38 @@
 
 </app-page-header>
 
-<p>items per page, documents per view type</p>
+<!-- <p>items per page, documents per view type</p> -->
+<ul ngbNav #nav="ngbNav" class="nav-tabs">
+  <li [ngbNavItem]="1">
+    <a ngbNavLink>Document List Settings</a>
+    <ng-template ngbNavContent>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="2">
+    <a ngbNavLink>Saved views</a>
+    <ng-template ngbNavContent>
 
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Show in dashboard</th>
+          <th scope="col">Show in sidebar</th>
+          <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let config of savedViewConfigService.getConfigs()">
+          <td>{{ config.title }}</td>
+          <td>{{ config.showInDashboard }}</td>
+          <td>{{ config.showInSideBar }}</td>
+          <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteViewConfig(config)">Delete</button></td>
+        </tr>
+        </tbody>
+      </table>
+
+    </ng-template>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>

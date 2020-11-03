@@ -36,6 +36,8 @@ import { NgxFileDropModule } from 'ngx-file-drop';
 import { TextComponent } from './components/common/input/text/text.component';
 import { SelectComponent } from './components/common/input/select/select.component';
 import { CheckComponent } from './components/common/input/check/check.component';
+import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @NgModule({
   declarations: [
@@ -66,7 +68,8 @@ import { CheckComponent } from './components/common/input/check/check.component'
     DocumentCardSmallComponent,
     TextComponent,
     SelectComponent,
-    CheckComponent
+    CheckComponent,
+    SaveViewConfigDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -75,7 +78,8 @@ import { CheckComponent } from './components/common/input/check/check.component'
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxFileDropModule
+    NgxFileDropModule,
+    InfiniteScrollModule
   ],
   providers: [
     DatePipe,

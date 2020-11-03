@@ -1,6 +1,6 @@
 import { MatchingModel } from './matching-model';
 
-export class PaperlessCorrespondent extends MatchingModel {
+export interface PaperlessCorrespondent extends MatchingModel {
 
   document_count?: number
   
