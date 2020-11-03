@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentEditDialogComponent } from '../correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { GenericListComponent } from '../generic-list/generic-list.component';
@@ -18,7 +18,7 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
    }
 
   getColor(id) {
-    return PaperlessTag.COLOURS.find(c => c.id == id)
+    return TAG_COLOURS.find(c => c.id == id)
   }
 
   getObjectName(object: PaperlessTag) {

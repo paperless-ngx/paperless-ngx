@@ -1,22 +1,19 @@
-from django.db import transaction
 import datetime
 import hashlib
 import logging
 import os
 import re
-import time
 import uuid
 
-from operator import itemgetter
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
+
 from paperless.db import GnuPG
 from .classifier import DocumentClassifier
-
-from .models import Document, FileInfo, Tag
-from .parsers import ParseError
+from .models import Document, FileInfo
+from .parsers import ParseError, get_parser_class
 from .signals import (
-    document_consumer_declaration,
     document_consumption_finished,
     document_consumption_started
 )
@@ -36,17 +33,12 @@ class Consumer:
       5. Delete the document and image(s)
     """
 
-    # Files are considered ready for consumption if they have been unmodified
-    # for this duration
-    FILES_MIN_UNMODIFIED_DURATION = 0.5
-
     def __init__(self, consume=settings.CONSUMPTION_DIR,
                  scratch=settings.SCRATCH_DIR):
 
         self.logger = logging.getLogger(__name__)
         self.logging_group = None
 
-        self._ignore = []
         self.consume = consume
         self.scratch = scratch
 
@@ -68,63 +60,19 @@ class Consumer:
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(self.consume))
 
-        self.parsers = []
-        for response in document_consumer_declaration.send(self):
-            self.parsers.append(response[1])
-
-        if not self.parsers:
-            raise ConsumerError(
-                "No parsers could be found, not even the default.  "
-                "This is a problem."
-            )
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
             "group": self.logging_group
         })
 
-    def consume_new_files(self):
-        """
-        Find non-ignored files in consumption dir and consume them if they have
-        been unmodified for FILES_MIN_UNMODIFIED_DURATION.
-        """
-        ignored_files = []
-        files = []
-        for entry in os.scandir(self.consume):
-            if entry.is_file():
-                file = (entry.path, entry.stat().st_mtime)
-                if file in self._ignore:
-                    ignored_files.append(file)
-                else:
-                    files.append(file)
-            else:
-                self.logger.warning(
-                    "Skipping %s as it is not a file",
-                    entry.path
-                )
-
-        if not files:
-            return
-
-        # Set _ignore to only include files that still exist.
-        # This keeps it from growing indefinitely.
-        self._ignore[:] = ignored_files
-
-        files_old_to_new = sorted(files, key=itemgetter(1))
-
-        time.sleep(self.FILES_MIN_UNMODIFIED_DURATION)
-
-        for file, mtime in files_old_to_new:
-            if mtime == os.path.getmtime(file):
-                # File has not been modified and can be consumed
-                if not self.try_consume_file(file):
-                    self._ignore.append((file, mtime))
-
     @transaction.atomic
     def try_consume_file(self, file):
         """
         Return True if file was consumed
         """
+
+        self.logging_group = uuid.uuid4()
 
         if not re.match(FileInfo.REGEXES["title"], file):
             return False
@@ -133,20 +81,21 @@ class Consumer:
 
         if self._is_duplicate(doc):
             self.log(
-                "info",
+                "warning",
                 "Skipping {} as it appears to be a duplicate".format(doc)
             )
             return False
 
-        parser_class = self._get_parser_class(doc)
+        self.log("info", "Consuming {}".format(doc))
+
+        parser_class = get_parser_class(doc)
         if not parser_class:
             self.log(
                 "error", "No parsers could be found for {}".format(doc))
             return False
+        else:
+            self.log("info", "Parser: {}".format(parser_class.__name__))
 
-        self.logging_group = uuid.uuid4()
-
-        self.log("info", "Consuming {}".format(doc))
 
         document_consumption_started.send(
             sender=self.__class__,
@@ -154,23 +103,24 @@ class Consumer:
             logging_group=self.logging_group
         )
 
-        parsed_document = parser_class(doc)
+        document_parser = parser_class(doc, self.logging_group)
 
         try:
-            thumbnail = parsed_document.get_optimised_thumbnail()
-            date = parsed_document.get_date()
+            self.log("info", "Generating thumbnail for {}...".format(doc))
+            thumbnail = document_parser.get_optimised_thumbnail()
+            date = document_parser.get_date()
             document = self._store(
-                parsed_document.get_text(),
+                document_parser.get_text(),
                 doc,
                 thumbnail,
                 date
             )
         except ParseError as e:
-            self.log("error", "PARSE FAILURE for {}: {}".format(doc, e))
-            parsed_document.cleanup()
+            self.log("fatal", "PARSE FAILURE for {}: {}".format(doc, e))
+            document_parser.cleanup()
             return False
         else:
-            parsed_document.cleanup()
+            document_parser.cleanup()
             self._cleanup_doc(doc)
 
             self.log(
@@ -184,9 +134,10 @@ class Consumer:
                 self.classifier.reload()
                 classifier = self.classifier
             except FileNotFoundError:
-                logging.getLogger(__name__).warning("Cannot classify documents, "
-                                                  "classifier model file was not "
-                                                  "found.")
+                self.log("warning", "Cannot classify documents, classifier "
+                                    "model file was not found. Consider "
+                                    "running python manage.py "
+                                    "document_create_classifier.")
 
             document_consumption_finished.send(
                 sender=self.__class__,
@@ -195,31 +146,6 @@ class Consumer:
                 classifier=classifier
             )
             return True
-
-    def _get_parser_class(self, doc):
-        """
-        Determine the appropriate parser class based on the file
-        """
-
-        options = []
-        for parser in self.parsers:
-            result = parser(doc)
-            if result:
-                options.append(result)
-
-        self.log(
-            "info",
-            "Parsers available: {}".format(
-                ", ".join([str(o["parser"].__name__) for o in options])
-            )
-        )
-
-        if not options:
-            return None
-
-        # Return the parser with the highest weight.
-        return sorted(
-            options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
 
     def _store(self, text, doc, thumbnail, date):
 
@@ -253,9 +179,8 @@ class Consumer:
         self._write(document, doc, document.source_path)
         self._write(document, thumbnail, document.thumbnail_path)
 
+        #TODO: why do we need to save the document again?
         document.save()
-
-        self.log("info", "Completed")
 
         return document
 

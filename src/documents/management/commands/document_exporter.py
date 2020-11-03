@@ -64,12 +64,14 @@ class Command(Renderable, BaseCommand):
 
             document = document_map[document_dict["pk"]]
 
-            file_target = os.path.join(self.target, document.file_name)
+            unique_filename = "{:07}_{}".format(document.pk, document.file_name)
 
-            thumbnail_name = document.file_name + "-thumbnail.png"
+            file_target = os.path.join(self.target, unique_filename)
+
+            thumbnail_name = unique_filename + "-thumbnail.png"
             thumbnail_target = os.path.join(self.target, thumbnail_name)
 
-            document_dict[EXPORTER_FILE_NAME] = document.file_name
+            document_dict[EXPORTER_FILE_NAME] = unique_filename
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
             print("Exporting: {}".format(file_target))

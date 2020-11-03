@@ -8,17 +8,12 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
-from documents.classifier import DocumentClassifier
 from .. import index, matching
 from ..models import Document, Tag
 
 
 def logger(message, group):
     logging.getLogger(__name__).debug(message, extra={"group": group})
-
-
-def index_document(sender, document=None, logging_group=None, **kwargs):
-    index.add_document_to_index(sender, instance=document)
 
 
 def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
@@ -52,13 +47,14 @@ def set_correspondent(sender, document=None, logging_group=None, classifier=None
             )
             return
 
-    logger(
-        'Assigning correspondent "{}" to "{}" '.format(selected, document),
-        logging_group
-    )
+    if selected or replace:
+        logger(
+            'Assigning correspondent "{}" to "{}" '.format(selected, document),
+            logging_group
+        )
 
-    document.correspondent = selected
-    document.save(update_fields=("correspondent",))
+        document.correspondent = selected
+        document.save(update_fields=("correspondent",))
 
 
 def set_document_type(sender, document=None, logging_group=None, classifier=None, replace=False, use_first=True, **kwargs):
@@ -88,13 +84,14 @@ def set_document_type(sender, document=None, logging_group=None, classifier=None
             )
             return
 
-    logger(
-        'Assigning document type "{}" to "{}" '.format(selected, document),
-        logging_group
-    )
+    if selected or replace:
+        logger(
+            'Assigning document type "{}" to "{}" '.format(selected, document),
+            logging_group
+        )
 
-    document.document_type = selected
-    document.save(update_fields=("document_type",))
+        document.document_type = selected
+        document.save(update_fields=("document_type",))
 
 
 def set_tags(sender, document=None, logging_group=None, classifier=None, replace=False, **kwargs):
@@ -133,7 +130,7 @@ def run_post_consume_script(sender, document, **kwargs):
 
     Popen((
         settings.POST_CONSUME_SCRIPT,
-        str(document.id),
+        str(document.pk),
         document.file_name,
         document.source_path,
         document.thumbnail_path,
@@ -165,7 +162,7 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
         action_flag=ADDITION,
         action_time=timezone.now(),
         content_type=ct,
-        object_id=document.id,
+        object_id=document.pk,
         user=user,
         object_repr=document.__str__(),
     )

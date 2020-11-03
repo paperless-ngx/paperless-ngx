@@ -84,4 +84,6 @@ scripts/nuke
 /data/index
 
 /paperless.conf
-/consumption/
+/consume
+/export
+/src-ui/.vscode

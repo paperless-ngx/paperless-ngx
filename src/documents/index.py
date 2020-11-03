@@ -1,12 +1,10 @@
-from collections import Iterable
+import logging
 
 from django.db import models
 from django.dispatch import receiver
-from whoosh.fields import Schema, TEXT, NUMERIC, DATETIME, KEYWORD
+from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.highlight import Formatter, get_text
 from whoosh.index import create_in, exists_in, open_dir
-from whoosh.qparser import QueryParser
-from whoosh.query import terms
 from whoosh.writing import AsyncWriter
 
 from documents.models import Document
@@ -57,7 +55,7 @@ def get_schema():
     return Schema(
         id=NUMERIC(stored=True, unique=True, numtype=int),
         title=TEXT(stored=True),
-        content=TEXT(stored=True)
+        content=TEXT()
     )
 
 
@@ -69,8 +67,9 @@ def open_index(recreate=False):
 
 
 def update_document(writer, doc):
+    logging.getLogger(__name__).debug("Updating index with document{}".format(str(doc)))
     writer.update_document(
-        id=doc.id,
+        id=doc.pk,
         title=doc.title,
         content=doc.content
     )
@@ -85,24 +84,10 @@ def add_document_to_index(sender, instance, **kwargs):
 
 @receiver(models.signals.post_delete, sender=Document)
 def remove_document_from_index(sender, instance, **kwargs):
+    logging.getLogger(__name__).debug("Removing document {} from index".format(str(instance)))
     ix = open_index()
     with AsyncWriter(ix) as writer:
-        writer.delete_by_term('id', instance.id)
-
-
-def query_index(ix, querystr):
-    with ix.searcher() as searcher:
-        query = QueryParser("content", ix.schema, termclass=terms.FuzzyTerm).parse(querystr)
-        results = searcher.search(query)
-        results.formatter = JsonFormatter()
-        results.fragmenter.surround = 50
-
-        return [
-            {'id': r['id'],
-             'highlights': r.highlights("content"),
-             'score': r.score,
-             'title': r['title']
-             } for r in results]
+        writer.delete_by_term('id', instance.pk)
 
 
 def autocomplete(ix, term, limit=10):

@@ -16,7 +16,6 @@ class DocumentsConfig(AppConfig):
             run_post_consume_script,
             cleanup_document_deletion,
             set_log_entry,
-            index_document,
             set_correspondent,
             set_document_type,
             set_tags
@@ -25,7 +24,6 @@ class DocumentsConfig(AppConfig):
 
         document_consumption_started.connect(run_pre_consume_script)
 
-        document_consumption_finished.connect(index_document)
         document_consumption_finished.connect(add_inbox_tags)
         document_consumption_finished.connect(set_correspondent)
         document_consumption_finished.connect(set_document_type)

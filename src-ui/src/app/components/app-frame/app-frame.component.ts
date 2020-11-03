@@ -7,6 +7,7 @@ import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { AuthService } from 'src/app/services/auth.service';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { SearchService } from 'src/app/services/rest/search.service';
+import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
   
 @Component({
   selector: 'app-app-frame',
@@ -15,7 +16,13 @@ import { SearchService } from 'src/app/services/rest/search.service';
 })
 export class AppFrameComponent implements OnInit, OnDestroy {
 
-  constructor (public router: Router, private openDocumentsService: OpenDocumentsService, private authService: AuthService, private searchService: SearchService) {
+  constructor (
+    public router: Router,
+    private openDocumentsService: OpenDocumentsService,
+    private authService: AuthService,
+    private searchService: SearchService,
+    public viewConfigService: SavedViewConfigService
+    ) {
   }
 
   searchField = new FormControl('')
