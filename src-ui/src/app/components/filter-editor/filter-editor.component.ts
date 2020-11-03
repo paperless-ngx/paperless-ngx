@@ -32,6 +32,7 @@ export class FilterEditorComponent implements OnInit {
 
   newRuleClicked() {
     this.filterRules.push({type: this.selectedRuleType, value: null})
+    this.selectedRuleType = this.getRuleTypes().length > 0 ? this.getRuleTypes()[0] : null
   }
 
   removeRuleClicked(rule) {
@@ -57,7 +58,7 @@ export class FilterEditorComponent implements OnInit {
   }
 
   getRuleTypes() {
-    return FILTER_RULE_TYPES
+    return FILTER_RULE_TYPES.filter(rt => rt.multi || !this.filterRules.find(r => r.type == rt))
   }
 
 }
