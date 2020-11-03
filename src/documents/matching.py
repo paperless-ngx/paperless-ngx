@@ -9,7 +9,7 @@ def match_correspondents(document_content, classifier):
     correspondents = Correspondent.objects.all()
     predicted_correspondent_id = classifier.predict_correspondent(document_content) if classifier else None
 
-    matched_correspondents = [o for o in correspondents if matches(o, document_content) or o.id == predicted_correspondent_id]
+    matched_correspondents = [o for o in correspondents if matches(o, document_content) or o.pk == predicted_correspondent_id]
     return matched_correspondents
 
 
@@ -17,7 +17,7 @@ def match_document_types(document_content, classifier):
     document_types = DocumentType.objects.all()
     predicted_document_type_id = classifier.predict_document_type(document_content) if classifier else None
 
-    matched_document_types = [o for o in document_types if matches(o, document_content) or o.id == predicted_document_type_id]
+    matched_document_types = [o for o in document_types if matches(o, document_content) or o.pk == predicted_document_type_id]
     return matched_document_types
 
 
@@ -25,7 +25,7 @@ def match_tags(document_content, classifier):
     objects = Tag.objects.all()
     predicted_tag_ids = classifier.predict_tags(document_content) if classifier else []
 
-    matched_tags = [o for o in objects if matches(o, document_content) or o.id in predicted_tag_ids]
+    matched_tags = [o for o in objects if matches(o, document_content) or o.pk in predicted_tag_ids]
     return matched_tags
 
 

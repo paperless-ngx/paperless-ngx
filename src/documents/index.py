@@ -69,7 +69,7 @@ def open_index(recreate=False):
 def update_document(writer, doc):
     logging.getLogger(__name__).debug("Updating index with document{}".format(str(doc)))
     writer.update_document(
-        id=doc.id,
+        id=doc.pk,
         title=doc.title,
         content=doc.content
     )
@@ -87,7 +87,7 @@ def remove_document_from_index(sender, instance, **kwargs):
     logging.getLogger(__name__).debug("Removing document {} from index".format(str(instance)))
     ix = open_index()
     with AsyncWriter(ix) as writer:
-        writer.delete_by_term('id', instance.id)
+        writer.delete_by_term('id', instance.pk)
 
 
 def autocomplete(ix, term, limit=10):

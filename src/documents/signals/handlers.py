@@ -134,7 +134,7 @@ def run_post_consume_script(sender, document, **kwargs):
 
     Popen((
         settings.POST_CONSUME_SCRIPT,
-        str(document.id),
+        str(document.pk),
         document.file_name,
         document.source_path,
         document.thumbnail_path,
@@ -166,7 +166,7 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
         action_flag=ADDITION,
         action_time=timezone.now(),
         content_type=ct,
-        object_id=document.id,
+        object_id=document.pk,
         user=user,
         object_repr=document.__str__(),
     )
