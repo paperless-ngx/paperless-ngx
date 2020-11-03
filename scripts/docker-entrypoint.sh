@@ -79,22 +79,11 @@ install_languages() {
     done
 }
 
-if [[ "$1" != "/"* ]]; then
-    initialize
+initialize
 
-    # Install additional languages if specified
-    if [[ ! -z "$PAPERLESS_OCR_LANGUAGES"  ]]; then
-        install_languages "$PAPERLESS_OCR_LANGUAGES"
-    fi
-
-    if [[ "$1" = "gunicorn" ]]; then
-        shift
-        cd /usr/src/paperless/src/ && \
-            exec sudo -HEu paperless gunicorn -c /usr/src/paperless/gunicorn.conf.py "$@" paperless.wsgi
-    fi
-
-		exec sudo -HEu paperless python3 manage.py "$@"
-
+# Install additional languages if specified
+if [[ ! -z "$PAPERLESS_OCR_LANGUAGES"  ]]; then
+		install_languages "$PAPERLESS_OCR_LANGUAGES"
 fi
 
 exec "$@"

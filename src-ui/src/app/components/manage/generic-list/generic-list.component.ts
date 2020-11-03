@@ -1,6 +1,6 @@
 import { Directive, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MatchingModel } from 'src/app/data/matching-model';
+import { MatchingModel, MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
 import { DeleteDialogComponent } from '../../common/delete-dialog/delete-dialog.component';
@@ -21,10 +21,10 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   public collectionSize = 0
 
   getMatching(o: MatchingModel) {
-    if (o.matching_algorithm == MatchingModel.MATCH_AUTO) {
+    if (o.matching_algorithm == MATCH_AUTO) {
       return "Automatic"
     } else if (o.match && o.match.length > 0) {
-      return `${o.match} (${MatchingModel.MATCHING_ALGORITHMS.find(a => a.id == o.matching_algorithm).name})`
+      return `${o.match} (${MATCHING_ALGORITHMS.find(a => a.id == o.matching_algorithm).name})`
     } else {
       return "-"
     }

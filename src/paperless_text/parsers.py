@@ -11,14 +11,8 @@ class TextDocumentParser(DocumentParser):
     This parser directly parses a text document (.txt, .md, or .csv)
     """
 
-    CONVERT = settings.CONVERT_BINARY
-    THREADS = int(settings.OCR_THREADS) if settings.OCR_THREADS else None
-    UNPAPER = settings.UNPAPER_BINARY
-    DEFAULT_OCR_LANGUAGE = settings.OCR_LANGUAGE
-    OCR_ALWAYS = settings.OCR_ALWAYS
-
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, path, logging_group):
+        super().__init__(path, logging_group)
         self._text = None
 
     def get_thumbnail(self):
@@ -44,7 +38,7 @@ class TextDocumentParser(DocumentParser):
             r = str(round(psize[0] / 10))
             rounded = ",".join([r, r])
             run_command(
-                self.CONVERT,
+                settings.CONVERT_BINARY,
                 "-size ", picsize,
                 ' xc:none -draw ',
                 '"fill ', bg_color, ' roundrectangle 0,0,', work_size, ",", rounded, '" ',  # NOQA: E501
@@ -59,7 +53,7 @@ class TextDocumentParser(DocumentParser):
 
         def create_txlayer():
             run_command(
-                self.CONVERT,
+                settings.CONVERT_BINARY,
                 "-background none",
                 "-fill",
                 text_color,
@@ -73,7 +67,7 @@ class TextDocumentParser(DocumentParser):
         create_txlayer()
         create_bg()
         run_command(
-            self.CONVERT,
+            settings.CONVERT_BINARY,
             temp_bg,
             temp_txlayer,
             "-background None -layers merge ",

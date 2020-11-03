@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { kMaxLength } from 'buffer';
+import { LOG_LEVELS, LOG_LEVEL_INFO, PaperlessLog } from 'src/app/data/paperless-log';
+import { LogService } from 'src/app/services/rest/log.service';
 
 @Component({
   selector: 'app-logs',
@@ -7,9 +10,40 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LogsComponent implements OnInit {
 
-  constructor() { }
+  constructor(private logService: LogService) { }
+
+  logs: PaperlessLog[] = []
+  level: number = LOG_LEVEL_INFO
 
   ngOnInit(): void {
+    this.reload()
+  }
+
+  reload() {
+    this.logService.list(1, 50, null, {'level__gte': this.level}).subscribe(result => this.logs = result.results)
+  }
+
+  getLevelText(level: number) {
+    return LOG_LEVELS.find(l => l.id == level)?.name
+  }
+
+  onScroll() {
+    let lastCreated = null
+    if (this.logs.length > 0) {
+      lastCreated = this.logs[this.logs.length-1].created
+    }
+    this.logService.list(1, 25, null, {'created__lt': lastCreated, 'level__gte': this.level}).subscribe(result => {
+      this.logs.push(...result.results)
+    })
+  }
+
+  getLevels() {
+    return LOG_LEVELS
+  }
+
+  setLevel(id) {
+    this.level = id
+    this.reload()
   }
 
 }

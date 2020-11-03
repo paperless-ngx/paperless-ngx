@@ -75,7 +75,6 @@ class DocumentAdmin(admin.ModelAdmin):
     def tags_(self, obj):
         r = ""
         for tag in obj.tags.all():
-            colour = tag.get_colour_display()
             r += self._html_tag(
                 "span",
                 tag.slug + ", "

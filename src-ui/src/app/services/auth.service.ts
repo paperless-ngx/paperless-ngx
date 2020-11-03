@@ -54,13 +54,9 @@ export class AuthService {
       map(tokenResponse => {
         this.currentUsername = username
         this.token = tokenResponse.token
-        if (rememberMe) {
-          localStorage.setItem('auth-service:token', this.token)
-          localStorage.setItem('auth-service:currentUsername', this.currentUsername)
-        } else {
-          sessionStorage.setItem('auth-service:token', this.token)
-          sessionStorage.setItem('auth-service:currentUsername', this.currentUsername)
-        }
+        let storage = rememberMe ? localStorage : sessionStorage
+        storage.setItem('auth-service:token', this.token)
+        storage.setItem('auth-service:currentUsername', this.currentUsername)
         return true
       })
     )

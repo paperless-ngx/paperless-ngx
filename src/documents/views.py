@@ -6,6 +6,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from whoosh import highlight
+from whoosh.qparser import QueryParser
+from whoosh.query import terms
 
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
@@ -27,7 +30,8 @@ from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
     TagFilterSet,
-    DocumentTypeFilterSet
+    DocumentTypeFilterSet,
+    LogFilterSet
 )
 
 import documents.index as index
@@ -147,12 +151,14 @@ class DocumentViewSet(RetrieveModelMixin,
 
 class LogViewSet(ReadOnlyModelViewSet):
     model = Log
-    queryset = Log.objects.all().by_group()
+
+    queryset = Log.objects.all()
     serializer_class = LogSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    ordering_fields = ("time",)
+    filter_class = LogFilterSet
+    ordering_fields = ("created",)
 
 
 class SearchView(APIView):
@@ -161,16 +167,45 @@ class SearchView(APIView):
 
     ix = index.open_index()
 
+    def add_infos_to_hit(self, r):
+        doc = Document.objects.get(id=r['id'])
+        return {'id': r['id'],
+                'highlights': r.highlights("content", text=doc.content),
+                'score': r.score,
+                'rank': r.rank,
+                'document': DocumentSerializer(doc).data,
+                'title': r['title']
+                }
+
     def get(self, request, format=None):
         if 'query' in request.query_params:
             query = request.query_params['query']
-            query_results = index.query_index(self.ix, query)
-            for r in query_results:
-                r['document'] = DocumentSerializer(Document.objects.get(id=r['id'])).data
+            try:
+                page = int(request.query_params.get('page', 1))
+            except (ValueError, TypeError):
+                page = 1
 
-            return Response(query_results)
+            with self.ix.searcher() as searcher:
+                query_parser = QueryParser("content", self.ix.schema,
+                                    termclass=terms.FuzzyTerm).parse(query)
+                result_page = searcher.search_page(query_parser, page)
+                result_page.results.fragmenter = highlight.ContextFragmenter(
+                    surround=50)
+                result_page.results.fragmenter = highlight.PinpointFragmenter()
+                result_page.results.formatter = index.JsonFormatter()
+
+                return Response(
+                    {'count': len(result_page),
+                     'page': result_page.pagenum,
+                     'page_count': result_page.pagecount,
+                     'results': list(map(self.add_infos_to_hit, result_page))})
+
         else:
-            return Response([])
+            return Response({
+                'count': 0,
+                'page': 0,
+                'page_count': 0,
+                'results': []})
 
 
 class SearchAutoCompleteView(APIView):
@@ -194,3 +229,14 @@ class SearchAutoCompleteView(APIView):
             return Response(index.autocomplete(self.ix, term, limit))
         else:
             return Response([])
+
+
+class StatisticsView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        return Response({
+            'documents_total': Document.objects.all().count(),
+            'documents_inbox': Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+        })

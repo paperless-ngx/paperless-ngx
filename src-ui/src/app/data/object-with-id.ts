@@ -1,4 +1,4 @@
-export class ObjectWithId {
+export interface ObjectWithId {
 
     id?: number
 

@@ -1,22 +1,23 @@
 import { ObjectWithId } from './object-with-id';
 
-export class MatchingModel extends ObjectWithId {
 
-    static MATCH_ANY = 1
-    static MATCH_ALL = 2
-    static MATCH_LITERAL = 3
-    static MATCH_REGEX = 4
-    static MATCH_FUZZY = 5
-    static MATCH_AUTO = 6
+export const MATCH_ANY = 1
+export const MATCH_ALL = 2
+export const MATCH_LITERAL = 3
+export const MATCH_REGEX = 4
+export const MATCH_FUZZY = 5
+export const MATCH_AUTO = 6
 
-    static MATCHING_ALGORITHMS = [
-        {id: MatchingModel.MATCH_ANY, name: "Any"},
-        {id: MatchingModel.MATCH_ALL, name: "All"},
-        {id: MatchingModel.MATCH_LITERAL, name: "Literal"},
-        {id: MatchingModel.MATCH_REGEX, name: "Regular Expression"},
-        {id: MatchingModel.MATCH_FUZZY, name: "Fuzzy Match"},
-        {id: MatchingModel.MATCH_AUTO, name: "Auto"},
-    ]
+export const MATCHING_ALGORITHMS = [
+    {id: MATCH_ANY, name: "Any"},
+    {id: MATCH_ALL, name: "All"},
+    {id: MATCH_LITERAL, name: "Literal"},
+    {id: MATCH_REGEX, name: "Regular Expression"},
+    {id: MATCH_FUZZY, name: "Fuzzy Match"},
+    {id: MATCH_AUTO, name: "Auto"},
+]
+
+export interface MatchingModel extends ObjectWithId {
 
     name?: string
 

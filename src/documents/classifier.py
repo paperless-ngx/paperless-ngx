@@ -75,16 +75,16 @@ class DocumentClassifier(object):
             y = -1
             if doc.document_type:
                 if doc.document_type.matching_algorithm == MatchingModel.MATCH_AUTO:
-                    y = doc.document_type.id
+                    y = doc.document_type.pk
             labels_document_type.append(y)
 
             y = -1
             if doc.correspondent:
                 if doc.correspondent.matching_algorithm == MatchingModel.MATCH_AUTO:
-                    y = doc.correspondent.id
+                    y = doc.correspondent.pk
             labels_correspondent.append(y)
 
-            tags = [tag.id for tag in doc.tags.filter(
+            tags = [tag.pk for tag in doc.tags.filter(
                 matching_algorithm=MatchingModel.MATCH_AUTO
             )]
             labels_tags.append(tags)

@@ -5,7 +5,7 @@ from unittest import mock
 from uuid import uuid4
 
 from dateutil import tz
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from ..parsers import RasterisedDocumentParser
 from django.conf import settings
@@ -16,39 +16,37 @@ class TestDate(TestCase):
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
     SCRATCH = "/tmp/paperless-tests-{}".format(str(uuid4())[:8])
 
-    MOCK_SCRATCH = "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH"  # NOQA: E501
-
     def setUp(self):
         os.makedirs(self.SCRATCH, exist_ok=True)
 
     def tearDown(self):
         shutil.rmtree(self.SCRATCH)
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_1(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = "lorem ipsum 130218 lorem ipsum"
         self.assertEqual(document.get_date(), None)
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_2(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = "lorem ipsum 2018 lorem ipsum"
         self.assertEqual(document.get_date(), None)
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_3(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = "lorem ipsum 20180213 lorem ipsum"
         self.assertEqual(document.get_date(), None)
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_4(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = "lorem ipsum 13.02.2018 lorem ipsum"
         date = document.get_date()
         self.assertEqual(
@@ -59,10 +57,10 @@ class TestDate(TestCase):
             )
         )
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_5(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = (
             "lorem ipsum 130218, 2018, 20180213 and lorem 13.02.2018 lorem "
             "ipsum"
@@ -76,10 +74,10 @@ class TestDate(TestCase):
             )
         )
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_6(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = (
             "lorem ipsum\n"
             "Wohnort\n"
@@ -93,10 +91,10 @@ class TestDate(TestCase):
         )
         self.assertEqual(document.get_date(), None)
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_7(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = (
             "lorem ipsum\n"
             "März 2019\n"
@@ -111,10 +109,10 @@ class TestDate(TestCase):
             )
         )
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_8(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = (
             "lorem ipsum\n"
             "Wohnort\n"
@@ -135,10 +133,10 @@ class TestDate(TestCase):
             )
         )
 
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_9(self):
         input_file = os.path.join(self.SAMPLE_FILES, "")
-        document = RasterisedDocumentParser(input_file)
+        document = RasterisedDocumentParser(input_file, None)
         document._text = (
             "lorem ipsum\n"
             "27. Nullmonth 2020\n"
@@ -157,9 +155,9 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
         return_value="01-07-0590 00:00:00"
     )
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_crazy_date_past(self, *args):
-        document = RasterisedDocumentParser("/dev/null")
+        document = RasterisedDocumentParser("/dev/null", None)
         document.get_text()
         self.assertIsNone(document.get_date())
 
@@ -167,9 +165,9 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
         return_value="01-07-2350 00:00:00"
     )
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_crazy_date_future(self, *args):
-        document = RasterisedDocumentParser("/dev/null")
+        document = RasterisedDocumentParser("/dev/null", None)
         document.get_text()
         self.assertIsNone(document.get_date())
 
@@ -177,9 +175,9 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
         return_value="20 408000l 2475"
     )
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_crazy_date_with_spaces(self, *args):
-        document = RasterisedDocumentParser("/dev/null")
+        document = RasterisedDocumentParser("/dev/null", None)
         document.get_text()
         self.assertIsNone(document.get_date())
 
@@ -187,14 +185,9 @@ class TestDate(TestCase):
         "paperless_tesseract.parsers.RasterisedDocumentParser.get_text",
         return_value="No date in here"
     )
-    @mock.patch(
-        "paperless_tesseract.parsers.RasterisedDocumentParser."
-        "FILENAME_DATE_ORDER",
-        new_callable=mock.PropertyMock,
-        return_value="YMD"
-    )
-    @mock.patch(MOCK_SCRATCH, SCRATCH)
+    @override_settings(FILENAME_DATE_ORDER="YMD")
+    @override_settings(SCRATCH_DIR=SCRATCH)
     def test_filename_date_parse_invalid(self, *args):
-        document = RasterisedDocumentParser("/tmp/20 408000l 2475 - test.pdf")
+        document = RasterisedDocumentParser("/tmp/20 408000l 2475 - test.pdf", None)
         document.get_text()
         self.assertIsNone(document.get_date())

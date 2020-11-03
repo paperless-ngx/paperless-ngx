@@ -62,10 +62,6 @@ class TestOCR(TestCase):
             )
 
     @skipIf(not TESSERACT_INSTALLED, "Tesseract not installed. Skipping")
-    @mock.patch(
-        "paperless_tesseract.parsers.RasterisedDocumentParser.SCRATCH",
-        SAMPLE_FILES
-    )
     @mock.patch("paperless_tesseract.parsers.pyocr", FakePyOcr)
     def test_image_to_string_with_text_free_page(self):
         """
@@ -77,4 +73,4 @@ class TestOCR(TestCase):
         text-free pages are now handled correctly so long as we work around
         this weird exception.
         """
-        image_to_string(["no-text.png", "en"])
+        image_to_string([os.path.join(self.SAMPLE_FILES, "no-text.png"), "en"])

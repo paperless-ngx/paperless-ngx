@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0022_auto_20181007_1420'),
+        ('documents', '1000_update_paperless'),
     ]
 
     operations = [

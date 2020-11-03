@@ -33,7 +33,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
       httpParams = httpParams.set('ordering', ordering)
     }
     for (let extraParamKey in extraParams) {
-      if (extraParams[extraParamKey]) {
+      if (extraParams[extraParamKey] != null) {
         httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
       }
     }

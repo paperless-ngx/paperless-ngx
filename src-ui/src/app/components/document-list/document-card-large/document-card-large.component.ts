@@ -1,9 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentService } from 'src/app/services/rest/document.service';
-import { SearchResultHighlightedText } from 'src/app/services/rest/search.service';
 
 @Component({
   selector: 'app-document-card-large',
