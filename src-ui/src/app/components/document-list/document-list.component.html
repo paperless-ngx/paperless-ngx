@@ -73,7 +73,7 @@
   </div>
 </div>
 
-<ngb-pagination [pageSize]="25" [collectionSize]="docs.collectionSize" [(page)]="docs.currentPage" [maxSize]="5"
+<ngb-pagination [pageSize]="docs.currentPageSize" [collectionSize]="docs.collectionSize" [(page)]="docs.currentPage" [maxSize]="5"
   [rotate]="true" [boundaryLinks]="true" (pageChange)="reload()" aria-label="Default pagination"></ngb-pagination>
 
 <div *ngIf="displayMode == 'largeCards'">
