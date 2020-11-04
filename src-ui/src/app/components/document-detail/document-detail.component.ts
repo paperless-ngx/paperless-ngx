@@ -38,8 +38,7 @@ export class DocumentDetailComponent implements OnInit {
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
     content: new FormControl(''),
-    created_date: new FormControl(),
-    created_time: new FormControl(),
+    created: new FormControl(),
     correspondent_id: new FormControl(),
     document_type_id: new FormControl(),
     archive_serial_number: new FormControl(),
@@ -59,6 +58,10 @@ export class DocumentDetailComponent implements OnInit {
     private documentListViewService: DocumentListViewService) { }
 
   ngOnInit(): void {
+    this.documentForm.valueChanges.subscribe(wow => {
+      Object.assign(this.document, this.documentForm.value)
+    })
+
     this.correspondentService.list(1,100000).subscribe(result => this.correspondents = result.results)
     this.documentTypeService.list(1,100000).subscribe(result => this.documentTypes = result.results)
     this.tagService.list(1,100000).subscribe(result => this.tags = result.results)
@@ -67,16 +70,22 @@ export class DocumentDetailComponent implements OnInit {
       this.documentId = +paramMap.get('id')
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
-      this.documentsService.get(this.documentId).subscribe(doc => {
-        this.openDocumentService.openDocument(doc)
-        this.document = doc
-        this.title = doc.title
-        this.documentForm.patchValue(doc)
-        this.documentForm.get('created_date').patchValue(this.datePipe.transform(doc.created, 'yyyy-MM-dd'))
-        this.documentForm.get('created_time').patchValue(this.datePipe.transform(doc.created, 'HH:mm:ss'))
-      }, error => {this.router.navigate(['404'])})
+      if (this.openDocumentService.getOpenDocument(this.documentId)) {
+        this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
+      } else {
+        this.documentsService.get(this.documentId).subscribe(doc => {
+          this.openDocumentService.openDocument(doc)
+          this.updateComponent(doc)
+        }, error => {this.router.navigate(['404'])})
+      }
     })
 
+  }
+
+  updateComponent(doc: PaperlessDocument) {
+    this.document = doc
+    this.title = doc.title
+    this.documentForm.patchValue(doc)
   }
 
   createTag() {
@@ -133,29 +142,15 @@ export class DocumentDetailComponent implements OnInit {
     }
   }
 
-  getDateCreated() {
-    let newDate = this.documentForm.value.created_date
-    let newTime = this.documentForm.value.created_time
-    return formatDate(newDate + "T" + newTime,"yyyy-MM-ddTHH:mm:ssZZZZZ", "en-us", "UTC")
-    
-  }
 
-  save() {
-    let newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
-
-    newDocument.created = this.getDateCreated()
-    
-    this.documentsService.update(newDocument).subscribe(result => {
+  save() {    
+    this.documentsService.update(this.document).subscribe(result => {
       this.close()
     })
   }
 
   saveEditNext() {
-    let newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
-
-    newDocument.created = this.getDateCreated()
-
-    this.documentsService.update(newDocument).subscribe(result => {
+    this.documentsService.update(this.document).subscribe(result => {
       this.documentListViewService.getNext(this.document.id).subscribe(nextDocId => {
         if (nextDocId) {
           this.openDocumentService.closeDocument(this.document)
