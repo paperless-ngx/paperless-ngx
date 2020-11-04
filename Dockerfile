@@ -1,5 +1,3 @@
-LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"
-
 ###############################################################################
 ### Front end                                                               ###
 ###############################################################################
@@ -81,3 +79,5 @@ RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 CMD ["python3", "manage.py", "--help"]
+
+LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"
