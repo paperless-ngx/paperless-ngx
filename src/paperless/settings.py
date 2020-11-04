@@ -125,7 +125,12 @@ TEMPLATES = [
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+if DEBUG:
+    X_FRAME_OPTIONS = ''
+    # this should really be 'allow-from uri' but its not supported in any mayor
+    # browser.
+else:
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # We allow CORS from localhost:8080
 CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8080,https://localhost:8080").split(","))
