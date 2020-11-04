@@ -1,10 +1,8 @@
-[ en | [de](README-de.md) | [el](README-el.md) ]
-
-![Paperless](https://raw.githubusercontent.com/jonaswinkler/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
-
-[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents. This project extends on the project and modernizes many things.
+[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, see below.
+
+This project is still in development and some things may not work as expected.
 
 # How it Works
 
@@ -20,7 +18,9 @@ Here's what you get:
 
 ![The before and after](https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/_static/screenshot.png)
 
-# What is different in Paperless-ng?
+# Why Paperless-ng?
+
+I wanted to make big changes to the project that will impact the way it is used by its users greatly. Among the users who currently use paperless in production there are probably many that don't want these changes right away. I also wanted to have more control over what goes into the code and what does not. Therefore, paperless-ng was created. NG stands for both Angular (the framework used for the Frontend) and next-gen. Publishing this project under a different name also avoids confusion between paperless and paperless-ng.
 
 This is a list of changes that have been made to the original project.
 
@@ -86,9 +86,13 @@ Please be aware that this uses a postgres database instead of sqlite. If you wan
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. Details for that will be available in the documentation.
 
+# Migrating to paperless-ng
+
+Don't do it yet. The migrations are in place, but I have not verified yet that they work.
+
 # Documentation
 
-The documentation for Paperless is available on [ReadTheDocs](https://paperless.readthedocs.io/). Updated documentation for this project is not yet available.
+The documentation for Paperless is available on [ReadTheDocs](https://paperless-ng.readthedocs.io/). Updated documentation for this project is not yet available.
 
 # Affiliated Projects
 
@@ -98,11 +102,6 @@ Paperless has been around a while now, and people are starting to build stuff on
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
 * [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
-
-# Similar Projects
-
-There's another project out there called [Mayan EDMS](https://www.mayan-edms.com/) that has a surprising amount of technical overlap with Paperless.  Also based on Django and using a consumer model with Tesseract and Unpaper, Mayan EDMS is *much* more featureful and comes with a slick UI as well, but still in Python 2. It may be that Paperless consumes fewer resources, but to be honest, this is just a guess as I haven't tested this myself.  One thing's for certain though, *Paperless* is a **way** better name.
-
 
 # Important Note
 
