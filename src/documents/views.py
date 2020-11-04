@@ -190,7 +190,6 @@ class SearchView(APIView):
                 result_page = searcher.search_page(query_parser, page)
                 result_page.results.fragmenter = highlight.ContextFragmenter(
                     surround=50)
-                result_page.results.fragmenter = highlight.PinpointFragmenter()
                 result_page.results.formatter = index.JsonFormatter()
 
                 return Response(
