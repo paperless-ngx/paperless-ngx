@@ -40,6 +40,10 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     return this.http.get<Results<T>>(this.getResourceUrl(), {params: httpParams})
   }
 
+  listAll(ordering?: string, extraParams?): Observable<Results<T>> {
+    return this.list(1, 100000, ordering, extraParams)
+  }
+
   get(id: number): Observable<T> {
     return this.http.get<T>(this.getResourceUrl(id))
   }

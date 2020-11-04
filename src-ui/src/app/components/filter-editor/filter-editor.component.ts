@@ -52,9 +52,9 @@ export class FilterEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.correspondentService.list().subscribe(result => {this.correspondents = result.results})
-    this.tagService.list().subscribe(result => this.tags = result.results)
-    this.documentTypeService.list().subscribe(result => this.documentTypes = result.results)
+    this.correspondentService.listAll().subscribe(result => {this.correspondents = result.results})
+    this.tagService.listAll().subscribe(result => this.tags = result.results)
+    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
   }
 
   getRuleTypes() {
