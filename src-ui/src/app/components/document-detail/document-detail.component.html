@@ -32,16 +32,7 @@
                     formControlName='archive_serial_number'>
             </div>
             
-            <div class="form-row">
-                <div class="form-group col">
-                    <label for="created_date">Date created</label>
-                    <input type="date" class="form-control" id="created_date" formControlName='created_date'>
-                </div>
-                <div class="form-group col">
-                    <label for="created_time">Time created</label>
-                    <input type="time" class="form-control" id="created_time" formControlName='created_time'>
-                </div>
-            </div>
+            <app-input-date-time title="Date created" titleTime="Time created" formControlName="created"></app-input-date-time>
             
             <div class="form-group">
                 <label for="content">Content</label>
