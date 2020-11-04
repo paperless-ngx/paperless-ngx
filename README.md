@@ -1,10 +1,10 @@
+# Paperless-ng
+
 [Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, see below.
 
 This project is still in development and some things may not work as expected.
-
-This project is still under development. There also is no automatic way yet to migrate your current paperless setup to this version. I'm working on that.
 
 # How it Works
 
