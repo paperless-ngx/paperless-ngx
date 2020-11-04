@@ -12,7 +12,7 @@ services:
 
   webserver:
     build: .
-    image: paperless_app
+    image: paperless-ng
     #restart: always
     depends_on:
       - db
