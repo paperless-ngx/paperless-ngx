@@ -33,7 +33,6 @@ export class DocumentDetailComponent implements OnInit {
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
-  tags: PaperlessTag[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -50,7 +49,6 @@ export class DocumentDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
-    private tagService: TagService,
     private datePipe: DatePipe,
     private router: Router,
     private modalService: NgbModal,
@@ -64,7 +62,6 @@ export class DocumentDetailComponent implements OnInit {
 
     this.correspondentService.list(1,100000).subscribe(result => this.correspondents = result.results)
     this.documentTypeService.list(1,100000).subscribe(result => this.documentTypes = result.results)
-    this.tagService.list(1,100000).subscribe(result => this.tags = result.results)
 
     this.route.paramMap.subscribe(paramMap => {
       this.documentId = +paramMap.get('id')
@@ -86,17 +83,6 @@ export class DocumentDetailComponent implements OnInit {
     this.document = doc
     this.title = doc.title
     this.documentForm.patchValue(doc)
-  }
-
-  createTag() {
-    var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.dialogMode = 'create'
-    modal.componentInstance.success.subscribe(newTag => {
-      this.tagService.list().subscribe(tags => {
-        this.tags = tags.results
-        this.documentForm.get('tags_id').setValue(this.documentForm.get('tags_id').value.concat([newTag.id]))
-      })
-    })
   }
 
   createDocumentType() {
@@ -121,27 +107,13 @@ export class DocumentDetailComponent implements OnInit {
     })
   }
 
-  getTag(id: number): PaperlessTag {
-    return this.tags.find(tag => tag.id == id)
+  discard() {
+    this.documentsService.get(this.documentId).subscribe(doc => {
+      Object.assign(this.document, doc)
+      this.title = doc.title
+      this.documentForm.patchValue(doc)
+    }, error => {this.router.navigate(['404'])})
   }
-
-  getColour(id: number) {
-    return TAG_COLOURS.find(c => c.id == this.getTag(id).colour)
-  }
-
-  addTag(id: number) {
-    if (this.documentForm.value.tags.indexOf(id) == -1) {
-      this.documentForm.value.tags.push(id)
-    }
-  }
-
-  removeTag(id: number) {
-    let index = this.documentForm.value.tags.indexOf(id)
-    if (index > -1) {
-      this.documentForm.value.tags.splice(index, 1)
-    }
-  }
-
 
   save() {    
     this.documentsService.update(this.document).subscribe(result => {
