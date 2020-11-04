@@ -186,8 +186,7 @@ class SearchView(APIView):
                 page = 1
 
             with self.ix.searcher() as searcher:
-                query_parser = QueryParser("content", self.ix.schema,
-                                    termclass=terms.FuzzyTerm).parse(query)
+                query_parser = QueryParser("content", self.ix.schema).parse(query)
                 result_page = searcher.search_page(query_parser, page)
                 result_page.results.fragmenter = highlight.ContextFragmenter(
                     surround=50)
