@@ -69,7 +69,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.openDocumentsSubscription = this.openDocumentsService.getOpenDocuments().subscribe(docs => this.openDocuments = docs)
+    this.openDocuments = this.openDocumentsService.getOpenDocuments()
   }
 
   ngOnDestroy() {

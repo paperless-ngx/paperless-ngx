@@ -33,13 +33,11 @@ export class DocumentDetailComponent implements OnInit {
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
-  tags: PaperlessTag[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
     content: new FormControl(''),
-    created_date: new FormControl(),
-    created_time: new FormControl(),
+    created: new FormControl(),
     correspondent_id: new FormControl(),
     document_type_id: new FormControl(),
     archive_serial_number: new FormControl(),
@@ -51,7 +49,6 @@ export class DocumentDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
-    private tagService: TagService,
     private datePipe: DatePipe,
     private router: Router,
     private modalService: NgbModal,
@@ -59,35 +56,33 @@ export class DocumentDetailComponent implements OnInit {
     private documentListViewService: DocumentListViewService) { }
 
   ngOnInit(): void {
-    this.correspondentService.list().subscribe(result => this.correspondents = result.results)
-    this.documentTypeService.list().subscribe(result => this.documentTypes = result.results)
-    this.tagService.list().subscribe(result => this.tags = result.results)
+    this.documentForm.valueChanges.subscribe(wow => {
+      Object.assign(this.document, this.documentForm.value)
+    })
+
+    this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
+    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
 
     this.route.paramMap.subscribe(paramMap => {
       this.documentId = +paramMap.get('id')
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
-      this.documentsService.get(this.documentId).subscribe(doc => {
-        this.openDocumentService.openDocument(doc)
-        this.document = doc
-        this.title = doc.title
-        this.documentForm.patchValue(doc)
-        this.documentForm.get('created_date').patchValue(this.datePipe.transform(doc.created, 'yyyy-MM-dd'))
-        this.documentForm.get('created_time').patchValue(this.datePipe.transform(doc.created, 'HH:mm:ss'))
-      }, error => {this.router.navigate(['404'])})
+      if (this.openDocumentService.getOpenDocument(this.documentId)) {
+        this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
+      } else {
+        this.documentsService.get(this.documentId).subscribe(doc => {
+          this.openDocumentService.openDocument(doc)
+          this.updateComponent(doc)
+        }, error => {this.router.navigate(['404'])})
+      }
     })
 
   }
 
-  createTag() {
-    var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.dialogMode = 'create'
-    modal.componentInstance.success.subscribe(newTag => {
-      this.tagService.list().subscribe(tags => {
-        this.tags = tags.results
-        this.documentForm.get('tags_id').setValue(this.documentForm.get('tags_id').value.concat([newTag.id]))
-      })
-    })
+  updateComponent(doc: PaperlessDocument) {
+    this.document = doc
+    this.title = doc.title
+    this.documentForm.patchValue(doc)
   }
 
   createDocumentType() {
@@ -112,50 +107,22 @@ export class DocumentDetailComponent implements OnInit {
     })
   }
 
-  getTag(id: number): PaperlessTag {
-    return this.tags.find(tag => tag.id == id)
+  discard() {
+    this.documentsService.get(this.documentId).subscribe(doc => {
+      Object.assign(this.document, doc)
+      this.title = doc.title
+      this.documentForm.patchValue(doc)
+    }, error => {this.router.navigate(['404'])})
   }
 
-  getColour(id: number) {
-    return TAG_COLOURS.find(c => c.id == this.getTag(id).colour)
-  }
-
-  addTag(id: number) {
-    if (this.documentForm.value.tags.indexOf(id) == -1) {
-      this.documentForm.value.tags.push(id)
-    }
-  }
-
-  removeTag(id: number) {
-    let index = this.documentForm.value.tags.indexOf(id)
-    if (index > -1) {
-      this.documentForm.value.tags.splice(index, 1)
-    }
-  }
-
-  getDateCreated() {
-    let newDate = this.documentForm.value.created_date
-    let newTime = this.documentForm.value.created_time
-    return formatDate(newDate + "T" + newTime,"yyyy-MM-ddTHH:mm:ssZZZZZ", "en-us", "UTC")
-    
-  }
-
-  save() {
-    let newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
-
-    newDocument.created = this.getDateCreated()
-    
-    this.documentsService.update(newDocument).subscribe(result => {
+  save() {    
+    this.documentsService.update(this.document).subscribe(result => {
       this.close()
     })
   }
 
   saveEditNext() {
-    let newDocument = Object.assign(Object.assign({}, this.document), this.documentForm.value)
-
-    newDocument.created = this.getDateCreated()
-
-    this.documentsService.update(newDocument).subscribe(result => {
+    this.documentsService.update(this.document).subscribe(result => {
       this.documentListViewService.getNext(this.document.id).subscribe(nextDocId => {
         if (nextDocId) {
           this.openDocumentService.closeDocument(this.document)

@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
 import { PaperlessDocument } from '../data/paperless-document';
 import { SavedViewConfig } from '../data/saved-view-config';
+import { GENERAL_SETTINGS } from '../data/storage-keys';
 import { DocumentService, SORT_DIRECTION_DESCENDING } from './rest/document.service';
 
 
@@ -15,6 +16,7 @@ export class DocumentListViewService {
 
   documents: PaperlessDocument[] = []
   currentPage = 1
+  currentPageSize: number = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
   collectionSize: number
 
   currentFilterRules: FilterRule[] = []
@@ -39,7 +41,7 @@ export class DocumentListViewService {
 
     this.documentService.list(
       this.currentPage,
-      null,
+      this.currentPageSize,
       sortField,
       sortDirection,
       filterRules).subscribe(
@@ -64,7 +66,7 @@ export class DocumentListViewService {
   }
 
   getLastPage(): number {
-    return Math.ceil(this.collectionSize / 25)
+    return Math.ceil(this.collectionSize / this.currentPageSize)
   }
 
   hasNext(doc: number) {
@@ -96,6 +98,14 @@ export class DocumentListViewService {
         nextDocId.complete()
       }
     })
+  }
+
+  updatePageSize() {
+    let newPageSize = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
+    if (newPageSize != this.currentPageSize) {
+      this.currentPageSize = newPageSize
+      //this.reload()
+    }
   }
 
   constructor(private documentService: DocumentService) { }
