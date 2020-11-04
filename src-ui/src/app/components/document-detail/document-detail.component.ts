@@ -60,8 +60,8 @@ export class DocumentDetailComponent implements OnInit {
       Object.assign(this.document, this.documentForm.value)
     })
 
-    this.correspondentService.list(1,100000).subscribe(result => this.correspondents = result.results)
-    this.documentTypeService.list(1,100000).subscribe(result => this.documentTypes = result.results)
+    this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
+    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
 
     this.route.paramMap.subscribe(paramMap => {
       this.documentId = +paramMap.get('id')
