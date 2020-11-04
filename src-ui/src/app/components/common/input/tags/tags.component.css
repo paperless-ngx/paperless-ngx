@@ -1,0 +1,10 @@
+.tags-form-control {
+  height: auto;
+}
+
+
+.scrollable-menu {
+  height: auto;
+  max-height: 300px;
+  overflow-x: hidden;
+}

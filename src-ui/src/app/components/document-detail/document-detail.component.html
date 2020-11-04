@@ -3,19 +3,19 @@
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg>
-        Delete
+        <span class="d-none d-lg-inline">Delete</span>
     </button>
     <a [href]="downloadUrl" class="btn btn-sm btn-outline-secondary mr-2">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#download" />
         </svg>
-        Download
+        <span class="d-none d-lg-inline">Download</span>
     </a>
     <button type="button" class="btn btn-sm btn-outline-secondary" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#x" />
         </svg>
-        Close
+        <span class="d-none d-lg-inline">Close</span>
     </button>
 </app-page-header>
 
@@ -43,26 +43,9 @@
 
             <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type_id" allowNull="true" (createNew)="createDocumentType()"></app-input-select>
 
-            <div class="form-group">
-                <label for="exampleFormControlTextarea1">Tags</label>
+            <app-input-tags formControlName="tags_id" title="Tags"></app-input-tags>
 
-                <div class="input-group">
-                    <select multiple class="form-control" id="tags" formControlName="tags_id">
-                        <option *ngFor="let t of tags" [ngValue]="t.id">{{t.name}}</option>
-                    </select>
-
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" (click)="createTag()">
-                            <svg class="buttonicon" fill="currentColor">
-                                <use xlink:href="assets/bootstrap-icons.svg#plus" />
-                            </svg>
-                        </button>
-                    </div>
-
-                </div>
-                <small class="form-text text-muted">Hold CTRL to (de)select multiple tags.</small>
-
-            </div>
+            <button type="button" class="btn btn-outline-secondary" (click)="discard()">Discard</button>&nbsp;
             <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()">Save & edit next</button>&nbsp;
             <button type="submit" class="btn btn-primary">Save</button>&nbsp;
         </form>
