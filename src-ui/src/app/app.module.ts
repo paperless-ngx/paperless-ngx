@@ -38,6 +38,8 @@ import { SelectComponent } from './components/common/input/select/select.compone
 import { CheckComponent } from './components/common/input/check/check.component';
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { DateTimeComponent } from './components/common/input/date-time/date-time.component';
+import { TagsComponent } from './components/common/input/tags/tags.component';
 
 @NgModule({
   declarations: [
@@ -69,7 +71,9 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     TextComponent,
     SelectComponent,
     CheckComponent,
-    SaveViewConfigDialogComponent
+    SaveViewConfigDialogComponent,
+    DateTimeComponent,
+    TagsComponent
   ],
   imports: [
     BrowserModule,

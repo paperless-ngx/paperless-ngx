@@ -3,37 +3,61 @@
 </app-page-header>
 
 <!-- <p>items per page, documents per view type</p> -->
-<ul ngbNav #nav="ngbNav" class="nav-tabs">
-  <li [ngbNavItem]="1">
-    <a ngbNavLink>Document List Settings</a>
-    <ng-template ngbNavContent>
-    </ng-template>
-  </li>
-  <li [ngbNavItem]="2">
-    <a ngbNavLink>Saved views</a>
-    <ng-template ngbNavContent>
+<form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
 
-      <table class="table table-striped">
-        <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Show in dashboard</th>
-          <th scope="col">Show in sidebar</th>
-          <th scope="col">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let config of savedViewConfigService.getConfigs()">
-          <td>{{ config.title }}</td>
-          <td>{{ config.showInDashboard }}</td>
-          <td>{{ config.showInSideBar }}</td>
-          <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteViewConfig(config)">Delete</button></td>
-        </tr>
-        </tbody>
-      </table>
+  <ul ngbNav #nav="ngbNav" class="nav-tabs">
+    <li [ngbNavItem]="1">
+      <a ngbNavLink>General settings</a>
+      <ng-template ngbNavContent>
 
-    </ng-template>
-  </li>
-</ul>
+        <h4>Document list</h4>
+        
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span>Items per page</span>
+          </div>
+          <div class="col">
+        
+            <select class="form-control" formControlName="documentListItemPerPage">
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="25">25</option>
+              <option [ngValue]="50">50</option>
+              <option [ngValue]="100">100</option>
+            </select>
+        
+          </div>
+        </div>
 
-<div [ngbNavOutlet]="nav" class="mt-2"></div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="2">
+      <a ngbNavLink>Saved views</a>
+      <ng-template ngbNavContent>
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Show in dashboard</th>
+              <th scope="col">Show in sidebar</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let config of savedViewConfigService.getConfigs()">
+              <td>{{ config.title }}</td>
+              <td>{{ config.showInDashboard }}</td>
+              <td>{{ config.showInSideBar }}</td>
+              <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteViewConfig(config)">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </ng-template>
+    </li>
+  </ul>
+
+  <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>

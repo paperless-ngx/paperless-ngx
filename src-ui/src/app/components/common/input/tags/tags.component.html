@@ -1,0 +1,30 @@
+<div class="form-group">
+  <label for="exampleFormControlTextarea1">Tags</label>
+
+  <div class="input-group">
+    <div class="form-control tags-form-control" id="tags">
+      <app-tag class="mr-2" *ngFor="let id of displayValue" [tag]="getTag(id)" (click)="removeTag(id)"></app-tag>
+    </div>
+
+    <div class="input-group-append" ngbDropdown placement="top-right">
+      <button class="btn btn-outline-secondary" type="button" ngbDropdownToggle></button>
+      <div ngbDropdownMenu class="scrollable-menu">
+        <button type="button" *ngFor="let tag of tags" ngbDropdownItem (click)="addTag(tag.id)">
+          <app-tag [tag]="tag"></app-tag>
+        </button>
+      </div>
+    </div>
+
+    <div class="input-group-append">
+
+      <button class="btn btn-outline-secondary" type="button" (click)="createTag()">
+        <svg class="buttonicon" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#plus" />
+        </svg>
+      </button>
+    </div>
+
+  </div>
+  <small class="form-text text-muted" *ngIf="hint">{{hint}}</small>
+
+</div>

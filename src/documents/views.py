@@ -52,35 +52,35 @@ class IndexView(TemplateView):
 
 class CorrespondentViewSet(ModelViewSet):
     model = Correspondent
-    queryset = Correspondent.objects.annotate(document_count=Count('documents'), last_correspondence=Max('documents__created'))
+    queryset = Correspondent.objects.annotate(document_count=Count('documents'), last_correspondence=Max('documents__created')).order_by('name')
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = CorrespondentFilterSet
-    ordering_fields = ("name", "document_count", "last_correspondence")
+    ordering_fields = ("name", "matching_algorithm", "match", "document_count", "last_correspondence")
 
 
 class TagViewSet(ModelViewSet):
     model = Tag
-    queryset = Tag.objects.annotate(document_count=Count('documents'))
+    queryset = Tag.objects.annotate(document_count=Count('documents')).order_by('name')
     serializer_class = TagSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = TagFilterSet
-    ordering_fields = ("name", "document_count")
+    ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
 class DocumentTypeViewSet(ModelViewSet):
     model = DocumentType
-    queryset = DocumentType.objects.annotate(document_count=Count('documents'))
+    queryset = DocumentType.objects.annotate(document_count=Count('documents')).order_by('name')
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = DocumentTypeFilterSet
-    ordering_fields = ("name", "document_count")
+    ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
 class DocumentViewSet(RetrieveModelMixin,
@@ -186,12 +186,10 @@ class SearchView(APIView):
                 page = 1
 
             with self.ix.searcher() as searcher:
-                query_parser = QueryParser("content", self.ix.schema,
-                                    termclass=terms.FuzzyTerm).parse(query)
+                query_parser = QueryParser("content", self.ix.schema).parse(query)
                 result_page = searcher.search_page(query_parser, page)
                 result_page.results.fragmenter = highlight.ContextFragmenter(
                     surround=50)
-                result_page.results.fragmenter = highlight.PinpointFragmenter()
                 result_page.results.formatter = index.JsonFormatter()
 
                 return Response(
