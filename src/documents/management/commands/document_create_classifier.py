@@ -1,7 +1,8 @@
 import logging
 
 from django.core.management.base import BaseCommand
-from documents.classifier import DocumentClassifier
+from documents.classifier import DocumentClassifier, \
+    IncompatibleClassifierVersionError
 from paperless import settings
 from ...mixins import Renderable
 
@@ -18,12 +19,25 @@ class Command(Renderable, BaseCommand):
 
     def handle(self, *args, **options):
         classifier = DocumentClassifier()
+
         try:
-            classifier.train()
-            logging.getLogger(__name__).info(
-                "Saving models to {}...".format(settings.MODEL_FILE)
-            )
-            classifier.save_classifier()
+            # load the classifier, since we might not have to train it again.
+            classifier.reload()
+        except (FileNotFoundError, IncompatibleClassifierVersionError):
+            # This is what we're going to fix here.
+            pass
+
+        try:
+            if classifier.train():
+                logging.getLogger(__name__).info(
+                    "Saving updated classifier model to {}...".format(settings.MODEL_FILE)
+                )
+                classifier.save_classifier()
+            else:
+                logging.getLogger(__name__).debug(
+                    "Training data unchanged."
+                )
+
         except Exception as e:
             logging.getLogger(__name__).error(
                 "Classifier error: " + str(e)
