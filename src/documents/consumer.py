@@ -10,7 +10,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from paperless.db import GnuPG
-from .classifier import DocumentClassifier
+from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .models import Document, FileInfo
 from .parsers import ParseError, get_parser_class
 from .signals import (
@@ -133,11 +133,8 @@ class Consumer:
             try:
                 self.classifier.reload()
                 classifier = self.classifier
-            except FileNotFoundError:
-                self.log("warning", "Cannot classify documents, classifier "
-                                    "model file was not found. Consider "
-                                    "running python manage.py "
-                                    "document_create_classifier.")
+            except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
+                logging.getLogger(__name__).warning("Cannot classify documents: {}.".format(e))
 
             document_consumption_finished.send(
                 sender=self.__class__,
