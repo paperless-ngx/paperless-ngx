@@ -69,6 +69,8 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
 
+    "channels",
+
 ]
 
 REST_FRAMEWORK = {
@@ -98,6 +100,7 @@ LOGIN_URL = "admin:login"
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 
 WSGI_APPLICATION = 'paperless.wsgi.application'
+ASGI_APPLICATION = "paperless.asgi.application"
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 
@@ -299,3 +302,12 @@ FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
