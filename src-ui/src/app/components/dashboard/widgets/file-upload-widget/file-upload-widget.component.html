@@ -1,0 +1,11 @@
+<h4>Upload new Document</h4>
+<form>
+  <ngx-file-drop
+    dropZoneLabel="Drop documents here"
+    (onFileDrop)="dropped($event)"
+    (onFileOver)="fileOver($event)"
+    (onFileLeave)="fileLeave($event)"
+    dropZoneClassName="bg-light mt-4 card">
+
+  </ngx-file-drop>
+</form>

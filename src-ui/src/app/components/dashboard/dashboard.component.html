@@ -6,59 +6,11 @@
 
 <div class='row'>
   <div class="col-lg">
-    <ng-container *ngFor="let v of savedDashboardViews">
-      <h4>{{v.viewConfig.title}}</h4>
-
-      <table class="table table-sm table-hover table-borderless">
-        <thead>
-        <tr>
-          <th>Date created</th>
-          <th scope="col">Document</th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let doc of v.documents" routerLink="/documents/{{doc.id}}">
-            <td>{{doc.created | date}}</td>
-            <td>{{doc.title}}<app-tag [tag]="t" *ngFor="let t of doc.tags" class="ml-1"></app-tag>
-          </tr>
-        </tbody>
-      </table>
-
-    </ng-container>
-    <ng-container *ngIf="savedDashboardViews.length == 0">
-      <h4>Saved views</h4>
-      <p>This space is reserved to display your saved views. Go to your documents and save a view to have it displayed here!</p>
-    </ng-container>
-
+    <app-saved-view-widget [viewConfig]="conf" *ngFor="let conf of savedViewConfigService.getDashboardConfigs()"></app-saved-view-widget>
   </div>
   <div class="col-lg">
-    <h4>Statistics</h4>
-    <p>Documents in inbox: {{statistics.documents_inbox}}</p>
-    <p>Total documents: {{statistics.documents_total}}</p>
-    <h4>Upload new Document</h4>
-    <form>
-      <ngx-file-drop
-        dropZoneLabel="Drop documents here"
-        (onFileDrop)="dropped($event)"
-        (onFileOver)="fileOver($event)"
-        (onFileLeave)="fileLeave($event)"
-        dropZoneClassName="bg-light mt-4 card">
-
-      </ngx-file-drop>
-    </form>
-    <h5 class="mt-3">Document conumser status</h5>
-    <p>This is what it might look like in the future.</p>
-    <div class="card bg-light mb-2">
-      <div class="card-body">
-        <p class="card-text"><strong>Filename.pdf:</strong> Running tesseract on page 4/8...</p>
-        <p><ngb-progressbar type="info" [value]="50"></ngb-progressbar></p>
-      </div>
-    </div>
-    <div class="card bg-light mb-2">
-      <div class="card-body">
-        <p class="card-text"><strong>Filename2.pdf:</strong> Completed.</p>
-        <p><ngb-progressbar type="success" [value]="100"></ngb-progressbar></p>
-      </div>
-    </div>
+    <app-statistics-widget></app-statistics-widget>
+    <app-file-upload-widget></app-file-upload-widget>
+    <app-consumer-status-widget></app-consumer-status-widget>
   </div>
 </div>

@@ -40,6 +40,10 @@ import { SaveViewConfigDialogComponent } from './components/document-list/save-v
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { DateTimeComponent } from './components/common/input/date-time/date-time.component';
 import { TagsComponent } from './components/common/input/tags/tags.component';
+import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-view-widget/saved-view-widget.component';
+import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/consumer-status-widget/consumer-status-widget.component';
+import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component';
+import { FileUploadWidgetComponent } from './components/dashboard/widgets/file-upload-widget/file-upload-widget.component';
 
 @NgModule({
   declarations: [
@@ -73,7 +77,11 @@ import { TagsComponent } from './components/common/input/tags/tags.component';
     CheckComponent,
     SaveViewConfigDialogComponent,
     DateTimeComponent,
-    TagsComponent
+    TagsComponent,
+    ConsumerStatusWidgetComponent,
+    SavedViewWidgetComponent,
+    StatisticsWidgetComponent,
+    FileUploadWidgetComponent
   ],
   imports: [
     BrowserModule,
