@@ -27,8 +27,8 @@ class RasterisedDocumentParser(DocumentParser):
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
 
-    def __init__(self, path, logging_group):
-        super().__init__(path, logging_group)
+    def __init__(self, path, logging_group, progress_callback):
+        super().__init__(path, logging_group, progress_callback)
         self._text = None
 
     def get_thumbnail(self):
@@ -91,6 +91,7 @@ class RasterisedDocumentParser(DocumentParser):
             self._text = get_text_from_pdf(self.document_path)
             return self._text
 
+        self.progress_callback(0,1,"Making greyscale images.")
         images = self._get_greyscale()
 
         if not images:
@@ -100,8 +101,10 @@ class RasterisedDocumentParser(DocumentParser):
 
             sample_page_index = int(len(images) / 2)
             self.log("info", "Attempting language detection on page {} of {}...".format(sample_page_index+1, len(images)))
+            self.progress_callback(0.4, 1, "Language Detection.")
             sample_page_text = self._ocr([images[sample_page_index]], settings.OCR_LANGUAGE)[0]
             guessed_language = self._guess_language(sample_page_text)
+            self.progress_callback(0.6, 1, "OCR all the pages.")
 
             if not guessed_language or guessed_language not in ISO639:
                 self.log("warning", "Language detection failed.")
@@ -117,7 +120,7 @@ class RasterisedDocumentParser(DocumentParser):
 
             else:
                 self.log("info", "Detected language: {}".format(guessed_language))
-                ocr_pages = self._ocr(images, ISO639[guessed_language])
+                ocr_pages = self._ocr(images, ISO639[guessed_language], report_progress=True)
 
             self.log("info", "OCR completed.")
             self._text = strip_excess_whitespace(" ".join(ocr_pages))
@@ -151,6 +154,8 @@ class RasterisedDocumentParser(DocumentParser):
 
         self.log("info", "Running unpaper on {} pages...".format(len(pnms)))
 
+        self.progress_callback(0.2,1, "Running unpaper on {} pages...".format(len(pnms)))
+
         # Run unpaper in parallel on converted images
         with Pool(processes=settings.OCR_THREADS) as pool:
             pnms = pool.map(run_unpaper, pnms)
@@ -165,11 +170,16 @@ class RasterisedDocumentParser(DocumentParser):
             self.log('debug', "Language detection failed with: {}".format(e))
             return None
 
-    def _ocr(self, imgs, lang):
+    def _ocr(self, imgs, lang, report_progress=False):
         self.log("info", "Performing OCR on {} page(s) with language {}".format(len(imgs), lang))
+        r = []
         with Pool(processes=settings.OCR_THREADS) as pool:
-            r = pool.map(image_to_string, itertools.product(imgs, [lang]))
-            return r
+            # r = pool.map(image_to_string, itertools.product(imgs, [lang]))
+            for i, page in enumerate(pool.imap(image_to_string, itertools.product(imgs, [lang]))):
+                if report_progress:
+                    self.progress_callback(0.6 + (i / len(imgs)) * 0.4, 1, "OCR'ed {} pages".format(i+1))
+                r += [page]
+        return r
 
     def _complete_ocr_default_language(self, images, sample_page_index, sample_page):
         """
@@ -182,12 +192,11 @@ class RasterisedDocumentParser(DocumentParser):
         del images_copy[sample_page_index]
         if images_copy:
             self.log('info', 'Continuing ocr with default language.')
-            ocr_pages = self._ocr(images_copy, settings.OCR_LANGUAGE)
+            ocr_pages = self._ocr(images_copy, settings.OCR_LANGUAGE, report_progress=True)
             ocr_pages.insert(sample_page_index, sample_page)
             return ocr_pages
         else:
             return [sample_page]
-
 
 
 def strip_excess_whitespace(text):

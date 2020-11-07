@@ -5,6 +5,8 @@ import os
 import re
 import uuid
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
@@ -33,6 +35,17 @@ class Consumer:
       5. Delete the document and image(s)
     """
 
+    def _send_progress(self, filename, current_progress, max_progress, status, message, document_id=None):
+        payload = {
+            'filename': os.path.basename(filename),
+            'current_progress': current_progress,
+            'max_progress': max_progress,
+            'status': status,
+            'message': message,
+            'document_id': document_id
+        }
+        async_to_sync(self.channel_layer.group_send)("status_updates", {'type': 'status_update', 'data': payload})
+
     def __init__(self, consume=settings.CONSUMPTION_DIR,
                  scratch=settings.SCRATCH_DIR):
 
@@ -43,6 +56,8 @@ class Consumer:
         self.scratch = scratch
 
         self.classifier = DocumentClassifier()
+
+        self.channel_layer = get_channel_layer()
 
         os.makedirs(self.scratch, exist_ok=True)
 
@@ -59,7 +74,6 @@ class Consumer:
         if not os.path.exists(self.consume):
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(self.consume))
-
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
@@ -88,6 +102,7 @@ class Consumer:
 
         self.log("info", "Consuming {}".format(doc))
 
+
         parser_class = get_parser_class(doc)
         if not parser_class:
             self.log(
@@ -96,6 +111,7 @@ class Consumer:
         else:
             self.log("info", "Parser: {}".format(parser_class.__name__))
 
+        self._send_progress(file, 0, 100, 'WORKING', 'Consumption started')
 
         document_consumption_started.send(
             sender=self.__class__,
@@ -103,20 +119,37 @@ class Consumer:
             logging_group=self.logging_group
         )
 
-        document_parser = parser_class(doc, self.logging_group)
+        def progress_callback(current_progress, max_progress, message):
+            # recalculate progress to be within 20 and 80
+            p = int((current_progress / max_progress) * 60 + 20)
+            self._send_progress(file, p, 100, "WORKING", message)
+
+        document_parser = parser_class(doc, self.logging_group, progress_callback)
 
         try:
             self.log("info", "Generating thumbnail for {}...".format(doc))
+            self._send_progress(file, 10, 100, 'WORKING',
+                                'Generating thumbnail...')
             thumbnail = document_parser.get_optimised_thumbnail()
+            self._send_progress(file, 20, 100, 'WORKING',
+                                'Getting text from document...')
+            text = document_parser.get_text()
+            self._send_progress(file, 80, 100, 'WORKING',
+                                'Getting date from document...')
             date = document_parser.get_date()
+            self._send_progress(file, 85, 100, 'WORKING',
+                                'Storing the document...')
             document = self._store(
-                document_parser.get_text(),
+                text,
                 doc,
                 thumbnail,
                 date
             )
         except ParseError as e:
             self.log("fatal", "PARSE FAILURE for {}: {}".format(doc, e))
+            self._send_progress(file, 100, 100, 'FAILED',
+                                "Failed: {}".format(e))
+
             document_parser.cleanup()
             return False
         else:
@@ -136,12 +169,17 @@ class Consumer:
             except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
                 logging.getLogger(__name__).warning("Cannot classify documents: {}.".format(e))
 
+            self._send_progress(file, 90, 100, 'WORKING',
+                                'Performing post-consumption tasks...')
+
             document_consumption_finished.send(
                 sender=self.__class__,
                 document=document,
                 logging_group=self.logging_group,
                 classifier=classifier
             )
+            self._send_progress(file, 100, 100, 'SUCCESS',
+                                'Finished.', document.id)
             return True
 
     def _store(self, text, doc, thumbnail, date):

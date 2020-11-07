@@ -26,6 +26,8 @@ fuzzywuzzy = "*"
 python-Levenshtein = "*"
 django-extensions = ""
 watchdog = "*"
+channels = "~=3.0"
+channels-redis = "*"
 
 [dev-packages]
 coveralls = "*"
