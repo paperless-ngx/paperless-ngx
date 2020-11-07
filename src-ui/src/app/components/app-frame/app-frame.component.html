@@ -47,8 +47,8 @@
           <span>Saved views</span>
         </h6>
         <ul class="nav flex-column mb-2">
-          <li class="nav-item" *ngFor='let config of viewConfigService.getSideBarConfigs()'>
-            <a class="nav-link" routerLink="view/{{config.id}}" routerLinkActive="active">
+          <li class="nav-item w-100" *ngFor='let config of viewConfigService.getSideBarConfigs()'>
+            <a class="nav-link text-truncate" routerLink="view/{{config.id}}" routerLinkActive="active">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
               </svg>
@@ -61,8 +61,8 @@
           <span>Open documents</span>
         </h6>
         <ul class="nav flex-column mb-2">
-          <li class="nav-item" *ngFor='let d of openDocuments'>
-            <a class="nav-link" routerLink="documents/{{d.id}}" routerLinkActive="active">
+          <li class="nav-item w-100" *ngFor='let d of openDocuments'>
+            <a class="nav-link text-truncate" routerLink="documents/{{d.id}}" routerLinkActive="active">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
               </svg>

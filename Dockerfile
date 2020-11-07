@@ -1,5 +1,3 @@
-LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"
-
 ###############################################################################
 ### Front end                                                               ###
 ###############################################################################
@@ -18,7 +16,7 @@ RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false
 ### Back end                                                                ###
 ###############################################################################
 
-FROM python:3.8-slim
+FROM ubuntu:20.04
 
 WORKDIR /usr/src/paperless/
 
@@ -26,7 +24,7 @@ COPY Pipfile* ./
 
 #Dependencies
 RUN apt-get update \
-  && apt-get -y --no-install-recommends install \
+  && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install \
 		anacron \
 		build-essential \
 		curl \
@@ -37,6 +35,9 @@ RUN apt-get update \
 		libpoppler-cpp-dev \
 		libpq-dev \
 		optipng \
+		python3 \
+		python3-dev \
+		python3-pip \
 		sudo \
 		tesseract-ocr \
 		tesseract-ocr-eng \
@@ -46,10 +47,10 @@ RUN apt-get update \
 		tesseract-ocr-spa \
 		tzdata \
 		unpaper \
-	&& pip install --upgrade pipenv supervisor \
+	&& pip3 install --upgrade pipenv supervisor setuptools \
 	&& pipenv install --system --deploy \
 	&& pipenv --clear \
-	&& apt-get -y purge build-essential \
+	&& apt-get -y purge build-essential python3-pip python3-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
@@ -81,3 +82,5 @@ RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 CMD ["python3", "manage.py", "--help"]
+
+LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"
