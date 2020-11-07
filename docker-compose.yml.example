@@ -1,5 +1,10 @@
 version: "3.4"
 services:
+  broker:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
   db:
     image: postgres:13
     #restart: always
