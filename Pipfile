@@ -26,6 +26,7 @@ fuzzywuzzy = "*"
 python-Levenshtein = "*"
 django-extensions = ""
 watchdog = "*"
+pathvalidate = "*"
 
 [dev-packages]
 coveralls = "*"
