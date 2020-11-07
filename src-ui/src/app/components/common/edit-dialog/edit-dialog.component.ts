@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { MATCHING_ALGORITHMS } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
-import { Toast, ToastService } from 'src/app/services/toast.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Directive()
 export abstract class EditDialogComponent<T extends ObjectWithId> implements OnInit {
@@ -66,7 +66,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       this.activeModal.close()
       this.success.emit(result)
     }, error => {
-      this.toastService.showToast(Toast.makeError(`Could not save ${this.entityName}: ${error.error.name}`))
+      this.toastService.showError(`Could not save ${this.entityName}: ${error.error.name}`)
     })
   }
 
