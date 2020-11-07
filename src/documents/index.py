@@ -55,7 +55,8 @@ def get_schema():
     return Schema(
         id=NUMERIC(stored=True, unique=True, numtype=int),
         title=TEXT(stored=True),
-        content=TEXT()
+        content=TEXT(),
+        correspondent=TEXT(stored=True)
     )
 
 
@@ -71,7 +72,8 @@ def update_document(writer, doc):
     writer.update_document(
         id=doc.pk,
         title=doc.title,
-        content=doc.content
+        content=doc.content,
+        correspondent=doc.correspondent.name if doc.correspondent else None
     )
 
 
