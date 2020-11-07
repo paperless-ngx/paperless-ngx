@@ -10,10 +10,10 @@ export interface SavedViewConfig {
 
   sortDirection: string
 
-  title: string
+  title?: string
 
-  showInSideBar: boolean
+  showInSideBar?: boolean
 
-  showInDashboard: boolean
+  showInDashboard?: boolean
 
 }
