@@ -26,13 +26,16 @@ export class DocumentListComponent implements OnInit {
   filterRules: FilterRule[] = []
   showFilter = false
 
+  getTitle() {
+    return this.docs.viewConfigOverride ? this.docs.viewConfigOverride.title : "Documents"
+  }
+
   getSortFields() {
     return DOCUMENT_SORT_FIELDS
   }
 
   setSort(field: string) {
-    this.docs.currentSortField = field
-    this.reload()
+    this.docs.sortField = field
   }
 
   saveDisplayMode() {
@@ -45,11 +48,11 @@ export class DocumentListComponent implements OnInit {
     }
     this.route.paramMap.subscribe(params => {
       if (params.has('id')) {
-        this.docs.viewConfig = this.savedViewConfigService.getConfig(params.get('id'))
+        this.docs.viewConfigOverride = this.savedViewConfigService.getConfig(params.get('id'))
       } else {
-        this.filterRules = cloneFilterRules(this.docs.currentFilterRules)
+        this.filterRules = this.docs.filterRules
         this.showFilter = this.filterRules.length > 0
-        this.docs.viewConfig = null
+        this.docs.viewConfigOverride = null
       }
       this.reload()
     })
@@ -60,28 +63,24 @@ export class DocumentListComponent implements OnInit {
   }
 
   applyFilterRules() {
-    this.docs.setFilterRules(this.filterRules)
-    this.reload()
+    this.docs.filterRules = this.filterRules
   }
 
   loadViewConfig(config: SavedViewConfig) {
     this.filterRules = cloneFilterRules(config.filterRules)
-    this.docs.setFilterRules(config.filterRules)
-    this.docs.currentSortField = config.sortField
-    this.docs.currentSortDirection = config.sortDirection
-    this.reload()
+    this.docs.loadViewConfig(config)
   }
 
   saveViewConfig() {
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {backdrop: 'static'})
     modal.componentInstance.saveClicked.subscribe(formValue => {
       this.savedViewConfigService.saveConfig({
-        filterRules: cloneFilterRules(this.filterRules),
         title: formValue.title,
         showInDashboard: formValue.showInDashboard,
         showInSideBar: formValue.showInSideBar,
-        sortDirection: this.docs.currentSortDirection,
-        sortField: this.docs.currentSortField
+        filterRules: this.docs.filterRules,
+        sortDirection: this.docs.sortDirection,
+        sortField: this.docs.sortField
       })
       modal.close()
     })
