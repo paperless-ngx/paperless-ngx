@@ -28,6 +28,7 @@ django-extensions = ""
 watchdog = "*"
 channels = "~=3.0"
 channels-redis = "*"
+daphne = "~=3.0"
 
 [dev-packages]
 coveralls = "*"
