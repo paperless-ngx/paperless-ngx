@@ -1,31 +1,17 @@
-import json
 import os
 
-from asgiref.sync import async_to_sync
-from channels.auth import AuthMiddlewareStack
-from channels.generic.websocket import WebsocketConsumer
-from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
-from django.urls import re_path
+# Fetch Django ASGI application early to ensure AppRegistry is populated
+# before importing consumers and AuthMiddlewareStack that may import ORM
+# models.
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'paperless.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
+django_asgi_app = get_asgi_application()
 
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
 
-class StatusConsumer(WebsocketConsumer):
-    def connect(self):
-        self.accept()
-        async_to_sync(self.channel_layer.group_add)('status_updates', self.channel_name)
-
-    def disconnect(self, close_code):
-        async_to_sync(self.channel_layer.group_discard)('status_updates', self.channel_name)
-
-    def status_update(self, event):
-        self.send(json.dumps(event['data']))
-
-
-websocket_urlpatterns = [
-    re_path(r'ws/status/$', StatusConsumer.as_asgi()),
-]
+from paperless.urls import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),

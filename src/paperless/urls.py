@@ -1,11 +1,12 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
+from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
 from documents.views import (
     CorrespondentViewSet,
@@ -63,6 +64,11 @@ urlpatterns = [
     # Root of the Frontent
     url(r".*", IndexView.as_view()),
 
+]
+
+
+websocket_urlpatterns = [
+    re_path(r'ws/status/$', StatusConsumer.as_asgi()),
 ]
 
 # Text in each page's <h1> (and above login form).
