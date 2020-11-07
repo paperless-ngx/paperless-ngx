@@ -97,7 +97,7 @@ class DocumentViewSet(RetrieveModelMixin,
     filter_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
-        "id", "title", "correspondent__name", "created", "modified", "added", "archive_serial_number")
+        "id", "title", "correspondent__name", "document_type__name", "created", "modified", "added", "archive_serial_number")
 
     def file_response(self, pk, disposition):
         #TODO: this should not be necessary here.
