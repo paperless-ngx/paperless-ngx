@@ -10,6 +10,7 @@ import { FilterRule } from 'src/app/data/filter-rule';
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: "correspondent__name", name: "Correspondent" },
+  { field: "document_type__name", name: "Document type" },
   { field: 'title', name: 'Title' },
   { field: 'archive_serial_number', name: 'ASN' },
   { field: 'created', name: 'Created' },
