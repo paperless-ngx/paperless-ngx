@@ -28,7 +28,7 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status == 401 && this.authService.isAuthenticated()) {
           this.authService.logout()
-          this.toastService.showToast(Toast.makeError("Your session has expired. Please log in again."))
+          this.toastService.showError("Your session has expired. Please log in again.")
         }
         return throwError(error)
       })
