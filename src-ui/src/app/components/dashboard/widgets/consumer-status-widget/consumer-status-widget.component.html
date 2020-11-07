@@ -1,10 +1,10 @@
 <h4 class="mt-3">Document consumer status</h4>
 
-<div class="p-2 mb-1 border bg-light" *ngFor="let s of getStatus()">
+<div class="mb-2 border-bottom" *ngFor="let s of getStatus()">
   <div class="mb-1"><strong>{{s.filename}}:</strong> {{s.message}}</div>
   <ngb-progressbar [type]="getType(s.status)" [value]="s.current_progress" [max]="s.max_progress" class="mb-2"></ngb-progressbar>
-  <div *ngIf="isFinished(s)">
-    <button *ngIf="s.document_id" class="btn btn-sm btn-outline-secondary mr-2" routerLink="/documents/{{s.document_id}}" (click)="dismiss(s)">Open document</button>
+  <div *ngIf="isFinished(s)" class="mb-2">
+    <button *ngIf="s.document_id" class="btn btn-sm btn-outline-primary mr-2" routerLink="/documents/{{s.document_id}}" (click)="dismiss(s)">Open document</button>
     <button class="btn btn-sm btn-outline-secondary" (click)="dismiss(s)">Dismiss</button>
   </div>
 </div>
