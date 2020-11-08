@@ -6,9 +6,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from whoosh import highlight
-from whoosh.qparser import QueryParser
-from whoosh.query import terms
 
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
@@ -194,18 +191,13 @@ class SearchView(APIView):
             except (ValueError, TypeError):
                 page = 1
 
-            with self.ix.searcher() as searcher:
-                query_parser = QueryParser("content", self.ix.schema).parse(query)
-                result_page = searcher.search_page(query_parser, page)
-                result_page.results.fragmenter = highlight.ContextFragmenter(
-                    surround=50)
-                result_page.results.formatter = index.JsonFormatter()
+            result_page = index.query_page(self.ix, query, page)
 
-                return Response(
-                    {'count': len(result_page),
-                     'page': result_page.pagenum,
-                     'page_count': result_page.pagecount,
-                     'results': list(map(self.add_infos_to_hit, result_page))})
+            return Response(
+                {'count': len(result_page),
+                 'page': result_page.pagenum,
+                 'page_count': result_page.pagecount,
+                 'results': list(map(self.add_infos_to_hit, result_page))})
 
         else:
             return Response({
