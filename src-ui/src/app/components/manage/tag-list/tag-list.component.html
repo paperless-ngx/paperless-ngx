@@ -9,10 +9,10 @@
   <table class="table table-striped">
       <thead>
       <tr>
-        <th scope="col">Name</th>
+        <th scope="col" sortable="name" (sort)="onSort($event)">Name</th>
         <th scope="col">Colour</th>
-        <th scope="col">Matching</th>
-        <th scope="col">Document count</th>
+        <th scope="col" sortable="matching_algorithm" (sort)="onSort($event)">Matching</th>
+        <th scope="col" sortable="document_count" (sort)="onSort($event)">Document count</th>
         <th scope="col">Actions</th>
       </tr>
       </thead>
