@@ -2,9 +2,11 @@ import logging
 
 from django.db import models
 from django.dispatch import receiver
+from whoosh import highlight
 from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.highlight import Formatter, get_text
 from whoosh.index import create_in, exists_in, open_dir
+from whoosh.qparser import MultifieldParser
 from whoosh.writing import AsyncWriter
 
 from documents.models import Document
@@ -95,6 +97,17 @@ def remove_document_from_index(document):
     ix = open_index()
     with AsyncWriter(ix) as writer:
         remove_document(writer, document)
+
+
+def query_page(ix, query, page):
+    with ix.searcher() as searcher:
+        query_parser = MultifieldParser(["content", "title", "correspondent"],
+                                        ix.schema).parse(query)
+        result_page = searcher.search_page(query_parser, page)
+        result_page.results.fragmenter = highlight.ContextFragmenter(
+            surround=50)
+        result_page.results.formatter = JsonFormatter()
+        return result_page
 
 
 def autocomplete(ix, term, limit=10):
