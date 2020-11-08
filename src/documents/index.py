@@ -11,6 +11,9 @@ from documents.models import Document
 from paperless import settings
 
 
+logger = logging.getLogger(__name__)
+
+
 class JsonFormatter(Formatter):
     def __init__(self):
         self.seen = {}
@@ -68,6 +71,7 @@ def open_index(recreate=False):
 
 
 def update_document(writer, doc):
+    logger.debug("Indexing {}...".format(doc))
     writer.update_document(
         id=doc.pk,
         title=doc.title,
@@ -76,18 +80,21 @@ def update_document(writer, doc):
     )
 
 
-@receiver(models.signals.post_save, sender=Document)
-def add_document_to_index(sender, instance, **kwargs):
-    ix = open_index()
-    with AsyncWriter(ix) as writer:
-        update_document(writer, instance)
+def remove_document(writer, doc):
+    logger.debug("Removing {} from index...".format(doc))
+    writer.delete_by_term('id', doc.pk)
 
 
-@receiver(models.signals.post_delete, sender=Document)
-def remove_document_from_index(sender, instance, **kwargs):
+def add_or_update_document(document):
     ix = open_index()
     with AsyncWriter(ix) as writer:
-        writer.delete_by_term('id', instance.pk)
+        update_document(writer, document)
+
+
+def remove_document_from_index(document):
+    ix = open_index()
+    with AsyncWriter(ix) as writer:
+        remove_document(writer, document)
 
 
 def autocomplete(ix, term, limit=10):
