@@ -99,6 +99,15 @@ class DocumentViewSet(RetrieveModelMixin,
     ordering_fields = (
         "id", "title", "correspondent__name", "document_type__name", "created", "modified", "added", "archive_serial_number")
 
+    def update(self, request, *args, **kwargs):
+        response = super(DocumentViewSet, self).update(request, *args, **kwargs)
+        index.add_or_update_document(self.get_object())
+        return response
+
+    def destroy(self, request, *args, **kwargs):
+        index.remove_document_from_index(self.get_object())
+        return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
+
     def file_response(self, pk, disposition):
         #TODO: this should not be necessary here.
         content_types = {
