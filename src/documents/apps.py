@@ -18,7 +18,8 @@ class DocumentsConfig(AppConfig):
             set_log_entry,
             set_correspondent,
             set_document_type,
-            set_tags
+            set_tags,
+            add_to_index
 
         )
 
@@ -29,6 +30,7 @@ class DocumentsConfig(AppConfig):
         document_consumption_finished.connect(set_document_type)
         document_consumption_finished.connect(set_tags)
         document_consumption_finished.connect(set_log_entry)
+        document_consumption_finished.connect(add_to_index)
         document_consumption_finished.connect(run_post_consume_script)
 
         post_delete.connect(cleanup_document_deletion)
