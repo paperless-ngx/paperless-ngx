@@ -26,6 +26,7 @@ This is a list of changes that have been made to the original project.
 
 ## Added
 - **A new single page UI** built with bootstrap and Angular. Its much more responsive than the django admin pages. It features the follwing improvements over the old django admin interface:
+  - *Dashboard.* The landing page shows some useful information, such as statistics, recently scanned documents, file uploading, and possibly more in the future.
   - *Document uploading on the web page.* This is very crude right now, but gets the job done. It simply uploads the documents and stores them in the configured consumer directory. The API for that has always been in the project, there simply was no form on the UI to support it.
   - *Full text search* with a proper document indexer: The search feature sorts documents by relevance to the search query, highlights query terms in the found documents and provides autocomplete while typing the query. This is still very basic but will see extensions in the future.
   - *Saveable filters.* Save filter and sorting presets and optionally display a couple documents of saved filters (i.e., your inbox sorted descending by added date, or tagged TODO, oldest to newest) on the dash board.
@@ -49,21 +50,18 @@ This is a list of changes that have been made to the original project.
 These features were removed each due to two reasons. First, I did not feel these features contributed all that much to the over project, and second, I don't want to maintain these features.
 
 - **(BREAKING) Reminders.** I have no idea what they were used for and thus removed them from the project.
-- **Filename handling (I'm sorry).** The master branch of the paperless project has seen some changes regarding the filename handling of stored documents. These changes allow you to change the filename of stored documents from their default form ‘{id}.pdf’. These changes have not made it into this project, since the whole point of paperless is that you don't have to access your documents on the disk anymore. If you are using version 2.7.0, this does not affect you. If you are on the most recent push on the master branch, the provided migration will revert these changes and rename all your files to their original file name.
 - **Every customization made to the admin interface.** Since this is not the primary interface for the application anymore, there is no need to keep and maintain these. Besides, some changes were incompatible with the most recent versions of django. The interface is completely usable, though.
 
 ## Planned
 
 These features will make it into the application at some point, sorted by priority.
 
-- **Better tag editor.** The tag editor on the document detail page is not very convenient. This was put in there to get the project working but will be replaced with something nicer eventually.
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
   - Provide corrections for mispelled queries
 - **More robust consumer** that shows its progress on the web page.
 - **Arbitrary tag colors**. Allow the selection of any color with a color picker.
-- **Dashboard**. The landing page is a little bleak right now but will feature status updates about the consumer, previews of saved filters and database statistics in the future.
 
 ## On the chopping block.
 
