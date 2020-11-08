@@ -23,48 +23,6 @@ def make_index(apps, schema_editor):
         print("  --> Cannot create document index.")
 
 
-def restore_filenames(apps, schema_editor):
-    Document = apps.get_model("documents", "Document")
-
-    rename_operations = []
-
-    for doc in Document.objects.all():
-        file_name = "{:07}.{}".format(doc.pk, doc.file_type)
-        if doc.storage_type == "gpg":
-            file_name += ".gpg"
-
-        if not doc.filename == file_name:
-            try:
-                src = os.path.join(settings.ORIGINALS_DIR, doc.filename)
-                dst = os.path.join(settings.ORIGINALS_DIR, file_name)
-                if os.path.exists(dst):
-                    raise Exception("Cannot move {}, {} already exists!".format(src, dst))
-                if not os.path.exists(src):
-                    raise Exception("Cannot move {}, file does not exist! (this is bad, one of your documents is missing".format(src))
-
-                rename_operations.append( (src,dst) )
-            except (PermissionError, FileNotFoundError) as e:
-                raise Exception(e)
-
-    for (src, dst) in rename_operations:
-        print("file was renamed, restoring {} to {}".format(src, dst))
-        os.rename(src, dst)
-
-
-def initialize_document_classifier(apps, schema_editor):
-    try:
-        print("Initalizing document classifier...")
-        from documents.classifier import DocumentClassifier
-        classifier = DocumentClassifier()
-        try:
-            classifier.train()
-            classifier.save_classifier()
-        except Exception as e:
-            print("Classifier error: {}".format(e))
-    except ImportError:
-        print("Document classifier not found, skipping")
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -72,13 +30,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(
-            code=restore_filenames,
-        ),
-        migrations.RemoveField(
-            model_name='document',
-            name='filename',
-        ),
         migrations.AddField(
             model_name='document',
             name='archive_serial_number',
@@ -139,10 +90,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             code=make_index,
-            reverse_code=django.db.migrations.operations.special.RunPython.noop,
-        ),
-        migrations.RunPython(
-            code=initialize_document_classifier,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
     ]
