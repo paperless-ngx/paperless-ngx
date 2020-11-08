@@ -40,6 +40,7 @@ import { SaveViewConfigDialogComponent } from './components/document-list/save-v
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { DateTimeComponent } from './components/common/input/date-time/date-time.component';
 import { TagsComponent } from './components/common/input/tags/tags.component';
+import { SortableDirective } from './directives/sortable.directive';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { TagsComponent } from './components/common/input/tags/tags.component';
     CheckComponent,
     SaveViewConfigDialogComponent,
     DateTimeComponent,
-    TagsComponent
+    TagsComponent,
+    SortableDirective
   ],
   imports: [
     BrowserModule,

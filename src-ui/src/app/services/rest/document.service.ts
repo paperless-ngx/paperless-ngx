@@ -47,16 +47,8 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     }
   }
 
-  private getOrderingQueryParam(sortField: string, sortDirection: string) {
-    if (DOCUMENT_SORT_FIELDS.find(f => f.field == sortField)) {
-      return (sortDirection == SORT_DIRECTION_DESCENDING ? '-' : '') + sortField
-    } else {
-      return null
-    }
-  }
-
   list(page?: number, pageSize?: number, sortField?: string, sortDirection?: string, filterRules?: FilterRule[]): Observable<Results<PaperlessDocument>> {
-    return super.list(page, pageSize, this.getOrderingQueryParam(sortField, sortDirection), this.filterRulesToQueryParams(filterRules))
+    return super.list(page, pageSize, sortField, sortDirection, this.filterRulesToQueryParams(filterRules))
   }
 
   getPreviewUrl(id: number): string {
