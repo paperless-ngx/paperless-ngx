@@ -21,6 +21,9 @@ def __get_boolean(key, default="NO"):
     """
     return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
+# NEVER RUN WITH DEBUG IN PRODUCTION.
+DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
+
 ###############################################################################
 # Directories                                                                 #
 ###############################################################################
@@ -66,8 +69,9 @@ INSTALLED_APPS = [
     "django.contrib.admin",
 
     "rest_framework",
-    "rest_framework.authtoken",
     "django_filters",
+
+    "django_q",
 
     "channels",
 
@@ -76,10 +80,14 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        'paperless.auth.QueryTokenAuthentication'
+        'rest_framework.authentication.SessionAuthentication'
     ]
 }
+
+if DEBUG:
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
+        'paperless.auth.AngularApiAuthenticationOverride'
+    )
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -94,8 +102,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'paperless.urls'
-
-LOGIN_URL = "admin:login"
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 
@@ -125,9 +131,6 @@ TEMPLATES = [
 # Security                                                                    #
 ###############################################################################
 
-# NEVER RUN WITH DEBUG IN PRODUCTION.
-DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
-
 if DEBUG:
     X_FRAME_OPTIONS = ''
     # this should really be 'allow-from uri' but its not supported in any mayor
@@ -141,11 +144,6 @@ CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://
 if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ORIGIN_WHITELIST += ('http://localhost:4200',)
-
-# If auth is disabled, we just use our "bypass" authentication middleware
-if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
-    _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
-    MIDDLEWARE[_index] = "paperless.middleware.Middleware"
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
@@ -250,6 +248,16 @@ LOGGING = {
 }
 
 ###############################################################################
+# Task queue                                                                  #
+###############################################################################
+
+Q_CLUSTER = {
+    'name': 'paperless',
+    'catch_up': False,
+    'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+}
+
+###############################################################################
 # Paperless Specific Settings                                                 #
 ###############################################################################
 
@@ -302,6 +310,9 @@ FILENAME_DATE_ORDER = os.getenv("PAPERLESS_FILENAME_DATE_ORDER")
 FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
+
+# Specify the filename format for out files
+PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
 
 CHANNEL_LAYERS = {
     "default": {

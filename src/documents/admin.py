@@ -2,7 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
+from whoosh.writing import AsyncWriter
 
+from . import index
 from .models import Correspondent, Document, DocumentType, Log, Tag
 
 
@@ -70,6 +72,21 @@ class DocumentAdmin(admin.ModelAdmin):
     def created_(self, obj):
         return obj.created.date().strftime("%Y-%m-%d")
     created_.short_description = "Created"
+
+    def delete_queryset(self, request, queryset):
+        ix = index.open_index()
+        with AsyncWriter(ix) as writer:
+            for o in queryset:
+                index.remove_document(writer, o)
+        super(DocumentAdmin, self).delete_queryset(request, queryset)
+
+    def delete_model(self, request, obj):
+        index.remove_document_from_index(obj)
+        super(DocumentAdmin, self).delete_model(request, obj)
+
+    def save_model(self, request, obj, form, change):
+        index.add_or_update_document(obj)
+        super(DocumentAdmin, self).save_model(request, obj, form, change)
 
     @mark_safe
     def tags_(self, obj):

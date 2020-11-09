@@ -12,7 +12,6 @@ import { TagListComponent } from './components/manage/tag-list/tag-list.componen
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component';
 import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
-import { LoginComponent } from './components/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { SafePipe } from './pipes/safe.pipe';
@@ -29,7 +28,6 @@ import { PageHeaderComponent } from './components/common/page-header/page-header
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
 import { FilterEditorComponent } from './components/filter-editor/filter-editor.component';
-import { AuthInterceptor } from './services/auth.interceptor';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
 import { NgxFileDropModule } from 'ngx-file-drop';
@@ -40,6 +38,7 @@ import { SaveViewConfigDialogComponent } from './components/document-list/save-v
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { DateTimeComponent } from './components/common/input/date-time/date-time.component';
 import { TagsComponent } from './components/common/input/tags/tags.component';
+import { SortableDirective } from './directives/sortable.directive';
 import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-view-widget/saved-view-widget.component';
 import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/consumer-status-widget/consumer-status-widget.component';
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component';
@@ -56,7 +55,6 @@ import { FileUploadWidgetComponent } from './components/dashboard/widgets/file-u
     DocumentTypeListComponent,
     LogsComponent,
     SettingsComponent,
-    LoginComponent,
     SafePipe,
     NotFoundComponent,
     CorrespondentEditDialogComponent,
@@ -78,6 +76,7 @@ import { FileUploadWidgetComponent } from './components/dashboard/widgets/file-u
     SaveViewConfigDialogComponent,
     DateTimeComponent,
     TagsComponent,
+    SortableDirective,
     ConsumerStatusWidgetComponent,
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
@@ -94,12 +93,7 @@ import { FileUploadWidgetComponent } from './components/dashboard/widgets/file-u
     InfiniteScrollModule
   ],
   providers: [
-    DatePipe,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }
+    DatePipe
   ],
   bootstrap: [AppComponent]
 })
