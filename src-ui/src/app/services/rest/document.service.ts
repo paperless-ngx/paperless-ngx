@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { AbstractPaperlessService } from './abstract-paperless-service';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../auth.service';
 import { Observable } from 'rxjs';
 import { Results } from 'src/app/data/results';
 import { FilterRule } from 'src/app/data/filter-rule';
@@ -10,6 +9,7 @@ import { FilterRule } from 'src/app/data/filter-rule';
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: "correspondent__name", name: "Correspondent" },
+  { field: "document_type__name", name: "Document type" },
   { field: 'title', name: 'Title' },
   { field: 'archive_serial_number', name: 'ASN' },
   { field: 'created', name: 'Created' },
@@ -26,7 +26,7 @@ export const SORT_DIRECTION_DESCENDING = "des"
 })
 export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
 
-  constructor(http: HttpClient, private auth: AuthService) {
+  constructor(http: HttpClient) {
     super(http, 'documents')
   }
 
@@ -46,28 +46,20 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     }
   }
 
-  private getOrderingQueryParam(sortField: string, sortDirection: string) {
-    if (DOCUMENT_SORT_FIELDS.find(f => f.field == sortField)) {
-      return (sortDirection == SORT_DIRECTION_DESCENDING ? '-' : '') + sortField
-    } else {
-      return null
-    }
-  }
-
   list(page?: number, pageSize?: number, sortField?: string, sortDirection?: string, filterRules?: FilterRule[]): Observable<Results<PaperlessDocument>> {
-    return super.list(page, pageSize, this.getOrderingQueryParam(sortField, sortDirection), this.filterRulesToQueryParams(filterRules))
+    return super.list(page, pageSize, sortField, sortDirection, this.filterRulesToQueryParams(filterRules))
   }
 
   getPreviewUrl(id: number): string {
-    return this.getResourceUrl(id, 'preview') + `?auth_token=${this.auth.getToken()}`
+    return this.getResourceUrl(id, 'preview')
   }
 
   getThumbUrl(id: number): string {
-    return this.getResourceUrl(id, 'thumb') + `?auth_token=${this.auth.getToken()}`
+    return this.getResourceUrl(id, 'thumb')
   }
 
   getDownloadUrl(id: number): string {
-    return this.getResourceUrl(id, 'download') + `?auth_token=${this.auth.getToken()}`
+    return this.getResourceUrl(id, 'download')
   }
 
   uploadDocument(formData) {

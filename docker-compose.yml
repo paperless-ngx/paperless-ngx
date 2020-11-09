@@ -2,8 +2,7 @@ version: "3.4"
 services:
   broker:
     image: redis:latest
-    ports:
-      - 6379:6379
+    #restart: always
 
   db:
     image: postgres:13
@@ -16,13 +15,12 @@ services:
       POSTGRES_PASSWORD: paperless
 
   webserver:
-    build: .
-    image: paperless-ng
+    image: paperless-ng:latest
     #restart: always
     depends_on:
       - db
     ports:
-      - "8000:8000"
+      - 8000:8000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 30s
@@ -34,6 +32,9 @@ services:
       - ./export:/usr/src/paperless/export
       - ./consume:/usr/src/paperless/consume
     env_file: docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
     command: ["supervisord", "-c", "/etc/supervisord.conf"]
 
 

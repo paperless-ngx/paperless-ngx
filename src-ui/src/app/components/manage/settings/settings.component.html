@@ -34,7 +34,7 @@
       <a ngbNavLink>Saved views</a>
       <ng-template ngbNavContent>
 
-        <table class="table table-striped">
+        <table class="table table-borderless table-sm">
           <thead>
             <tr>
               <th scope="col">Title</th>
@@ -57,7 +57,7 @@
     </li>
   </ul>
 
-  <div [ngbNavOutlet]="nav" class="mt-2"></div>
+  <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3"></div>
 
   <button type="submit" class="btn btn-primary">Save</button>
 </form>

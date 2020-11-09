@@ -4,6 +4,16 @@
 # running paperless.
 
 ###############################################################################
+####                           Message Broker                              ####
+###############################################################################
+
+# This is required for processing scheduled tasks such as email fetching, index
+# optimization and for training the automatic document matcher.
+# Defaults to localhost:6379.
+#PAPERLESS_REDIS="redis://localhost:6379"
+
+
+###############################################################################
 ####                        Database Settings                              ####
 ###############################################################################
 
@@ -63,7 +73,19 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 
 # Any email sent to the target account that does not contain this text will be
 # ignored.
-#PAPERLESS_EMAIL_SECRET=""
+PAPERLESS_EMAIL_SECRET=""
+
+# Specify a filename format for the document (directories are supported)
+# Use the following placeholders:
+# * {correspondent}
+# * {title}
+# * {created}
+# * {added}
+# * {tags[KEY]} If your tags conform to key_value or key-value
+# * {tags[INDEX]} If your tags are strings, select the tag by index
+# Uniqueness of filenames is ensured, as an incrementing counter is attached
+# to each filename.
+#PAPERLESS_FILENAME_FORMAT=""
 
 ###############################################################################
 ####                              Security                                 ####
@@ -116,11 +138,6 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 #
 # https://docs.djangoproject.com/en/1.11/ref/settings/#force-script-name
 #PAPERLESS_FORCE_SCRIPT_NAME=""
-
-# If you are using alternative authentication means or are just using paperless
-# as a single user on a small private network, this option allows you to disable
-# user authentication if you set it to "true"
-#PAPERLESS_DISABLE_LOGIN="false"
 
 ###############################################################################
 ####                          Software Tweaks                              ####
