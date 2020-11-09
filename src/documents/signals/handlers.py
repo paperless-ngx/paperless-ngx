@@ -166,3 +166,7 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
         user=user,
         object_repr=document.__str__(),
     )
+
+
+def add_to_index(sender, document, **kwargs):
+    index.add_or_update_document(document)

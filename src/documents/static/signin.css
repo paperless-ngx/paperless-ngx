@@ -1,23 +1,23 @@
-.form-signin-container {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: fixed;
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
   background-color: #f5f5f5;
 }
 
 .form-signin {
+  width: 100%;
   max-width: 330px;
-  height: auto;
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-
+  padding: 15px;
   margin: auto;
-  text-align: center;
 }
 .form-signin .checkbox {
   font-weight: 400;
