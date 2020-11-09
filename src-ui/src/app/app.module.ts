@@ -12,7 +12,6 @@ import { TagListComponent } from './components/manage/tag-list/tag-list.componen
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component';
 import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
-import { LoginComponent } from './components/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { SafePipe } from './pipes/safe.pipe';
@@ -29,7 +28,6 @@ import { PageHeaderComponent } from './components/common/page-header/page-header
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
 import { FilterEditorComponent } from './components/filter-editor/filter-editor.component';
-import { AuthInterceptor } from './services/auth.interceptor';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
 import { NgxFileDropModule } from 'ngx-file-drop';
@@ -53,7 +51,6 @@ import { SortableDirective } from './directives/sortable.directive';
     DocumentTypeListComponent,
     LogsComponent,
     SettingsComponent,
-    LoginComponent,
     SafePipe,
     NotFoundComponent,
     CorrespondentEditDialogComponent,
@@ -88,12 +85,7 @@ import { SortableDirective } from './directives/sortable.directive';
     InfiniteScrollModule
   ],
   providers: [
-    DatePipe,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }
+    DatePipe
   ],
   bootstrap: [AppComponent]
 })
