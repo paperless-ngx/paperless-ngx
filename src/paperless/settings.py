@@ -140,11 +140,6 @@ if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ORIGIN_WHITELIST += ('http://localhost:4200',)
 
-# If auth is disabled, we just use our "bypass" authentication middleware
-if bool(os.getenv("PAPERLESS_DISABLE_LOGIN", "false").lower() in ("yes", "y", "1", "t", "true")):
-    _index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
-    MIDDLEWARE[_index] = "paperless.middleware.Middleware"
-
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
 # public, you should change the key to something unique and verbose.
