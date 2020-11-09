@@ -21,6 +21,9 @@ def __get_boolean(key, default="NO"):
     """
     return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
+# NEVER RUN WITH DEBUG IN PRODUCTION.
+DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
+
 ###############################################################################
 # Directories                                                                 #
 ###############################################################################
@@ -66,7 +69,6 @@ INSTALLED_APPS = [
     "django.contrib.admin",
 
     "rest_framework",
-    "rest_framework.authtoken",
     "django_filters",
 
 ]
@@ -74,10 +76,14 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        'paperless.auth.QueryTokenAuthentication'
+        'rest_framework.authentication.SessionAuthentication'
     ]
 }
+
+if DEBUG:
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
+        'paperless.auth.AngularApiAuthenticationOverride'
+    )
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -92,8 +98,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'paperless.urls'
-
-LOGIN_URL = "admin:login"
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 
@@ -121,9 +125,6 @@ TEMPLATES = [
 ###############################################################################
 # Security                                                                    #
 ###############################################################################
-
-# NEVER RUN WITH DEBUG IN PRODUCTION.
-DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
 if DEBUG:
     X_FRAME_OPTIONS = ''

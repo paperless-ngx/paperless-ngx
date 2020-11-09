@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { AbstractPaperlessService } from './abstract-paperless-service';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../auth.service';
 import { Observable } from 'rxjs';
 import { Results } from 'src/app/data/results';
 import { FilterRule } from 'src/app/data/filter-rule';
@@ -27,7 +26,7 @@ export const SORT_DIRECTION_DESCENDING = "des"
 })
 export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
 
-  constructor(http: HttpClient, private auth: AuthService) {
+  constructor(http: HttpClient) {
     super(http, 'documents')
   }
 
@@ -52,15 +51,15 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
   }
 
   getPreviewUrl(id: number): string {
-    return this.getResourceUrl(id, 'preview') + `?auth_token=${this.auth.getToken()}`
+    return this.getResourceUrl(id, 'preview')
   }
 
   getThumbUrl(id: number): string {
-    return this.getResourceUrl(id, 'thumb') + `?auth_token=${this.auth.getToken()}`
+    return this.getResourceUrl(id, 'thumb')
   }
 
   getDownloadUrl(id: number): string {
-    return this.getResourceUrl(id, 'download') + `?auth_token=${this.auth.getToken()}`
+    return this.getResourceUrl(id, 'download')
   }
 
   uploadDocument(formData) {
