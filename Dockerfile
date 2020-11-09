@@ -65,7 +65,7 @@ COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 
 # copy app
 COPY src/ ./src/
-COPY --from=frontend /usr/src/paperless/src-ui/dist/paperless-ui/ ./src/documents/static/
+COPY --from=frontend /usr/src/paperless/src-ui/dist/paperless-ui/ ./src/documents/static/frontend/
 
 # add users, setup scripts
 RUN addgroup --gid 1000 paperless \
