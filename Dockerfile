@@ -25,7 +25,6 @@ COPY Pipfile* ./
 #Dependencies
 RUN apt-get update \
   && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install \
-		anacron \
 		build-essential \
 		curl \
 		ghostscript \
@@ -60,7 +59,6 @@ RUN apt-get update \
 COPY scripts/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 COPY scripts/gunicorn.conf.py ./
 COPY scripts/supervisord.conf /etc/supervisord.conf
-COPY scripts/paperless-cron /etc/cron.daily/
 COPY scripts/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 
 # copy app
@@ -71,9 +69,7 @@ COPY --from=frontend /usr/src/paperless/src-ui/dist/paperless-ui/ ./src/document
 RUN addgroup --gid 1000 paperless \
 	&& useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
 	&& chown -R paperless:paperless . \
-	&& chmod 755 /sbin/docker-entrypoint.sh \
-	&& chmod +x /etc/cron.daily/paperless-cron \
-	&& rm /etc/cron.daily/apt-compat /etc/cron.daily/dpkg
+	&& chmod 755 /sbin/docker-entrypoint.sh
 
 WORKDIR /usr/src/paperless/src/
 
@@ -81,6 +77,6 @@ RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
 
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
-CMD ["python3", "manage.py", "--help"]
+CMD ["supervisord", "-c", "/etc/supervisord.conf"]
 
 LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"

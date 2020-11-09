@@ -71,6 +71,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
 
+    "django_q",
+
 ]
 
 REST_FRAMEWORK = {
@@ -240,6 +242,16 @@ LOGGING = {
             "level": "DEBUG"
         },
     },
+}
+
+###############################################################################
+# Task queue                                                                  #
+###############################################################################
+
+Q_CLUSTER = {
+    'name': 'paperless',
+    'catch_up': False,
+    'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 }
 
 ###############################################################################

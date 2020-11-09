@@ -4,6 +4,16 @@
 # running paperless.
 
 ###############################################################################
+####                           Message Broker                              ####
+###############################################################################
+
+# This is required for processing scheduled tasks such as email fetching, index
+# optimization and for training the automatic document matcher.
+# Defaults to localhost:6379.
+#PAPERLESS_REDIS="redis://localhost:6379"
+
+
+###############################################################################
 ####                        Database Settings                              ####
 ###############################################################################
 
