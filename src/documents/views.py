@@ -191,13 +191,12 @@ class SearchView(APIView):
             except (ValueError, TypeError):
                 page = 1
 
-            result_page = index.query_page(self.ix, query, page)
-
-            return Response(
-                {'count': len(result_page),
-                 'page': result_page.pagenum,
-                 'page_count': result_page.pagecount,
-                 'results': list(map(self.add_infos_to_hit, result_page))})
+            with index.query_page(self.ix, query, page) as result_page:
+                return Response(
+                    {'count': len(result_page),
+                     'page': result_page.pagenum,
+                     'page_count': result_page.pagecount,
+                     'results': list(map(self.add_infos_to_hit, result_page))})
 
         else:
             return Response({
