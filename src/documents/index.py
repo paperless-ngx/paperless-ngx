@@ -1,4 +1,5 @@
 import logging
+from contextlib import contextmanager
 
 from django.db import models
 from django.dispatch import receiver
@@ -99,15 +100,19 @@ def remove_document_from_index(document):
         remove_document(writer, document)
 
 
+@contextmanager
 def query_page(ix, query, page):
-    with ix.searcher() as searcher:
+    searcher = ix.searcher()
+    try:
         query_parser = MultifieldParser(["content", "title", "correspondent"],
                                         ix.schema).parse(query)
         result_page = searcher.search_page(query_parser, page)
         result_page.results.fragmenter = highlight.ContextFragmenter(
             surround=50)
         result_page.results.formatter = JsonFormatter()
-        return result_page
+        yield result_page
+    finally:
+        searcher.close()
 
 
 def autocomplete(ix, term, limit=10):
