@@ -84,6 +84,8 @@ class Consumer:
                 "warning",
                 "Skipping {} as it appears to be a duplicate".format(doc)
             )
+            if settings.CONSUMER_DELETE_DUPLICATES:
+                self._cleanup_doc(doc)
             return False
 
         self.log("info", "Consuming {}".format(doc))
