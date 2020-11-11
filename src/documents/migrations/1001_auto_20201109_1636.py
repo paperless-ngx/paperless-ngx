@@ -13,7 +13,9 @@ def add_schedules(apps, schema_editor):
 
 
 def remove_schedules(apps, schema_editor):
-    Schedule.objects.all().delete()
+    Schedule.objects.filter(func='documents.tasks.train_classifier').delete()
+    Schedule.objects.filter(func='documents.tasks.index_optimize').delete()
+    Schedule.objects.filter(func='documents.tasks.consume_mail').delete()
 
 
 class Migration(migrations.Migration):
