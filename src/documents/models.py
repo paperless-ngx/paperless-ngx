@@ -8,10 +8,8 @@ from collections import OrderedDict
 import dateutil.parser
 from django.conf import settings
 from django.db import models
-from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.text import slugify
-
 
 
 class MatchingModel(models.Model):
@@ -190,6 +188,14 @@ class Document(models.Model):
     added = models.DateTimeField(
         default=timezone.now, editable=False, db_index=True)
 
+    filename = models.FilePathField(
+        max_length=1024,
+        editable=False,
+        default=None,
+        null=True,
+        help_text="Current filename in storage"
+    )
+
     archive_serial_number = models.IntegerField(
         blank=True,
         null=True,
@@ -213,13 +219,16 @@ class Document(models.Model):
 
     @property
     def source_path(self):
-        file_name = "{:07}.{}".format(self.pk, self.file_type)
-        if self.storage_type == self.STORAGE_TYPE_GPG:
-            file_name += ".gpg"
+        if self.filename:
+            fname = str(self.filename)
+        else:
+            fname = "{:07}.{}".format(self.pk, self.file_type)
+            if self.storage_type == self.STORAGE_TYPE_GPG:
+                fname += ".gpg"
 
         return os.path.join(
             settings.ORIGINALS_DIR,
-            file_name
+            fname
         )
 
     @property

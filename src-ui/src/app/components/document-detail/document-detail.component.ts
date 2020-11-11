@@ -134,8 +134,8 @@ export class DocumentDetailComponent implements OnInit {
 
   close() {
     this.openDocumentService.closeDocument(this.document)
-    if (this.documentListViewService.viewConfig) {
-      this.router.navigate(['view', this.documentListViewService.viewConfig.id])
+    if (this.documentListViewService.viewId) {
+      this.router.navigate(['view', this.documentListViewService.viewId])
     } else {
       this.router.navigate(['documents'])
     }

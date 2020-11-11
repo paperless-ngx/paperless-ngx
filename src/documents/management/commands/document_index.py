@@ -1,9 +1,7 @@
 from django.core.management import BaseCommand
-from whoosh.writing import AsyncWriter
 
-import documents.index as index
 from documents.mixins import Renderable
-from documents.models import Document
+from documents.tasks import index_reindex, index_optimize
 
 
 class Command(Renderable, BaseCommand):
@@ -22,13 +20,6 @@ class Command(Renderable, BaseCommand):
         self.verbosity = options["verbosity"]
 
         if options['command'] == 'reindex':
-            documents = Document.objects.all()
-
-            ix = index.open_index(recreate=True)
-
-            with AsyncWriter(ix) as writer:
-                for document in documents:
-                    index.update_document(writer, document)
-
+            index_reindex()
         elif options['command'] == 'optimize':
-            index.open_index().optimize()
+            index_optimize()
