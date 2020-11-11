@@ -1,4 +1,4 @@
-<app-page-header [title]="docs.viewConfig ? docs.viewConfig.title : 'Documents'">
+<app-page-header [title]="getTitle()">
 
   <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="displayMode"
     (ngModelChange)="saveDisplayMode()">
@@ -21,14 +21,13 @@
       </svg>
     </label>
   </div>
-  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="docs.currentSortDirection"
-    (ngModelChange)="reload()"
-    *ngIf="!docs.viewConfig">
+  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="docs.sortDirection"
+    *ngIf="!docs.viewId">
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-secondary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
         <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSort(f.field)"
-          [class.active]="docs.currentSortField == f.field">{{f.name}}</button>
+          [class.active]="docs.sortField == f.field">{{f.name}}</button>
       </div>
     </div>
     <label ngbButtonLabel class="btn-outline-secondary btn-sm">
@@ -44,7 +43,7 @@
       </svg>
     </label>
   </div>
-  <div class="btn-group" *ngIf="!docs.viewConfig">
+  <div class="btn-group" *ngIf="!docs.viewId">
 
     <button type="button" class="btn btn-sm btn-outline-secondary" (click)="showFilter=!showFilter">
       <svg class="toolbaricon" fill="currentColor">
@@ -61,7 +60,6 @@
         <button ngbDropdownItem (click)="saveViewConfig()">Save current view</button>
       </div>
     </div>
-
 
   </div>
 </app-page-header>

@@ -20,7 +20,7 @@ export class LogsComponent implements OnInit {
   }
 
   reload() {
-    this.logService.list(1, 50, null, {'level__gte': this.level}).subscribe(result => this.logs = result.results)
+    this.logService.list(1, 50, 'created', 'des', {'level__gte': this.level}).subscribe(result => this.logs = result.results)
   }
 
   getLevelText(level: number) {
@@ -32,7 +32,7 @@ export class LogsComponent implements OnInit {
     if (this.logs.length > 0) {
       lastCreated = this.logs[this.logs.length-1].created
     }
-    this.logService.list(1, 25, null, {'created__lt': lastCreated, 'level__gte': this.level}).subscribe(result => {
+    this.logService.list(1, 25, 'created', 'des', {'created__lt': lastCreated, 'level__gte': this.level}).subscribe(result => {
       this.logs.push(...result.results)
     })
   }

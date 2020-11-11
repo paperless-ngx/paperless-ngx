@@ -1,7 +1,8 @@
-import { Directive, OnInit } from '@angular/core';
+import { Directive, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MatchingModel, MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
+import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
 import { DeleteDialogComponent } from '../../common/delete-dialog/delete-dialog.component';
 
@@ -14,11 +15,16 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
     private editDialogComponent: any) {
     }
 
+  @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>;
+
   public data: T[] = []
 
   public page = 1
 
   public collectionSize = 0
+
+  public sortField: string
+  public sortDirection: string
 
   getMatching(o: MatchingModel) {
     if (o.matching_algorithm == MATCH_AUTO) {
@@ -30,12 +36,31 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
     }
   }
 
+  onSort(event: SortEvent) {
+
+    if (event.direction && event.direction.length > 0) {
+      this.sortField = event.column
+      this.sortDirection = event.direction
+    } else {
+      this.sortField = null
+      this.sortDirection = null
+    }
+
+    this.headers.forEach(header => {
+      if (header.sortable !== this.sortField) {
+        header.direction = '';
+      }
+    });
+
+    this.reloadData()
+  }
+
   ngOnInit(): void {
     this.reloadData()
   }
 
   reloadData() {
-    this.service.list(this.page).subscribe(c => {
+    this.service.list(this.page, null, this.sortField, this.sortDirection).subscribe(c => {
       this.data = c.results
       this.collectionSize = c.count
     });

@@ -6,9 +6,13 @@ from django.conf import settings
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db import models, DatabaseError
+from django.dispatch import receiver
 from django.utils import timezone
 
 from .. import index, matching
+from ..file_handling import delete_empty_directories, generate_filename, \
+    create_source_path_directory
 from ..models import Document, Tag
 
 
@@ -141,16 +145,64 @@ def run_post_consume_script(sender, document, **kwargs):
     )).wait()
 
 
+@receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
-
-    if not isinstance(instance, Document):
-        return
-
     for f in (instance.source_path, instance.thumbnail_path):
         try:
             os.unlink(f)
         except FileNotFoundError:
             pass  # The file's already gone, so we're cool with it.
+
+    delete_empty_directories(os.path.dirname(instance.source_path))
+
+
+@receiver(models.signals.m2m_changed, sender=Document.tags.through)
+@receiver(models.signals.post_save, sender=Document)
+def update_filename_and_move_files(sender, instance, **kwargs):
+
+    if not instance.filename:
+        # Can't update the filename if there is not filename to begin with
+        # This happens after the consumer creates a new document.
+        # The PK needs to be set first by saving the document once. When this
+        # happens, the file is not yet in the ORIGINALS_DIR, and thus can't be
+        # renamed anyway. In all other cases, instance.filename will be set.
+        return
+
+    old_filename = instance.filename
+    old_path = instance.source_path
+    new_filename = generate_filename(instance)
+
+    if new_filename == instance.filename:
+        # Don't do anything if its the same.
+        return
+
+    new_path = os.path.join(settings.ORIGINALS_DIR, new_filename)
+
+    if not os.path.isfile(old_path):
+        # Can't do anything if the old file does not exist anymore.
+        logging.getLogger(__name__).fatal('Document {}: File {} has gone.'.format(str(instance), old_path))
+        return
+
+    if os.path.isfile(new_path):
+        # Can't do anything if the new file already exists. Skip updating file.
+        logging.getLogger(__name__).warning('Document {}: Cannot rename file since target path {} already exists.'.format(str(instance), new_path))
+        return
+
+    create_source_path_directory(new_path)
+
+    try:
+        os.rename(old_path, new_path)
+        instance.filename = new_filename
+        instance.save()
+
+    except OSError as e:
+        instance.filename = old_filename
+    except DatabaseError as e:
+        os.rename(new_path, old_path)
+        instance.filename = old_filename
+
+    if not os.path.isfile(old_path):
+        delete_empty_directories(os.path.dirname(old_path))
 
 
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
@@ -166,3 +218,7 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
         user=user,
         object_repr=document.__str__(),
     )
+
+
+def add_to_index(sender, document, **kwargs):
+    index.add_or_update_document(document)

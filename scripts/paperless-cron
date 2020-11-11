@@ -1,5 +1,0 @@
-#!/bin/sh
-
-cd /usr/src/paperless/src
-
-sudo -HEu paperless python3 manage.py document_create_classifier
