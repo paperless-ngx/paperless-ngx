@@ -60,7 +60,6 @@ class Consumer:
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(self.consume))
 
-
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
             "group": self.logging_group
@@ -98,7 +97,6 @@ class Consumer:
         else:
             self.log("info", "Parser: {}".format(parser_class.__name__))
 
-
         document_consumption_started.send(
             sender=self.__class__,
             filename=doc,
@@ -110,9 +108,10 @@ class Consumer:
         try:
             self.log("info", "Generating thumbnail for {}...".format(doc))
             thumbnail = document_parser.get_optimised_thumbnail()
+            text = document_parser.get_text()
             date = document_parser.get_date()
             document = self._store(
-                document_parser.get_text(),
+                text,
                 doc,
                 thumbnail,
                 date
