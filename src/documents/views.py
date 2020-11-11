@@ -6,9 +6,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from whoosh import highlight
-from whoosh.qparser import QueryParser
-from whoosh.query import terms
 
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
@@ -97,7 +94,16 @@ class DocumentViewSet(RetrieveModelMixin,
     filter_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
-        "id", "title", "correspondent__name", "created", "modified", "added", "archive_serial_number")
+        "id", "title", "correspondent__name", "document_type__name", "created", "modified", "added", "archive_serial_number")
+
+    def update(self, request, *args, **kwargs):
+        response = super(DocumentViewSet, self).update(request, *args, **kwargs)
+        index.add_or_update_document(self.get_object())
+        return response
+
+    def destroy(self, request, *args, **kwargs):
+        index.remove_document_from_index(self.get_object())
+        return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
     def file_response(self, pk, disposition):
         #TODO: this should not be necessary here.
@@ -185,13 +191,7 @@ class SearchView(APIView):
             except (ValueError, TypeError):
                 page = 1
 
-            with self.ix.searcher() as searcher:
-                query_parser = QueryParser("content", self.ix.schema).parse(query)
-                result_page = searcher.search_page(query_parser, page)
-                result_page.results.fragmenter = highlight.ContextFragmenter(
-                    surround=50)
-                result_page.results.formatter = index.JsonFormatter()
-
+            with index.query_page(self.ix, query, page) as result_page:
                 return Response(
                     {'count': len(result_page),
                      'page': result_page.pagenum,

@@ -10,7 +10,11 @@ export class SavedViewConfigService {
   constructor() { 
     let savedConfigs = localStorage.getItem('saved-view-config-service:savedConfigs')
     if (savedConfigs) {
-      this.configs = JSON.parse(savedConfigs)
+      try {
+        this.configs = JSON.parse(savedConfigs)
+      } catch (e) {
+        this.configs = []
+      }
     }
   }
 

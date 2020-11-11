@@ -1,9 +1,9 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
-from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
 from paperless.views import FaviconView
@@ -34,7 +34,7 @@ urlpatterns = [
     url(r"^api/search/autocomplete/", SearchAutoCompleteView.as_view(), name="autocomplete"),
     url(r"^api/search/", SearchView.as_view(), name="search"),
     url(r"^api/statistics/", StatisticsView.as_view(), name="statistics"),
-    url(r"^api/token/", views.obtain_auth_token), url(r"^api/", include((api_router.urls, 'drf'), namespace="drf")),
+    url(r"^api/", include((api_router.urls, 'drf'), namespace="drf")),
 
     # Favicon
     url(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
@@ -58,10 +58,12 @@ urlpatterns = [
     url(r"^push$", csrf_exempt(RedirectView.as_view(url='/api/documents/post_document/'))),
 
     # Frontend assets TODO: this is pretty bad.
-    path('assets/<path:path>', RedirectView.as_view(url='/static/assets/%(path)s')),
+    path('assets/<path:path>', RedirectView.as_view(url='/static/frontend/assets/%(path)s')),
+
+    path('accounts/', include('django.contrib.auth.urls')),
 
     # Root of the Frontent
-    url(r".*", IndexView.as_view()),
+    url(r".*", login_required(IndexView.as_view())),
 
 ]
 

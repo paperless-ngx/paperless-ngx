@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from paperless.db import GnuPG
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
+from .file_handling import generate_filename, create_source_path_directory
 from .models import Document, FileInfo
 from .parsers import ParseError, get_parser_class
 from .signals import (
@@ -60,7 +61,6 @@ class Consumer:
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(self.consume))
 
-
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
             "group": self.logging_group
@@ -84,6 +84,8 @@ class Consumer:
                 "warning",
                 "Skipping {} as it appears to be a duplicate".format(doc)
             )
+            if settings.CONSUMER_DELETE_DUPLICATES:
+                self._cleanup_doc(doc)
             return False
 
         self.log("info", "Consuming {}".format(doc))
@@ -96,7 +98,6 @@ class Consumer:
         else:
             self.log("info", "Parser: {}".format(parser_class.__name__))
 
-
         document_consumption_started.send(
             sender=self.__class__,
             filename=doc,
@@ -108,9 +109,10 @@ class Consumer:
         try:
             self.log("info", "Generating thumbnail for {}...".format(doc))
             thumbnail = document_parser.get_optimised_thumbnail()
+            text = document_parser.get_text()
             date = document_parser.get_date()
             document = self._store(
-                document_parser.get_text(),
+                text,
                 doc,
                 thumbnail,
                 date
@@ -173,10 +175,15 @@ class Consumer:
             self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
+        document.filename = generate_filename(document)
+
+        create_source_path_directory(document.source_path)
+
         self._write(document, doc, document.source_path)
         self._write(document, thumbnail, document.thumbnail_path)
 
-        #TODO: why do we need to save the document again?
+        # We need to save the document twice, since we need the PK of the
+        # document in order to create its filename above.
         document.save()
 
         return document
