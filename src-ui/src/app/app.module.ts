@@ -39,6 +39,8 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { DateTimeComponent } from './components/common/input/date-time/date-time.component';
 import { TagsComponent } from './components/common/input/tags/tags.component';
 import { SortableDirective } from './directives/sortable.directive';
+import { CookieService } from 'ngx-cookie-service';
+import { CsrfInterceptor } from './interceptors/csrf.interceptor';
 
 @NgModule({
   declarations: [
@@ -85,7 +87,12 @@ import { SortableDirective } from './directives/sortable.directive';
     InfiniteScrollModule
   ],
   providers: [
-    DatePipe
+    DatePipe,
+    CookieService, {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CsrfInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })
