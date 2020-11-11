@@ -8,6 +8,7 @@ from django.core.management import call_command
 
 from documents.models import Document
 from paperless.db import GnuPG
+from ...file_handling import generate_filename, create_source_path_directory
 
 from ...mixins import Renderable
 
@@ -82,6 +83,10 @@ class Command(Renderable, BaseCommand):
 
     def _import_files_from_manifest(self):
 
+        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        if settings.PASSPHRASE:
+            storage_type = Document.STORAGE_TYPE_GPG
+
         for record in self.manifest:
 
             if not record["model"] == "documents.document":
@@ -93,6 +98,14 @@ class Command(Renderable, BaseCommand):
 
             document_path = os.path.join(self.source, doc_file)
             thumbnail_path = os.path.join(self.source, thumb_file)
+
+            document.storage_type = storage_type
+            document.filename = generate_filename(document)
+
+            if os.path.isfile(document.source_path):
+                raise FileExistsError(document.source_path)
+
+            create_source_path_directory(document.source_path)
 
             if settings.PASSPHRASE:
 
@@ -109,18 +122,8 @@ class Command(Renderable, BaseCommand):
                         encrypted.write(GnuPG.encrypted(unencrypted))
 
             else:
-
+                print("Moving {} to {}".format(document_path, document.source_path))
                 shutil.copy(document_path, document.source_path)
                 shutil.copy(thumbnail_path, document.thumbnail_path)
 
-        # Reset the storage type to whatever we've used while importing
-
-        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        if settings.PASSPHRASE:
-            storage_type = Document.STORAGE_TYPE_GPG
-
-        Document.objects.filter(
-            pk__in=[r["pk"] for r in self.manifest]
-        ).update(
-            storage_type=storage_type
-        )
+            document.save()

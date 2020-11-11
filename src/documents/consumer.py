@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from paperless.db import GnuPG
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
+from .file_handling import generate_filename, create_source_path_directory
 from .models import Document, FileInfo
 from .parsers import ParseError, get_parser_class
 from .signals import (
@@ -174,10 +175,15 @@ class Consumer:
             self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
+        document.filename = generate_filename(document)
+
+        create_source_path_directory(document.source_path)
+
         self._write(document, doc, document.source_path)
         self._write(document, thumbnail, document.thumbnail_path)
 
-        #TODO: why do we need to save the document again?
+        # We need to save the document twice, since we need the PK of the
+        # document in order to create its filename above.
         document.save()
 
         return document
