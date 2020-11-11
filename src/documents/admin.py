@@ -120,8 +120,3 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Log, LogAdmin)
-
-
-# Unless we implement multi-user, these default registrations don't make sense.
-admin.site.unregister(Group)
-admin.site.unregister(User)
