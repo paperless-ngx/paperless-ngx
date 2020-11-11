@@ -1,12 +1,12 @@
 version: "3.4"
 services:
   broker:
-    image: redis:latest
-    #restart: always
+    image: redis:6.0
+    restart: always
 
   db:
     image: postgres:13
-    #restart: always
+    restart: always
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
@@ -16,9 +16,10 @@ services:
 
   webserver:
     image: paperless-ng:latest
-    #restart: always
+    restart: always
     depends_on:
       - db
+      - broker
     ports:
       - 8000:8000
     healthcheck:
