@@ -1,19 +1,15 @@
-import datetime
 import os
 import shutil
-from unittest import mock
 from uuid import uuid4
 from pathlib import Path
-from shutil import rmtree
 
-from dateutil import tz
 from django.test import TestCase, override_settings
 
-from django.utils.text import slugify
-
 from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories
-from ..models import Tag, Document, Correspondent
+from ..models import Document, Correspondent
 from django.conf import settings
+
+from ..signals.handlers import update_filename_and_move_files
 
 
 class TestDate(TestCase):
@@ -123,6 +119,46 @@ class TestDate(TestCase):
 
         os.chmod(settings.ORIGINALS_DIR + "/none", 0o777)
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
+                       "{correspondent}")
+    def test_file_renaming_database_error(self):
+
+        document1 = Document.objects.create(file_type="pdf", storage_type=Document.STORAGE_TYPE_UNENCRYPTED, checksum="AAAAA")
+
+        document = Document()
+        document.file_type = "pdf"
+        document.checksum = "BBBBB"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename,
+                         "none/none-{:07d}.pdf".format(document.pk))
+        create_source_path_directory(document.source_path)
+        Path(document.source_path).touch()
+
+        # Test source_path
+        self.assertTrue(os.path.isfile(document.source_path))
+
+        # Set a correspondent and save the document
+        document.correspondent = Correspondent.objects.get_or_create(
+            name="test")[0]
+
+        # This will cause save() to fail.
+        document.checksum = document1.checksum
+
+        # Assume saving the document initially works, this gets called.
+        # After renaming, an error occurs, and filename is not saved:
+        # document should still be available at document.filename.
+        update_filename_and_move_files(None, document)
+
+        # Check proper handling of files
+        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
+                                        "originals/none/none-{:07d}.pdf".format(document.pk)), True)
+        self.assertEqual(document.filename,
+                         "none/none-{:07d}.pdf".format(document.pk))
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
                        "{correspondent}")
