@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
 import { PaperlessDocument } from '../data/paperless-document';
 import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys';
 
@@ -7,6 +6,8 @@ import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys';
   providedIn: 'root'
 })
 export class OpenDocumentsService {
+
+  private MAX_OPEN_DOCUMENTS = 5
 
   constructor() { 
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
@@ -31,7 +32,10 @@ export class OpenDocumentsService {
 
   openDocument(doc: PaperlessDocument) {
     if (this.openDocuments.find(d => d.id == doc.id) == null) {
-      this.openDocuments.push(doc)
+      this.openDocuments.unshift(doc)
+      if (this.openDocuments.length > this.MAX_OPEN_DOCUMENTS) {
+        this.openDocuments.pop()
+      }
       this.save()
     }
   }
@@ -42,6 +46,11 @@ export class OpenDocumentsService {
       this.openDocuments.splice(index, 1)
       this.save()
     }
+  }
+
+  closeAll() {
+    this.openDocuments.splice(0, this.openDocuments.length)
+    this.save()
   }
 
   save() {
