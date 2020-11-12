@@ -5,15 +5,14 @@ import subprocess
 from multiprocessing.pool import Pool
 
 import langdetect
+import pdftotext
 import pyocr
-from django.conf import settings
 from PIL import Image
+from django.conf import settings
 from pyocr import PyocrException
 
-import pdftotext
 from documents.parsers import DocumentParser, ParseError, run_unpaper, \
     run_convert
-
 from .languages import ISO639
 
 
@@ -45,8 +44,8 @@ class RasterisedDocumentParser(DocumentParser):
                         alpha="remove",
                         strip=True,
                         trim=True,
-                        input="{}[0]".format(self.document_path),
-                        output=out_path,
+                        input_file="{}[0]".format(self.document_path),
+                        output_file=out_path,
                         logging_group=self.logging_group)
         except ParseError:
             # if convert fails, fall back to extracting
@@ -66,8 +65,8 @@ class RasterisedDocumentParser(DocumentParser):
                         alpha="remove",
                         strip=True,
                         trim=True,
-                        input=gs_out_path,
-                        output=out_path,
+                        input_file=gs_out_path,
+                        output_file=out_path,
                         logging_group=self.logging_group)
 
         return out_path
@@ -99,7 +98,7 @@ class RasterisedDocumentParser(DocumentParser):
         try:
 
             sample_page_index = int(len(images) / 2)
-            self.log("info", "Attempting language detection on page {} of {}...".format(sample_page_index+1, len(images)))
+            self.log("info", "Attempting language detection on page {} of {}...".format(sample_page_index + 1, len(images)))
             sample_page_text = self._ocr([images[sample_page_index]], settings.OCR_LANGUAGE)[0]
             guessed_language = self._guess_language(sample_page_text)
 
@@ -139,8 +138,8 @@ class RasterisedDocumentParser(DocumentParser):
         run_convert(density=settings.CONVERT_DENSITY,
                     depth="8",
                     type="grayscale",
-                    input=self.document_path,
-                    output=pnm,
+                    input_file=self.document_path,
+                    output_file=pnm,
                     logging_group=self.logging_group)
 
         # Get a list of converted images
@@ -187,7 +186,6 @@ class RasterisedDocumentParser(DocumentParser):
             return ocr_pages
         else:
             return [sample_page]
-
 
 
 def strip_excess_whitespace(text):

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group, User
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from whoosh.writing import AsyncWriter
@@ -52,8 +51,16 @@ class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = ("added", "file_type", "storage_type", "filename")
-    list_display = ("title", "created", "added", "correspondent",
-                    "tags_", "archive_serial_number", "document_type", "filename")
+    list_display = (
+        "title",
+        "created",
+        "added",
+        "correspondent",
+        "tags_",
+        "archive_serial_number",
+        "document_type",
+        "filename"
+    )
     list_filter = (
         "document_type",
         "tags",

@@ -1,16 +1,15 @@
 import json
 import os
-import time
 import shutil
+import time
 
-from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
+from django.core.management.base import BaseCommand, CommandError
 
 from documents.models import Document, Correspondent, Tag, DocumentType
-from paperless.db import GnuPG
-
-from ...mixins import Renderable
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME
+from paperless.db import GnuPG
+from ...mixins import Renderable
 
 
 class Command(Renderable, BaseCommand):

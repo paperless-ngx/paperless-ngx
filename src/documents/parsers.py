@@ -22,11 +22,13 @@ from django.utils import timezone
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
 from documents.signals import document_consumer_declaration
 
+# TODO: isnt there a date parsing library for this?
+
 DATE_REGEX = re.compile(
-    r'(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|' +  # NOQA: E501
-    r'(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|' +  # NOQA: E501
-    r'(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|' +  # NOQA: E501
-    r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|' +
+    r'(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|'   # NOQA: E501
+    r'(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|'   # NOQA: E501
+    r'(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|'   # NOQA: E501
+    r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|'
     r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))'
 )
 
@@ -43,7 +45,7 @@ def get_parser_class(doc):
     for response in document_consumer_declaration.send(None):
         parsers.append(response[1])
 
-    #TODO: add a check that checks parser availability.
+    # TODO: add a check that checks parser availability.
 
     options = []
     for parser in parsers:
@@ -59,7 +61,7 @@ def get_parser_class(doc):
         options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
 
 
-def run_convert(input, output, density=None, scale=None, alpha=None, strip=False, trim=False, type=None, depth=None, extra=None, logging_group=None):
+def run_convert(input_file, output_file, density=None, scale=None, alpha=None, strip=False, trim=False, type=None, depth=None, extra=None, logging_group=None):
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
@@ -74,7 +76,7 @@ def run_convert(input, output, density=None, scale=None, alpha=None, strip=False
     args += ['-trim'] if trim else []
     args += ['-type', str(type)] if type else []
     args += ['-depth', str(depth)] if depth else []
-    args += [input, output]
+    args += [input_file, output_file]
 
     logger.debug("Execute: " + " ".join(args), extra={'group': logging_group})
 

@@ -4,11 +4,6 @@ from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from paperless.db import GnuPG
-from paperless.views import StandardPagination
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.mixins import (
     DestroyModelMixin,
@@ -17,12 +12,17 @@ from rest_framework.mixins import (
     UpdateModelMixin
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet,
     ReadOnlyModelViewSet
 )
 
+import documents.index as index
+from paperless.db import GnuPG
+from paperless.views import StandardPagination
 from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
@@ -30,8 +30,6 @@ from .filters import (
     DocumentTypeFilterSet,
     LogFilterSet
 )
-
-import documents.index as index
 from .forms import UploadForm
 from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
@@ -106,7 +104,7 @@ class DocumentViewSet(RetrieveModelMixin,
         return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
     def file_response(self, pk, disposition):
-        #TODO: this should not be necessary here.
+        # TODO: this should not be necessary here.
         content_types = {
             Document.TYPE_PDF: "application/pdf",
             Document.TYPE_PNG: "image/png",
@@ -114,7 +112,7 @@ class DocumentViewSet(RetrieveModelMixin,
             Document.TYPE_GIF: "image/gif",
             Document.TYPE_TIF: "image/tiff",
             Document.TYPE_CSV: "text/csv",
-            Document.TYPE_MD:  "text/markdown",
+            Document.TYPE_MD: "text/markdown",
             Document.TYPE_TXT: "text/plain"
         }
 
@@ -132,7 +130,7 @@ class DocumentViewSet(RetrieveModelMixin,
 
     @action(methods=['post'], detail=False)
     def post_document(self, request, pk=None):
-        #TODO: is this a good implementation?
+        # TODO: is this a good implementation?
         form = UploadForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
