@@ -20,8 +20,21 @@ class Handler(FileSystemEventHandler):
     def __init__(self, consumer):
         self.consumer = consumer
 
+    def _consume(self, file):
+        if os.path.isfile(file):
+            try:
+                self.consumer.try_consume_file(file)
+            except Exception as e:
+                logging.getLogger(__name__).error("Error while consuming document: {}".format(e))
+
     def on_created(self, event):
-        self.consumer.try_consume_file(event.src_path)
+        self._consume(event.src_path)
+
+    def on_modified(self, event):
+        self._consume(event.src_path)
+
+    def on_moved(self, event):
+        self._consume(event.src_path)
 
 
 class Command(BaseCommand):
