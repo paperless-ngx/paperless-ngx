@@ -20,6 +20,7 @@ script:
   - cd src/
   - pipenv run pytest --cov
   - pipenv run pycodestyle
+  - cd ..
   - docker build --tag=jonaswinkler/paperless-ng .
 
 after_success:
