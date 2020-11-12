@@ -120,8 +120,8 @@ class DocumentClassifier(object):
 
         num_tags = len(labels_tags_unique)
         # substract 1 since -1 (null) is also part of the classes.
-        num_correspondents = len(labels_correspondent) - 1
-        num_document_types = len(labels_document_type) - 1
+        num_correspondents = len(set(labels_correspondent)) - 1
+        num_document_types = len(set(labels_document_type)) - 1
 
         logging.getLogger(__name__).debug(
             "{} documents, {} tag(s), {} correspondent(s), "
