@@ -25,12 +25,10 @@ class Handler(FileSystemEventHandler):
             try:
                 self.consumer.try_consume_file(file)
             except Exception as e:
+                # Catch all so that the consumer won't crash.
                 logging.getLogger(__name__).error("Error while consuming document: {}".format(e))
 
     def on_created(self, event):
-        self._consume(event.src_path)
-
-    def on_modified(self, event):
         self._consume(event.src_path)
 
     def on_moved(self, event):
