@@ -69,6 +69,14 @@
               {{d.title}}
             </a>
           </li>
+          <li class="nav-item w-100" *ngIf="openDocuments.length > 1">
+            <a class="nav-link text-truncate" [routerLink]="" (click)="closeAll()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#x"/>
+              </svg>
+              Close all
+            </a>
+          </li>
         </ul>
 
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
