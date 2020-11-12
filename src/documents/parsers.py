@@ -45,8 +45,6 @@ def get_parser_class(doc):
     for response in document_consumer_declaration.send(None):
         parsers.append(response[1])
 
-    # TODO: add a check that checks parser availability.
-
     options = []
     for parser in parsers:
         result = parser(doc)
