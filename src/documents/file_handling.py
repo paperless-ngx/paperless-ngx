@@ -73,7 +73,13 @@ def generate_filename(document):
             correspondent=slugify(document.correspondent),
             title=slugify(document.title),
             created=slugify(document.created),
+            created_year=document.created.year if document.created else "none",
+            created_month=document.created.month if document.created else "none",
+            created_day=document.created.day if document.created else "none",
             added=slugify(document.added),
+            added_year=document.added.year if document.added else "none",
+            added_month=document.added.month if document.added else "none",
+            added_day=document.added.day if document.added else "none",
             tags=tags,
         )
     else:
