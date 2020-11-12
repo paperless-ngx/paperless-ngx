@@ -203,11 +203,11 @@ DATABASES = {
     }
 }
 
-# Always have sqlite available as a second option for management commands
-# This is important when migrating to/from sqlite
-DATABASES['sqlite'] = DATABASES['default'].copy()
-
 if os.getenv("PAPERLESS_DBHOST"):
+    # Have sqlite available as a second option for management commands
+    # This is important when migrating to/from sqlite
+    DATABASES['sqlite'] = DATABASES['default'].copy()
+
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "HOST": os.getenv("PAPERLESS_DBHOST"),
