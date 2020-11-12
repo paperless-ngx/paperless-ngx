@@ -49,7 +49,6 @@ export class DocumentDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
-    private datePipe: DatePipe,
     private router: Router,
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
