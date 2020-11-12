@@ -4,7 +4,13 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "3.9"
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
 
 install:
   - pip install --upgrade pipenv
@@ -14,6 +20,7 @@ script:
   - cd src/
   - pipenv run pytest --cov
   - pipenv run pycodestyle
+  - docker build --tag=jonaswinkler/paperless-ng .
 
 after_success:
   - pipenv run coveralls
