@@ -13,6 +13,17 @@ elif os.path.exists("/etc/paperless.conf"):
 elif os.path.exists("/usr/local/etc/paperless.conf"):
     load_dotenv("/usr/local/etc/paperless.conf")
 
+# There are multiple levels of concurrency in paperless:
+#  - Multiple consumers may be run in parallel.
+#  - Each consumer may process multiple pages in parallel.
+#  - Each Tesseract OCR run may spawn multiple threads to process a single page
+#    slightly faster.
+# The performance gains from having tesseract use multiple threads are minimal.
+# However, when multiple pages are processed in parallel, the total number of
+# OCR threads may exceed the number of available cpu cores, which will
+# dramatically slow down the consumption process. This settings limits each
+# Tesseract process to one thread.
+os.environ['OMP_THREAD_LIMIT'] = "1"
 
 def __get_boolean(key, default="NO"):
     """
