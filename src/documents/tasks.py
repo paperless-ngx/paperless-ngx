@@ -1,7 +1,6 @@
 import logging
 
 from django.conf import settings
-from django_q.tasks import async_task, result
 from whoosh.writing import AsyncWriter
 
 from documents import index

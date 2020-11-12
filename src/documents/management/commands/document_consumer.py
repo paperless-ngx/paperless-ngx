@@ -3,9 +3,8 @@ import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-
-from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 from documents.consumer import Consumer
 

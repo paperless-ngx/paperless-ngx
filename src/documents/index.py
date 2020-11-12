@@ -1,8 +1,6 @@
 import logging
 from contextlib import contextmanager
 
-from django.db import models
-from django.dispatch import receiver
 from whoosh import highlight
 from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.highlight import Formatter, get_text
@@ -10,9 +8,7 @@ from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser import MultifieldParser
 from whoosh.writing import AsyncWriter
 
-from documents.models import Document
 from paperless import settings
-
 
 logger = logging.getLogger(__name__)
 

@@ -155,7 +155,7 @@ class Consumer:
         self.log("debug", "Saving record to database")
 
         created = file_info.created or date or timezone.make_aware(
-                    datetime.datetime.fromtimestamp(stats.st_mtime))
+            datetime.datetime.fromtimestamp(stats.st_mtime))
 
         with open(doc, "rb") as f:
             document = Document.objects.create(

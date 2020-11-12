@@ -1,10 +1,9 @@
 import base64
 import os
-import magic
-
 from hashlib import md5
 from unittest import mock
 
+import magic
 from django.conf import settings
 from django.test import TestCase
 

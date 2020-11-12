@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
 
-from paperless.views import FaviconView
 from documents.views import (
     CorrespondentViewSet,
     DocumentViewSet,
@@ -18,6 +17,7 @@ from documents.views import (
     SearchAutoCompleteView,
     StatisticsView
 )
+from paperless.views import FaviconView
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -30,7 +30,7 @@ api_router.register(r"tags", TagViewSet)
 urlpatterns = [
 
     # API
-    url(r"^api/auth/",include(('rest_framework.urls', 'rest_framework'), namespace="rest_framework")),
+    url(r"^api/auth/", include(('rest_framework.urls', 'rest_framework'), namespace="rest_framework")),
     url(r"^api/search/autocomplete/", SearchAutoCompleteView.as_view(), name="autocomplete"),
     url(r"^api/search/", SearchView.as_view(), name="search"),
     url(r"^api/statistics/", StatisticsView.as_view(), name="statistics"),

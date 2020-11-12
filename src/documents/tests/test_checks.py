@@ -2,9 +2,9 @@ import unittest
 
 from django.test import TestCase
 
+from .factories import DocumentFactory
 from ..checks import changed_password_check
 from ..models import Document
-from .factories import DocumentFactory
 
 
 class ChecksTestCase(TestCase):

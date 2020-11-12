@@ -1,6 +1,5 @@
 import logging
 import uuid
-
 from unittest import mock
 
 from django.test import TestCase

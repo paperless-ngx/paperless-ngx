@@ -5,10 +5,10 @@ from unittest import mock
 from uuid import uuid4
 
 from dateutil import tz
+from django.conf import settings
 from django.test import TestCase, override_settings
 
 from ..parsers import RasterisedDocumentParser
-from django.conf import settings
 
 
 class TestDate(TestCase):

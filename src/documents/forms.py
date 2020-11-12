@@ -1,5 +1,4 @@
 import os
-
 from datetime import datetime
 from time import mktime
 
@@ -22,7 +21,10 @@ class UploadForm(forms.Form):
     def get_filename(self, i=None):
         return os.path.join(
             settings.CONSUMPTION_DIR,
-            "{}_{}".format(str(i), self.cleaned_data.get("document").name) if i else self.cleaned_data.get("document").name
+            "{}_{}".format(
+                str(i),
+                self.cleaned_data.get("document").name
+            ) if i else self.cleaned_data.get("document").name
         )
 
     def save(self):

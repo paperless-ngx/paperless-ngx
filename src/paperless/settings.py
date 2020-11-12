@@ -25,6 +25,7 @@ elif os.path.exists("/usr/local/etc/paperless.conf"):
 # Tesseract process to one thread.
 os.environ['OMP_THREAD_LIMIT'] = "1"
 
+
 def __get_boolean(key, default="NO"):
     """
     Return a boolean value based on whatever the user has supplied in the
@@ -32,8 +33,10 @@ def __get_boolean(key, default="NO"):
     """
     return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
 
+
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
+
 
 ###############################################################################
 # Directories                                                                 #
