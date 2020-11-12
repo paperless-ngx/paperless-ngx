@@ -70,6 +70,9 @@ def open_index(recreate=False):
     if exists_in(settings.INDEX_DIR) and not recreate:
         return open_dir(settings.INDEX_DIR)
     else:
+        # TODO: this is not thread safe. If 2 instances try to create the index
+        #  at the same time, this fails. This currently prevents parallel
+        #  tests.
         return create_in(settings.INDEX_DIR, get_schema())
 
 

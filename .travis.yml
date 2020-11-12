@@ -1,56 +1,19 @@
 language: python
 
-before_install:
-- sudo apt-get update -qq
-- sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
-
-sudo: false
-
-matrix:
-    include:        
-        - python: "3.5"
-        - python: "3.6"
-        - python: "3.7-dev"
-        - env:
-            - BUILD_DOCKER=1
-            # Variable to add to publish the Docker image:
-            # * DOCKER_USERNAME
-            # * DOCKER_PASSWORD, to be encrypted, use `travis encrypt DOCKER_PASSWORD=<password>`
-          services:
-            - docker
-          before_install:
-            - true
-          install:
-            - true
-          script:
-            - docker build --tag=the-paperless-project/paperless .
-          after_success:
-            - true
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
 
 install:
-    - pip install --upgrade pip pipenv sphinx
-    - pipenv lock -r > requirements.txt
-    - pip install -r requirements.txt
+  - pip install --upgrade pipenv
+  - pipenv install --dev
 
 script:
-    - cd src/
-    - pytest --cov
-    - pycodestyle
-    - sphinx-build -b html ../docs ../docs/_build -W
+  - cd src/
+  - pipenv run pytest --cov
+  - pipenv run pycodestyle
 
 after_success:
-  - coveralls
-
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: ci/deploy-docker
-    on:
-      tags: true
-      condition: '"${BUILD_DOCKER}" = 1'
-  - provider: script
-    skip_cleanup: true
-    script: ci/deploy-docker
-    on:
-      branch: master
-      condition: '"${BUILD_DOCKER}" = 1'
+  - pipenv run coveralls
