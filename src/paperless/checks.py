@@ -11,6 +11,8 @@ writeable_hint = (
     "Set the permissions of {} to be writeable by the user running the "
     "Paperless services"
 )
+
+
 def path_check(env_var):
     messages = []
     directory = os.getenv(env_var)
@@ -27,6 +29,7 @@ def path_check(env_var):
             ))
     return messages
 
+
 @register()
 def paths_check(app_configs, **kwargs):
     """
@@ -34,9 +37,9 @@ def paths_check(app_configs, **kwargs):
     """
 
     check_messages = path_check("PAPERLESS_DATA_DIR") + \
-                     path_check("PAPERLESS_MEDIA_ROOT") + \
-                     path_check("PAPERLESS_CONSUMPTION_DIR") + \
-                     path_check("PAPERLESS_STATICDIR")
+        path_check("PAPERLESS_MEDIA_ROOT") + \
+        path_check("PAPERLESS_CONSUMPTION_DIR") + \
+        path_check("PAPERLESS_STATICDIR")
 
     return check_messages
 

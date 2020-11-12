@@ -5,12 +5,11 @@ import os
 import re
 import time
 import uuid
-
 from base64 import b64decode
 from email import policy
 from email.parser import BytesParser
-from dateutil import parser
 
+from dateutil import parser
 from django.conf import settings
 
 from .models import Correspondent
