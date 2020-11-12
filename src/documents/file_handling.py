@@ -72,7 +72,7 @@ def generate_filename(document):
         path = settings.PAPERLESS_FILENAME_FORMAT.format(
             correspondent=slugify(document.correspondent),
             title=slugify(document.title),
-            created=document.created.date(),
+            created=slugify(document.created),
             added=slugify(document.added),
             tags=tags,
         )
