@@ -87,3 +87,6 @@ scripts/nuke
 /consume
 /export
 /src-ui/.vscode
+
+# this is where the compiled frontend is moved to.
+/src/documents/static/frontend/
