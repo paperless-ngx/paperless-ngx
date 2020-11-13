@@ -1,3 +1,4 @@
+import logging
 import os
 from collections import defaultdict
 
@@ -66,24 +67,27 @@ def many_to_dictionary(field):
 
 def generate_filename(document):
     # Create filename based on configured format
-    if settings.PAPERLESS_FILENAME_FORMAT is not None:
-        tags = defaultdict(lambda: slugify(None),
-                           many_to_dictionary(document.tags))
-        path = settings.PAPERLESS_FILENAME_FORMAT.format(
-            correspondent=slugify(document.correspondent),
-            title=slugify(document.title),
-            created=slugify(document.created),
-            created_year=document.created.year if document.created else "none",
-            created_month=document.created.month if document.created else "none",
-            created_day=document.created.day if document.created else "none",
-            added=slugify(document.added),
-            added_year=document.added.year if document.added else "none",
-            added_month=document.added.month if document.added else "none",
-            added_day=document.added.day if document.added else "none",
-            tags=tags,
-        )
-    else:
-        path = ""
+    path = ""
+
+    try:
+        if settings.PAPERLESS_FILENAME_FORMAT is not None:
+            tags = defaultdict(lambda: slugify(None),
+                               many_to_dictionary(document.tags))
+            path = settings.PAPERLESS_FILENAME_FORMAT.format(
+                correspondent=slugify(document.correspondent),
+                title=slugify(document.title),
+                created=slugify(document.created),
+                created_year=document.created.year if document.created else "none",
+                created_month=document.created.month if document.created else "none",
+                created_day=document.created.day if document.created else "none",
+                added=slugify(document.added),
+                added_year=document.added.year if document.added else "none",
+                added_month=document.added.month if document.added else "none",
+                added_day=document.added.day if document.added else "none",
+                tags=tags,
+            )
+    except (ValueError, KeyError, IndexError) as e:
+        logging.getLogger(__name__).warning("Invalid PAPERLESS_FILENAME_FORMAT: {}, falling back to default,".format(settings.PAPERLESS_FILENAME_FORMAT))
 
     # Always append the primary key to guarantee uniqueness of filename
     if len(path) > 0:
