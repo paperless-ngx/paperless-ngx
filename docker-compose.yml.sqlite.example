@@ -4,21 +4,10 @@ services:
     image: redis:6.0
     restart: always
 
-  db:
-    image: postgres:13
-    restart: always
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
-
   webserver:
     image: jonaswinkler/paperless-ng:latest
     restart: always
     depends_on:
-      - db
       - broker
     ports:
       - 8000:8000
@@ -35,11 +24,8 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
-      PAPERLESS_DBHOST: db
-    command: ["supervisord", "-c", "/etc/supervisord.conf"]
 
 
 volumes:
   data:
   media:
-  pgdata:
