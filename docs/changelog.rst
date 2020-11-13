@@ -56,7 +56,9 @@ paperless-ng 1.0
   management command.
 * **Removed [breaking]:** Reminders.
 * **Removed:** All customizations made to the django admin pages.
-
+* **Removed [breaking]:** The docker image no longer supports SSL. If you want to expose
+  paperless to the internet, hide paperless behind a proxy server that handles SSL
+  requests.
 * **Internal changes:** Mostly code cleanup, including:
 
   * Rework of the code of the tesseract parser. This is now a lot cleaner.
