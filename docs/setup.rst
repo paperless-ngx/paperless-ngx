@@ -127,7 +127,8 @@ how you installed paperless. The important things to keep in mind are as follows
   with your current paperless media and data volumes and used the default
   sqlite database, **it will not use your sqlite database and it may seem
   as if your documents are gone**. You may use the provided
-  ``docker-compose.yml.sqlite.example`` script, which does not use postgresql.
+  ``docker-compose.yml.sqlite.example`` script, which does not use postgresql. See
+  :ref:`setup-sqlite_to_psql` for details.
 * The task scheduler of paperless, which is used to execute periodic tasks
   such as email checking and maintenance, requires a `redis`_ message broker
   instance. The docker-compose route takes care of that.
@@ -176,6 +177,8 @@ Migration to paperless-ng is then performed in a few simple steps:
     redirect is still in place and prevents access to the new UI. Clear 
     everything related to paperless in your browsers data in order to fix
     this issue.
+
+.. _setup-sqlite_to_psql:
 
 Moving data from sqlite to postgresql
 =====================================

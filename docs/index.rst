@@ -47,6 +47,7 @@ Contents
    usage_overview
    advanced_usage
    administration
+   configuration
    api
    extending
    troubleshooting
