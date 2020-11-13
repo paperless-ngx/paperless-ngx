@@ -1,5 +1,5 @@
 from django.db.models import Count, Max
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -140,17 +140,27 @@ class DocumentViewSet(RetrieveModelMixin,
 
     @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
-        response = self.file_response(pk, "inline")
-        return response
+        try:
+            response = self.file_response(pk, "inline")
+            return response
+        except FileNotFoundError:
+            raise Http404("Document source file does not exist")
 
     @action(methods=['get'], detail=True)
     @cache_control(public=False, max_age=315360000)
     def thumb(self, request, pk=None):
-        return HttpResponse(Document.objects.get(id=pk).thumbnail_file, content_type='image/png')
+        try:
+            return HttpResponse(Document.objects.get(id=pk).thumbnail_file, content_type='image/png')
+        except FileNotFoundError:
+            raise Http404("Document thumbnail does not exist")
 
     @action(methods=['get'], detail=True)
     def download(self, request, pk=None):
-        return self.file_response(pk, "attachment")
+        try:
+            return self.file_response(pk, "attachment")
+        except FileNotFoundError:
+            raise Http404("Document source file does not exist")
+
 
 
 class LogViewSet(ReadOnlyModelViewSet):
