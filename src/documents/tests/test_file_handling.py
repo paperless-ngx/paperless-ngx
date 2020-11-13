@@ -330,3 +330,21 @@ class TestDate(TestCase):
             os.path.join(tmp, "notempty", "file")), True)
         self.assertEqual(os.path.isdir(
             os.path.join(tmp, "notempty", "empty")), False)
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{created/[title]")
+    def test_invalid_format(self):
+        document = Document()
+        document.pk = 1
+        document.file_type = "pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+
+        self.assertEqual(generate_filename(document), "0000001.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{created__year}")
+    def test_invalid_format_key(self):
+        document = Document()
+        document.pk = 1
+        document.file_type = "pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+
+        self.assertEqual(generate_filename(document), "0000001.pdf")
