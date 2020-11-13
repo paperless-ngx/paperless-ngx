@@ -240,3 +240,84 @@ example, you can take a look at ``post-consumption-example.sh`` in the
 ``scripts`` directory in this project.
 
 The post consumption script cannot cancel the consumption process.
+
+
+File name handling
+##################
+
+By default, paperless stores your documents in the media directory and renames them
+using the identifier which it has assigned to each document. You will end up getting
+files like ``0000123.pdf`` in your media directory. This isn't necessarily a bad
+thing, because you normally don't have to access these files manually. However, if
+you wish to name your files differently, you can do that by adjustng the
+``PAPERLESS_FILENAME_FORMAT`` settings variable.
+
+This variable allows you to configure the filename (folders are allowed!) using
+placeholders. For example, setting
+
+.. code:: bash
+
+    PAPERLESS_FILENAME_FORMAT={created_year}/{correspondent}/{title}
+
+will create a directory structure as follows:
+
+.. code::
+
+    2019/
+      my_bank/
+        statement-january-0000001.pdf
+        statement-february-0000002.pdf
+    2020/
+      my_bank/
+        statement-january-0000003.pdf
+      shoe_store/
+        my_new_shoes-0000004.pdf
+
+Paperless appends the unique identifier of each document to the filename. This
+avoides filename clashes.
+
+.. danger::
+
+    Do not manually move your files in the media folder. Paperless remembers the
+    last filename a document was stored as. If you do rename a file, paperless will
+    report your files as missing and won't be able to find them.
+
+Paperless provides the following placeholders withing filenames:
+
+* ``{correspondent}``: The name of the correspondent, or "none".
+* ``{title}``: The title of the document.
+* ``{created}``: The full date and time the document was created.
+* ``{created_year}``: Year created only.
+* ``{created_month}``: Month created only (number 1-12).
+* ``{created_day}``: Day created only (number 1-31).
+* ``{added}``: The full date and time the document was added to paperless.
+* ``{added_year}``: Year added only.
+* ``{added_month}``: Month added only (number 1-12).
+* ``{added_day}``: Day added only (number 1-31).
+* ``{tags}``: I don't know how this works. Look at the source.
+
+Paperless will convert all values for the placeholders into values which are safe
+for use in filenames.
+
+.. hint::
+
+    Paperless checks the filename of a document whenever it is saved. Therefore,
+    you need to update the filenames of your documents and move them after altering
+    this setting by invoking the :ref:`document renamer <utilities-renamer>`.
+
+.. warning::
+
+    Make absolutely sure you get the spelling of the placeholders right, or else
+    paperless will use the default naming scheme instead.
+
+.. caution::
+
+    As of now, you could totally tell paperless to store your files anywhere outside
+    the media directory by setting
+
+    .. code::
+
+        PAPERLESS_FILENAME_FORMAT=../../my/custom/location/{title}
+    
+    However, keep in mind that inside docker, if files get stored outside of the
+    predefined volumes, they will be lost after a restart of paperless.
