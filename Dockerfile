@@ -10,7 +10,7 @@ COPY src-ui/package* ./
 RUN npm install
 
 COPY src-ui .
-RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false
+RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false --output-path dist/paperless-ui
 
 ###############################################################################
 ### Back end                                                                ###
