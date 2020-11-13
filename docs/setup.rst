@@ -120,7 +120,7 @@ At its core, paperless-ng is still paperless and fully compatible. However, some
 things have changed under the hood, so you need to adapt your setup depending on
 how you installed paperless. The important things to keep in mind are as follows.
 
-* Read the :ref:`paperless_changelog` and take note of breaking changes.
+* Read the :ref:`changelog <paperless_changelog>` and take note of breaking changes.
 * It is recommended to use postgresql as the database now. The docker-compose
   deployment will automatically create a postgresql instance and instruct
   paperless to use it. This means that if you use the docker-compose script

@@ -1,4 +1,3 @@
-.. _api:
 
 ************
 The REST API
@@ -17,12 +16,10 @@ installation.
 .. _Django REST Framework: http://django-rest-framework.org/
 
 
-.. _api-uploading:
-
 Uploading
 =========
 
 File uploads in an API are hard and so far as I've been able to tell, there's
 no standard way of accepting them, so rather than crowbar file uploads into the
 REST API and endure that headache, I've left that process to a simple HTTP
-POST, documented on the :ref:`consumption page <consumption-http>`.
+POST.
