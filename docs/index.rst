@@ -1,7 +1,6 @@
-.. _index:
-
+*********
 Paperless
-=========
+*********
 
 Paperless is a simple Django application running in two parts:
 a *Consumer* (the thing that does the indexing) and
@@ -9,8 +8,6 @@ the *Web server* (the part that lets you search &
 download already-indexed documents). If you want to learn more about its
 functions keep on reading after the installation section.
 
-
-.. _index-why-this-exists:
 
 Why This Exists
 ===============

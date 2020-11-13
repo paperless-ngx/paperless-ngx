@@ -1,10 +1,12 @@
+
 .. _paperless_changelog:
 
+*********
 Changelog
-#########
+*********
 
 paperless-ng 1.0
-================
+################
 
 * **Deprecated:** GnuPG. Don't use it. If you're still using it, be aware that it
   offers no protection at all, since the passphrase is stored alongside with the
@@ -49,7 +51,9 @@ paperless-ng 1.0
     Username, database and password all default to ``paperless`` if not specified.
   * **docker-compose.yml uses PostgreSQL by default.**
 
-* **Modified [breaking]:** document_retagger management command rework. See TODO hyperref
+* **Modified [breaking]:** document_retagger management command rework. See
+  :ref:`utilities-retagger` for details. Replaces ``document_correspondents``
+  management command.
 * **Removed [breaking]:** Reminders.
 * **Removed:** All customizations made to the django admin pages.
 
@@ -75,11 +79,11 @@ paperless-ng 1.0
 * Many more small changes here and there. The usual stuff.
 
 2.7.0
-=====
+#####
 
 * `syntonym`_ submitted a pull request to catch IMAP connection errors `#475`_.
 * `Stéphane Brunner`_ added ``psycopg2`` to the Pipfile `#489`_.  He also fixed
-  a syntax error in ``docker-compose.yml.example`` `#488`_ and added [DjangoQL](https://github.com/ivelum/djangoql),
+  a syntax error in ``docker-compose.yml.example`` `#488`_ and added `DjangoQL`_,
   which allows a litany of handy search functionality `#492`_.
 * `CkuT`_ and `JOKer`_ hacked out a simple, but super-helpful optimisation to
   how the thumbnails are served up, improving performance considerably `#481`_.
@@ -92,7 +96,7 @@ paperless-ng 1.0
 
 
 2.6.1
-=====
+#####
 
 * We now have a logo, complete with a favicon :-)
 * Removed some problematic tests.
@@ -104,7 +108,7 @@ paperless-ng 1.0
 
 
 2.6.0
-=====
+#####
 
 * Allow an infinite number of logs to be deleted.  Thanks to `Ulli`_ for noting
   the problem in `#433`_.
@@ -125,7 +129,7 @@ paperless-ng 1.0
 
 
 2.5.0
-=====
+#####
 
 * **New dependency**: Paperless now optimises thumbnail generation with
   `optipng`_, so you'll need to install that somewhere in your PATH or declare
@@ -169,7 +173,7 @@ paperless-ng 1.0
 
 
 2.4.0
-=====
+#####
 
 * A new set of actions are now available thanks to `jonaswinkler`_'s very first
   pull request!  You can now do nifty things like tag documents in bulk, or set
@@ -190,7 +194,7 @@ paperless-ng 1.0
 
 
 2.3.0
-=====
+#####
 
 * Support for consuming plain text & markdown documents was added by
   `Joshua Taillon`_!  This was a long-requested feature, and it's addition is
@@ -208,14 +212,14 @@ paperless-ng 1.0
 
 
 2.2.1
-=====
+#####
 
 * `Kyle Lucy`_ reported a bug quickly after the release of 2.2.0 where we broke
   the ``DISABLE_LOGIN`` feature: `#392`_.
 
 
 2.2.0
-=====
+#####
 
 * Thanks to `dadosch`_, `Wolfgang Mader`_, and `Tim Brooks`_ this is the first
   version of Paperless that supports Django 2.0!  As a result of their hard
@@ -232,7 +236,7 @@ paperless-ng 1.0
 
 
 2.1.0
-=====
+#####
 
 * `Enno Lohmeier`_ added three simple features that make Paperless a lot more
   user (and developer) friendly:
@@ -251,7 +255,7 @@ paperless-ng 1.0
 
 
 2.0.0
-=====
+#####
 
 This is a big release as we've changed a core-functionality of Paperless: we no
 longer encrypt files with GPG by default.
@@ -267,7 +271,7 @@ that it was more an annoyance than anything else, so this feature is now turned
 off unless you explicitly set a passphrase in your config file.
 
 Migrating from 1.x
-------------------
+==================
 
 Encryption isn't gone, it's just off for new users.  So long as you have
 ``PAPERLESS_PASSPHRASE`` set in your config or your environment, Paperless
@@ -283,7 +287,7 @@ Special thanks to `erikarvstedt`_, `matthewmoto`_, and `mcronce`_ who did the
 bulk of the work on this big change.
 
 1.4.0
-=====
+#####
 
 * `Quentin Dawans`_ has refactored the document consumer to allow for some
   command-line options.  Notably, you can now direct it to consume from a
@@ -318,7 +322,7 @@ bulk of the work on this big change.
   to some excellent work from `erikarvstedt`_ on `#351`_
 
 1.3.0
-=====
+#####
 
 * You can now run Paperless without a login, though you'll still have to create
   at least one user.  This is thanks to a pull-request from `matthewmoto`_:
@@ -341,7 +345,7 @@ bulk of the work on this big change.
   problem and helping me find where to fix it.
 
 1.2.0
-=====
+#####
 
 * New Docker image, now based on Alpine, thanks to the efforts of `addadi`_
   and `Pit`_.  This new image is dramatically smaller than the Debian-based
@@ -360,7 +364,7 @@ bulk of the work on this big change.
   in the document text.
 
 1.1.0
-=====
+#####
 
 * Fix for `#283`_, a redirect bug which broke interactions with
   paperless-desktop.  Thanks to `chris-aeviator`_ for reporting it.
@@ -370,7 +374,7 @@ bulk of the work on this big change.
   `Dan Panzarella`_
 
 1.0.0
-=====
+#####
 
 * Upgrade to Django 1.11.  **You'll need to run
   ``pip install -r requirements.txt`` after the usual ``git pull`` to
@@ -389,14 +393,14 @@ bulk of the work on this big change.
   `Lukas Winkler`_'s issue `#278`_
 
 0.8.0
-=====
+#####
 
 * Paperless can now run in a subdirectory on a host (``/paperless``), rather
   than always running in the root (``/``) thanks to `maphy-psd`_'s work on
   `#255`_.
 
 0.7.0
-=====
+#####
 
 * **Potentially breaking change**: As per `#235`_, Paperless will no longer
   automatically delete documents attached to correspondents when those
@@ -408,7 +412,7 @@ bulk of the work on this big change.
   `Kusti Skytén`_ for posting the correct solution in the Github issue.
 
 0.6.0
-=====
+#####
 
 * Abandon the shared-secret trick we were using for the POST API in favour
   of BasicAuth or Django session.
@@ -422,7 +426,7 @@ bulk of the work on this big change.
   the help with this feature.
 
 0.5.0
-=====
+#####
 
 * Support for fuzzy matching in the auto-tagger & auto-correspondent systems
   thanks to `Jake Gysland`_'s patch `#220`_.
@@ -440,13 +444,13 @@ bulk of the work on this big change.
   * Amended the Django Admin configuration to have nice headers (`#230`_)
 
 0.4.1
-=====
+#####
 
 * Fix for `#206`_ wherein the pluggable parser didn't recognise files with
   all-caps suffixes like ``.PDF``
 
 0.4.0
-=====
+#####
 
 * Introducing reminders.  See `#199`_ for more information, but the short
   explanation is that you can now attach simple notes & times to documents
@@ -456,7 +460,7 @@ bulk of the work on this big change.
   like to make use of this feature in his project.
 
 0.3.6
-=====
+#####
 
 * Fix for `#200`_ (!!) where the API wasn't configured to allow updating the
   correspondent or the tags for a document.
@@ -470,7 +474,7 @@ bulk of the work on this big change.
   documentation is on its way.
 
 0.3.5
-=====
+#####
 
 * A serious facelift for the documents listing page wherein we drop the
   tabular layout in favour of a tiled interface.
@@ -481,7 +485,7 @@ bulk of the work on this big change.
   consumption.
 
 0.3.4
-=====
+#####
 
 * Removal of django-suit due to a licensing conflict I bumped into in 0.3.3.
   Note that you *can* use Django Suit with Paperless, but only in a
@@ -494,26 +498,26 @@ bulk of the work on this big change.
   API thanks to @thomasbrueggemann.  See `#179`_.
 
 0.3.3
-=====
+#####
 
 * Thumbnails in the UI and a Django-suit -based face-lift courtesy of @ekw!
 * Timezone, items per page, and default language are now all configurable,
   also thanks to @ekw.
 
 0.3.2
-=====
+#####
 
 * Fix for `#172`_: defaulting ALLOWED_HOSTS to ``["*"]`` and allowing the
   user to set her own value via ``PAPERLESS_ALLOWED_HOSTS`` should the need
   arise.
 
 0.3.1
-=====
+#####
 
 * Added a default value for ``CONVERT_BINARY``
 
 0.3.0
-=====
+#####
 
 * Updated to using django-filter 1.x
 * Added some system checks so new users aren't confused by misconfigurations.
@@ -526,7 +530,7 @@ bulk of the work on this big change.
   ``PAPERLESS_SHARED_SECRET`` respectively instead.
 
 0.2.0
-=====
+#####
 
 * `#150`_: The media root is now a variable you can set in
   ``paperless.conf``.
@@ -554,7 +558,7 @@ bulk of the work on this big change.
   to `Martin Honermeyer`_ and `Tim White`_ for working with me on this.
 
 0.1.1
-=====
+#####
 
 * Potentially **Breaking Change**: All references to "sender" in the code
   have been renamed to "correspondent" to better reflect the nature of the
@@ -578,7 +582,7 @@ bulk of the work on this big change.
   to be imported but made unavailable.
 
 0.1.0
-=====
+#####
 
 * Docker support!  Big thanks to `Wayne Werner`_, `Brian Conn`_, and
   `Tikitu de Jager`_ for this one, and especially to `Pit`_
@@ -597,14 +601,14 @@ bulk of the work on this big change.
 * Added tox with pep8 checking
 
 0.0.6
-=====
+#####
 
 * Added support for parallel OCR (significant work from `Pit`_)
 * Sped up the language detection (significant work from `Pit`_)
 * Added simple logging
 
 0.0.5
-=====
+#####
 
 * Added support for image files as documents (png, jpg, gif, tiff)
 * Added a crude means of HTTP POST for document imports
@@ -613,7 +617,7 @@ bulk of the work on this big change.
 * Documentation for the above as well as data migration
 
 0.0.4
-=====
+#####
 
 * Added automated tagging basted on keyword matching
 * Cleaned up the document listing page
@@ -621,19 +625,19 @@ bulk of the work on this big change.
 * Added ``pytz`` to the list of requirements
 
 0.0.3
-=====
+#####
 
 * Added basic tagging
 
 0.0.2
-=====
+#####
 
 * Added language detection
 * Added datestamps to ``document_exporter``.
 * Changed ``settings.TESSERACT_LANGUAGE`` to ``settings.OCR_LANGUAGE``.
 
 0.0.1
-=====
+#####
 
 * Initial release
 
@@ -812,6 +816,6 @@ bulk of the work on this big change.
 .. _#489: https://github.com/the-paperless-project/paperless/pull/489
 .. _#492: https://github.com/the-paperless-project/paperless/pull/492
 
-.. _pipenv: https://docs.pipenv.org/
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
 .. _optipng: http://optipng.sourceforge.net/
+.. _DjangoQL: https://github.com/ivelum/djangoql

@@ -130,7 +130,6 @@ REST API
 
 You can also submit a document using the REST API, see the API section for details.
 
-
 .. _usage-recommended_workflow:
 
 The recommended workflow

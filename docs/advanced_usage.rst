@@ -220,8 +220,6 @@ the consumption process will begin with the newly modified file.
 .. _pdf2pdfocr.py: https://github.com/LeoFCardoso/pdf2pdfocr
 
 
-.. _consumption-director-hook-variables-post:
-
 Post-consumption script
 =======================
 
