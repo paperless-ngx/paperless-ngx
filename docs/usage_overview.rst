@@ -94,15 +94,22 @@ pull emails down from an arbitrary account and dump them into the consumption
 directory where the consumer will follow the
 usual pattern on consuming the document.
 
-Some things you need to know about this feature:
+.. hint::
 
-* It's disabled by default. By setting the values below it will be enabled.
-* It's been tested in a limited environment, so it may not work for you (please
-  submit a pull request if you can!)
-* It's designed to **delete mail from the server once consumed**.  So don't go
-  pointing this to your personal email account and wonder where all your stuff
-  went.
-* Currently, only one photo (attachment) per email will work.
+    It's disabled by default. By setting the values below it will be enabled.
+    
+    It's been tested in a limited environment, so it may not work for you (please
+    submit a pull request if you can!)
+
+.. danger::
+
+    It's designed to **delete mail from the server once consumed**.  So don't go
+    pointing this to your personal email account and wonder where all your stuff
+    went.
+
+.. hint::
+
+    Currently, only one photo (attachment) per email will work.
 
 So, with all that in mind, here's what you do to get it running:
 
@@ -128,7 +135,7 @@ So, with all that in mind, here's what you do to get it running:
 REST API
 ========
 
-You can also submit a document using the REST API, see the API section for details.
+You can also submit a document using the REST API, see :ref:`api-file_uploads` for details.
 
 .. _usage-recommended_workflow:
 

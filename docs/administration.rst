@@ -9,7 +9,7 @@ Making backups
 
 .. warning::
 
-    This section is not updated yet.
+    This section is not updated to paperless-ng yet.
 
 So you're bored of this whole project, or you want to make a remote backup of
 your files for whatever reason.  This is easy to do, simply use the
@@ -21,6 +21,7 @@ into an arbitrary directory.
 
 Restoring
 =========
+
 
 .. _administration-updating:
 

@@ -2,6 +2,9 @@
 Troubleshooting
 ***************
 
+.. warning::
+
+    This section is not updated to paperless-ng yet.
 
 Consumer warns ``OCR for XX failed``
 ####################################
