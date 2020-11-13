@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/paperless-ui",
+            "outputPath": "../src/documents/static/frontend",
             "outputHashing": "none",
             "index": "src/index.html",
             "main": "src/main.ts",
