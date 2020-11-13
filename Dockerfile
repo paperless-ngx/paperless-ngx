@@ -75,8 +75,8 @@ WORKDIR /usr/src/paperless/src/
 
 RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
 
-VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
+VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
-CMD ["supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"
