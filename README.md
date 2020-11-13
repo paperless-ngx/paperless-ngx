@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/jonaswinkler/paperless-ng.svg?branch=master)](https://travis-ci.org/jonaswinkler/paperless-ng)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
-
+[![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
 
 # Paperless-ng
 
