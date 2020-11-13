@@ -1,7 +1,12 @@
 .. _api:
 
+************
 The REST API
-############
+************
+
+.. warning::
+
+    This section is not updated yet.
 
 Paperless makes use of the `Django REST Framework`_ standard API interface
 because of its inherent awesomeness.  Conveniently, the system is also
@@ -15,7 +20,7 @@ installation.
 .. _api-uploading:
 
 Uploading
----------
+=========
 
 File uploads in an API are hard and so far as I've been able to tell, there's
 no standard way of accepting them, so rather than crowbar file uploads into the

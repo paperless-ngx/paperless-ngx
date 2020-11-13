@@ -4,8 +4,8 @@ Paperless
 =========
 
 Paperless is a simple Django application running in two parts:
-a :ref:`consumer <utilities-consumer>` (the thing that does the indexing) and
-the :ref:`webserver <utilities-webserver>` (the part that lets you search &
+a *Consumer* (the thing that does the indexing) and
+the *Web server* (the part that lets you search &
 download already-indexed documents). If you want to learn more about its
 functions keep on reading after the installation section.
 
@@ -25,26 +25,34 @@ finding stuff again. I feed documents right from the post box into the scanner
 and then shred them.  Perhaps you might find it useful too.
 
 
+Paperless-ng
+============
+
+I wanted to make big changes to the project that will impact the way it is used
+by its users greatly. Among the users who currently use paperless in production
+there are probably many that don't want these changes right away. I also wanted
+to have more control over what goes into the code and what does not. Therefore,
+paperless-ng was created. NG stands for both Angular (the framework used for the
+Frontend) and next-gen. Publishing this project under a different name also
+avoids confusion between paperless and paperless-ng.
+
+It would be great if this project could eventually merge back into the main
+repository, but it needs a lot more work before that can happen.
 
 
 Contents
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   requirements
    setup
-   consumption
+   usage_overview
+   advanced_usage
+   administration
    api
-   utilities
-   guesswork
-   migrating
-   customising
    extending
    troubleshooting
    contributing
    scanners
-   screenshots
    changelog
-   changelog_jonaswinkler
