@@ -68,8 +68,8 @@ urlpatterns = [
 ]
 
 # Text in each page's <h1> (and above login form).
-admin.site.site_header = 'Paperless'
+admin.site.site_header = 'Paperless-ng'
 # Text at the end of each page's <title>.
-admin.site.site_title = 'Paperless'
+admin.site.site_title = 'Paperless-ng'
 # Text at the top of the admin index page.
-admin.site.index_title = 'Paperless administration'
+admin.site.index_title = 'Paperless-ng administration'
