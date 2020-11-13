@@ -1,5 +1,78 @@
+.. _paperless_changelog:
+
 Changelog
 #########
+
+paperless-ng 1.0
+================
+
+* **Deprecated:** GnuPG. Don't use it. If you're still using it, be aware that it
+  offers no protection at all, since the passphrase is stored alongside with the
+  encrypted documents itself. This features will most likely be removed in future
+  versions.
+
+* **Added:** New frontend. Features:
+
+  * Single page application: It's much more responsive than the django admin pages.
+  * Dashboard. Shows recently scanned documents, or todos, or other documents
+    at wish. Allows uploading of documents. Shows basic statistics.
+  * Better document list with multiple display options.
+  * Full text search with result highlighting, auto completion and scoring based
+    on the query. It uses a document search index in the background.
+  * Saveable filters.
+  * Better log viewer.
+
+* **Added:** Document types. Assign these to documents just as correspondents.
+  They may be used in the future to perform automatic operations on documents
+  depending on the type.
+* **Added:** Inbox tags. Define an inbox tag and it will automatically be
+  assigned to any new document scanned into the system.
+* **Added:** Automatic matching. A new matching algorithm that automatically
+  assigns tags, document types and correspondents to your documents. It uses
+  a neural network trained on your data.
+* **Added:** Archive serial numbers. Assign these to quickly find documents stored in
+  physical binders.
+* **Added:** Enabled the internal user management of django. This isn't really a
+  multi user solution, however, it allows more than one user to access the website
+  and set some basic permissions / renew passwords.
+
+* **Modified [breaking]:** REST Api changes:
+
+  * New filters added, other filters removed (case sensitive filters, slug filters)
+  * Endpoints for thumbnails, previews and downloads replace the old ``/fetch/`` urls. Redirects are in place.
+  * Endpoint for document uploads replaces the old ``/push`` url. Redirects are in place.
+  * Foreign key relationships are now served as IDs, not as urls.
+
+* **Modified [breaking]:** PostgreSQL:
+
+  * If ``PAPERLESS_DBHOST`` is specified in the settings, paperless uses postgresql instead of sqlite.
+    Username, database and password all default to ``paperless`` if not specified.
+  * **docker-compose.yml uses PostgreSQL by default.**
+
+* **Modified [breaking]:** document_retagger management command rework. See TODO hyperref
+* **Removed [breaking]:** Reminders.
+* **Removed:** All customizations made to the django admin pages.
+
+* **Internal changes:** Mostly code cleanup, including:
+
+  * Rework of the code of the tesseract parser. This is now a lot cleaner.
+  * Rework of the filename handling code. It was a mess.
+  * Fixed some issues with the document exporter not exporting all documents when encountering duplicate filenames.
+  * Consumer rework: now uses the excellent watchdog library, lots of code removed.
+  * Added a task scheduler that takes care of checking mail, training the classifier and maintaining the document search index.
+  * Updated dependencies. Now uses Pipenv all around.
+  * Updated Dockerfile and docker-compose. Now uses ``supervisord`` to run everything paperless-related in a single container.
+
+* **Settings:**
+
+  * ``PAPERLESS_FORGIVING_OCR`` is now default and gone. Reason: Even if ``langdetect`` fails to detect
+    a language, tesseract still does a very good job at ocr'ing a document with the default language.
+    Certain language specifics such as umlauts may not get picked up properly.
+  * ``PAPERLESS_DEBUG`` defaults to ``false``.
+  * The presence of ``PAPERLESS_DBHOST`` now determines whether to use PostgreSQL or
+    sqlite.
+
+* Many more small changes here and there. The usual stuff.
 
 2.7.0
 =====

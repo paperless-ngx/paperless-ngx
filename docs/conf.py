@@ -54,7 +54,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Paperless'
+project = u'Paperless-ng'
 copyright = u'2015, Daniel Quinn'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -205,7 +205,8 @@ try:
     import sphinx_rtd_theme
     html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-except ImportError:
+except ImportError as e:
+    print("error " + str(e))
     pass
 
 # -- Options for LaTeX output ---------------------------------------------
