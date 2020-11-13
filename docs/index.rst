@@ -49,6 +49,7 @@ Contents
    administration
    configuration
    api
+   faq
    extending
    troubleshooting
    contributing
