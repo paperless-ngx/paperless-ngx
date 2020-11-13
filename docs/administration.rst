@@ -27,75 +27,74 @@ Restoring
 Updating paperless
 ##################
 
-.. warning::
-
-    This section is not updated yet.
-
 For the most part, all you have to do to update Paperless is run ``git pull``
-on the directory containing the project files, and then use Django's
-``migrate`` command to execute any database schema updates that might have been
-rolled in as part of the update:
+on the directory containing the project files, and then rebuild the docker
+image.
 
 .. code-block:: shell-session
 
-    $ cd /path/to/project
+    $ cd /path/to/paperless
     $ git pull
-    $ pip install -r requirements.txt
-    $ cd src
-    $ ./manage.py migrate
-
-Note that it's possible (even likely) that while ``git pull`` may update some
-files, the ``migrate`` step may not update anything.  This is totally normal.
-
-Additionally, as new features are added, the ability to control those features
-is typically added by way of an environment variable set in ``paperless.conf``.
-You may want to take a look at the ``paperless.conf.example`` file to see if
-there's anything new in there compared to what you've got in ``/etc``.
-
-If you are using docker the update process is similar:
-
-.. code-block:: shell-session
-
-    $ cd /path/to/project
-    $ git pull
-    $ docker build -t paperless .
-    $ docker-compose run --rm consumer migrate
-    $ docker-compose up -d
 
 If ``git pull`` doesn't report any changes, there is no need to continue with
 the remaining steps.
 
-This depends on the route you've chosen to run paperless.
+After that, check if ``docker-compose.yml.example`` has changed. Update your
+``docker-compose.yml`` file if necessary.
 
-    a.  If you are not using docker, update python requirements. Paperless uses
-        `Pipenv`_ for managing dependencies:
+.. code-block:: shell-session
 
-        .. code:: bash
+    $ docker-compose down
+    $ docker build -t jonaswinkler/paperless-ng .
+    $ docker-compose up -d
 
-            $ pip install --upgrade pipenv
-            $ cd /path/to/paperless
-            $ pipenv install
+The docker image will take care of database migrations during startup.
 
-        This creates a new virtual environment (or uses your existing environment)
-        and installs all dependencies into it. Running commands inside the environment
-        is done via
+Updating paperless without docker
+=================================
 
-        .. code:: bash
+Since paperless now involves a single page app that has to be built from source,
+updating paperless manually is somewhat more complicated.
 
-            $ cd /path/to/paperless/src
-            $ pipenv run python3 manage.py my_command
-        
-        You will also need to build the frontend each time a new update is pushed.
-        See updating paperless for more information. TODO REFERENCE
-        
-    b.  If you are using docker, build the docker image.
+1.  Update python requirements. Paperless uses
+    `Pipenv`_ for managing dependencies:
 
-        .. code:: bash
+    .. code:: shell-session
 
-            $ docker build -t jonaswinkler/paperless-ng:latest .
+        $ pip install --upgrade pipenv
+        $ cd /path/to/paperless
+        $ pipenv install
 
-        Copy either docker-compose.yml.example or docker-compose.yml.sqlite.example
-        to docker-compose.yml and adjust the consumption directory.
+    This creates a new virtual environment (or uses your existing environment)
+    and installs all dependencies into it.
+    
+2.  You will also need to build the frontend each time a new update is pushed.
+    You need `npm <https://www.npmjs.com/get-npm>`_ for this.
+
+    .. code:: shell-session
+
+        $ cd src-ui
+        $ npm install @angular/cli
+        $ ng build --prod
+    
+    This will build the application and move the relevant files to a location
+    within the django app (``src/documents/static/frontend``) at which django
+    expects to find the files.
+
+3.  Collect static files, namely the newly created frontend files.
+
+    .. code:: shell-session
+
+        $ cd src
+        $ pipenv run python3 manage.py collectstatic --clear
+    
+4.  Migrate the database.
+
+    .. code:: shell-session
+
+        $ cd src
+        $ pipenv run python3 manage.py migrate
+
         
 Management utilities
 ####################
@@ -246,6 +245,7 @@ the index and usually makes queries faster and also ensures that the
 autocompletion works properly. This command is regularly invoked by the task
 scheduler.
 
+.. _utilities-renamer:
 
 Managing filenames
 ==================
@@ -269,7 +269,7 @@ The command takes no arguments and processes all your documents at once.
 
 .. _utilities-encyption:
 
-Managing encrpytion
+Managing encryption
 ===================
 
 Documents can be stored in Paperless using GnuPG encryption.
