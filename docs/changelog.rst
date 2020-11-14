@@ -5,8 +5,8 @@
 Changelog
 *********
 
-paperless-ng 1.0
-################
+paperless-ng 0.9.0
+##################
 
 * **Deprecated:** GnuPG. Don't use it. If you're still using it, be aware that it
   offers no protection at all, since the passphrase is stored alongside with the
