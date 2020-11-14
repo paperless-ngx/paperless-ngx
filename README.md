@@ -35,6 +35,8 @@ The gist of the changes is the following:
 * Machine learning powered document matching.
 * Code cleanup in many, MANY areas.
 
+If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
+
 For a complete list of changes, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
 
 ## Planned
