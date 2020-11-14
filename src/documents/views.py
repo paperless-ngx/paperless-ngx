@@ -162,7 +162,6 @@ class DocumentViewSet(RetrieveModelMixin,
             raise Http404("Document source file does not exist")
 
 
-
 class LogViewSet(ReadOnlyModelViewSet):
     model = Log
 
