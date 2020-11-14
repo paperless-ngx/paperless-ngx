@@ -45,7 +45,6 @@ Each document has a couple of fields that you can assign to them:
   This text is fed into the search engine and is used for matching tags,
   correspondents and document types.
 
-.. TODO: hyperref
 
 Frontend overview
 #################

@@ -241,6 +241,7 @@ example, you can take a look at ``post-consumption-example.sh`` in the
 
 The post consumption script cannot cancel the consumption process.
 
+.. _advanced-file_name_handling:
 
 File name handling
 ##################
