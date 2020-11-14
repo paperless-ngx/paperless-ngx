@@ -1,18 +1,4 @@
 ###############################################################################
-### Front end                                                               ###
-###############################################################################
-
-FROM node:current AS frontend
-
-WORKDIR /usr/src/paperless/src-ui/
-
-COPY src-ui/package* ./
-RUN npm install
-
-COPY src-ui .
-RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false --output-path dist/paperless-ui
-
-###############################################################################
 ### Back end                                                                ###
 ###############################################################################
 
@@ -63,7 +49,6 @@ COPY docker/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 
 # copy app
 COPY src/ ./src/
-COPY --from=frontend /usr/src/paperless/src-ui/dist/paperless-ui/ ./src/documents/static/frontend/
 
 # add users, setup scripts
 RUN addgroup --gid 1000 paperless \
