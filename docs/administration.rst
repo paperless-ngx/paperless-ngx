@@ -3,13 +3,15 @@
 Administration
 **************
 
+.. _administration-backup:
 
 Making backups
 ##############
 
 .. warning::
 
-    This section is not updated to paperless-ng yet.
+    This section is not updated to paperless-ng yet, the exporter is a valid tool
+    for backups though.
 
 So you're bored of this whole project, or you want to make a remote backup of
 your files for whatever reason.  This is easy to do, simply use the
@@ -28,34 +30,61 @@ Restoring
 Updating paperless
 ##################
 
-For the most part, all you have to do to update Paperless is run ``git pull``
-on the directory containing the project files, and then rebuild the docker
-image.
+If a new release of paperless-ng is available, upgrading depends on how you
+installed paperless-ng in the first place. The releases are available at
+`release page <https://github.com/jonaswinkler/paperless-ng/releases>`_.
 
-.. code-block:: shell-session
+First of all, ensure that paperless is stopped.
+
+.. code:: shell-session
 
     $ cd /path/to/paperless
-    $ git pull
-
-If ``git pull`` doesn't report any changes, there is no need to continue with
-the remaining steps.
-
-After that, check if ``docker-compose.yml.example`` has changed. Update your
-``docker-compose.yml`` file if necessary.
-
-.. code-block:: shell-session
-
     $ docker-compose down
-    $ docker build -t jonaswinkler/paperless-ng .
-    $ docker-compose up -d
 
-The docker image will take care of database migrations during startup.
+After that, :ref:`make a backup <administration-backup>`.
+
+A.  If you used the docker-compose file, simply download the files of the new release,
+    adjust the settings in the files (i.e., the path to your consumption directory),
+    and replace your existing docker-compose files. Then start paperless as usual,
+    which will pull the new image, and update your database, if necessary:
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless
+        $ docker-compose up
+
+    If you see everything working, you can start paperless-ng with "-d" to have it
+    run in the background.
+
+B.  If you built the image yourself, grab the new archive and replace your current
+    paperless folder with the new contents.
+
+    After that, make the necessary adjustments to the docker-compose.yml (i.e.,
+    adjust your consumption directory).
+
+    Build and start the new image with:
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless
+        $ docker-compose build
+        $ docker-compose up
+
+    If you see everything working, you can start paperless-ng with "-d" to have it
+    run in the background.
+
+.. hint::
+
+    You can usually keep your ``docker-compose.env`` file, since this file will
+    never include mandantory configuration options. However, it is worth checking
+    out the new version of this file, since it might have new recommendations
+    on what to configure.
+
 
 Updating paperless without docker
 =================================
 
-Since paperless now involves a single page app that has to be built from source,
-updating paperless manually is somewhat more complicated.
+After grabbing the new release and unpacking the contents, do the following:
 
 1.  Update python requirements. Paperless uses
     `Pipenv`_ for managing dependencies:
@@ -68,28 +97,15 @@ updating paperless manually is somewhat more complicated.
 
     This creates a new virtual environment (or uses your existing environment)
     and installs all dependencies into it.
-    
-2.  You will also need to build the frontend each time a new update is pushed.
-    You need `npm <https://www.npmjs.com/get-npm>`_ for this.
 
-    .. code:: shell-session
-
-        $ cd src-ui
-        $ npm install @angular/cli
-        $ ng build --prod
-    
-    This will build the application and move the relevant files to a location
-    within the django app (``src/documents/static/frontend``) at which django
-    expects to find the files.
-
-3.  Collect static files, namely the newly created frontend files.
+2.  Collect static files.
 
     .. code:: shell-session
 
         $ cd src
         $ pipenv run python3 manage.py collectstatic --clear
     
-4.  Migrate the database.
+3.  Migrate the database.
 
     .. code:: shell-session
 
@@ -251,8 +267,9 @@ scheduler.
 Managing filenames
 ==================
 
-If you use paperless' feature to assign custom filenames to your documents
-(TODO ref), you can use this command to move all your files after changing
+If you use paperless' feature to
+:ref:`assign custom filenames to your documents <advanced-file_name_handling>`,
+you can use this command to move all your files after changing
 the naming scheme.
 
 .. warning::

@@ -20,3 +20,7 @@ places.
 
     Copy ``paperless.conf.example`` to any of these locations and adjust it to your
     needs.
+
+.. warning::
+
+    TBD: explain config options.

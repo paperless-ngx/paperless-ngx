@@ -6,13 +6,22 @@ Setup
 Download
 ########
 
-The source is currently only available via GitHub, so grab it from there,
-by using ``git``:
+Go to the project page on GitHub and download the
+`latest release <https://github.com/jonaswinkler/paperless-ng/releases>`_.
+There are multiple options available.
 
-.. code:: bash
+*   Download the docker-compose files if you want to pull paperless from
+    Docker Hub.
 
-    $ git clone https://github.com/jonaswinkler/paperless-ng.git
-    $ cd paperless
+*   Download the archive and extract it if you want to build the docker image
+    yourself or want to install paperless without docker.
+
+.. hint::
+
+    In contrast to paperless, the recommended way to get and update paperless-ng
+    is not to pull the entire git repository. Paperless-ng includes artifacts
+    that need to be compiled, and that's already done for you in the release.
+
 
 Installation
 ############
@@ -22,10 +31,7 @@ You can go multiple routes with setting up and running Paperless:
 * The `docker route`_
 * The `bare metal route`_
 
-The recommended setup route is docker, since it takes care of all dependencies
-for you.
-
-The `docker route`_ is quick & easy.
+The `docker route`_ is quick & easy. This is the recommended route.
 
 The `bare metal route`_ is more complicated to setup but makes it easier
 should you want to contribute some code back.
@@ -50,12 +56,7 @@ Docker Route
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
         .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
-2.  Create a copy of ``docker-compose.yml.example`` as ``docker-compose.yml``
-    and a copy of ``docker-compose.env.example`` as ``docker-compose.env``.
-    You'll be editing both these files: taking a copy ensures that you can
-    ``git pull`` to receive updates without risking merge conflicts with your
-    modified versions of the configuration files.
-3.  Modify ``docker-compose.yml`` to your preferences. You should change the path
+2.  Modify ``docker-compose.yml`` to your preferences. You should change the path
     to the consumption directory in this file. Find the line that specifies where
     to mount the consumption directory:
 
@@ -72,7 +73,7 @@ Docker Route
     Don't change the part after the colon or paperless wont find your documents.
 
 
-4.  Modify ``docker-compose.env``, following the comments in the file. The
+3.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. This ensures that
     both the docker container and you on the host machine have write access
@@ -80,10 +81,11 @@ Docker Route
     1000 (the default for the first normal user on most systems), it will
     work out of the box without any modifications.
 
-5. Run ``docker-compose up -d``. This will create and start the necessary
-   containers.
+4.  Run ``docker-compose up -d``. This will create and start the necessary
+    containers. This will also build the image of paperless if you grabbed the
+    source archive.
 
-6.  To be able to login, you will need a super user. To create it, execute the
+5.  To be able to login, you will need a super user. To create it, execute the
     following command:
 
     .. code-block:: shell-session
@@ -93,7 +95,7 @@ Docker Route
     This will prompt you to set a username, an optional e-mail address and
     finally a password.
 
-7.  The default ``docker-compose.yml`` exports the webserver on your local port
+6.  The default ``docker-compose.yml`` exports the webserver on your local port
     8000. If you haven't adapted this, you should now be able to visit your
     Paperless instance at ``http://127.0.0.1:8000``. You can login with the
     user and password you just created.
@@ -127,53 +129,48 @@ how you installed paperless. The important things to keep in mind are as follows
   with your current paperless media and data volumes and used the default
   sqlite database, **it will not use your sqlite database and it may seem
   as if your documents are gone**. You may use the provided
-  ``docker-compose.yml.sqlite.example`` script, which does not use postgresql. See
-  :ref:`setup-sqlite_to_psql` for details.
+  ``docker-compose.sqlite.yml`` script instead, which does not use postgresql. See
+  :ref:`setup-sqlite_to_psql` for details on how to move your data from
+  sqlite to postgres.
 * The task scheduler of paperless, which is used to execute periodic tasks
   such as email checking and maintenance, requires a `redis`_ message broker
   instance. The docker-compose route takes care of that.
 * The layout of the folder structure for your documents and data remains the
-  same.
-* The frontend needs to be built from source. The docker image takes care of
-  that.
+  same, so you can just plug your old docker volumes into paperless-ng and
+  expect it to find everything where it should be.
 
 Migration to paperless-ng is then performed in a few simple steps:
 
-1.  Do a backup for two purposes: If something goes wrong, you still have your
+1.  Stop paperless.
+
+    .. code:: bash
+
+        $ cd /path/to/current/paperless
+        $ docker-compose down
+
+2.  Do a backup for two purposes: If something goes wrong, you still have your
     data. Second, if you don't like paperless-ng, you can switch back to
     paperless.
 
-2.  Replace the paperless source with paperless-ng. If you're using git, this
-    is done by:
+3.  Download the latest release of paperless-ng. You can either go with the
+    docker-compose files or use the archive to build the image yourself.
+    You can either replace your current paperless folder or put paperless-ng
+    in a different location. Paperless-ng will use the same docker volumes
+    as paperless.
 
-    .. code:: bash
+4.  Adjust ``docker-compose.yml`` and
+    ``docker-compose.env`` to your needs.
+    See `docker route`_ for details on which edits are required.
 
-        $ git remote set-url origin https://github.com/jonaswinkler/paperless-ng
-        $ git pull
+5.  Update paperless. See :ref:`administration-updating` for details.
 
-3.  If you are using docker, copy ``docker-compose.yml.example`` to
-    ``docker-compose.yml`` and ``docker-compose.env.example`` to
-    ``docker-compose.env``. Make adjustments to these files as necessary.
-    See `docker route`_ for details.
-
-4.  Update paperless. See :ref:`administration-updating` for details.
-
-5.  Start paperless-ng.
-
-    .. code:: bash
-
-        $ docker-compose up
-        
-    This will also migrate your database as usual. Verify by inspecting the
-    output that the migration was successfully executed. CTRL-C will then
-    gracefully stop the container. After that, you can start paperless-ng as
-    usuall with 
+6.  Start paperless-ng.
 
     .. code:: bash
 
         $ docker-compose up -d
 
-6.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
+7.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
     redirect is still in place and prevents access to the new UI. Clear 
     everything related to paperless in your browsers data in order to fix
     this issue.
@@ -187,4 +184,4 @@ Moving data from sqlite to postgresql
 
     TBD.
 
-  .. _redis: https://redis.io/
+.. _redis: https://redis.io/
