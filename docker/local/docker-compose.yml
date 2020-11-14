@@ -15,7 +15,7 @@ services:
       POSTGRES_PASSWORD: paperless
 
   webserver:
-    image: jonaswinkler/paperless-ng:latest
+    build: .
     restart: always
     depends_on:
       - db
@@ -32,7 +32,7 @@ services:
       - media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
       - ./consume:/usr/src/paperless/consume
-    env_file: docker-compose.env
+    env_file: ../docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
