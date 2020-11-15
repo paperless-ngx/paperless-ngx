@@ -42,6 +42,7 @@ mkdir "$PAPERLESS_DIST_APP/docker"
 # the application itself
 
 cp "$PAPERLESS_ROOT/.env" \
+  "$PAPERLESS_ROOT/.dockerignore" \
 	"$PAPERLESS_ROOT/CONTRIBUTING.md" \
 	"$PAPERLESS_ROOT/LICENSE" \
 	"$PAPERLESS_ROOT/Pipfile" \
