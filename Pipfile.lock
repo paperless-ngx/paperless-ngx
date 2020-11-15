@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c0dfeedbac2e9b705267336349e6f72ba650ff9184affae06046db32299e2c87"
+            "sha256": "d6416e6844126b09200b9839a3abdcf3c24ef5cf70052b8f134d8bc804552c17"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -122,6 +122,14 @@
             ],
             "index": "pypi",
             "version": "==20.0.4"
+        },
+        "imap-tools": {
+            "hashes": [
+                "sha256:070929b8ec429c0aad94588a37a2962eed656a119ab61dcf91489f20fe983f5d",
+                "sha256:6232cd43748741496446871e889eb137351fc7a7e7f4c7888cd8c0fa28e20cda"
+            ],
+            "index": "pypi",
+            "version": "==0.31.0"
         },
         "joblib": {
             "hashes": [

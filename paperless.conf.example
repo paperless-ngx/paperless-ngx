@@ -59,22 +59,6 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 #PAPERLESS_STATIC_URL="/static/"
 
 
-# These values are required if you want paperless to check a particular email
-# box every 10 minutes and attempt to consume documents from there.  If you
-# don't define a HOST, mail checking will just be disabled.
-#PAPERLESS_CONSUME_MAIL_HOST=""
-#PAPERLESS_CONSUME_MAIL_PORT=""
-#PAPERLESS_CONSUME_MAIL_USER=""
-#PAPERLESS_CONSUME_MAIL_PASS=""
-
-# Override the default IMAP inbox here. If not set Paperless defaults to
-# "INBOX".
-#PAPERLESS_CONSUME_MAIL_INBOX="INBOX"
-
-# Any email sent to the target account that does not contain this text will be
-# ignored.
-PAPERLESS_EMAIL_SECRET=""
-
 # Specify a filename format for the document (directories are supported)
 # Use the following placeholders:
 # * {correspondent}
