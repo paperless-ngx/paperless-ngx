@@ -1,3 +1,4 @@
+/src-ui/.vscode
 /src-ui/node_modules
 /src-ui/dist
 .git
@@ -5,3 +6,7 @@
 /consume
 /media
 /data
+/docs
+.pytest_cache
+/dist
+/scripts
