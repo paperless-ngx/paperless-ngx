@@ -37,17 +37,13 @@ class Handler(FileSystemEventHandler):
 class Command(BaseCommand):
     """
     On every iteration of an infinite loop, consume what we can from the
-    consumption directory, and fetch any mail available.
+    consumption directory.
     """
 
     def __init__(self, *args, **kwargs):
 
         self.verbosity = 0
         self.logger = logging.getLogger(__name__)
-
-        self.file_consumer = None
-        self.mail_fetcher = None
-        self.first_iteration = True
 
         self.consumer = Consumer()
 

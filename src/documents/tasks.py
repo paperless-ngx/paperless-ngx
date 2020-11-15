@@ -6,12 +6,7 @@ from whoosh.writing import AsyncWriter
 from documents import index
 from documents.classifier import DocumentClassifier, \
     IncompatibleClassifierVersionError
-from documents.mail import MailFetcher
 from documents.models import Document
-
-
-def consume_mail():
-    MailFetcher().pull()
 
 
 def index_optimize():
