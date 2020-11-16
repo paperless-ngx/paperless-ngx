@@ -97,14 +97,14 @@ def handle_mail_account(account):
             post_consume_messages = []
 
             for message in messages:
-                result = handle_message(M, message, rule)
+                result = handle_message(message, rule)
                 if result:
                     post_consume_messages.append(message.uid)
 
             action.post_consume(M, post_consume_messages, rule.action_parameter)
 
 
-def handle_message(M, message, rule):
+def handle_message(message, rule):
     if not message.attachments:
         return False
 
