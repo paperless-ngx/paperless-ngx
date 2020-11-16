@@ -286,12 +286,28 @@ TASK_WORKERS = int(os.getenv("PAPERLESS_TASK_WORKERS", default_task_workers()))
 Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
+    'workers': TASK_WORKERS,
     'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 }
+
+
+def default_threads_per_worker():
+    try:
+        return max(
+            math.floor(multiprocessing.cpu_count() / TASK_WORKERS),
+            1
+        )
+    except NotImplementedError:
+        return 1
+
+
+THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker())
 
 ###############################################################################
 # Paperless Specific Settings                                                 #
 ###############################################################################
+
+CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 

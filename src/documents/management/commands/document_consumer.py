@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django_q.tasks import async_task
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 
 try:
     from inotify_simple import INotify, flags
@@ -75,7 +76,12 @@ class Command(BaseCommand):
                 async_task("documents.tasks.consume_file", entry.path, task_name=os.path.basename(entry.path))
 
         # Start the watchdog. Woof!
-        observer = Observer()
+        if settings.CONSUMER_POLLING > 0:
+            logging.getLogger(__name__).info('Using polling instead of file'
+                                             'system notifications.')
+            observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
+        else:
+            observer = Observer()
         event_handler = Handler()
         observer.schedule(event_handler, directory, recursive=True)
         observer.start()

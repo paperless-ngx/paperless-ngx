@@ -165,6 +165,12 @@ PAPERLESS_EMAIL_SECRET=""
 # If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
 # PAPERLESS_THREADS_PER_WORKER automatically.
 
+# If paperless won't find documents added to your consume folder, it might
+# not be able to automatically detect filesystem changes. In that case,
+# specify a polling interval in seconds below, which will then cause paperless
+# to periodically check your consumption directory for changes.
+#PAPERLESS_CONSUMER_POLLING=10
+
 
 # When the consumer detects a duplicate document, it will not touch the
 # original document. This default behavior can be changed here.
