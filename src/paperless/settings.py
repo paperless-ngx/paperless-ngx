@@ -1,4 +1,5 @@
 import json
+import math
 import multiprocessing
 import os
 import re
@@ -262,6 +263,26 @@ LOGGING = {
 # Task queue                                                                  #
 ###############################################################################
 
+
+# Sensible defaults for multitasking:
+# use a fair balance between worker processes and threads epr worker so that
+# both consuming many documents in parallel and consuming large documents is
+# reasonably fast.
+# Favors threads per worker on smaller systems and never exceeds cpu_count()
+# in total.
+
+def default_task_workers():
+    try:
+        return max(
+            math.floor(math.sqrt(multiprocessing.cpu_count())),
+            1
+        )
+    except NotImplementedError:
+        return 1
+
+
+TASK_WORKERS = int(os.getenv("PAPERLESS_TASK_WORKERS", default_task_workers()))
+
 Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
@@ -278,8 +299,6 @@ CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
-# The amount of threads to use for OCR
-OCR_THREADS = int(os.getenv("PAPERLESS_OCR_THREADS", multiprocessing.cpu_count()))
 
 # OCR all documents?
 OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS", "false")
