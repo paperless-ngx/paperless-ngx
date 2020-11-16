@@ -6,6 +6,7 @@ from whoosh.writing import AsyncWriter
 from documents import index
 from documents.classifier import DocumentClassifier, \
     IncompatibleClassifierVersionError
+from documents.consumer import Consumer, ConsumerError
 from documents.mail import MailFetcher
 from documents.models import Document
 
@@ -54,3 +55,27 @@ def train_classifier():
         logging.getLogger(__name__).error(
             "Classifier error: " + str(e)
         )
+
+
+def consume_file(file,
+                 original_filename=None,
+                 force_title=None,
+                 force_correspondent_id=None,
+                 force_document_type_id=None,
+                 force_tag_ids=None):
+
+    document = Consumer().try_consume_file(
+        file,
+        original_filename=original_filename,
+        force_title=force_title,
+        force_correspondent_id=force_correspondent_id,
+        force_document_type_id=force_document_type_id,
+        force_tag_ids=force_tag_ids)
+
+    if document:
+        return "Success. New document id {} created".format(
+            document.pk
+        )
+    else:
+        raise ConsumerError("Unknown error: Returned document was null, but "
+                            "no error message was given.")
