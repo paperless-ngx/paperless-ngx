@@ -2,7 +2,7 @@ import itertools
 import os
 import re
 import subprocess
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool
 
 import langdetect
 import pdftotext
@@ -151,7 +151,7 @@ class RasterisedDocumentParser(DocumentParser):
         self.log("info", "Running unpaper on {} pages...".format(len(pnms)))
 
         # Run unpaper in parallel on converted images
-        with Pool(processes=settings.OCR_THREADS) as pool:
+        with ThreadPool(processes=settings.THREADS_PER_WORKER) as pool:
             pnms = pool.map(run_unpaper, pnms)
 
         return sorted(filter(lambda __: os.path.isfile(__), pnms))
@@ -166,7 +166,7 @@ class RasterisedDocumentParser(DocumentParser):
 
     def _ocr(self, imgs, lang):
         self.log("info", "Performing OCR on {} page(s) with language {}".format(len(imgs), lang))
-        with Pool(processes=settings.OCR_THREADS) as pool:
+        with ThreadPool(processes=settings.THREADS_PER_WORKER) as pool:
             r = pool.map(image_to_string, itertools.product(imgs, [lang]))
             return r
 
