@@ -1,8 +1,11 @@
-import email
-from datetime import datetime, timedelta, date
-from email.parser import BytesParser
+import os
+import tempfile
+from datetime import timedelta, date
 
+
+from django.conf import settings
 from django.utils.text import slugify
+from django_q.tasks import async_task
 from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags
 
 from documents.models import Correspondent
@@ -117,7 +120,10 @@ def handle_message(message, rule):
                 "slug": slugify(corerspondent_name)
             })[0]
     elif rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_NAME:
-        corerspondent_name = message.from_values.name if message.from_values and message.from_values.name else message.from_
+        corerspondent_name = message.from_values['name'] \
+            if (message.from_values and
+                'name' in message.from_values and
+                message.from_values['name']) else message.from_
         correspondent = Correspondent.objects.get_or_create(
             name=corerspondent_name, defaults={
                 "slug": slugify(corerspondent_name)
@@ -145,5 +151,22 @@ def handle_message(message, rule):
                   "give it the title '{}', correspondent '{}', tag '{}', and doc type"
                   "'{}'."
                   .format(att.filename, title, correspondent, tag, doc_type))
+
+            os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+
+            _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)
+
+            with open(temp_filename, 'wb') as f:
+                f.write(att.payload)
+
+            async_task(
+                "documents.tasks.consume_file",
+                file=temp_filename,
+                original_filename=att.filename,
+                force_title=title,
+                force_correspondent_id=correspondent.id if correspondent else None,
+                force_document_type_id=doc_type.id if doc_type else None,
+                force_tag_ids=[tag.id] if tag else None
+            )
 
     return True
