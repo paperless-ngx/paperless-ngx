@@ -3,21 +3,16 @@ import re
 from .parsers import RasterisedDocumentParser
 
 
-class ConsumerDeclaration:
+def tesseract_consumer_declaration(sender, **kwargs):
+    return {
+        "parser": RasterisedDocumentParser,
+        "weight": 0,
+        "test": tesseract_consumer_test
+    }
 
-    MATCHING_FILES = re.compile(r"^.*\.(pdf|jpe?g|gif|png|tiff?|pnm|bmp)$")
 
-    @classmethod
-    def handle(cls, sender, **kwargs):
-        return cls.test
+MATCHING_FILES = re.compile(r"^.*\.(pdf|jpe?g|gif|png|tiff?|pnm|bmp)$")
 
-    @classmethod
-    def test(cls, doc):
 
-        if cls.MATCHING_FILES.match(doc.lower()):
-            return {
-                "parser": RasterisedDocumentParser,
-                "weight": 0
-            }
-
-        return None
+def tesseract_consumer_test(doc):
+    return MATCHING_FILES.match(doc.lower())

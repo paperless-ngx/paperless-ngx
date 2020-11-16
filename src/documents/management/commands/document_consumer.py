@@ -3,10 +3,10 @@ import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django_q.tasks import async_task
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-
-from documents.consumer import Consumer
+from watchdog.observers.polling import PollingObserver
 
 try:
     from inotify_simple import INotify, flags
@@ -16,13 +16,10 @@ except ImportError:
 
 class Handler(FileSystemEventHandler):
 
-    def __init__(self, consumer):
-        self.consumer = consumer
-
     def _consume(self, file):
         if os.path.isfile(file):
             try:
-                self.consumer.try_consume_file(file)
+                async_task("documents.tasks.consume_file", file, task_name=os.path.basename(file))
             except Exception as e:
                 # Catch all so that the consumer won't crash.
                 logging.getLogger(__name__).error("Error while consuming document: {}".format(e))
@@ -49,8 +46,6 @@ class Command(BaseCommand):
         self.mail_fetcher = None
         self.first_iteration = True
 
-        self.consumer = Consumer()
-
         BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
@@ -66,9 +61,6 @@ class Command(BaseCommand):
         self.verbosity = options["verbosity"]
         directory = options["directory"]
 
-        for d in (settings.ORIGINALS_DIR, settings.THUMBNAIL_DIR):
-            os.makedirs(d, exist_ok=True)
-
         logging.getLogger(__name__).info(
             "Starting document consumer at {}".format(
                 directory
@@ -78,11 +70,16 @@ class Command(BaseCommand):
         # Consume all files as this is not done initially by the watchdog
         for entry in os.scandir(directory):
             if entry.is_file():
-                self.consumer.try_consume_file(entry.path)
+                async_task("documents.tasks.consume_file", entry.path, task_name=os.path.basename(entry.path))
 
         # Start the watchdog. Woof!
-        observer = Observer()
-        event_handler = Handler(self.consumer)
+        if settings.CONSUMER_POLLING > 0:
+            logging.getLogger(__name__).info('Using polling instead of file'
+                                             'system notifications.')
+            observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
+        else:
+            observer = Observer()
+        event_handler = Handler()
         observer.schedule(event_handler, directory, recursive=True)
         observer.start()
         try:
