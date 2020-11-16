@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
+from paperless_text.signals import text_consumer_declaration
+
 
 class PaperlessTextConfig(AppConfig):
 
@@ -9,8 +11,6 @@ class PaperlessTextConfig(AppConfig):
 
         from documents.signals import document_consumer_declaration
 
-        from .signals import ConsumerDeclaration
-
-        document_consumer_declaration.connect(ConsumerDeclaration.handle)
+        document_consumer_declaration.connect(text_consumer_declaration)
 
         AppConfig.ready(self)
