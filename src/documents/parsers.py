@@ -41,15 +41,16 @@ def get_parser_class(doc):
     Determine the appropriate parser class based on the file
     """
 
-    parsers = []
-    for response in document_consumer_declaration.send(None):
-        parsers.append(response[1])
-
     options = []
-    for parser in parsers:
-        result = parser(doc)
-        if result:
-            options.append(result)
+
+    # Sein letzter Befehl war: KOMMT! Und sie kamen. Alle. Sogar die Parser.
+
+    for response in document_consumer_declaration.send(None):
+        parser_declaration = response[1]
+        parser_test = parser_declaration["test"]
+
+        if parser_test(doc):
+            options.append(parser_declaration)
 
     if not options:
         return None

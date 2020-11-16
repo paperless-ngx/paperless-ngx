@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from ..signals import ConsumerDeclaration
+from paperless_tesseract.signals import tesseract_consumer_test
 
 
 class SignalsTestCase(TestCase):
@@ -20,7 +20,7 @@ class SignalsTestCase(TestCase):
         for prefix in prefixes:
             for suffix in suffixes:
                 name = "{}.{}".format(prefix, suffix)
-                self.assertTrue(ConsumerDeclaration.test(name))
+                self.assertTrue(tesseract_consumer_test(name))
 
     def test_test_handles_various_file_names_false(self):
 
@@ -30,7 +30,7 @@ class SignalsTestCase(TestCase):
         for prefix in prefixes:
             for suffix in suffixes:
                 name = "{}.{}".format(prefix, suffix)
-                self.assertFalse(ConsumerDeclaration.test(name))
+                self.assertFalse(tesseract_consumer_test(name))
 
-        self.assertFalse(ConsumerDeclaration.test(""))
-        self.assertFalse(ConsumerDeclaration.test("doc"))
+        self.assertFalse(tesseract_consumer_test(""))
+        self.assertFalse(tesseract_consumer_test("doc"))
