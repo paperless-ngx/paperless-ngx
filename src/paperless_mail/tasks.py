@@ -15,4 +15,3 @@ def process_mail_account(name):
         mail.handle_mail_account(account)
     else:
         logging.error("Unknown mail acccount: {}".format(name))
-
