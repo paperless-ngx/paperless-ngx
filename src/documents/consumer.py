@@ -72,8 +72,10 @@ class Consumer:
             )
 
     @staticmethod
-    def pre_check_scratch_fir():
+    def pre_check_directories():
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+        os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
+        os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
 
     def log(self, level, message):
         getattr(self.logger, level)(message, extra={
@@ -100,7 +102,7 @@ class Consumer:
 
         self.pre_check_file_exists(filename)
         self.pre_check_consumption_dir()
-        self.pre_check_scratch_fir()
+        self.pre_check_directories()
         self.pre_check_regex(filename)
         self.pre_check_duplicate(filename)
 

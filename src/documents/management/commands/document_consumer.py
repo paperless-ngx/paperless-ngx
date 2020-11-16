@@ -61,9 +61,6 @@ class Command(BaseCommand):
         self.verbosity = options["verbosity"]
         directory = options["directory"]
 
-        for d in (settings.ORIGINALS_DIR, settings.THUMBNAIL_DIR):
-            os.makedirs(d, exist_ok=True)
-
         logging.getLogger(__name__).info(
             "Starting document consumer at {}".format(
                 directory
