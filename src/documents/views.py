@@ -52,7 +52,7 @@ class CorrespondentViewSet(ModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = CorrespondentFilterSet
+    filterset_class = CorrespondentFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count", "last_correspondence")
 
 
@@ -63,7 +63,7 @@ class TagViewSet(ModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = TagFilterSet
+    filterset_class = TagFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
@@ -74,7 +74,7 @@ class DocumentTypeViewSet(ModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = DocumentTypeFilterSet
+    filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
@@ -89,7 +89,7 @@ class DocumentViewSet(RetrieveModelMixin,
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
-    filter_class = DocumentFilterSet
+    filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
         "id", "title", "correspondent__name", "document_type__name", "created", "modified", "added", "archive_serial_number")
@@ -170,7 +170,7 @@ class LogViewSet(ReadOnlyModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = LogFilterSet
+    filterset_class = LogFilterSet
     ordering_fields = ("created",)
 
 
