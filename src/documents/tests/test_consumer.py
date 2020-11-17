@@ -450,12 +450,14 @@ class TestConsumer(TestCase):
     def setUp(self):
         self.scratch_dir = tempfile.mkdtemp()
         self.media_dir = tempfile.mkdtemp()
+        self.consumption_dir = tempfile.mkdtemp()
 
         override_settings(
             SCRATCH_DIR=self.scratch_dir,
             MEDIA_ROOT=self.media_dir,
             ORIGINALS_DIR=os.path.join(self.media_dir, "documents", "originals"),
-            THUMBNAIL_DIR=os.path.join(self.media_dir, "documents", "thumbnails")
+            THUMBNAIL_DIR=os.path.join(self.media_dir, "documents", "thumbnails"),
+            CONSUMPTION_DIR=self.consumption_dir
         ).enable()
 
         patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
@@ -473,6 +475,7 @@ class TestConsumer(TestCase):
     def tearDown(self):
         shutil.rmtree(self.scratch_dir, ignore_errors=True)
         shutil.rmtree(self.media_dir, ignore_errors=True)
+        shutil.rmtree(self.consumption_dir, ignore_errors=True)
 
     def get_test_file(self):
         fd, f = tempfile.mkstemp(suffix=".pdf", dir=self.scratch_dir)
