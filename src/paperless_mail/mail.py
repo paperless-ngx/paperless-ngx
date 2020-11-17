@@ -79,6 +79,8 @@ def handle_mail_account(account):
     else:
         raise ValueError("Unknown IMAP security")
 
+    total_processed_files = 0
+
     with mailbox as M:
 
         try:
@@ -121,14 +123,15 @@ def handle_mail_account(account):
 
             for message in messages:
                 try:
-                    result = handle_message(message, rule)
+                    processed_files = handle_message(message, rule)
                 except Exception:
                     raise MailError(
                         f"Rule {rule.name}: Error while processing mail "
                         f"{message.uid} of account {account.name}")
-                if result:
+                if processed_files > 0:
                     post_consume_messages.append(message.uid)
 
+                total_processed_files += processed_files
             try:
                 action.post_consume(
                     M,
@@ -140,10 +143,12 @@ def handle_mail_account(account):
                     f"Rule {rule.name}: Error while processing post-consume "
                     f"actions for account {account.name}")
 
+    return total_processed_files
+
 
 def handle_message(message, rule):
     if not message.attachments:
-        return False
+        return 0
 
     if rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_NOTHING:
         correspondent = None
@@ -200,9 +205,10 @@ def handle_message(message, rule):
                 force_title=title,
                 force_correspondent_id=correspondent.id if correspondent else None,
                 force_document_type_id=doc_type.id if doc_type else None,
-                force_tag_ids=[tag.id] if tag else None
+                force_tag_ids=[tag.id] if tag else None,
+                task_name=f"Mail: {att.filename}"
             )
 
             processed_attachments += 1
 
-    return processed_attachments > 0
+    return processed_attachments

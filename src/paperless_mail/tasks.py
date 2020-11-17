@@ -5,8 +5,14 @@ from paperless_mail.models import MailAccount
 
 
 def process_mail_accounts():
+    total_new_documents = 0
     for account in MailAccount.objects.all():
-        mail.handle_mail_account(account)
+        total_new_documents += mail.handle_mail_account(account)
+
+    if total_new_documents > 0:
+        return f"Added {total_new_documents} document(s)."
+    else:
+        return "No new documents were added."
 
 
 def process_mail_account(name):
