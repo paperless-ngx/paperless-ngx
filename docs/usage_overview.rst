@@ -86,9 +86,49 @@ files from the scanner.  Typically, you're looking at an FTP server like
 IMAP (Email)
 ============
 
-.. note::
+You can tell paperless-ng to consume documents from your email accounts.
+This is a very flexible and powerful feature, if you regularly received documents
+via mail that you need to archive. The mail consumer can be configured by using the
+admin interface in the following manner:
 
-    This is in the process of getting reworked.
+1.  Define e-mail accounts.
+2.  Define mail rules for your account.
+
+These rules perform the following:
+
+1.  Connect to the mail server.
+2.  Fetch all matching mails (as defined by folder, maximum age and the filters)
+3.  Check if there are any consumable attachments.
+4.  If so, instruct paperless to consume the attachments and optionally
+    use the metadata provided in the rule for the new document.
+5.  If documents were consumed from a mail, the rule action is performed
+    on that mail.
+
+Paperless will completely ignore mails that do not match your filters. It will also
+only perform the action on mails that it has consumed documents from.
+
+The actions all ensure that the same mail is not consumed twice by different means.
+These are as follows:
+
+*   **Delete:** Immediately deletes mail that paperless has consumed documents from.
+    Use with caution.
+*   **Mark as read:** Mark consumed mail as read. Paperless will not consume documents
+    from already read mails. If you read a mail before paperless sees it, it will be
+    ignored.
+*   **Flag:** Sets the 'important' flag on mails with consumed documents. Paperless
+    will not consume flagged mails.
+*   **Move to folder:** Moves consumed mails out of the way so that paperless wont
+    consume them again.
+
+.. caution::
+
+    The mail consumer will perform these actions on all mails it has consumed
+    documents from. Keep in mind that the actual consumption process may fail
+    for some reason, leaving you with missing documents in paperless.
+
+Paperless is set up to check your mails every 10 minutes. this can be configured on the
+'Scheduled tasks' page in the admin.
+
 
 REST API
 ========
