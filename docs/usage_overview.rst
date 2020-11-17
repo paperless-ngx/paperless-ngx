@@ -136,6 +136,7 @@ REST API
 
 You can also submit a document using the REST API, see :ref:`api-file_uploads` for details.
 
+
 .. _usage-recommended_workflow:
 
 The recommended workflow
@@ -146,6 +147,10 @@ for all your documents, the recommended workflow for managing your documents
 is as follows. This workflow also takes into account that some documents
 have to be kept in physical form, but still ensures that you get all the
 advantages for these documents as well.
+
+The following diagram shows how easy it is to manage your documents.
+
+.. image:: _static/recommended_workflow.png
 
 Preparations in paperless
 =========================
