@@ -29,6 +29,7 @@ watchdog = "*"
 pathvalidate = "*"
 django-q = "*"
 redis = "*"
+imap-tools = "*"
 
 [dev-packages]
 coveralls = "*"
