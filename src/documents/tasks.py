@@ -7,12 +7,7 @@ from documents import index
 from documents.classifier import DocumentClassifier, \
     IncompatibleClassifierVersionError
 from documents.consumer import Consumer, ConsumerError
-from documents.mail import MailFetcher
 from documents.models import Document
-
-
-def consume_mail():
-    MailFetcher().pull()
 
 
 def index_optimize():
