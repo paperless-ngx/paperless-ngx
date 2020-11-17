@@ -213,12 +213,12 @@ def handle_message(message, rule):
 
             async_task(
                 "documents.tasks.consume_file",
-                file=temp_filename,
-                original_filename=att.filename,
-                force_title=title,
-                force_correspondent_id=correspondent.id if correspondent else None,
-                force_document_type_id=doc_type.id if doc_type else None,
-                force_tag_ids=[tag.id] if tag else None,
+                path=temp_filename,
+                override_filename=att.filename,
+                override_title=title,
+                override_correspondent_id=correspondent.id if correspondent else None,
+                override_document_type_id=doc_type.id if doc_type else None,
+                override_tag_ids=[tag.id] if tag else None,
                 task_name=f"Mail: {att.filename}"
             )
 

@@ -89,11 +89,11 @@ class TestMail(TestCase):
         args1, kwargs1 = m.call_args_list[0]
         args2, kwargs2 = m.call_args_list[1]
 
-        self.assertEqual(kwargs1['force_title'], "test1")
-        self.assertEqual(kwargs1['original_filename'], "test1.pdf")
+        self.assertEqual(kwargs1['override_title'], "test1")
+        self.assertEqual(kwargs1['override_filename'], "test1.pdf")
 
-        self.assertEqual(kwargs2['force_title'], "test2")
-        self.assertEqual(kwargs2['original_filename'], "test2.pdf")
+        self.assertEqual(kwargs2['override_title'], "test2")
+        self.assertEqual(kwargs2['override_filename'], "test2.pdf")
 
     @mock.patch("paperless_mail.mail.async_task")
     def test_handle_empty_message(self, m):
