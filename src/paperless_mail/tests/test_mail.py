@@ -56,16 +56,53 @@ class TestMail(TestCase):
         rule = MailRule(assign_title_from=MailRule.TITLE_FROM_SUBJECT)
         self.assertEqual(get_title(message, att, rule), "the message title")
 
-    @mock.patch("django_q.tasks.async_task")
+    @mock.patch("paperless_mail.mail.async_task")
     def test_handle_message(self, m):
         message = namedtuple('MailMessage', [])
         message.subject = "the message title"
+
         att = namedtuple('Attachment', [])
-        att.filename = "this_is_the_file.pdf"
+        att.filename = "test1.pdf"
         att.content_type = 'application/pdf'
         att.payload = b"attachment contents"
-        message.attachments = [att]
+
+        att2 = namedtuple('Attachment', [])
+        att2.filename = "test2.pdf"
+        att2.content_type = 'application/pdf'
+        att2.payload = b"attachment contents"
+
+        att3 = namedtuple('Attachment', [])
+        att3.filename = "test3.pdf"
+        att3.content_type = 'application/invalid'
+        att3.payload = b"attachment contents"
+
+        message.attachments = [att, att2, att3]
 
         rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME)
 
-        #handle_message(message, rule)
+        result = handle_message(message, rule)
+
+        self.assertEqual(result, 2)
+
+        self.assertEqual(len(m.call_args_list), 2)
+
+        args1, kwargs1 = m.call_args_list[0]
+        args2, kwargs2 = m.call_args_list[1]
+
+        self.assertEqual(kwargs1['force_title'], "test1")
+        self.assertEqual(kwargs1['original_filename'], "test1.pdf")
+
+        self.assertEqual(kwargs2['force_title'], "test2")
+        self.assertEqual(kwargs2['original_filename'], "test2.pdf")
+
+    @mock.patch("paperless_mail.mail.async_task")
+    def test_handle_empty_message(self, m):
+        message = namedtuple('MailMessage', [])
+
+        message.attachments = []
+        rule = MailRule()
+
+        result = handle_message(message, rule)
+
+        self.assertFalse(m.called)
+        self.assertEqual(result, 0)
