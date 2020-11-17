@@ -5,10 +5,15 @@ from datetime import timedelta, date
 from django.conf import settings
 from django.utils.text import slugify
 from django_q.tasks import async_task
-from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags
+from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags, \
+    MailboxFolderSelectError
 
 from documents.models import Correspondent
 from paperless_mail.models import MailAccount, MailRule
+
+
+class MailError(Exception):
+    pass
 
 
 class BaseMailAction:
@@ -74,11 +79,22 @@ def handle_mail_account(account):
     else:
         raise ValueError("Unknown IMAP security")
 
-    with mailbox.login(account.username, account.password) as M:
+    with mailbox as M:
+
+        try:
+            M.login(account.username, account.password)
+        except Exception:
+            raise MailError(
+                f"Error while authenticating account {account.name}")
 
         for rule in account.rules.all():
 
-            M.folder.set(rule.folder)
+            try:
+                M.folder.set(rule.folder)
+            except MailboxFolderSelectError:
+                raise MailError(
+                    f"Rule {rule.name}: Folder {rule.folder} does not exist "
+                    f"in account {account.name}")
 
             maximum_age = date.today() - timedelta(days=rule.maximum_age)
             criterias = {
@@ -94,16 +110,35 @@ def handle_mail_account(account):
             action = get_rule_action(rule.action)
             criterias = {**criterias, **action.get_criteria()}
 
-            messages = M.fetch(criteria=AND(**criterias), mark_seen=False)
+            try:
+                messages = M.fetch(criteria=AND(**criterias), mark_seen=False)
+            except Exception:
+                raise MailError(
+                    f"Rule {rule.name}: Error while fetching folder "
+                    f"{rule.folder} of account {account.name}")
 
             post_consume_messages = []
 
             for message in messages:
-                result = handle_message(message, rule)
+                try:
+                    result = handle_message(message, rule)
+                except Exception:
+                    raise MailError(
+                        f"Rule {rule.name}: Error while processing mail "
+                        f"{message.uid} of account {account.name}")
                 if result:
                     post_consume_messages.append(message.uid)
 
-            action.post_consume(M, post_consume_messages, rule.action_parameter)
+            try:
+                action.post_consume(
+                    M,
+                    post_consume_messages,
+                    rule.action_parameter)
+
+            except Exception:
+                raise MailError(
+                    f"Rule {rule.name}: Error while processing post-consume "
+                    f"actions for account {account.name}")
 
 
 def handle_message(message, rule):
@@ -139,6 +174,8 @@ def handle_message(message, rule):
 
     doc_type = rule.assign_document_type
 
+    processed_attachments = 0
+
     for att in message.attachments:
 
         if rule.assign_title_from == MailRule.TITLE_FROM_SUBJECT:
@@ -166,4 +203,6 @@ def handle_message(message, rule):
                 force_tag_ids=[tag.id] if tag else None
             )
 
-    return True
+            processed_attachments += 1
+
+    return processed_attachments > 0
