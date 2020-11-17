@@ -2,6 +2,15 @@
 
 set -e
 
+
+VERSION=$1
+
+if [ -z "$VERSION" ]
+then
+	echo "Need a version string."
+	exit 1
+fi
+
 # source root directory of paperless
 PAPERLESS_ROOT=$(git rev-parse --show-toplevel)
 
@@ -81,10 +90,12 @@ cp "$PAPERLESS_ROOT/docker/supervisord.conf" "$PAPERLESS_DIST_APP/docker/"
 
 cd "$PAPERLESS_DIST_APP"
 
-docker-compose build
+docker build . -t "jonaswinkler/paperless-ng:$VERSION"
+
+docker push "jonaswinkler/paperless-ng:$VERSION"
 
 # works. package the app!
 
 cd "$PAPERLESS_DIST"
 
-tar -cJf paperless-ng.tar.xz paperless-ng/
+tar -cJf "paperless-ng-$VERSION.tar.xz" paperless-ng/

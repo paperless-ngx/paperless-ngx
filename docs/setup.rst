@@ -23,6 +23,77 @@ There are multiple options available.
     that need to be compiled, and that's already done for you in the release.
 
 
+Overview of Paperless-ng
+########################
+
+Compared to paperless, paperless-ng works a little different under the hood and has
+more moving parts that work together. While this increases the complexity of
+the system, it also brings many benefits. 
+
+Paperless consists of the following components:
+
+*   **The webserver:** This is pretty much the same as in paperless. It serves 
+    the administration pages, the API, and the new frontend. This is the main
+    tool you'll be using to interact with paperless. You may start the webserver
+    with
+
+    .. code:: shell-session
+        
+        $ cd /path/to/paperless/src/
+        $ pipenv run gunicorn -c /usr/src/paperless/gunicorn.conf.py -b 0.0.0.0:8000 paperless.wsgi
+    
+    or by any other means such as Apache ``mod_wsgi``.
+
+*   **The consumer:** This is what watches your consumption folder for documents.
+    However, the consumer itself does not consume really consume your documents anymore.
+    It rather notifies a task processor that a new file is ready for consumption.
+    I suppose it should be named differently.
+    This also used to check your emails, but that's now gone elsewhere as well.
+
+    Start the consumer with the management command ``document_consumer``:
+
+    .. code:: shell-session
+    
+        $ cd /path/to/paperless/src/
+        $ pipenv run python3 manage.py document_consumer
+
+*   **The task processor:** Paperless relies on `Django Q <https://django-q.readthedocs.io/en/latest/>`_
+    for doing much of the heavy lifting. This is a task queue that accepts tasks from
+    multiple sources and processes tasks in parallel. It also comes with a scheduler that executes
+    certain commands periodically.
+    
+    This task processor is responsible for:
+
+    *   Consuming documents. When the consumer finds new documents, it notifies the task processor to
+        start a consumption task.
+    *   Consuming emails. It periodically checks your configured accounts for new mails and
+        produces consumption tasks for any documents it finds.
+    *   The task processor also performs the consumption of any documents you upload through
+        the web interface.
+    *   Maintain the search index and the automatic matching algorithm. These are things that paperless
+        needs to do from time to time in order to operate properly.
+    
+    This allows paperless to process multiple documents from your consumption folder in parallel! On
+    a modern multicore system, consumption with full ocr is blazing fast.
+
+    The task processor comes with a built-in admin interface that you can use to see whenever any of the
+    tasks fail and inspect the errors.
+
+    You may start the task processor by executing:
+
+    .. code:: shell-session
+    
+        $ cd /path/to/paperless/src/
+        $ pipenv run python3 manage.py qcluster
+
+*   A `redis <https://redis.io/>`_ message broker: This is a really lightweight service that is responsible
+    for getting the tasks from the webserver and consumer to the task scheduler. These run in different
+    processes (maybe even on different machines!), and therefore, this is necessary.
+
+*   A database server. Paperless supports PostgreSQL and sqlite for storing its data. However, with the
+    added concurrency, it is strongly advised to use PostgreSQL, as sqlite has its limits in that regard.
+
+
 Installation
 ############
 
@@ -31,10 +102,12 @@ You can go multiple routes with setting up and running Paperless:
 * The `docker route`_
 * The `bare metal route`_
 
-The `docker route`_ is quick & easy. This is the recommended route.
+The `docker route`_ is quick & easy. This is the recommended route. This configures all the stuff
+from above automatically so that it just works and uses sensible defaults for all configuration options.
 
 The `bare metal route`_ is more complicated to setup but makes it easier
-should you want to contribute some code back.
+should you want to contribute some code back. You need to configure and
+run the above mentioned components yourself.
 
 Docker Route
 ============
