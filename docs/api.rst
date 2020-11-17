@@ -66,7 +66,7 @@ Result list object returned by the endpoint:
         "page": 1,
         "page_count": 1,
         "results": [
-            ...
+            
         ]
     }
 
@@ -83,11 +83,13 @@ Result object:
 
     {
         "id": 1,
-        "highlights": ...,
+        "highlights": [
+            
+        ],
         "score": 6.34234,
         "rank": 23,
         "document": {
-            ...
+            
         }
 
 *   ``id``: the primary key of the found document
