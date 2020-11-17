@@ -1,7 +1,7 @@
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
-from django.urls import path
+from django.urls import path, re_path
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
@@ -30,32 +30,32 @@ api_router.register(r"tags", TagViewSet)
 urlpatterns = [
 
     # API
-    url(r"^api/auth/", include(('rest_framework.urls', 'rest_framework'), namespace="rest_framework")),
-    url(r"^api/search/autocomplete/", SearchAutoCompleteView.as_view(), name="autocomplete"),
-    url(r"^api/search/", SearchView.as_view(), name="search"),
-    url(r"^api/statistics/", StatisticsView.as_view(), name="statistics"),
-    url(r"^api/", include((api_router.urls, 'drf'), namespace="drf")),
+    re_path(r"^api/auth/", include(('rest_framework.urls', 'rest_framework'), namespace="rest_framework")),
+    re_path(r"^api/search/autocomplete/", SearchAutoCompleteView.as_view(), name="autocomplete"),
+    re_path(r"^api/search/", SearchView.as_view(), name="search"),
+    re_path(r"^api/statistics/", StatisticsView.as_view(), name="statistics"),
+    re_path(r"^api/", include((api_router.urls, 'drf'), namespace="drf")),
 
     # Favicon
-    url(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
+    re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
 
     # The Django admin
-    url(r"admin/", admin.site.urls),
+    re_path(r"admin/", admin.site.urls),
 
     # These redirects are here to support clients that use the old FetchView.
-    url(
+    re_path(
         r"^fetch/doc/(?P<pk>\d+)$",
         RedirectView.as_view(url='/api/documents/%(pk)s/download/'),
     ),
-    url(
+    re_path(
         r"^fetch/thumb/(?P<pk>\d+)$",
         RedirectView.as_view(url='/api/documents/%(pk)s/thumb/'),
     ),
-    url(
+    re_path(
         r"^fetch/preview/(?P<pk>\d+)$",
         RedirectView.as_view(url='/api/documents/%(pk)s/preview/'),
     ),
-    url(r"^push$", csrf_exempt(RedirectView.as_view(url='/api/documents/post_document/'))),
+    re_path(r"^push$", csrf_exempt(RedirectView.as_view(url='/api/documents/post_document/'))),
 
     # Frontend assets TODO: this is pretty bad.
     path('assets/<path:path>', RedirectView.as_view(url='/static/frontend/assets/%(path)s')),
@@ -63,7 +63,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
 
     # Root of the Frontent
-    url(r".*", login_required(IndexView.as_view())),
+    re_path(r".*", login_required(IndexView.as_view())),
 
 ]
 
