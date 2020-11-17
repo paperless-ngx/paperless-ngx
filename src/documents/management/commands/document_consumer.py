@@ -42,10 +42,6 @@ class Command(BaseCommand):
         self.verbosity = 0
         self.logger = logging.getLogger(__name__)
 
-        self.file_consumer = None
-        self.mail_fetcher = None
-        self.first_iteration = True
-
         BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
