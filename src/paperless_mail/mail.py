@@ -55,17 +55,32 @@ class FlagMailAction(BaseMailAction):
         M.flag(message_uids, [MailMessageFlags.FLAGGED], True)
 
 
-def get_rule_action(action):
-    if action == MailRule.ACTION_FLAG:
+def get_rule_action(rule):
+    if rule.action == MailRule.ACTION_FLAG:
         return FlagMailAction()
-    elif action == MailRule.ACTION_DELETE:
+    elif rule.action == MailRule.ACTION_DELETE:
         return DeleteMailAction()
-    elif action == MailRule.ACTION_MOVE:
+    elif rule.action == MailRule.ACTION_MOVE:
         return MoveMailAction()
-    elif action == MailRule.ACTION_MARK_READ:
+    elif rule.action == MailRule.ACTION_MARK_READ:
         return MarkReadMailAction()
     else:
         raise ValueError("Unknown action.")
+
+
+def make_criterias(rule):
+    maximum_age = date.today() - timedelta(days=rule.maximum_age)
+    criterias = {
+        "date_gte": maximum_age
+    }
+    if rule.filter_from:
+        criterias["from_"] = rule.filter_from
+    if rule.filter_subject:
+        criterias["subject"] = rule.filter_subject
+    if rule.filter_body:
+        criterias["body"] = rule.filter_body
+
+    return {**criterias, **get_rule_action(rule).get_criteria()}
 
 
 def handle_mail_account(account):
@@ -98,19 +113,7 @@ def handle_mail_account(account):
                     f"Rule {rule.name}: Folder {rule.folder} does not exist "
                     f"in account {account.name}")
 
-            maximum_age = date.today() - timedelta(days=rule.maximum_age)
-            criterias = {
-                "date_gte": maximum_age
-            }
-            if rule.filter_from:
-                criterias["from_"] = rule.filter_from
-            if rule.filter_subject:
-                criterias["subject"] = rule.filter_subject
-            if rule.filter_body:
-                criterias["body"] = rule.filter_body
-
-            action = get_rule_action(rule.action)
-            criterias = {**criterias, **action.get_criteria()}
+            criterias = make_criterias(rule)
 
             try:
                 messages = M.fetch(criteria=AND(**criterias), mark_seen=False)
@@ -133,7 +136,7 @@ def handle_mail_account(account):
 
                 total_processed_files += processed_files
             try:
-                action.post_consume(
+                get_rule_action(rule).post_consume(
                     M,
                     post_consume_messages,
                     rule.action_parameter)
@@ -146,10 +149,18 @@ def handle_mail_account(account):
     return total_processed_files
 
 
-def handle_message(message, rule):
-    if not message.attachments:
-        return 0
+def get_title(message, att, rule):
+    if rule.assign_title_from == MailRule.TITLE_FROM_SUBJECT:
+        title = message.subject
+    elif rule.assign_title_from == MailRule.TITLE_FROM_FILENAME:
+        title = os.path.splitext(os.path.basename(att.filename))[0]
+    else:
+        raise ValueError("Unknown title selector.")
 
+    return title
+
+
+def get_correspondent(message, rule):
     if rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_NOTHING:
         correspondent = None
     elif rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_EMAIL:
@@ -175,20 +186,22 @@ def handle_message(message, rule):
     else:
         raise ValueError("Unknwown correspondent selector")
 
-    tag = rule.assign_tag
+    return correspondent
 
+
+def handle_message(message, rule):
+    if not message.attachments:
+        return 0
+
+    correspondent = get_correspondent(message, rule)
+    tag = rule.assign_tag
     doc_type = rule.assign_document_type
 
     processed_attachments = 0
 
     for att in message.attachments:
 
-        if rule.assign_title_from == MailRule.TITLE_FROM_SUBJECT:
-            title = message.subject
-        elif rule.assign_title_from == MailRule.TITLE_FROM_FILENAME:
-            title = att.filename
-        else:
-            raise ValueError("Unknown title selector.")
+        title = get_title(message, att, rule)
 
         # TODO: check with parsers what files types are supported
         if att.content_type == 'application/pdf':
