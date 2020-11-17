@@ -37,4 +37,4 @@ class UploadForm(forms.Form):
             f.write(document)
             os.utime(f.name, times=(t, t))
 
-            async_task("documents.tasks.consume_file", f.name, original_filename, task_name=os.path.basename(original_filename))
+            async_task("documents.tasks.consume_file", f.name, override_filename=original_filename, task_name=os.path.basename(original_filename))

@@ -52,20 +52,20 @@ def train_classifier():
         )
 
 
-def consume_file(file,
-                 original_filename=None,
-                 force_title=None,
-                 force_correspondent_id=None,
-                 force_document_type_id=None,
-                 force_tag_ids=None):
+def consume_file(path,
+                 override_filename=None,
+                 override_title=None,
+                 override_correspondent_id=None,
+                 override_document_type_id=None,
+                 override_tag_ids=None):
 
     document = Consumer().try_consume_file(
-        file,
-        original_filename=original_filename,
-        force_title=force_title,
-        force_correspondent_id=force_correspondent_id,
-        force_document_type_id=force_document_type_id,
-        force_tag_ids=force_tag_ids)
+        path,
+        override_filename=override_filename,
+        override_title=override_title,
+        override_correspondent_id=override_correspondent_id,
+        override_document_type_id=override_document_type_id,
+        override_tag_ids=override_tag_ids)
 
     if document:
         return "Success. New document id {} created".format(

@@ -503,33 +503,33 @@ class TestConsumer(TestCase):
         filename = self.get_test_file()
         overrideFilename = "My Bank - Statement for November.pdf"
 
-        document = self.consumer.try_consume_file(filename, original_filename=overrideFilename)
+        document = self.consumer.try_consume_file(filename, override_filename=overrideFilename)
 
         self.assertEqual(document.correspondent.name, "My Bank")
         self.assertEqual(document.title, "Statement for November")
 
     def testOverrideTitle(self):
 
-        document = self.consumer.try_consume_file(self.get_test_file(), force_title="Override Title")
+        document = self.consumer.try_consume_file(self.get_test_file(), override_title="Override Title")
         self.assertEqual(document.title, "Override Title")
 
     def testOverrideCorrespondent(self):
         c = Correspondent.objects.create(name="test")
 
-        document = self.consumer.try_consume_file(self.get_test_file(), force_correspondent_id=c.pk)
+        document = self.consumer.try_consume_file(self.get_test_file(), override_correspondent_id=c.pk)
         self.assertEqual(document.correspondent.id, c.id)
 
     def testOverrideDocumentType(self):
         dt = DocumentType.objects.create(name="test")
 
-        document = self.consumer.try_consume_file(self.get_test_file(), force_document_type_id=dt.pk)
+        document = self.consumer.try_consume_file(self.get_test_file(), override_document_type_id=dt.pk)
         self.assertEqual(document.document_type.id, dt.id)
 
     def testOverrideTags(self):
         t1 = Tag.objects.create(name="t1")
         t2 = Tag.objects.create(name="t2")
         t3 = Tag.objects.create(name="t3")
-        document = self.consumer.try_consume_file(self.get_test_file(), force_tag_ids=[t1.id, t3.id])
+        document = self.consumer.try_consume_file(self.get_test_file(), override_tag_ids=[t1.id, t3.id])
 
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
@@ -624,7 +624,7 @@ class TestConsumer(TestCase):
     def testFilenameHandling(self):
         filename = self.get_test_file()
 
-        document = self.consumer.try_consume_file(filename, original_filename="Bank - Test.pdf", force_title="new docs")
+        document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
 
         print(document.source_path)
         print("===")
