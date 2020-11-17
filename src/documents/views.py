@@ -223,17 +223,16 @@ class SearchAutoCompleteView(APIView):
         if 'term' in request.query_params:
             term = request.query_params['term']
         else:
-            term = None
+            return HttpResponseBadRequest("Term required")
 
         if 'limit' in request.query_params:
             limit = int(request.query_params['limit'])
+            if limit <= 0:
+                return HttpResponseBadRequest("Invalid limit")
         else:
             limit = 10
 
-        if term is not None:
-            return Response(index.autocomplete(self.ix, term, limit))
-        else:
-            return Response([])
+        return Response(index.autocomplete(self.ix, term, limit))
 
 
 class StatisticsView(APIView):
