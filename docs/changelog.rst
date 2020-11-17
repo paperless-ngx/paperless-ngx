@@ -38,6 +38,12 @@ paperless-ng 0.9.0
   multi user solution, however, it allows more than one user to access the website
   and set some basic permissions / renew passwords.
 
+* **Modified [breaking]:** All new mail consumer with customizable filters, actions and
+  multiple account support. Replaces the old mail consumer. The new mail consumer
+  needs different configuration but can be configured to act exactly like the old
+  consumer.
+
+
 * **Modified:** Changes to the consumer:
 
   * Now uses the excellent watchdog library that should make sure files are

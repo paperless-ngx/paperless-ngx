@@ -36,6 +36,10 @@ The old admin is still there and accessible!
 
 .. image:: _static/paperless-9-admin.png
 
+Fancy mail filters!
+
+.. image:: _static/paperless-11-mail-filters.png
+
 Mobile support in the future? This doesn't really work yet.
 
 .. image:: _static/paperless-10-mobile.png
