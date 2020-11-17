@@ -48,13 +48,11 @@ class TestClassifier(TestCase):
         self.assertIsNone(self.classifier.predict_document_type(""))
         self.assertIsNone(self.classifier.predict_correspondent(""))
 
-
     def testTrain(self):
         self.generate_test_data()
         self.classifier.train()
         self.assertListEqual(list(self.classifier.correspondent_classifier.classes_), [-1, self.c1.pk])
         self.assertListEqual(list(self.classifier.tags_binarizer.classes_), [self.t1.pk, self.t3.pk])
-
 
     def testPredict(self):
         self.generate_test_data()
@@ -62,7 +60,7 @@ class TestClassifier(TestCase):
         self.assertEqual(self.classifier.predict_correspondent(self.doc1.content), self.c1.pk)
         self.assertEqual(self.classifier.predict_correspondent(self.doc2.content), None)
         self.assertTupleEqual(self.classifier.predict_tags(self.doc1.content), (self.t1.pk,))
-        self.assertTupleEqual(self.classifier.predict_tags(self.doc2.content), (self.t1.pk,self.t3.pk))
+        self.assertTupleEqual(self.classifier.predict_tags(self.doc2.content), (self.t1.pk, self.t3.pk))
         self.assertEqual(self.classifier.predict_document_type(self.doc1.content), self.dt.pk)
         self.assertEqual(self.classifier.predict_document_type(self.doc2.content), None)
 
