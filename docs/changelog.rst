@@ -8,10 +8,8 @@ Changelog
 paperless-ng 0.9.0
 ##################
 
-* **Deprecated:** GnuPG. Don't use it. If you're still using it, be aware that it
-  offers no protection at all, since the passphrase is stored alongside with the
-  encrypted documents itself. This features will most likely be removed in future
-  versions.
+* **Deprecated:** GnuPG. :ref:`See this note on the state of GnuPG in paperless-ng. <utilities-encyption>`
+  This features will most likely be removed in future versions.
 
 * **Added:** New frontend. Features:
 
@@ -97,7 +95,7 @@ paperless-ng 0.9.0
   * The presence of ``PAPERLESS_DBHOST`` now determines whether to use PostgreSQL or
     sqlite.
   * ``PAPERLESS_OCR_THREADS`` is gone and replaced with ``PAPERLESS_TASK_WORKERS`` and
-    ``PAPERLESS_THREADS_PER_WORKER``. See TODO for details.
+    ``PAPERLESS_THREADS_PER_WORKER``. Refer to the config example for details.
 
 * Many more small changes here and there. The usual stuff.
 
