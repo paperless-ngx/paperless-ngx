@@ -2,7 +2,6 @@ import os
 import tempfile
 from datetime import timedelta, date
 
-
 from django.conf import settings
 from django.utils.text import slugify
 from django_q.tasks import async_task
@@ -114,19 +113,22 @@ def handle_message(message, rule):
     if rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_NOTHING:
         correspondent = None
     elif rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_EMAIL:
-        corerspondent_name = message.from_
+        correspondent_name = message.from_
         correspondent = Correspondent.objects.get_or_create(
-            name=corerspondent_name, defaults={
-                "slug": slugify(corerspondent_name)
+            name=correspondent_name, defaults={
+                "slug": slugify(correspondent_name)
             })[0]
     elif rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_NAME:
-        corerspondent_name = message.from_values['name'] \
-            if (message.from_values and
-                'name' in message.from_values and
-                message.from_values['name']) else message.from_
+        if message.from_values and \
+           'name' in message.from_values \
+           and message.from_values['name']:
+            correspondent_name = message.from_values['name']
+        else:
+            correspondent_name = message.from_
+
         correspondent = Correspondent.objects.get_or_create(
-            name=corerspondent_name, defaults={
-                "slug": slugify(corerspondent_name)
+            name=correspondent_name, defaults={
+                "slug": slugify(correspondent_name)
             })[0]
     elif rule.assign_correspondent_from == MailRule.CORRESPONDENT_FROM_CUSTOM:
         correspondent = rule.assign_correspondent
@@ -146,16 +148,11 @@ def handle_message(message, rule):
         else:
             raise ValueError("Unknown title selector.")
 
+        # TODO: check with parsers what files types are supported
         if att.content_type == 'application/pdf':
-            print("This is where I would consume the file with name {} and I would "
-                  "give it the title '{}', correspondent '{}', tag '{}', and doc type"
-                  "'{}'."
-                  .format(att.filename, title, correspondent, tag, doc_type))
 
             os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-
             _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)
-
             with open(temp_filename, 'wb') as f:
                 f.write(att.payload)
 
