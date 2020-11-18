@@ -59,22 +59,6 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 #PAPERLESS_STATIC_URL="/static/"
 
 
-# These values are required if you want paperless to check a particular email
-# box every 10 minutes and attempt to consume documents from there.  If you
-# don't define a HOST, mail checking will just be disabled.
-#PAPERLESS_CONSUME_MAIL_HOST=""
-#PAPERLESS_CONSUME_MAIL_PORT=""
-#PAPERLESS_CONSUME_MAIL_USER=""
-#PAPERLESS_CONSUME_MAIL_PASS=""
-
-# Override the default IMAP inbox here. If not set Paperless defaults to
-# "INBOX".
-#PAPERLESS_CONSUME_MAIL_INBOX="INBOX"
-
-# Any email sent to the target account that does not contain this text will be
-# ignored.
-PAPERLESS_EMAIL_SECRET=""
-
 # Specify a filename format for the document (directories are supported)
 # Use the following placeholders:
 # * {correspondent}
@@ -143,6 +127,35 @@ PAPERLESS_EMAIL_SECRET=""
 ####                          Software Tweaks                              ####
 ###############################################################################
 
+# Paperless does multiple things in the background: Maintain the search index,
+# maintain the automatic matching algorithm, check emails, consume documents,
+# etc. This variable specifies how many things it will do in parallel.
+#PAPERLESS_TASK_WORKERS=1
+
+# Furthermore, paperless uses multiple threads when consuming documents to
+# speed up OCR. This variable specifies how many pages paperless will process
+# in parallel on a single document.
+#PAPERLESS_THREADS_PER_WORKER=1
+
+# Ensure that the product
+#   PAPERLESS_TASK_WORKERS * PAPERLESS_THREADS_PER_WORKER
+# does not exceed your CPU core count or else paperless will be extremely slow.
+# If you want paperless to process many documents in parallel, choose a high
+# worker count. If you want paperless to process very large documents faster,
+# use a higher thread per worker count.
+# The default is a balance between the two, according to your CPU core count,
+# with a slight favor towards threads per worker, and using as much cores as
+# possible.
+# If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
+# PAPERLESS_THREADS_PER_WORKER automatically.
+
+# If paperless won't find documents added to your consume folder, it might
+# not be able to automatically detect filesystem changes. In that case,
+# specify a polling interval in seconds below, which will then cause paperless
+# to periodically check your consumption directory for changes.
+#PAPERLESS_CONSUMER_POLLING=10
+
+
 # When the consumer detects a duplicate document, it will not touch the
 # original document. This default behavior can be changed here.
 #PAPERLESS_CONSUMER_DELETE_DUPLICATES="false"
@@ -184,12 +197,6 @@ PAPERLESS_EMAIL_SECRET=""
 # running Paperless on a low-resource device (like a Raspberry Pi), modifying
 # some of these values may be necessary.
 #
-
-
-# By default, Paperless will attempt to use all available CPU cores to process
-# a document, but if you would like to limit that, you can set this value to
-# an integer:
-#PAPERLESS_OCR_THREADS=1
 
 
 # Customize the default language that tesseract will attempt to use when

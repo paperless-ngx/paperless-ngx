@@ -14,7 +14,7 @@ class TestParserDiscovery(TestCase):
             pass
 
         m.return_value = (
-            (None, lambda _: {"weight": 0, "parser": DummyParser}),
+            (None, {"weight": 0, "parser": DummyParser, "test": lambda _: True}),
         )
 
         self.assertEqual(
@@ -32,8 +32,8 @@ class TestParserDiscovery(TestCase):
             pass
 
         m.return_value = (
-            (None, lambda _: {"weight": 0, "parser": DummyParser1}),
-            (None, lambda _: {"weight": 1, "parser": DummyParser2}),
+            (None, {"weight": 0, "parser": DummyParser1, "test": lambda _: True}),
+            (None, {"weight": 1, "parser": DummyParser2, "test": lambda _: True}),
         )
 
         self.assertEqual(
@@ -43,7 +43,7 @@ class TestParserDiscovery(TestCase):
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test__get_parser_class_0_parsers(self, m, *args):
-        m.return_value = ((None, lambda _: None),)
+        m.return_value = []
         with TemporaryDirectory() as tmpdir:
             self.assertIsNone(
                 get_parser_class("doc.pdf")

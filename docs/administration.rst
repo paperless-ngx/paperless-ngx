@@ -294,10 +294,14 @@ Documents can be stored in Paperless using GnuPG encryption.
 
 .. danger::
 
-    Decryption is depreceated since paperless-ng 1.0 and doesn't really provide any
+    Decryption is depreceated since paperless-ng 0.9 and doesn't really provide any
     additional security, since you have to store the passphrase in a configuration
-    file on the same system as the encrypted documents for paperless to work. Also,
-    paperless provides transparent access to your encrypted documents.
+    file on the same system as the encrypted documents for paperless to work.
+    Furthermore, the entire text content of the documents is stored plain in the
+    database, even if your documents are encrypted. Filenames are not encrypted as
+    well.
+    
+    Also, the web server provides transparent access to your encrypted documents.
 
     Consider running paperless on an encrypted filesystem instead, which will then
     at least provide security against physical hardware theft.
