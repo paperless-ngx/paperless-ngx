@@ -5,8 +5,6 @@ import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
 
-from django.conf import settings
-from django.db import DatabaseError
 from django.test import TestCase, override_settings
 
 from ..consumer import Consumer, ConsumerError
@@ -504,9 +502,9 @@ class TestConsumer(TestCase):
 
     def testOverrideFilename(self):
         filename = self.get_test_file()
-        overrideFilename = "My Bank - Statement for November.pdf"
+        override_filename = "My Bank - Statement for November.pdf"
 
-        document = self.consumer.try_consume_file(filename, override_filename=overrideFilename)
+        document = self.consumer.try_consume_file(filename, override_filename=override_filename)
 
         self.assertEqual(document.correspondent.name, "My Bank")
         self.assertEqual(document.title, "Statement for November")

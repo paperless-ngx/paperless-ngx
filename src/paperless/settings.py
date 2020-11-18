@@ -257,6 +257,14 @@ LOGGING = {
             "handlers": ["dbhandler", "streamhandler"],
             "level": "DEBUG"
         },
+        "paperless_mail": {
+            "handlers": ["dbhandler", "streamhandler"],
+            "level": "DEBUG"
+        },
+        "paperless_tesseract": {
+            "handlers": ["dbhandler", "streamhandler"],
+            "level": "DEBUG"
+        },
     },
 }
 
@@ -311,6 +319,8 @@ THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_p
 CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
+
+OPTIMIZE_THUMBNAILS = __get_boolean("PAPERLESS_OPTIMIZE_THUMBNAILS", "true")
 
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.

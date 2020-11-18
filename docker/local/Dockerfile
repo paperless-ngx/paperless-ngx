@@ -2,27 +2,25 @@
 ### Back end                                                                ###
 ###############################################################################
 
-FROM ubuntu:20.04
+FROM python:3.7-slim
 
 WORKDIR /usr/src/paperless/
 
-COPY Pipfile* ./
+COPY requirements.txt ./
 
 #Dependencies
 RUN apt-get update \
-  && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install \
+  && apt-get -y --no-install-recommends install \
 		build-essential \
 		curl \
 		ghostscript \
 		gnupg \
 		imagemagick \
+		libatlas-base-dev \
 		libmagic-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \
 		optipng \
-		python3 \
-		python3-dev \
-		python3-pip \
 		sudo \
 		tesseract-ocr \
 		tesseract-ocr-eng \
@@ -32,10 +30,9 @@ RUN apt-get update \
 		tesseract-ocr-spa \
 		tzdata \
 		unpaper \
-	&& pip3 install --upgrade pipenv supervisor setuptools \
-	&& pipenv install --system --deploy \
-	&& pipenv --clear \
-	&& apt-get -y purge build-essential python3-pip python3-dev \
+	&& pip3 install --upgrade supervisor setuptools \
+	&& pip install --no-cache-dir -r requirements.txt \
+	&& apt-get -y purge build-essential \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord

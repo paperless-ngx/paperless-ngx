@@ -7,7 +7,7 @@ from django.test import TestCase
 from imap_tools import MailMessageFlags, MailboxFolderSelectError
 
 from documents.models import Correspondent
-from paperless_mail.mail import get_correspondent, get_title, handle_message, handle_mail_account, MailError
+from paperless_mail.mail import MailError, MailAccountHandler, get_correspondent, get_title
 from paperless_mail.models import MailRule, MailAccount
 
 
@@ -126,6 +126,8 @@ class TestMail(TestCase):
 
         self.reset_bogus_mailbox()
 
+        self.mail_account_handler = MailAccountHandler()
+
     def reset_bogus_mailbox(self):
         self.bogus_mailbox.messages = []
         self.bogus_mailbox.messages_spam = []
@@ -145,10 +147,10 @@ class TestMail(TestCase):
         me_localhost = Correspondent.objects.create(name=message2.from_)
         someone_else = Correspondent.objects.create(name="someone else")
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING)
+        rule = MailRule(name="a", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING)
         self.assertIsNone(get_correspondent(message, rule))
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL)
+        rule = MailRule(name="b", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL)
         c = get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "someone@somewhere.com")
@@ -157,7 +159,7 @@ class TestMail(TestCase):
         self.assertEqual(c.name, "me@localhost.com")
         self.assertEqual(c.id, me_localhost.id)
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME)
+        rule = MailRule(name="c", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME)
         c = get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "Someone!")
@@ -165,7 +167,7 @@ class TestMail(TestCase):
         self.assertIsNotNone(c)
         self.assertEqual(c.id, me_localhost.id)
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_CUSTOM, assign_correspondent=someone_else)
+        rule = MailRule(name="d", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_CUSTOM, assign_correspondent=someone_else)
         c = get_correspondent(message, rule)
         self.assertEqual(c, someone_else)
 
@@ -174,14 +176,15 @@ class TestMail(TestCase):
         message.subject = "the message title"
         att = namedtuple('Attachment', [])
         att.filename = "this_is_the_file.pdf"
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME)
+        rule = MailRule(name="a", assign_title_from=MailRule.TITLE_FROM_FILENAME)
         self.assertEqual(get_title(message, att, rule), "this_is_the_file")
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_SUBJECT)
+        rule = MailRule(name="b", assign_title_from=MailRule.TITLE_FROM_SUBJECT)
         self.assertEqual(get_title(message, att, rule), "the message title")
 
     def test_handle_message(self):
         message = namedtuple('MailMessage', [])
         message.subject = "the message title"
+        message.from_ = "Myself"
 
         att = namedtuple('Attachment', [])
         att.filename = "test1.pdf"
@@ -200,9 +203,10 @@ class TestMail(TestCase):
 
         message.attachments = [att, att2, att3]
 
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME)
+        account = MailAccount()
+        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account)
 
-        result = handle_message(message, rule)
+        result = self.mail_account_handler.handle_message(message, rule)
 
         self.assertEqual(result, 2)
 
@@ -224,7 +228,7 @@ class TestMail(TestCase):
         message.attachments = []
         rule = MailRule()
 
-        result = handle_message(message, rule)
+        result = self.mail_account_handler.handle_message(message, rule)
 
         self.assertFalse(m.called)
         self.assertEqual(result, 0)
@@ -235,11 +239,13 @@ class TestMail(TestCase):
 
         rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_MARK_READ)
 
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
         self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(self.async_task.call_count, 2)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_handle_mail_account_delete(self):
 
@@ -249,7 +255,7 @@ class TestMail(TestCase):
 
         self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(self.async_task.call_count, 2)
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
 
@@ -258,11 +264,13 @@ class TestMail(TestCase):
 
         rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_FLAG, filter_subject="Invoice")
 
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
         self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 2)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(self.async_task.call_count, 1)
         self.assertEqual(len(self.bogus_mailbox.fetch("UNFLAGGED", False)), 1)
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
 
     def test_handle_mail_account_move(self):
         account = MailAccount.objects.create(name="test", imap_server="", username="admin", password="secret")
@@ -272,7 +280,7 @@ class TestMail(TestCase):
         self.assertEqual(self.async_task.call_count, 0)
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 0)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(self.async_task.call_count, 1)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
@@ -281,7 +289,7 @@ class TestMail(TestCase):
         account = MailAccount.objects.create(name="test", imap_server="", username="admin", password="wrong")
 
         try:
-            handle_mail_account(account)
+            self.mail_account_handler.handle_mail_account(account)
         except MailError as e:
             self.assertTrue(str(e).startswith("Error while authenticating account"))
         else:
@@ -291,7 +299,7 @@ class TestMail(TestCase):
         rule = MailRule.objects.create(name="testrule", account=account, folder="uuuh")
 
         try:
-            handle_mail_account(account)
+            self.mail_account_handler.handle_mail_account(account)
         except MailError as e:
             self.assertTrue("uuuh does not exist" in str(e))
         else:
@@ -299,10 +307,10 @@ class TestMail(TestCase):
 
         account = MailAccount.objects.create(name="test3", imap_server="", username="admin", password="secret")
 
-        rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_MOVE, action_parameter="doesnotexist", filter_subject="Claim")
+        rule = MailRule.objects.create(name="testrule2", account=account, action=MailRule.ACTION_MOVE, action_parameter="doesnotexist", filter_subject="Claim")
 
         try:
-            handle_mail_account(account)
+            self.mail_account_handler.handle_mail_account(account)
         except MailError as e:
             self.assertTrue("Error while processing post-consume actions" in str(e))
         else:
@@ -311,12 +319,12 @@ class TestMail(TestCase):
     def test_filters(self):
 
         account = MailAccount.objects.create(name="test3", imap_server="", username="admin", password="secret")
-        rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_DELETE, filter_subject="Claim")
+        rule = MailRule.objects.create(name="testrule3", account=account, action=MailRule.ACTION_DELETE, filter_subject="Claim")
 
         self.assertEqual(self.async_task.call_count, 0)
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(self.async_task.call_count, 1)
 
@@ -326,7 +334,7 @@ class TestMail(TestCase):
         rule.filter_body = "electronic"
         rule.save()
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(self.async_task.call_count, 2)
 
@@ -336,7 +344,7 @@ class TestMail(TestCase):
         rule.filter_body = None
         rule.save()
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
         self.assertEqual(self.async_task.call_count, 4)
 
@@ -347,6 +355,6 @@ class TestMail(TestCase):
         rule.filter_subject = "Invoice"
         rule.save()
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
-        handle_mail_account(account)
+        self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(self.async_task.call_count, 5)

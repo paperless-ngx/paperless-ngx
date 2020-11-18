@@ -10,7 +10,7 @@
 # This is required for processing scheduled tasks such as email fetching, index
 # optimization and for training the automatic document matcher.
 # Defaults to localhost:6379.
-#PAPERLESS_REDIS="redis://localhost:6379"
+#PAPERLESS_REDIS=redis://localhost:6379
 
 
 ###############################################################################
@@ -22,15 +22,15 @@
 # configuration for this is already done inside the docker-compose.env file.
 
 #Set PAPERLESS_DBHOST and postgresql will be used instead of mysql.
-#PAPERLESS_DBHOST="localhost"
+#PAPERLESS_DBHOST=localhost
 
 #Adjust port if necessary
 #PAPERLESS_DBPORT=
 
 #name, user and pass all default to "paperless"
-#PAPERLESS_DBNAME="paperless"
-#PAPERLESS_DBUSER="paperless"
-#PAPERLESS_DBPASS="paperless"
+#PAPERLESS_DBNAME=paperless
+#PAPERLESS_DBUSER=paperless
+#PAPERLESS_DBPASS=paperless
 
 
 ###############################################################################
@@ -40,23 +40,23 @@
 # This where your documents should go to be consumed.  Make sure that it exists
 # and that the user running the paperless service can read/write its contents
 # before you start Paperless.
-PAPERLESS_CONSUMPTION_DIR="../consume"
+PAPERLESS_CONSUMPTION_DIR=../consume
 
 # This is where paperless stores all its data (search index, sqlite database,
 # classification model, etc).
-#PAPERLESS_DATA_DIR="../data"
+#PAPERLESS_DATA_DIR=../data
 
 # This is where your documents and thumbnails are stored.
-#PAPERLESS_MEDIA_ROOT="../media"
+#PAPERLESS_MEDIA_ROOT=../media
 
 # Override the default STATIC_ROOT here.  This is where all static files
 # created using "collectstatic" manager command are stored.
-#PAPERLESS_STATICDIR="../static"
+#PAPERLESS_STATICDIR=../static
 
 
 # Override the STATIC_URL here.  Unless you're hosting Paperless off a
 # subdomain like /paperless/, you probably don't need to change this.
-#PAPERLESS_STATIC_URL="/static/"
+#PAPERLESS_STATIC_URL=/static/
 
 
 # Specify a filename format for the document (directories are supported)
@@ -69,7 +69,7 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 # * {tags[INDEX]} If your tags are strings, select the tag by index
 # Uniqueness of filenames is ensured, as an incrementing counter is attached
 # to each filename.
-#PAPERLESS_FILENAME_FORMAT=""
+#PAPERLESS_FILENAME_FORMAT=
 
 ###############################################################################
 ####                              Security                                 ####
@@ -77,9 +77,11 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 
 # Controls whether django's debug mode is enabled. Disable this on production
 # systems. Debug mode is disabled by default.
-#PAPERLESS_DEBUG="false"
+#PAPERLESS_DEBUG=false
 
 # GnuPG encryption is deprecated and will be removed in future versions.
+#
+# Dont use it. It does not provide any security at all.
 #
 # Paperless can be instructed to attempt to encrypt your PDF files with GPG
 # using the PAPERLESS_PASSPHRASE specified below.  If however you're not
@@ -93,13 +95,13 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 # you've since changed it to a new one.
 #
 # The default is to not use encryption at all.
-#PAPERLESS_PASSPHRASE="secret"
+#PAPERLESS_PASSPHRASE=secret
 
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
 # public, you should change the key to something unique and verbose.
-#PAPERLESS_SECRET_KEY="change-me"
+#PAPERLESS_SECRET_KEY=change-me
 
 
 # If you're planning on putting Paperless on the open internet, then you
@@ -109,19 +111,19 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 #
 # Just remember that this is a comma-separated list, so "example.com" is fine,
 # as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
-#PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
+#PAPERLESS_ALLOWED_HOSTS=example.com,www.example.com
 
 # If you decide to use the Paperless API in an ajax call, you need to add your
 # servers to the list of allowed hosts that can do CORS calls. By default
 # Paperless allows calls from localhost:8080, but you'd like to change that,
 # you can set this value to a comma-separated list.
-#PAPERLESS_CORS_ALLOWED_HOSTS="localhost:8080,example.com,localhost:8000"
+#PAPERLESS_CORS_ALLOWED_HOSTS=localhost:8080,example.com,localhost:8000
 
 # To host paperless under a subpath url like example.com/paperless you set
 # this value to /paperless. No trailing slash!
 #
 # https://docs.djangoproject.com/en/1.11/ref/settings/#force-script-name
-#PAPERLESS_FORCE_SCRIPT_NAME=""
+#PAPERLESS_FORCE_SCRIPT_NAME=
 
 ###############################################################################
 ####                          Software Tweaks                              ####
@@ -158,14 +160,19 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 
 # When the consumer detects a duplicate document, it will not touch the
 # original document. This default behavior can be changed here.
-#PAPERLESS_CONSUMER_DELETE_DUPLICATES="false"
+#PAPERLESS_CONSUMER_DELETE_DUPLICATES=false
+
+# Use optipng to optimize thumbnails. This usually reduces the sice of
+# thumbnails by about 20%, but uses considerable compute time during
+# consumption.
+#PAPERLESS_OPTIMIZE_THUMBNAILS=true
 
 # After a document is consumed, Paperless can trigger an arbitrary script if
 # you like.  This script will be passed a number of arguments for you to work
 # with.  The default is blank, which means nothing will be executed.  For more
 # information, take a look at the docs:
 # http://paperless.readthedocs.org/en/latest/consumption.html#hooking-into-the-consumption-process
-#PAPERLESS_POST_CONSUME_SCRIPT="/path/to/an/arbitrary/script.sh"
+#PAPERLESS_POST_CONSUME_SCRIPT=/path/to/an/arbitrary/script.sh
 
 # By default, paperless will check the document text for document date information.
 # Uncomment the line below to enable checking the document filename for date
@@ -173,7 +180,7 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 # https://dateparser.readthedocs.io/en/latest/#settings. The filename will be
 # checked first, and if nothing is found, the document text will be checked
 # as normal.
-#PAPERLESS_FILENAME_DATE_ORDER="YMD"
+#PAPERLESS_FILENAME_DATE_ORDER=YMD
 
 # Sometimes devices won't create filenames which can be parsed properly
 # by the filename parser (see
@@ -243,7 +250,7 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 
 # By default Paperless does not OCR a document if the text can be retrieved from
 # the document directly. Set to true to always OCR documents.
-#PAPERLESS_OCR_ALWAYS="false"
+#PAPERLESS_OCR_ALWAYS=false
 
 
 ###############################################################################
@@ -271,7 +278,7 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 #PAPERLESS_CONVERT_BINARY=/usr/bin/convert
 
 # Ghostscript
-#PAPERLESS_GS_BINARY = /usr/bin/gs
+#PAPERLESS_GS_BINARY=/usr/bin/gs
 
 # Unpaper
 #PAPERLESS_UNPAPER_BINARY=/usr/bin/unpaper
