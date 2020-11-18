@@ -9,6 +9,8 @@ class MailAccountAdmin(admin.ModelAdmin):
 
 class MailRuleAdmin(admin.ModelAdmin):
 
+    list_filter = ("account",)
+
     list_display = ("name", "account", "folder", "action")
 
 

@@ -19,7 +19,11 @@ class MailAccount(models.Model):
 
     imap_server = models.CharField(max_length=256)
 
-    imap_port = models.IntegerField(blank=True, null=True)
+    imap_port = models.IntegerField(
+        blank=True,
+        null=True,
+        help_text="This is usually 143 for unencrypted and STARTTLS "
+                  "connections, and 993 for SSL connections.")
 
     imap_security = models.PositiveIntegerField(
         choices=IMAP_SECURITY_OPTIONS,
@@ -68,7 +72,7 @@ class MailRule(models.Model):
         (CORRESPONDENT_FROM_CUSTOM, "Use correspondent selected below")
     )
 
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=256, unique=True)
 
     account = models.ForeignKey(
         MailAccount,
