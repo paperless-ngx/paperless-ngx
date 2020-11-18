@@ -24,12 +24,17 @@ then
 	rm "$PAPERLESS_DIST" -r
 fi
 
+mkdir "$PAPERLESS_DIST"
+mkdir "$PAPERLESS_DIST_APP"
+mkdir "$PAPERLESS_DIST_APP/docker"
+
 # setup dependencies.
 
 cd "$PAPERLESS_ROOT"
 
 pipenv clean
 pipenv install --dev
+pipenv lock --keep-outdated -r > "$PAPERLESS_DIST_APP/requirements.txt"
 
 # test if the application works.
 
@@ -43,10 +48,6 @@ cd "$PAPERLESS_ROOT/docs"
 make clean html
 
 # copy stuff into place
-
-mkdir "$PAPERLESS_DIST"
-mkdir "$PAPERLESS_DIST_APP"
-mkdir "$PAPERLESS_DIST_APP/docker"
 
 # the application itself
 
@@ -91,8 +92,6 @@ cp "$PAPERLESS_ROOT/docker/supervisord.conf" "$PAPERLESS_DIST_APP/docker/"
 cd "$PAPERLESS_DIST_APP"
 
 docker build . -t "jonaswinkler/paperless-ng:$VERSION"
-
-docker push "jonaswinkler/paperless-ng:$VERSION"
 
 # works. package the app!
 

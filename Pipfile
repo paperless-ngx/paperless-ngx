@@ -3,6 +3,11 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://www.piwheels.org/simple"
+verify_ssl = true
+name = "piwheels"
+
 [packages]
 django = "~=3.1"
 pillow = "*"
