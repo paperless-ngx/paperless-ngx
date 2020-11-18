@@ -257,6 +257,14 @@ LOGGING = {
             "handlers": ["dbhandler", "streamhandler"],
             "level": "DEBUG"
         },
+        "paperless_mail": {
+            "handlers": ["dbhandler", "streamhandler"],
+            "level": "DEBUG"
+        },
+        "paperless_tesseract": {
+            "handlers": ["dbhandler", "streamhandler"],
+            "level": "DEBUG"
+        },
     },
 }
 
