@@ -86,7 +86,7 @@ def generate_filename(document):
                 added_day=document.added.day if document.added else "none",
                 tags=tags,
             )
-    except (ValueError, KeyError, IndexError) as e:
+    except (ValueError, KeyError, IndexError):
         logging.getLogger(__name__).warning("Invalid PAPERLESS_FILENAME_FORMAT: {}, falling back to default,".format(settings.PAPERLESS_FILENAME_FORMAT))
 
     # Always append the primary key to guarantee uniqueness of filename

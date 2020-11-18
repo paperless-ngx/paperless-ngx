@@ -1,6 +1,5 @@
 import logging
 
-from paperless_mail import mail
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
 
