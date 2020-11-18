@@ -135,6 +135,7 @@ def get_mailbox(server, port, security):
         raise ValueError("Unknown IMAP security")
     return mailbox
 
+
 class MailAccountHandler(LoggingMixin):
 
     def handle_mail_account(self, account):
