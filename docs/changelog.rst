@@ -96,6 +96,8 @@ paperless-ng 0.9.0
     sqlite.
   * ``PAPERLESS_OCR_THREADS`` is gone and replaced with ``PAPERLESS_TASK_WORKERS`` and
     ``PAPERLESS_THREADS_PER_WORKER``. Refer to the config example for details.
+  * ``PAPERLESS_OPTIMIZE_THUMBNAILS`` allows you to disable or enable thumbnail
+    optimization. This is useful on less powerful devices.
 
 * Many more small changes here and there. The usual stuff.
 

@@ -128,6 +128,8 @@ consumer.  Once complete, you should see the newly-created document,
 automatically tagged with the appropriate data.
 
 
+.. _advanced-automatic_matching:
+
 Automatic matching
 ==================
 
