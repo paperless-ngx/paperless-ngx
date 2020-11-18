@@ -126,7 +126,22 @@ These are as follows:
     documents from. Keep in mind that the actual consumption process may fail
     for some reason, leaving you with missing documents in paperless.
 
-Paperless is set up to check your mails every 10 minutes. this can be configured on the
+.. note::
+
+    With the correct set of rules, you can completely automate your email documents.
+    Create rules for every correspondent you receive digital documents from and
+    paperless will read them automatically. The default acion "mark as read" is
+    pretty tame and will not cause any damage or data loss whatsoever.
+
+.. note::
+
+    Paperless will process the rules in the order defined in the admin page.
+
+    You can define catch-all rules and have them executed last to consume
+    any documents not matched by previous rules. Such a rule may assign an "Unknown
+    mail document" tag to consumed documents so you can inspect them further.
+
+Paperless is set up to check your mails every 10 minutes. This can be configured on the
 'Scheduled tasks' page in the admin.
 
 
