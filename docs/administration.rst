@@ -8,21 +8,47 @@ Administration
 Making backups
 ##############
 
-.. warning::
+Multiple options exist for making backups of your paperless instance,
+depending on how you installed paperless.
 
-    This section is not updated to paperless-ng yet, the exporter is a valid tool
-    for backups though.
+Before making backups, make sure that paperless is not running.
 
-So you're bored of this whole project, or you want to make a remote backup of
-your files for whatever reason.  This is easy to do, simply use the
-:ref:`exporter <utilities-exporter>` to dump your documents and database out
-into an arbitrary directory.
+Options available to any installation of paperless:
 
+*   Use the :ref:`document exporter <utilities-exporter>`.
+    The document exporter exports all your documents, thumbnails and
+    metadata to a specific folder. You may import your documents into a
+    fresh instance of paperless again or store your documents in another
+    DMS with this export.
+
+Options available to docker installations:
+
+*   Backup the docker volumes. These usually reside within
+    ``/var/lib/docker/volumes`` on the host and you need to be root in order
+    to access them.
+
+    Paperless uses 3 volumes:
+
+    *   ``paperless_media``: This is where your documents are stored.
+    *   ``paperless_data``: This is where auxilliary data is stored. This
+        folder also contains the SQLite database, if you use it.
+    *   ``paperless_pgdata``: Exists only if you use PostgreSQL and contains
+        the database.
+
+Options available to bare-metal and non-docker installations:
+
+*   Backup the entire paperless folder. This ensures that if your paperless instance
+    crashes at some point or your disk fails, you can simply copy the folder back
+    into place and it works.
+
+    When using PostgreSQL, you'll also have to backup the database.
 
 .. _migrating-restoring:
 
 Restoring
 =========
+
+
 
 
 .. _administration-updating:

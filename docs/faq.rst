@@ -23,11 +23,31 @@ is
 
 **Q:** *Will paperless-ng run on Raspberry Pi?*
 
-**A:** The short answer is yes. The long answer is that certain parts of
+**A:** The short answer is yes. I've tested it on a Raspberry Pi 3 B.
+The long answer is that certain parts of
 Paperless will run very slow, such as the tesseract OCR. On Rasperry Pi,
 try to OCR documents before feeding them into paperless so that paperless can
 reuse the text. The web interface should be alot snappier, since it runs
 in your browser and paperless has to do much less work to serve the data.
+
+.. note::
+    
+    Consider setting ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to false to speed up
+    the consumption process. This takes quite a bit of time on Raspberry Pi.
+
+.. note::
+    
+    Updating the :ref:`automatic matching algorithm <advanced-automatic_matching>`
+    takes quite a bit of time. However, the update mechanism checks if your
+    data has changed before doing the heavy lifting. If you experience the 
+    algorithm taking too much cpu time, consider changing the schedule in the
+    admin interface to daily or weekly. You can also manually invoke the task
+    by changing the date and time of the next run to today/now.
+
+    The actual matching of the algorithm is fast and works on Raspberry Pi as 
+    well as on any other device.
+
+    
 
 **Q:** *How do I install paperless-ng on Raspberry Pi?*
 
@@ -35,15 +55,3 @@ in your browser and paperless has to do much less work to serve the data.
 that automatically, I'm all ears. For now, you have to grab the latest release
 archive from the project page and build the image yourself. The release comes
 with the front end already compiled, so you don't have to do this on the Pi.
-
-You may encounter some issues during the build:
-
-.. code:: shell-session
-
-    W: GPG error: http://ports.ubuntu.com/ubuntu-ports focal InRelease: At least one invalid signature was encountered.
-    E: The repository 'http://ports.ubuntu.com/ubuntu-ports focal InRelease' is not signed.
-    N: Updating from such a repository can't be done securely, and is therefore disabled by default.
-    N: See apt-secure(8) manpage for repository creation and user configuration details.
-
-If this happens, look at `this thread <https://askubuntu.com/questions/1263284/>`:_.
-You will need to update docker to the latest version to fix this issue.

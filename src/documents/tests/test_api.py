@@ -2,11 +2,10 @@ import os
 import shutil
 import tempfile
 from unittest import mock
-from unittest.mock import MagicMock
 
 from django.contrib.auth.models import User
 from django.test import override_settings
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 
 from documents.models import Document, Correspondent, DocumentType, Tag
 
