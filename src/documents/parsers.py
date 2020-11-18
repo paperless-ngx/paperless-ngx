@@ -122,16 +122,19 @@ class DocumentParser(LoggingMixin):
 
     def optimise_thumbnail(self, in_path):
 
-        out_path = os.path.join(self.tempdir, "optipng.png")
+        if settings.OPTIMIZE_THUMBNAILS:
+            out_path = os.path.join(self.tempdir, "optipng.png")
 
-        args = (settings.OPTIPNG_BINARY, "-silent", "-o5", in_path, "-out", out_path)
+            args = (settings.OPTIPNG_BINARY, "-silent", "-o5", in_path, "-out", out_path)
 
-        self.log('debug', 'Execute: ' + " ".join(args))
+            self.log('debug', 'Execute: ' + " ".join(args))
 
-        if not subprocess.Popen(args).wait() == 0:
-            raise ParseError("Optipng failed at {}".format(args))
+            if not subprocess.Popen(args).wait() == 0:
+                raise ParseError("Optipng failed at {}".format(args))
 
-        return out_path
+            return out_path
+        else:
+            return in_path
 
     def get_optimised_thumbnail(self):
         return self.optimise_thumbnail(self.get_thumbnail())
