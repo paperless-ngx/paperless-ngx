@@ -35,15 +35,3 @@ in your browser and paperless has to do much less work to serve the data.
 that automatically, I'm all ears. For now, you have to grab the latest release
 archive from the project page and build the image yourself. The release comes
 with the front end already compiled, so you don't have to do this on the Pi.
-
-You may encounter some issues during the build:
-
-.. code:: shell-session
-
-    W: GPG error: http://ports.ubuntu.com/ubuntu-ports focal InRelease: At least one invalid signature was encountered.
-    E: The repository 'http://ports.ubuntu.com/ubuntu-ports focal InRelease' is not signed.
-    N: Updating from such a repository can't be done securely, and is therefore disabled by default.
-    N: See apt-secure(8) manpage for repository creation and user configuration details.
-
-If this happens, look at `this thread <https://askubuntu.com/questions/1263284/>`:_.
-You will need to update docker to the latest version to fix this issue.
