@@ -3,7 +3,6 @@ import hashlib
 import logging
 import os
 import re
-import uuid
 
 from django.conf import settings
 from django.db import transaction
@@ -12,6 +11,7 @@ from django.utils import timezone
 from paperless.db import GnuPG
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .file_handling import generate_filename, create_source_path_directory
+from .loggers import LoggingMixin
 from .models import Document, FileInfo, Correspondent, DocumentType, Tag
 from .parsers import ParseError, get_parser_class
 from .signals import (
@@ -24,12 +24,10 @@ class ConsumerError(Exception):
     pass
 
 
-class Consumer:
+class Consumer(LoggingMixin):
 
     def __init__(self):
-
-        self.logger = logging.getLogger(__name__)
-        self.logging_group = None
+        super().__init__()
         self.path = None
         self.filename = None
         self.override_title = None
@@ -74,11 +72,6 @@ class Consumer:
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
 
-    def log(self, level, message):
-        getattr(self.logger, level)(message, extra={
-            "group": self.logging_group
-        })
-
     def try_consume_file(self,
                          path,
                          override_filename=None,
@@ -100,7 +93,7 @@ class Consumer:
         # this is for grouping logging entries for this particular file
         # together.
 
-        self.logging_group = uuid.uuid4()
+        self.renew_logging_group()
 
         # Make sure that preconditions for consuming the file are met.
 

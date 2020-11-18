@@ -80,6 +80,6 @@ class TestClassifier(TestCase):
 
         self.classifier.save_classifier()
 
-        newClassifier = DocumentClassifier()
-        newClassifier.reload()
-        self.assertFalse(newClassifier.train())
+        new_classifier = DocumentClassifier()
+        new_classifier.reload()
+        self.assertFalse(new_classifier.train())

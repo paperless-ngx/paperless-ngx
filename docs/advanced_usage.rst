@@ -128,6 +128,8 @@ consumer.  Once complete, you should see the newly-created document,
 automatically tagged with the appropriate data.
 
 
+.. _advanced-automatic_matching:
+
 Automatic matching
 ==================
 
@@ -174,8 +176,6 @@ Just write a script, put it somewhere that Paperless can read & execute, and
 then put the path to that script in ``paperless.conf`` with the variable name
 of either ``PAPERLESS_PRE_CONSUME_SCRIPT`` or
 ``PAPERLESS_POST_CONSUME_SCRIPT``.
-
-.. TODO HYPEREF TO CONFIG
 
 .. important::
 
@@ -319,6 +319,6 @@ for use in filenames.
     .. code::
 
         PAPERLESS_FILENAME_FORMAT=../../my/custom/location/{title}
-    
+
     However, keep in mind that inside docker, if files get stored outside of the
     predefined volumes, they will be lost after a restart of paperless.
