@@ -158,7 +158,12 @@ PAPERLESS_CONSUMPTION_DIR="../consume"
 
 # When the consumer detects a duplicate document, it will not touch the
 # original document. This default behavior can be changed here.
-#PAPERLESS_CONSUMER_DELETE_DUPLICATES="false"
+#PAPERLESS_CONSUMER_DELETE_DUPLICATES=false
+
+# Use optipng to optimize thumbnails. This usually reduces the sice of
+# thumbnails by about 20%, but uses considerable compute time during
+# consumption.
+#PAPERLESS_OPTIMIZE_THUMBNAILS=true
 
 # After a document is consumed, Paperless can trigger an arbitrary script if
 # you like.  This script will be passed a number of arguments for you to work
