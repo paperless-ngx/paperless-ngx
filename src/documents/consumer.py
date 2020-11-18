@@ -3,7 +3,6 @@ import hashlib
 import logging
 import os
 import re
-import uuid
 
 from django.conf import settings
 from django.db import transaction

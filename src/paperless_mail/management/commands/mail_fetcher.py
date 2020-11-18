@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from paperless_mail import mail, tasks
+from paperless_mail import tasks
 
 
 class Command(BaseCommand):
