@@ -113,6 +113,7 @@ class DocumentType(MatchingModel):
 
 class Document(models.Model):
 
+    # TODO: why do we need an explicit list
     TYPE_PDF = "pdf"
     TYPE_PNG = "png"
     TYPE_JPG = "jpg"
@@ -291,7 +292,7 @@ class FileInfo:
             non_separated_word=r"([\w,. ]|([^\s]-))"
         )
     )
-
+    # TODO: what is this used for
     formats = "pdf|jpe?g|png|gif|tiff?|te?xt|md|csv"
     REGEXES = OrderedDict([
         ("created-correspondent-title-tags", re.compile(

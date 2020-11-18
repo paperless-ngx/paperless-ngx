@@ -27,7 +27,7 @@ Each document has a couple of fields that you can assign to them:
   a document either originates form, or is sent to.
 * A *tag* is a label that you can assign to documents. Think of labels as more
   powerful folders: Multiple documents can be grouped together with a single
-  tag, however, a single document can also have multiple tags. This is not 
+  tag, however, a single document can also have multiple tags. This is not
   possible with folders. The reason folders are not implemented in paperless
   is simply that tags are much more versatile than folders.
 * A *document type* is used to demarkate the type of a document such as letter,
@@ -86,55 +86,70 @@ files from the scanner.  Typically, you're looking at an FTP server like
 IMAP (Email)
 ============
 
-Another handy way to get documents into your database is to email them to
-yourself.  The typical use-case would be to be out for lunch and want to send a
-copy of the receipt back to your system at home.  Paperless can be taught to
-pull emails down from an arbitrary account and dump them into the consumption
-directory where the consumer will follow the
-usual pattern on consuming the document.
+You can tell paperless-ng to consume documents from your email accounts.
+This is a very flexible and powerful feature, if you regularly received documents
+via mail that you need to archive. The mail consumer can be configured by using the
+admin interface in the following manner:
 
-.. hint::
+1.  Define e-mail accounts.
+2.  Define mail rules for your account.
 
-    It's disabled by default. By setting the values below it will be enabled.
-    
-    It's been tested in a limited environment, so it may not work for you (please
-    submit a pull request if you can!)
+These rules perform the following:
 
-.. danger::
+1.  Connect to the mail server.
+2.  Fetch all matching mails (as defined by folder, maximum age and the filters)
+3.  Check if there are any consumable attachments.
+4.  If so, instruct paperless to consume the attachments and optionally
+    use the metadata provided in the rule for the new document.
+5.  If documents were consumed from a mail, the rule action is performed
+    on that mail.
 
-    It's designed to **delete mail from the server once consumed**.  So don't go
-    pointing this to your personal email account and wonder where all your stuff
-    went.
+Paperless will completely ignore mails that do not match your filters. It will also
+only perform the action on mails that it has consumed documents from.
 
-.. hint::
+The actions all ensure that the same mail is not consumed twice by different means.
+These are as follows:
 
-    Currently, only one photo (attachment) per email will work.
+*   **Delete:** Immediately deletes mail that paperless has consumed documents from.
+    Use with caution.
+*   **Mark as read:** Mark consumed mail as read. Paperless will not consume documents
+    from already read mails. If you read a mail before paperless sees it, it will be
+    ignored.
+*   **Flag:** Sets the 'important' flag on mails with consumed documents. Paperless
+    will not consume flagged mails.
+*   **Move to folder:** Moves consumed mails out of the way so that paperless wont
+    consume them again.
 
-So, with all that in mind, here's what you do to get it running:
+.. caution::
 
-1. Setup a new email account somewhere, or if you're feeling daring, create a
-   folder in an existing email box and note the path to that folder.
-2. In ``/etc/paperless.conf`` set all of the appropriate values in
-   ``PATHS AND FOLDERS`` and ``SECURITY``.
-   If you decided to use a subfolder of an existing account, then make sure you
-   set ``PAPERLESS_CONSUME_MAIL_INBOX`` accordingly here.  You also have to set
-   the ``PAPERLESS_EMAIL_SECRET`` to something you can remember 'cause you'll
-   have to include that in every email you send.
-3. Restart paperless.  Paperless will check
-   the configured email account at startup and from then on every 10 minutes
-   for something new and pulls down whatever it finds.
-4. Send yourself an email!  Note that the subject is treated as the file name,
-   so if you set the subject to ``Correspondent - Title - tag,tag,tag``, you'll
-   get what you expect.  Also, you must include the aforementioned secret
-   string in every email so the fetcher knows that it's safe to import.
-   Note that Paperless only allows the email title to consist of safe characters
-   to be imported. These consist of alpha-numeric characters and ``-_ ,.'``.
+    The mail consumer will perform these actions on all mails it has consumed
+    documents from. Keep in mind that the actual consumption process may fail
+    for some reason, leaving you with missing documents in paperless.
+
+.. note::
+
+    With the correct set of rules, you can completely automate your email documents.
+    Create rules for every correspondent you receive digital documents from and
+    paperless will read them automatically. The default acion "mark as read" is
+    pretty tame and will not cause any damage or data loss whatsoever.
+
+.. note::
+
+    Paperless will process the rules in the order defined in the admin page.
+
+    You can define catch-all rules and have them executed last to consume
+    any documents not matched by previous rules. Such a rule may assign an "Unknown
+    mail document" tag to consumed documents so you can inspect them further.
+
+Paperless is set up to check your mails every 10 minutes. This can be configured on the
+'Scheduled tasks' page in the admin.
 
 
 REST API
 ========
 
 You can also submit a document using the REST API, see :ref:`api-file_uploads` for details.
+
 
 .. _usage-recommended_workflow:
 
@@ -147,6 +162,10 @@ is as follows. This workflow also takes into account that some documents
 have to be kept in physical form, but still ensures that you get all the
 advantages for these documents as well.
 
+The following diagram shows how easy it is to manage your documents.
+
+.. image:: _static/recommended_workflow.png
+
 Preparations in paperless
 =========================
 
@@ -156,7 +175,7 @@ Preparations in paperless
 Processing of the physical documents
 ====================================
 
-Keep a physical inbox. Whenever you receive a document that you need to 
+Keep a physical inbox. Whenever you receive a document that you need to
 archive, put it into your inbox. Regulary, do the following for all documents
 in your inbox:
 

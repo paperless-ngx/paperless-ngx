@@ -1,9 +1,11 @@
 import os
+import tempfile
 from datetime import datetime
 from time import mktime
 
 from django import forms
 from django.conf import settings
+from django_q.tasks import async_task
 from pathvalidate import validate_filename, ValidationError
 
 
@@ -18,15 +20,6 @@ class UploadForm(forms.Form):
             raise forms.ValidationError("That filename is suspicious.")
         return self.cleaned_data.get("document")
 
-    def get_filename(self, i=None):
-        return os.path.join(
-            settings.CONSUMPTION_DIR,
-            "{}_{}".format(
-                str(i),
-                self.cleaned_data.get("document").name
-            ) if i else self.cleaned_data.get("document").name
-        )
-
     def save(self):
         """
         Since the consumer already does a lot of work, it's easier just to save
@@ -35,15 +28,13 @@ class UploadForm(forms.Form):
         """
 
         document = self.cleaned_data.get("document").read()
+        original_filename = self.cleaned_data.get("document").name
 
         t = int(mktime(datetime.now().timetuple()))
 
-        file_name = self.get_filename()
-        i = 0
-        while os.path.exists(file_name):
-            i += 1
-            file_name = self.get_filename(i)
+        with tempfile.NamedTemporaryFile(prefix="paperless-upload-", suffix=".pdf", dir=settings.SCRATCH_DIR, delete=False) as f:
 
-        with open(file_name, "wb") as f:
             f.write(document)
-            os.utime(file_name, times=(t, t))
+            os.utime(f.name, times=(t, t))
+
+            async_task("documents.tasks.consume_file", f.name, override_filename=original_filename, task_name=os.path.basename(original_filename))

@@ -1,4 +1,5 @@
 import json
+import math
 import multiprocessing
 import os
 import re
@@ -79,6 +80,7 @@ INSTALLED_APPS = [
     "documents.apps.DocumentsConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
+    "paperless_mail.apps.PaperlessMailConfig",
 
     "django.contrib.admin",
 
@@ -262,15 +264,51 @@ LOGGING = {
 # Task queue                                                                  #
 ###############################################################################
 
+
+# Sensible defaults for multitasking:
+# use a fair balance between worker processes and threads epr worker so that
+# both consuming many documents in parallel and consuming large documents is
+# reasonably fast.
+# Favors threads per worker on smaller systems and never exceeds cpu_count()
+# in total.
+
+def default_task_workers():
+    try:
+        return max(
+            math.floor(math.sqrt(multiprocessing.cpu_count())),
+            1
+        )
+    except NotImplementedError:
+        return 1
+
+
+TASK_WORKERS = int(os.getenv("PAPERLESS_TASK_WORKERS", default_task_workers()))
+
 Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
+    'workers': TASK_WORKERS,
     'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 }
+
+
+def default_threads_per_worker():
+    try:
+        return max(
+            math.floor(multiprocessing.cpu_count() / TASK_WORKERS),
+            1
+        )
+    except NotImplementedError:
+        return 1
+
+
+THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker())
 
 ###############################################################################
 # Paperless Specific Settings                                                 #
 ###############################################################################
+
+CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
@@ -278,8 +316,6 @@ CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
-# The amount of threads to use for OCR
-OCR_THREADS = int(os.getenv("PAPERLESS_OCR_THREADS", multiprocessing.cpu_count()))
 
 # OCR all documents?
 OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS", "false")
@@ -324,5 +360,6 @@ FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
 
+# TODO: this should not have a prefix.
 # Specify the filename format for out files
 PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
