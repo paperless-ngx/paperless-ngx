@@ -72,11 +72,11 @@ def binaries_check(app_configs, **kwargs):
 @register()
 def debug_mode_check(app_configs, **kwargs):
     if settings.DEBUG:
-        return [Warning("DEBUG mode is enabled. Disable Debug mode. "
-                        "This is a serious security "
-                        "issue, since it puts security overides in place which"
-                        "are meant to be only used during development. This"
-                        "also means that paperless will tell anyone various"
-                        "debugging information when something goes wrong.")]
+        return [Warning(
+            "DEBUG mode is enabled. Disable Debug mode. This is a serious "
+            "security issue, since it puts security overides in place which "
+            "are meant to be only used during development. This "
+            "also means that paperless will tell anyone various "
+            "debugging information when something goes wrong.")]
     else:
         return []

@@ -1,8 +1,5 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
-
 import documents.models as document_models
 
 
