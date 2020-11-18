@@ -8,10 +8,8 @@ Changelog
 paperless-ng 0.9.0
 ##################
 
-* **Deprecated:** GnuPG. Don't use it. If you're still using it, be aware that it
-  offers no protection at all, since the passphrase is stored alongside with the
-  encrypted documents itself. This features will most likely be removed in future
-  versions.
+* **Deprecated:** GnuPG. :ref:`See this note on the state of GnuPG in paperless-ng. <utilities-encyption>`
+  This features will most likely be removed in future versions.
 
 * **Added:** New frontend. Features:
 
@@ -37,6 +35,25 @@ paperless-ng 0.9.0
 * **Added:** Enabled the internal user management of django. This isn't really a
   multi user solution, however, it allows more than one user to access the website
   and set some basic permissions / renew passwords.
+
+* **Modified [breaking]:** All new mail consumer with customizable filters, actions and
+  multiple account support. Replaces the old mail consumer. The new mail consumer
+  needs different configuration but can be configured to act exactly like the old
+  consumer.
+
+
+* **Modified:** Changes to the consumer:
+
+  * Now uses the excellent watchdog library that should make sure files are
+    discovered no matter what the platform is.
+  * The consumer now uses a task scheduler to run consumption processes in parallel.
+    This means that consuming many documents should be much faster on systems with
+    many cores.
+  * Concurrency is controlled with the new settings ``PAPERLESS_TASK_WORKERS``
+    and ``PAPERLESS_THREADS_PER_WORKER``. See TODO for details on concurrency.
+  * The consumer no longer blocks the database for extended periods of time.
+  * An issue with tesseract running multiple threads per page and slowing down
+    the consumer was fixed.
 
 * **Modified [breaking]:** REST Api changes:
 
@@ -64,8 +81,8 @@ paperless-ng 0.9.0
   * Rework of the code of the tesseract parser. This is now a lot cleaner.
   * Rework of the filename handling code. It was a mess.
   * Fixed some issues with the document exporter not exporting all documents when encountering duplicate filenames.
-  * Consumer rework: now uses the excellent watchdog library, lots of code removed.
-  * Added a task scheduler that takes care of checking mail, training the classifier and maintaining the document search index.
+  * Added a task scheduler that takes care of checking mail, training the classifier, maintaining the document search index
+    and consuming documents.
   * Updated dependencies. Now uses Pipenv all around.
   * Updated Dockerfile and docker-compose. Now uses ``supervisord`` to run everything paperless-related in a single container.
 
@@ -77,6 +94,8 @@ paperless-ng 0.9.0
   * ``PAPERLESS_DEBUG`` defaults to ``false``.
   * The presence of ``PAPERLESS_DBHOST`` now determines whether to use PostgreSQL or
     sqlite.
+  * ``PAPERLESS_OCR_THREADS`` is gone and replaced with ``PAPERLESS_TASK_WORKERS`` and
+    ``PAPERLESS_THREADS_PER_WORKER``. Refer to the config example for details.
 
 * Many more small changes here and there. The usual stuff.
 
