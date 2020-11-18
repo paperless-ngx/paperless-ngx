@@ -147,10 +147,10 @@ class TestMail(TestCase):
         me_localhost = Correspondent.objects.create(name=message2.from_)
         someone_else = Correspondent.objects.create(name="someone else")
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING)
+        rule = MailRule(name="a", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING)
         self.assertIsNone(get_correspondent(message, rule))
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL)
+        rule = MailRule(name="b", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL)
         c = get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "someone@somewhere.com")
@@ -159,7 +159,7 @@ class TestMail(TestCase):
         self.assertEqual(c.name, "me@localhost.com")
         self.assertEqual(c.id, me_localhost.id)
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME)
+        rule = MailRule(name="c", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME)
         c = get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "Someone!")
@@ -167,7 +167,7 @@ class TestMail(TestCase):
         self.assertIsNotNone(c)
         self.assertEqual(c.id, me_localhost.id)
 
-        rule = MailRule(assign_correspondent_from=MailRule.CORRESPONDENT_FROM_CUSTOM, assign_correspondent=someone_else)
+        rule = MailRule(name="d", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_CUSTOM, assign_correspondent=someone_else)
         c = get_correspondent(message, rule)
         self.assertEqual(c, someone_else)
 
@@ -176,9 +176,9 @@ class TestMail(TestCase):
         message.subject = "the message title"
         att = namedtuple('Attachment', [])
         att.filename = "this_is_the_file.pdf"
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME)
+        rule = MailRule(name="a", assign_title_from=MailRule.TITLE_FROM_FILENAME)
         self.assertEqual(get_title(message, att, rule), "this_is_the_file")
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_SUBJECT)
+        rule = MailRule(name="b", assign_title_from=MailRule.TITLE_FROM_SUBJECT)
         self.assertEqual(get_title(message, att, rule), "the message title")
 
     def test_handle_message(self):
@@ -307,7 +307,7 @@ class TestMail(TestCase):
 
         account = MailAccount.objects.create(name="test3", imap_server="", username="admin", password="secret")
 
-        rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_MOVE, action_parameter="doesnotexist", filter_subject="Claim")
+        rule = MailRule.objects.create(name="testrule2", account=account, action=MailRule.ACTION_MOVE, action_parameter="doesnotexist", filter_subject="Claim")
 
         try:
             self.mail_account_handler.handle_mail_account(account)
@@ -319,7 +319,7 @@ class TestMail(TestCase):
     def test_filters(self):
 
         account = MailAccount.objects.create(name="test3", imap_server="", username="admin", password="secret")
-        rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_DELETE, filter_subject="Claim")
+        rule = MailRule.objects.create(name="testrule3", account=account, action=MailRule.ACTION_DELETE, filter_subject="Claim")
 
         self.assertEqual(self.async_task.call_count, 0)
 
