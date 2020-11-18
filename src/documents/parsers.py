@@ -20,6 +20,7 @@ from django.utils import timezone
 # - XX. MONTH ZZZZ with XX being 1 or 2 and ZZZZ being 2 or 4 digits
 # - MONTH ZZZZ, with ZZZZ being 4 digits
 # - MONTH XX, ZZZZ with XX being 1 or 2 and ZZZZ being 4 digits
+from documents.loggers import LoggingMixin
 from documents.signals import document_consumer_declaration
 
 # TODO: isnt there a date parsing library for this?
@@ -101,17 +102,17 @@ class ParseError(Exception):
     pass
 
 
-class DocumentParser:
+class DocumentParser(LoggingMixin):
     """
     Subclass this to make your own parser.  Have a look at
     `paperless_tesseract.parsers` for inspiration.
     """
 
     def __init__(self, path, logging_group):
+        super().__init__()
+        self.logging_group = logging_group
         self.document_path = path
         self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-        self.logger = logging.getLogger(__name__)
-        self.logging_group = logging_group
 
     def get_thumbnail(self):
         """
@@ -221,11 +222,6 @@ class DocumentParser:
             self.log("info", "Unable to detect date for document")
 
         return date
-
-    def log(self, level, message):
-        getattr(self.logger, level)(message, extra={
-            "group": self.logging_group
-        })
 
     def cleanup(self):
         self.log("debug", "Deleting directory {}".format(self.tempdir))

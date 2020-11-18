@@ -8,6 +8,7 @@ from django_q.tasks import async_task
 from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags, \
     MailboxFolderSelectError
 
+from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from paperless_mail.models import MailAccount, MailRule
 
@@ -83,72 +84,6 @@ def make_criterias(rule):
     return {**criterias, **get_rule_action(rule).get_criteria()}
 
 
-def handle_mail_account(account):
-
-    if account.imap_security == MailAccount.IMAP_SECURITY_NONE:
-        mailbox = MailBoxUnencrypted(account.imap_server, account.imap_port)
-    elif account.imap_security == MailAccount.IMAP_SECURITY_STARTTLS:
-        mailbox = MailBox(account.imap_server, account.imap_port, starttls=True)
-    elif account.imap_security == MailAccount.IMAP_SECURITY_SSL:
-        mailbox = MailBox(account.imap_server, account.imap_port)
-    else:
-        raise ValueError("Unknown IMAP security")
-
-    total_processed_files = 0
-
-    with mailbox as M:
-
-        try:
-            M.login(account.username, account.password)
-        except Exception:
-            raise MailError(
-                f"Error while authenticating account {account.name}")
-
-        for rule in account.rules.all():
-
-            try:
-                M.folder.set(rule.folder)
-            except MailboxFolderSelectError:
-                raise MailError(
-                    f"Rule {rule.name}: Folder {rule.folder} does not exist "
-                    f"in account {account.name}")
-
-            criterias = make_criterias(rule)
-
-            try:
-                messages = M.fetch(criteria=AND(**criterias), mark_seen=False)
-            except Exception:
-                raise MailError(
-                    f"Rule {rule.name}: Error while fetching folder "
-                    f"{rule.folder} of account {account.name}")
-
-            post_consume_messages = []
-
-            for message in messages:
-                try:
-                    processed_files = handle_message(message, rule)
-                except Exception:
-                    raise MailError(
-                        f"Rule {rule.name}: Error while processing mail "
-                        f"{message.uid} of account {account.name}")
-                if processed_files > 0:
-                    post_consume_messages.append(message.uid)
-
-                total_processed_files += processed_files
-            try:
-                get_rule_action(rule).post_consume(
-                    M,
-                    post_consume_messages,
-                    rule.action_parameter)
-
-            except Exception:
-                raise MailError(
-                    f"Rule {rule.name}: Error while processing post-consume "
-                    f"actions for account {account.name}")
-
-    return total_processed_files
-
-
 def get_title(message, att, rule):
     if rule.assign_title_from == MailRule.TITLE_FROM_SUBJECT:
         title = message.subject
@@ -189,39 +124,155 @@ def get_correspondent(message, rule):
     return correspondent
 
 
-def handle_message(message, rule):
-    if not message.attachments:
-        return 0
+def get_mailbox(server, port, security):
+    if security == MailAccount.IMAP_SECURITY_NONE:
+        mailbox = MailBoxUnencrypted(server, port)
+    elif security == MailAccount.IMAP_SECURITY_STARTTLS:
+        mailbox = MailBox(server, port, starttls=True)
+    elif security == MailAccount.IMAP_SECURITY_SSL:
+        mailbox = MailBox(server, port)
+    else:
+        raise ValueError("Unknown IMAP security")
+    return mailbox
 
-    correspondent = get_correspondent(message, rule)
-    tag = rule.assign_tag
-    doc_type = rule.assign_document_type
+class MailAccountHandler(LoggingMixin):
 
-    processed_attachments = 0
+    def handle_mail_account(self, account):
 
-    for att in message.attachments:
+        self.renew_logging_group()
 
-        title = get_title(message, att, rule)
+        self.log('debug', f"Processing mail account {account}")
 
-        # TODO: check with parsers what files types are supported
-        if att.content_type == 'application/pdf':
+        total_processed_files = 0
 
-            os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-            _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)
-            with open(temp_filename, 'wb') as f:
-                f.write(att.payload)
+        with get_mailbox(account.imap_server,
+                         account.imap_port,
+                         account.imap_security) as M:
 
-            async_task(
-                "documents.tasks.consume_file",
-                path=temp_filename,
-                override_filename=att.filename,
-                override_title=title,
-                override_correspondent_id=correspondent.id if correspondent else None,
-                override_document_type_id=doc_type.id if doc_type else None,
-                override_tag_ids=[tag.id] if tag else None,
-                task_name=f"Mail: {att.filename}"
-            )
+            try:
+                M.login(account.username, account.password)
+            except Exception:
+                raise MailError(
+                    f"Error while authenticating account {account.name}")
 
-            processed_attachments += 1
+            self.log('debug', f"Account {account}: Processing "
+                              f"{account.rules.count()} rule(s)")
 
-    return processed_attachments
+            for rule in account.rules.all():
+                self.log(
+                    'debug',
+                    f"Account {account}: Processing rule {rule.name}")
+
+                self.log(
+                    'debug',
+                    f"Rule {account}.{rule}: Selecting folder {rule.folder}")
+
+                try:
+                    M.folder.set(rule.folder)
+                except MailboxFolderSelectError:
+                    raise MailError(
+                        f"Rule {rule.name}: Folder {rule.folder} does not exist "
+                        f"in account {account.name}")
+
+                criterias = make_criterias(rule)
+
+                self.log(
+                    'debug',
+                    f"Rule {account}.{rule}: Searching folder with criteria "
+                    f"{str(AND(**criterias))}")
+
+                try:
+                    messages = M.fetch(criteria=AND(**criterias), mark_seen=False)
+                except Exception:
+                    raise MailError(
+                        f"Rule {rule.name}: Error while fetching folder "
+                        f"{rule.folder} of account {account.name}")
+
+                post_consume_messages = []
+
+                mails_processed = 0
+
+                for message in messages:
+                    try:
+                        processed_files = self.handle_message(message, rule)
+                    except Exception:
+                        raise MailError(
+                            f"Rule {rule.name}: Error while processing mail "
+                            f"{message.uid} of account {account.name}")
+                    if processed_files > 0:
+                        post_consume_messages.append(message.uid)
+
+                    total_processed_files += processed_files
+                    mails_processed += 1
+
+                self.log(
+                    'debug',
+                    f"Rule {account}.{rule}: Processed {mails_processed} "
+                    f"matching mail(s)")
+
+                self.log(
+                    'debug',
+                    f"Rule {account}.{rule}: Running mail actions on "
+                    f"{len(post_consume_messages)} mails")
+
+                try:
+                    get_rule_action(rule).post_consume(
+                        M,
+                        post_consume_messages,
+                        rule.action_parameter)
+
+                except Exception:
+                    raise MailError(
+                        f"Rule {rule.name}: Error while processing post-consume "
+                        f"actions for account {account.name}")
+
+        return total_processed_files
+
+    def handle_message(self, message, rule):
+        if not message.attachments:
+            return 0
+
+        self.log(
+            'debug',
+            f"Rule {rule.account}.{rule}: "
+            f"Processing mail {message.subject} from {message.from_} with "
+            f"{len(message.attachments)} attachment(s)")
+
+        correspondent = get_correspondent(message, rule)
+        tag = rule.assign_tag
+        doc_type = rule.assign_document_type
+
+        processed_attachments = 0
+
+        for att in message.attachments:
+
+            title = get_title(message, att, rule)
+
+            # TODO: check with parsers what files types are supported
+            if att.content_type == 'application/pdf':
+
+                os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+                _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)
+                with open(temp_filename, 'wb') as f:
+                    f.write(att.payload)
+
+                self.log(
+                    'info',
+                    f"Rule {rule.account}.{rule}: "
+                    f"Consuming attachment {att.filename} from mail "
+                    f"{message.subject} from {message.from_}")
+
+                async_task(
+                    "documents.tasks.consume_file",
+                    path=temp_filename,
+                    override_filename=att.filename,
+                    override_title=title,
+                    override_correspondent_id=correspondent.id if correspondent else None,
+                    override_document_type_id=doc_type.id if doc_type else None,
+                    override_tag_ids=[tag.id] if tag else None,
+                    task_name=f"Mail: {att.filename}"
+                )
+
+                processed_attachments += 1
+
+        return processed_attachments
