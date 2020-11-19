@@ -152,11 +152,11 @@ else:
     X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # We allow CORS from localhost:8080
-CORS_ORIGIN_WHITELIST = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8080,https://localhost:8080").split(","))
+CORS_ALLOWED_ORIGINS = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","))
 
 if DEBUG:
     # Allow access from the angular development server during debugging
-    CORS_ORIGIN_WHITELIST += ('http://localhost:4200',)
+    CORS_ALLOWED_ORIGINS += ('http://localhost:4200',)
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere

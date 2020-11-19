@@ -52,6 +52,8 @@ filename as described above.
 
 .. _dateparser: https://github.com/scrapinghub/dateparser/blob/v0.7.0/docs/usage.rst#settings
 
+.. _advanced-transforming_filenames:
+
 Transforming filenames for parsing
 ==================================
 
@@ -219,6 +221,7 @@ the consumption process will begin with the newly modified file.
 
 .. _pdf2pdfocr.py: https://github.com/LeoFCardoso/pdf2pdfocr
 
+.. _advanced-post_consume_script:
 
 Post-consumption script
 =======================

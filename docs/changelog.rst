@@ -66,7 +66,6 @@ paperless-ng 0.9.0
 
   * If ``PAPERLESS_DBHOST`` is specified in the settings, paperless uses postgresql instead of sqlite.
     Username, database and password all default to ``paperless`` if not specified.
-  * **docker-compose.yml uses PostgreSQL by default.**
 
 * **Modified [breaking]:** document_retagger management command rework. See
   :ref:`utilities-retagger` for details. Replaces ``document_correspondents``

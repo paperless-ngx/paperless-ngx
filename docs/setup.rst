@@ -28,20 +28,20 @@ Overview of Paperless-ng
 
 Compared to paperless, paperless-ng works a little different under the hood and has
 more moving parts that work together. While this increases the complexity of
-the system, it also brings many benefits. 
+the system, it also brings many benefits.
 
 Paperless consists of the following components:
 
-*   **The webserver:** This is pretty much the same as in paperless. It serves 
+*   **The webserver:** This is pretty much the same as in paperless. It serves
     the administration pages, the API, and the new frontend. This is the main
     tool you'll be using to interact with paperless. You may start the webserver
     with
 
     .. code:: shell-session
-        
+
         $ cd /path/to/paperless/src/
         $ pipenv run gunicorn -c /usr/src/paperless/gunicorn.conf.py -b 0.0.0.0:8000 paperless.wsgi
-    
+
     or by any other means such as Apache ``mod_wsgi``.
 
 *   **The consumer:** This is what watches your consumption folder for documents.
@@ -53,7 +53,7 @@ Paperless consists of the following components:
     Start the consumer with the management command ``document_consumer``:
 
     .. code:: shell-session
-    
+
         $ cd /path/to/paperless/src/
         $ pipenv run python3 manage.py document_consumer
 
@@ -61,7 +61,7 @@ Paperless consists of the following components:
     for doing much of the heavy lifting. This is a task queue that accepts tasks from
     multiple sources and processes tasks in parallel. It also comes with a scheduler that executes
     certain commands periodically.
-    
+
     This task processor is responsible for:
 
     *   Consuming documents. When the consumer finds new documents, it notifies the task processor to
@@ -72,7 +72,7 @@ Paperless consists of the following components:
         the web interface.
     *   Maintain the search index and the automatic matching algorithm. These are things that paperless
         needs to do from time to time in order to operate properly.
-    
+
     This allows paperless to process multiple documents from your consumption folder in parallel! On
     a modern multicore system, consumption with full ocr is blazing fast.
 
@@ -82,7 +82,7 @@ Paperless consists of the following components:
     You may start the task processor by executing:
 
     .. code:: shell-session
-    
+
         $ cd /path/to/paperless/src/
         $ pipenv run python3 manage.py qcluster
 
@@ -116,7 +116,7 @@ Docker Route
 
     .. caution::
 
-        If you want to use the included ``docker-compose.yml.example`` file, you
+        If you want to use the included ``docker-compose.*.yml`` file, you
         need to have at least Docker version **17.09.0** and docker-compose
         version **1.17.0**.
 
@@ -129,20 +129,28 @@ Docker Route
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
         .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
+2.  Copy either ``docker-compose.sqlite.yml`` or ``docker-compose.postgres.yml`` to
+    ``docker-compose.yml``, depending on which database backend you want to use.
+
+    .. hint::
+
+        For new installations, it is recommended to use postgresql as the database
+        backend. This is due to the increased amount of concurrency in paperless-ng.
+
 2.  Modify ``docker-compose.yml`` to your preferences. You should change the path
     to the consumption directory in this file. Find the line that specifies where
     to mount the consumption directory:
 
     .. code::
-    
+
         - ./consume:/usr/src/paperless/consume
-    
+
     Replace the part BEFORE the colon with a local directory of your choice:
 
     .. code::
 
         - /home/jonaswinkler/paperless-inbox:/usr/src/paperless/consume
-    
+
     Don't change the part after the colon or paperless wont find your documents.
 
 
@@ -153,6 +161,11 @@ Docker Route
     to the consumption directory. If your UID and GID on the host system is
     1000 (the default for the first normal user on most systems), it will
     work out of the box without any modifications.
+
+    .. note::
+
+        You can use any settings from the file ``paperless.conf`` in this file.
+        Have a look at :ref:`configuration` to see whats available.
 
 4.  Run ``docker-compose up -d``. This will create and start the necessary
     containers. This will also build the image of paperless if you grabbed the
@@ -196,14 +209,9 @@ things have changed under the hood, so you need to adapt your setup depending on
 how you installed paperless. The important things to keep in mind are as follows.
 
 * Read the :ref:`changelog <paperless_changelog>` and take note of breaking changes.
-* It is recommended to use postgresql as the database now. The docker-compose
-  deployment will automatically create a postgresql instance and instruct
-  paperless to use it. This means that if you use the docker-compose script
-  with your current paperless media and data volumes and used the default
-  sqlite database, **it will not use your sqlite database and it may seem
-  as if your documents are gone**. You may use the provided
-  ``docker-compose.sqlite.yml`` script instead, which does not use postgresql. See
-  :ref:`setup-sqlite_to_psql` for details on how to move your data from
+* It is recommended to use postgresql as the database now. If you want to continue
+  using SQLite, which is the default of paperless, use ``docker-compose.sqlite.yml``.
+  See :ref:`setup-sqlite_to_psql` for details on how to move your data from
   sqlite to postgres.
 * The task scheduler of paperless, which is used to execute periodic tasks
   such as email checking and maintenance, requires a `redis`_ message broker
@@ -228,25 +236,39 @@ Migration to paperless-ng is then performed in a few simple steps:
 3.  Download the latest release of paperless-ng. You can either go with the
     docker-compose files or use the archive to build the image yourself.
     You can either replace your current paperless folder or put paperless-ng
-    in a different location. Paperless-ng will use the same docker volumes
-    as paperless.
+    in a different location.
+
+    .. caution::
+
+        Make sure you also download the ``.env`` file. This will set the
+        project name for docker compose to ``paperless`` and then it will
+        automatically reuse your existing paperless volumes.
 
 4.  Adjust ``docker-compose.yml`` and
     ``docker-compose.env`` to your needs.
     See `docker route`_ for details on which edits are required.
 
-5.  Update paperless. See :ref:`administration-updating` for details.
+5.  Start paperless-ng.
 
-6.  Start paperless-ng.
+    .. code:: bash
+
+        $ docker-compose up
+
+    If you see everything working (you should see some migrations getting
+    applied, for instance), you can gracefully stop paperless-ng with Ctrl-C
+    and then start paperless-ng as usual with
 
     .. code:: bash
 
         $ docker-compose up -d
 
-7.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
-    redirect is still in place and prevents access to the new UI. Clear 
+    This will run paperless in the background and automatically start it on system boot.
+
+6.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
+    redirect is still in place and prevents access to the new UI. Clear
     everything related to paperless in your browsers data in order to fix
     this issue.
+
 
 .. _setup-sqlite_to_psql:
 
