@@ -5,6 +5,14 @@
 Changelog
 *********
 
+paperless-ng 0.9.1
+##################
+
+* Moved documentation of the settings to the actual documentation.
+* Updated release script to force the user to choose between SQLite
+  and PostgreSQL. This avoids confusion when upgrading from paperless.
+
+
 paperless-ng 0.9.0
 ##################
 
