@@ -49,7 +49,6 @@ export class DocumentDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
-    private datePipe: DatePipe,
     private router: Router,
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
@@ -89,7 +88,7 @@ export class DocumentDetailComponent implements OnInit {
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
     modal.componentInstance.success.subscribe(newDocumentType => {
-      this.documentTypeService.list().subscribe(documentTypes => {
+      this.documentTypeService.listAll().subscribe(documentTypes => {
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type_id').setValue(newDocumentType.id)
       })
@@ -100,7 +99,7 @@ export class DocumentDetailComponent implements OnInit {
     var modal = this.modalService.open(CorrespondentEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
     modal.componentInstance.success.subscribe(newCorrespondent => {
-      this.correspondentService.list().subscribe(correspondents => {
+      this.correspondentService.listAll().subscribe(correspondents => {
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent_id').setValue(newCorrespondent.id)
       })

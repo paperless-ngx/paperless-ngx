@@ -1,17 +1,14 @@
-import datetime
 import os
 import shutil
-from unittest import mock
-from uuid import uuid4
 from pathlib import Path
-from shutil import rmtree
+from uuid import uuid4
 
-from dateutil import tz
+from django.conf import settings
 from django.test import TestCase, override_settings
 
-from django.utils.text import slugify
-from ..models import Tag, Document, Correspondent
-from django.conf import settings
+from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories
+from ..models import Document, Correspondent
+from ..signals.handlers import update_filename_and_move_files
 
 
 class TestDate(TestCase):
@@ -32,76 +29,56 @@ class TestDate(TestCase):
             shutil.rmtree(dirname, ignore_errors=True)
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
-    def test_source_filename(self):
-        document = Document()
-        document.file_type = "pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        self.assertEqual(document.source_filename, "0000001.pdf")
-
-        document.filename = "test.pdf"
-        self.assertEqual(document.source_filename, "test.pdf")
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_generate_source_filename(self):
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
-        self.assertEqual(document.generate_source_filename(), "0000001.pdf")
+        self.assertEqual(generate_filename(document), "{:07d}.pdf".format(document.pk))
 
         document.storage_type = Document.STORAGE_TYPE_GPG
-        self.assertEqual(document.generate_source_filename(),
-                         "0000001.pdf.gpg")
+        self.assertEqual(generate_filename(document),
+                         "{:07d}.pdf.gpg".format(document.pk))
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming(self):
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
-        # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
+        # Test default source_path
+        self.assertEqual(document.source_path, settings.ORIGINALS_DIR + "/{:07d}.pdf".format(document.pk))
 
-        # Test source_path
-        self.assertEqual(document.source_path, settings.MEDIA_ROOT +
-                         "/documents/originals/none/none-0000001.pdf")
+        document.filename = generate_filename(document)
+
+        # Ensure that filename is properly generated
+        self.assertEqual(document.filename, "none/none-{:07d}.pdf".format(document.pk))
 
         # Enable encryption and check again
         document.storage_type = Document.STORAGE_TYPE_GPG
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf.gpg")
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename,
+                         "none/none-{:07d}.pdf.gpg".format(document.pk))
+
         document.save()
 
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), True)
+        # test that creating dirs for the source_path creates the correct directory
+        create_source_path_directory(document.source_path)
+        Path(document.source_path).touch()
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), True)
 
         # Set a correspondent and save the document
-        document.correspondent = Correspondent.objects.get_or_create(
-                name="test")[0]
+        document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
         document.save()
 
         # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/test"), True)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), False)
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/test/test-0000001.pdf.gpg"), True)
-        self.assertEqual(document.generate_source_filename(),
-                         "test/test-0000001.pdf.gpg")
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/test"), True)
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
+        self.assertEqual(os.path.isfile(settings.ORIGINALS_DIR + "/test/test-{:07d}.pdf.gpg".format(document.pk)), True)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_missing_permissions(self):
         document = Document()
         document.file_type = "pdf"
@@ -109,34 +86,67 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf")
-        document.create_source_directory()
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename,
+                         "none/none-{:07d}.pdf".format(document.pk))
+        create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
 
         # Test source_path
-        self.assertEqual(document.source_path, settings.MEDIA_ROOT +
-                         "/documents/originals/none/none-0000001.pdf")
+        self.assertEqual(document.source_path, settings.ORIGINALS_DIR + "/none/none-{:07d}.pdf".format(document.pk))
 
         # Make the folder read- and execute-only (no writing and no renaming)
-        os.chmod(settings.MEDIA_ROOT + "/documents/originals/none", 0o555)
+        os.chmod(settings.ORIGINALS_DIR + "/none", 0o555)
 
         # Set a correspondent and save the document
-        document.correspondent = Correspondent.objects.get_or_create(
-                name="test")[0]
+        document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
         document.save()
 
         # Check proper handling of files
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/none/none-0000001.pdf"), True)
-        self.assertEqual(document.source_filename,
-                         "none/none-0000001.pdf")
+        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/originals/none/none-{:07d}.pdf".format(document.pk)), True)
+        self.assertEqual(document.filename, "none/none-{:07d}.pdf".format(document.pk))
 
-        os.chmod(settings.MEDIA_ROOT + "/documents/originals/none", 0o777)
+        os.chmod(settings.ORIGINALS_DIR + "/none", 0o777)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
+    def test_file_renaming_database_error(self):
+
+        document1 = Document.objects.create(file_type="pdf", storage_type=Document.STORAGE_TYPE_UNENCRYPTED, checksum="AAAAA")
+
+        document = Document()
+        document.file_type = "pdf"
+        document.checksum = "BBBBB"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename,
+                         "none/none-{:07d}.pdf".format(document.pk))
+        create_source_path_directory(document.source_path)
+        Path(document.source_path).touch()
+
+        # Test source_path
+        self.assertTrue(os.path.isfile(document.source_path))
+
+        # Set a correspondent and save the document
+        document.correspondent = Correspondent.objects.get_or_create(
+            name="test")[0]
+
+        # This will cause save() to fail.
+        document.checksum = document1.checksum
+
+        # Assume saving the document initially works, this gets called.
+        # After renaming, an error occurs, and filename is not saved:
+        # document should still be available at document.filename.
+        update_filename_and_move_files(None, document)
+
+        # Check proper handling of files
+        self.assertTrue(os.path.isfile(document.source_path))
+        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/originals/none/none-{:07d}.pdf".format(document.pk)), True)
+        self.assertEqual(document.filename, "none/none-{:07d}.pdf".format(document.pk))
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete(self):
         document = Document()
         document.file_type = "pdf"
@@ -144,21 +154,20 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf")
-        document.create_source_directory()
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename,
+                         "none/none-{:07d}.pdf".format(document.pk))
+
+        create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
 
         # Ensure file deletion after delete
+        pk = document.pk
         document.delete()
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT +
-                         "/documents/originals/none/none-0000001.pdf"), False)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), False)
+        self.assertEqual(os.path.isfile(settings.ORIGINALS_DIR + "/none/none-{:07d}.pdf".format(pk)), False)
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete_nofile(self):
         document = Document()
         document.file_type = "pdf"
@@ -167,8 +176,7 @@ class TestDate(TestCase):
 
         document.delete()
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_directory_not_empty(self):
         document = Document()
         document.file_type = "pdf"
@@ -176,28 +184,24 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf")
-        document.create_source_directory()
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename,
+                         "none/none-{:07d}.pdf".format(document.pk))
+
+        create_source_path_directory(document.source_path)
+
         Path(document.source_path).touch()
-        Path(document.source_path + "test").touch()
+        important_file = document.source_path + "test"
+        Path(important_file).touch()
 
         # Set a correspondent and save the document
-        document.correspondent = Correspondent.objects.get_or_create(
-                name="test")[0]
+        document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
         document.save()
 
         # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/test"), True)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), True)
-
-        # Cleanup
-        os.remove(settings.MEDIA_ROOT +
-                  "/documents/originals/none/none-0000001.pdftest")
-        os.rmdir(settings.MEDIA_ROOT + "/documents/originals/none")
+        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT + "/documents/originals/test"), True)
+        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT + "/documents/originals/none"), True)
+        self.assertTrue(os.path.isfile(important_file))
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
@@ -212,13 +216,8 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "demo-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        document.delete()
+        self.assertEqual(generate_filename(document),
+                         "demo-{:07d}.pdf".format(document.pk))
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_dash(self):
@@ -233,13 +232,8 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "demo-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        document.delete()
+        self.assertEqual(generate_filename(document),
+                         "demo-{:07d}.pdf".format(document.pk))
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_malformed(self):
@@ -254,13 +248,8 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        document.delete()
+        self.assertEqual(generate_filename(document),
+                         "none-{:07d}.pdf".format(document.pk))
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
     def test_tags_all(self):
@@ -274,64 +263,25 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "demo-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
+        self.assertEqual(generate_filename(document),
+                         "demo-{:07d}.pdf".format(document.pk))
 
-        document.delete()
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
-    def test_tags_out_of_bounds_0(self):
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[1]}")
+    def test_tags_out_of_bounds(self):
         document = Document()
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
-        # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        document.delete()
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[10000000]}")
-    def test_tags_out_of_bounds_10000000(self):
-        document = Document()
-        document.file_type = "pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        # Add tag to document
+        document.tags.create(name="demo")
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
+        self.assertEqual(generate_filename(document),
+                         "none-{:07d}.pdf".format(document.pk))
 
-        document.delete()
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[99]}")
-    def test_tags_out_of_bounds_99(self):
-        document = Document()
-        document.file_type = "pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        document.delete()
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}/{correspondent}")
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
         document = Document()
         document.file_type = "pdf"
@@ -339,153 +289,34 @@ class TestDate(TestCase):
         document.save()
 
         # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none/none-0000001.pdf")
-        document.create_source_directory()
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename, "none/none/none-{:07d}.pdf".format(document.pk))
+        create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
 
         # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none/none"), True)
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none/none"), True)
 
+        pk = document.pk
         document.delete()
 
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT +
-                         "/documents/originals/none/none/none-0000001.pdf"),
-                         False)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none/none"), False)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), False)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals"), True)
+        self.assertEqual(os.path.isfile(settings.ORIGINALS_DIR + "/none/none/none-{:07d}.pdf".format(pk)), False)
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none/none"), False)
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR), True)
 
     @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def test_format_none(self):
         document = Document()
+        document.pk = 1
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
 
-        self.assertEqual(document.generate_source_filename(), "0000001.pdf")
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
-    def test_document_renamed(self):
-        document = Document()
-        document.file_type = "pdf"
-        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
-
-        # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        # Test source_path
-        self.assertEqual(document.source_path, settings.MEDIA_ROOT +
-                         "/documents/originals/none/none-0000001.pdf")
-
-        # Rename the document "illegaly"
-        os.makedirs(settings.MEDIA_ROOT + "/documents/originals/test")
-        os.rename(settings.MEDIA_ROOT + "/documents/originals/" +
-                                        "none/none-0000001.pdf",
-                  settings.MEDIA_ROOT + "/documents/originals/" +
-                                        "test/test-0000001.pdf")
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/test/test-0000001.pdf"), True)
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/none/none-0000001.pdf"), False)
-
-        # Set new correspondent and expect document to be saved properly
-        document.correspondent = Correspondent.objects.get_or_create(
-                name="foo")[0]
-        document.save()
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/foo/foo-0000001.pdf"), True)
-
-        # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/foo"), True)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), False)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/test"), False)
-        self.assertEqual(document.generate_source_filename(),
-                         "foo/foo-0000001.pdf")
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
-    def test_document_renamed_encrypted(self):
-        document = Document()
-        document.file_type = "pdf"
-        document.storage_type = Document.STORAGE_TYPE_GPG
-        document.save()
-
-        # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf.gpg")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        # Test source_path
-        self.assertEqual(document.source_path, settings.MEDIA_ROOT +
-                         "/documents/originals/none/none-0000001.pdf.gpg")
-
-        # Rename the document "illegaly"
-        os.makedirs(settings.MEDIA_ROOT + "/documents/originals/test")
-        os.rename(settings.MEDIA_ROOT + "/documents/originals/" +
-                                        "none/none-0000001.pdf.gpg",
-                  settings.MEDIA_ROOT + "/documents/originals/" +
-                                        "test/test-0000001.pdf.gpg")
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/test/test-0000001.pdf.gpg"), True)
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/none/none-0000001.pdf"), False)
-
-        # Set new correspondent and expect document to be saved properly
-        document.correspondent = Correspondent.objects.get_or_create(
-                name="foo")[0]
-        document.save()
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/" +
-                         "originals/foo/foo-0000001.pdf.gpg"), True)
-
-        # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/foo"), True)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), False)
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/test"), False)
-        self.assertEqual(document.generate_source_filename(),
-                         "foo/foo-0000001.pdf.gpg")
-
-    def test_delete_all_empty_subdirectories(self):
-        # Create our working directory
-        tmp = "/tmp/paperless-tests-{}".format(str(uuid4())[:8])
-        os.makedirs(tmp)
-        self.add_to_deletion_list(tmp)
-
-        os.makedirs(os.path.join(tmp, "empty"))
-        os.makedirs(os.path.join(tmp, "empty", "subdirectory"))
-
-        os.makedirs(os.path.join(tmp, "notempty"))
-        Path(os.path.join(tmp, "notempty", "file")).touch()
-
-        Document.delete_all_empty_subdirectories(tmp)
-
-        self.assertEqual(os.path.isdir(os.path.join(tmp, "notempty")), True)
-        self.assertEqual(os.path.isdir(os.path.join(tmp, "empty")), False)
-        self.assertEqual(os.path.isfile(
-            os.path.join(tmp, "notempty", "file")), True)
+        self.assertEqual(generate_filename(document), "0000001.pdf")
 
     def test_try_delete_empty_directories(self):
         # Create our working directory
-        tmp = "/tmp/paperless-tests-{}".format(str(uuid4())[:8])
+        tmp = os.path.join(settings.ORIGINALS_DIR, "test_delete_empty")
         os.makedirs(tmp)
         self.add_to_deletion_list(tmp)
 
@@ -493,67 +324,27 @@ class TestDate(TestCase):
         Path(os.path.join(tmp, "notempty", "file")).touch()
         os.makedirs(os.path.join(tmp, "notempty", "empty"))
 
-        Document.try_delete_empty_directories(
-                os.path.join(tmp, "notempty", "empty"))
+        delete_empty_directories(os.path.join(tmp, "notempty", "empty"))
         self.assertEqual(os.path.isdir(os.path.join(tmp, "notempty")), True)
         self.assertEqual(os.path.isfile(
             os.path.join(tmp, "notempty", "file")), True)
         self.assertEqual(os.path.isdir(
             os.path.join(tmp, "notempty", "empty")), False)
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
-    def test_document_accidentally_deleted(self):
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{created/[title]")
+    def test_invalid_format(self):
         document = Document()
+        document.pk = 1
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
 
-        # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
+        self.assertEqual(generate_filename(document), "0000001.pdf")
 
-        # Test source_path
-        self.assertEqual(document.source_path, settings.MEDIA_ROOT +
-                         "/documents/originals/none/none-0000001.pdf")
-
-        # Delete the document "illegaly"
-        os.remove(settings.MEDIA_ROOT + "/documents/originals/" +
-                                        "none/none-0000001.pdf")
-
-        # Set new correspondent and expect document to be saved properly
-        document.correspondent = Correspondent.objects.get_or_create(
-                name="foo")[0]
-        document.save()
-
-        # Check proper handling of files
-        self.assertEqual(os.path.isdir(settings.MEDIA_ROOT +
-                         "/documents/originals/none"), True)
-        self.assertEqual(document.source_filename,
-                         "none/none-0000001.pdf")
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/" +
-                       "{correspondent}")
-    def test_set_filename(self):
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{created__year}")
+    def test_invalid_format_key(self):
         document = Document()
+        document.pk = 1
         document.file_type = "pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        document.save()
 
-        # Ensure that filename is properly generated
-        tmp = document.source_filename
-        self.assertEqual(document.generate_source_filename(),
-                         "none/none-0000001.pdf")
-        document.create_source_directory()
-        Path(document.source_path).touch()
-
-        # Set existing filename
-        document.set_filename(tmp)
-        self.assertEqual(document.source_filename, "none/none-0000001.pdf")
-
-        # Set non-existing filename
-        document.set_filename("doesnotexist")
-        self.assertEqual(document.source_filename, "none/none-0000001.pdf")
+        self.assertEqual(generate_filename(document), "0000001.pdf")

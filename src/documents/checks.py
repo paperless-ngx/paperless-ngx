@@ -4,6 +4,8 @@ from django.conf import settings
 from django.core.checks import Error, register
 from django.db.utils import OperationalError, ProgrammingError
 
+from documents.signals import document_consumer_declaration
+
 
 @register()
 def changed_password_check(app_configs, **kwargs):
@@ -37,3 +39,17 @@ def changed_password_check(app_configs, **kwargs):
                 """))]
 
     return []
+
+
+@register()
+def parser_check(app_configs, **kwargs):
+
+    parsers = []
+    for response in document_consumer_declaration.send(None):
+        parsers.append(response[1])
+
+    if len(parsers) == 0:
+        return [Error("No parsers found. This is a bug. The consumer won't be "
+                      "able to onsume any documents without parsers.")]
+    else:
+        return []

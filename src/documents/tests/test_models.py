@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from ..models import Document, Correspondent
 from .factories import DocumentFactory, CorrespondentFactory
+from ..models import Document, Correspondent
 
 
 class CorrespondentTestCase(TestCase):

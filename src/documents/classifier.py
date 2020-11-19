@@ -3,7 +3,6 @@ import logging
 import os
 import pickle
 import re
-import time
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.neural_network import MLPClassifier
@@ -64,7 +63,7 @@ class DocumentClassifier(object):
 
     def save_classifier(self):
         with open(settings.MODEL_FILE, "wb") as f:
-            pickle.dump(self.FORMAT_VERSION, f) # Version
+            pickle.dump(self.FORMAT_VERSION, f)
             pickle.dump(self.data_hash, f)
             pickle.dump(self.data_vectorizer, f)
 
@@ -89,16 +88,14 @@ class DocumentClassifier(object):
             data.append(preprocessed_content)
 
             y = -1
-            if doc.document_type:
-                if doc.document_type.matching_algorithm == MatchingModel.MATCH_AUTO:
-                    y = doc.document_type.pk
+            if doc.document_type and doc.document_type.matching_algorithm == MatchingModel.MATCH_AUTO:
+                y = doc.document_type.pk
             m.update(y.to_bytes(4, 'little', signed=True))
             labels_document_type.append(y)
 
             y = -1
-            if doc.correspondent:
-                if doc.correspondent.matching_algorithm == MatchingModel.MATCH_AUTO:
-                    y = doc.correspondent.pk
+            if doc.correspondent and doc.correspondent.matching_algorithm == MatchingModel.MATCH_AUTO:
+                y = doc.correspondent.pk
             m.update(y.to_bytes(4, 'little', signed=True))
             labels_correspondent.append(y)
 
@@ -120,8 +117,8 @@ class DocumentClassifier(object):
 
         num_tags = len(labels_tags_unique)
         # substract 1 since -1 (null) is also part of the classes.
-        num_correspondents = len(labels_correspondent) - 1
-        num_document_types = len(labels_document_type) - 1
+        num_correspondents = len(set(labels_correspondent)) - 1
+        num_document_types = len(set(labels_document_type)) - 1
 
         logging.getLogger(__name__).debug(
             "{} documents, {} tag(s), {} correspondent(s), "
@@ -137,7 +134,7 @@ class DocumentClassifier(object):
         logging.getLogger(__name__).debug("Vectorizing data...")
         self.data_vectorizer = CountVectorizer(
             analyzer="word",
-            ngram_range=(1,2),
+            ngram_range=(1, 2),
             min_df=0.01
         )
         data_vectorized = self.data_vectorizer.fit_transform(data)
