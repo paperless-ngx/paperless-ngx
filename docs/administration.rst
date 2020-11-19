@@ -82,6 +82,13 @@ A.  If you used the docker-compose file, simply download the files of the new re
     If you see everything working, you can start paperless-ng with "-d" to have it
     run in the background.
 
+    .. hint::
+
+        The released docker-compose files specify exact versions to be pulled from the hub.
+        This is to ensure that if the docker-compose files should change at some point
+        (i.e., services updates/configured differently), you wont run into trouble due to
+        docker pulling the ``latest`` image and running it in an older environment.
+        
 B.  If you built the image yourself, grab the new archive and replace your current
     paperless folder with the new contents.
 
@@ -120,6 +127,7 @@ After grabbing the new release and unpacking the contents, do the following:
         $ pip install --upgrade pipenv
         $ cd /path/to/paperless
         $ pipenv install
+        $ pipenv clean
 
     This creates a new virtual environment (or uses your existing environment)
     and installs all dependencies into it.
@@ -143,7 +151,7 @@ Management utilities
 ####################
 
 Paperless comes with some management commands that perform various maintenance
-tasks on your paperless instance. You can invoce these commands either by
+tasks on your paperless instance. You can invoke these commands either by
 
 .. code:: bash
 
@@ -311,6 +319,19 @@ the naming scheme.
 The command takes no arguments and processes all your documents at once.
 
 
+Fetching e-mail
+===============
+
+Paperless automatically fetches your e-mail every 10 minutes by default. If
+you want to invoke the email consumer manually, call the following management
+command:
+
+.. code::
+
+    mail_fetcher
+
+The command takes no arguments and processes all your mail accounts and rules.
+
 .. _utilities-encyption:
 
 Managing encryption
@@ -320,7 +341,7 @@ Documents can be stored in Paperless using GnuPG encryption.
 
 .. danger::
 
-    Decryption is depreceated since paperless-ng 0.9 and doesn't really provide any
+    Encryption is depreceated since paperless-ng 0.9 and doesn't really provide any
     additional security, since you have to store the passphrase in a configuration
     file on the same system as the encrypted documents for paperless to work.
     Furthermore, the entire text content of the documents is stored plain in the

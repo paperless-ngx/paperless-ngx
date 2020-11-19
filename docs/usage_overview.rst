@@ -82,6 +82,7 @@ files from the scanner.  Typically, you're looking at an FTP server like
 
 .. TODO: hyperref to configuration of the location of this magic folder.
 
+.. _usage-email:
 
 IMAP (Email)
 ============
@@ -132,6 +133,11 @@ These are as follows:
     Create rules for every correspondent you receive digital documents from and
     paperless will read them automatically. The default acion "mark as read" is
     pretty tame and will not cause any damage or data loss whatsoever.
+
+    You can also setup a special folder in your mail account for paperless and use
+    your favorite mail client to move to be consumed mails into that folder
+    automatically or manually and tell paperless to move them to yet another folder
+    after consumption. It's up to you.
 
 .. note::
 
