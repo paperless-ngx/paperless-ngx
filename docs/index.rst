@@ -25,13 +25,27 @@ and then shred them.  Perhaps you might find it useful too.
 Paperless-ng
 ============
 
-I wanted to make big changes to the project that will impact the way it is used
-by its users greatly. Among the users who currently use paperless in production
-there are probably many that don't want these changes right away. I also wanted
-to have more control over what goes into the code and what does not. Therefore,
-paperless-ng was created. NG stands for both Angular (the framework used for the
+Paperless-ng is a fork of the original paperless project. It changes many
+things both on the surface and under the hood. Paperless-ng was created
+because I feel that these changes are too big to be pushed into the main
+repository right away.
+
+NG stands for both Angular (the framework used for the
 Frontend) and next-gen. Publishing this project under a different name also
 avoids confusion between paperless and paperless-ng.
+
+If you want to learn about what's different in paperless-ng, check out these
+resources in the documentation:
+
+*   :ref:`Some screenshots <screenshots>` of the new UI are available.
+*   Read :ref:`this section <advanced-automatic_matching>` if you want to
+    learn about how paperless automates all tagging using machine learning.
+*   Paperless now comes with a :ref:`proper email consumer <usage-email>`
+    that's fully tested and production ready.
+*   See :ref:`this note <utilities-encyption>` about GnuPG encryption in
+    paperless-ng.
+*   The :ref:`changelog <paperless_changelog>` contains a detailed list of all changes
+    in paperless-ng.
 
 It would be great if this project could eventually merge back into the main
 repository, but it needs a lot more work before that can happen.
