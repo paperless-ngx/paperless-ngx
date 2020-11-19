@@ -2,18 +2,17 @@ import itertools
 import os
 import re
 import subprocess
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool
 
 import langdetect
+import pdftotext
 import pyocr
-from django.conf import settings
 from PIL import Image
+from django.conf import settings
 from pyocr import PyocrException
 
-import pdftotext
 from documents.parsers import DocumentParser, ParseError, run_unpaper, \
     run_convert
-
 from .languages import ISO639
 
 
@@ -45,8 +44,8 @@ class RasterisedDocumentParser(DocumentParser):
                         alpha="remove",
                         strip=True,
                         trim=True,
-                        input="{}[0]".format(self.document_path),
-                        output=out_path,
+                        input_file="{}[0]".format(self.document_path),
+                        output_file=out_path,
                         logging_group=self.logging_group)
         except ParseError:
             # if convert fails, fall back to extracting
@@ -66,8 +65,8 @@ class RasterisedDocumentParser(DocumentParser):
                         alpha="remove",
                         strip=True,
                         trim=True,
-                        input=gs_out_path,
-                        output=out_path,
+                        input_file=gs_out_path,
+                        output_file=out_path,
                         logging_group=self.logging_group)
 
         return out_path
@@ -87,7 +86,7 @@ class RasterisedDocumentParser(DocumentParser):
             return self._text
 
         if not settings.OCR_ALWAYS and self._is_ocred():
-            self.log("info", "Skipping OCR, using Text from PDF")
+            self.log("debug", "Skipping OCR, using Text from PDF")
             self._text = get_text_from_pdf(self.document_path)
             return self._text
 
@@ -100,7 +99,7 @@ class RasterisedDocumentParser(DocumentParser):
         try:
 
             sample_page_index = int(len(images) / 2)
-            self.log("info", "Attempting language detection on page {} of {}...".format(sample_page_index+1, len(images)))
+            self.log("debug", "Attempting language detection on page {} of {}...".format(sample_page_index + 1, len(images)))
             self.progress_callback(0.4, 1, "Language Detection.")
             sample_page_text = self._ocr([images[sample_page_index]], settings.OCR_LANGUAGE)[0]
             guessed_language = self._guess_language(sample_page_text)
@@ -111,7 +110,7 @@ class RasterisedDocumentParser(DocumentParser):
                 ocr_pages = self._complete_ocr_default_language(images, sample_page_index, sample_page_text)
 
             elif ISO639[guessed_language] == settings.OCR_LANGUAGE:
-                self.log("info", "Detected language: {} (default language)".format(guessed_language))
+                self.log("debug", "Detected language: {} (default language)".format(guessed_language))
                 ocr_pages = self._complete_ocr_default_language(images, sample_page_index, sample_page_text)
 
             elif not ISO639[guessed_language] in pyocr.get_available_tools()[0].get_available_languages():
@@ -119,10 +118,10 @@ class RasterisedDocumentParser(DocumentParser):
                 ocr_pages = self._complete_ocr_default_language(images, sample_page_index, sample_page_text)
 
             else:
-                self.log("info", "Detected language: {}".format(guessed_language))
+                self.log("debug", "Detected language: {}".format(guessed_language))
                 ocr_pages = self._ocr(images, ISO639[guessed_language], report_progress=True)
 
-            self.log("info", "OCR completed.")
+            self.log("debug", "OCR completed.")
             self._text = strip_excess_whitespace(" ".join(ocr_pages))
             return self._text
 
@@ -134,7 +133,7 @@ class RasterisedDocumentParser(DocumentParser):
         Greyscale images are easier for Tesseract to OCR
         """
 
-        self.log("info", "Converting document {} into greyscale images...".format(self.document_path))
+        self.log("debug", "Converting document {} into greyscale images...".format(self.document_path))
 
         # Convert PDF to multiple PNMs
         pnm = os.path.join(self.tempdir, "convert-%04d.pnm")
@@ -142,8 +141,8 @@ class RasterisedDocumentParser(DocumentParser):
         run_convert(density=settings.CONVERT_DENSITY,
                     depth="8",
                     type="grayscale",
-                    input=self.document_path,
-                    output=pnm,
+                    input_file=self.document_path,
+                    output_file=pnm,
                     logging_group=self.logging_group)
 
         # Get a list of converted images
@@ -152,12 +151,12 @@ class RasterisedDocumentParser(DocumentParser):
             if f.endswith(".pnm"):
                 pnms.append(os.path.join(self.tempdir, f))
 
-        self.log("info", "Running unpaper on {} pages...".format(len(pnms)))
+        self.log("debug", "Running unpaper on {} pages...".format(len(pnms)))
 
         self.progress_callback(0.2,1, "Running unpaper on {} pages...".format(len(pnms)))
 
         # Run unpaper in parallel on converted images
-        with Pool(processes=settings.OCR_THREADS) as pool:
+        with ThreadPool(processes=settings.THREADS_PER_WORKER) as pool:
             pnms = pool.map(run_unpaper, pnms)
 
         return sorted(filter(lambda __: os.path.isfile(__), pnms))
@@ -167,13 +166,13 @@ class RasterisedDocumentParser(DocumentParser):
             guess = langdetect.detect(text)
             return guess
         except Exception as e:
-            self.log('debug', "Language detection failed with: {}".format(e))
+            self.log('warning', "Language detection failed with: {}".format(e))
             return None
 
     def _ocr(self, imgs, lang, report_progress=False):
-        self.log("info", "Performing OCR on {} page(s) with language {}".format(len(imgs), lang))
+        self.log("debug", "Performing OCR on {} page(s) with language {}".format(len(imgs), lang))
         r = []
-        with Pool(processes=settings.OCR_THREADS) as pool:
+        with ThreadPool(processes=settings.THREADS_PER_WORKER) as pool:
             # r = pool.map(image_to_string, itertools.product(imgs, [lang]))
             for i, page in enumerate(pool.imap(image_to_string, itertools.product(imgs, [lang]))):
                 if report_progress:
@@ -191,7 +190,7 @@ class RasterisedDocumentParser(DocumentParser):
         images_copy = list(images)
         del images_copy[sample_page_index]
         if images_copy:
-            self.log('info', 'Continuing ocr with default language.')
+            self.log('debug', 'Continuing ocr with default language.')
             ocr_pages = self._ocr(images_copy, settings.OCR_LANGUAGE, report_progress=True)
             ocr_pages.insert(sample_page_index, sample_page)
             return ocr_pages

@@ -1,7 +1,6 @@
 import logging
+from contextlib import contextmanager
 
-from django.db import models
-from django.dispatch import receiver
 from whoosh import highlight
 from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.highlight import Formatter, get_text
@@ -9,9 +8,7 @@ from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser import MultifieldParser
 from whoosh.writing import AsyncWriter
 
-from documents.models import Document
 from paperless import settings
-
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +66,9 @@ def open_index(recreate=False):
     if exists_in(settings.INDEX_DIR) and not recreate:
         return open_dir(settings.INDEX_DIR)
     else:
+        # TODO: this is not thread safe. If 2 instances try to create the index
+        #  at the same time, this fails. This currently prevents parallel
+        #  tests.
         return create_in(settings.INDEX_DIR, get_schema())
 
 
@@ -99,15 +99,19 @@ def remove_document_from_index(document):
         remove_document(writer, document)
 
 
+@contextmanager
 def query_page(ix, query, page):
-    with ix.searcher() as searcher:
+    searcher = ix.searcher()
+    try:
         query_parser = MultifieldParser(["content", "title", "correspondent"],
                                         ix.schema).parse(query)
         result_page = searcher.search_page(query_parser, page)
         result_page.results.fragmenter = highlight.ContextFragmenter(
             surround=50)
         result_page.results.formatter = JsonFormatter()
-        return result_page
+        yield result_page
+    finally:
+        searcher.close()
 
 
 def autocomplete(ix, term, limit=10):

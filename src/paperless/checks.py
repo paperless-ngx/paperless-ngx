@@ -11,6 +11,8 @@ writeable_hint = (
     "Set the permissions of {} to be writeable by the user running the "
     "Paperless services"
 )
+
+
 def path_check(env_var):
     messages = []
     directory = os.getenv(env_var)
@@ -27,6 +29,7 @@ def path_check(env_var):
             ))
     return messages
 
+
 @register()
 def paths_check(app_configs, **kwargs):
     """
@@ -34,9 +37,9 @@ def paths_check(app_configs, **kwargs):
     """
 
     check_messages = path_check("PAPERLESS_DATA_DIR") + \
-                     path_check("PAPERLESS_MEDIA_ROOT") + \
-                     path_check("PAPERLESS_CONSUMPTION_DIR") + \
-                     path_check("PAPERLESS_STATICDIR")
+        path_check("PAPERLESS_MEDIA_ROOT") + \
+        path_check("PAPERLESS_CONSUMPTION_DIR") + \
+        path_check("PAPERLESS_STATICDIR")
 
     return check_messages
 
@@ -64,3 +67,16 @@ def binaries_check(app_configs, **kwargs):
             check_messages.append(Warning(error.format(binary), hint))
 
     return check_messages
+
+
+@register()
+def debug_mode_check(app_configs, **kwargs):
+    if settings.DEBUG:
+        return [Warning(
+            "DEBUG mode is enabled. Disable Debug mode. This is a serious "
+            "security issue, since it puts security overides in place which "
+            "are meant to be only used during development. This "
+            "also means that paperless will tell anyone various "
+            "debugging information when something goes wrong.")]
+    else:
+        return []

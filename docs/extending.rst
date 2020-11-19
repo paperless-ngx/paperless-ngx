@@ -3,6 +3,10 @@
 Extending Paperless
 ===================
 
+.. warning::
+
+    This section is not updated to paperless-ng yet.
+
 For the most part, Paperless is monolithic, so extending it is often best
 managed by way of modifying the code directly and issuing a pull request on
 `GitHub`_.  However, over time the project has been evolving to be a little

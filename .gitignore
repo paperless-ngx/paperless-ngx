@@ -66,6 +66,7 @@ target/
 virtualenv
 /venv
 docker-compose.env
+docker-compose.yml
 
 # Used for development
 scripts/import-for-development
@@ -86,3 +87,6 @@ scripts/nuke
 /consume
 /export
 /src-ui/.vscode
+
+# this is where the compiled frontend is moved to.
+/src/documents/static/frontend/

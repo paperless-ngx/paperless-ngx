@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group, User
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from whoosh.writing import AsyncWriter
@@ -32,7 +31,7 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
-    readonly_fields = ("slug",)
+    readonly_fields = ("slug", )
 
 
 class DocumentTypeAdmin(admin.ModelAdmin):
@@ -51,9 +50,17 @@ class DocumentTypeAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
-    readonly_fields = ("added", "file_type", "storage_type",)
-    list_display = ("title", "created", "added", "correspondent",
-                    "tags_", "archive_serial_number", "document_type")
+    readonly_fields = ("added", "file_type", "storage_type", "filename")
+    list_display = (
+        "title",
+        "created",
+        "added",
+        "correspondent",
+        "tags_",
+        "archive_serial_number",
+        "document_type",
+        "filename"
+    )
     list_filter = (
         "document_type",
         "tags",
@@ -120,8 +127,3 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Log, LogAdmin)
-
-
-# Unless we implement multi-user, these default registrations don't make sense.
-admin.site.unregister(Group)
-admin.site.unregister(User)

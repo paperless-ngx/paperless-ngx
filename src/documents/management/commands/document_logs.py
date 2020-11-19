@@ -8,5 +8,5 @@ class Command(BaseCommand):
     help = "A quick & dirty way to see what's in the logs"
 
     def handle(self, *args, **options):
-        for l in Log.objects.order_by("pk"):
-            print(l)
+        for log in Log.objects.order_by("pk"):
+            print(log)

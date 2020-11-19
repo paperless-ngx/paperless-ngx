@@ -86,7 +86,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
     modal.componentInstance.success.subscribe(newTag => {
-      this.tagService.list().subscribe(tags => {
+      this.tagService.listAll().subscribe(tags => {
         this.tags = tags.results
         this.addTag(newTag.id)
       })

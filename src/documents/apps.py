@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_delete
 
 
 class DocumentsConfig(AppConfig):
@@ -14,7 +13,6 @@ class DocumentsConfig(AppConfig):
             add_inbox_tags,
             run_pre_consume_script,
             run_post_consume_script,
-            cleanup_document_deletion,
             set_log_entry,
             set_correspondent,
             set_document_type,
@@ -32,7 +30,5 @@ class DocumentsConfig(AppConfig):
         document_consumption_finished.connect(set_log_entry)
         document_consumption_finished.connect(add_to_index)
         document_consumption_finished.connect(run_post_consume_script)
-
-        post_delete.connect(cleanup_document_deletion)
 
         AppConfig.ready(self)
