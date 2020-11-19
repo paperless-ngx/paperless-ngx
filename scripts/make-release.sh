@@ -79,6 +79,7 @@ cp "$PAPERLESS_ROOT/docker/docker-compose.env" "$PAPERLESS_DIST_APP"
 
 # docker files for pulling from docker hub
 cp "$PAPERLESS_ROOT/docker/hub/"* "$PAPERLESS_DIST"
+cp "$PAPERLESS_ROOT/.env" "$PAPERLESS_DIST"
 cp "$PAPERLESS_ROOT/docker/docker-compose.env" "$PAPERLESS_DIST"
 
 # auxiliary files required for the docker image
