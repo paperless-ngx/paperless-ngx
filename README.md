@@ -54,7 +54,7 @@ These features will make it into the application at some point, sorted by priori
 
 # Getting started
 
-The recommended way to deploy paperless is docker-compose. Grab the latest release to get started.
+The recommended way to deploy paperless is docker-compose. Grab the latest release to get started. the dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself.
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
