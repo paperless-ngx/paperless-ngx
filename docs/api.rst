@@ -91,6 +91,7 @@ Result object:
         "document": {
             
         }
+    }
 
 *   ``id``: the primary key of the found document
 *   ``highlights``: an object containing parseable highlights for the result.
@@ -109,7 +110,7 @@ Each fragment contains a list of strings, and some of them are marked as a highl
 
 .. code:: json
 
-    "highlights": [
+    [
         [
             {"text": "This is a sample text with a "},
             {"text": "highlighted", "term": 0},
@@ -120,6 +121,8 @@ Each fragment contains a list of strings, and some of them are marked as a highl
             {"text": " fragment with a highlight."}
         ]
     ]
+    
+
 
 When ``term`` is present within a string, the word within ``text`` should be highlighted.
 The term index groups multiple matches together and words with the same index
