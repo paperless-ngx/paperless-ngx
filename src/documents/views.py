@@ -1,14 +1,9 @@
 from django.db.models import Count, Max
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from paperless.db import GnuPG
-from paperless.views import StandardPagination
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.mixins import (
     DestroyModelMixin,
@@ -17,12 +12,17 @@ from rest_framework.mixins import (
     UpdateModelMixin
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet,
     ReadOnlyModelViewSet
 )
 
+import documents.index as index
+from paperless.db import GnuPG
+from paperless.views import StandardPagination
 from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
@@ -30,8 +30,6 @@ from .filters import (
     DocumentTypeFilterSet,
     LogFilterSet
 )
-
-import documents.index as index
 from .forms import UploadForm
 from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
@@ -54,7 +52,7 @@ class CorrespondentViewSet(ModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = CorrespondentFilterSet
+    filterset_class = CorrespondentFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count", "last_correspondence")
 
 
@@ -65,7 +63,7 @@ class TagViewSet(ModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = TagFilterSet
+    filterset_class = TagFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
@@ -76,7 +74,7 @@ class DocumentTypeViewSet(ModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = DocumentTypeFilterSet
+    filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
@@ -91,7 +89,7 @@ class DocumentViewSet(RetrieveModelMixin,
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
-    filter_class = DocumentFilterSet
+    filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
         "id", "title", "correspondent__name", "document_type__name", "created", "modified", "added", "archive_serial_number")
@@ -106,7 +104,7 @@ class DocumentViewSet(RetrieveModelMixin,
         return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
     def file_response(self, pk, disposition):
-        #TODO: this should not be necessary here.
+        # TODO: this should not be necessary here.
         content_types = {
             Document.TYPE_PDF: "application/pdf",
             Document.TYPE_PNG: "image/png",
@@ -114,7 +112,7 @@ class DocumentViewSet(RetrieveModelMixin,
             Document.TYPE_GIF: "image/gif",
             Document.TYPE_TIF: "image/tiff",
             Document.TYPE_CSV: "text/csv",
-            Document.TYPE_MD:  "text/markdown",
+            Document.TYPE_MD: "text/markdown",
             Document.TYPE_TXT: "text/plain"
         }
 
@@ -132,7 +130,7 @@ class DocumentViewSet(RetrieveModelMixin,
 
     @action(methods=['post'], detail=False)
     def post_document(self, request, pk=None):
-        #TODO: is this a good implementation?
+        # TODO: is this a good implementation?
         form = UploadForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
@@ -142,17 +140,26 @@ class DocumentViewSet(RetrieveModelMixin,
 
     @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
-        response = self.file_response(pk, "inline")
-        return response
+        try:
+            response = self.file_response(pk, "inline")
+            return response
+        except FileNotFoundError:
+            raise Http404("Document source file does not exist")
 
     @action(methods=['get'], detail=True)
     @cache_control(public=False, max_age=315360000)
     def thumb(self, request, pk=None):
-        return HttpResponse(Document.objects.get(id=pk).thumbnail_file, content_type='image/png')
+        try:
+            return HttpResponse(Document.objects.get(id=pk).thumbnail_file, content_type='image/png')
+        except FileNotFoundError:
+            raise Http404("Document thumbnail does not exist")
 
     @action(methods=['get'], detail=True)
     def download(self, request, pk=None):
-        return self.file_response(pk, "attachment")
+        try:
+            return self.file_response(pk, "attachment")
+        except FileNotFoundError:
+            raise Http404("Document source file does not exist")
 
 
 class LogViewSet(ReadOnlyModelViewSet):
@@ -163,7 +170,7 @@ class LogViewSet(ReadOnlyModelViewSet):
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = LogFilterSet
+    filterset_class = LogFilterSet
     ordering_fields = ("created",)
 
 
@@ -191,13 +198,12 @@ class SearchView(APIView):
             except (ValueError, TypeError):
                 page = 1
 
-            result_page = index.query_page(self.ix, query, page)
-
-            return Response(
-                {'count': len(result_page),
-                 'page': result_page.pagenum,
-                 'page_count': result_page.pagecount,
-                 'results': list(map(self.add_infos_to_hit, result_page))})
+            with index.query_page(self.ix, query, page) as result_page:
+                return Response(
+                    {'count': len(result_page),
+                     'page': result_page.pagenum,
+                     'page_count': result_page.pagecount,
+                     'results': list(map(self.add_infos_to_hit, result_page))})
 
         else:
             return Response({
@@ -217,17 +223,16 @@ class SearchAutoCompleteView(APIView):
         if 'term' in request.query_params:
             term = request.query_params['term']
         else:
-            term = None
+            return HttpResponseBadRequest("Term required")
 
         if 'limit' in request.query_params:
             limit = int(request.query_params['limit'])
+            if limit <= 0:
+                return HttpResponseBadRequest("Invalid limit")
         else:
             limit = 10
 
-        if term is not None:
-            return Response(index.autocomplete(self.ix, term, limit))
-        else:
-            return Response([])
+        return Response(index.autocomplete(self.ix, term, limit))
 
 
 class StatisticsView(APIView):

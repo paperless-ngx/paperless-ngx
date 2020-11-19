@@ -105,7 +105,6 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 class LogSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         model = Log
         fields = (

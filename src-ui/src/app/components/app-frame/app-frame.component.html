@@ -1,5 +1,5 @@
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-  <span class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Paperless</span>
+  <span class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Paperless-ng</span>
   <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
     data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -69,6 +69,14 @@
               {{d.title}}
             </a>
           </li>
+          <li class="nav-item w-100" *ngIf="openDocuments.length > 1">
+            <a class="nav-link text-truncate" [routerLink]="" (click)="closeAll()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#x"/>
+              </svg>
+              Close all
+            </a>
+          </li>
         </ul>
 
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -121,6 +129,28 @@
                 <use xlink:href="assets/bootstrap-icons.svg#toggles"/>
               </svg>
               Admin
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Misc</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="https://paperless-ng.readthedocs.io/en/latest/">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
+              </svg>
+              Documentation
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/jonaswinkler/paperless-ng">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#link"/>
+              </svg>
+              Github
             </a>
           </li>
         </ul>

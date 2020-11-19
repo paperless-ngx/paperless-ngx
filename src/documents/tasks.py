@@ -1,18 +1,13 @@
 import logging
 
 from django.conf import settings
-from django_q.tasks import async_task, result
 from whoosh.writing import AsyncWriter
 
 from documents import index
 from documents.classifier import DocumentClassifier, \
     IncompatibleClassifierVersionError
-from documents.mail import MailFetcher
+from documents.consumer import Consumer, ConsumerError
 from documents.models import Document
-
-
-def consume_mail():
-    MailFetcher().pull()
 
 
 def index_optimize():
@@ -55,3 +50,27 @@ def train_classifier():
         logging.getLogger(__name__).error(
             "Classifier error: " + str(e)
         )
+
+
+def consume_file(path,
+                 override_filename=None,
+                 override_title=None,
+                 override_correspondent_id=None,
+                 override_document_type_id=None,
+                 override_tag_ids=None):
+
+    document = Consumer().try_consume_file(
+        path,
+        override_filename=override_filename,
+        override_title=override_title,
+        override_correspondent_id=override_correspondent_id,
+        override_document_type_id=override_document_type_id,
+        override_tag_ids=override_tag_ids)
+
+    if document:
+        return "Success. New document id {} created".format(
+            document.pk
+        )
+    else:
+        raise ConsumerError("Unknown error: Returned document was null, but "
+                            "no error message was given.")

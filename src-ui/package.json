@@ -23,6 +23,7 @@
     "@ng-bootstrap/ng-bootstrap": "^8.0.0",
     "bootstrap": "^4.5.0",
     "ng-bootstrap": "^1.6.3",
+    "ngx-cookie-service": "^10.1.1",
     "ngx-file-drop": "^10.0.0",
     "ngx-infinite-scroll": "^9.1.0",
     "rxjs": "~6.6.0",

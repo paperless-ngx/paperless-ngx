@@ -9,11 +9,11 @@ from django_q.tasks import schedule
 def add_schedules(apps, schema_editor):
     schedule('documents.tasks.train_classifier', name="Train the classifier", schedule_type=Schedule.HOURLY)
     schedule('documents.tasks.index_optimize', name="Optimize the index", schedule_type=Schedule.DAILY)
-    schedule('documents.tasks.consume_mail', name="Check E-Mail", schedule_type=Schedule.MINUTES, minutes=10)
 
 
 def remove_schedules(apps, schema_editor):
-    Schedule.objects.all().delete()
+    Schedule.objects.filter(func='documents.tasks.train_classifier').delete()
+    Schedule.objects.filter(func='documents.tasks.index_optimize').delete()
 
 
 class Migration(migrations.Migration):
