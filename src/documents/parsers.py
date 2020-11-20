@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 
 import dateparser
+import magic
 from django.conf import settings
 from django.utils import timezone
 
@@ -37,10 +38,11 @@ DATE_REGEX = re.compile(
 logger = logging.getLogger(__name__)
 
 
-def get_parser_class(doc):
-    """
-    Determine the appropriate parser class based on the file
-    """
+def is_mime_type_supported(mime_type):
+    return get_parser_class_for_mime_type(mime_type) is not None
+
+
+def get_parser_class_for_mime_type(mime_type):
 
     options = []
 
@@ -48,9 +50,9 @@ def get_parser_class(doc):
 
     for response in document_consumer_declaration.send(None):
         parser_declaration = response[1]
-        parser_test = parser_declaration["test"]
+        supported_mime_types = parser_declaration["mime_types"]
 
-        if parser_test(doc):
+        if mime_type in supported_mime_types:
             options.append(parser_declaration)
 
     if not options:
@@ -59,6 +61,16 @@ def get_parser_class(doc):
     # Return the parser with the highest weight.
     return sorted(
         options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
+
+
+def get_parser_class(path):
+    """
+    Determine the appropriate parser class based on the file
+    """
+
+    mime_type = magic.from_file(path, mime=True)
+
+    return get_parser_class_for_mime_type(mime_type)
 
 
 def run_convert(input_file, output_file, density=None, scale=None, alpha=None, strip=False, trim=False, type=None, depth=None, extra=None, logging_group=None):

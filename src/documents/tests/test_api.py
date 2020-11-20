@@ -45,7 +45,7 @@ class DocumentApiTest(APITestCase):
         dt = DocumentType.objects.create(name="dt", pk=63)
         tag = Tag.objects.create(name="t", pk=85)
 
-        doc = Document.objects.create(title="WOW", content="the content", correspondent=c, document_type=dt, checksum="123")
+        doc = Document.objects.create(title="WOW", content="the content", correspondent=c, document_type=dt, checksum="123", mime_type="application/pdf")
 
         doc.tags.add(tag)
 
@@ -95,7 +95,7 @@ class DocumentApiTest(APITestCase):
         with open(filename, "wb") as f:
             f.write(content)
 
-        doc = Document.objects.create(title="none", filename=os.path.basename(filename), file_type="pdf")
+        doc = Document.objects.create(title="none", filename=os.path.basename(filename), mime_type="application/pdf")
 
         with open(os.path.join(self.thumbnail_dir, "{:07d}.png".format(doc.pk)), "wb") as f:
             f.write(content_thumbnail)
@@ -117,7 +117,7 @@ class DocumentApiTest(APITestCase):
 
     def test_document_actions_not_existing_file(self):
 
-        doc = Document.objects.create(title="none", filename=os.path.basename("asd"), file_type="pdf")
+        doc = Document.objects.create(title="none", filename=os.path.basename("asd"), mime_type="application/pdf")
 
         response = self.client.get('/api/documents/{}/download/'.format(doc.pk))
         self.assertEqual(response.status_code, 404)
@@ -130,9 +130,9 @@ class DocumentApiTest(APITestCase):
 
     def test_document_filters(self):
 
-        doc1 = Document.objects.create(title="none1", checksum="A")
-        doc2 = Document.objects.create(title="none2", checksum="B")
-        doc3 = Document.objects.create(title="none3", checksum="C")
+        doc1 = Document.objects.create(title="none1", checksum="A", mime_type="application/pdf")
+        doc2 = Document.objects.create(title="none2", checksum="B", mime_type="application/pdf")
+        doc3 = Document.objects.create(title="none3", checksum="C", mime_type="application/pdf")
 
         tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
         tag_2 = Tag.objects.create(name="t2")

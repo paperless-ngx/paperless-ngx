@@ -10,6 +10,7 @@ from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags, \
 
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
+from documents.parsers import is_mime_type_supported
 from paperless_mail.models import MailAccount, MailRule
 
 
@@ -249,8 +250,7 @@ class MailAccountHandler(LoggingMixin):
 
             title = get_title(message, att, rule)
 
-            # TODO: check with parsers what files types are supported
-            if att.content_type == 'application/pdf':
+            if is_mime_type_supported(att.content_type):
 
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
                 _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)

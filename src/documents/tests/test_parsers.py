@@ -1,3 +1,4 @@
+import os
 from tempfile import TemporaryDirectory
 from unittest import mock
 
@@ -5,7 +6,18 @@ from django.test import TestCase
 
 from documents.parsers import get_parser_class
 
+def fake_magic_from_file(file, mime=False):
 
+    if mime:
+        if os.path.splitext(file)[1] == ".pdf":
+            return "application/pdf"
+        else:
+            return "unknown"
+    else:
+        return "A verbose string that describes the contents of the file"
+
+
+@mock.patch("documents.parsers.magic.from_file", fake_magic_from_file)
 class TestParserDiscovery(TestCase):
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
@@ -14,7 +26,7 @@ class TestParserDiscovery(TestCase):
             pass
 
         m.return_value = (
-            (None, {"weight": 0, "parser": DummyParser, "test": lambda _: True}),
+            (None, {"weight": 0, "parser": DummyParser, "mime_types": ["application/pdf"]}),
         )
 
         self.assertEqual(
@@ -32,8 +44,8 @@ class TestParserDiscovery(TestCase):
             pass
 
         m.return_value = (
-            (None, {"weight": 0, "parser": DummyParser1, "test": lambda _: True}),
-            (None, {"weight": 1, "parser": DummyParser2, "test": lambda _: True}),
+            (None, {"weight": 0, "parser": DummyParser1, "mime_types": ["application/pdf"]}),
+            (None, {"weight": 1, "parser": DummyParser2, "mime_types": ["application/pdf"]}),
         )
 
         self.assertEqual(

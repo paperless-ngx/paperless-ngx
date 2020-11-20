@@ -13,9 +13,12 @@ class TestDocument(TestCase):
             title="Title",
             content="content",
             checksum="checksum",
+            mime_type="application/pdf"
         )
+
         file_path = document.source_path
         thumb_path = document.thumbnail_path
+
         with mock.patch("documents.signals.handlers.os.unlink") as mock_unlink:
             document.delete()
             mock_unlink.assert_any_call(file_path)
