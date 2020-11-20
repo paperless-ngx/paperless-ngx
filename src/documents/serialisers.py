@@ -91,7 +91,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "document_type_id",
             "title",
             "content",
-            "file_type",
+            "mime_type",
             "tags",
             "tags_id",
             "checksum",

@@ -2,8 +2,8 @@ import datetime
 import hashlib
 import logging
 import os
-import re
 
+import magic
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
@@ -13,7 +13,7 @@ from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .file_handling import generate_filename, create_source_path_directory
 from .loggers import LoggingMixin
 from .models import Document, FileInfo, Correspondent, DocumentType, Tag
-from .parsers import ParseError, get_parser_class
+from .parsers import ParseError, get_parser_class_for_mime_type
 from .signals import (
     document_consumption_finished,
     document_consumption_started
@@ -50,12 +50,6 @@ class Consumer(LoggingMixin):
             raise ConsumerError(
                 "Consumption directory {} does not exist".format(
                     settings.CONSUMPTION_DIR))
-
-    def pre_check_regex(self):
-        if not re.match(FileInfo.REGEXES["title"], self.filename):
-            raise ConsumerError(
-                "Filename {} does not seem to be safe to "
-                "consume".format(self.filename))
 
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
@@ -100,18 +94,19 @@ class Consumer(LoggingMixin):
         self.pre_check_file_exists()
         self.pre_check_consumption_dir()
         self.pre_check_directories()
-        self.pre_check_regex()
         self.pre_check_duplicate()
 
         self.log("info", "Consuming {}".format(self.filename))
 
         # Determine the parser class.
 
-        parser_class = get_parser_class(self.filename)
+        mime_type = magic.from_file(self.path, mime=True)
+
+        parser_class = get_parser_class_for_mime_type(mime_type)
         if not parser_class:
             raise ConsumerError("No parsers abvailable for {}".format(self.filename))
         else:
-            self.log("debug", "Parser: {}".format(parser_class.__name__))
+            self.log("debug", "Parser: {} based on mime type {}".format(parser_class.__name__, mime_type))
 
         # Notify all listeners that we're going to do some work.
 
@@ -162,7 +157,8 @@ class Consumer(LoggingMixin):
                 # store the document.
                 document = self._store(
                     text=text,
-                    date=date
+                    date=date,
+                    mime_type=mime_type
                 )
 
                 # If we get here, it was successful. Proceed with post-consume
@@ -197,7 +193,7 @@ class Consumer(LoggingMixin):
 
         return document
 
-    def _store(self, text, date):
+    def _store(self, text, date, mime_type):
 
         # If someone gave us the original filename, use it instead of doc.
 
@@ -220,7 +216,7 @@ class Consumer(LoggingMixin):
                 correspondent=file_info.correspondent,
                 title=file_info.title,
                 content=text,
-                file_type=file_info.extension,
+                mime_type=mime_type,
                 checksum=hashlib.md5(f.read()).hexdigest(),
                 created=created,
                 modified=created,

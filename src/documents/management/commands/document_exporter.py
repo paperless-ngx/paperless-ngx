@@ -127,8 +127,8 @@ class Command(Renderable, BaseCommand):
         tags = ",".join([t.slug for t in doc.tags.all()])
 
         if tags:
-            return "{} - {} - {} - {}.{}".format(
+            return "{} - {} - {} - {}{}".format(
                 created, doc.correspondent, doc.title, tags, doc.file_type)
 
-        return "{} - {} - {}.{}".format(
+        return "{} - {} - {}{}".format(
             created, doc.correspondent, doc.title, doc.file_type)

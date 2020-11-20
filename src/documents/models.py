@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import logging
+import mimetypes
 import os
 import re
 from collections import OrderedDict
@@ -113,18 +114,6 @@ class DocumentType(MatchingModel):
 
 class Document(models.Model):
 
-    # TODO: why do we need an explicit list
-    TYPE_PDF = "pdf"
-    TYPE_PNG = "png"
-    TYPE_JPG = "jpg"
-    TYPE_GIF = "gif"
-    TYPE_TIF = "tiff"
-    TYPE_TXT = "txt"
-    TYPE_CSV = "csv"
-    TYPE_MD = "md"
-    TYPES = (TYPE_PDF, TYPE_PNG, TYPE_JPG, TYPE_GIF, TYPE_TIF,
-             TYPE_TXT, TYPE_CSV, TYPE_MD)
-
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
     STORAGE_TYPES = (
@@ -156,10 +145,9 @@ class Document(models.Model):
                   "primarily used for searching."
     )
 
-    file_type = models.CharField(
-        max_length=4,
-        editable=False,
-        choices=tuple([(t, t.upper()) for t in TYPES])
+    mime_type = models.CharField(
+        max_length=256,
+        editable=False
     )
 
     tags = models.ManyToManyField(
@@ -223,7 +211,7 @@ class Document(models.Model):
         if self.filename:
             fname = str(self.filename)
         else:
-            fname = "{:07}.{}".format(self.pk, self.file_type)
+            fname = "{:07}{}".format(self.pk, self.file_type)
             if self.storage_type == self.STORAGE_TYPE_GPG:
                 fname += ".gpg"
 
@@ -238,7 +226,11 @@ class Document(models.Model):
 
     @property
     def file_name(self):
-        return slugify(str(self)) + "." + self.file_type
+        return slugify(str(self)) + self.file_type
+
+    @property
+    def file_type(self):
+        return mimetypes.guess_extension(str(self.mime_type))
 
     @property
     def thumbnail_path(self):

@@ -31,7 +31,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_generate_source_filename(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -44,7 +44,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -81,7 +81,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_missing_permissions(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -111,10 +111,10 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_file_renaming_database_error(self):
 
-        document1 = Document.objects.create(file_type="pdf", storage_type=Document.STORAGE_TYPE_UNENCRYPTED, checksum="AAAAA")
+        document1 = Document.objects.create(mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_UNENCRYPTED, checksum="AAAAA")
 
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.checksum = "BBBBB"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
@@ -149,7 +149,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -170,7 +170,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete_nofile(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -179,7 +179,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_directory_not_empty(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -206,7 +206,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -222,7 +222,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_dash(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -238,7 +238,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_malformed(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -254,7 +254,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[0]}")
     def test_tags_all(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -269,7 +269,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[1]}")
     def test_tags_out_of_bounds(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -284,7 +284,7 @@ class TestDate(TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
         document = Document()
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
@@ -309,7 +309,7 @@ class TestDate(TestCase):
     def test_format_none(self):
         document = Document()
         document.pk = 1
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
         self.assertEqual(generate_filename(document), "0000001.pdf")
@@ -335,7 +335,7 @@ class TestDate(TestCase):
     def test_invalid_format(self):
         document = Document()
         document.pk = 1
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
         self.assertEqual(generate_filename(document), "0000001.pdf")
@@ -344,7 +344,7 @@ class TestDate(TestCase):
     def test_invalid_format_key(self):
         document = Document()
         document.pk = 1
-        document.file_type = "pdf"
+        document.mime_type = "application/pdf"
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
         self.assertEqual(generate_filename(document), "0000001.pdf")
