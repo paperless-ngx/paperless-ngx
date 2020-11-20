@@ -197,7 +197,7 @@ class Consumer(LoggingMixin):
 
         # If someone gave us the original filename, use it instead of doc.
 
-        file_info = FileInfo.from_path(self.filename)
+        file_info = FileInfo.from_filename(self.filename)
 
         stats = os.stat(self.path)
 

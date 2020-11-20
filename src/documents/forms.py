@@ -34,8 +34,7 @@ class UploadForm(forms.Form):
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
-        # TODO: dont just append pdf. This is here for taht weird regex check at the start of the consumer.
-        with tempfile.NamedTemporaryFile(prefix="paperless-upload-", suffix=".pdf", dir=settings.SCRATCH_DIR, delete=False) as f:
+        with tempfile.NamedTemporaryFile(prefix="paperless-upload-", dir=settings.SCRATCH_DIR, delete=False) as f:
 
             f.write(document)
             os.utime(f.name, times=(t, t))
