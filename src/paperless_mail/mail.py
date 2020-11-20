@@ -2,6 +2,7 @@ import os
 import tempfile
 from datetime import timedelta, date
 
+import magic
 from django.conf import settings
 from django.utils.text import slugify
 from django_q.tasks import async_task
@@ -248,9 +249,21 @@ class MailAccountHandler(LoggingMixin):
 
         for att in message.attachments:
 
+            if not att.content_disposition == "attachment":
+                self.log(
+                    'debug',
+                    f"Rule {rule.account}.{rule}: "
+                    f"Skipping attachment {att.filename} "
+                    f"with content disposition inline")
+                continue
+
             title = get_title(message, att, rule)
 
-            if is_mime_type_supported(att.content_type):
+            # don't trust the content type of the attachment. Could be
+            # generic application/octet-stream.
+            mime_type = magic.from_buffer(att.payload, mime=True)
+
+            if is_mime_type_supported(mime_type):
 
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
                 _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)
@@ -275,5 +288,12 @@ class MailAccountHandler(LoggingMixin):
                 )
 
                 processed_attachments += 1
+            else:
+                self.log(
+                    'debug',
+                    f"Rule {rule.account}.{rule}: "
+                    f"Skipping attachment {att.filename} "
+                    f"since guessed mime type {mime_type} is not supported "
+                    f"by paperless")
 
         return processed_attachments
