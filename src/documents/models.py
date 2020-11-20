@@ -269,7 +269,7 @@ class Log(models.Model):
     def __str__(self):
         return self.message
 
-
+# TODO: why is this in the models file?
 class FileInfo:
 
     # This epic regex *almost* worked for our needs, so I'm keeping it here for
@@ -284,53 +284,44 @@ class FileInfo:
             non_separated_word=r"([\w,. ]|([^\s]-))"
         )
     )
-    # TODO: what is this used for
-    formats = "pdf|jpe?g|png|gif|tiff?|te?xt|md|csv"
     REGEXES = OrderedDict([
         ("created-correspondent-title-tags", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>{})$".format(formats),
+            r"(?P<tags>[a-z0-9\-,]*)$",
             flags=re.IGNORECASE
         )),
         ("created-title-tags", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>{})$".format(formats),
+            r"(?P<tags>[a-z0-9\-,]*)$",
             flags=re.IGNORECASE
         )),
         ("created-correspondent-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<correspondent>.*) - "
-            r"(?P<title>.*)"
-            r"\.(?P<extension>{})$".format(formats),
+            r"(?P<title>.*)$",
             flags=re.IGNORECASE
         )),
         ("created-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<title>.*)"
-            r"\.(?P<extension>{})$".format(formats),
+            r"(?P<title>.*)$",
             flags=re.IGNORECASE
         )),
         ("correspondent-title-tags", re.compile(
             r"(?P<correspondent>.*) - "
             r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)"
-            r"\.(?P<extension>{})$".format(formats),
+            r"(?P<tags>[a-z0-9\-,]*)$",
             flags=re.IGNORECASE
         )),
         ("correspondent-title", re.compile(
             r"(?P<correspondent>.*) - "
-            r"(?P<title>.*)?"
-            r"\.(?P<extension>{})$".format(formats),
+            r"(?P<title>.*)?$",
             flags=re.IGNORECASE
         )),
         ("title", re.compile(
-            r"(?P<title>.*)"
-            r"\.(?P<extension>{})$".format(formats),
+            r"(?P<title>.*)$",
             flags=re.IGNORECASE
         ))
     ])
@@ -374,15 +365,6 @@ class FileInfo:
         return tuple(r)
 
     @classmethod
-    def _get_extension(cls, extension):
-        r = extension.lower()
-        if r == "jpeg":
-            return "jpg"
-        if r == "tif":
-            return "tiff"
-        return r
-
-    @classmethod
     def _mangle_property(cls, properties, name):
         if name in properties:
             properties[name] = getattr(cls, "_get_{}".format(name))(
@@ -390,17 +372,15 @@ class FileInfo:
             )
 
     @classmethod
-    def from_path(cls, path):
+    def from_filename(cls, filename):
         """
         We use a crude naming convention to make handling the correspondent,
         title, and tags easier:
-          "<date> - <correspondent> - <title> - <tags>.<suffix>"
-          "<correspondent> - <title> - <tags>.<suffix>"
-          "<correspondent> - <title>.<suffix>"
-          "<title>.<suffix>"
+          "<date> - <correspondent> - <title> - <tags>"
+          "<correspondent> - <title> - <tags>"
+          "<correspondent> - <title>"
+          "<title>"
         """
-
-        filename = os.path.basename(path)
 
         # Mutate filename in-place before parsing its components
         # by applying at most one of the configured transformations.
@@ -408,6 +388,23 @@ class FileInfo:
             (filename, count) = pattern.subn(repl, filename)
             if count:
                 break
+
+        # do this after the transforms so that the transforms can do whatever
+        # with the file extension.
+        filename_no_ext = os.path.splitext(filename)[0]
+
+        if filename_no_ext == filename and filename.startswith("."):
+            # This is a very special case where there is no text before the
+            # file type.
+            # TODO: this should be handled better. The ext is not removed
+            #  because usually, files like '.pdf' are just hidden files
+            #  with the name pdf, but in our case, its more likely that
+            #  there's just no name to begin with.
+            filename = ""
+            # This isn't too bad either, since we'll just not match anything
+            # and return an empty title. TODO: actually, this is kinda bad.
+        else:
+            filename = filename_no_ext
 
         # Parse filename components.
         for regex in cls.REGEXES.values():
@@ -418,5 +415,4 @@ class FileInfo:
                 cls._mangle_property(properties, "correspondent")
                 cls._mangle_property(properties, "title")
                 cls._mangle_property(properties, "tags")
-                cls._mangle_property(properties, "extension")
                 return cls(**properties)
