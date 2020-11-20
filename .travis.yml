@@ -7,7 +7,7 @@ python:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
+  - sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript
 
 install:
   - pip install --upgrade pipenv
