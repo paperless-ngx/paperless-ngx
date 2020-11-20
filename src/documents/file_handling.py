@@ -91,9 +91,9 @@ def generate_filename(document):
 
     # Always append the primary key to guarantee uniqueness of filename
     if len(path) > 0:
-        filename = "%s-%07i.%s" % (path, document.pk, document.file_type)
+        filename = "%s-%07i%s" % (path, document.pk, document.file_type)
     else:
-        filename = "%07i.%s" % (document.pk, document.file_type)
+        filename = "%07i%s" % (document.pk, document.file_type)
 
     # Append .gpg for encrypted files
     if document.storage_type == document.STORAGE_TYPE_GPG:

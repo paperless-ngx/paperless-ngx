@@ -50,7 +50,7 @@ class DocumentTypeAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
-    readonly_fields = ("added", "file_type", "storage_type", "filename")
+    readonly_fields = ("added", "mime_type", "storage_type", "filename")
     list_display = (
         "title",
         "created",
@@ -58,8 +58,7 @@ class DocumentAdmin(admin.ModelAdmin):
         "correspondent",
         "tags_",
         "archive_serial_number",
-        "document_type",
-        "filename"
+        "document_type"
     )
     list_filter = (
         "document_type",

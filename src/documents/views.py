@@ -104,18 +104,6 @@ class DocumentViewSet(RetrieveModelMixin,
         return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
     def file_response(self, pk, disposition):
-        # TODO: this should not be necessary here.
-        content_types = {
-            Document.TYPE_PDF: "application/pdf",
-            Document.TYPE_PNG: "image/png",
-            Document.TYPE_JPG: "image/jpeg",
-            Document.TYPE_GIF: "image/gif",
-            Document.TYPE_TIF: "image/tiff",
-            Document.TYPE_CSV: "text/csv",
-            Document.TYPE_MD: "text/markdown",
-            Document.TYPE_TXT: "text/plain"
-        }
-
         doc = Document.objects.get(id=pk)
 
         if doc.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
@@ -123,7 +111,7 @@ class DocumentViewSet(RetrieveModelMixin,
         else:
             file_handle = GnuPG.decrypted(doc.source_file)
 
-        response = HttpResponse(file_handle, content_type=content_types[doc.file_type])
+        response = HttpResponse(file_handle, content_type=doc.mime_type)
         response["Content-Disposition"] = '{}; filename="{}"'.format(
             disposition, doc.file_name)
         return response

@@ -437,6 +437,18 @@ class FaultyParser(DocumentParser):
         raise ParseError("Does not compute.")
 
 
+def fake_magic_from_file(file, mime=False):
+
+    if mime:
+        if os.path.splitext(file)[1] == ".pdf":
+            return "application/pdf"
+        else:
+            return "unknown"
+    else:
+        return "A verbose string that describes the contents of the file"
+
+
+@mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumer(TestCase):
 
     def make_dummy_parser(self, path, logging_group):
@@ -462,7 +474,7 @@ class TestConsumer(TestCase):
         m = patcher.start()
         m.return_value = [(None, {
             "parser": self.make_dummy_parser,
-            "test": lambda _: True,
+            "mime_types": ["application/pdf"],
             "weight": 0
         })]
 
@@ -592,7 +604,7 @@ class TestConsumer(TestCase):
     def testFaultyParser(self, m):
         m.return_value = [(None, {
             "parser": self.make_faulty_parser,
-            "test": lambda _: True,
+            "mime_types": ["application/pdf"],
             "weight": 0
         })]
 
