@@ -90,7 +90,7 @@ class RasterisedDocumentParser(DocumentParser):
             self._text = get_text_from_pdf(self.document_path)
             return self._text
 
-        self.progress_callback(0,1,"Making greyscale images.")
+        self.progress_callback(0, 1, "Making greyscale images.")
         images = self._get_greyscale()
 
         if not images:
