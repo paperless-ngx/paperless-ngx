@@ -10,10 +10,10 @@ Go to the project page on GitHub and download the
 `latest release <https://github.com/jonaswinkler/paperless-ng/releases>`_.
 There are multiple options available.
 
-*   Download the docker-compose files if you want to pull paperless from
+*   Download the dockerfiles archive if you want to pull paperless from
     Docker Hub.
 
-*   Download the archive and extract it if you want to build the docker image
+*   Download the dist archive and extract it if you want to build the docker image
     yourself or want to install paperless without docker.
 
 .. hint::
@@ -21,6 +21,15 @@ There are multiple options available.
     In contrast to paperless, the recommended way to get and update paperless-ng
     is not to pull the entire git repository. Paperless-ng includes artifacts
     that need to be compiled, and that's already done for you in the release.
+
+.. admonition:: Want to try out paperless-ng before migrating?
+
+    The release contains a file ``.env`` which sets the docker-compose project
+    name to "paperless", which is the same as before and instructs docker-compose
+    to reuse and upgrade your paperless volumes.
+
+    Just rename the project name in that file to anything else and docker-compose
+    will create fresh volumes for you!
 
 
 Overview of Paperless-ng
