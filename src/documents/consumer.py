@@ -223,9 +223,9 @@ class Consumer(LoggingMixin):
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
         except Exception as e:
-            raise ConsumerError(e)
-            self._send_progress(file, 100, 100, 'FAILED',
+            self._send_progress(self.filename, 100, 100, 'FAILED',
                                 "Failed: {}".format(e))
+            raise ConsumerError(e)
         finally:
             document_parser.cleanup()
 
@@ -234,7 +234,7 @@ class Consumer(LoggingMixin):
             "Document {} consumption finished".format(document)
         )
 
-        self._send_progress(file, 100, 100, 'SUCCESS',
+        self._send_progress(self.filename, 100, 100, 'SUCCESS',
                             'Finished.', document.id)
 
         return document
