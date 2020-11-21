@@ -28,43 +28,56 @@ api_router.register(r"tags", TagViewSet)
 
 
 urlpatterns = [
+    re_path(r"^api/", include([
+        re_path(r"^auth/",
+                include(('rest_framework.urls', 'rest_framework'),
+                        namespace="rest_framework")),
 
-    # API
-    re_path(r"^api/auth/", include(('rest_framework.urls', 'rest_framework'), namespace="rest_framework")),
-    re_path(r"^api/search/autocomplete/", SearchAutoCompleteView.as_view(), name="autocomplete"),
-    re_path(r"^api/search/", SearchView.as_view(), name="search"),
-    re_path(r"^api/statistics/", StatisticsView.as_view(), name="statistics"),
-    re_path(r"^api/", include((api_router.urls, 'drf'), namespace="drf")),
+        re_path(r"^search/autocomplete/",
+                SearchAutoCompleteView.as_view(),
+                name="autocomplete"),
 
-    # Favicon
+        re_path(r"^search/",
+                SearchView.as_view(),
+                name="search"),
+
+        re_path(r"^statistics/",
+                StatisticsView.as_view(),
+                name="statistics"),
+
+    ] + api_router.urls)),
+
     re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
 
-    # The Django admin
     re_path(r"admin/", admin.site.urls),
 
-    # These redirects are here to support clients that use the old FetchView.
-    re_path(
-        r"^fetch/doc/(?P<pk>\d+)$",
-        RedirectView.as_view(url='/api/documents/%(pk)s/download/'),
-    ),
-    re_path(
-        r"^fetch/thumb/(?P<pk>\d+)$",
-        RedirectView.as_view(url='/api/documents/%(pk)s/thumb/'),
-    ),
-    re_path(
-        r"^fetch/preview/(?P<pk>\d+)$",
-        RedirectView.as_view(url='/api/documents/%(pk)s/preview/'),
-    ),
-    re_path(r"^push$", csrf_exempt(RedirectView.as_view(url='/api/documents/post_document/'))),
+    re_path(r"^fetch/", include([
+        re_path(
+            r"^doc/(?P<pk>\d+)$",
+            RedirectView.as_view(url='/api/documents/%(pk)s/download/'),
+        ),
+        re_path(
+            r"^thumb/(?P<pk>\d+)$",
+            RedirectView.as_view(url='/api/documents/%(pk)s/thumb/'),
+        ),
+        re_path(
+            r"^preview/(?P<pk>\d+)$",
+            RedirectView.as_view(url='/api/documents/%(pk)s/preview/'),
+        ),
+    ])),
 
-    # Frontend assets TODO: this is pretty bad.
-    path('assets/<path:path>', RedirectView.as_view(url='/static/frontend/assets/%(path)s')),
+    re_path(r"^push$", csrf_exempt(
+        RedirectView.as_view(url='/api/documents/post_document/'))),
 
+    # Frontend assets TODO: this is pretty bad, but it works.
+    path('assets/<path:path>',
+         RedirectView.as_view(url='/static/frontend/assets/%(path)s')),
+
+    # login, logout
     path('accounts/', include('django.contrib.auth.urls')),
 
     # Root of the Frontent
     re_path(r".*", login_required(IndexView.as_view())),
-
 ]
 
 # Text in each page's <h1> (and above login form).
