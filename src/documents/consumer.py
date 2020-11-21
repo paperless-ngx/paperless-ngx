@@ -104,9 +104,11 @@ class Consumer(LoggingMixin):
 
         parser_class = get_parser_class_for_mime_type(mime_type)
         if not parser_class:
-            raise ConsumerError("No parsers abvailable for {}".format(self.filename))
+            raise ConsumerError(f"No parsers abvailable for {self.filename}")
         else:
-            self.log("debug", "Parser: {} based on mime type {}".format(parser_class.__name__, mime_type))
+            self.log("debug",
+                     f"Parser: {parser_class.__name__} "
+                     f"based on mime type {mime_type}")
 
         # Notify all listeners that we're going to do some work.
 
@@ -126,7 +128,7 @@ class Consumer(LoggingMixin):
         # Parse the document. This may take some time.
 
         try:
-            self.log("debug", "Generating thumbnail for {}...".format(self.filename))
+            self.log("debug", f"Generating thumbnail for {self.filename}...")
             thumbnail = document_parser.get_optimised_thumbnail()
             self.log("debug", "Parsing {}...".format(self.filename))
             text = document_parser.get_text()
@@ -244,10 +246,12 @@ class Consumer(LoggingMixin):
             document.title = self.override_title
 
         if self.override_correspondent_id:
-            document.correspondent = Correspondent.objects.get(pk=self.override_correspondent_id)
+            document.correspondent = Correspondent.objects.get(
+                pk=self.override_correspondent_id)
 
         if self.override_document_type_id:
-            document.document_type = DocumentType.objects.get(pk=self.override_document_type_id)
+            document.document_type = DocumentType.objects.get(
+                pk=self.override_document_type_id)
 
         if self.override_tag_ids:
             for tag_id in self.override_tag_ids:

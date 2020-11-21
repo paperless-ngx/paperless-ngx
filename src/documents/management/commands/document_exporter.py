@@ -63,7 +63,7 @@ class Command(Renderable, BaseCommand):
 
             document = document_map[document_dict["pk"]]
 
-            unique_filename = "{:07}_{}".format(document.pk, document.file_name)
+            unique_filename = f"{document.pk:07}_{document.file_name}"
 
             file_target = os.path.join(self.target, unique_filename)
 
@@ -73,7 +73,7 @@ class Command(Renderable, BaseCommand):
             document_dict[EXPORTER_FILE_NAME] = unique_filename
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
-            print("Exporting: {}".format(file_target))
+            print(f"Exporting: {file_target}")
 
             t = int(time.mktime(document.created.timetuple()))
             if document.storage_type == Document.STORAGE_TYPE_GPG:

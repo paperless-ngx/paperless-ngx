@@ -120,6 +120,7 @@ def query_page(ix, query, page):
 def autocomplete(ix, term, limit=10):
     with ix.reader() as reader:
         terms = []
-        for (score, t) in reader.most_distinctive_terms("content", limit, term.lower()):
+        for (score, t) in reader.most_distinctive_terms(
+                "content", number=limit, prefix=term.lower()):
             terms.append(t)
         return terms

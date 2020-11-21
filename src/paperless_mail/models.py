@@ -66,10 +66,14 @@ class MailRule(models.Model):
     CORRESPONDENT_FROM_CUSTOM = 4
 
     CORRESPONDENT_SELECTOR = (
-        (CORRESPONDENT_FROM_NOTHING, "Do not assign a correspondent"),
-        (CORRESPONDENT_FROM_EMAIL, "Use mail address"),
-        (CORRESPONDENT_FROM_NAME, "Use name (or mail address if not available)"),
-        (CORRESPONDENT_FROM_CUSTOM, "Use correspondent selected below")
+        (CORRESPONDENT_FROM_NOTHING,
+         "Do not assign a correspondent"),
+        (CORRESPONDENT_FROM_EMAIL,
+         "Use mail address"),
+        (CORRESPONDENT_FROM_NAME,
+         "Use name (or mail address if not available)"),
+        (CORRESPONDENT_FROM_CUSTOM,
+         "Use correspondent selected below")
     )
 
     name = models.CharField(max_length=256, unique=True)

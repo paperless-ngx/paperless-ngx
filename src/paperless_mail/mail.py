@@ -174,8 +174,8 @@ class MailAccountHandler(LoggingMixin):
                     M.folder.set(rule.folder)
                 except MailboxFolderSelectError:
                     raise MailError(
-                        f"Rule {rule.name}: Folder {rule.folder} does not exist "
-                        f"in account {account.name}")
+                        f"Rule {rule.name}: Folder {rule.folder} "
+                        f"does not exist in account {account.name}")
 
                 criterias = make_criterias(rule)
 
@@ -185,7 +185,8 @@ class MailAccountHandler(LoggingMixin):
                     f"{str(AND(**criterias))}")
 
                 try:
-                    messages = M.fetch(criteria=AND(**criterias), mark_seen=False)
+                    messages = M.fetch(criteria=AND(**criterias),
+                                       mark_seen=False)
                 except Exception:
                     raise MailError(
                         f"Rule {rule.name}: Error while fetching folder "
@@ -226,8 +227,8 @@ class MailAccountHandler(LoggingMixin):
 
                 except Exception:
                     raise MailError(
-                        f"Rule {rule.name}: Error while processing post-consume "
-                        f"actions for account {account.name}")
+                        f"Rule {rule.name}: Error while processing "
+                        f"post-consume actions for account {account.name}")
 
         return total_processed_files
 
@@ -266,7 +267,8 @@ class MailAccountHandler(LoggingMixin):
             if is_mime_type_supported(mime_type):
 
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-                _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)
+                _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-",
+                                                    dir=settings.SCRATCH_DIR)
                 with open(temp_filename, 'wb') as f:
                     f.write(att.payload)
 
