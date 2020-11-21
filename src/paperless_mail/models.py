@@ -78,6 +78,8 @@ class MailRule(models.Model):
 
     name = models.CharField(max_length=256, unique=True)
 
+    order = models.IntegerField(default=0)
+
     account = models.ForeignKey(
         MailAccount,
         related_name="rules",
