@@ -73,7 +73,18 @@ def get_parser_class(path):
     return get_parser_class_for_mime_type(mime_type)
 
 
-def run_convert(input_file, output_file, density=None, scale=None, alpha=None, strip=False, trim=False, type=None, depth=None, extra=None, logging_group=None):
+def run_convert(input_file,
+                output_file,
+                density=None,
+                scale=None,
+                alpha=None,
+                strip=False,
+                trim=False,
+                type=None,
+                depth=None,
+                extra=None,
+                logging_group=None):
+
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
@@ -102,10 +113,13 @@ def run_unpaper(pnm, logging_group=None):
     command_args = (settings.UNPAPER_BINARY, "--overwrite", "--quiet", pnm,
                     pnm_out)
 
-    logger.debug("Execute: " + " ".join(command_args), extra={'group': logging_group})
+    logger.debug(f"Execute: {' '.join(command_args)}",
+                 extra={'group': logging_group})
 
-    if not subprocess.Popen(command_args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait() == 0:
-        raise ParseError("Unpaper failed at {}".format(command_args))
+    if not subprocess.Popen(command_args,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL).wait() == 0:
+        raise ParseError(f"Unpaper failed at {command_args}")
 
     return pnm_out
 
@@ -124,7 +138,8 @@ class DocumentParser(LoggingMixin):
         super().__init__()
         self.logging_group = logging_group
         self.document_path = path
-        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        self.tempdir = tempfile.mkdtemp(
+            prefix="paperless-", dir=settings.SCRATCH_DIR)
 
     def get_thumbnail(self):
         """
@@ -137,9 +152,10 @@ class DocumentParser(LoggingMixin):
         if settings.OPTIMIZE_THUMBNAILS:
             out_path = os.path.join(self.tempdir, "optipng.png")
 
-            args = (settings.OPTIPNG_BINARY, "-silent", "-o5", in_path, "-out", out_path)
+            args = (settings.OPTIPNG_BINARY,
+                    "-silent", "-o5", in_path, "-out", out_path)
 
-            self.log('debug', 'Execute: ' + " ".join(args))
+            self.log('debug', f"Execute: {' '.join(args)}")
 
             if not subprocess.Popen(args).wait() == 0:
                 raise ParseError("Optipng failed at {}".format(args))

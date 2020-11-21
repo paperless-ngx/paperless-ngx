@@ -6,17 +6,23 @@ from documents.models import MatchingModel, Correspondent, DocumentType, Tag
 
 
 def match_correspondents(document_content, classifier):
-    correspondents = Correspondent.objects.all()
-    predicted_correspondent_id = classifier.predict_correspondent(document_content) if classifier else None
+    if classifier:
+        pred_id = classifier.predict_correspondent(document_content)
+    else:
+        pred_id = None
 
-    return [o for o in correspondents if matches(o, document_content) or o.pk == predicted_correspondent_id]
+    correspondents = Correspondent.objects.all()
+    return [o for o in correspondents if matches(o, document_content) or o.pk == pred_id]
 
 
 def match_document_types(document_content, classifier):
-    document_types = DocumentType.objects.all()
-    predicted_document_type_id = classifier.predict_document_type(document_content) if classifier else None
+    if classifier:
+        pred_id = classifier.predict_document_type(document_content)
+    else:
+        pred_id = None
 
-    return [o for o in document_types if matches(o, document_content) or o.pk == predicted_document_type_id]
+    document_types = DocumentType.objects.all()
+    return [o for o in document_types if matches(o, document_content) or o.pk == pred_id]
 
 
 def match_tags(document_content, classifier):

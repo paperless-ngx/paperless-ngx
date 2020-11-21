@@ -19,10 +19,13 @@ class Handler(FileSystemEventHandler):
     def _consume(self, file):
         if os.path.isfile(file):
             try:
-                async_task("documents.tasks.consume_file", file, task_name=os.path.basename(file))
+                async_task("documents.tasks.consume_file",
+                           file,
+                           task_name=os.path.basename(file))
             except Exception as e:
                 # Catch all so that the consumer won't crash.
-                logging.getLogger(__name__).error("Error while consuming document: {}".format(e))
+                logging.getLogger(__name__).error(
+                    "Error while consuming document: {}".format(e))
 
     def on_created(self, event):
         self._consume(event.src_path)
@@ -66,12 +69,14 @@ class Command(BaseCommand):
         # Consume all files as this is not done initially by the watchdog
         for entry in os.scandir(directory):
             if entry.is_file():
-                async_task("documents.tasks.consume_file", entry.path, task_name=os.path.basename(entry.path))
+                async_task("documents.tasks.consume_file",
+                           entry.path,
+                           task_name=os.path.basename(entry.path))
 
         # Start the watchdog. Woof!
         if settings.CONSUMER_POLLING > 0:
-            logging.getLogger(__name__).info('Using polling instead of file'
-                                             'system notifications.')
+            logging.getLogger(__name__).info(
+                "Using polling instead of file system notifications.")
             observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
         else:
             observer = Observer()

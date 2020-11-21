@@ -46,9 +46,14 @@ class UploadForm(forms.Form):
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
-        with tempfile.NamedTemporaryFile(prefix="paperless-upload-", dir=settings.SCRATCH_DIR, delete=False) as f:
+        with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
+                                         dir=settings.SCRATCH_DIR,
+                                         delete=False) as f:
 
             f.write(data)
             os.utime(f.name, times=(t, t))
 
-            async_task("documents.tasks.consume_file", f.name, override_filename=original_filename, task_name=os.path.basename(original_filename))
+            async_task("documents.tasks.consume_file",
+                       f.name,
+                       override_filename=original_filename,
+                       task_name=os.path.basename(original_filename))
