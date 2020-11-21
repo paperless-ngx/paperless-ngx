@@ -123,7 +123,7 @@ class RasterisedDocumentParser(DocumentParser):
                 ocr_pages = self._complete_ocr_default_language(
                     images, sample_page_index, sample_page_text)
 
-            elif not ISO639[guessed_language] in pyocr.get_available_tools()[0].get_available_languages():
+            elif not ISO639[guessed_language] in pyocr.get_available_tools()[0].get_available_languages():  # NOQA: E501
                 self.log(
                     "warning",
                     f"Detected language {guessed_language} is not available "

@@ -65,25 +65,24 @@ def many_to_dictionary(field):
     return mydictionary
 
 
-def generate_filename(document):
-    # Create filename based on configured format
+def generate_filename(doc):
     path = ""
 
     try:
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
             tags = defaultdict(lambda: slugify(None),
-                               many_to_dictionary(document.tags))
+                               many_to_dictionary(doc.tags))
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
-                correspondent=slugify(document.correspondent),
-                title=slugify(document.title),
-                created=slugify(document.created),
-                created_year=document.created.year if document.created else "none",
-                created_month=document.created.month if document.created else "none",
-                created_day=document.created.day if document.created else "none",
-                added=slugify(document.added),
-                added_year=document.added.year if document.added else "none",
-                added_month=document.added.month if document.added else "none",
-                added_day=document.added.day if document.added else "none",
+                correspondent=slugify(doc.correspondent),
+                title=slugify(doc.title),
+                created=slugify(doc.created),
+                created_year=doc.created.year if doc.created else "none",
+                created_month=doc.created.month if doc.created else "none",
+                created_day=doc.created.day if doc.created else "none",
+                added=slugify(doc.added),
+                added_year=doc.added.year if doc.added else "none",
+                added_month=doc.added.month if doc.added else "none",
+                added_day=doc.added.day if doc.added else "none",
                 tags=tags,
             )
     except (ValueError, KeyError, IndexError):
@@ -93,12 +92,12 @@ def generate_filename(document):
 
     # Always append the primary key to guarantee uniqueness of filename
     if len(path) > 0:
-        filename = "%s-%07i%s" % (path, document.pk, document.file_type)
+        filename = "%s-%07i%s" % (path, doc.pk, doc.file_type)
     else:
-        filename = "%07i%s" % (document.pk, document.file_type)
+        filename = "%07i%s" % (doc.pk, doc.file_type)
 
     # Append .gpg for encrypted files
-    if document.storage_type == document.STORAGE_TYPE_GPG:
+    if doc.storage_type == doc.STORAGE_TYPE_GPG:
         filename += ".gpg"
 
     return filename
