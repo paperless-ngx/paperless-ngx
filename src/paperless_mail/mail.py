@@ -161,7 +161,7 @@ class MailAccountHandler(LoggingMixin):
             self.log('debug', f"Account {account}: Processing "
                               f"{account.rules.count()} rule(s)")
 
-            for rule in account.rules.all():
+            for rule in account.rules.order_by('order'):
                 self.log(
                     'debug',
                     f"Account {account}: Processing rule {rule.name}")
