@@ -51,15 +51,16 @@ class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
     readonly_fields = ("added", "mime_type", "storage_type", "filename")
+
+    list_display_links = ("title",)
+
     list_display = (
-        "title",
-        "created",
-        "added",
         "correspondent",
+        "title",
         "tags_",
-        "archive_serial_number",
-        "document_type"
+        "created",
     )
+
     list_filter = (
         "document_type",
         "tags",
@@ -117,8 +118,18 @@ class DocumentAdmin(admin.ModelAdmin):
 
 class LogAdmin(admin.ModelAdmin):
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
     list_display = ("created", "message", "level",)
     list_filter = ("level", "created",)
+
+    ordering = ('-created',)
+
+    list_display_links = ("created", "message")
 
 
 admin.site.register(Correspondent, CorrespondentAdmin)

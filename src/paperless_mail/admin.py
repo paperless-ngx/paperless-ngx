@@ -11,7 +11,15 @@ class MailRuleAdmin(admin.ModelAdmin):
 
     list_filter = ("account",)
 
-    list_display = ("name", "account", "folder", "action")
+    list_display = ("order", "name", "account", "folder", "action")
+
+    list_editable = ("order", )
+
+    list_display_links = ("name", )
+
+    sortable_by = []
+
+    ordering = ["order"]
 
 
 admin.site.register(MailAccount, MailAccountAdmin)
