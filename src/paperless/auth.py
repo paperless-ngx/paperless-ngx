@@ -9,7 +9,7 @@ class AngularApiAuthenticationOverride(authentication.BaseAuthentication):
     """
 
     def authenticate(self, request):
-        if settings.DEBUG and 'Referer' in request.headers and request.headers['Referer'].startswith('http://localhost:4200/'):
+        if settings.DEBUG and 'Referer' in request.headers and request.headers['Referer'].startswith('http://localhost:4200/'):  # NOQA: E501
             user = User.objects.filter(is_staff=True).first()
             print("Auto-Login with user {}".format(user))
             return (user, None)
