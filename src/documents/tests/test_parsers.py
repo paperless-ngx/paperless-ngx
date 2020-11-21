@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from documents.parsers import get_parser_class
 
+
 def fake_magic_from_file(file, mime=False):
 
     if mime:
