@@ -15,7 +15,41 @@ map_uidgid() {
     fi
 }
 
+
+wait_for_postgres() {
+	attempt_num=1
+	max_attempts=5
+
+	echo "Waiting for PostgreSQL to start..."
+
+	host="${PAPERLESS_DBHOST}"
+
+	while !</dev/tcp/$host/5432 ;
+	do
+
+		if [ $attempt_num -eq $max_attempts ]
+		then
+			echo "Unable to connect to database."
+			exit 1
+		else
+			echo "Attempt $attempt_num failed! Trying again in 5 seconds..."
+
+		fi
+
+		attempt_num=$(expr "$attempt_num" + 1)
+		sleep 5
+	done
+
+
+}
+
+
 migrations() {
+
+	if [[ -n "${PAPERLESS_DBHOST}" ]]
+	then
+		wait_for_postgres
+	fi
 
 	(
 		# flock is in place to prevent multiple containers from doing migrations
