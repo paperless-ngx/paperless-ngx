@@ -66,6 +66,8 @@ Paperless consists of the following components:
         $ cd /path/to/paperless/src/
         $ pipenv run python3 manage.py document_consumer
 
+    .. _setup-task_processor:
+
 *   **The task processor:** Paperless relies on `Django Q <https://django-q.readthedocs.io/en/latest/>`_
     for doing much of the heavy lifting. This is a task queue that accepts tasks from
     multiple sources and processes tasks in parallel. It also comes with a scheduler that executes
@@ -86,7 +88,8 @@ Paperless consists of the following components:
     a modern multicore system, consumption with full ocr is blazing fast.
 
     The task processor comes with a built-in admin interface that you can use to see whenever any of the
-    tasks fail and inspect the errors.
+    tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
+    file, etc).
 
     You may start the task processor by executing:
 
@@ -249,15 +252,21 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     .. caution::
 
-        Make sure you also download the ``.env`` file. This will set the
-        project name for docker compose to ``paperless`` and then it will
-        automatically reuse your existing paperless volumes.
+        The release include a ``.env`` file. This will set the
+        project name for docker compose to ``paperless`` so that paperless-ng will
+        automatically reuse your existing paperless volumes. When you start it, it
+        will migrate your existing data. After that, your old paperless installation
+        will be incompatible with the migrated volumes.
 
-4.  Adjust ``docker-compose.yml`` and
+4.  Copy the ``docker-compose.sqlite.yml`` file to ``docker-compose.yml``.
+    If you want to migrate to PostgreSQL, do that after you migrated your existing
+    SQLite database.
+
+5.  Adjust ``docker-compose.yml`` and
     ``docker-compose.env`` to your needs.
-    See `docker route`_ for details on which edits are required.
+    See `docker route`_ for details on which edits are advised.
 
-5.  Start paperless-ng.
+6.  Start paperless-ng.
 
     .. code:: bash
 
@@ -273,19 +282,80 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     This will run paperless in the background and automatically start it on system boot.
 
-6.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
+7.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
     redirect is still in place and prevents access to the new UI. Clear
-    everything related to paperless in your browsers data in order to fix
-    this issue.
+    browsing cache in order to fix this.
+
+8.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
 
 
 .. _setup-sqlite_to_psql:
 
-Moving data from sqlite to postgresql
+Moving data from SQLite to PostgreSQL
 =====================================
 
-.. warning::
+Moving your data from SQLite to PostgreSQL is done via executing a series of django
+management commands as below.
 
-    TBD.
+.. caution::
+
+    Make sure that your sqlite database is migrated to the latest version.
+    Starting paperless will make sure that this is the case. If your try to
+    load data from an old database schema in SQLite into a newer database
+    schema in PostgreSQL, you will run into trouble.
+
+1.  Stop paperless, if it is running.
+2.  Tell paperless to use PostgreSQL:
+
+    a)  With docker, copy the provided ``docker-compose.postgres.yml`` file to
+        ``docker-compose.yml``. Remember to adjust the consumption directory,
+        if necessary.
+    b)  Without docker, configure the database in your ``paperless.conf`` file.
+        See :ref:`configuration` for details.
+
+3.  Open a shell and initialize the database:
+
+    a)  With docker, run the following command to open a shell within the paperless
+        container:
+
+        .. code:: shell-session
+
+            $ cd /path/to/paperless
+            $ docker-compose run --rm webserver /bin/bash
+        
+        This will lauch the container and initialize the PostgreSQL database.
+    
+    b)  Without docker, open a shell in your virtual environment, switch to
+        the ``src`` directory and create the database schema:
+
+        .. code:: shell-session
+
+            $ cd /path/to/paperless
+            $ pipenv shell
+            $ cd src
+            $ python3 manage.py migrate
+        
+        This will not copy any data yet.
+
+4.  Dump your data from SQLite:
+
+    .. code:: shell-session
+
+        $ python3 manage.py dumpdata --database=sqlite --exclude=contenttypes --exclude=auth.Permission > data.json
+    
+5.  Load your data into PostgreSQL:
+
+    .. code:: shell-session
+
+        $ python3 manage.py loaddata data.json
+
+6.  Exit the shell.
+
+    .. code:: shell-session
+
+        $ exit
+
+7.  Start paperless.
+
 
 .. _redis: https://redis.io/
