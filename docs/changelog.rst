@@ -17,6 +17,9 @@ next
   content type was not set correctly. (i.e. PDF documents with
   content type ``application/octet-stream``)
 
+* Docker entrypoint script awaits the database server if it is
+  configured.
+
 
 paperless-ng 0.9.1
 ##################
