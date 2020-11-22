@@ -9,7 +9,7 @@ import { ToastService } from 'src/app/services/toast.service';
 @Component({
   selector: 'app-tag-edit-dialog',
   templateUrl: './tag-edit-dialog.component.html',
-  styleUrls: ['./tag-edit-dialog.component.css']
+  styleUrls: ['./tag-edit-dialog.component.scss']
 })
 export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
 
