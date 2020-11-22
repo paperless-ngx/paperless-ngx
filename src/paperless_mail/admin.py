@@ -20,24 +20,36 @@ class MailRuleAdmin(admin.ModelAdmin):
             'fields': ('name', 'order', 'account', 'folder')
         }),
         ("Filter", {
-            'description': "Paperless will only process mails that match ALL "
-                           "of the filters given below.",
-            'fields': ('filter_from', 'filter_subject', 'filter_body', 'maximum_age')
+            'description':
+                "Paperless will only process mails that match ALL of the "
+                "filters given below.",
+            'fields':
+                ('filter_from',
+                 'filter_subject',
+                 'filter_body',
+                 'maximum_age')
         }),
         ("Actions", {
-            'description': "The action applied to the mail. This action is "
-                           "only performed when documents were consumed from "
-                           "the mail. Mails without attachments will remain "
-                           "entirely untouched.",
-            'fields': ('action', 'action_parameter')
+            'description':
+                "The action applied to the mail. This action is only "
+                "performed when documents were consumed from the mail. Mails "
+                "without attachments will remain entirely untouched.",
+            'fields': (
+                'action',
+                'action_parameter')
         }),
         ("Metadata", {
-            'description': "Assign metadata to documents consumed from this "
-                           "rule automatically. If you do not assign tags, "
-                           "types or correspondents here, paperless will "
-                           "still process all matching rules that you have "
-                           "defined.",
-            "fields": ('assign_title_from', 'assign_tag', 'assign_document_type', 'assign_correspondent_from', 'assign_correspondent')
+            'description':
+                "Assign metadata to documents consumed from this rule "
+                "automatically. If you do not assign tags, types or "
+                "correspondents here, paperless will still process all "
+                "matching rules that you have defined.",
+            "fields": (
+                'assign_title_from',
+                'assign_tag',
+                'assign_document_type',
+                'assign_correspondent_from',
+                'assign_correspondent')
         })
     )
 
