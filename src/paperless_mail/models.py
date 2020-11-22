@@ -46,10 +46,10 @@ class MailRule(models.Model):
     ACTION_FLAG = 4
 
     ACTIONS = (
-        (ACTION_DELETE, "Delete"),
-        (ACTION_MOVE, "Move to specified folder"),
         (ACTION_MARK_READ, "Mark as read, don't process read mails"),
-        (ACTION_FLAG, "Flag the mail, don't process flagged mails")
+        (ACTION_FLAG, "Flag the mail, don't process flagged mails"),
+        (ACTION_MOVE, "Move to specified folder"),
+        (ACTION_DELETE, "Delete"),
     )
 
     TITLE_FROM_SUBJECT = 1
@@ -92,15 +92,13 @@ class MailRule(models.Model):
     filter_subject = models.CharField(max_length=256, null=True, blank=True)
     filter_body = models.CharField(max_length=256, null=True, blank=True)
 
-    maximum_age = models.PositiveIntegerField(default=30)
+    maximum_age = models.PositiveIntegerField(
+        default=30,
+        help_text="Specified in days.")
 
     action = models.PositiveIntegerField(
         choices=ACTIONS,
         default=ACTION_MARK_READ,
-        help_text="The action applied to the mail. This action is only "
-                  "performed when documents were consumed from the mail. "
-                  "Mails without attachments will remain entirely "
-                  "untouched."
     )
 
     action_parameter = models.CharField(
