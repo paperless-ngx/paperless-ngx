@@ -1,9 +1,15 @@
 <div class="col p-2 h-100" style="width: 16rem;">
   <div class="card h-100">
-    <img [src]="getThumbUrl()" class="card-img-top doc-img border-bottom" style="height: 200px;"/>
+    <div class=" border-bottom doc-img pr-1" [ngStyle]="{'background-image': 'url(' + getThumbUrl() + ')'}">
+      <div class="row" *ngFor="let t of document.tags">
+        <app-tag [tag]="t" class="col text-right"></app-tag>
+      </div>
+    </div>
+
+    
     <div class="card-body p-2">
       <p class="card-title" *ngIf="document.correspondent">{{document.correspondent.name}}</p>
-      <p class="card-text">{{document.title}} <app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></p>
+      <p class="card-text">{{document.title}}</p>
     </div>
     <div class="card-footer">
 
