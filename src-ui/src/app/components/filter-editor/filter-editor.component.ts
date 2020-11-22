@@ -12,7 +12,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
 @Component({
   selector: 'app-filter-editor',
   templateUrl: './filter-editor.component.html',
-  styleUrls: ['./filter-editor.component.css']
+  styleUrls: ['./filter-editor.component.scss']
 })
 export class FilterEditorComponent implements OnInit {
 
