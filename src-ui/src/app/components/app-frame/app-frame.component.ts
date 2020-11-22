@@ -25,6 +25,8 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     ) {
   }
 
+  isMenuCollapsed: boolean = true
+
   searchField = new FormControl('')
 
   openDocuments: PaperlessDocument[] = []
