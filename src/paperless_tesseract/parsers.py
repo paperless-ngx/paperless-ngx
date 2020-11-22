@@ -147,18 +147,25 @@ class RasterisedDocumentParser(DocumentParser):
         Greyscale images are easier for Tesseract to OCR
         """
 
+        # Convert PDF to multiple PNMs
+        input_file = self.document_path
+
+        if settings.OCR_PAGES == 1:
+            input_file += "[0]"
+        elif settings.OCR_PAGES > 1:
+            input_file += f"[0-{settings.OCR_PAGES - 1}]"
+
         self.log(
             "debug",
-            f"Converting document {self.document_path} into greyscale images")
+            f"Converting document {input_file} into greyscale images")
 
-        # Convert PDF to multiple PNMs
-        pnm = os.path.join(self.tempdir, "convert-%04d.pnm")
+        output_files = os.path.join(self.tempdir, "convert-%04d.pnm")
 
         run_convert(density=settings.CONVERT_DENSITY,
                     depth="8",
                     type="grayscale",
-                    input_file=self.document_path,
-                    output_file=pnm,
+                    input_file=input_file,
+                    output_file=output_files,
                     logging_group=self.logging_group)
 
         # Get a list of converted images

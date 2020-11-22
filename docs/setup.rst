@@ -358,4 +358,30 @@ management commands as below.
 7.  Start paperless.
 
 
+Considerations for less powerful devices
+########################################
+
+Paperless runs on Raspberry Pi. However, some things are rather slow on the Pi and 
+configuring some options in paperless can help improve performance immensely:
+
+*   Consider setting ``PAPERLESS_OCR_PAGES`` to 1, so that paperless will only OCR
+    the first page of your documents.
+*   ``PAPERLESS_TASK_WORKERS`` and ``PAPERLESS_THREADS_PER_WORKER`` are configured
+    to use all cores. The Raspberry Pi models 3 and up have 4 cores, meaning that
+    paperless will use 2 workers and 2 threads per worker. This may result in
+    slugish response times during consumption, so you might want to lower these
+    settings (example: 2 workers and 1 thread to always have some computing power
+    left for other tasks).
+*   Keep ``PAPERLESS_OCR_ALWAYS`` at its default value 'false' and consider OCR'ing
+    your documents before feeding them into paperless. Some scanners are able to
+    do this!
+*   Lower ``PAPERLESS_CONVERT_DENSITY`` from its default value 300 to 200. This
+    will still result in rather accurate OCR, but will decrease consumption time
+    by quite a bit.
+*   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
+    times. Thumbnails will be about 20% larger.
+
+For details, refer to :ref:`configuration`.
+
+
 .. _redis: https://redis.io/

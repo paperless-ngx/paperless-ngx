@@ -322,6 +322,8 @@ CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES
 
 OPTIMIZE_THUMBNAILS = __get_boolean("PAPERLESS_OPTIMIZE_THUMBNAILS", "true")
 
+OCR_PAGES = int(os.getenv('PAPERLESS_OCR_PAGES', 0))
+
 # The default language that tesseract will attempt to use when parsing
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
