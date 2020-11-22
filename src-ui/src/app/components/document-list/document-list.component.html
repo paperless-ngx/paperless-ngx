@@ -101,8 +101,9 @@
   </tbody>
 </table>
 
-<div class="row justify-content-left" *ngIf="displayMode == 'smallCards'">
-  <app-document-card-small [document]="d" *ngFor="let d of docs.documents"></app-document-card-small>
+
+<div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
+  <app-document-card-small [document]="d" *ngFor="let d of docs.documents"></app-document-card-small>    
 </div>
 
 <p *ngIf="docs.documents.length == 0" class="mx-auto">No results</p>
