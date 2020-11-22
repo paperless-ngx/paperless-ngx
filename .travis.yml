@@ -13,7 +13,6 @@ matrix:
 
     - name: "Documentation"
       before_install: true
-      install: true
       script:
         - cd docs/
         - make html
@@ -22,7 +21,7 @@ matrix:
     - name: "Front end"
       language: node_js
       node_js:
-        - 6
+        - 15
       before_install: true
       install:
         - cd src-ui/
