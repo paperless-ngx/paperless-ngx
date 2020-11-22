@@ -358,6 +358,9 @@ management commands as below.
 7.  Start paperless.
 
 
+.. _setup-less_powerful_devices:
+
+
 Considerations for less powerful devices
 ########################################
 
@@ -382,6 +385,19 @@ configuring some options in paperless can help improve performance immensely:
     times. Thumbnails will be about 20% larger.
 
 For details, refer to :ref:`configuration`.
+
+.. note::
+    
+    Updating the :ref:`automatic matching algorithm <advanced-automatic_matching>`
+    takes quite a bit of time. However, the update mechanism checks if your
+    data has changed before doing the heavy lifting. If you experience the 
+    algorithm taking too much cpu time, consider changing the schedule in the
+    admin interface to daily. You can also manually invoke the task
+    by changing the date and time of the next run to today/now.
+
+    The actual matching of the algorithm is fast and works on Raspberry Pi as 
+    well as on any other device.
+
 
 
 .. _redis: https://redis.io/

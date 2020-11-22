@@ -43,21 +43,8 @@ in your browser and paperless has to do much less work to serve the data.
 
 .. note::
     
-    Consider setting ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to false to speed up
-    the consumption process. This takes quite a bit of time on Raspberry Pi.
-
-.. note::
-    
-    Updating the :ref:`automatic matching algorithm <advanced-automatic_matching>`
-    takes quite a bit of time. However, the update mechanism checks if your
-    data has changed before doing the heavy lifting. If you experience the 
-    algorithm taking too much cpu time, consider changing the schedule in the
-    admin interface to daily or weekly. You can also manually invoke the task
-    by changing the date and time of the next run to today/now.
-
-    The actual matching of the algorithm is fast and works on Raspberry Pi as 
-    well as on any other device.
-
+    You can adjust some of the settings so that paperless uses less processing
+    power. See :ref:`setup-less_powerful_devices` for details.
     
 
 **Q:** *How do I install paperless-ng on Raspberry Pi?*
