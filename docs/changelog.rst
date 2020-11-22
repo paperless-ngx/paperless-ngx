@@ -38,7 +38,17 @@ paperless-ng 0.9.2
 paperless-ng 0.9.1
 ##################
 
-* Moved documentation of the settings VG271UP
+* Moved documentation of the settings to the actual documentation.
+* Updated release script to force the user to choose between SQLite
+  and PostgreSQL. This avoids confusion when upgrading from paperless.
+
+
+paperless-ng 0.9.0
+##################
+
+* **Deprecated:** GnuPG. :ref:`See this note on the state of GnuPG in paperless-ng. <utilities-encyption>`
+  This features will most likely be removed in future versions.
+
 * **Added:** New frontend. Features:
 
   * Single page application: It's much more responsive than the django admin pages.
