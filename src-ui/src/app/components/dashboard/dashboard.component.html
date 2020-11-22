@@ -62,8 +62,14 @@
       </div>
       <div class="card-body text-dark">
         <form>
-          <ngx-file-drop dropZoneLabel="Drop documents here" (onFileDrop)="dropped($event)"
-            (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light mt-4 card">
+          <ngx-file-drop 
+            dropZoneLabel="Drop documents here or" (onFileDrop)="dropped($event)"
+            (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)"
+            dropZoneClassName="bg-light mt-4 card"
+            multiple="true"
+            contentClassName="justify-content-center d-flex align-items-center p-5"
+            [showBrowseBtn]=true
+            browseBtnClassName="btn btn-sm btn-outline-primary ml-2">
 
           </ngx-file-drop>
         </form>
