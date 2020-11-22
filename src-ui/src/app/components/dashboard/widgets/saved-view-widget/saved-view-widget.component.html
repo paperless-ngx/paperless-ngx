@@ -1,16 +1,18 @@
-<h4>{{viewConfig.title}}</h4>
+<app-widget-frame [title]="savedView.title">
 
-<table class="table table-sm table-hover table-borderless">
-  <thead>
-  <tr>
-    <th>Date created</th>
-    <th scope="col">Document</th>
-  </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let doc of documents" routerLink="/documents/{{doc.id}}">
-      <td>{{doc.created | date}}</td>
-      <td>{{doc.title}}<app-tag [tag]="t" *ngFor="let t of doc.tags" class="ml-1"></app-tag>
-    </tr>
-  </tbody>
-</table>
+  <table class="table table-sm table-hover table-borderless">
+    <thead>
+      <tr>
+        <th>Created</th>
+        <th scope="col">Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let doc of documents" routerLink="/documents/{{doc.id}}">
+        <td>{{doc.created | date}}</td>
+        <td>{{doc.title}}<app-tag [tag]="t" *ngFor="let t of doc.tags" class="ml-1"></app-tag>
+      </tr>
+    </tbody>
+  </table>
+
+</app-widget-frame>

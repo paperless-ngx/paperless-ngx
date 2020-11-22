@@ -6,25 +6,42 @@ from documents.models import MatchingModel, Correspondent, DocumentType, Tag
 
 
 def match_correspondents(document_content, classifier):
-    correspondents = Correspondent.objects.all()
-    predicted_correspondent_id = classifier.predict_correspondent(document_content) if classifier else None
+    if classifier:
+        pred_id = classifier.predict_correspondent(document_content)
+    else:
+        pred_id = None
 
-    return [o for o in correspondents if matches(o, document_content) or o.pk == predicted_correspondent_id]
+    correspondents = Correspondent.objects.all()
+
+    return list(filter(
+        lambda o: matches(o, document_content) or o.pk == pred_id,
+        correspondents))
 
 
 def match_document_types(document_content, classifier):
-    document_types = DocumentType.objects.all()
-    predicted_document_type_id = classifier.predict_document_type(document_content) if classifier else None
+    if classifier:
+        pred_id = classifier.predict_document_type(document_content)
+    else:
+        pred_id = None
 
-    return [o for o in document_types if matches(o, document_content) or o.pk == predicted_document_type_id]
+    document_types = DocumentType.objects.all()
+
+    return list(filter(
+        lambda o: matches(o, document_content) or o.pk == pred_id,
+        document_types))
 
 
 def match_tags(document_content, classifier):
-    objects = Tag.objects.all()
-    predicted_tag_ids = classifier.predict_tags(document_content) if classifier else []
+    if classifier:
+        predicted_tag_ids = classifier.predict_tags(document_content)
+    else:
+        predicted_tag_ids = []
 
-    matched_tags = [o for o in objects if matches(o, document_content) or o.pk in predicted_tag_ids]
-    return matched_tags
+    tags = Tag.objects.all()
+
+    return list(filter(
+        lambda o: matches(o, document_content) or o.pk in predicted_tag_ids,
+        tags))
 
 
 def matches(matching_model, document_content):
@@ -42,39 +59,45 @@ def matches(matching_model, document_content):
     if matching_model.matching_algorithm == MatchingModel.MATCH_ALL:
         for word in _split_match(matching_model):
             search_result = re.search(
-                r"\b{}\b".format(word), document_content, **search_kwargs)
+                rf"\b{word}\b", document_content, **search_kwargs)
             if not search_result:
                 return False
         return True
 
-    if matching_model.matching_algorithm == MatchingModel.MATCH_ANY:
+    elif matching_model.matching_algorithm == MatchingModel.MATCH_ANY:
         for word in _split_match(matching_model):
-            if re.search(r"\b{}\b".format(word), document_content, **search_kwargs):
+            if re.search(rf"\b{word}\b", document_content, **search_kwargs):
                 return True
         return False
 
-    if matching_model.matching_algorithm == MatchingModel.MATCH_LITERAL:
+    elif matching_model.matching_algorithm == MatchingModel.MATCH_LITERAL:
         return bool(re.search(
-            r"\b{}\b".format(matching_model.match), document_content, **search_kwargs))
+            rf"\b{matching_model.match}\b",
+            document_content,
+            **search_kwargs
+        ))
 
-    if matching_model.matching_algorithm == MatchingModel.MATCH_REGEX:
+    elif matching_model.matching_algorithm == MatchingModel.MATCH_REGEX:
         return bool(re.search(
-            re.compile(matching_model.match, **search_kwargs), document_content))
+            re.compile(matching_model.match, **search_kwargs),
+            document_content
+        ))
 
-    if matching_model.matching_algorithm == MatchingModel.MATCH_FUZZY:
+    elif matching_model.matching_algorithm == MatchingModel.MATCH_FUZZY:
         match = re.sub(r'[^\w\s]', '', matching_model.match)
         text = re.sub(r'[^\w\s]', '', document_content)
         if matching_model.is_insensitive:
             match = match.lower()
             text = text.lower()
 
-        return True if fuzz.partial_ratio(match, text) >= 90 else False
+        return fuzz.partial_ratio(match, text) >= 90
 
-    if matching_model.matching_algorithm == MatchingModel.MATCH_AUTO:
+    elif matching_model.matching_algorithm == MatchingModel.MATCH_AUTO:
         # this is done elsewhere.
         return False
 
-    raise NotImplementedError("Unsupported matching algorithm")
+    else:
+        raise NotImplementedError("Unsupported matching algorithm")
 
 
 def _split_match(matching_model):

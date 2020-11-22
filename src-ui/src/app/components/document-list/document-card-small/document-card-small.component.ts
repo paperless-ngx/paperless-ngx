@@ -5,7 +5,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 @Component({
   selector: 'app-document-card-small',
   templateUrl: './document-card-small.component.html',
-  styleUrls: ['./document-card-small.component.css']
+  styleUrls: ['./document-card-small.component.scss']
 })
 export class DocumentCardSmallComponent implements OnInit {
 

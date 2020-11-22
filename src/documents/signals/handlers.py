@@ -25,11 +25,18 @@ def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
     document.tags.add(*inbox_tags)
 
 
-def set_correspondent(sender, document=None, logging_group=None, classifier=None, replace=False, use_first=True, **kwargs):
+def set_correspondent(sender,
+                      document=None,
+                      logging_group=None,
+                      classifier=None,
+                      replace=False,
+                      use_first=True,
+                      **kwargs):
     if document.correspondent and not replace:
         return
 
-    potential_correspondents = matching.match_correspondents(document.content, classifier)
+    potential_correspondents = matching.match_correspondents(document.content,
+                                                             classifier)
 
     potential_count = len(potential_correspondents)
     if potential_correspondents:
@@ -38,22 +45,22 @@ def set_correspondent(sender, document=None, logging_group=None, classifier=None
         selected = None
     if potential_count > 1:
         if use_first:
-            message = "Detected {} potential correspondents, so we've opted for {}"
             logger(
-                message.format(potential_count, selected),
+                f"Detected {potential_count} potential correspondents, "
+                f"so we've opted for {selected}",
                 logging_group
             )
         else:
-            message = "Detected {} potential correspondents, not assigning any correspondent"
             logger(
-                message.format(potential_count),
+                f"Detected {potential_count} potential correspondents, "
+                f"not assigning any correspondent",
                 logging_group
             )
             return
 
     if selected or replace:
         logger(
-            'Assigning correspondent "{}" to "{}" '.format(selected, document),
+            f"Assigning correspondent {selected} to {document}",
             logging_group
         )
 
@@ -61,11 +68,18 @@ def set_correspondent(sender, document=None, logging_group=None, classifier=None
         document.save(update_fields=("correspondent",))
 
 
-def set_document_type(sender, document=None, logging_group=None, classifier=None, replace=False, use_first=True, **kwargs):
+def set_document_type(sender,
+                      document=None,
+                      logging_group=None,
+                      classifier=None,
+                      replace=False,
+                      use_first=True,
+                      **kwargs):
     if document.document_type and not replace:
         return
 
-    potential_document_type = matching.match_document_types(document.content, classifier)
+    potential_document_type = matching.match_document_types(document.content,
+                                                            classifier)
 
     potential_count = len(potential_document_type)
     if potential_document_type:
@@ -75,22 +89,22 @@ def set_document_type(sender, document=None, logging_group=None, classifier=None
 
     if potential_count > 1:
         if use_first:
-            message = "Detected {} potential document types, so we've opted for {}"
             logger(
-                message.format(potential_count, selected),
+                f"Detected {potential_count} potential document types, "
+                f"so we've opted for {selected}",
                 logging_group
             )
         else:
-            message = "Detected {} potential document types, not assigning any document type"
             logger(
-                message.format(potential_count),
+                f"Detected {potential_count} potential document types, "
+                f"not assigning any document type",
                 logging_group
             )
             return
 
     if selected or replace:
         logger(
-            'Assigning document type "{}" to "{}" '.format(selected, document),
+            f"Assigning document type {selected} to {document}",
             logging_group
         )
 
@@ -98,14 +112,21 @@ def set_document_type(sender, document=None, logging_group=None, classifier=None
         document.save(update_fields=("document_type",))
 
 
-def set_tags(sender, document=None, logging_group=None, classifier=None, replace=False, **kwargs):
+def set_tags(sender,
+             document=None,
+             logging_group=None,
+             classifier=None,
+             replace=False,
+             **kwargs):
     if replace:
         document.tags.clear()
         current_tags = set([])
     else:
         current_tags = set(document.tags.all())
 
-    relevant_tags = set(matching.match_tags(document.content, classifier)) - current_tags
+    matched_tags = matching.match_tags(document.content, classifier)
+
+    relevant_tags = set(matched_tags) - current_tags
 
     if not relevant_tags:
         return
@@ -180,12 +201,15 @@ def update_filename_and_move_files(sender, instance, **kwargs):
 
     if not os.path.isfile(old_path):
         # Can't do anything if the old file does not exist anymore.
-        logging.getLogger(__name__).fatal('Document {}: File {} has gone.'.format(str(instance), old_path))
+        logging.getLogger(__name__).fatal(
+            f"Document {str(instance)}: File {old_path} has gone.")
         return
 
     if os.path.isfile(new_path):
         # Can't do anything if the new file already exists. Skip updating file.
-        logging.getLogger(__name__).warning('Document {}: Cannot rename file since target path {} already exists.'.format(str(instance), new_path))
+        logging.getLogger(__name__).warning(
+            f"Document {str(instance)}: Cannot rename file "
+            f"since target path {new_path} already exists.")
         return
 
     create_source_path_directory(new_path)

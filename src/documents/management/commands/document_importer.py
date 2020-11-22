@@ -120,7 +120,7 @@ class Command(Renderable, BaseCommand):
                         encrypted.write(GnuPG.encrypted(unencrypted))
 
             else:
-                print("Moving {} to {}".format(document_path, document.source_path))
+                print(f"Moving {document_path} to {document.source_path}")
                 shutil.copy(document_path, document.source_path)
                 shutil.copy(thumbnail_path, document.thumbnail_path)
 

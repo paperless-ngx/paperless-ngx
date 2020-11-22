@@ -8,10 +8,11 @@ export interface Statistics {
   documents_inbox?: number
 }
 
+
 @Component({
   selector: 'app-statistics-widget',
   templateUrl: './statistics-widget.component.html',
-  styleUrls: ['./statistics-widget.component.css']
+  styleUrls: ['./statistics-widget.component.scss']
 })
 export class StatisticsWidgetComponent implements OnInit {
 
@@ -19,14 +20,14 @@ export class StatisticsWidgetComponent implements OnInit {
 
   statistics: Statistics = {}
 
+  getStatistics(): Observable<Statistics> {
+    return this.http.get(`${environment.apiBaseUrl}statistics/`)
+  }
+
   ngOnInit(): void {
     this.getStatistics().subscribe(statistics => {
       this.statistics = statistics
     })
-  }
-
-  getStatistics(): Observable<Statistics> {
-    return this.http.get(`${environment.apiBaseUrl}statistics/`)
   }
 
 }
