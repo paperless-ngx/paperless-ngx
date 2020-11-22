@@ -29,6 +29,8 @@ next
 * New setting ``PAPERLESS_OCR_PAGES`` limits the tesseract parser
   to the first n pages of scanned documents.
 
+* Fixed a bug where tasks with too long task names would not show 
+  up in the admin.
 
 paperless-ng 0.9.1
 ##################
