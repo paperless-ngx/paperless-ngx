@@ -286,7 +286,7 @@ class MailAccountHandler(LoggingMixin):
                     override_correspondent_id=correspondent.id if correspondent else None,  # NOQA: E501
                     override_document_type_id=doc_type.id if doc_type else None,  # NOQA: E501
                     override_tag_ids=[tag.id] if tag else None,
-                    task_name=f"Mail: {att.filename}"
+                    task_name=att.filename[:100]
                 )
 
                 processed_attachments += 1

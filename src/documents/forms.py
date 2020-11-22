@@ -56,4 +56,4 @@ class UploadForm(forms.Form):
             async_task("documents.tasks.consume_file",
                        f.name,
                        override_filename=original_filename,
-                       task_name=os.path.basename(original_filename))
+                       task_name=os.path.basename(original_filename)[:100])
