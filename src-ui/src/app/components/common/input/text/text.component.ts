@@ -11,7 +11,7 @@ import { AbstractInputComponent } from '../abstract-input';
   }],
   selector: 'app-input-text',
   templateUrl: './text.component.html',
-  styleUrls: ['./text.component.css']
+  styleUrls: ['./text.component.scss']
 })
 export class TextComponent extends AbstractInputComponent<string> {
 

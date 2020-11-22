@@ -5,6 +5,33 @@
 Changelog
 *********
 
+next
+####
+
+* Paperless now uses mime types and libmagic detection to determine
+  if a file type is supported and which parser to use. Removes all
+  file type checks that where present in MANY different places in
+  paperless.
+
+* Mail consumer now correctly consumes documents even when their
+  content type was not set correctly. (i.e. PDF documents with
+  content type ``application/octet-stream``)
+
+* Docker entrypoint script awaits the database server if it is
+  configured.
+
+* Basic sorting of mail rules added.
+
+* Disabled editing of logs.
+
+* Much better admin for mail rule editing.
+
+* New setting ``PAPERLESS_OCR_PAGES`` limits the tesseract parser
+  to the first n pages of scanned documents.
+
+* Fixed a bug where tasks with too long task names would not show 
+  up in the admin.
+
 paperless-ng 0.9.1
 ##################
 

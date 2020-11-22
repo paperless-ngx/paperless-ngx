@@ -17,6 +17,7 @@ PAPERLESS_ROOT=$(git rev-parse --show-toplevel)
 # output directory
 PAPERLESS_DIST="$PAPERLESS_ROOT/dist"
 PAPERLESS_DIST_APP="$PAPERLESS_DIST/paperless-ng"
+PAPERLESS_DIST_DOCKERFILES="$PAPERLESS_DIST/paperless-ng-dockerfiles"
 
 if [ -d "$PAPERLESS_DIST" ]
 then
@@ -27,6 +28,7 @@ fi
 mkdir "$PAPERLESS_DIST"
 mkdir "$PAPERLESS_DIST_APP"
 mkdir "$PAPERLESS_DIST_APP/docker"
+mkdir "$PAPERLESS_DIST_DOCKERFILES"
 
 # setup dependencies.
 
@@ -78,9 +80,9 @@ cp "$PAPERLESS_ROOT/docker/local/"* "$PAPERLESS_DIST_APP"
 cp "$PAPERLESS_ROOT/docker/docker-compose.env" "$PAPERLESS_DIST_APP"
 
 # docker files for pulling from docker hub
-cp "$PAPERLESS_ROOT/docker/hub/"* "$PAPERLESS_DIST"
-cp "$PAPERLESS_ROOT/.env" "$PAPERLESS_DIST"
-cp "$PAPERLESS_ROOT/docker/docker-compose.env" "$PAPERLESS_DIST"
+cp "$PAPERLESS_ROOT/docker/hub/"* "$PAPERLESS_DIST_DOCKERFILES"
+cp "$PAPERLESS_ROOT/.env" "$PAPERLESS_DIST_DOCKERFILES"
+cp "$PAPERLESS_ROOT/docker/docker-compose.env" "$PAPERLESS_DIST_DOCKERFILES"
 
 # auxiliary files required for the docker image
 cp "$PAPERLESS_ROOT/docker/docker-entrypoint.sh" "$PAPERLESS_DIST_APP/docker/"
@@ -99,3 +101,4 @@ docker build . -t "jonaswinkler/paperless-ng:$VERSION"
 cd "$PAPERLESS_DIST"
 
 tar -cJf "paperless-ng-$VERSION.tar.xz" paperless-ng/
+tar -cJf "paperless-ng-$VERSION-dockerfiles.tar.xz" paperless-ng-dockerfiles/

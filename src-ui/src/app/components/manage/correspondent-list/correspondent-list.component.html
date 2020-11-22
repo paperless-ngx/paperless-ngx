@@ -1,12 +1,14 @@
 <app-page-header title="Correspondents">
-  <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openCreateDialog()">
+  <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()">
     Create
   </button>
 </app-page-header>
 
-<ngb-pagination [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" (pageChange)="reloadData()" aria-label="Default pagination"></ngb-pagination>
+<div class="row m-0 justify-content-end">
+  <ngb-pagination [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" (pageChange)="reloadData()" aria-label="Default pagination"></ngb-pagination>
+</div>
 
-<table class="table table-striped">
+<table class="table table-striped border shadow">
     <thead>
     <tr>
       <th scope="col" sortable="name" (sort)="onSort($event)">Name</th>

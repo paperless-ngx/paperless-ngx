@@ -1,6 +1,8 @@
 import logging
+import os
 from contextlib import contextmanager
 
+from django.conf import settings
 from whoosh import highlight
 from whoosh.fields import Schema, TEXT, NUMERIC
 from whoosh.highlight import Formatter, get_text
@@ -8,7 +10,6 @@ from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser import MultifieldParser
 from whoosh.writing import AsyncWriter
 
-from paperless import settings
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,8 @@ def open_index(recreate=False):
         # TODO: this is not thread safe. If 2 instances try to create the index
         #  at the same time, this fails. This currently prevents parallel
         #  tests.
+        if not os.path.isdir(settings.INDEX_DIR):
+            os.makedirs(settings.INDEX_DIR, exist_ok=True)
         return create_in(settings.INDEX_DIR, get_schema())
 
 
@@ -117,6 +120,7 @@ def query_page(ix, query, page):
 def autocomplete(ix, term, limit=10):
     with ix.reader() as reader:
         terms = []
-        for (score, t) in reader.most_distinctive_terms("content", limit, term.lower()):
+        for (score, t) in reader.most_distinctive_terms(
+                "content", number=limit, prefix=term.lower()):
             terms.append(t)
         return terms

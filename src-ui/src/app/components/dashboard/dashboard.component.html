@@ -1,16 +1,27 @@
-
-<app-page-header title="Dashboard">
+<app-page-header title="Dashboard" subTitle="Welcome to paperless-ng!">
+  <img src="assets/logo.svg" height="80" class="m-2 d-none d-md-block">
 </app-page-header>
-
-<p>Welcome to paperless-ng!</p>
 
 <div class='row'>
   <div class="col-lg">
-    <app-saved-view-widget [viewConfig]="conf" *ngFor="let conf of savedViewConfigService.getDashboardConfigs()"></app-saved-view-widget>
+    <app-widget-frame title="Saved views" *ngIf="savedViews.length == 0">
+      <p class="card-text">This space is reserved to display your saved views. Go to your documents and save a view
+        to have it displayed
+        here!</p>
+    </app-widget-frame>
+
+    <ng-container *ngFor="let v of savedViews">
+      <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
+    </ng-container>
+
   </div>
   <div class="col-lg">
+
     <app-statistics-widget></app-statistics-widget>
-    <app-file-upload-widget></app-file-upload-widget>
+
+    <app-upload-file-widget></app-upload-file-widget>
+
     <app-consumer-status-widget></app-consumer-status-widget>
+
   </div>
 </div>
