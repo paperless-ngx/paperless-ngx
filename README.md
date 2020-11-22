@@ -15,15 +15,11 @@ This project is still in development and some things may not work as expected.
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces.
 
-1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless.readthedocs.io/en/latest/scanners.html) page.
+1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ng.readthedocs.io/en/latest/scanners.html) page.
 2. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
 3. Have the target server run the Paperless consumption script to OCR the file and index it into a local database.
 4. Use the web frontend to sift through the database and find what you want.
 5. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
-
-Here's what you get:
-
-![The before and after](https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/_static/screenshot.png)
 
 # Why Paperless-ng?
 
@@ -33,6 +29,7 @@ The gist of the changes is the following:
 
 * New front end. This will eventually be mobile friendly as well.
 * New full text search.
+* New email processing.
 * Machine learning powered document matching.
 * Code cleanup in many, MANY areas.
 
@@ -49,22 +46,19 @@ These features will make it into the application at some point, sorted by priori
   - Ability to search for “Similar documents” in the search results
   - Provide corrections for mispelled queries
 - **More robust consumer** that shows its progress on the web page.
-- **More rigid email processing**. Like, dont delete imported mail, provide filters, etc...
 - **Arbitrary tag colors**. Allow the selection of any color with a color picker.
 
 ## On the chopping block.
-
-I don't know if these features are used all that much. I don't exactly know how they work and will probably remove them at some point in the future.
 
 - **GnuPG encrypion.** Since its disabled by default and the website allows transparent access to encrypted documents anyway, this doesn’t really provide any benefit over having the application stored on an encrypted file system.
 
 # Getting started
 
-The recommended way to deploy paperless is docker-compose. Use the provided docker-compose.yml files to get started. This pulls the image from Docker hub. Alternatively, you can build the image yourself.
+The recommended way to deploy paperless is docker-compose. Grab the latest release to get started. the dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself.
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
-Alternatively, you can install the dependencies and setup apache and a database server yourself. Details for that will be available in the documentation.
+Alternatively, you can install the dependencies and setup apache and a database server yourself. Details for that will be available in the documentation at some point.
 
 # Migrating to paperless-ng
 
