@@ -94,7 +94,7 @@ cp "$PAPERLESS_ROOT/docker/supervisord.conf" "$PAPERLESS_DIST_APP/docker/"
 
 cd "$PAPERLESS_DIST_APP"
 
-docker-compose -f docker-compose.postgres.yml build
+docker build . -t "jonaswinkler/paperless-ng:$VERSION"
 
 # works. package the app!
 
