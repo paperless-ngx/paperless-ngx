@@ -12,13 +12,19 @@ next
   if a file type is supported and which parser to use. Removes all
   file type checks that where present in MANY different places in
   paperless.
-  
+
 * Mail consumer now correctly consumes documents even when their
   content type was not set correctly. (i.e. PDF documents with
   content type ``application/octet-stream``)
 
 * Docker entrypoint script awaits the database server if it is
   configured.
+
+* Basic sorting of mail rules added.
+
+* Disabled editing of logs.
+
+* Much better admin for mail rule editing.
 
 
 paperless-ng 0.9.1
