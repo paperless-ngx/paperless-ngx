@@ -15,7 +15,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
   }],
   selector: 'app-input-tags',
   templateUrl: './tags.component.html',
-  styleUrls: ['./tags.component.css']
+  styleUrls: ['./tags.component.scss']
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
 

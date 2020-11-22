@@ -10,10 +10,10 @@ Go to the project page on GitHub and download the
 `latest release <https://github.com/jonaswinkler/paperless-ng/releases>`_.
 There are multiple options available.
 
-*   Download the docker-compose files if you want to pull paperless from
+*   Download the dockerfiles archive if you want to pull paperless from
     Docker Hub.
 
-*   Download the archive and extract it if you want to build the docker image
+*   Download the dist archive and extract it if you want to build the docker image
     yourself or want to install paperless without docker.
 
 .. hint::
@@ -21,6 +21,15 @@ There are multiple options available.
     In contrast to paperless, the recommended way to get and update paperless-ng
     is not to pull the entire git repository. Paperless-ng includes artifacts
     that need to be compiled, and that's already done for you in the release.
+
+.. admonition:: Want to try out paperless-ng before migrating?
+
+    The release contains a file ``.env`` which sets the docker-compose project
+    name to "paperless", which is the same as before and instructs docker-compose
+    to reuse and upgrade your paperless volumes.
+
+    Just rename the project name in that file to anything else and docker-compose
+    will create fresh volumes for you!
 
 
 Overview of Paperless-ng
@@ -57,6 +66,8 @@ Paperless consists of the following components:
         $ cd /path/to/paperless/src/
         $ pipenv run python3 manage.py document_consumer
 
+    .. _setup-task_processor:
+
 *   **The task processor:** Paperless relies on `Django Q <https://django-q.readthedocs.io/en/latest/>`_
     for doing much of the heavy lifting. This is a task queue that accepts tasks from
     multiple sources and processes tasks in parallel. It also comes with a scheduler that executes
@@ -77,7 +88,8 @@ Paperless consists of the following components:
     a modern multicore system, consumption with full ocr is blazing fast.
 
     The task processor comes with a built-in admin interface that you can use to see whenever any of the
-    tasks fail and inspect the errors.
+    tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
+    file, etc).
 
     You may start the task processor by executing:
 
@@ -240,15 +252,21 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     .. caution::
 
-        Make sure you also download the ``.env`` file. This will set the
-        project name for docker compose to ``paperless`` and then it will
-        automatically reuse your existing paperless volumes.
+        The release include a ``.env`` file. This will set the
+        project name for docker compose to ``paperless`` so that paperless-ng will
+        automatically reuse your existing paperless volumes. When you start it, it
+        will migrate your existing data. After that, your old paperless installation
+        will be incompatible with the migrated volumes.
 
-4.  Adjust ``docker-compose.yml`` and
+4.  Copy the ``docker-compose.sqlite.yml`` file to ``docker-compose.yml``.
+    If you want to migrate to PostgreSQL, do that after you migrated your existing
+    SQLite database.
+
+5.  Adjust ``docker-compose.yml`` and
     ``docker-compose.env`` to your needs.
-    See `docker route`_ for details on which edits are required.
+    See `docker route`_ for details on which edits are advised.
 
-5.  Start paperless-ng.
+6.  Start paperless-ng.
 
     .. code:: bash
 
@@ -264,19 +282,122 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     This will run paperless in the background and automatically start it on system boot.
 
-6.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
+7.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
     redirect is still in place and prevents access to the new UI. Clear
-    everything related to paperless in your browsers data in order to fix
-    this issue.
+    browsing cache in order to fix this.
+
+8.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
 
 
 .. _setup-sqlite_to_psql:
 
-Moving data from sqlite to postgresql
+Moving data from SQLite to PostgreSQL
 =====================================
 
-.. warning::
+Moving your data from SQLite to PostgreSQL is done via executing a series of django
+management commands as below.
 
-    TBD.
+.. caution::
+
+    Make sure that your sqlite database is migrated to the latest version.
+    Starting paperless will make sure that this is the case. If your try to
+    load data from an old database schema in SQLite into a newer database
+    schema in PostgreSQL, you will run into trouble.
+
+1.  Stop paperless, if it is running.
+2.  Tell paperless to use PostgreSQL:
+
+    a)  With docker, copy the provided ``docker-compose.postgres.yml`` file to
+        ``docker-compose.yml``. Remember to adjust the consumption directory,
+        if necessary.
+    b)  Without docker, configure the database in your ``paperless.conf`` file.
+        See :ref:`configuration` for details.
+
+3.  Open a shell and initialize the database:
+
+    a)  With docker, run the following command to open a shell within the paperless
+        container:
+
+        .. code:: shell-session
+
+            $ cd /path/to/paperless
+            $ docker-compose run --rm webserver /bin/bash
+        
+        This will lauch the container and initialize the PostgreSQL database.
+    
+    b)  Without docker, open a shell in your virtual environment, switch to
+        the ``src`` directory and create the database schema:
+
+        .. code:: shell-session
+
+            $ cd /path/to/paperless
+            $ pipenv shell
+            $ cd src
+            $ python3 manage.py migrate
+        
+        This will not copy any data yet.
+
+4.  Dump your data from SQLite:
+
+    .. code:: shell-session
+
+        $ python3 manage.py dumpdata --database=sqlite --exclude=contenttypes --exclude=auth.Permission > data.json
+    
+5.  Load your data into PostgreSQL:
+
+    .. code:: shell-session
+
+        $ python3 manage.py loaddata data.json
+
+6.  Exit the shell.
+
+    .. code:: shell-session
+
+        $ exit
+
+7.  Start paperless.
+
+
+.. _setup-less_powerful_devices:
+
+
+Considerations for less powerful devices
+########################################
+
+Paperless runs on Raspberry Pi. However, some things are rather slow on the Pi and 
+configuring some options in paperless can help improve performance immensely:
+
+*   Consider setting ``PAPERLESS_OCR_PAGES`` to 1, so that paperless will only OCR
+    the first page of your documents.
+*   ``PAPERLESS_TASK_WORKERS`` and ``PAPERLESS_THREADS_PER_WORKER`` are configured
+    to use all cores. The Raspberry Pi models 3 and up have 4 cores, meaning that
+    paperless will use 2 workers and 2 threads per worker. This may result in
+    slugish response times during consumption, so you might want to lower these
+    settings (example: 2 workers and 1 thread to always have some computing power
+    left for other tasks).
+*   Keep ``PAPERLESS_OCR_ALWAYS`` at its default value 'false' and consider OCR'ing
+    your documents before feeding them into paperless. Some scanners are able to
+    do this!
+*   Lower ``PAPERLESS_CONVERT_DENSITY`` from its default value 300 to 200. This
+    will still result in rather accurate OCR, but will decrease consumption time
+    by quite a bit.
+*   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
+    times. Thumbnails will be about 20% larger.
+
+For details, refer to :ref:`configuration`.
+
+.. note::
+    
+    Updating the :ref:`automatic matching algorithm <advanced-automatic_matching>`
+    takes quite a bit of time. However, the update mechanism checks if your
+    data has changed before doing the heavy lifting. If you experience the 
+    algorithm taking too much cpu time, consider changing the schedule in the
+    admin interface to daily. You can also manually invoke the task
+    by changing the date and time of the next run to today/now.
+
+    The actual matching of the algorithm is fast and works on Raspberry Pi as 
+    well as on any other device.
+
+
 
 .. _redis: https://redis.io/

@@ -42,7 +42,8 @@ Fancy mail filters!
 
 .. image:: _static/paperless-11-mail-filters.png
 
-Mobile support in the future? This doesn't really work yet.
+Mobile support in the future? This kinda works, however some layouts are still
+too wide.
 
 .. image:: _static/paperless-10-mobile.png
 

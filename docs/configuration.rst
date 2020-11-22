@@ -184,6 +184,16 @@ PAPERLESS_TIME_ZONE=<timezone>
 
 
 
+PAPERLESS_OCR_PAGES=<num>
+    Tells paperless to use only the specified amount of pages for OCR. Documents
+    with less than the specified amount of pages get OCR'ed completely.
+
+    Specifying 1 here will only use the first page.
+
+    Defaults to 0, which disables this feature and always uses all pages.
+
+
+
 PAPERLESS_OCR_LANGUAGE=<lang>
     Customize the default language that tesseract will attempt to use when
     parsing documents. The default language is used whenever
