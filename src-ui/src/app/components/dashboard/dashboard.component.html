@@ -6,7 +6,7 @@
   <div class="col-lg">
     <ng-container *ngFor="let v of savedDashboardViews">
 
-      <div class="card mb-3">
+      <div class="card mb-3 shadow">
         <div class="card-header">
           <h5 class="card-title mb-0">{{v.viewConfig.title}}</h5>
         </div>
@@ -30,7 +30,7 @@
       </div>
     </ng-container>
     <ng-container *ngIf="savedDashboardViews.length == 0">
-      <div class="card mb-3">
+      <div class="card mb-3 shadow">
         <div class="card-header">
           <h5 class="card-title mb-0">Saved views</h5>
         </div>
@@ -46,7 +46,7 @@
   </div>
   <div class="col-lg">
 
-    <div class="card mb-3">
+    <div class="card mb-3 shadow">
       <div class="card-header">
         <h5 class="card-title mb-0">Statistics</h5>
       </div>
@@ -56,7 +56,7 @@
       </div>
     </div>
 
-    <div class="card mb-3">
+    <div class="card mb-3 shadow">
       <div class="card-header">
         <h5 class="card-title mb-0">Upload new documents</h5>
       </div>
