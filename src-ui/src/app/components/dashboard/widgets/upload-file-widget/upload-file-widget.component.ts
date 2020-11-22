@@ -33,9 +33,9 @@ export class UploadFileWidgetComponent implements OnInit {
           const formData = new FormData()
           formData.append('document', file, file.name)
           this.documentService.uploadDocument(formData).subscribe(result => {
-            this.toastService.showToast(Toast.make("Information", "The document has been uploaded and will be processed by the consumer shortly."))
+            this.toastService.showInfo("The document has been uploaded and will be processed by the consumer shortly.")
           }, error => {
-            this.toastService.showToast(Toast.makeError("An error has occured while uploading the document. Sorry!"))
+            this.toastService.showError("An error has occured while uploading the document. Sorry!")
           })
         });
       }

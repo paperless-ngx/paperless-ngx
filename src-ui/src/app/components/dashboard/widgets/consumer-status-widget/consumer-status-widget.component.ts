@@ -4,7 +4,7 @@ import { ConsumerStatusService, FileStatus } from 'src/app/services/consumer-sta
 @Component({
   selector: 'app-consumer-status-widget',
   templateUrl: './consumer-status-widget.component.html',
-  styleUrls: ['./consumer-status-widget.component.css']
+  styleUrls: ['./consumer-status-widget.component.scss']
 })
 export class ConsumerStatusWidgetComponent implements OnInit {
 
