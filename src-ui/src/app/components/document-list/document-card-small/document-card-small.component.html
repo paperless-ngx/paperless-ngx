@@ -8,8 +8,9 @@
 
     
     <div class="card-body p-2">
-      <p class="card-title" *ngIf="document.correspondent">{{document.correspondent.name}}</p>
-      <p class="card-text">{{document.title}}</p>
+      <p class="card-text">
+        <span class="font-weight-bold">{{document.correspondent? document.correspondent.name + ': ' : ''}}</span> {{document.title}}
+      </p>
     </div>
     <div class="card-footer">
 
