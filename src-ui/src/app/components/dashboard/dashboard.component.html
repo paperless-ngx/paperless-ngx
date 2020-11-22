@@ -4,77 +4,22 @@
 
 <div class='row'>
   <div class="col-lg">
-    <ng-container *ngFor="let v of savedDashboardViews">
+    <app-widget-frame title="Saved views" *ngIf="savedViews.length == 0">
+      <p class="card-text">This space is reserved to display your saved views. Go to your documents and save a view
+        to have it displayed
+        here!</p>
+    </app-widget-frame>
 
-      <div class="card mb-3 shadow">
-        <div class="card-header">
-          <h5 class="card-title mb-0">{{v.viewConfig.title}}</h5>
-        </div>
-        <div class="card-body text-dark">
-
-          <table class="table table-sm table-hover table-borderless">
-            <thead>
-              <tr>
-                <th>Created</th>
-                <th scope="col">Title</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let doc of v.documents" routerLink="/documents/{{doc.id}}">
-                <td>{{doc.created | date}}</td>
-                <td>{{doc.title}}<app-tag [tag]="t" *ngFor="let t of doc.tags" class="ml-1"></app-tag>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="savedDashboardViews.length == 0">
-      <div class="card mb-3 shadow">
-        <div class="card-header">
-          <h5 class="card-title mb-0">Saved views</h5>
-        </div>
-        <div class="card-body text-dark">
-          <p class="card-text">This space is reserved to display your saved views. Go to your documents and save a view
-            to have it displayed
-            here!</p>
-        </div>
-      </div>
-
+    <ng-container *ngFor="let v of savedViews">
+      <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
     </ng-container>
 
   </div>
   <div class="col-lg">
 
-    <div class="card mb-3 shadow">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Statistics</h5>
-      </div>
-      <div class="card-body text-dark">
-        <p class="card-text">Documents in inbox: {{statistics.documents_inbox}}</p>
-        <p class="card-text">Total documents: {{statistics.documents_total}}</p>
-      </div>
-    </div>
+    <app-statistics-widget></app-statistics-widget>
 
-    <div class="card mb-3 shadow">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Upload new documents</h5>
-      </div>
-      <div class="card-body text-dark">
-        <form>
-          <ngx-file-drop 
-            dropZoneLabel="Drop documents here or" (onFileDrop)="dropped($event)"
-            (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)"
-            dropZoneClassName="bg-light card"
-            multiple="true"
-            contentClassName="justify-content-center d-flex align-items-center p-5"
-            [showBrowseBtn]=true
-            browseBtnClassName="btn btn-sm btn-outline-primary ml-2">
-
-          </ngx-file-drop>
-        </form>
-      </div>
-    </div>
+    <app-upload-file-widget></app-upload-file-widget>
 
   </div>
 </div>
