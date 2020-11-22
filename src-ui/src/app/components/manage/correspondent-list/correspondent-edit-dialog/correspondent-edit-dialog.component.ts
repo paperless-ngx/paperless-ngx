@@ -9,7 +9,7 @@ import { ToastService } from 'src/app/services/toast.service';
 @Component({
   selector: 'app-correspondent-edit-dialog',
   templateUrl: './correspondent-edit-dialog.component.html',
-  styleUrls: ['./correspondent-edit-dialog.component.css']
+  styleUrls: ['./correspondent-edit-dialog.component.scss']
 })
 export class CorrespondentEditDialogComponent extends EditDialogComponent<PaperlessCorrespondent> {
 

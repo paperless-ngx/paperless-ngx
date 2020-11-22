@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 
 import dateparser
+import magic
 from django.conf import settings
 from django.utils import timezone
 
@@ -37,10 +38,11 @@ DATE_REGEX = re.compile(
 logger = logging.getLogger(__name__)
 
 
-def get_parser_class(doc):
-    """
-    Determine the appropriate parser class based on the file
-    """
+def is_mime_type_supported(mime_type):
+    return get_parser_class_for_mime_type(mime_type) is not None
+
+
+def get_parser_class_for_mime_type(mime_type):
 
     options = []
 
@@ -48,9 +50,9 @@ def get_parser_class(doc):
 
     for response in document_consumer_declaration.send(None):
         parser_declaration = response[1]
-        parser_test = parser_declaration["test"]
+        supported_mime_types = parser_declaration["mime_types"]
 
-        if parser_test(doc):
+        if mime_type in supported_mime_types:
             options.append(parser_declaration)
 
     if not options:
@@ -61,7 +63,28 @@ def get_parser_class(doc):
         options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
 
 
-def run_convert(input_file, output_file, density=None, scale=None, alpha=None, strip=False, trim=False, type=None, depth=None, extra=None, logging_group=None):
+def get_parser_class(path):
+    """
+    Determine the appropriate parser class based on the file
+    """
+
+    mime_type = magic.from_file(path, mime=True)
+
+    return get_parser_class_for_mime_type(mime_type)
+
+
+def run_convert(input_file,
+                output_file,
+                density=None,
+                scale=None,
+                alpha=None,
+                strip=False,
+                trim=False,
+                type=None,
+                depth=None,
+                extra=None,
+                logging_group=None):
+
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
         environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
@@ -90,10 +113,13 @@ def run_unpaper(pnm, logging_group=None):
     command_args = (settings.UNPAPER_BINARY, "--overwrite", "--quiet", pnm,
                     pnm_out)
 
-    logger.debug("Execute: " + " ".join(command_args), extra={'group': logging_group})
+    logger.debug(f"Execute: {' '.join(command_args)}",
+                 extra={'group': logging_group})
 
-    if not subprocess.Popen(command_args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait() == 0:
-        raise ParseError("Unpaper failed at {}".format(command_args))
+    if not subprocess.Popen(command_args,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL).wait() == 0:
+        raise ParseError(f"Unpaper failed at {command_args}")
 
     return pnm_out
 
@@ -112,7 +138,8 @@ class DocumentParser(LoggingMixin):
         super().__init__()
         self.logging_group = logging_group
         self.document_path = path
-        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        self.tempdir = tempfile.mkdtemp(
+            prefix="paperless-", dir=settings.SCRATCH_DIR)
 
     def get_thumbnail(self):
         """
@@ -125,9 +152,10 @@ class DocumentParser(LoggingMixin):
         if settings.OPTIMIZE_THUMBNAILS:
             out_path = os.path.join(self.tempdir, "optipng.png")
 
-            args = (settings.OPTIPNG_BINARY, "-silent", "-o5", in_path, "-out", out_path)
+            args = (settings.OPTIPNG_BINARY,
+                    "-silent", "-o5", in_path, "-out", out_path)
 
-            self.log('debug', 'Execute: ' + " ".join(args))
+            self.log('debug', f"Execute: {' '.join(args)}")
 
             if not subprocess.Popen(args).wait() == 0:
                 raise ParseError("Optipng failed at {}".format(args))

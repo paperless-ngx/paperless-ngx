@@ -47,18 +47,30 @@ class IndexView(TemplateView):
 
 class CorrespondentViewSet(ModelViewSet):
     model = Correspondent
-    queryset = Correspondent.objects.annotate(document_count=Count('documents'), last_correspondence=Max('documents__created')).order_by('name')
+
+    queryset = Correspondent.objects.annotate(
+        document_count=Count('documents'),
+        last_correspondence=Max('documents__created')).order_by('name')
+
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = CorrespondentFilterSet
-    ordering_fields = ("name", "matching_algorithm", "match", "document_count", "last_correspondence")
+    ordering_fields = (
+        "name",
+        "matching_algorithm",
+        "match",
+        "document_count",
+        "last_correspondence")
 
 
 class TagViewSet(ModelViewSet):
     model = Tag
-    queryset = Tag.objects.annotate(document_count=Count('documents')).order_by('name')
+
+    queryset = Tag.objects.annotate(
+        document_count=Count('documents')).order_by('name')
+
     serializer_class = TagSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
@@ -69,7 +81,10 @@ class TagViewSet(ModelViewSet):
 
 class DocumentTypeViewSet(ModelViewSet):
     model = DocumentType
-    queryset = DocumentType.objects.annotate(document_count=Count('documents')).order_by('name')
+
+    queryset = DocumentType.objects.annotate(
+        document_count=Count('documents')).order_by('name')
+
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
@@ -92,10 +107,18 @@ class DocumentViewSet(RetrieveModelMixin,
     filterset_class = DocumentFilterSet
     search_fields = ("title", "correspondent__name", "content")
     ordering_fields = (
-        "id", "title", "correspondent__name", "document_type__name", "created", "modified", "added", "archive_serial_number")
+        "id",
+        "title",
+        "correspondent__name",
+        "document_type__name",
+        "created",
+        "modified",
+        "added",
+        "archive_serial_number")
 
     def update(self, request, *args, **kwargs):
-        response = super(DocumentViewSet, self).update(request, *args, **kwargs)
+        response = super(DocumentViewSet, self).update(
+            request, *args, **kwargs)
         index.add_or_update_document(self.get_object())
         return response
 
@@ -104,18 +127,6 @@ class DocumentViewSet(RetrieveModelMixin,
         return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
     def file_response(self, pk, disposition):
-        # TODO: this should not be necessary here.
-        content_types = {
-            Document.TYPE_PDF: "application/pdf",
-            Document.TYPE_PNG: "image/png",
-            Document.TYPE_JPG: "image/jpeg",
-            Document.TYPE_GIF: "image/gif",
-            Document.TYPE_TIF: "image/tiff",
-            Document.TYPE_CSV: "text/csv",
-            Document.TYPE_MD: "text/markdown",
-            Document.TYPE_TXT: "text/plain"
-        }
-
         doc = Document.objects.get(id=pk)
 
         if doc.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
@@ -123,7 +134,7 @@ class DocumentViewSet(RetrieveModelMixin,
         else:
             file_handle = GnuPG.decrypted(doc.source_file)
 
-        response = HttpResponse(file_handle, content_type=content_types[doc.file_type])
+        response = HttpResponse(file_handle, content_type=doc.mime_type)
         response["Content-Disposition"] = '{}; filename="{}"'.format(
             disposition, doc.file_name)
         return response
@@ -150,7 +161,8 @@ class DocumentViewSet(RetrieveModelMixin,
     @cache_control(public=False, max_age=315360000)
     def thumb(self, request, pk=None):
         try:
-            return HttpResponse(Document.objects.get(id=pk).thumbnail_file, content_type='image/png')
+            return HttpResponse(Document.objects.get(id=pk).thumbnail_file,
+                                content_type='image/png')
         except FileNotFoundError:
             raise Http404("Document thumbnail does not exist")
 
@@ -242,5 +254,6 @@ class StatisticsView(APIView):
     def get(self, request, format=None):
         return Response({
             'documents_total': Document.objects.all().count(),
-            'documents_inbox': Document.objects.filter(tags__is_inbox_tag=True).distinct().count()
+            'documents_inbox': Document.objects.filter(
+                tags__is_inbox_tag=True).distinct().count()
         })

@@ -2,6 +2,7 @@ import os
 import tempfile
 from datetime import timedelta, date
 
+import magic
 from django.conf import settings
 from django.utils.text import slugify
 from django_q.tasks import async_task
@@ -10,6 +11,7 @@ from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags, \
 
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
+from documents.parsers import is_mime_type_supported
 from paperless_mail.models import MailAccount, MailRule
 
 
@@ -159,7 +161,7 @@ class MailAccountHandler(LoggingMixin):
             self.log('debug', f"Account {account}: Processing "
                               f"{account.rules.count()} rule(s)")
 
-            for rule in account.rules.all():
+            for rule in account.rules.order_by('order'):
                 self.log(
                     'debug',
                     f"Account {account}: Processing rule {rule.name}")
@@ -172,8 +174,8 @@ class MailAccountHandler(LoggingMixin):
                     M.folder.set(rule.folder)
                 except MailboxFolderSelectError:
                     raise MailError(
-                        f"Rule {rule.name}: Folder {rule.folder} does not exist "
-                        f"in account {account.name}")
+                        f"Rule {rule.name}: Folder {rule.folder} "
+                        f"does not exist in account {account.name}")
 
                 criterias = make_criterias(rule)
 
@@ -183,7 +185,8 @@ class MailAccountHandler(LoggingMixin):
                     f"{str(AND(**criterias))}")
 
                 try:
-                    messages = M.fetch(criteria=AND(**criterias), mark_seen=False)
+                    messages = M.fetch(criteria=AND(**criterias),
+                                       mark_seen=False)
                 except Exception:
                     raise MailError(
                         f"Rule {rule.name}: Error while fetching folder "
@@ -224,8 +227,8 @@ class MailAccountHandler(LoggingMixin):
 
                 except Exception:
                     raise MailError(
-                        f"Rule {rule.name}: Error while processing post-consume "
-                        f"actions for account {account.name}")
+                        f"Rule {rule.name}: Error while processing "
+                        f"post-consume actions for account {account.name}")
 
         return total_processed_files
 
@@ -247,13 +250,25 @@ class MailAccountHandler(LoggingMixin):
 
         for att in message.attachments:
 
+            if not att.content_disposition == "attachment":
+                self.log(
+                    'debug',
+                    f"Rule {rule.account}.{rule}: "
+                    f"Skipping attachment {att.filename} "
+                    f"with content disposition inline")
+                continue
+
             title = get_title(message, att, rule)
 
-            # TODO: check with parsers what files types are supported
-            if att.content_type == 'application/pdf':
+            # don't trust the content type of the attachment. Could be
+            # generic application/octet-stream.
+            mime_type = magic.from_buffer(att.payload, mime=True)
+
+            if is_mime_type_supported(mime_type):
 
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-                _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-", dir=settings.SCRATCH_DIR)
+                _, temp_filename = tempfile.mkstemp(prefix="paperless-mail-",
+                                                    dir=settings.SCRATCH_DIR)
                 with open(temp_filename, 'wb') as f:
                     f.write(att.payload)
 
@@ -268,12 +283,19 @@ class MailAccountHandler(LoggingMixin):
                     path=temp_filename,
                     override_filename=att.filename,
                     override_title=title,
-                    override_correspondent_id=correspondent.id if correspondent else None,
-                    override_document_type_id=doc_type.id if doc_type else None,
+                    override_correspondent_id=correspondent.id if correspondent else None,  # NOQA: E501
+                    override_document_type_id=doc_type.id if doc_type else None,  # NOQA: E501
                     override_tag_ids=[tag.id] if tag else None,
-                    task_name=f"Mail: {att.filename}"
+                    task_name=att.filename[:100]
                 )
 
                 processed_attachments += 1
+            else:
+                self.log(
+                    'debug',
+                    f"Rule {rule.account}.{rule}: "
+                    f"Skipping attachment {att.filename} "
+                    f"since guessed mime type {mime_type} is not supported "
+                    f"by paperless")
 
         return processed_attachments

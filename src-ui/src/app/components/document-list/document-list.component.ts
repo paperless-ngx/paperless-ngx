@@ -11,7 +11,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
 @Component({
   selector: 'app-document-list',
   templateUrl: './document-list.component.html',
-  styleUrls: ['./document-list.component.css']
+  styleUrls: ['./document-list.component.scss']
 })
 export class DocumentListComponent implements OnInit {
 

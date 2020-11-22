@@ -12,7 +12,7 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
 @Component({
   selector: 'app-app-frame',
   templateUrl: './app-frame.component.html',
-  styleUrls: ['./app-frame.component.css']
+  styleUrls: ['./app-frame.component.scss']
 })
 export class AppFrameComponent implements OnInit, OnDestroy {
 
@@ -23,6 +23,12 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     public viewConfigService: SavedViewConfigService
     ) {
+  }
+
+  isMenuCollapsed: boolean = true
+
+  closeMenu() {
+    this.isMenuCollapsed = true
   }
 
   searchField = new FormControl('')
@@ -61,10 +67,12 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   search() {
+    this.closeMenu()
     this.router.navigate(['search'], {queryParams: {query: this.searchField.value}})
   }
 
   closeAll() {
+    this.closeMenu()
     this.openDocumentsService.closeAll()
 
     // TODO: is there a better way to do this?
