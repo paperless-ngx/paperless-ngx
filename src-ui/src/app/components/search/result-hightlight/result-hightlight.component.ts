@@ -4,7 +4,7 @@ import { SearchHitHighlight } from 'src/app/data/search-result';
 @Component({
   selector: 'app-result-hightlight',
   templateUrl: './result-hightlight.component.html',
-  styleUrls: ['./result-hightlight.component.css']
+  styleUrls: ['./result-hightlight.component.scss']
 })
 export class ResultHightlightComponent implements OnInit {
 

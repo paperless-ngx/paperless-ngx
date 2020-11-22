@@ -12,7 +12,7 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
 @Component({
   selector: 'app-app-frame',
   templateUrl: './app-frame.component.html',
-  styleUrls: ['./app-frame.component.css']
+  styleUrls: ['./app-frame.component.scss']
 })
 export class AppFrameComponent implements OnInit, OnDestroy {
 

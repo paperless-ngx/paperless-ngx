@@ -8,7 +8,7 @@ import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/co
 @Component({
   selector: 'app-correspondent-list',
   templateUrl: './correspondent-list.component.html',
-  styleUrls: ['./correspondent-list.component.css']
+  styleUrls: ['./correspondent-list.component.scss']
 })
 export class CorrespondentListComponent extends GenericListComponent<PaperlessCorrespondent> {
 
