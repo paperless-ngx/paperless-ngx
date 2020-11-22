@@ -1,6 +1,6 @@
 <app-page-header [title]="getTitle()">
 
-  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="displayMode"
+  <div class="btn-group btn-group-toggle" ngbRadioGroup [(ngModel)]="displayMode"
     (ngModelChange)="saveDisplayMode()">
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
       <input ngbButton type="radio" class="btn btn-sm" value="details">
@@ -21,7 +21,7 @@
       </svg>
     </label>
   </div>
-  <div class="btn-group btn-group-toggle mr-2" ngbRadioGroup [(ngModel)]="docs.sortDirection"
+  <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="docs.sortDirection"
     *ngIf="!docs.viewId">
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
@@ -43,7 +43,7 @@
       </svg>
     </label>
   </div>
-  <div class="btn-group" *ngIf="!docs.viewId">
+  <div class="btn-group ml-2" *ngIf="!docs.viewId">
 
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="showFilter=!showFilter">
       <svg class="toolbaricon" fill="currentColor">
