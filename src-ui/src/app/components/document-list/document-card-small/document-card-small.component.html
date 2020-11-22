@@ -1,11 +1,13 @@
-<div class="col-auto mb-3">
-  <div class="card h-100 bg-light" style="width: 14rem">
-    <div style="height: 10rem; overflow: hidden;">
-      <img [src]="getThumbUrl()" class="card-img doc-img"/>
+<div class="col p-2 h-100" style="width: 16rem;">
+  <div class="card h-100">
+    <img [src]="getThumbUrl()" class="card-img-top doc-img border-bottom" style="height: 200px;"/>
+    <div class="card-body p-2">
+      <p class="card-title" *ngIf="document.correspondent">{{document.correspondent.name}}</p>
+      <p class="card-text">{{document.title}} <app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></p>
     </div>
-    <div class="card-body">
-      <p class="card-title">{{document.correspondent ? document.correspondent.name + ': ' : ''}}{{document.title}} <app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></p>
-      <div class="d-flex justify-content-between align-items-center">
+    <div class="card-footer">
+
+      <div class="d-flex justify-content-between align-items-center ml-n2">
         <div class="btn-group">
           <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary">
             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -21,6 +23,7 @@
         </div>
         <small class="text-muted">{{document.created | date}}</small>
       </div>
+      
     </div>
-  </div>
+  </div>  
 </div>
