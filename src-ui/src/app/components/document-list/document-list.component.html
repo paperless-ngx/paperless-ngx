@@ -71,32 +71,33 @@
   </div>
 </div>
 
-<ngb-pagination [pageSize]="docs.currentPageSize" [collectionSize]="docs.collectionSize" [(page)]="docs.currentPage" [maxSize]="5"
+<div class="row m-0 justify-content-end">
+  <ngb-pagination [pageSize]="docs.currentPageSize" [collectionSize]="docs.collectionSize" [(page)]="docs.currentPage" [maxSize]="5"
   [rotate]="true" (pageChange)="reload()" aria-label="Default pagination"></ngb-pagination>
+</div>
 
 <div *ngIf="displayMode == 'largeCards'">
   <app-document-card-large *ngFor="let d of docs.documents" [document]="d" [details]="d.content">
   </app-document-card-large>
 </div>
 
-<table class="table table-hover table-sm" *ngIf="displayMode == 'details'">
+<table class="table table-hover table-sm border" *ngIf="displayMode == 'details'">
   <thead>
-    <th>ASN</th>
-    <th>Correspondent</th>
+    <th class="d-none d-lg-table-cell">ASN</th>
+    <th class="d-none d-md-table-cell">Correspondent</th>
     <th>Title</th>
-    <th>Document type</th>
+    <th class="d-none d-xl-table-cell">Document type</th>
     <th>Created</th>
-    <th>Added</th>
+    <th class="d-none d-xl-table-cell">Added</th>
   </thead>
   <tbody>
     <tr *ngFor="let d of docs.documents" routerLink="/documents/{{d.id}}">
-      <td>{{d.archive_serial_number}}</td>
-      <td>{{d.correspondent ? d.correspondent.name : ''}}</td>
-      <td>{{d.title}}<app-tag [tag]="t" *ngFor="let t of d.tags" class="ml-1"></app-tag>
-      </td>
-      <td>{{d.document_type ? d.document_type.name : ''}}</td>
+      <td class="d-none d-lg-table-cell">{{d.archive_serial_number}}</td>
+      <td class="d-none d-md-table-cell">{{d.correspondent ? d.correspondent.name : ''}}</td>
+      <td>{{d.title}}<app-tag [tag]="t" *ngFor="let t of d.tags" class="ml-1"></app-tag></td>
+      <td class="d-none d-xl-table-cell">{{d.document_type ? d.document_type.name : ''}}</td>
       <td>{{d.created | date}}</td>
-      <td>{{d.added | date}}</td>
+      <td class="d-none d-xl-table-cell">{{d.added | date}}</td>
     </tr>
   </tbody>
 </table>
