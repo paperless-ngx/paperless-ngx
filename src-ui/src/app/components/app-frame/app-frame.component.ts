@@ -27,6 +27,10 @@ export class AppFrameComponent implements OnInit, OnDestroy {
 
   isMenuCollapsed: boolean = true
 
+  closeMenu() {
+    this.isMenuCollapsed = true
+  }
+
   searchField = new FormControl('')
 
   openDocuments: PaperlessDocument[] = []
@@ -63,10 +67,12 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   search() {
+    this.closeMenu()
     this.router.navigate(['search'], {queryParams: {query: this.searchField.value}})
   }
 
   closeAll() {
+    this.closeMenu()
     this.openDocumentsService.closeAll()
 
     // TODO: is there a better way to do this?
