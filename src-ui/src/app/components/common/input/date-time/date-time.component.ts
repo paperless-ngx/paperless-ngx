@@ -11,7 +11,7 @@ import { AbstractInputComponent } from '../abstract-input';
   }],
   selector: 'app-input-date-time',
   templateUrl: './date-time.component.html',
-  styleUrls: ['./date-time.component.css']
+  styleUrls: ['./date-time.component.scss']
 })
 export class DateTimeComponent implements OnInit,ControlValueAccessor  {
 

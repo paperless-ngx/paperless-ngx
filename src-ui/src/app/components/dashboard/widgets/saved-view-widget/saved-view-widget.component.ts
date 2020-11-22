@@ -8,16 +8,16 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 @Component({
   selector: 'app-saved-view-widget',
   templateUrl: './saved-view-widget.component.html',
-  styleUrls: ['./saved-view-widget.component.css']
+  styleUrls: ['./saved-view-widget.component.scss']
 })
-export class SavedViewWidgetComponent implements OnInit, OnDestroy {
+export class SavedViewWidgetComponent implements OnInit {
 
   constructor(private documentService: DocumentService, private consumerStatusService: ConsumerStatusService) { }
 
   @Input()
-  viewConfig: SavedViewConfig
+  savedView: SavedViewConfig
 
-  documents: PaperlessDocument[]
+  documents: PaperlessDocument[] = []
 
   subscription: Subscription
 
@@ -33,7 +33,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
   }
 
   reload() {
-    this.documentService.list(1,10,this.viewConfig.sortField,this.viewConfig.sortDirection,this.viewConfig.filterRules).subscribe(result => {
+    this.documentService.list(1,10,this.savedView.sortField,this.savedView.sortDirection,this.savedView.filterRules).subscribe(result => {
       this.documents = result.results
     })
   }

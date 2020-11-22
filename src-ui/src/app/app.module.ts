@@ -42,9 +42,9 @@ import { SortableDirective } from './directives/sortable.directive';
 import { CookieService } from 'ngx-cookie-service';
 import { CsrfInterceptor } from './interceptors/csrf.interceptor';
 import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-view-widget/saved-view-widget.component';
-import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/consumer-status-widget/consumer-status-widget.component';
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component';
-import { FileUploadWidgetComponent } from './components/dashboard/widgets/file-upload-widget/file-upload-widget.component';
+import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component';
+import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
 
 @NgModule({
   declarations: [
@@ -79,10 +79,10 @@ import { FileUploadWidgetComponent } from './components/dashboard/widgets/file-u
     DateTimeComponent,
     TagsComponent,
     SortableDirective,
-    ConsumerStatusWidgetComponent,
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
-    FileUploadWidgetComponent
+    UploadFileWidgetComponent,
+    WidgetFrameComponent
   ],
   imports: [
     BrowserModule,

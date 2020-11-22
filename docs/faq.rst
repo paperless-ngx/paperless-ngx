@@ -21,6 +21,17 @@ is
     files around manually. This folder is meant to be entirely managed by docker
     and paperless.
 
+**Q:** *What file types does paperless-ng support?*
+
+**A:** Currently, the following files are supported:
+
+*   PDF documents, PNG images and JPEG images are processed with OCR.
+*   Plain text documents are supported as well and are added verbatim
+    to paperless.
+
+Paperless determines the type of a file by inspecting its content. The
+file extensions do not matter.
+
 **Q:** *Will paperless-ng run on Raspberry Pi?*
 
 **A:** The short answer is yes. I've tested it on a Raspberry Pi 3 B.
