@@ -1,4 +1,6 @@
-@import "bootstrap";
+@import "theme";
+
+@import "node_modules/bootstrap/scss/bootstrap";
 
 
 .toolbaricon {
@@ -27,11 +29,14 @@ body {
   border-color: rgba(255, 255, 255, .1);
 }
 
+.form-control-dark::placeholder {
+  color: #fff;
+}
+
 .form-control-dark:focus {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
-
 
 .asc {
   background-color: #f8f9fa!important;

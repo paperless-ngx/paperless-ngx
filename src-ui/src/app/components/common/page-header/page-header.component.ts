@@ -12,6 +12,9 @@ export class PageHeaderComponent implements OnInit {
   @Input()
   title: string = ""
 
+  @Input()
+  subTitle: string = ""
+
   ngOnInit(): void {
   }
 
