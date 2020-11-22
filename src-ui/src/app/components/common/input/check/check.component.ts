@@ -11,7 +11,7 @@ import { AbstractInputComponent } from '../abstract-input';
   }],
   selector: 'app-input-check',
   templateUrl: './check.component.html',
-  styleUrls: ['./check.component.css']
+  styleUrls: ['./check.component.scss']
 })
 export class CheckComponent extends AbstractInputComponent<boolean> {
 

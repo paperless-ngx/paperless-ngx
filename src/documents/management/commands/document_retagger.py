@@ -74,13 +74,13 @@ class Command(Renderable, BaseCommand):
         try:
             classifier.reload()
         except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
-            logging.getLogger(__name__).warning("Cannot classify documents: {}.".format(e))
+            logging.getLogger(__name__).warning(
+                f"Cannot classify documents: {e}.")
             classifier = None
 
         for document in documents:
             logging.getLogger(__name__).info(
-                "Processing document {}".format(document.title)
-            )
+                f"Processing document {document.title}")
 
             if options['correspondent']:
                 set_correspondent(

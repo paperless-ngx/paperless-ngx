@@ -8,7 +8,7 @@ import { DocumentTypeEditDialogComponent } from './document-type-edit-dialog/doc
 @Component({
   selector: 'app-document-type-list',
   templateUrl: './document-type-list.component.html',
-  styleUrls: ['./document-type-list.component.css']
+  styleUrls: ['./document-type-list.component.scss']
 })
 export class DocumentTypeListComponent extends GenericListComponent<PaperlessDocumentType> {
 

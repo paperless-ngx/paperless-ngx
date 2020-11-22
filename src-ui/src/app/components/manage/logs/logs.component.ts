@@ -6,7 +6,7 @@ import { LogService } from 'src/app/services/rest/log.service';
 @Component({
   selector: 'app-logs',
   templateUrl: './logs.component.html',
-  styleUrls: ['./logs.component.css']
+  styleUrls: ['./logs.component.scss']
 })
 export class LogsComponent implements OnInit {
 

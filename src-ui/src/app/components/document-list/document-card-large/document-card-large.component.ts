@@ -6,7 +6,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 @Component({
   selector: 'app-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: ['./document-card-large.component.css']
+  styleUrls: ['./document-card-large.component.scss']
 })
 export class DocumentCardLargeComponent implements OnInit {
 

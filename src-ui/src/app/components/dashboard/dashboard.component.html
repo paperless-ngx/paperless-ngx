@@ -1,50 +1,25 @@
-
-<app-page-header title="Dashboard">
+<app-page-header title="Dashboard" subTitle="Welcome to paperless-ng!">
+  <img src="assets/logo.svg" height="80" class="m-2 d-none d-md-block">
 </app-page-header>
-
-<p>Welcome to paperless-ng!</p>
 
 <div class='row'>
   <div class="col-lg">
-    <ng-container *ngFor="let v of savedDashboardViews">
-      <h4>{{v.viewConfig.title}}</h4>
+    <app-widget-frame title="Saved views" *ngIf="savedViews.length == 0">
+      <p class="card-text">This space is reserved to display your saved views. Go to your documents and save a view
+        to have it displayed
+        here!</p>
+    </app-widget-frame>
 
-      <table class="table table-sm table-hover table-borderless">
-        <thead>
-        <tr>
-          <th>Created</th>
-          <th scope="col">Title</th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let doc of v.documents" routerLink="/documents/{{doc.id}}">
-            <td>{{doc.created | date}}</td>
-            <td>{{doc.title}}<app-tag [tag]="t" *ngFor="let t of doc.tags" class="ml-1"></app-tag>
-          </tr>
-        </tbody>
-      </table>
-
-    </ng-container>
-    <ng-container *ngIf="savedDashboardViews.length == 0">
-      <h4>Saved views</h4>
-      <p>This space is reserved to display your saved views. Go to your documents and save a view to have it displayed here!</p>
+    <ng-container *ngFor="let v of savedViews">
+      <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
     </ng-container>
 
   </div>
   <div class="col-lg">
-    <h4>Statistics</h4>
-    <p>Documents in inbox: {{statistics.documents_inbox}}</p>
-    <p>Total documents: {{statistics.documents_total}}</p>
-    <h4>Upload new Document</h4>
-    <form>
-      <ngx-file-drop
-        dropZoneLabel="Drop documents here"
-        (onFileDrop)="dropped($event)"
-        (onFileOver)="fileOver($event)"
-        (onFileLeave)="fileLeave($event)"
-        dropZoneClassName="bg-light mt-4 card">
 
-      </ngx-file-drop>
-    </form>
+    <app-statistics-widget></app-statistics-widget>
+
+    <app-upload-file-widget></app-upload-file-widget>
+
   </div>
 </div>
