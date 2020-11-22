@@ -1,24 +1,14 @@
-<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+<nav class="navbar navbar-dark sticky-top bg-primary flex-md-nowrap p-0 shadow">
   <span class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Paperless-ng</span>
   <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
     data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"
     (click)="isMenuCollapsed = !isMenuCollapsed">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <form (ngSubmit)="search()" class="w-100">
+  <form (ngSubmit)="search()" class="w-100 m-1">
     <input class="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search"
       [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)">
   </form>
-  <ul class="navbar-nav px-3">
-    <li class="nav-item text-nowrap">
-      <a class="nav-link" href="accounts/logout/">
-        <svg class="buttonicon" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#door-closed"/>
-        </svg>
-        Logout
-      </a>
-    </li>
-  </ul>
 </nav>
 
 <div class="container-fluid">
@@ -151,7 +141,15 @@
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#link"/>
               </svg>
-              Github
+              GitHub
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="accounts/logout/">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#door-open"/>
+              </svg>
+              Logout
             </a>
           </li>
         </ul>
