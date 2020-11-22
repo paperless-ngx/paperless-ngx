@@ -17,7 +17,7 @@
       <div class="sidebar-sticky pt-3">
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link" routerLink="dashboard" routerLinkActive="active">
+            <a class="nav-link" routerLink="dashboard" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#house"/>
               </svg>
@@ -25,7 +25,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="documents" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <a class="nav-link" routerLink="documents" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#files"/>
               </svg>
@@ -39,7 +39,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor='let config of viewConfigService.getSideBarConfigs()'>
-            <a class="nav-link text-truncate" routerLink="view/{{config.id}}" routerLinkActive="active">
+            <a class="nav-link text-truncate" routerLink="view/{{config.id}}" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
               </svg>
@@ -53,7 +53,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor='let d of openDocuments'>
-            <a class="nav-link text-truncate" routerLink="documents/{{d.id}}" routerLinkActive="active">
+            <a class="nav-link text-truncate" routerLink="documents/{{d.id}}" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
               </svg>
@@ -75,7 +75,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" routerLink="correspondents" routerLinkActive="active">
+            <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#person"/>
               </svg>
@@ -83,7 +83,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="tags" routerLinkActive="active">
+            <a class="nav-link" routerLink="tags" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#tags"/>
               </svg>
@@ -91,7 +91,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="documenttypes" routerLinkActive="active">
+            <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#hash"/>
               </svg>
@@ -99,7 +99,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="logs" routerLinkActive="active">
+            <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>
               </svg>
@@ -107,7 +107,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="settings" routerLinkActive="active">
+            <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#gear"/>
               </svg>
