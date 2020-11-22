@@ -1,5 +1,5 @@
 <div class="col p-2 h-100" style="width: 16rem;">
-  <div class="card h-100">
+  <div class="card h-100 shadow-sm">
     <div class=" border-bottom doc-img pr-1" [ngStyle]="{'background-image': 'url(' + getThumbUrl() + ')'}">
       <div class="row" *ngFor="let t of document.tags">
         <app-tag [tag]="t" class="col text-right"></app-tag>
