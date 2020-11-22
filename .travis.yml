@@ -1,9 +1,37 @@
 language: python
 
-python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
+matrix:
+  include:
+    - name: "Paperless on Python 3.6"
+      python: "3.6"
+
+    - name: "Paperless on Python 3.7"
+      python: "3.7"
+
+    - name: "Paperless on Python 3.8"
+      python: "3.8"
+
+    - name: "Documentation"
+      before_install: true
+      install: true
+      script:
+        - cd docs/
+        - make html
+      after_success: true
+
+    - name: "Front end"
+      language: node_js
+      node_js:
+        - 6
+      before_install: true
+      install:
+        - cd src-ui/
+        - npm install -g
+      script:
+        - cd src-ui/
+        - ng build --prod
+      after_success: true
+
 
 before_install:
   - sudo apt-get update -qq
