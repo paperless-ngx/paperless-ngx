@@ -26,6 +26,9 @@ next
 
 * Much better admin for mail rule editing.
 
+* New setting ``PAPERLESS_OCR_PAGES`` limits the tesseract parser
+  to the first n pages of scanned documents.
+
 
 paperless-ng 0.9.1
 ##################
