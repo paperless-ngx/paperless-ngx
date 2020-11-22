@@ -1,6 +1,6 @@
 language: python
 
-matrix:
+jobs:
   include:
     - name: "Paperless on Python 3.6"
       python: "3.6"
@@ -12,7 +12,6 @@ matrix:
       python: "3.8"
 
     - name: "Documentation"
-      before_install: true
       script:
         - cd docs/
         - make html
@@ -25,9 +24,8 @@ matrix:
       before_install: true
       install:
         - cd src-ui/
-        - npm install -g
+        - npm install -g @angular/cli
       script:
-        - cd src-ui/
         - ng build --prod
       after_success: true
 
