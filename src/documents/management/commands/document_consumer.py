@@ -21,7 +21,7 @@ class Handler(FileSystemEventHandler):
             try:
                 async_task("documents.tasks.consume_file",
                            file,
-                           task_name=os.path.basename(file))
+                           task_name=os.path.basename(file)[:100])
             except Exception as e:
                 # Catch all so that the consumer won't crash.
                 logging.getLogger(__name__).error(
@@ -71,7 +71,7 @@ class Command(BaseCommand):
             if entry.is_file():
                 async_task("documents.tasks.consume_file",
                            entry.path,
-                           task_name=os.path.basename(entry.path))
+                           task_name=os.path.basename(entry.path)[:100])
 
         # Start the watchdog. Woof!
         if settings.CONSUMER_POLLING > 0:
