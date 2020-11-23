@@ -52,7 +52,7 @@ paperless-ng 0.9.0
 * **Added:** New frontend. Features:
 
   * Single page application: It's much more responsive than the django admin pages.
-  * Dashboard. Shows recently scanned documents, or todos, or other documents
+  * Dashboard. Shows recently scanned documents, or todo notes, or other documents
     at wish. Allows uploading of documents. Shows basic statistics.
   * Better document list with multiple display options.
   * Full text search with result highlighting, auto completion and scoring based
@@ -102,7 +102,7 @@ paperless-ng 0.9.0
 
 * **Modified [breaking]:** PostgreSQL:
 
-  * If ``PAPERLESS_DBHOST`` is specified in the settings, paperless uses postgresql instead of sqlite.
+  * If ``PAPERLESS_DBHOST`` is specified in the settings, paperless uses PostgreSQL instead of SQLite.
     Username, database and password all default to ``paperless`` if not specified.
 
 * **Modified [breaking]:** document_retagger management command rework. See
@@ -130,7 +130,7 @@ paperless-ng 0.9.0
     Certain language specifics such as umlauts may not get picked up properly.
   * ``PAPERLESS_DEBUG`` defaults to ``false``.
   * The presence of ``PAPERLESS_DBHOST`` now determines whether to use PostgreSQL or
-    sqlite.
+    SQLite.
   * ``PAPERLESS_OCR_THREADS`` is gone and replaced with ``PAPERLESS_TASK_WORKERS`` and
     ``PAPERLESS_THREADS_PER_WORKER``. Refer to the config example for details.
   * ``PAPERLESS_OPTIMIZE_THUMBNAILS`` allows you to disable or enable thumbnail
