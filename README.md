@@ -47,7 +47,7 @@ For a complete list of changes, check out the [changelog](https://paperless-ng.r
 
 These features will make it into the application at some point, sorted by priority.
 
-- **Adding text to PDF documents.** I've seen there are libraries that do this for you.
+- **Adding a text layer to ocr'ed PDF documents.** I've seen there are libraries that do this for you.
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
