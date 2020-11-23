@@ -35,7 +35,9 @@ The gist of the changes is the following:
 * New full text search.
 * New email processing.
 * Machine learning powered document matching.
-* Code cleanup in many, MANY areas.
+* A task processor that processes documents in parallel and also tells you when something goes wrong.
+* Code cleanup in many, MANY areas. Some of the code was just overly complicated.
+* More tests, more stability.
 
 If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
 
@@ -45,28 +47,31 @@ For a complete list of changes, check out the [changelog](https://paperless-ng.r
 
 These features will make it into the application at some point, sorted by priority.
 
+- **Adding text to PDF documents.** I've seen there are libraries that do this for you.
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
   - Provide corrections for mispelled queries
-- **More robust consumer** that shows its progress on the web page.
+- **An interactive consumer** that shows its progress for documents it processes on the web page.
+	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
+	- Notifications when a document was added with buttons to open the new document right away.
 - **Arbitrary tag colors**. Allow the selection of any color with a color picker.
 
 ## On the chopping block.
 
-- **GnuPG encrypion.** Since its disabled by default and the website allows transparent access to encrypted documents anyway, this doesn’t really provide any benefit over having the application stored on an encrypted file system.
+- **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
 
 # Getting started
 
-The recommended way to deploy paperless is docker-compose. Grab the latest release to get started. the dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself.
+The recommended way to deploy paperless is docker-compose. Don't clone the repository, grab the latest release to get started instead. The dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself (i.e. if you want to run on Raspberry Pi).
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
-Alternatively, you can install the dependencies and setup apache and a database server yourself. Details for that will be available in the documentation at some point.
+Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has information about the individual components of paperless that you need to take care of.
 
 # Migrating to paperless-ng
 
-Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation.
+Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation. Its also entirely possible to go back to paperless by reverting the database migrations.
 
 # Documentation
 
