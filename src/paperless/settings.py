@@ -144,6 +144,15 @@ TEMPLATES = [
 # Security                                                                    #
 ###############################################################################
 
+AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
+
+if AUTO_LOGIN_USERNAME:
+    _index = MIDDLEWARE.index('django.contrib.auth.middleware.AuthenticationMiddleware')
+    # This overrides everything the auth middleware is doing but still allows
+    # regular login in case the provided user does not exist.
+    MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
+
+
 if DEBUG:
     X_FRAME_OPTIONS = ''
     # this should really be 'allow-from uri' but its not supported in any mayor
