@@ -85,7 +85,7 @@ Paperless consists of the following components:
         needs to do from time to time in order to operate properly.
 
     This allows paperless to process multiple documents from your consumption folder in parallel! On
-    a modern multicore system, consumption with full ocr is blazing fast.
+    a modern multi core system, consumption with full ocr is blazing fast.
 
     The task processor comes with a built-in admin interface that you can use to see whenever any of the
     tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
@@ -322,7 +322,7 @@ management commands as below.
             $ cd /path/to/paperless
             $ docker-compose run --rm webserver /bin/bash
         
-        This will lauch the container and initialize the PostgreSQL database.
+        This will launch the container and initialize the PostgreSQL database.
     
     b)  Without docker, open a shell in your virtual environment, switch to
         the ``src`` directory and create the database schema:
@@ -372,7 +372,7 @@ configuring some options in paperless can help improve performance immensely:
 *   ``PAPERLESS_TASK_WORKERS`` and ``PAPERLESS_THREADS_PER_WORKER`` are configured
     to use all cores. The Raspberry Pi models 3 and up have 4 cores, meaning that
     paperless will use 2 workers and 2 threads per worker. This may result in
-    slugish response times during consumption, so you might want to lower these
+    sluggish response times during consumption, so you might want to lower these
     settings (example: 2 workers and 1 thread to always have some computing power
     left for other tasks).
 *   Keep ``PAPERLESS_OCR_ALWAYS`` at its default value 'false' and consider OCR'ing

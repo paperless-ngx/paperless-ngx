@@ -84,6 +84,8 @@ to the filename.
    PAPERLESS_FILENAME_PARSE_TRANSFORMS=[{"pattern":"^([a-z]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.", "repl":"\\2\\3Z - \\4 - \\1."}, {"pattern":"^([a-z]+)_([0-9]+)\\.", "repl":" - \\2 - \\1."}]
 
 
+.. _advanced-matching:
+
 Matching tags, correspondents and document types
 ################################################
 
@@ -253,7 +255,7 @@ By default, paperless stores your documents in the media directory and renames t
 using the identifier which it has assigned to each document. You will end up getting
 files like ``0000123.pdf`` in your media directory. This isn't necessarily a bad
 thing, because you normally don't have to access these files manually. However, if
-you wish to name your files differently, you can do that by adjustng the
+you wish to name your files differently, you can do that by adjusting the
 ``PAPERLESS_FILENAME_FORMAT`` settings variable.
 
 This variable allows you to configure the filename (folders are allowed!) using
@@ -278,7 +280,7 @@ will create a directory structure as follows:
         my_new_shoes-0000004.pdf
 
 Paperless appends the unique identifier of each document to the filename. This
-avoides filename clashes.
+avoids filename clashes.
 
 .. danger::
 

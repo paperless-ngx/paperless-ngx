@@ -94,7 +94,7 @@ Result object:
     }
 
 *   ``id``: the primary key of the found document
-*   ``highlights``: an object containing parseable highlights for the result.
+*   ``highlights``: an object containing parsable highlights for the result.
     See below.
 *   ``score``: The score assigned to the document. A higher score indicates a
     better match with the query. Search results are sorted descending by score.
