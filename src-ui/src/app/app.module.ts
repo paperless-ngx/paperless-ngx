@@ -23,7 +23,7 @@ import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-di
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { TagComponent } from './components/common/tag/tag.component';
 import { SearchComponent } from './components/search/search.component';
-import { ResultHightlightComponent } from './components/search/result-hightlight/result-hightlight.component';
+import { ResultHighlightComponent } from './components/search/result-highlight/result-highlight.component';
 import { PageHeaderComponent } from './components/common/page-header/page-header.component';
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
@@ -65,7 +65,7 @@ import { WidgetFrameComponent } from './components/dashboard/widgets/widget-fram
     DocumentTypeEditDialogComponent,
     TagComponent,
     SearchComponent,
-    ResultHightlightComponent,
+    ResultHighlightComponent,
     PageHeaderComponent,
     AppFrameComponent,
     ToastsComponent,
