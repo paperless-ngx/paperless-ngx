@@ -69,7 +69,7 @@ PAPERLESS_CONSUMPTION_DIR=<path>
     Defaults to "../consume", relative to the "src" directory.
 
 PAPERLESS_DATA_DIR=<path>
-    This is where paperless stores all its data (search index, sqlite database,
+    This is where paperless stores all its data (search index, SQLite database,
     classification model, etc).
 
     Defaults to "../data", relative to the "src" directory.
@@ -100,7 +100,7 @@ Hosting & Security
 ##################
 
 PAPERLESS_SECRET_KEY=<key>
-    Paperless uses this to make session tokens. If you exose paperless on the
+    Paperless uses this to make session tokens. If you expose paperless on the
     internet, you need to change this, since the default secret is well known.
 
     Use any sequence of characters. The more, the better. You don't need to
@@ -220,7 +220,7 @@ PAPERLESS_CONSUMER_POLLING=<num>
     specify a polling interval in seconds here, which will then cause paperless
     to periodically check your consumption directory for changes.
 
-    Defaults to 0, which disables polling and uses filesystem notifiactions.
+    Defaults to 0, which disables polling and uses filesystem notifications.
 
 PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>
     When the consumer detects a duplicate document, it will not touch the
@@ -264,7 +264,7 @@ PAPERLESS_CONVERT_DENSITY=<num>
     Default is 300.
 
 PAPERLESS_OPTIMIZE_THUMBNAILS=<bool>
-    Use optipng to optimize thumbnails. This usually reduces the sice of
+    Use optipng to optimize thumbnails. This usually reduces the size of
     thumbnails by about 20%, but uses considerable compute time during
     consumption.
 

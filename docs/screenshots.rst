@@ -21,7 +21,7 @@ Extensive filtering mechanisms:
 
 .. image:: _static/screenshots/documents-filter.png
 
-Side-by-side editing of documents. Optmized for 1080p.
+Side-by-side editing of documents. Optimized for 1080p.
 
 .. image:: _static/screenshots/editing.png
 
