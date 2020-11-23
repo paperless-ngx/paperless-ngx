@@ -102,8 +102,7 @@ Paperless consists of the following components:
     for getting the tasks from the webserver and consumer to the task scheduler. These run in different
     processes (maybe even on different machines!), and therefore, this is necessary.
 
-*   A database server. Paperless supports PostgreSQL and sqlite for storing its data. However, with the
-    added concurrency, it is strongly advised to use PostgreSQL, as sqlite has its limits in that regard.
+*   Optional: A database server. Paperless supports both PostgreSQL and SQLite for storing its data.
 
 
 Installation
@@ -146,10 +145,10 @@ Docker Route
 
     .. hint::
 
-        For new installations, it is recommended to use postgresql as the database
-        backend. This is due to the increased amount of concurrency in paperless-ng.
+        For new installations, it is recommended to use PostgreSQL as the database
+        backend.
 
-2.  Modify ``docker-compose.yml`` to your preferences. You should change the path
+2.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
     to the consumption directory in this file. Find the line that specifies where
     to mount the consumption directory:
 
@@ -221,10 +220,10 @@ things have changed under the hood, so you need to adapt your setup depending on
 how you installed paperless. The important things to keep in mind are as follows.
 
 * Read the :ref:`changelog <paperless_changelog>` and take note of breaking changes.
-* It is recommended to use postgresql as the database now. If you want to continue
-  using SQLite, which is the default of paperless, use ``docker-compose.sqlite.yml``.
-  See :ref:`setup-sqlite_to_psql` for details on how to move your data from
-  sqlite to postgres.
+* You should decide if you want to stick with SQLite or want to migrate your database
+  to PostgreSQL. See :ref:`setup-sqlite_to_psql` for details on how to move your data from
+  SQLite to PostgreSQL. Both work fine with paperless. However, if you already have a
+  database server running for other services, you might as well use it for paperless as well.
 * The task scheduler of paperless, which is used to execute periodic tasks
   such as email checking and maintenance, requires a `redis`_ message broker
   instance. The docker-compose route takes care of that.
@@ -259,7 +258,7 @@ Migration to paperless-ng is then performed in a few simple steps:
         will be incompatible with the migrated volumes.
 
 4.  Copy the ``docker-compose.sqlite.yml`` file to ``docker-compose.yml``.
-    If you want to migrate to PostgreSQL, do that after you migrated your existing
+    If you want to switch to PostgreSQL, do that after you migrated your existing
     SQLite database.
 
 5.  Adjust ``docker-compose.yml`` and
@@ -299,7 +298,7 @@ management commands as below.
 
 .. caution::
 
-    Make sure that your sqlite database is migrated to the latest version.
+    Make sure that your SQLite database is migrated to the latest version.
     Starting paperless will make sure that this is the case. If your try to
     load data from an old database schema in SQLite into a newer database
     schema in PostgreSQL, you will run into trouble.
@@ -367,6 +366,7 @@ Considerations for less powerful devices
 Paperless runs on Raspberry Pi. However, some things are rather slow on the Pi and 
 configuring some options in paperless can help improve performance immensely:
 
+*   Stick with SQLite to save some resources.
 *   Consider setting ``PAPERLESS_OCR_PAGES`` to 1, so that paperless will only OCR
     the first page of your documents.
 *   ``PAPERLESS_TASK_WORKERS`` and ``PAPERLESS_THREADS_PER_WORKER`` are configured

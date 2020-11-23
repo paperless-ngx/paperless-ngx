@@ -69,7 +69,7 @@ First of all, ensure that paperless is stopped.
 
 After that, :ref:`make a backup <administration-backup>`.
 
-A.  If you used the docker-compose file, simply download the files of the new release,
+A.  If you used the dockerfiles archive, simply download the files of the new release,
     adjust the settings in the files (i.e., the path to your consumption directory),
     and replace your existing docker-compose files. Then start paperless as usual,
     which will pull the new image, and update your database, if necessary:
