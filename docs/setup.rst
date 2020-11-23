@@ -357,6 +357,35 @@ management commands as below.
 7.  Start paperless.
 
 
+Moving back to paperless
+========================
+
+Lets say you migrated to Paperless-ng and used it for a while, but decided that
+you don't like it and want to move back (If you do, send me a mail about what
+part you didn't like!), you can totally do that with a few simple steps.
+
+Paperless-ng modified the database schema slightly, however, these changes can
+be reverted while keeping your current data, so that your current data will
+be compatible with original Paperless.
+
+Execute this:
+
+.. code:: shell-session
+
+    $ cd /path/to/paperless
+    $ docker-compose run --rm webserver migrate documents 0023
+
+Or without docker:
+
+.. code:: shell-session
+
+    $ cd /path/to/paperless/src
+    $ python3 manage.py migrate documents 0023
+
+After that, you need to clear your cookies (Paperless-ng comes with updated
+dependencies that do cookie-processing differently) and probably your cache
+as well.
+
 .. _setup-less_powerful_devices:
 
 
