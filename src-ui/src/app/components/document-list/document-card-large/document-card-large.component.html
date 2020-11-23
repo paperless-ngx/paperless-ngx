@@ -11,7 +11,7 @@
           <h5 class="card-title" *ngIf="document.archive_serial_number">#{{document.archive_serial_number}}</h5>
         </div>
         <p class="card-text">
-          <app-result-hightlight *ngIf="getDetailsAsHighlight()" class="result-content" [highlights]="getDetailsAsHighlight()"></app-result-hightlight>
+          <app-result-highlight *ngIf="getDetailsAsHighlight()" class="result-content" [highlights]="getDetailsAsHighlight()"></app-result-highlight>
           <span *ngIf="getDetailsAsString()" class="result-content">{{getDetailsAsString()}}</span>
         </p>
 
