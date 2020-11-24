@@ -77,6 +77,10 @@ Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest
 
 The documentation for Paperless-ng is available on [ReadTheDocs](https://paperless-ng.readthedocs.io/).
 
+# Suggestions? Questions? Something not working?
+
+Please open an issue and start a discussion about it!
+
 # Affiliated Projects
 
 Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
