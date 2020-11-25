@@ -353,39 +353,23 @@ Documents can be stored in Paperless using GnuPG encryption.
     Consider running paperless on an encrypted filesystem instead, which will then
     at least provide security against physical hardware theft.
 
-.. code::
-
-    change_storage_type [--passphrase PASSPHRASE] {gpg,unencrypted} {gpg,unencrypted}
-
-    positional arguments:
-      {gpg,unencrypted}     The state you want to change your documents from
-      {gpg,unencrypted}     The state you want to change your documents to
-
-    optional arguments:
-      --passphrase PASSPHRASE
 
 Enabling encryption
 -------------------
 
-Basic usage to enable encryption of your document store (**USE A MORE SECURE PASSPHRASE**):
-
-(Note: If ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
-
-.. code::
-
-    change_storage_type [--passphrase SECR3TP4SSPHRA$E] unencrypted gpg
+Enabling encryption is no longer supported.
 
 
 Disabling encryption
 --------------------
 
-Basic usage to enable encryption of your document store:
+Basic usage to disable encryption of your document store:
 
-(Note: Again, if ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
+(Note: If ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
 
 .. code::
 
-    change_storage_type [--passphrase SECR3TP4SSPHRA$E] gpg unencrypted
+    decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
 
 
 .. _Pipenv: https://pipenv.pypa.io/en/latest/

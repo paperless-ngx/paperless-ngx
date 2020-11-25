@@ -82,8 +82,6 @@ class Command(Renderable, BaseCommand):
     def _import_files_from_manifest(self):
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        if settings.PASSPHRASE:
-            storage_type = Document.STORAGE_TYPE_GPG
 
         for record in self.manifest:
 
@@ -105,23 +103,8 @@ class Command(Renderable, BaseCommand):
 
             create_source_path_directory(document.source_path)
 
-            if settings.PASSPHRASE:
-
-                with open(document_path, "rb") as unencrypted:
-                    with open(document.source_path, "wb") as encrypted:
-                        print("Encrypting {} and saving it to {}".format(
-                            doc_file, document.source_path))
-                        encrypted.write(GnuPG.encrypted(unencrypted))
-
-                with open(thumbnail_path, "rb") as unencrypted:
-                    with open(document.thumbnail_path, "wb") as encrypted:
-                        print("Encrypting {} and saving it to {}".format(
-                            thumb_file, document.thumbnail_path))
-                        encrypted.write(GnuPG.encrypted(unencrypted))
-
-            else:
-                print(f"Moving {document_path} to {document.source_path}")
-                shutil.copy(document_path, document.source_path)
-                shutil.copy(thumbnail_path, document.thumbnail_path)
+            print(f"Moving {document_path} to {document.source_path}")
+            shutil.copy(document_path, document.source_path)
+            shutil.copy(thumbnail_path, document.thumbnail_path)
 
             document.save()
