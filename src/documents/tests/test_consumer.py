@@ -364,35 +364,35 @@ class TestFieldPermutations(TestCase):
 
 class DummyParser(DocumentParser):
 
-    def get_thumbnail(self):
+    def get_thumbnail(self, document_path, mime_type):
         # not important during tests
         raise NotImplementedError()
 
-    def __init__(self, path, logging_group, scratch_dir):
-        super(DummyParser, self).__init__(path, logging_group)
+    def __init__(self, logging_group, scratch_dir):
+        super(DummyParser, self).__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
 
-    def get_optimised_thumbnail(self):
+    def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def get_text(self):
-        return "The Text"
+    def parse(self, document_path, mime_type):
+        self.text = "The Text"
 
 
 class FaultyParser(DocumentParser):
 
-    def get_thumbnail(self):
+    def get_thumbnail(self, document_path, mime_type):
         # not important during tests
         raise NotImplementedError()
 
-    def __init__(self, path, logging_group, scratch_dir):
-        super(FaultyParser, self).__init__(path, logging_group)
+    def __init__(self, logging_group, scratch_dir):
+        super(FaultyParser, self).__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
 
-    def get_optimised_thumbnail(self):
+    def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def get_text(self):
+    def parse(self, document_path, mime_type):
         raise ParseError("Does not compute.")
 
 
@@ -410,11 +410,11 @@ def fake_magic_from_file(file, mime=False):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumer(TestCase):
 
-    def make_dummy_parser(self, path, logging_group):
-        return DummyParser(path, logging_group, self.scratch_dir)
+    def make_dummy_parser(self, logging_group):
+        return DummyParser(logging_group, self.scratch_dir)
 
-    def make_faulty_parser(self, path, logging_group):
-        return FaultyParser(path, logging_group, self.scratch_dir)
+    def make_faulty_parser(self, logging_group):
+        return FaultyParser(logging_group, self.scratch_dir)
 
     def setUp(self):
         self.scratch_dir = tempfile.mkdtemp()
