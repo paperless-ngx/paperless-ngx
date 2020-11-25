@@ -8,7 +8,8 @@ class AutoLoginMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         try:
-            request.user = User.objects.get(username=settings.AUTO_LOGIN_USERNAME)
+            request.user = User.objects.get(
+                username=settings.AUTO_LOGIN_USERNAME)
         except User.DoesNotExist:
             pass
 
