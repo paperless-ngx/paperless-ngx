@@ -10,6 +10,7 @@ def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
 
 
+# TODO: also make this work for archive dir
 def delete_empty_directories(directory):
     # Go up in the directory hierarchy and try to delete all directories
     directory = os.path.normpath(directory)
