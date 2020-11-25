@@ -242,6 +242,10 @@ class Document(models.Model):
         return slugify(str(self)) + self.file_type
 
     @property
+    def archive_file_name(self):
+        return slugify(str(self)) + ".pdf"
+
+    @property
     def file_type(self):
         return mimetypes.guess_extension(str(self.mime_type))
 
