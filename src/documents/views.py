@@ -138,7 +138,7 @@ class DocumentViewSet(RetrieveModelMixin,
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
         mime_type = doc.mime_type
-        if not self.original_requested(request) and os.path.isfile(doc.archive_path):
+        if not self.original_requested(request) and os.path.isfile(doc.archive_path):  # NOQA: E501
             file_handle = doc.archive_file
             mime_type = 'application/pdf'
         elif doc.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
@@ -169,7 +169,8 @@ class DocumentViewSet(RetrieveModelMixin,
                 "paperless__checksum": doc.checksum,
                 "paperless__mime_type": doc.mime_type,
                 "paperless__filename": doc.filename,
-                "paperless__has_archive_version": os.path.isfile(doc.archive_path)
+                "paperless__has_archive_version":
+                    os.path.isfile(doc.archive_path)
             })
         except Document.DoesNotExist:
             raise Http404()
