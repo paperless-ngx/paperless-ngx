@@ -141,6 +141,9 @@ class DocumentParser(LoggingMixin):
         self.tempdir = tempfile.mkdtemp(
             prefix="paperless-", dir=settings.SCRATCH_DIR)
 
+    def get_archive_path(self):
+        return None
+
     def get_thumbnail(self):
         """
         Returns the path to a file we can use as a thumbnail for this document.
