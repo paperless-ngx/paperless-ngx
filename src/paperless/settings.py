@@ -346,6 +346,8 @@ OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 # TODO: validate this.
 OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
+OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
+
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
 

@@ -4,6 +4,7 @@ import subprocess
 
 import ocrmypdf
 import pdftotext
+from PIL import Image
 from django.conf import settings
 from ocrmypdf import InputFileError
 
@@ -60,10 +61,22 @@ class RasterisedDocumentParser(DocumentParser):
 
         return out_path
 
-    def get_text(self):
+    def is_image(self, mime_type):
+        return mime_type in [
+            "image/png",
+            "image/jpeg"
+        ]
 
-        if self._text:
-            return self._text
+    def get_dpi(self, image):
+        try:
+            with Image.open(image) as im:
+                x, y = im.info['dpi']
+                return x
+        except Exception as e:
+            self.log(
+                'warning',
+                f"Error while getting DPI from image {image}: {e}")
+            return None
 
     def parse(self, document_path, mime_type):
         archive_path = os.path.join(self.tempdir, "archive.pdf")
@@ -88,6 +101,22 @@ class RasterisedDocumentParser(DocumentParser):
             ocr_args['redo_ocr'] = True
         elif settings.OCR_MODE == 'force':
             ocr_args['force_ocr'] = True
+
+        if self.is_image(mime_type):
+            dpi = self.get_dpi(document_path)
+            if dpi:
+                self.log(
+                    "debug",
+                    f"Detected DPI for image {document_path}: {dpi}"
+                )
+                ocr_args['image_dpi'] = dpi
+            elif settings.OCR_IMAGE_DPI:
+                ocr_args['image_dpi'] = settings.OCR_IMAGE_DPI
+            else:
+                raise ParseError(
+                    f"Cannot produce archive PDF for image {document_path}, "
+                    f"no DPI information is present in this image and "
+                    f"OCR_IMAGE_DPI is not set.")
 
         try:
             ocrmypdf.ocr(**ocr_args)
