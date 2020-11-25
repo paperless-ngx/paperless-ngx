@@ -208,10 +208,7 @@ class Consumer(LoggingMixin):
         created = file_info.created or date or timezone.make_aware(
             datetime.datetime.fromtimestamp(stats.st_mtime))
 
-        if settings.PASSPHRASE:
-            storage_type = Document.STORAGE_TYPE_GPG
-        else:
-            storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
         with open(self.path, "rb") as f:
             document = Document.objects.create(
@@ -260,8 +257,4 @@ class Consumer(LoggingMixin):
     def _write(self, document, source, target):
         with open(source, "rb") as read_file:
             with open(target, "wb") as write_file:
-                if document.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
-                    write_file.write(read_file.read())
-                    return
-                self.log("debug", "Encrypting")
-                write_file.write(GnuPG.encrypted(read_file))
+                write_file.write(read_file.read())
