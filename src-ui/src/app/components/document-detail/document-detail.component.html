@@ -5,12 +5,26 @@
         </svg>
         <span class="d-none d-lg-inline"> Delete</span>
     </button>
-    <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary mr-2">
-        <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#download" />
-        </svg>
-        <span class="d-none d-lg-inline"> Download</span>
-    </a>
+
+    <div class="btn-group mr-2">
+
+        <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
+            <svg class="buttonicon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#download" />
+            </svg>
+            <span class="d-none d-lg-inline"> Download</span>
+        </a>
+    
+        <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.paperless__has_archive_version">
+          <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
+          <div class="dropdown-menu" ngbDropdownMenu>
+            <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
+          </div>
+        </div>
+    
+      </div>
+
+
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#x" />
