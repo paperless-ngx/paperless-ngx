@@ -133,7 +133,8 @@ class Consumer(LoggingMixin):
             document_parser.parse(self.path, mime_type)
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
-            thumbnail = document_parser.get_optimised_thumbnail(self.path, mime_type)
+            thumbnail = document_parser.get_optimised_thumbnail(
+                self.path, mime_type)
 
             text = document_parser.get_text()
             date = document_parser.get_date()
