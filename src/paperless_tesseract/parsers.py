@@ -160,7 +160,9 @@ def strip_excess_whitespace(text):
         r"([\n\r]+)([^\S\n\r]+)", '\\1', collapsed_spaces)
     no_trailing_whitespace = re.sub(
         r"([^\S\n\r]+)$", '', no_leading_whitespace)
-    return no_trailing_whitespace
+
+    # TODO: this needs a rework
+    return no_trailing_whitespace.strip()
 
 
 def get_text_from_pdf(pdf_file):
