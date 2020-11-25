@@ -56,8 +56,8 @@ class TestAuxilliaryFunctions(TestCase):
         self.assertIsNone(text)
 
     def test_thumbnail(self):
-        parser = RasterisedDocumentParser(os.path.join(self.SAMPLE_FILES, 'simple.pdf'), uuid.uuid4())
-        parser.get_thumbnail()
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple.pdf'), "application/pdf")
         # dont really know how to test it, just call it and assert that it does not raise anything.
 
     @mock.patch("paperless_tesseract.parsers.run_convert")
@@ -71,6 +71,6 @@ class TestAuxilliaryFunctions(TestCase):
 
         m.side_effect = call_convert
 
-        parser = RasterisedDocumentParser(os.path.join(self.SAMPLE_FILES, 'simple.pdf'), uuid.uuid4())
-        parser.get_thumbnail()
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple.pdf'), "application/pdf")
         # dont really know how to test it, just call it and assert that it does not raise anything.
