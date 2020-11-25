@@ -65,6 +65,7 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
+        os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
     def try_consume_file(self,
                          path,

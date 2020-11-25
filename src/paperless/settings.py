@@ -49,6 +49,7 @@ STATIC_ROOT = os.getenv("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "sta
 
 MEDIA_ROOT = os.getenv('PAPERLESS_MEDIA_ROOT', os.path.join(BASE_DIR, "..", "media"))
 ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents", "originals")
+ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
