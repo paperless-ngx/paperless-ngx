@@ -10,6 +10,8 @@ next
 
 *   Setting ``PAPERLESS_AUTO_LOGIN_USERNAME`` replaces ``PAPERLESS_DISABLE_LOGIN``.
     You have to specify your username.
+*   Added a simple sanity checker that checks your documents for missing or orphaned files,
+    files with wrong checksums, inaccessible files, and documents with empty content.
 
 
 paperless-ng 0.9.2
