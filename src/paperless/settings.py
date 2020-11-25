@@ -353,11 +353,10 @@ GNUPG_HOME = os.getenv("HOME", "/tmp")
 CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY", "convert")
 CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
-CONVERT_DENSITY = int(os.getenv("PAPERLESS_CONVERT_DENSITY", 300))
 
 GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
+
 OPTIPNG_BINARY = os.getenv("PAPERLESS_OPTIPNG_BINARY", "optipng")
-UNPAPER_BINARY = os.getenv("PAPERLESS_UNPAPER_BINARY", "unpaper")
 
 
 # Pre-2.x versions of Paperless stored your documents locally with GPG
