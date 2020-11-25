@@ -338,9 +338,13 @@ OCR_PAGES = int(os.getenv('PAPERLESS_OCR_PAGES', 0))
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
+# OCRmyPDF --output-type options are available.
+# TODO: validate this setting.
+OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 
-# OCR all documents?
-OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS", "false")
+# skip. redo, force
+# TODO: validate this.
+OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")

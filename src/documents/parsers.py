@@ -107,23 +107,6 @@ def run_convert(input_file,
         raise ParseError("Convert failed at {}".format(args))
 
 
-def run_unpaper(pnm, logging_group=None):
-    pnm_out = pnm.replace(".pnm", ".unpaper.pnm")
-
-    command_args = (settings.UNPAPER_BINARY, "--overwrite", "--quiet", pnm,
-                    pnm_out)
-
-    logger.debug(f"Execute: {' '.join(command_args)}",
-                 extra={'group': logging_group})
-
-    if not subprocess.Popen(command_args,
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL).wait() == 0:
-        raise ParseError(f"Unpaper failed at {command_args}")
-
-    return pnm_out
-
-
 class ParseError(Exception):
     pass
 

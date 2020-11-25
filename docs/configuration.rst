@@ -218,11 +218,37 @@ PAPERLESS_OCR_LANGUAGE=<lang>
 
     Defaults to "eng".
 
-PAPERLESS_OCR_ALWAYS=<bool>
-    By default Paperless does not OCR a document if the text can be retrieved from
-    the document directly. Set to true to always OCR documents.
+PAPERLESS_OCR_MODE=<mode>
+    Tell paperless when and how to perform ocr on your documents. Three modes
+    are available:
 
-    Defaults to false.
+    *   ``skip``: Paperless skips all pages and will perform ocr only on pages
+        where no text is present. This is the safest and fastest option.
+    *   ``redo``: Paperless will OCR all pages of your documents and attempt to
+        replace any existing text layers with new text. This will be useful for
+        documents from scanners that already performed OCR with insufficient
+        results. It will also perform OCR on purely digital documents.
+
+        This option may fail on some documents that have features that cannot
+        be removed, such as forms. In this case, the text from the document is
+        used instead.
+    *   ``force``: Paperless rasterizes your documents, converting any text
+        into images and puts the OCRed text on top. This works for all documents,
+        however, the resulting document may be significantly larger and text
+        won't appear as sharp when zoomed in.
+    
+    The default is ``skip``, which only performs OCR when necessary.
+
+PAPERLESS_OCR_OUTPUT_TYPE=<type>
+    Specify the the type of PDF documents that paperless should produce.
+    
+    *   ``pdf``: Modify the PDF document as little as possible.
+    *   ``pdfa``: Convert PDF documents into PDF/A documents, which is a
+        subset of the entire PDF specification and meant for storing
+        documents long term.
+    
+    If not specified, ``pdfa`` is used. Remember that paperless also keeps
+    the original input file as well as the archived version.
 
 PAPERLESS_CONSUMER_POLLING=<num>
     If paperless won't find documents added to your consume folder, it might
