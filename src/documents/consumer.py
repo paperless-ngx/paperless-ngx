@@ -194,7 +194,7 @@ class Consumer(LoggingMixin):
                             thumbnail, document.thumbnail_path)
 
                 if archive_path and os.path.isfile(archive_path):
-                    self._write(Document.STORAGE_TYPE_UNENCRYPTED,
+                    self._write(document.storage_type,
                                 archive_path, document.archive_path)
 
                 # Delete the file only if it was successfully consumed

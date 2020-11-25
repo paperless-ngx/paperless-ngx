@@ -137,16 +137,17 @@ class DocumentViewSet(RetrieveModelMixin,
 
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
-        mime_type = doc.mime_type
-        filename = doc.file_name
         if not self.original_requested(request) and os.path.isfile(doc.archive_path):  # NOQA: E501
             file_handle = doc.archive_file
             filename = doc.archive_file_name
             mime_type = 'application/pdf'
-        elif doc.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
-            file_handle = doc.source_file
         else:
-            file_handle = GnuPG.decrypted(doc.source_file)
+            file_handle = doc.source_file
+            filename = doc.file_name
+            mime_type = doc.mime_type
+
+        if doc.storage_type == Document.STORAGE_TYPE_GPG:
+            file_handle = GnuPG.decrypted(file_handle)
 
         response = HttpResponse(file_handle, content_type=mime_type)
         response["Content-Disposition"] = '{}; filename="{}"'.format(

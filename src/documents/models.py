@@ -227,6 +227,8 @@ class Document(models.Model):
     @property
     def archive_path(self):
         fname = "{:07}{}".format(self.pk, ".pdf")
+        if self.storage_type == self.STORAGE_TYPE_GPG:
+            fname += ".gpg"
 
         return os.path.join(
             settings.ARCHIVE_DIR,
