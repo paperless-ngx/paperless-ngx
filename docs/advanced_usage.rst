@@ -147,7 +147,9 @@ America are tagged with the tag "bofa_123" and the matching algorithm of this
 tag is set to *Auto*, this neural network will examine your documents and
 automatically learn when to assign this tag.
 
-There are a couple caveats you need to keep in mind when using this feature:
+Paperless tries to hide much of the involved complexity with this approach.
+However, there are a couple caveats you need to keep in mind when using this
+feature:
 
 * Changes to your documents are not immediately reflected by the matching
   algorithm. The neural network needs to be *trained* on your documents after
@@ -167,6 +169,11 @@ There are a couple caveats you need to keep in mind when using this feature:
   has the correspondent "Very obscure web shop I bought something five years
   ago", it will probably not assign this correspondent automatically if you buy
   something from them again. The more documents, the better.
+* Paperless also needs a reasonable amount of negative examples to decide when
+  not to assign a certain tag, correspondent or type. This will usually be the
+  case as you start filling up paperless with documents. Example: If all your
+  documents are either from "Webshop" and "Bank", paperless will assign one of
+  these correspondents to ANY new document, if both are set to automatic matching.
 
 Hooking into the consumption process
 ####################################
