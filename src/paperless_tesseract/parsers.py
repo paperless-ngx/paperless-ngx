@@ -2,7 +2,6 @@ import os
 import re
 import subprocess
 
-import langdetect
 import ocrmypdf
 import pdftotext
 from django.conf import settings
@@ -17,12 +16,7 @@ class RasterisedDocumentParser(DocumentParser):
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
 
-    def __init__(self, path, logging_group):
-        super().__init__(path, logging_group)
-        self._text = None
-        self._archive_path = None
-
-    def get_thumbnail(self):
+    def get_thumbnail(self, document_path, mime_type):
         """
         The thumbnail of a PDF is just a 500px wide image of the first page.
         """
@@ -36,7 +30,7 @@ class RasterisedDocumentParser(DocumentParser):
                         alpha="remove",
                         strip=True,
                         trim=True,
-                        input_file="{}[0]".format(self.document_path),
+                        input_file="{}[0]".format(document_path),
                         output_file=out_path,
                         logging_group=self.logging_group)
         except ParseError:
@@ -51,7 +45,7 @@ class RasterisedDocumentParser(DocumentParser):
                    "-q",
                    "-sDEVICE=pngalpha",
                    "-o", gs_out_path,
-                   self.document_path]
+                   document_path]
             if not subprocess.Popen(cmd).wait() == 0:
                 raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
             # then run convert on the output from gs
@@ -71,10 +65,11 @@ class RasterisedDocumentParser(DocumentParser):
         if self._text:
             return self._text
 
+    def parse(self, document_path, mime_type):
         archive_path = os.path.join(self.tempdir, "archive.pdf")
 
         ocr_args = {
-            'input_file': self.document_path,
+            'input_file': document_path,
             'output_file': archive_path,
             'use_threads': True,
             'jobs': settings.THREADS_PER_WORKER,
@@ -96,17 +91,17 @@ class RasterisedDocumentParser(DocumentParser):
 
         try:
             ocrmypdf.ocr(**ocr_args)
-            # success! announce that we have an archive document
-            self._archive_path = archive_path
-            self._text = get_text_from_pdf(self._archive_path)
+            # success! announce results
+            self.archive_path = archive_path
+            self.text = get_text_from_pdf(archive_path)
 
         except InputFileError as e:
             # This happens with some PDFs when used with the redo_ocr option.
             # This is not the end of the world, we'll just use what we already
             # have in the document.
-            self._text = get_text_from_pdf(self.document_path)
+            self.text = get_text_from_pdf(document_path)
             # Also, no archived file.
-            if not self._text:
+            if not self.text:
                 # However, if we don't have anything, fail:
                 raise ParseError(e)
 
@@ -114,27 +109,14 @@ class RasterisedDocumentParser(DocumentParser):
             # Anything else is probably serious.
             raise ParseError(e)
 
-        if not self._text:
+        if not self.text:
             # This may happen for files that don't have any text.
             self.log(
                 'warning',
-                f"Document {self.document_path} does not have any text."
+                f"Document {document_path} does not have any text."
                 f"This is probably an error or you tried to add an image "
                 f"without text.")
-            return ""
-
-        return self._text
-
-    def get_archive_path(self):
-        return self._archive_path
-
-    def _guess_language(self, text):
-        try:
-            guess = langdetect.detect(text)
-            return guess
-        except Exception as e:
-            self.log('warning', f"Language detection failed with: {e}")
-            return None
+            self.text = ""
 
 
 def strip_excess_whitespace(text):

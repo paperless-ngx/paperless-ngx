@@ -107,6 +107,61 @@ def run_convert(input_file,
         raise ParseError("Convert failed at {}".format(args))
 
 
+def parse_date(filename, text):
+    """
+    Returns the date of the document.
+    """
+
+    def __parser(ds, date_order):
+        """
+        Call dateparser.parse with a particular date ordering
+        """
+        return dateparser.parse(
+            ds,
+            settings={
+                "DATE_ORDER": date_order,
+                "PREFER_DAY_OF_MONTH": "first",
+                "RETURN_AS_TIMEZONE_AWARE":
+                True
+            }
+        )
+
+    date = None
+
+    next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
+
+    # if filename date parsing is enabled, search there first:
+    if settings.FILENAME_DATE_ORDER:
+        for m in re.finditer(DATE_REGEX, filename):
+            date_string = m.group(0)
+
+            try:
+                date = __parser(date_string, settings.FILENAME_DATE_ORDER)
+            except (TypeError, ValueError):
+                # Skip all matches that do not parse to a proper date
+                continue
+
+            if date is not None and next_year > date.year > 1900:
+                return date
+
+    # Iterate through all regex matches in text and try to parse the date
+    for m in re.finditer(DATE_REGEX, text):
+        date_string = m.group(0)
+
+        try:
+            date = __parser(date_string, settings.DATE_ORDER)
+        except (TypeError, ValueError):
+            # Skip all matches that do not parse to a proper date
+            continue
+
+        if date is not None and next_year > date.year > 1900:
+            break
+        else:
+            date = None
+
+    return date
+
+
 class ParseError(Exception):
     pass
 
@@ -117,29 +172,35 @@ class DocumentParser(LoggingMixin):
     `paperless_tesseract.parsers` for inspiration.
     """
 
-    def __init__(self, path, logging_group):
+    def __init__(self, logging_group):
         super().__init__()
         self.logging_group = logging_group
-        self.document_path = path
         self.tempdir = tempfile.mkdtemp(
             prefix="paperless-", dir=settings.SCRATCH_DIR)
 
-    def get_archive_path(self):
-        return None
+        self.archive_path = None
+        self.text = None
+        self.date = None
 
-    def get_thumbnail(self):
+    def parse(self, document_path, mime_type):
+        raise NotImplementedError()
+
+    def get_archive_path(self):
+        return self.archive_path
+
+    def get_thumbnail(self, document_path, mime_type):
         """
         Returns the path to a file we can use as a thumbnail for this document.
         """
         raise NotImplementedError()
 
-    def optimise_thumbnail(self, in_path):
-
+    def get_optimised_thumbnail(self, document_path, mime_type):
+        thumbnail = self.get_thumbnail(document_path, mime_type)
         if settings.OPTIMIZE_THUMBNAILS:
-            out_path = os.path.join(self.tempdir, "optipng.png")
+            out_path = os.path.join(self.tempdir, "thumb_optipng.png")
 
             args = (settings.OPTIPNG_BINARY,
-                    "-silent", "-o5", in_path, "-out", out_path)
+                    "-silent", "-o5", thumbnail, "-out", out_path)
 
             self.log('debug', f"Execute: {' '.join(args)}")
 
@@ -148,97 +209,13 @@ class DocumentParser(LoggingMixin):
 
             return out_path
         else:
-            return in_path
-
-    def get_optimised_thumbnail(self):
-        return self.optimise_thumbnail(self.get_thumbnail())
+            return thumbnail
 
     def get_text(self):
-        """
-        Returns the text from the document and only the text.
-        """
-        raise NotImplementedError()
+        return self.text
 
     def get_date(self):
-        """
-        Returns the date of the document.
-        """
-
-        def __parser(ds, date_order):
-            """
-            Call dateparser.parse with a particular date ordering
-            """
-            return dateparser.parse(
-                ds,
-                settings={
-                    "DATE_ORDER": date_order,
-                    "PREFER_DAY_OF_MONTH": "first",
-                    "RETURN_AS_TIMEZONE_AWARE":
-                    True
-                }
-            )
-
-        date = None
-        date_string = None
-
-        next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
-        title = os.path.basename(self.document_path)
-
-        # if filename date parsing is enabled, search there first:
-        if settings.FILENAME_DATE_ORDER:
-            self.log("info", "Checking document title for date")
-            for m in re.finditer(DATE_REGEX, title):
-                date_string = m.group(0)
-
-                try:
-                    date = __parser(date_string, settings.FILENAME_DATE_ORDER)
-                except (TypeError, ValueError):
-                    # Skip all matches that do not parse to a proper date
-                    continue
-
-                if date is not None and next_year > date.year > 1900:
-                    self.log(
-                        "info",
-                        "Detected document date {} based on string {} "
-                        "from document title"
-                        "".format(date.isoformat(), date_string)
-                    )
-                    return date
-
-        try:
-            # getting text after checking filename will save time if only
-            # looking at the filename instead of the whole text
-            text = self.get_text()
-        except ParseError:
-            return None
-
-        # Iterate through all regex matches in text and try to parse the date
-        for m in re.finditer(DATE_REGEX, text):
-            date_string = m.group(0)
-
-            try:
-                date = __parser(date_string, settings.DATE_ORDER)
-            except (TypeError, ValueError):
-                # Skip all matches that do not parse to a proper date
-                continue
-
-            if date is not None and next_year > date.year > 1900:
-                break
-            else:
-                date = None
-
-        if date is not None:
-            self.log(
-                "info",
-                "Detected document date {} based on string {}".format(
-                    date.isoformat(),
-                    date_string
-                )
-            )
-        else:
-            self.log("info", "Unable to detect date for document")
-
-        return date
+        return self.date
 
     def cleanup(self):
         self.log("debug", "Deleting directory {}".format(self.tempdir))

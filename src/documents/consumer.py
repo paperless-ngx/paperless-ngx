@@ -13,7 +13,7 @@ from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .file_handling import generate_filename, create_source_path_directory
 from .loggers import LoggingMixin
 from .models import Document, FileInfo, Correspondent, DocumentType, Tag
-from .parsers import ParseError, get_parser_class_for_mime_type
+from .parsers import ParseError, get_parser_class_for_mime_type, parse_date
 from .signals import (
     document_consumption_finished,
     document_consumption_started
@@ -121,7 +121,7 @@ class Consumer(LoggingMixin):
 
         # This doesn't parse the document yet, but gives us a parser.
 
-        document_parser = parser_class(self.path, self.logging_group)
+        document_parser = parser_class(self.logging_group)
 
         # However, this already created working directories which we have to
         # clean up.
@@ -129,12 +129,18 @@ class Consumer(LoggingMixin):
         # Parse the document. This may take some time.
 
         try:
-            self.log("debug", f"Generating thumbnail for {self.filename}...")
-            thumbnail = document_parser.get_optimised_thumbnail()
             self.log("debug", "Parsing {}...".format(self.filename))
+            document_parser.parse(self.path, mime_type)
+
+            self.log("debug", f"Generating thumbnail for {self.filename}...")
+            thumbnail = document_parser.get_optimised_thumbnail(self.path, mime_type)
+
             text = document_parser.get_text()
             date = document_parser.get_date()
+            if not date:
+                date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
+
         except ParseError as e:
             document_parser.cleanup()
             raise ConsumerError(e)
