@@ -61,10 +61,20 @@ class Command(BaseCommand):
                 document).encode('utf-8'), "green"))
 
             old_paths = [document.source_path, document.thumbnail_path]
+
             raw_document = GnuPG.decrypted(document.source_file, passphrase)
             raw_thumb = GnuPG.decrypted(document.thumbnail_file, passphrase)
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+
+            ext = os.path.splitext(document.filename)[1]
+
+            if not ext == '.gpg':
+                raise CommandError(
+                    f"Abort: encrypted file {document.source_path} does not "
+                    f"end with .gpg")
+
+            document.filename = os.path.splitext(document.source_path)[0]
 
             with open(document.source_path, "wb") as f:
                 f.write(raw_document)
@@ -72,7 +82,7 @@ class Command(BaseCommand):
             with open(document.thumbnail_path, "wb") as f:
                 f.write(raw_thumb)
 
-            document.save(update_fields=("storage_type",))
+            document.save(update_fields=("storage_type", "filename"))
 
             for path in old_paths:
                 os.unlink(path)
