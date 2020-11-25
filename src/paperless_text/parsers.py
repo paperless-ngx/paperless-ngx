@@ -11,11 +11,7 @@ class TextDocumentParser(DocumentParser):
     This parser directly parses a text document (.txt, .md, or .csv)
     """
 
-    def __init__(self, path, logging_group):
-        super().__init__(path, logging_group)
-        self._text = None
-
-    def get_thumbnail(self):
+    def get_thumbnail(self, document_path, mime_type):
         """
         The thumbnail of a text file is just a 500px wide image of the text
         rendered onto a letter-sized page.
@@ -46,7 +42,7 @@ class TextDocumentParser(DocumentParser):
             )
 
         def read_text():
-            with open(self.document_path, 'r') as src:
+            with open(document_path, 'r') as src:
                 lines = [line.strip() for line in src.readlines()]
                 text = "\n".join([line for line in lines[:n_lines]])
                 return text.replace('"', "'")
@@ -76,15 +72,9 @@ class TextDocumentParser(DocumentParser):
 
         return out_path
 
-    def get_text(self):
-
-        if self._text is not None:
-            return self._text
-
-        with open(self.document_path, 'r') as f:
-            self._text = f.read()
-
-        return self._text
+    def parse(self, document_path, mime_type):
+        with open(document_path, 'r') as f:
+            self.text = f.read()
 
 
 def run_command(*args):
