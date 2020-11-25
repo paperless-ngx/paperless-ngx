@@ -162,13 +162,25 @@ class DocumentViewSet(RetrieveModelMixin,
             return HttpResponseBadRequest(str(form.errors))
 
     @action(methods=['get'], detail=True)
+    def metadata(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+            return Response({
+                "paperless__checksum": doc.checksum,
+                "paperless__mime_type": doc.mime_type,
+                "paperless__filename": doc.filename,
+            })
+        except Document.DoesNotExist:
+            raise Http404()
+
+    @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
         try:
             response = self.file_response(
                 pk, request, "inline")
             return response
-        except FileNotFoundError:
-            raise Http404("Document source file does not exist")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404()
 
     @action(methods=['get'], detail=True)
     @cache_control(public=False, max_age=315360000)
@@ -176,16 +188,16 @@ class DocumentViewSet(RetrieveModelMixin,
         try:
             return HttpResponse(Document.objects.get(id=pk).thumbnail_file,
                                 content_type='image/png')
-        except FileNotFoundError:
-            raise Http404("Document thumbnail does not exist")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404()
 
     @action(methods=['get'], detail=True)
     def download(self, request, pk=None):
         try:
             return self.file_response(
                 pk, request, "attachment")
-        except FileNotFoundError:
-            raise Http404("Document source file does not exist")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404()
 
 
 class LogViewSet(ReadOnlyModelViewSet):
