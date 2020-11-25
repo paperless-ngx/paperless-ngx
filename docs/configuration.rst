@@ -250,6 +250,19 @@ PAPERLESS_OCR_OUTPUT_TYPE=<type>
     If not specified, ``pdfa`` is used. Remember that paperless also keeps
     the original input file as well as the archived version.
 
+PAPERLESS_OCR_IMAGE_DPI=<num>
+    Paperless will OCR any images you put into the system and convert them
+    into PDF documents. This is useful if your scanner produces images.
+    In order to do so, paperless needs to know the DPI of the image.
+    Most images from scanners will have this information embedded and
+    paperless will detect and use that information. In case this fails, it
+    uses this value as a fallback.
+
+    Set this to the DPI your scanner produces images at.
+
+    Default is none, which causes paperless to fail if no DPI information is
+    present in an image.
+
 PAPERLESS_CONSUMER_POLLING=<num>
     If paperless won't find documents added to your consume folder, it might
     not be able to automatically detect filesystem changes. In that case,
