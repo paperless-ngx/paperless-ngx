@@ -118,6 +118,9 @@ class RasterisedDocumentParser(DocumentParser):
                     f"no DPI information is present in this image and "
                     f"OCR_IMAGE_DPI is not set.")
 
+        # This forces tesseract to use one core per page.
+        os.environ['OMP_THREAD_LIMIT'] = "1"
+
         try:
             ocrmypdf.ocr(**ocr_args)
             # success! announce results
