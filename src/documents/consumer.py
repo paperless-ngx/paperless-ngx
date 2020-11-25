@@ -134,6 +134,7 @@ class Consumer(LoggingMixin):
             self.log("debug", "Parsing {}...".format(self.filename))
             text = document_parser.get_text()
             date = document_parser.get_date()
+            archive_path = document_parser.get_archive_path()
         except ParseError as e:
             document_parser.cleanup()
             raise ConsumerError(e)
@@ -178,8 +179,16 @@ class Consumer(LoggingMixin):
                 # place. If this fails, we'll also rollback the transaction.
 
                 create_source_path_directory(document.source_path)
-                self._write(document, self.path, document.source_path)
-                self._write(document, thumbnail, document.thumbnail_path)
+
+                self._write(document.storage_type,
+                            self.path, document.source_path)
+
+                self._write(document.storage_type,
+                            thumbnail, document.thumbnail_path)
+
+                if archive_path and os.path.isfile(archive_path):
+                    self._write(Document.STORAGE_TYPE_UNENCRYPTED,
+                                archive_path, document.archive_path)
 
                 # Delete the file only if it was successfully consumed
                 self.log("debug", "Deleting file {}".format(self.path))
@@ -258,10 +267,10 @@ class Consumer(LoggingMixin):
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
 
-    def _write(self, document, source, target):
+    def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file:
             with open(target, "wb") as write_file:
-                if document.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
+                if storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
                     write_file.write(read_file.read())
                     return
                 self.log("debug", "Encrypting")

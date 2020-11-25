@@ -168,11 +168,17 @@ def run_post_consume_script(sender, document, **kwargs):
 
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
-    for f in (instance.source_path, instance.thumbnail_path):
-        try:
-            os.unlink(f)
-        except FileNotFoundError:
-            pass  # The file's already gone, so we're cool with it.
+    for f in (instance.source_path,
+              instance.archive_path,
+              instance.thumbnail_path):
+        if os.path.isfile(f):
+            try:
+                os.unlink(f)
+            except OSError as e:
+                logging.getLogger(__name__).warning(
+                    f"While deleting document {instance.file_name}, the file "
+                    f"{f} could not be deleted: {e}"
+                )
 
     delete_empty_directories(os.path.dirname(instance.source_path))
 

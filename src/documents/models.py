@@ -225,6 +225,19 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
+    def archive_path(self):
+        fname = "{:07}{}".format(self.pk, ".pdf")
+
+        return os.path.join(
+            settings.ARCHIVE_DIR,
+            fname
+        )
+
+    @property
+    def archive_file(self):
+        return open(self.archive_path, "rb")
+
+    @property
     def file_name(self):
         return slugify(str(self)) + self.file_type
 
