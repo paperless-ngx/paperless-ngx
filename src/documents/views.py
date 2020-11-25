@@ -169,6 +169,7 @@ class DocumentViewSet(RetrieveModelMixin,
                 "paperless__checksum": doc.checksum,
                 "paperless__mime_type": doc.mime_type,
                 "paperless__filename": doc.filename,
+                "paperless__has_archive_version": os.path.isfile(doc.archive_path)
             })
         except Document.DoesNotExist:
             raise Http404()
