@@ -12,7 +12,8 @@ next
     You have to specify your username.
 *   Added a simple sanity checker that checks your documents for missing or orphaned files,
     files with wrong checksums, inaccessible files, and documents with empty content.
-
+*   It is no longer possible to encrypt your documents. For the time being, paperless will
+    continue to operate with already encrypted documents.
 
 paperless-ng 0.9.2
 ##################
