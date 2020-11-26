@@ -5,6 +5,7 @@ from unittest import mock
 
 from django.contrib.auth.models import User
 from django.test import override_settings
+from pathvalidate import ValidationError
 from rest_framework.test import APITestCase
 
 from documents.models import Document, Correspondent, DocumentType, Tag
@@ -215,3 +216,41 @@ class DocumentApiTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['documents_total'], 3)
         self.assertEqual(response.data['documents_inbox'], 1)
+
+    @mock.patch("documents.forms.async_task")
+    def test_upload(self, m):
+
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f})
+
+        self.assertEqual(response.status_code, 200)
+
+        m.assert_called_once()
+
+        self.assertEqual(m.call_args.kwargs['override_filename'], "simple.pdf")
+
+    @mock.patch("documents.forms.async_task")
+    def test_upload_invalid_form(self, m):
+
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"documenst": f})
+        self.assertEqual(response.status_code, 400)
+        m.assert_not_called()
+
+    @mock.patch("documents.forms.async_task")
+    def test_upload_invalid_file(self, m):
+
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.zip"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f})
+        self.assertEqual(response.status_code, 400)
+        m.assert_not_called()
+
+    @mock.patch("documents.forms.async_task")
+    @mock.patch("documents.forms.validate_filename")
+    def test_upload_invalid_filename(self, validate_filename, async_task):
+        validate_filename.side_effect = ValidationError()
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f})
+        self.assertEqual(response.status_code, 400)
+
+        async_task.assert_not_called()
