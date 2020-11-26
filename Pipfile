@@ -35,6 +35,7 @@ scikit-learn="~=0.23.2"
 whitenoise = "~=5.2.0"
 watchdog = "*"
 whoosh="~=2.7.4"
+inotify-simple = "*"
 
 [dev-packages]
 coveralls = "*"
