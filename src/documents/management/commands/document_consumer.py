@@ -95,14 +95,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         directory = options["directory"]
 
-        logging.getLogger(__name__).info(
-            f"Starting document consumer at {directory}")
-
         for entry in os.scandir(directory):
-            if entry.is_file():
-                async_task("documents.tasks.consume_file",
-                           entry.path,
-                           task_name=os.path.basename(entry.path)[:100])
+            _consume(entry.path)
 
         if options["oneshot"]:
             return
