@@ -43,11 +43,14 @@ If you want to see some screenshots of paperless-ng in action, [some are availab
 
 For a complete list of changes, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
 
-## Planned
+# Roadmap for 1.0
 
-These features will make it into the application at some point, sorted by priority.
+- Test coverage at 90%.
+- Store archived documents with an embedded OCR text layer, while keeping originals available. Making good progress in the `feature-ocrmypdf` branch.
+- Fix whatever bugs I and you find
 
-- **Adding a text layer to ocr'ed PDF documents.** I've seen there are libraries that do this for you.
+## Roadmap for versions beyond 1.0
+
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
@@ -60,17 +63,6 @@ These features will make it into the application at some point, sorted by priori
 ## On the chopping block.
 
 - **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
-
-## Goals for 1.0
-
-- Test coverage at 90%.
-- Store archived documents with an embedded OCR text layer, while keeping originals available. Making good progress in the `feature-ocrmypdf` branch.
-- Fix whatever bugs I and you find.
-
-## Non-goals for 1.0
-
-- Mobile support.
-- Any other big feature or improvement listed in the issues section.
 
 # Getting started
 
@@ -91,6 +83,12 @@ The documentation for Paperless-ng is available on [ReadTheDocs](https://paperle
 # Suggestions? Questions? Something not working?
 
 Please open an issue and start a discussion about it!
+
+## Feel like helping out?
+
+There's still lots of things to be done, just have a look at that issue log. If you feel like conctributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome.
+
+If you want to implement something big: Please start a discussion about that in the issues! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested. See the roadmap above.
 
 # Affiliated Projects
 
