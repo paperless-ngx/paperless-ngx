@@ -410,10 +410,10 @@ def fake_magic_from_file(file, mime=False):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumer(TestCase):
 
-    def make_dummy_parser(self, path, logging_group):
+    def make_dummy_parser(self, logging_group):
         return DummyParser(logging_group, self.dirs.scratch_dir)
 
-    def make_faulty_parser(self, path, logging_group):
+    def make_faulty_parser(self, logging_group):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
