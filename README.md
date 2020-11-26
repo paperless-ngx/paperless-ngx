@@ -61,6 +61,17 @@ These features will make it into the application at some point, sorted by priori
 
 - **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
 
+## Goals for 1.0
+
+- Test coverage at 90%.
+- Store archived documents with an embedded OCR text layer, while keeping originals available. Making good progress in the `feature-ocrmypdf` branch.
+- Fix whatever bugs I and you find.
+
+## Non-goals for 1.0
+
+- Mobile support.
+- Any other big feature or improvement listed in the issues section.
+
 # Getting started
 
 The recommended way to deploy paperless is docker-compose. Don't clone the repository, grab the latest release to get started instead. The dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself (i.e. if you want to run on Raspberry Pi).
