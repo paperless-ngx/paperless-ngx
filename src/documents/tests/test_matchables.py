@@ -1,3 +1,5 @@
+import shutil
+import tempfile
 from random import randint
 
 from django.contrib.admin.models import LogEntry
@@ -214,6 +216,13 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
         User.objects.create_user(username='test_consumer', password='12345')
         self.doc_contains = Document.objects.create(
             content="I contain the keyword.", mime_type="application/pdf")
+
+        self.index_dir = tempfile.mkdtemp()
+        # TODO: we should not need the index here.
+        override_settings(INDEX_DIR=self.index_dir).enable()
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.index_dir, ignore_errors=True)
 
     def test_tag_applied_any(self):
         t1 = Tag.objects.create(
