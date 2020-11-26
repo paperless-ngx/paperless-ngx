@@ -74,7 +74,7 @@ class Command(BaseCommand):
                     f"Abort: encrypted file {document.source_path} does not "
                     f"end with .gpg")
 
-            document.filename = os.path.splitext(document.source_path)[0]
+            document.filename = os.path.splitext(document.filename)[0]
 
             with open(document.source_path, "wb") as f:
                 f.write(raw_document)

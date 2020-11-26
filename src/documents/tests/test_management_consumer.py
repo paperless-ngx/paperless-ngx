@@ -1,7 +1,6 @@
 import filecmp
 import os
 import shutil
-import tempfile
 from threading import Thread
 from time import sleep
 from unittest import mock
@@ -11,6 +10,7 @@ from django.test import TestCase, override_settings
 
 from documents.consumer import ConsumerError
 from documents.management.commands import document_consumer
+from documents.tests.utils import setup_directories, remove_dirs
 
 
 class ConsumerThread(Thread):
@@ -41,9 +41,8 @@ class TestConsumer(TestCase):
         self.task_mock = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.consume_dir = tempfile.mkdtemp()
-
-        override_settings(CONSUMPTION_DIR=self.consume_dir).enable()
+        self.dirs = setup_directories()
+        self.addCleanup(remove_dirs, self.dirs)
 
     def t_start(self):
         self.t = ConsumerThread()
@@ -94,25 +93,29 @@ class TestConsumer(TestCase):
     def test_consume_file(self):
         self.t_start()
 
-        f = os.path.join(self.consume_dir, "my_file.pdf")
+        f = os.path.join(self.dirs.consumption_dir, "my_file.pdf")
         shutil.copy(self.sample_file, f)
 
         self.wait_for_task_mock_call()
 
         self.task_mock.assert_called_once()
-        self.assertEqual(self.task_mock.call_args.args[1], f)
+
+        args, kwargs = self.task_mock.call_args
+        self.assertEqual(args[1], f)
 
     @override_settings(CONSUMER_POLLING=1)
     def test_consume_file_polling(self):
         self.test_consume_file()
 
     def test_consume_existing_file(self):
-        f = os.path.join(self.consume_dir, "my_file.pdf")
+        f = os.path.join(self.dirs.consumption_dir, "my_file.pdf")
         shutil.copy(self.sample_file, f)
 
         self.t_start()
         self.task_mock.assert_called_once()
-        self.assertEqual(self.task_mock.call_args.args[1], f)
+
+        args, kwargs = self.task_mock.call_args
+        self.assertEqual(args[1], f)
 
     @override_settings(CONSUMER_POLLING=1)
     def test_consume_existing_file_polling(self):
@@ -125,7 +128,7 @@ class TestConsumer(TestCase):
 
         self.t_start()
 
-        fname = os.path.join(self.consume_dir, "my_file.pdf")
+        fname = os.path.join(self.dirs.consumption_dir, "my_file.pdf")
 
         self.slow_write_file(fname)
 
@@ -135,7 +138,8 @@ class TestConsumer(TestCase):
 
         self.task_mock.assert_called_once()
 
-        self.assertEqual(self.task_mock.call_args.args[1], fname)
+        args, kwargs = self.task_mock.call_args
+        self.assertEqual(args[1], fname)
 
     @override_settings(CONSUMER_POLLING=1)
     def test_slow_write_pdf_polling(self):
@@ -148,8 +152,8 @@ class TestConsumer(TestCase):
 
         self.t_start()
 
-        fname = os.path.join(self.consume_dir, "my_file.~df")
-        fname2 = os.path.join(self.consume_dir, "my_file.pdf")
+        fname = os.path.join(self.dirs.consumption_dir, "my_file.~df")
+        fname2 = os.path.join(self.dirs.consumption_dir, "my_file.pdf")
 
         self.slow_write_file(fname)
         shutil.move(fname, fname2)
@@ -157,7 +161,9 @@ class TestConsumer(TestCase):
         self.wait_for_task_mock_call()
 
         self.task_mock.assert_called_once()
-        self.assertEqual(self.task_mock.call_args.args[1], fname2)
+
+        args, kwargs = self.task_mock.call_args
+        self.assertEqual(args[1], fname2)
 
         error_logger.assert_not_called()
 
@@ -172,13 +178,14 @@ class TestConsumer(TestCase):
 
         self.t_start()
 
-        fname = os.path.join(self.consume_dir, "my_file.pdf")
+        fname = os.path.join(self.dirs.consumption_dir, "my_file.pdf")
         self.slow_write_file(fname, incomplete=True)
 
         self.wait_for_task_mock_call()
 
         self.task_mock.assert_called_once()
-        self.assertEqual(self.task_mock.call_args.args[1], fname)
+        args, kwargs = self.task_mock.call_args
+        self.assertEqual(args[1], fname)
 
         # assert that we have an error logged with this invalid file.
         error_logger.assert_called_once()
