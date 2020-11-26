@@ -11,7 +11,6 @@ from documents.models import Correspondent, Document, Tag, DocumentType
 class TestClassifier(TestCase):
 
     def setUp(self):
-
         self.classifier = DocumentClassifier()
 
     def generate_test_data(self):

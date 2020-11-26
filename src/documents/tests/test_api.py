@@ -1,40 +1,23 @@
 import os
-import shutil
 import tempfile
 from unittest import mock
 
 from django.contrib.auth.models import User
-from django.test import override_settings
 from pathvalidate import ValidationError
 from rest_framework.test import APITestCase
 
 from documents.models import Document, Correspondent, DocumentType, Tag
+from documents.tests.utils import setup_directories, remove_dirs
 
 
 class DocumentApiTest(APITestCase):
 
     def setUp(self):
-        self.scratch_dir = tempfile.mkdtemp()
-        self.media_dir = tempfile.mkdtemp()
-        self.originals_dir = os.path.join(self.media_dir, "documents", "originals")
-        self.thumbnail_dir = os.path.join(self.media_dir, "documents", "thumbnails")
-
-        os.makedirs(self.originals_dir, exist_ok=True)
-        os.makedirs(self.thumbnail_dir, exist_ok=True)
-
-        override_settings(
-            SCRATCH_DIR=self.scratch_dir,
-            MEDIA_ROOT=self.media_dir,
-            ORIGINALS_DIR=self.originals_dir,
-            THUMBNAIL_DIR=self.thumbnail_dir
-        ).enable()
+        self.dirs = setup_directories()
+        self.addCleanup(remove_dirs, self.dirs)
 
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=user)
-
-    def tearDown(self):
-        shutil.rmtree(self.scratch_dir, ignore_errors=True)
-        shutil.rmtree(self.media_dir, ignore_errors=True)
 
     def testDocuments(self):
 
@@ -88,7 +71,7 @@ class DocumentApiTest(APITestCase):
 
     def test_document_actions(self):
 
-        _, filename = tempfile.mkstemp(dir=self.originals_dir)
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
 
         content = b"This is a test"
         content_thumbnail = b"thumbnail content"
@@ -98,7 +81,7 @@ class DocumentApiTest(APITestCase):
 
         doc = Document.objects.create(title="none", filename=os.path.basename(filename), mime_type="application/pdf")
 
-        with open(os.path.join(self.thumbnail_dir, "{:07d}.png".format(doc.pk)), "wb") as f:
+        with open(os.path.join(self.dirs.thumbnail_dir, "{:07d}.png".format(doc.pk)), "wb") as f:
             f.write(content_thumbnail)
 
         response = self.client.get('/api/documents/{}/download/'.format(doc.pk))
@@ -227,7 +210,8 @@ class DocumentApiTest(APITestCase):
 
         m.assert_called_once()
 
-        self.assertEqual(m.call_args.kwargs['override_filename'], "simple.pdf")
+        args, kwargs = m.call_args
+        self.assertEqual(kwargs['override_filename'], "simple.pdf")
 
     @mock.patch("documents.forms.async_task")
     def test_upload_invalid_form(self, m):
