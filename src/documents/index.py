@@ -64,15 +64,18 @@ def get_schema():
 
 
 def open_index(recreate=False):
-    if exists_in(settings.INDEX_DIR) and not recreate:
-        return open_dir(settings.INDEX_DIR)
-    else:
-        # TODO: this is not thread safe. If 2 instances try to create the index
-        #  at the same time, this fails. This currently prevents parallel
-        #  tests.
-        if not os.path.isdir(settings.INDEX_DIR):
-            os.makedirs(settings.INDEX_DIR, exist_ok=True)
-        return create_in(settings.INDEX_DIR, get_schema())
+    # TODO: this is not thread safe. If 2 instances try to create the index
+    #  at the same time, this fails. This currently prevents parallel
+    #  tests.
+    try:
+        if exists_in(settings.INDEX_DIR) and not recreate:
+            return open_dir(settings.INDEX_DIR)
+    except Exception as e:
+        logger.error(f"Error while opening the index: {e}, recreating.")
+
+    if not os.path.isdir(settings.INDEX_DIR):
+        os.makedirs(settings.INDEX_DIR, exist_ok=True)
+    return create_in(settings.INDEX_DIR, get_schema())
 
 
 def update_document(writer, doc):
