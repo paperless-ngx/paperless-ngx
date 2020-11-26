@@ -1,12 +1,12 @@
 import os
 import re
-import shutil
 import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
 
 from django.test import TestCase, override_settings
 
+from .utils import setup_directories, remove_dirs
 from ..consumer import Consumer, ConsumerError
 from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
 from ..parsers import DocumentParser, ParseError
@@ -410,24 +410,15 @@ def fake_magic_from_file(file, mime=False):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumer(TestCase):
 
-    def make_dummy_parser(self, logging_group):
-        return DummyParser(logging_group, self.scratch_dir)
+    def make_dummy_parser(self, path, logging_group):
+        return DummyParser(logging_group, self.dirs.scratch_dir)
 
-    def make_faulty_parser(self, logging_group):
-        return FaultyParser(logging_group, self.scratch_dir)
+    def make_faulty_parser(self, path, logging_group):
+        return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
-        self.scratch_dir = tempfile.mkdtemp()
-        self.media_dir = tempfile.mkdtemp()
-        self.consumption_dir = tempfile.mkdtemp()
-
-        override_settings(
-            SCRATCH_DIR=self.scratch_dir,
-            MEDIA_ROOT=self.media_dir,
-            ORIGINALS_DIR=os.path.join(self.media_dir, "documents", "originals"),
-            THUMBNAIL_DIR=os.path.join(self.media_dir, "documents", "thumbnails"),
-            CONSUMPTION_DIR=self.consumption_dir
-        ).enable()
+        self.dirs = setup_directories()
+        self.addCleanup(remove_dirs, self.dirs)
 
         patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
         m = patcher.start()
@@ -441,13 +432,8 @@ class TestConsumer(TestCase):
 
         self.consumer = Consumer()
 
-    def tearDown(self):
-        shutil.rmtree(self.scratch_dir, ignore_errors=True)
-        shutil.rmtree(self.media_dir, ignore_errors=True)
-        shutil.rmtree(self.consumption_dir, ignore_errors=True)
-
     def get_test_file(self):
-        fd, f = tempfile.mkstemp(suffix=".pdf", dir=self.scratch_dir)
+        fd, f = tempfile.mkstemp(suffix=".pdf", dir=self.dirs.scratch_dir)
         return f
 
     def testNormalOperation(self):
