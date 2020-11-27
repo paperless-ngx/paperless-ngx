@@ -202,7 +202,9 @@ class SearchView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    ix = index.open_index()
+    def __init__(self, *args, **kwargs):
+        super(SearchView, self).__init__(*args, **kwargs)
+        self.ix = index.open_index()
 
     def add_infos_to_hit(self, r):
         doc = Document.objects.get(id=r['id'])
@@ -241,7 +243,9 @@ class SearchAutoCompleteView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    ix = index.open_index()
+    def __init__(self, *args, **kwargs):
+        super(SearchAutoCompleteView, self).__init__(*args, **kwargs)
+        self.ix = index.open_index()
 
     def get(self, request, format=None):
         if 'term' in request.query_params:
