@@ -250,6 +250,8 @@ USE_TZ = True
 # Logging                                                                     #
 ###############################################################################
 
+DISABLE_DBHANDLER = __get_boolean("PAPERLESS_DISABLE_DBHANDLER")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
