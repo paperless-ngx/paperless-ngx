@@ -137,7 +137,8 @@ class Command(BaseCommand):
             f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()
-        descriptor = inotify.add_watch(directory, flags.CLOSE_WRITE | flags.MOVED_TO)
+        descriptor = inotify.add_watch(
+            directory, flags.CLOSE_WRITE | flags.MOVED_TO)
         try:
             while not self.stop_flag:
                 for event in inotify.read(timeout=1000, read_delay=1000):
@@ -147,3 +148,4 @@ class Command(BaseCommand):
             pass
 
         inotify.rm_watch(descriptor)
+        inotify.close()
