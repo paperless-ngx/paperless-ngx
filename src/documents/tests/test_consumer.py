@@ -502,26 +502,6 @@ class TestConsumer(TestCase):
 
         self.fail("Should throw exception")
 
-    @override_settings(CONSUMPTION_DIR=None)
-    def testConsumptionDirUnset(self):
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "The CONSUMPTION_DIR settings variable does not appear to be set.")
-            return
-
-        self.fail("Should throw exception")
-
-    @override_settings(CONSUMPTION_DIR="asd")
-    def testNoConsumptionDir(self):
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "Consumption directory asd does not exist")
-            return
-
-        self.fail("Should throw exception")
-
     def testDuplicates(self):
         self.consumer.try_consume_file(self.get_test_file())
 

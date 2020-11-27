@@ -6,6 +6,7 @@ from time import sleep
 from unittest import mock
 
 from django.conf import settings
+from django.core.management import call_command, CommandError
 from django.test import TestCase, override_settings
 
 from documents.consumer import ConsumerError
@@ -193,3 +194,13 @@ class TestConsumer(TestCase):
     @override_settings(CONSUMER_POLLING=1)
     def test_slow_write_incomplete_polling(self):
         self.test_slow_write_incomplete()
+
+    @override_settings(CONSUMPTION_DIR="does_not_exist")
+    def test_consumption_directory_invalid(self):
+
+        self.assertRaises(CommandError, call_command, 'document_consumer', '--oneshot')
+
+    @override_settings(CONSUMPTION_DIR="")
+    def test_consumption_directory_unset(self):
+
+        self.assertRaises(CommandError, call_command, 'document_consumer', '--oneshot')
