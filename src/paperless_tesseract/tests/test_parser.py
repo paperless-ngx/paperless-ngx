@@ -1,6 +1,4 @@
 import os
-import shutil
-import tempfile
 import uuid
 from typing import ContextManager
 from unittest import mock
@@ -8,7 +6,8 @@ from unittest import mock
 from django.test import TestCase, override_settings
 
 from documents.parsers import ParseError, run_convert
-from paperless_tesseract.parsers import RasterisedDocumentParser, get_text_from_pdf
+from documents.tests.utils import DirectoriesMixin
+from paperless_tesseract.parsers import RasterisedDocumentParser, get_text_from_pdf, strip_excess_whitespace
 
 image_to_string_calls = []
 
@@ -33,15 +32,32 @@ class FakeImageFile(ContextManager):
         return os.path.basename(self.fname)
 
 
-class TestParser(TestCase):
+class TestParser(DirectoriesMixin, TestCase):
 
-    def setUp(self):
-        self.scratch = tempfile.mkdtemp()
+    text_cases = [
+        ("simple     string", "simple string"),
+        (
+            "simple    newline\n   testing string",
+            "simple newline\ntesting string"
+        ),
+        (
+            "utf-8   строка с пробелами в конце  ",
+            "utf-8 строка с пробелами в конце"
+        )
+    ]
 
-        override_settings(SCRATCH_DIR=self.scratch).enable()
-
-    def tearDown(self):
-        shutil.rmtree(self.scratch)
+    def test_strip_excess_whitespace(self):
+        for source, result in self.text_cases:
+            actual_result = strip_excess_whitespace(source)
+            self.assertEqual(
+                result,
+                actual_result,
+                "strip_exceess_whitespace({}) != '{}', but '{}'".format(
+                    source,
+                    result,
+                    actual_result
+                )
+            )
 
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
