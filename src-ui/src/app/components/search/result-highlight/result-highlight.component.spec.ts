@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResultHightlightComponent } from './result-hightlight.component';
+import { ResultHighlightComponent } from './result-highlight.component';
 
-describe('ResultHightlightComponent', () => {
-  let component: ResultHightlightComponent;
-  let fixture: ComponentFixture<ResultHightlightComponent>;
+describe('ResultHighlightComponent', () => {
+  let component: ResultHighlightComponent;
+  let fixture: ComponentFixture<ResultHighlightComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ResultHightlightComponent ]
+      declarations: [ ResultHighlightComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultHightlightComponent);
+    fixture = TestBed.createComponent(ResultHighlightComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

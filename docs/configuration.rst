@@ -35,22 +35,22 @@ PAPERLESS_DBHOST=<hostname>
 
 PAPERLESS_DBPORT=<port>
     Adjust port if necessary.
-    
+
     Default is 5432.
 
 PAPERLESS_DBNAME=<name>
     Database name in PostgreSQL.
-    
+
     Defaults to "paperless".
 
 PAPERLESS_DBUSER=<name>
     Database user in PostgreSQL.
-    
+
     Defaults to "paperless".
 
 PAPERLESS_DBPASS=<password>
     Database password for PostgreSQL.
-    
+
     Defaults to "paperless".
 
 
@@ -69,7 +69,7 @@ PAPERLESS_CONSUMPTION_DIR=<path>
     Defaults to "../consume", relative to the "src" directory.
 
 PAPERLESS_DATA_DIR=<path>
-    This is where paperless stores all its data (search index, sqlite database,
+    This is where paperless stores all its data (search index, SQLite database,
     classification model, etc).
 
     Defaults to "../data", relative to the "src" directory.
@@ -100,7 +100,7 @@ Hosting & Security
 ##################
 
 PAPERLESS_SECRET_KEY=<key>
-    Paperless uses this to make session tokens. If you exose paperless on the
+    Paperless uses this to make session tokens. If you expose paperless on the
     internet, you need to change this, since the default secret is well known.
 
     Use any sequence of characters. The more, the better. You don't need to
@@ -113,7 +113,7 @@ PAPERLESS_ALLOWED_HOSTS<comma-separated-list>
     really should set this value to the domain name you're using.  Failing to do
     so leaves you open to HTTP host header attacks:
     https://docs.djangoproject.com/en/3.1/topics/security/#host-header-validation
-    
+
     Just remember that this is a comma-separated list, so "example.com" is fine,
     as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 
@@ -132,15 +132,25 @@ PAPERLESS_FORCE_SCRIPT_NAME=<path>
     .. note::
 
         I don't know if this works in paperless-ng. Probably not.
-    
+
     Defaults to none, which hosts paperless at "/".
 
 PAPERLESS_STATIC_URL=<path>
     Override the STATIC_URL here.  Unless you're hosting Paperless off a
     subdomain like /paperless/, you probably don't need to change this.
-    
+
     Defaults to "/static/".
 
+PAPERLESS_AUTO_LOGIN_USERNAME=<username>
+    Specify a username here so that paperless will automatically perform login
+    with the selected user.
+
+    .. danger::
+
+        Do not use this when exposing paperless on the internet. There are no
+        checks in place that would prevent you from doing this.
+
+    Defaults to none, which disables this feature.
 
 Software tweaks
 ###############
@@ -156,11 +166,11 @@ PAPERLESS_THREADS_PER_WORKER=<num>
     in parallel on a single document.
 
     .. caution::
-        
+
         Ensure that the product
-        
+
             PAPERLESS_TASK_WORKERS * PAPERLESS_THREADS_PER_WORKER
-        
+
         does not exceed your CPU core count or else paperless will be extremely slow.
         If you want paperless to process many documents in parallel, choose a high
         worker count. If you want paperless to process very large documents faster,
@@ -197,10 +207,10 @@ PAPERLESS_OCR_PAGES=<num>
 PAPERLESS_OCR_LANGUAGE=<lang>
     Customize the default language that tesseract will attempt to use when
     parsing documents. The default language is used whenever
-    
+
     * No language could be detected on a document
     * No tesseract data files are available for the detected language
-    
+
     It should be a 3-letter language code consistent with ISO
     639: https://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -220,7 +230,7 @@ PAPERLESS_CONSUMER_POLLING=<num>
     specify a polling interval in seconds here, which will then cause paperless
     to periodically check your consumption directory for changes.
 
-    Defaults to 0, which disables polling and uses filesystem notifiactions.
+    Defaults to 0, which disables polling and uses filesystem notifications.
 
 PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>
     When the consumer detects a duplicate document, it will not touch the
@@ -234,7 +244,7 @@ PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
     such cases, try setting this to a reasonably low value, like 32.  The
     default is to use whatever is necessary to do everything without writing to
     disk, and units are in megabytes.
-    
+
     For more information on how to use this value, you should search
     the web for "MAGICK_MEMORY_LIMIT".
 
@@ -245,7 +255,7 @@ PAPERLESS_CONVERT_TMPDIR=<path>
     /tmp as tmpfs, you should set this to a path that's on a physical disk, like
     /home/your_user/tmp or something.  ImageMagick will use this as scratch space
     when crunching through very large documents.
-    
+
     For more information on how to use this value, you should search
     the web for "MAGICK_TMPDIR".
 
@@ -264,7 +274,7 @@ PAPERLESS_CONVERT_DENSITY=<num>
     Default is 300.
 
 PAPERLESS_OPTIMIZE_THUMBNAILS=<bool>
-    Use optipng to optimize thumbnails. This usually reduces the sice of
+    Use optipng to optimize thumbnails. This usually reduces the size of
     thumbnails by about 20%, but uses considerable compute time during
     consumption.
 
@@ -282,7 +292,7 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
     Use this setting to enable checking the document filename for date
     information. The date order can be set to any option as specified in
     https://dateparser.readthedocs.io/en/latest/settings.html#date-order.
-    The filename will be checked first, and if nothing is found, the document 
+    The filename will be checked first, and if nothing is found, the document
     text will be checked as normal.
 
     Defaults to none, which disables this feature.

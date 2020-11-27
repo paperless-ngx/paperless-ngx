@@ -5,13 +5,13 @@ Usage Overview
 Paperless is an application that manages your personal documents. With
 the help of a document scanner (see :ref:`scanners`), paperless transforms
 your wieldy physical document binders into a searchable archive and
-provices many utilities for finding and managing your documents.
+provides many utilities for finding and managing your documents.
 
 
 Terms and definitions
 #####################
 
-Paperless esentially consists of two different parts for managing your
+Paperless essentially consists of two different parts for managing your
 documents:
 
 * The *consumer* watches a specified folder and adds all documents in that
@@ -30,12 +30,12 @@ Each document has a couple of fields that you can assign to them:
   tag, however, a single document can also have multiple tags. This is not
   possible with folders. The reason folders are not implemented in paperless
   is simply that tags are much more versatile than folders.
-* A *document type* is used to demarkate the type of a document such as letter,
+* A *document type* is used to demarcate the type of a document such as letter,
   bank statement, invoice, contract, etc. It is used to identify what a document
   is about.
 * The *date added* of a document is the date the document was scanned into
   paperless. You cannot and should not change this date.
-* The *date created* of a document is the date the document was intially issued.
+* The *date created* of a document is the date the document was initially issued.
   This can be the date you bought a product, the date you signed a contract, or
   the date a letter was sent to you.
 * The *archive serial number* (short: ASN) of a document is the identifier of
@@ -131,7 +131,7 @@ These are as follows:
 
     With the correct set of rules, you can completely automate your email documents.
     Create rules for every correspondent you receive digital documents from and
-    paperless will read them automatically. The default acion "mark as read" is
+    paperless will read them automatically. The default action "mark as read" is
     pretty tame and will not cause any damage or data loss whatsoever.
 
     You can also setup a special folder in your mail account for paperless and use
@@ -182,7 +182,7 @@ Processing of the physical documents
 ====================================
 
 Keep a physical inbox. Whenever you receive a document that you need to
-archive, put it into your inbox. Regulary, do the following for all documents
+archive, put it into your inbox. Regularly, do the following for all documents
 in your inbox:
 
 1.  For each document, decide if you need to keep the document in physical
@@ -217,18 +217,24 @@ Once you have scanned in a document, proceed in paperless as follows.
 
 1.  If the document has an ASN, assign the ASN to the document.
 2.  Assign a correspondent to the document (i.e., your employer, bank, etc)
-    This isnt strictly necessary but helps in finding a document when you need
+    This isn't strictly necessary but helps in finding a document when you need
     it.
 3.  Assign a document type (i.e., invoice, bank statement, etc) to the document
-    This isnt strictly necessary but helps in finding a document when you need
+    This isn't strictly necessary but helps in finding a document when you need
     it.
 4.  Assign a proper title to the document (the name of an item you bought, the
     subject of the letter, etc)
-5.  Check that the date of the document is corrent. Paperless tries to read
+5.  Check that the date of the document is correct. Paperless tries to read
     the date from the content of the document, but this fails sometimes if the
     OCR is bad or multiple dates appear on the document.
 6.  Remove inbox tags from the documents.
 
+.. hint::
+    
+    You can setup manual matching rules for your correspondents and tags and
+    paperless will assign them automatically. After consuming a couple documents,
+    you can even ask paperless to *learn* when to assign tags and correspondents
+    by itself. For details on this feature, see :ref:`advanced-matching`.
 
 Task management
 ===============

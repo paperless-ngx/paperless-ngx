@@ -30,7 +30,7 @@ Options available to docker installations:
     Paperless uses 3 volumes:
 
     *   ``paperless_media``: This is where your documents are stored.
-    *   ``paperless_data``: This is where auxilliary data is stored. This
+    *   ``paperless_data``: This is where auxillary data is stored. This
         folder also contains the SQLite database, if you use it.
     *   ``paperless_pgdata``: Exists only if you use PostgreSQL and contains
         the database.
@@ -109,7 +109,7 @@ B.  If you built the image yourself, grab the new archive and replace your curre
 .. hint::
 
     You can usually keep your ``docker-compose.env`` file, since this file will
-    never include mandantory configuration options. However, it is worth checking
+    never include mandatory configuration options. However, it is worth checking
     out the new version of this file, since it might have new recommendations
     on what to configure.
 
@@ -126,8 +126,8 @@ After grabbing the new release and unpacking the contents, do the following:
 
         $ pip install --upgrade pipenv
         $ cd /path/to/paperless
-        $ pipenv install
         $ pipenv clean
+        $ pipenv install
 
     This creates a new virtual environment (or uses your existing environment)
     and installs all dependencies into it.
@@ -247,12 +247,12 @@ your already processed documents.
 
 When multiple document types or correspondents match a single document,
 the retagger won't assign these to the document. Specify ``--use-first``
-to override this behaviour and just use the first correspondent or type
+to override this behavior and just use the first correspondent or type
 it finds. This option does not apply to tags, since any amount of tags
 can be applied to a document.
 
 Finally, ``-f`` specifies that you wish to overwrite already assigned
-correspondents, types and/or tags. The default behaviour is to not
+correspondents, types and/or tags. The default behavior is to not
 assign correspondents and types to documents that have this data already
 assigned. ``-f`` works differently for tags: By default, only additional tags get
 added to documents, no tags will be removed. With ``-f``, tags that don't
@@ -341,7 +341,7 @@ Documents can be stored in Paperless using GnuPG encryption.
 
 .. danger::
 
-    Encryption is depreceated since paperless-ng 0.9 and doesn't really provide any
+    Encryption is deprecated since paperless-ng 0.9 and doesn't really provide any
     additional security, since you have to store the passphrase in a configuration
     file on the same system as the encrypted documents for paperless to work.
     Furthermore, the entire text content of the documents is stored plain in the
@@ -353,39 +353,23 @@ Documents can be stored in Paperless using GnuPG encryption.
     Consider running paperless on an encrypted filesystem instead, which will then
     at least provide security against physical hardware theft.
 
-.. code::
-
-    change_storage_type [--passphrase PASSPHRASE] {gpg,unencrypted} {gpg,unencrypted}
-
-    positional arguments:
-      {gpg,unencrypted}     The state you want to change your documents from
-      {gpg,unencrypted}     The state you want to change your documents to
-
-    optional arguments:
-      --passphrase PASSPHRASE
 
 Enabling encryption
 -------------------
 
-Basic usage to enable encryption of your document store (**USE A MORE SECURE PASSPHRASE**):
-
-(Note: If ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
-
-.. code::
-
-    change_storage_type [--passphrase SECR3TP4SSPHRA$E] unencrypted gpg
+Enabling encryption is no longer supported.
 
 
 Disabling encryption
 --------------------
 
-Basic usage to enable encryption of your document store:
+Basic usage to disable encryption of your document store:
 
-(Note: Again, if ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
+(Note: If ``PAPERLESS_PASSPHRASE`` isn't set already, you need to specify it here)
 
 .. code::
 
-    change_storage_type [--passphrase SECR3TP4SSPHRA$E] gpg unencrypted
+    decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
 
 
 .. _Pipenv: https://pipenv.pypa.io/en/latest/

@@ -22,13 +22,6 @@ class Command(Renderable, BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("target")
-        parser.add_argument(
-            "--legacy",
-            action="store_true",
-            help="Don't try to export all of the document data, just dump the "
-                 "original document files out in a format that makes "
-                 "re-consuming them easy."
-        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -44,10 +37,7 @@ class Command(Renderable, BaseCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
-        if options["legacy"]:
-            self.dump_legacy()
-        else:
-            self.dump()
+        self.dump()
 
     def dump(self):
 
@@ -102,33 +92,3 @@ class Command(Renderable, BaseCommand):
 
         with open(os.path.join(self.target, "manifest.json"), "w") as f:
             json.dump(manifest, f, indent=2)
-
-    def dump_legacy(self):
-
-        for document in Document.objects.all():
-
-            target = os.path.join(
-                self.target, self._get_legacy_file_name(document))
-
-            print("Exporting: {}".format(target))
-
-            with open(target, "wb") as f:
-                f.write(GnuPG.decrypted(document.source_file))
-                t = int(time.mktime(document.created.timetuple()))
-                os.utime(target, times=(t, t))
-
-    @staticmethod
-    def _get_legacy_file_name(doc):
-
-        if not doc.correspondent and not doc.title:
-            return os.path.basename(doc.source_path)
-
-        created = doc.created.strftime("%Y%m%d%H%M%SZ")
-        tags = ",".join([t.slug for t in doc.tags.all()])
-
-        if tags:
-            return "{} - {} - {} - {}{}".format(
-                created, doc.correspondent, doc.title, tags, doc.file_type)
-
-        return "{} - {} - {}{}".format(
-            created, doc.correspondent, doc.title, doc.file_type)
