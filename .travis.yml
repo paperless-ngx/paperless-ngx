@@ -1,5 +1,8 @@
 language: python
 
+dist: focal
+os: linux
+
 jobs:
   include:
     - name: "Paperless on Python 3.6"
