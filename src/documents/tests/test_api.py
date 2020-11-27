@@ -7,14 +7,13 @@ from pathvalidate import ValidationError
 from rest_framework.test import APITestCase
 
 from documents.models import Document, Correspondent, DocumentType, Tag
-from documents.tests.utils import setup_directories, remove_dirs
+from documents.tests.utils import DirectoriesMixin
 
 
-class DocumentApiTest(APITestCase):
+class DocumentApiTest(DirectoriesMixin, APITestCase):
 
     def setUp(self):
-        self.dirs = setup_directories()
-        self.addCleanup(remove_dirs, self.dirs)
+        super(DocumentApiTest, self).setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=user)

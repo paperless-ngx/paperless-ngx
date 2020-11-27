@@ -64,9 +64,6 @@ def get_schema():
 
 
 def open_index(recreate=False):
-    # TODO: this is not thread safe. If 2 instances try to create the index
-    #  at the same time, this fails. This currently prevents parallel
-    #  tests.
     try:
         if exists_in(settings.INDEX_DIR) and not recreate:
             return open_dir(settings.INDEX_DIR)

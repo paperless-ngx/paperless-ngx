@@ -39,3 +39,18 @@ def remove_dirs(dirs):
     shutil.rmtree(dirs.data_dir, ignore_errors=True)
     shutil.rmtree(dirs.scratch_dir, ignore_errors=True)
     shutil.rmtree(dirs.consumption_dir, ignore_errors=True)
+
+
+class DirectoriesMixin:
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dirs = None
+
+    def setUp(self) -> None:
+        self.dirs = setup_directories()
+        super(DirectoriesMixin, self).setUp()
+
+    def tearDown(self) -> None:
+        super(DirectoriesMixin, self).tearDown()
+        remove_dirs(self.dirs)

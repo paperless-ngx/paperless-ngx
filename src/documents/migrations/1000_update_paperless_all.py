@@ -5,23 +5,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def make_index(apps, schema_editor):
-    Document = apps.get_model("documents", "Document")
-    documents = Document.objects.all()
-    print()
-    try:
-        print("  --> Creating document index...")
-        from whoosh.writing import AsyncWriter
-        from documents import index
-        ix = index.open_index(recreate=True)
-        with AsyncWriter(ix) as writer:
-            for document in documents:
-                index.update_document(writer, document)
-    except ImportError:
-        # index may not be relevant anymore
-        print("  --> Cannot create document index.")
-
-
 def logs_set_default_group(apps, schema_editor):
     Log = apps.get_model('documents', 'Log')
     for log in Log.objects.all():
@@ -98,9 +81,5 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             code=django.db.migrations.operations.special.RunPython.noop,
             reverse_code=logs_set_default_group
-        ),
-        migrations.RunPython(
-            code=make_index,
-            reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
     ]
