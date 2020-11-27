@@ -243,6 +243,9 @@ class SearchView(APIView):
             except (ValueError, TypeError):
                 page = 1
 
+            if page < 1:
+                page = 1
+
             with index.query_page(self.ix, query, page) as result_page:
                 return Response(
                     {'count': len(result_page),
