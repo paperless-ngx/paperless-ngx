@@ -15,7 +15,7 @@ Use python 3.6 for development. Paperless supports python 3.6, 3.7 and 3.8.
 
 master always reflects the latest release.
 
-dev contains all changes that will be part of the next release.
+dev contains all changes that will be part of the next release. Use this branch to start making your changes.
 
 feature-X branches is for experimental stuff that will eventually be merged into dev, and then released as part of the next release.
 
