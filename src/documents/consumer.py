@@ -8,7 +8,6 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
-from paperless.db import GnuPG
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .file_handling import generate_filename, create_source_path_directory
 from .loggers import LoggingMixin
@@ -39,17 +38,6 @@ class Consumer(LoggingMixin):
         if not os.path.isfile(self.path):
             raise ConsumerError("Cannot consume {}: It is not a file".format(
                 self.path))
-
-    def pre_check_consumption_dir(self):
-        if not settings.CONSUMPTION_DIR:
-            raise ConsumerError(
-                "The CONSUMPTION_DIR settings variable does not appear to be "
-                "set.")
-
-        if not os.path.isdir(settings.CONSUMPTION_DIR):
-            raise ConsumerError(
-                "Consumption directory {} does not exist".format(
-                    settings.CONSUMPTION_DIR))
 
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
@@ -92,7 +80,6 @@ class Consumer(LoggingMixin):
         # Make sure that preconditions for consuming the file are met.
 
         self.pre_check_file_exists()
-        self.pre_check_consumption_dir()
         self.pre_check_directories()
         self.pre_check_duplicate()
 
@@ -208,10 +195,7 @@ class Consumer(LoggingMixin):
         created = file_info.created or date or timezone.make_aware(
             datetime.datetime.fromtimestamp(stats.st_mtime))
 
-        if settings.PASSPHRASE:
-            storage_type = Document.STORAGE_TYPE_GPG
-        else:
-            storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
         with open(self.path, "rb") as f:
             document = Document.objects.create(
@@ -260,8 +244,4 @@ class Consumer(LoggingMixin):
     def _write(self, document, source, target):
         with open(source, "rb") as read_file:
             with open(target, "wb") as write_file:
-                if document.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
-                    write_file.write(read_file.read())
-                    return
-                self.log("debug", "Encrypting")
-                write_file.write(GnuPG.encrypted(read_file))
+                write_file.write(read_file.read())

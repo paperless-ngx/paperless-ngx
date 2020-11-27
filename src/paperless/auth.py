@@ -1,6 +1,17 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.deprecation import MiddlewareMixin
 from rest_framework import authentication
+
+
+class AutoLoginMiddleware(MiddlewareMixin):
+
+    def process_request(self, request):
+        try:
+            request.user = User.objects.get(
+                username=settings.AUTO_LOGIN_USERNAME)
+        except User.DoesNotExist:
+            pass
 
 
 class AngularApiAuthenticationOverride(authentication.BaseAuthentication):

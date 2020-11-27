@@ -85,7 +85,7 @@ Paperless consists of the following components:
         needs to do from time to time in order to operate properly.
 
     This allows paperless to process multiple documents from your consumption folder in parallel! On
-    a modern multicore system, consumption with full ocr is blazing fast.
+    a modern multi core system, consumption with full ocr is blazing fast.
 
     The task processor comes with a built-in admin interface that you can use to see whenever any of the
     tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
@@ -265,15 +265,17 @@ Migration to paperless-ng is then performed in a few simple steps:
     ``docker-compose.env`` to your needs.
     See `docker route`_ for details on which edits are advised.
 
-6.  Start paperless-ng.
+6.  In order to find your existing documents with the new search feature, you need
+    to invoke a one-time operation that will create the search index:
 
-    .. code:: bash
+    .. code:: shell-session
 
-        $ docker-compose up
+        $ docker-compose run --rm webserver document_index reindex
+    
+    This will migrate your database and create the search index. After that,
+    paperless will take care of maintaining the index by itself.
 
-    If you see everything working (you should see some migrations getting
-    applied, for instance), you can gracefully stop paperless-ng with Ctrl-C
-    and then start paperless-ng as usual with
+7.  Start paperless-ng.
 
     .. code:: bash
 
@@ -281,11 +283,11 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     This will run paperless in the background and automatically start it on system boot.
 
-7.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
+8.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
     redirect is still in place and prevents access to the new UI. Clear
     browsing cache in order to fix this.
 
-8.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
+9.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
 
 
 .. _setup-sqlite_to_psql:
@@ -322,7 +324,7 @@ management commands as below.
             $ cd /path/to/paperless
             $ docker-compose run --rm webserver /bin/bash
         
-        This will lauch the container and initialize the PostgreSQL database.
+        This will launch the container and initialize the PostgreSQL database.
     
     b)  Without docker, open a shell in your virtual environment, switch to
         the ``src`` directory and create the database schema:
@@ -357,6 +359,35 @@ management commands as below.
 7.  Start paperless.
 
 
+Moving back to paperless
+========================
+
+Lets say you migrated to Paperless-ng and used it for a while, but decided that
+you don't like it and want to move back (If you do, send me a mail about what
+part you didn't like!), you can totally do that with a few simple steps.
+
+Paperless-ng modified the database schema slightly, however, these changes can
+be reverted while keeping your current data, so that your current data will
+be compatible with original Paperless.
+
+Execute this:
+
+.. code:: shell-session
+
+    $ cd /path/to/paperless
+    $ docker-compose run --rm webserver migrate documents 0023
+
+Or without docker:
+
+.. code:: shell-session
+
+    $ cd /path/to/paperless/src
+    $ python3 manage.py migrate documents 0023
+
+After that, you need to clear your cookies (Paperless-ng comes with updated
+dependencies that do cookie-processing differently) and probably your cache
+as well.
+
 .. _setup-less_powerful_devices:
 
 
@@ -372,7 +403,7 @@ configuring some options in paperless can help improve performance immensely:
 *   ``PAPERLESS_TASK_WORKERS`` and ``PAPERLESS_THREADS_PER_WORKER`` are configured
     to use all cores. The Raspberry Pi models 3 and up have 4 cores, meaning that
     paperless will use 2 workers and 2 threads per worker. This may result in
-    slugish response times during consumption, so you might want to lower these
+    sluggish response times during consumption, so you might want to lower these
     settings (example: 2 workers and 1 thread to always have some computing power
     left for other tasks).
 *   Keep ``PAPERLESS_OCR_ALWAYS`` at its default value 'false' and consider OCR'ing

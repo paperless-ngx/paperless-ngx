@@ -2,11 +2,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import { SearchHitHighlight } from 'src/app/data/search-result';
 
 @Component({
-  selector: 'app-result-hightlight',
-  templateUrl: './result-hightlight.component.html',
-  styleUrls: ['./result-hightlight.component.scss']
+  selector: 'app-result-highlight',
+  templateUrl: './result-highlight.component.html',
+  styleUrls: ['./result-highlight.component.scss']
 })
-export class ResultHightlightComponent implements OnInit {
+export class ResultHighlightComponent implements OnInit {
 
   constructor() { }
 

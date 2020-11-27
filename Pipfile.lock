@@ -1,10 +1,12 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ae2643b9cf0cf5741ae149fb6bc0c480de41329ce48e773eb4b5d760bc5e2244"
+            "sha256": "d6432a18280c092c108e998f00bcd377c0c55ef18f26cb0b8eb64f9618b9f383"
         },
         "pipfile-spec": 6,
-        "requires": {},
+        "requires": {
+            "python_version": "3.6"
+        },
         "sources": [
             {
                 "name": "pypi",
@@ -128,6 +130,14 @@
             ],
             "index": "pypi",
             "version": "==0.32.0"
+        },
+        "inotify-simple": {
+            "hashes": [
+                "sha256:8440ffe49c4ae81a8df57c1ae1eb4b6bfa7acb830099bfb3e305b383005cc128",
+                "sha256:854f9ac752cc1fcff6ca34e9d3d875c9a94c9b7d6eb377f63be2d481a566c6ee"
+            ],
+            "index": "pypi",
+            "version": "==1.3.5"
         },
         "joblib": {
             "hashes": [
@@ -663,11 +673,11 @@
         },
         "faker": {
             "hashes": [
-                "sha256:3f5d379e4b5ce92a8afe3c2ce59d7c43886370dd3bf9495a936b91888debfc81",
-                "sha256:8c0e8a06acef4b9312902e2ce18becabe62badd3a6632180bd0680c6ee111473"
+                "sha256:5398268e1d751ffdb3ed36b8a790ed98659200599b368eec38a02eed15bce997",
+                "sha256:d4183b8f57316de3be27cd6c3b40e9f9343d27c95c96179f027316c58c2c239e"
             ],
             "markers": "python_version >= '3.5'",
-            "version": "==4.17.0"
+            "version": "==4.17.1"
         },
         "filelock": {
             "hashes": [
@@ -692,6 +702,22 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.2.0"
+        },
+        "importlib-metadata": {
+            "hashes": [
+                "sha256:030f3b1bdb823ecbe4a9659e14cc861ce5af403fe99863bae173ec5fe00ab132",
+                "sha256:caeee3603f5dcf567864d1be9b839b0bcfdf1383e3e7be33ce2dead8144ff19c"
+            ],
+            "markers": "python_version < '3.8'",
+            "version": "==2.1.0"
+        },
+        "importlib-resources": {
+            "hashes": [
+                "sha256:7b51f0106c8ec564b1bef3d9c588bc694ce2b92125bbb6278f4f2f5b54ec3592",
+                "sha256:a3d34a8464ce1d5d7c92b0ea4e921e696d86f2aa212e684451cb1482c8d84ed5"
+            ],
+            "markers": "python_version < '3.7'",
+            "version": "==3.3.0"
         },
         "iniconfig": {
             "hashes": [
@@ -999,11 +1025,19 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:b0011228208944ce71052987437d3843e05690b2f23d1c7da4263fde104c97a2",
-                "sha256:b8d6110f493af256a40d65e29846c69340a947669eec8ce784fcf3dd3af28380"
+                "sha256:07cff122e9d343140366055f31be4dcd61fd598c69d11cd33a9d9c8df4546dd7",
+                "sha256:e0aac7525e880a429764cefd3aaaff54afb5d9f25c82627563603f5d7de5a6e5"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==20.1.0"
+            "version": "==20.2.1"
+        },
+        "zipp": {
+            "hashes": [
+                "sha256:102c24ef8f171fd729d46599845e95c7ab894a4cf45f5de11a44cc7444fb1108",
+                "sha256:ed5eee1974372595f9e416cc7bbeeb12335201d8081ca8a0743c954d4446e5cb"
+            ],
+            "markers": "python_version < '3.8'",
+            "version": "==3.4.0"
         }
     }
 }

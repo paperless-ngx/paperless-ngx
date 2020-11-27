@@ -18,16 +18,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
 
         parser.add_argument(
-            "from",
-            choices=("gpg", "unencrypted"),
-            help="The state you want to change your documents from"
-        )
-        parser.add_argument(
-            "to",
-            choices=("gpg", "unencrypted"),
-            help="The state you want to change your documents to"
-        )
-        parser.add_argument(
             "--passphrase",
             help="If PAPERLESS_PASSPHRASE isn't set already, you need to "
                  "specify it here"
@@ -50,11 +40,6 @@ class Command(BaseCommand):
         except KeyboardInterrupt:
             return
 
-        if options["from"] == options["to"]:
-            raise CommandError(
-                'The "from" and "to" values can\'t be the same.'
-            )
-
         passphrase = options["passphrase"] or settings.PASSPHRASE
         if not passphrase:
             raise CommandError(
@@ -62,10 +47,7 @@ class Command(BaseCommand):
                 "by declaring it in your environment or your config."
             )
 
-        if options["from"] == "gpg" and options["to"] == "unencrypted":
-            self.__gpg_to_unencrypted(passphrase)
-        elif options["from"] == "unencrypted" and options["to"] == "gpg":
-            self.__unencrypted_to_gpg(passphrase)
+        self.__gpg_to_unencrypted(passphrase)
 
     @staticmethod
     def __gpg_to_unencrypted(passphrase):
@@ -79,10 +61,20 @@ class Command(BaseCommand):
                 document).encode('utf-8'), "green"))
 
             old_paths = [document.source_path, document.thumbnail_path]
+
             raw_document = GnuPG.decrypted(document.source_file, passphrase)
             raw_thumb = GnuPG.decrypted(document.thumbnail_file, passphrase)
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+
+            ext = os.path.splitext(document.filename)[1]
+
+            if not ext == '.gpg':
+                raise CommandError(
+                    f"Abort: encrypted file {document.source_path} does not "
+                    f"end with .gpg")
+
+            document.filename = os.path.splitext(document.filename)[0]
 
             with open(document.source_path, "wb") as f:
                 f.write(raw_document)
@@ -90,31 +82,7 @@ class Command(BaseCommand):
             with open(document.thumbnail_path, "wb") as f:
                 f.write(raw_thumb)
 
-            document.save(update_fields=("storage_type",))
-
-            for path in old_paths:
-                os.unlink(path)
-
-    @staticmethod
-    def __unencrypted_to_gpg(passphrase):
-
-        unencrypted_files = Document.objects.filter(
-            storage_type=Document.STORAGE_TYPE_UNENCRYPTED)
-
-        for document in unencrypted_files:
-
-            print(coloured("Encrypting {}".format(document), "green"))
-
-            old_paths = [document.source_path, document.thumbnail_path]
-            with open(document.source_path, "rb") as raw_document:
-                with open(document.thumbnail_path, "rb") as raw_thumb:
-                    document.storage_type = Document.STORAGE_TYPE_GPG
-                    with open(document.source_path, "wb") as f:
-                        f.write(GnuPG.encrypted(raw_document, passphrase))
-                    with open(document.thumbnail_path, "wb") as f:
-                        f.write(GnuPG.encrypted(raw_thumb, passphrase))
-
-            document.save(update_fields=("storage_type",))
+            document.save(update_fields=("storage_type", "filename"))
 
             for path in old_paths:
                 os.unlink(path)
