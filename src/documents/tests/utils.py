@@ -14,12 +14,13 @@ def setup_directories():
     dirs.scratch_dir = tempfile.mkdtemp()
     dirs.media_dir = tempfile.mkdtemp()
     dirs.consumption_dir = tempfile.mkdtemp()
-    dirs.index_dir = os.path.join(dirs.data_dir, "documents", "originals")
+    dirs.index_dir = os.path.join(dirs.data_dir, "index")
     dirs.originals_dir = os.path.join(dirs.media_dir, "documents", "originals")
     dirs.thumbnail_dir = os.path.join(dirs.media_dir, "documents", "thumbnails")
-    os.makedirs(dirs.index_dir)
-    os.makedirs(dirs.originals_dir)
-    os.makedirs(dirs.thumbnail_dir)
+
+    os.makedirs(dirs.index_dir, exist_ok=True)
+    os.makedirs(dirs.originals_dir, exist_ok=True)
+    os.makedirs(dirs.thumbnail_dir, exist_ok=True)
 
     override_settings(
         DATA_DIR=dirs.data_dir,
@@ -28,7 +29,9 @@ def setup_directories():
         ORIGINALS_DIR=dirs.originals_dir,
         THUMBNAIL_DIR=dirs.thumbnail_dir,
         CONSUMPTION_DIR=dirs.consumption_dir,
-        INDEX_DIR=dirs.index_dir
+        INDEX_DIR=dirs.index_dir,
+        MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle")
+
     ).enable()
 
     return dirs

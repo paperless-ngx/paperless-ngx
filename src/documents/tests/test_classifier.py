@@ -6,11 +6,13 @@ from django.test import TestCase, override_settings
 
 from documents.classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from documents.models import Correspondent, Document, Tag, DocumentType
+from documents.tests.utils import DirectoriesMixin
 
 
-class TestClassifier(TestCase):
+class TestClassifier(DirectoriesMixin, TestCase):
 
     def setUp(self):
+        super(TestClassifier, self).setUp()
         self.classifier = DocumentClassifier()
 
     def generate_test_data(self):
@@ -80,12 +82,14 @@ class TestClassifier(TestCase):
         self.assertTrue(self.classifier.train())
         self.assertFalse(self.classifier.train())
 
+        self.classifier.save_classifier()
+
         classifier2 = DocumentClassifier()
 
         current_ver = DocumentClassifier.FORMAT_VERSION
         with mock.patch("documents.classifier.DocumentClassifier.FORMAT_VERSION", current_ver+1):
             # assure that we won't load old classifiers.
-            self.assertRaises(IncompatibleClassifierVersionError, self.classifier.reload)
+            self.assertRaises(IncompatibleClassifierVersionError, classifier2.reload)
 
             self.classifier.save_classifier()
 

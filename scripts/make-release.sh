@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Release checklist
+# - wait for travis build.
+# adjust src/paperless/version.py
+# changelog in the documentation
+# adjust versions in docker/hub/*
+# If docker-compose was modified: all compose files are the same.
+
+# Steps:
+# run release script "dev", push
+# if it works: new tag, merge into master
+# on master: make release "lastest", push
+# on master: make release "version-tag", push
+# publish release files
+
 set -e
 
 

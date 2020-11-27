@@ -5,15 +5,23 @@
 Changelog
 *********
 
-next
-####
+paperless-ng 0.9.3
+##################
 
-*   Setting ``PAPERLESS_AUTO_LOGIN_USERNAME`` replaces ``PAPERLESS_DISABLE_LOGIN``.
-    You have to specify your username.
-*   Added a simple sanity checker that checks your documents for missing or orphaned files,
-    files with wrong checksums, inaccessible files, and documents with empty content.
-*   It is no longer possible to encrypt your documents. For the time being, paperless will
-    continue to operate with already encrypted documents.
+* Setting ``PAPERLESS_AUTO_LOGIN_USERNAME`` replaces ``PAPERLESS_DISABLE_LOGIN``.
+  You have to specify your username.
+* Added a simple sanity checker that checks your documents for missing or orphaned files,
+  files with wrong checksums, inaccessible files, and documents with empty content.
+* It is no longer possible to encrypt your documents. For the time being, paperless will
+  continue to operate with already encrypted documents.
+* Fixes:
+
+  * Paperless now uses inotify again, since the watchdog was causing issues which I was not
+    aware of.
+  * Issue with the automatic classifier not working with only one tag.
+  * A couple issues with the search index being opened to eagerly.
+  
+* Added lots of tests for various parts of the application.
 
 paperless-ng 0.9.2
 ##################
