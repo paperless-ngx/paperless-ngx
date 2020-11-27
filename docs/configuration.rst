@@ -193,17 +193,6 @@ PAPERLESS_TIME_ZONE=<timezone>
     Defaults to UTC.
 
 
-
-PAPERLESS_OCR_PAGES=<num>
-    Tells paperless to use only the specified amount of pages for OCR. Documents
-    with less than the specified amount of pages get OCR'ed completely.
-
-    Specifying 1 here will only use the first page.
-
-    Defaults to 0, which disables this feature and always uses all pages.
-
-
-
 PAPERLESS_OCR_LANGUAGE=<lang>
     Customize the default language that tesseract will attempt to use when
     parsing documents. The default language is used whenever
@@ -249,6 +238,20 @@ PAPERLESS_OCR_OUTPUT_TYPE=<type>
     
     If not specified, ``pdfa`` is used. Remember that paperless also keeps
     the original input file as well as the archived version.
+
+
+PAPERLESS_OCR_PAGES=<num>
+    Tells paperless to use only the specified amount of pages for OCR. Documents
+    with less than the specified amount of pages get OCR'ed completely.
+
+    Specifying 1 here will only use the first page.
+
+    When combined with ``PAPERLESS_OCR_MODE=redo`` or ``PAPERLESS_OCR_MODE=force``,
+    paperless will not modify any text it finds on excluded pages and copy it
+    verbatim.
+
+    Defaults to 0, which disables this feature and always uses all pages.
+
 
 PAPERLESS_OCR_IMAGE_DPI=<num>
     Paperless will OCR any images you put into the system and convert them
@@ -300,18 +303,6 @@ PAPERLESS_CONVERT_TMPDIR=<path>
 
     Default is none, which disables the temporary directory.
 
-PAPERLESS_CONVERT_DENSITY=<num>
-    This setting has a high impact on the physical size of tmp page files,
-    the speed of document conversion, and can affect the accuracy of OCR
-    results. Individual results can vary and this setting should be tested
-    thoroughly against the documents you are importing to see if it has any
-    impacts either negative or positive.
-    Testing on limited document sets has shown a setting of 200 can cut the
-    size of tmp files by 1/3, and speed up conversion by up to 4x
-    with little impact to OCR accuracy.
-
-    Default is 300.
-
 PAPERLESS_OPTIMIZE_THUMBNAILS=<bool>
     Use optipng to optimize thumbnails. This usually reduces the size of
     thumbnails by about 20%, but uses considerable compute time during
@@ -357,9 +348,6 @@ PAPERLESS_CONVERT_BINARY=<path>
 
 PAPERLESS_GS_BINARY=<path>
     Defaults to "/usr/bin/gs".
-
-PAPERLESS_UNPAPER_BINARY=<path>
-    Defaults to "/usr/bin/unpaper".
 
 PAPERLESS_OPTIPNG_BINARY=<path>
     Defaults to "/usr/bin/optipng".
