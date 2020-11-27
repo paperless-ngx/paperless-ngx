@@ -38,6 +38,7 @@ class TestConsumer(TestCase):
     sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
     def setUp(self) -> None:
+        self.t = None
         patcher = mock.patch("documents.management.commands.document_consumer.async_task")
         self.task_mock = patcher.start()
         self.addCleanup(patcher.stop)
@@ -53,7 +54,12 @@ class TestConsumer(TestCase):
 
     def tearDown(self) -> None:
         if self.t:
+            # set the stop flag
             self.t.stop()
+            # wait for the consumer to exit.
+            self.t.join()
+
+        remove_dirs(self.dirs)
 
     def wait_for_task_mock_call(self):
         n = 0
