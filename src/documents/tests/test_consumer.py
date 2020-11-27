@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 from django.test import TestCase, override_settings
 
-from .utils import setup_directories, remove_dirs
+from .utils import DirectoriesMixin
 from ..consumer import Consumer, ConsumerError
 from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
 from ..parsers import DocumentParser, ParseError
@@ -408,7 +408,7 @@ def fake_magic_from_file(file, mime=False):
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
-class TestConsumer(TestCase):
+class TestConsumer(DirectoriesMixin, TestCase):
 
     def make_dummy_parser(self, path, logging_group):
         return DummyParser(path, logging_group, self.dirs.scratch_dir)
@@ -417,8 +417,7 @@ class TestConsumer(TestCase):
         return FaultyParser(path, logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
-        self.dirs = setup_directories()
-        self.addCleanup(remove_dirs, self.dirs)
+        super(TestConsumer, self).setUp()
 
         patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
         m = patcher.start()
