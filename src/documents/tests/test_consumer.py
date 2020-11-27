@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 from django.test import TestCase, override_settings
 
-from .utils import setup_directories, remove_dirs
+from .utils import DirectoriesMixin
 from ..consumer import Consumer, ConsumerError
 from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
 from ..parsers import DocumentParser, ParseError
@@ -408,7 +408,7 @@ def fake_magic_from_file(file, mime=False):
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
-class TestConsumer(TestCase):
+class TestConsumer(DirectoriesMixin, TestCase):
 
     def make_dummy_parser(self, logging_group):
         return DummyParser(logging_group, self.dirs.scratch_dir)
@@ -417,8 +417,7 @@ class TestConsumer(TestCase):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
-        self.dirs = setup_directories()
-        self.addCleanup(remove_dirs, self.dirs)
+        super(TestConsumer, self).setUp()
 
         patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
         m = patcher.start()
@@ -498,26 +497,6 @@ class TestConsumer(TestCase):
             self.consumer.try_consume_file("non-existing-file")
         except ConsumerError as e:
             self.assertTrue(str(e).endswith('It is not a file'))
-            return
-
-        self.fail("Should throw exception")
-
-    @override_settings(CONSUMPTION_DIR=None)
-    def testConsumptionDirUnset(self):
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "The CONSUMPTION_DIR settings variable does not appear to be set.")
-            return
-
-        self.fail("Should throw exception")
-
-    @override_settings(CONSUMPTION_DIR="asd")
-    def testNoConsumptionDir(self):
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "Consumption directory asd does not exist")
             return
 
         self.fail("Should throw exception")

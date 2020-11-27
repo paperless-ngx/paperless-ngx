@@ -249,6 +249,7 @@ class Document(models.Model):
 
     @property
     def file_type(self):
+        # TODO: this is not stable across python versions
         return mimetypes.guess_extension(str(self.mime_type))
 
     @property
