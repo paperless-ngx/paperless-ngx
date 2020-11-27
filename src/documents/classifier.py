@@ -4,13 +4,13 @@ import os
 import pickle
 import re
 
+from django.conf import settings
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
 from sklearn.utils.multiclass import type_of_target
 
 from documents.models import Document, MatchingModel
-from paperless import settings
 
 
 class IncompatibleClassifierVersionError(Exception):
