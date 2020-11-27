@@ -137,12 +137,13 @@ class Command(BaseCommand):
             f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()
-        inotify.add_watch(directory, flags.CLOSE_WRITE | flags.MOVED_TO)
+        descriptor = inotify.add_watch(directory, flags.CLOSE_WRITE | flags.MOVED_TO)
         try:
             while not self.stop_flag:
                 for event in inotify.read(timeout=1000, read_delay=1000):
                     file = os.path.join(directory, event.name)
-                    if os.path.isfile(file):
-                        _consume(file)
+                    _consume(file)
         except KeyboardInterrupt:
             pass
+
+        inotify.rm_watch(descriptor)
