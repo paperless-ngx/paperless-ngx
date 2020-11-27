@@ -2,7 +2,7 @@ import logging
 import uuid
 from unittest import mock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from ..models import Log
 
@@ -14,6 +14,7 @@ class TestPaperlessLog(TestCase):
         self.logger = logging.getLogger(
             "documents.management.commands.document_consumer")
 
+    @override_settings(DISABLE_DBHANDLER=False)
     def test_that_it_saves_at_all(self):
 
         kw = {"group": uuid.uuid4()}
@@ -38,6 +39,7 @@ class TestPaperlessLog(TestCase):
             self.logger.critical("This is a critical message", extra=kw)
             self.assertEqual(Log.objects.all().count(), 5)
 
+    @override_settings(DISABLE_DBHANDLER=False)
     def test_groups(self):
 
         kw1 = {"group": uuid.uuid4()}

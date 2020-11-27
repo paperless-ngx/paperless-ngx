@@ -17,7 +17,7 @@ is
 
 .. caution::
 
-    Dont mess with this folder. Don't change permissions and don't move
+    Do not mess with this folder. Don't change permissions and don't move
     files around manually. This folder is meant to be entirely managed by docker
     and paperless.
 
@@ -36,9 +36,9 @@ file extensions do not matter.
 
 **A:** The short answer is yes. I've tested it on a Raspberry Pi 3 B.
 The long answer is that certain parts of
-Paperless will run very slow, such as the tesseract OCR. On Rasperry Pi,
+Paperless will run very slow, such as the tesseract OCR. On Raspberry Pi,
 try to OCR documents before feeding them into paperless so that paperless can
-reuse the text. The web interface should be alot snappier, since it runs
+reuse the text. The web interface should be a lot snappier, since it runs
 in your browser and paperless has to do much less work to serve the data.
 
 .. note::
