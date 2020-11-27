@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from pathvalidate import ValidationError
 from rest_framework.test import APITestCase
 
+from documents import index
 from documents.models import Document, Correspondent, DocumentType, Tag
 from documents.tests.utils import DirectoriesMixin
 
@@ -161,6 +162,109 @@ class DocumentApiTest(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
         self.assertEqual(len(results), 3)
+
+    def test_search_no_query(self):
+        response = self.client.get("/api/search/")
+        results = response.data['results']
+
+        self.assertEqual(len(results), 0)
+
+    def test_search(self):
+        d1=Document.objects.create(title="invoice", content="the thing i bought at a shop and paid with bank account", checksum="A", pk=1)
+        d2=Document.objects.create(title="bank statement 1", content="things i paid for in august", pk=2, checksum="B")
+        d3=Document.objects.create(title="bank statement 3", content="things i paid for in september", pk=3, checksum="C")
+        with index.open_index(False).writer() as writer:
+            # Note to future self: there is a reason we dont use a model signal handler to update the index: some operations edit many documents at once
+            # (retagger, renamer) and we don't want to open a writer for each of these, but rather perform the entire operation with one writer.
+            # That's why we cant open the writer in a model on_save handler or something.
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+        response = self.client.get("/api/search/?query=bank")
+        results = response.data['results']
+        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(response.data['page'], 1)
+        self.assertEqual(response.data['page_count'], 1)
+        self.assertEqual(len(results), 3)
+
+        response = self.client.get("/api/search/?query=september")
+        results = response.data['results']
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['page'], 1)
+        self.assertEqual(response.data['page_count'], 1)
+        self.assertEqual(len(results), 1)
+
+        response = self.client.get("/api/search/?query=statement")
+        results = response.data['results']
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['page'], 1)
+        self.assertEqual(response.data['page_count'], 1)
+        self.assertEqual(len(results), 2)
+
+        response = self.client.get("/api/search/?query=sfegdfg")
+        results = response.data['results']
+        self.assertEqual(response.data['count'], 0)
+        self.assertEqual(response.data['page'], 0)
+        self.assertEqual(response.data['page_count'], 0)
+        self.assertEqual(len(results), 0)
+
+    def test_search_multi_page(self):
+        with index.open_index(False).writer() as writer:
+            for i in range(55):
+                doc = Document.objects.create(checksum=str(i), pk=i+1, title=f"Document {i+1}", content="content")
+                index.update_document(writer, doc)
+
+        # This is here so that we test that no document gets returned twice (might happen if the paging is not working)
+        seen_ids = []
+
+        for i in range(1, 6):
+            response = self.client.get(f"/api/search/?query=content&page={i}")
+            results = response.data['results']
+            self.assertEqual(response.data['count'], 55)
+            self.assertEqual(response.data['page'], i)
+            self.assertEqual(response.data['page_count'], 6)
+            self.assertEqual(len(results), 10)
+
+            for result in results:
+                self.assertNotIn(result['id'], seen_ids)
+                seen_ids.append(result['id'])
+
+        response = self.client.get(f"/api/search/?query=content&page=6")
+        results = response.data['results']
+        self.assertEqual(response.data['count'], 55)
+        self.assertEqual(response.data['page'], 6)
+        self.assertEqual(response.data['page_count'], 6)
+        self.assertEqual(len(results), 5)
+
+        for result in results:
+            self.assertNotIn(result['id'], seen_ids)
+            seen_ids.append(result['id'])
+
+        response = self.client.get(f"/api/search/?query=content&page=7")
+        results = response.data['results']
+        self.assertEqual(response.data['count'], 55)
+        self.assertEqual(response.data['page'], 6)
+        self.assertEqual(response.data['page_count'], 6)
+        self.assertEqual(len(results), 5)
+
+    def test_search_invalid_page(self):
+        with index.open_index(False).writer() as writer:
+            for i in range(15):
+                doc = Document.objects.create(checksum=str(i), pk=i+1, title=f"Document {i+1}", content="content")
+                index.update_document(writer, doc)
+
+        first_page = self.client.get(f"/api/search/?query=content&page=1").data
+        second_page = self.client.get(f"/api/search/?query=content&page=2").data
+        should_be_first_page_1 = self.client.get(f"/api/search/?query=content&page=0").data
+        should_be_first_page_2 = self.client.get(f"/api/search/?query=content&page=dgfd").data
+        should_be_first_page_3 = self.client.get(f"/api/search/?query=content&page=").data
+        should_be_first_page_4 = self.client.get(f"/api/search/?query=content&page=-7868").data
+
+        self.assertDictEqual(first_page, should_be_first_page_1)
+        self.assertDictEqual(first_page, should_be_first_page_2)
+        self.assertDictEqual(first_page, should_be_first_page_3)
+        self.assertDictEqual(first_page, should_be_first_page_4)
+        self.assertNotEqual(len(first_page['results']), len(second_page['results']))
 
     @mock.patch("documents.index.autocomplete")
     def test_search_autocomplete(self, m):
