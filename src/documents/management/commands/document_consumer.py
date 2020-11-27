@@ -3,7 +3,7 @@ import os
 from time import sleep
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django_q.tasks import async_task
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
@@ -95,6 +95,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         directory = options["directory"]
 
+        if not directory:
+            raise CommandError(
+                "CONSUMPTION_DIR does not appear to be set."
+            )
+
+        if not os.path.isdir(directory):
+            raise CommandError(
+                f"Consumption directory {directory} does not exist")
+
         for entry in os.scandir(directory):
             _consume(entry.path)
 
@@ -128,12 +137,15 @@ class Command(BaseCommand):
             f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()
-        inotify.add_watch(directory, flags.CLOSE_WRITE | flags.MOVED_TO)
+        descriptor = inotify.add_watch(
+            directory, flags.CLOSE_WRITE | flags.MOVED_TO)
         try:
             while not self.stop_flag:
                 for event in inotify.read(timeout=1000, read_delay=1000):
                     file = os.path.join(directory, event.name)
-                    if os.path.isfile(file):
-                        _consume(file)
+                    _consume(file)
         except KeyboardInterrupt:
             pass
+
+        inotify.rm_watch(descriptor)
+        inotify.close()
