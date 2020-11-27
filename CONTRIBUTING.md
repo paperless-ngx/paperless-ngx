@@ -1,13 +1,26 @@
 # Contributing
 
-If you feel that somethings is not working, please submit an issue. You can also ask questions on the issue tracker by tagging your question with the question tag.
+There's still lots of things to be done, just have a look at that issue log. If you feel like conctributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome.
 
-Pull requests are welcome, however, I will be a little bit more strict about what goes into the code and what does not. If you want to make a big change, please ask me about it first.
+If you want to implement something big: Please start a discussion about that in the issues! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested. See the roadmap in the readme.
 
 * When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
 * Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
 
-However:
+## Python
 
-* Bug fixes and are always welcome. Docker makes things easier, however, I alone cannot ensure that this runs on all platforms.
-* Improvements to the styling of the front-end are always welcome. I'm no expert in things UX, and simply copied one of the Bootstrap examples. I think it turned out rather good, but I just can't seem to get some things working properly.
+Use python 3.6 for development. Paperless supports python 3.6, 3.7 and 3.8.
+
+## Branches
+
+master always reflects the latest release.
+
+dev contains all changes that will be part of the next release.
+
+feature-X branches is for experimental stuff that will eventually be merged into dev, and then released as part of the next release.
+
+## Testing:
+
+I'm trying to get most of paperless tested, so please do the same for your code! I know its a hassle, but it makes sure that your code works now and will allow us to detect regressions easily.
+
+To test your code, execute `pytest` in the src/ directory. Executing that in the project root is no good. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
