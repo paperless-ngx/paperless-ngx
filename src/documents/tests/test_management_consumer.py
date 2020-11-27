@@ -7,11 +7,11 @@ from unittest import mock
 
 from django.conf import settings
 from django.core.management import call_command, CommandError
-from django.test import TestCase, override_settings
+from django.test import override_settings, TestCase
 
 from documents.consumer import ConsumerError
 from documents.management.commands import document_consumer
-from documents.tests.utils import setup_directories, remove_dirs
+from documents.tests.utils import DirectoriesMixin
 
 
 class ConsumerThread(Thread):
@@ -33,18 +33,16 @@ def chunked(size, source):
         yield source[i:i+size]
 
 
-class TestConsumer(TestCase):
+class TestConsumer(DirectoriesMixin, TestCase):
 
     sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
     def setUp(self) -> None:
+        super(TestConsumer, self).setUp()
         self.t = None
         patcher = mock.patch("documents.management.commands.document_consumer.async_task")
         self.task_mock = patcher.start()
         self.addCleanup(patcher.stop)
-
-        self.dirs = setup_directories()
-        self.addCleanup(remove_dirs, self.dirs)
 
     def t_start(self):
         self.t = ConsumerThread()
@@ -59,7 +57,7 @@ class TestConsumer(TestCase):
             # wait for the consumer to exit.
             self.t.join()
 
-        remove_dirs(self.dirs)
+        super(TestConsumer, self).tearDown()
 
     def wait_for_task_mock_call(self):
         n = 0
