@@ -1,4 +1,3 @@
-import { DatePipe, formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,17 +5,14 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
-import { TagService } from 'src/app/services/rest/tag.service';
 import { DeleteDialogComponent } from '../common/delete-dialog/delete-dialog.component';
 import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
-import { TagEditDialogComponent } from '../manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 
 @Component({
   selector: 'app-document-detail',
@@ -133,8 +129,8 @@ export class DocumentDetailComponent implements OnInit {
 
   close() {
     this.openDocumentService.closeDocument(this.document)
-    if (this.documentListViewService.viewId) {
-      this.router.navigate(['view', this.documentListViewService.viewId])
+    if (this.documentListViewService.savedViewId) {
+      this.router.navigate(['view', this.documentListViewService.savedViewId])
     } else {
       this.router.navigate(['documents'])
     }
