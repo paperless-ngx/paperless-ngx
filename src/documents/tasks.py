@@ -12,7 +12,9 @@ from documents.sanity_checker import SanityFailedError
 
 
 def index_optimize():
-    index.open_index().optimize()
+    ix = index.open_index()
+    with AsyncWriter(ix) as writer:
+        writer.commit(optimize=True)
 
 
 def index_reindex():
