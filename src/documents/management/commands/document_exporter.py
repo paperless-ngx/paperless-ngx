@@ -7,7 +7,8 @@ from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 
 from documents.models import Document, Correspondent, Tag, DocumentType
-from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME
+from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
+    EXPORTER_ARCHIVE_NAME
 from paperless.db import GnuPG
 from ...mixins import Renderable
 
@@ -54,7 +55,6 @@ class Command(Renderable, BaseCommand):
             document = document_map[document_dict["pk"]]
 
             unique_filename = f"{document.pk:07}_{document.file_name}"
-
             file_target = os.path.join(self.target, unique_filename)
 
             thumbnail_name = unique_filename + "-thumbnail.png"
@@ -62,6 +62,14 @@ class Command(Renderable, BaseCommand):
 
             document_dict[EXPORTER_FILE_NAME] = unique_filename
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
+
+            if os.path.exists(document.archive_path):
+                archive_name = \
+                    f"{document.pk:07}_archive_{document.archive_file_name}"
+                archive_target = os.path.join(self.target, archive_name)
+                document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
+            else:
+                archive_target = None
 
             print(f"Exporting: {file_target}")
 
@@ -76,10 +84,17 @@ class Command(Renderable, BaseCommand):
                     f.write(GnuPG.decrypted(document.thumbnail_file))
                     os.utime(thumbnail_target, times=(t, t))
 
+                if archive_target:
+                    with open(archive_target, "wb") as f:
+                        f.write(GnuPG.decrypted(document.archive_path))
+                        os.utime(archive_target, times=(t, t))
             else:
 
                 shutil.copy(document.source_path, file_target)
                 shutil.copy(document.thumbnail_path, thumbnail_target)
+
+                if archive_target:
+                    shutil.copy(document.archive_path, archive_target)
 
         manifest += json.loads(
             serializers.serialize("json", Correspondent.objects.all()))
