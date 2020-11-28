@@ -41,4 +41,8 @@ export class DocumentCardLargeComponent implements OnInit {
   getDownloadUrl() {
     return this.documentService.getDownloadUrl(this.document.id)
   }
+
+  getPreviewUrl() {
+    return this.documentService.getPreviewUrl(this.document.id)
+  }
 }
