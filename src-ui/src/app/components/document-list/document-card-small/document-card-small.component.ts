@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentService } from 'src/app/services/rest/document.service';
 
 @Component({
@@ -13,6 +14,12 @@ export class DocumentCardSmallComponent implements OnInit {
 
   @Input()
   document: PaperlessDocument
+
+  @Output()
+  clickTag = new EventEmitter<PaperlessTag>()
+
+  @Output()
+  clickCorrespondent = new EventEmitter<PaperlessDocument>()
 
   ngOnInit(): void {
   }
