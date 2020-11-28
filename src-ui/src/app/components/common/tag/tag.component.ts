@@ -16,9 +16,6 @@ export class TagComponent implements OnInit {
   @Input()
   clickable: boolean = false
 
-  @Output()
-  click = new EventEmitter()
-
   ngOnInit(): void {
   }
 
