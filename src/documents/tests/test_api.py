@@ -5,6 +5,7 @@ from unittest import mock
 from django.contrib.auth.models import User
 from pathvalidate import ValidationError
 from rest_framework.test import APITestCase
+from whoosh.writing import AsyncWriter
 
 from documents import index
 from documents.models import Document, Correspondent, DocumentType, Tag
@@ -173,7 +174,7 @@ class DocumentApiTest(DirectoriesMixin, APITestCase):
         d1=Document.objects.create(title="invoice", content="the thing i bought at a shop and paid with bank account", checksum="A", pk=1)
         d2=Document.objects.create(title="bank statement 1", content="things i paid for in august", pk=2, checksum="B")
         d3=Document.objects.create(title="bank statement 3", content="things i paid for in september", pk=3, checksum="C")
-        with index.open_index(False).writer() as writer:
+        with AsyncWriter(index.open_index()) as writer:
             # Note to future self: there is a reason we dont use a model signal handler to update the index: some operations edit many documents at once
             # (retagger, renamer) and we don't want to open a writer for each of these, but rather perform the entire operation with one writer.
             # That's why we cant open the writer in a model on_save handler or something.
@@ -209,7 +210,7 @@ class DocumentApiTest(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 0)
 
     def test_search_multi_page(self):
-        with index.open_index(False).writer() as writer:
+        with AsyncWriter(index.open_index()) as writer:
             for i in range(55):
                 doc = Document.objects.create(checksum=str(i), pk=i+1, title=f"Document {i+1}", content="content")
                 index.update_document(writer, doc)
@@ -248,7 +249,7 @@ class DocumentApiTest(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 5)
 
     def test_search_invalid_page(self):
-        with index.open_index(False).writer() as writer:
+        with AsyncWriter(index.open_index()) as writer:
             for i in range(15):
                 doc = Document.objects.create(checksum=str(i), pk=i+1, title=f"Document {i+1}", content="content")
                 index.update_document(writer, doc)
