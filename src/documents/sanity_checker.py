@@ -81,6 +81,17 @@ def check_sanity():
                     f"Stored: {doc.checksum}, actual: {checksum}."
                 ))
 
+        if os.path.isfile(doc.archive_path):
+            try:
+                with doc.archive_file as f:
+                    f.read()
+            except OSError as e:
+                messages.append(SanityError(
+                    f"Cannot read archive file of document {doc.pk}: {e}"
+                ))
+
+            present_files.remove(os.path.normpath(doc.archive_path))
+
         if not doc.content:
             messages.append(SanityWarning(
                 f"Document {doc.pk} has no content."
