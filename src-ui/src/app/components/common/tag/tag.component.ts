@@ -14,6 +14,9 @@ export class TagComponent implements OnInit {
   tag: PaperlessTag
 
   @Input()
+  linkTitle: string = ""
+
+  @Input()
   clickable: boolean = false
 
   ngOnInit(): void {

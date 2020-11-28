@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentService } from 'src/app/services/rest/document.service';
 
 @Component({
@@ -17,6 +18,12 @@ export class DocumentCardLargeComponent implements OnInit {
 
   @Input()
   details: any
+
+  @Output()
+  clickTag = new EventEmitter<PaperlessTag>()
+
+  @Output()
+  clickCorrespondent = new EventEmitter<PaperlessDocument>()
 
   ngOnInit(): void {
   }
