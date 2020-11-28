@@ -2,14 +2,16 @@
   <div class="card h-100 shadow-sm">
     <div class=" border-bottom doc-img pr-1" [ngStyle]="{'background-image': 'url(' + getThumbUrl() + ')'}">
       <div class="row" *ngFor="let t of document.tags">
-        <app-tag [tag]="t" class="col text-right"></app-tag>
+        <app-tag [tag]="t" class="col text-right" (click)="clickTag.emit(t)" [clickable]="true" linkTitle="Filter by tag"></app-tag>
       </div>
     </div>
-
     
     <div class="card-body p-2">
       <p class="card-text">
-        <span class="font-weight-bold">{{document.correspondent? document.correspondent.name + ': ' : ''}}</span> {{document.title}}
+        <ng-container *ngIf="document.correspondent">
+          <a [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{document.correspondent.name}}</a>:
+        </ng-container>
+        {{document.title}}
       </p>
     </div>
     <div class="card-footer">

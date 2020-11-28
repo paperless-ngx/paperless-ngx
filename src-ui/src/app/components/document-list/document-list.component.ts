@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
+import { FILTER_CORRESPONDENT, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
@@ -86,4 +89,24 @@ export class DocumentListComponent implements OnInit {
       modal.close()
     })
   }
+
+  filterByTag(t: PaperlessTag) {
+    if (this.filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == t.id)) {
+      return
+    }
+
+    this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: t.id})
+    this.applyFilterRules()
+  }
+
+  filterByCorrespondent(c: PaperlessCorrespondent) {
+    let existing_rule = this.filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
+    if (existing_rule) {
+      existing_rule.value = c.id
+    } else {
+      this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: c.id})
+    }
+    this.applyFilterRules()
+  }
+
 }
