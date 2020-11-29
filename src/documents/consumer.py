@@ -169,7 +169,9 @@ class Consumer(LoggingMixin):
 
                 # Afte performing all database operations and moving files
                 # into place, tell paperless where the file is.
-                document.filename = generate_filename(document)
+                document.filename = os.path.basename(document.source_path)
+                # Saving the document now will trigger the filename handling
+                # logic.
                 document.save()
 
                 # Delete the file only if it was successfully consumed
