@@ -9,10 +9,11 @@ from django.db import transaction
 from django.utils import timezone
 
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
-from .file_handling import generate_filename, create_source_path_directory
+from .file_handling import create_source_path_directory
 from .loggers import LoggingMixin
 from .models import Document, FileInfo, Correspondent, DocumentType, Tag
-from .parsers import ParseError, get_parser_class_for_mime_type
+from .parsers import ParseError, get_parser_class_for_mime_type, \
+    get_supported_file_extensions
 from .signals import (
     document_consumption_finished,
     document_consumption_started
@@ -38,6 +39,21 @@ class Consumer(LoggingMixin):
         if not os.path.isfile(self.path):
             raise ConsumerError("Cannot consume {}: It is not a file".format(
                 self.path))
+
+    def pre_check_file_extension(self):
+        extensions = get_supported_file_extensions()
+        _, ext = os.path.splitext(self.filename)
+
+        if not ext:
+            raise ConsumerError(
+                f"Not consuming {self.filename}: File type unknown."
+            )
+
+        if ext not in extensions:
+            raise ConsumerError(
+                f"Not consuming {self.filename}: File extension {ext} does "
+                f"not map to any known file type ({str(extensions)})"
+            )
 
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
@@ -80,6 +96,7 @@ class Consumer(LoggingMixin):
         # Make sure that preconditions for consuming the file are met.
 
         self.pre_check_file_exists()
+        self.pre_check_file_extension()
         self.pre_check_directories()
         self.pre_check_duplicate()
 
