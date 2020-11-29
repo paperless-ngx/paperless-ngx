@@ -224,7 +224,11 @@ def update_filename_and_move_files(sender, instance, **kwargs):
     try:
         os.rename(old_path, new_path)
         instance.filename = new_filename
-        instance.save()
+        # Don't save here to prevent infinite recursion.
+        Document.objects.filter(pk=instance.pk).update(filename=new_filename)
+
+        logging.getLogger(__name__).debug(
+            f"Moved file {old_path} to {new_path}.")
 
     except OSError as e:
         instance.filename = old_filename
