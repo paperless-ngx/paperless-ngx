@@ -32,7 +32,14 @@ class FakeImageFile(ContextManager):
         return os.path.basename(self.fname)
 
 
+
+
 class TestParser(DirectoriesMixin, TestCase):
+
+    def assertContainsStrings(self, content, strings):
+        # Asserts that all strings appear in content, in the given order.
+        indices = [content.index(s) for s in strings]
+        self.assertListEqual(indices, sorted(indices))
 
     text_cases = [
         ("simple     string", "simple string"),
@@ -64,7 +71,7 @@ class TestParser(DirectoriesMixin, TestCase):
     def test_get_text_from_pdf(self):
         text = get_text_from_pdf(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'))
 
-        self.assertEqual(text.strip(), "This is a test document.")
+        self.assertContainsStrings(text.strip(), ["This is a test document."])
 
     def test_thumbnail(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
@@ -102,7 +109,7 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertTrue(os.path.isfile(parser.archive_path))
 
-        self.assertEqual(parser.get_text(), "This is a test document.")
+        self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
     def test_with_form(self):
         parser = RasterisedDocumentParser(None)
@@ -111,7 +118,7 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertTrue(os.path.isfile(parser.archive_path))
 
-        self.assertEqual(parser.get_text(), "Please enter your name in here:\n\nThis is a PDF document with a form.")
+        self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
 
     @override_settings(OCR_MODE="redo")
     def test_with_form_error(self):
@@ -120,8 +127,7 @@ class TestParser(DirectoriesMixin, TestCase):
         parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
 
         self.assertIsNone(parser.archive_path)
-
-        self.assertEqual(parser.get_text(), "Please enter your name in here:\n\nThis is a PDF document with a form.")
+        self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
 
     @override_settings(OCR_MODE="redo")
     @mock.patch("paperless_tesseract.parsers.get_text_from_pdf", lambda _: None)
@@ -137,9 +143,9 @@ class TestParser(DirectoriesMixin, TestCase):
     def test_with_form_force(self):
         parser = RasterisedDocumentParser(None)
 
-#        parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
+        parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
 
-#        self.assertEqual(parser.get_text(), "Please enter your name in here:\n\nThis is a PDF document with a form.")
+        self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
 
     def test_image_simple(self):
         parser = RasterisedDocumentParser(None)
@@ -148,7 +154,7 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertTrue(os.path.isfile(parser.archive_path))
 
-        self.assertEqual(parser.get_text(), "This is a test document.")
+        self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
     def test_image_simple_alpha_fail(self):
         parser = RasterisedDocumentParser(None)
@@ -175,52 +181,55 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertTrue(os.path.isfile(parser.archive_path))
 
-        self.assertEqual(parser.get_text(), "This is a test document.")
+        self.assertContainsStrings(parser.get_text().lower(), ["this is a test document."])
 
     def test_multi_page(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertEqual(parser.get_text(), "This is a multi page document. Page 1.\n\nThis is a multi page document. Page 2.\n\nThis is a multi page document. Page 3.")
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
 
     @override_settings(OCR_PAGES=2, OCR_MODE="skip")
     def test_multi_page_pages_skip(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertEqual(parser.get_text(), "This is a multi page document. Page 1.\n\nThis is a multi page document. Page 2.\n\nThis is a multi page document. Page 3.")
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
 
     @override_settings(OCR_PAGES=2, OCR_MODE="redo")
     def test_multi_page_pages_redo(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertEqual(parser.get_text(), "This is a multi page document. Page 1.\n\nThis is a multi page document. Page 2.\n\nThis is a multi page document. Page 3.")
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
 
     @override_settings(OCR_PAGES=2, OCR_MODE="force")
     def test_multi_page_pages_force(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertEqual(parser.get_text(), "This is a multi page document. Page 1.\n\nThis is a multi page document. Page 2.\n\nThis is a multi page document. Page 3.")
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
 
     @override_settings(OOCR_MODE="skip")
     def test_multi_page_analog_pages_skip(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertEqual(parser.get_text(), "This is a multi page document. Page 1.\n\nThis is a multi page document. Page 2.\n\nThis is a multi page document. Page 3.")
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
 
     @override_settings(OCR_PAGES=2, OCR_MODE="redo")
     def test_multi_page_analog_pages_redo(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertEqual(parser.get_text(), "This is a multi page document. Page 1.\n\nThis is a multi page document. Page 2.")
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2"])
+        self.assertFalse("page 3" in parser.get_text().lower())
 
     @override_settings(OCR_PAGES=1, OCR_MODE="force")
     def test_multi_page_analog_pages_force(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
         self.assertTrue(os.path.isfile(parser.archive_path))
-        self.assertEqual(parser.get_text(), "This is a multi page document. Page 1.")
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1"])
+        self.assertFalse("page 2" in parser.get_text().lower())
+        self.assertFalse("page 3" in parser.get_text().lower())
