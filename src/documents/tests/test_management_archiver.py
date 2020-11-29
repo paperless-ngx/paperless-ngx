@@ -1,14 +1,17 @@
+import filecmp
 import os
 import shutil
-from unittest import mock
 
 from django.core.management import call_command
 from django.test import TestCase
 
+from documents.management.commands.document_archiver import handle_document
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
 
+
 sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
+
 
 class TestArchiver(DirectoriesMixin, TestCase):
 
@@ -17,12 +20,23 @@ class TestArchiver(DirectoriesMixin, TestCase):
         #self.d2 = Document.objects.create(checksum="B", title="B", content="second document")
         #self.d3 = Document.objects.create(checksum="C", title="C", content="unrelated document")
 
-    @mock.patch("documents.management.commands.document_archiver.handle_document")
-    def test_archiver(self, m):
+    def test_archiver(self):
 
         shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, "0000001.pdf"))
         self.make_models()
 
         call_command('document_archiver')
 
-        m.assert_called()
+    def test_handle_document(self):
+
+        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, "0000001.pdf"))
+        self.make_models()
+
+        handle_document(self.d1)
+
+        doc = Document.objects.get(id=self.d1.id)
+
+        self.assertIsNotNone(doc.checksum)
+        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertTrue(os.path.isfile(doc.source_path))
+        self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
