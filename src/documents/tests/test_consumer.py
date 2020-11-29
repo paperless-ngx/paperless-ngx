@@ -563,12 +563,33 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
 
-        print(document.source_path)
-        print("===")
-
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.correspondent.name, "Bank")
         self.assertEqual(document.filename, "bank/new-docs-0000001.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
+    @mock.patch("documents.signals.handlers.generate_filename")
+    def testFilenameHandlingUnstableFormat(self, m):
+
+        filenames = ["this", "that", "now this", "i cant decide"]
+
+        def get_filename():
+            f = filenames.pop()
+            filenames.insert(0, f)
+            return f
+
+        m.side_effect = lambda f: get_filename()
+
+        filename = self.get_test_file()
+
+        Tag.objects.create(name="test", is_inbox_tag=True)
+
+        document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
+
+        self.assertEqual(document.title, "new docs")
+        self.assertEqual(document.correspondent.name, "Bank")
+        self.assertIsNotNone(os.path.isfile(document.title))
+        self.assertTrue(os.path.isfile(document.source_path))
 
     @mock.patch("documents.consumer.DocumentClassifier")
     def testClassifyDocument(self, m):

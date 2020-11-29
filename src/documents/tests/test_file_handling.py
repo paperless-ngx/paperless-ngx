@@ -1,14 +1,15 @@
 import os
 import shutil
 from pathlib import Path
+from unittest import mock
 from uuid import uuid4
 
 from django.conf import settings
+from django.db import DatabaseError
 from django.test import TestCase, override_settings
 
 from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories
 from ..models import Document, Correspondent
-from ..signals.handlers import update_filename_and_move_files
 
 
 class TestDate(TestCase):
@@ -133,18 +134,14 @@ class TestDate(TestCase):
         document.correspondent = Correspondent.objects.get_or_create(
             name="test")[0]
 
-        # This will cause save() to fail.
-        document.checksum = document1.checksum
+        with mock.patch("documents.signals.handlers.Document.objects.filter") as m:
+            m.side_effect = DatabaseError()
+            document.save()
 
-        # Assume saving the document initially works, this gets called.
-        # After renaming, an error occurs, and filename is not saved:
-        # document should still be available at document.filename.
-        update_filename_and_move_files(None, document)
-
-        # Check proper handling of files
-        self.assertTrue(os.path.isfile(document.source_path))
-        self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/originals/none/none-{:07d}.pdf".format(document.pk)), True)
-        self.assertEqual(document.filename, "none/none-{:07d}.pdf".format(document.pk))
+            # Check proper handling of files
+            self.assertTrue(os.path.isfile(document.source_path))
+            self.assertEqual(os.path.isfile(settings.MEDIA_ROOT + "/documents/originals/none/none-{:07d}.pdf".format(document.pk)), True)
+            self.assertEqual(document.filename, "none/none-{:07d}.pdf".format(document.pk))
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete(self):
