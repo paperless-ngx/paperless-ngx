@@ -1,16 +1,13 @@
 import hashlib
 import multiprocessing
 
-import ocrmypdf
 import logging
 import os
 import shutil
 import uuid
 
 from django.conf import settings
-from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from ocrmypdf import Verbosity
 from whoosh.writing import AsyncWriter
 
 from documents.models import Document
