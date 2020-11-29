@@ -1,5 +1,31 @@
 <app-page-header [title]="getTitle()">
 
+  <div ngbDropdown class="d-inline-block mr-2">
+    <button class="btn btn-sm btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
+      </svg>
+      Bulk edit
+    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+      <button ngbDropdownItem>Select page</button>
+      <button ngbDropdownItem>Select all</button>
+      <button ngbDropdownItem>Select none</button>
+      <div class="dropdown-divider"></div>
+      <button ngbDropdownItem>Re-create archived document</button>
+      <div class="dropdown-divider"></div>
+      <button ngbDropdownItem>Set correspondent</button>
+      <button ngbDropdownItem>Remove correspondent</button>
+      <button ngbDropdownItem>Set document type</button>
+      <button ngbDropdownItem>Remove document type</button>
+      <button ngbDropdownItem>Add tag</button>
+      <button ngbDropdownItem>Remove tag</button>
+      <div class="dropdown-divider"></div>
+      <button ngbDropdownItem>Delete</button>
+
+    </div>
+  </div>
+
   <div class="btn-group btn-group-toggle" ngbRadioGroup [(ngModel)]="displayMode"
     (ngModelChange)="saveDisplayMode()">
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
