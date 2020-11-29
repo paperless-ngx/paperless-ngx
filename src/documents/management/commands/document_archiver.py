@@ -1,3 +1,4 @@
+import hashlib
 import multiprocessing
 
 import ocrmypdf
@@ -27,6 +28,8 @@ def handle_document(document):
     parser.parse(document.source_path, mime_type)
     if parser.get_archive_path():
         shutil.copy(parser.get_archive_path(), document.archive_path)
+        with document.archive_file as f:
+            document.archive_checksum = hashlib.md5(f.read()).hexdigest()
     else:
         logging.getLogger(__name__).warning(
             f"Parser {parser} did not produce an archived document "
@@ -35,7 +38,7 @@ def handle_document(document):
 
     if parser.get_text():
         document.content = parser.get_text()
-        document.save()
+    document.save()
 
     parser.cleanup()
 
