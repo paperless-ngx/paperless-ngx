@@ -132,6 +132,9 @@ class Consumer(LoggingMixin):
 
         except ParseError as e:
             document_parser.cleanup()
+            self.log(
+                "error",
+                f"Error while consuming document {self.filename}: {e}")
             raise ConsumerError(e)
 
         # Prepare the document classifier.
@@ -194,6 +197,11 @@ class Consumer(LoggingMixin):
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
         except Exception as e:
+            self.log(
+                "error",
+                f"The following error occured while consuming "
+                f"{self.filename}: {e}"
+            )
             raise ConsumerError(e)
         finally:
             document_parser.cleanup()
