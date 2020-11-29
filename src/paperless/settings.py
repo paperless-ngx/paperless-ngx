@@ -331,6 +331,15 @@ CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
+# Consume from subdirectories of CONSUMPTION_DIR as well
+CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
+
+# Set the names of subdirectories as tags for consumed files.
+# E.g. $CONSUMPTION_DIR/foo/bar/file.pdf will add the tags "foo" and "bar" to
+# the consumed file.
+# PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
+CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
+
 OPTIMIZE_THUMBNAILS = __get_boolean("PAPERLESS_OPTIMIZE_THUMBNAILS", "true")
 
 OCR_PAGES = int(os.getenv('PAPERLESS_OCR_PAGES', 0))
