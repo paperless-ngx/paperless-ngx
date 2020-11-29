@@ -23,10 +23,7 @@ class TestExporter(DirectoriesMixin, TestCase):
 
         file = os.path.join(self.dirs.originals_dir, "0000001.pdf")
 
-        with open(file, "rb") as f:
-            checksum = hashlib.md5(f.read()).hexdigest()
-
-        Document.objects.create(checksum=checksum, title="wow", filename="0000001.pdf", id=1, mime_type="application/pdf")
+        Document.objects.create(checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", title="wow", filename="0000001.pdf", id=1, mime_type="application/pdf")
         Document.objects.create(checksum="9c9691e51741c1f4f41a20896af31770", title="wow", filename="0000002.pdf.gpg", id=2, mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
         Tag.objects.create(name="t")
         DocumentType.objects.create(name="dt")
@@ -50,6 +47,14 @@ class TestExporter(DirectoriesMixin, TestCase):
                 with open(fname, "rb") as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(checksum, element['fields']['checksum'])
+
+                if document_exporter.EXPORTER_ARCHIVE_NAME in element:
+                    fname = os.path.join(target, element[document_exporter.EXPORTER_ARCHIVE_NAME])
+                    self.assertTrue(os.path.exists(fname))
+
+                    with open(fname, "rb") as f:
+                        checksum = hashlib.md5(f.read()).hexdigest()
+                    self.assertEqual(checksum, element['fields']['archive_checksum'])
 
         Document.objects.create(checksum="AAAAAAAAAAAAAAAAA", title="wow", filename="0000004.pdf", id=3, mime_type="application/pdf")
 
