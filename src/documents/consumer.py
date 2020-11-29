@@ -6,6 +6,7 @@ import os
 import magic
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
@@ -42,7 +43,7 @@ class Consumer(LoggingMixin):
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        if Document.objects.filter(checksum=checksum).exists():
+        if Document.objects.filter(Q(checksum=checksum) | Q(archive_checksum=checksum)).exists():  # NOQA: E501
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             raise ConsumerError(
@@ -183,6 +184,11 @@ class Consumer(LoggingMixin):
                 if archive_path and os.path.isfile(archive_path):
                     self._write(document.storage_type,
                                 archive_path, document.archive_path)
+
+                    with open(archive_path, 'rb') as f:
+                        document.archive_checksum = hashlib.md5(
+                            f.read()).hexdigest()
+                        document.save()
 
                 # Delete the file only if it was successfully consumed
                 self.log("debug", "Deleting file {}".format(self.path))

@@ -157,9 +157,15 @@ class Document(models.Model):
         max_length=32,
         editable=False,
         unique=True,
-        help_text="The checksum of the original document (before it was "
-                  "encrypted).  We use this to prevent duplicate document "
-                  "imports."
+        help_text="The checksum of the original document."
+    )
+
+    archive_checksum = models.CharField(
+        max_length=32,
+        editable=False,
+        blank=True,
+        null=True,
+        help_text="The checksum of the archived document."
     )
 
     created = models.DateTimeField(
