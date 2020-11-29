@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import shutil
 import tempfile
 
 from django.core.management import call_command
@@ -8,17 +9,19 @@ from django.test import TestCase, override_settings
 
 from documents.management.commands import document_exporter
 from documents.models import Document, Tag, DocumentType, Correspondent
+from documents.tests.utils import DirectoriesMixin
 
 
-class TestExporter(TestCase):
+class TestExporter(DirectoriesMixin, TestCase):
 
     @override_settings(
-        ORIGINALS_DIR=os.path.join(os.path.dirname(__file__), "samples", "originals"),
-        THUMBNAIL_DIR=os.path.join(os.path.dirname(__file__), "samples", "thumb"),
         PASSPHRASE="test"
     )
     def test_exporter(self):
-        file = os.path.join(os.path.dirname(__file__), "samples", "originals", "0000001.pdf")
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(os.path.join(os.path.dirname(__file__), "samples", "documents"), os.path.join(self.dirs.media_dir, "documents"))
+
+        file = os.path.join(self.dirs.originals_dir, "0000001.pdf")
 
         with open(file, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
