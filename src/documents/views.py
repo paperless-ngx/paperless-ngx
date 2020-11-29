@@ -93,6 +93,10 @@ class DocumentTypeViewSet(ModelViewSet):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
+class BulkEditForm(object):
+    pass
+
+
 class DocumentViewSet(RetrieveModelMixin,
                       UpdateModelMixin,
                       DestroyModelMixin,
@@ -148,6 +152,13 @@ class DocumentViewSet(RetrieveModelMixin,
             return Response("OK")
         else:
             return HttpResponseBadRequest(str(form.errors))
+
+    @action(methods=['post'], detail=False)
+    def bulk_edit(self, request, pk=None):
+        form = BulkEditForm(data=request.POST)
+        if not form.is_valid():
+            return HttpResponseBadRequest("")
+        return Response({'asd': request.POST['content']})
 
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
