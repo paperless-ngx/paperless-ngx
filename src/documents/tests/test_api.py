@@ -100,6 +100,42 @@ class DocumentApiTest(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_thumbnail)
 
+    def test_download_with_archive(self):
+
+        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
+
+        content = b"This is a test"
+        content_archive = b"This is the same test but archived"
+
+        with open(filename, "wb") as f:
+            f.write(content)
+
+        doc = Document.objects.create(title="none", filename=os.path.basename(filename),
+                                      mime_type="application/pdf")
+
+        with open(os.path.join(self.dirs.archive_dir, "{:07d}.pdf".format(doc.pk)), "wb") as f:
+            f.write(content_archive)
+
+        response = self.client.get('/api/documents/{}/download/'.format(doc.pk))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, content_archive)
+
+        response = self.client.get('/api/documents/{}/download/?original=true'.format(doc.pk))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, content)
+
+        response = self.client.get('/api/documents/{}/preview/'.format(doc.pk))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, content_archive)
+
+        response = self.client.get('/api/documents/{}/preview/?original=true'.format(doc.pk))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, content)
+
     def test_document_actions_not_existing_file(self):
 
         doc = Document.objects.create(title="none", filename=os.path.basename("asd"), mime_type="application/pdf")
