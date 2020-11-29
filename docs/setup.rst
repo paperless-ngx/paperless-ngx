@@ -208,9 +208,147 @@ Docker Route
 Bare Metal Route
 ================
 
-.. warning::
+Paperless runs on linux only. The following procedure has been tested on a minimal
+installation of Debian/Buster, which is the current stable release at the time of
+writing. Windows is not and will never be supported.
 
-    TBD. User docker for now.
+1.  Install dependencies. Paperless requires the following packages.
+
+    *   ``python3`` 3.6, 3.7, 3.8 (3.9 is untested).
+    *   ``python3-pip``, optionally ``pipenv`` for package installation
+    *   ``python3-dev``
+
+    *   ``imagemagick`` >= 6 for PDF conversion
+    *   ``unpaper`` for cleaning documents before OCR
+    *   ``ghostscript``
+    *   ``optipng`` for optimising thumbnails
+    *   ``tesseract-ocr`` >= 4.0.0 for OCR
+    *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
+    *   ``gnupg`` for handling encrypted documents
+    *   ``libpoppler-cpp-dev`` for PDF to text conversion
+    *   ``libmagic-dev`` for mime type detection
+    *   ``libpq-dev`` for PostgreSQL
+
+    You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
+    for installing some of the python dependencies. You can remove that
+    again after installation.
+
+2.  Install ``redis`` >= 5.0 and configure it to start automatically.
+
+3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
+    to use PostgreSQL, SQLite is avialable as well.
+
+4.  Get the release archive. If you pull the git repo as it is, you also have to compile the front end by yourself.
+    Extract the frontend to a place from where you wish to execute it, such as ``/opt/paperless``.
+
+5.  Configure paperless. See :ref:`configuration` for details. Edit the included ``paperless.conf`` and adjust the
+    settings to your needs. Required settings for getting paperless running are:
+
+    *   ``PAPERLESS_REDIS`` should point to your redis server, such as redis://localhost:6379.
+    *   ``PAPERLESS_DBHOST`` should be the hostname on which your PostgreSQL server is running. Do not configure this
+        to use SQLite instead. Also configure port, database name, user and password as necessary.
+    *   ``PAPERLESS_CONSUMPTION_DIR`` should point to a folder which paperless should watch for documents. You might
+        want to have this somewhere else. Likewise, ``PAPERLESS_DATA_DIR`` and ``PAPERLESS_MEDIA_ROOT`` define where
+        paperless stores its data. If you like, you can point both to the same directory.
+    *   ``PAPERLESS_SECRET_KEY`` should be a random sequence of characters. It's used for authentication. Failure
+        to do so allows third parties to forge authentication credentials.
+    
+    Many more adjustments can be made to paperless, especially the OCR part. The following options are recommended
+    for everyone:
+
+    *   Set ``PAPERLESS_OCR_LANGUAGE`` to the language most of your documents are written in.
+    *   Set ``PAPERLESS_TIME_ZONE`` to your local time zone.
+
+6.  Setup permissions. Create a system users under which you wish to run paperless. Ensure that these directories exist
+    and that the user has write permissions to the following directories
+    
+    *   ``/opt/paperless/media``
+    *   ``/opt/paperless/data``
+    *   ``/opt/paperless/consume``
+
+    Adjust as necessary if you configured different folders.
+
+7.  Install python requirements. Paperless comes with both Pipfiles for ``pipenv`` as well as with a ``requirements.txt``.
+    Both will install exactly the same requirements. It is up to you if you wish to use a virtual environment or not.
+
+8.  Go to ``/opt/paperless/src``, and execute the following commands:
+
+    .. code:: bash
+
+        # This collects static files from paperless and django.
+        python3 manage.py collectstatic --clear --no-input
+        
+        # This creates the database schema.
+        python3 manage.py migrate
+
+        # This creates your first paperless user
+        python3 manage.py createsuperuser
+
+9.  Optional: Test that paperless is working by executing
+
+      .. code:: bash
+
+        # This collects static files from paperless and django.
+        python3 manage.py runserver
+    
+    and pointing your browser to http://localhost:8000/.
+
+    .. warning::
+
+        This is a development server which should not be used in
+        production.
+
+    .. hint::
+
+        This will not start the consumer. Paperless does this in a
+        separate process.
+
+10. Setup systemd services to run paperless automatically. You may
+    use the service definition files included in the ``scripts`` folder
+    as a starting point.
+
+    Paperless needs the ``webserver`` script to run the webserver, the
+    ``consumer`` script to watch the input folder, and the ``scheduler``
+    script to run tasks such as email checking and document consumption.
+
+    These services rely on redis and optionally the database server, but
+    don't need to be started in any particular order. The example files
+    depend on redis being started. If you use a database server, you should
+    add additinal dependencies.
+
+    .. hint::
+
+        You may optionally set up your preferred web server to serve
+        paperless as a wsgi application directly instead of running the
+        ``webserver`` service. The module containing the wsgi application
+        is named ``paperless.wsgi``.
+
+    .. caution::
+
+        The included scripts run a ``gunicorn`` standalone server,
+        which is fine for running paperless. It does support SSL,
+        however, the documentation of GUnicorn states that you should
+        use a proxy server in front of gunicorn instead.
+
+11. Optional: Install a samba server and make the consumption folder
+    available as a network share.
+
+12. Configure ImageMagick to allow processing of PDF documents. Most distributions have
+    this disabled by default, since PDF documents can contain malware. If
+    you don't do this, paperless will fall back to ghostscript for certain steps
+    such as thumbnail generation.
+
+    Edit ``/etc/ImageMagick-6/policy.xml`` and adjust
+
+    .. code::
+
+        <policy domain="coder" rights="none" pattern="PDF" />
+    
+    to
+
+    .. code::
+
+        <policy domain="coder" rights="read|write" pattern="PDF" />
 
 Migration to paperless-ng
 #########################
