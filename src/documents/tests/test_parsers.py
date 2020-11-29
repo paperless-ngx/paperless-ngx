@@ -82,6 +82,7 @@ class TestBaseParser(TestCase):
         shutil.rmtree(self.scratch)
 
     @mock.patch("documents.parsers.DocumentParser.get_thumbnail", fake_get_thumbnail)
+    @override_settings(OPTIMIZE_THUMBNAILS=True)
     def test_get_optimised_thumbnail(self):
         parser = DocumentParser(None)
 

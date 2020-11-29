@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
@@ -368,9 +369,10 @@ class DummyParser(DocumentParser):
         # not important during tests
         raise NotImplementedError()
 
-    def __init__(self, logging_group, scratch_dir):
+    def __init__(self, logging_group, scratch_dir, archive_path):
         super(DummyParser, self).__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
+        self.archive_path = archive_path
 
     def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
@@ -411,7 +413,7 @@ def fake_magic_from_file(file, mime=False):
 class TestConsumer(DirectoriesMixin, TestCase):
 
     def make_dummy_parser(self, logging_group):
-        return DummyParser(logging_group, self.dirs.scratch_dir)
+        return DummyParser(logging_group, self.dirs.scratch_dir, self.get_test_archive_file())
 
     def make_faulty_parser(self, logging_group):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
@@ -432,8 +434,16 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.consumer = Consumer()
 
     def get_test_file(self):
-        fd, f = tempfile.mkstemp(suffix=".pdf", dir=self.dirs.scratch_dir)
-        return f
+        src = os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000001.pdf")
+        dst = os.path.join(self.dirs.scratch_dir, "sample.pdf")
+        shutil.copy(src, dst)
+        return dst
+
+    def get_test_archive_file(self):
+        src = os.path.join(os.path.dirname(__file__), "samples", "documents", "archive", "0000001.pdf")
+        dst = os.path.join(self.dirs.scratch_dir, "sample_archive.pdf")
+        shutil.copy(src, dst)
+        return dst
 
     def testNormalOperation(self):
 
@@ -453,6 +463,13 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(
             document.thumbnail_path
         ))
+
+        self.assertTrue(os.path.isfile(
+            document.archive_path
+        ))
+
+        self.assertEqual(document.checksum, "42995833e01aea9b3edee44bbfdd7ce1")
+        self.assertEqual(document.archive_checksum, "62acb0bcbfbcaa62ca6ad3668e4e404b")
 
         self.assertFalse(os.path.isfile(filename))
 
@@ -501,7 +518,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.fail("Should throw exception")
 
-    def testDuplicates(self):
+    def testDuplicates1(self):
         self.consumer.try_consume_file(self.get_test_file())
 
         try:
@@ -511,6 +528,21 @@ class TestConsumer(DirectoriesMixin, TestCase):
             return
 
         self.fail("Should throw exception")
+
+    def testDuplicates2(self):
+        self.consumer.try_consume_file(self.get_test_file())
+
+        try:
+            self.consumer.try_consume_file(self.get_test_archive_file())
+        except ConsumerError as e:
+            self.assertTrue(str(e).endswith("It is a duplicate."))
+            return
+
+        self.fail("Should throw exception")
+
+    def testDuplicates3(self):
+        self.consumer.try_consume_file(self.get_test_archive_file())
+        self.consumer.try_consume_file(self.get_test_file())
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testNoParsers(self, m):
