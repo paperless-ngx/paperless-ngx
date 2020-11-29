@@ -193,6 +193,13 @@ class Consumer(LoggingMixin):
                             f.read()).hexdigest()
                         document.save()
 
+                # Afte performing all database operations and moving files
+                # into place, tell paperless where the file is.
+                document.filename = os.path.basename(document.source_path)
+                # Saving the document now will trigger the filename handling
+                # logic.
+                document.save()
+
                 # Delete the file only if it was successfully consumed
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
@@ -247,12 +254,6 @@ class Consumer(LoggingMixin):
             document.tags.add(*relevant_tags)
 
         self.apply_overrides(document)
-
-        document.filename = generate_filename(document)
-
-        # We need to save the document twice, since we need the PK of the
-        # document in order to create its filename above.
-        document.save()
 
         return document
 
