@@ -199,7 +199,7 @@ class Document(models.Model):
         ordering = ("correspondent", "title")
 
     def __str__(self):
-        created = self.created.strftime("%Y%m%d%H%M%S")
+        created = self.created.strftime("%Y%m%d")
         if self.correspondent and self.title:
             return "{}: {} - {}".format(
                 created, self.correspondent, self.title)
