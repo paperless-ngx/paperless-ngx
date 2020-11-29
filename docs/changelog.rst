@@ -8,11 +8,15 @@ Changelog
 paperless-ng 0.9.4
 ##################
 
-* Front end: Clickable tags, correspondents and types allow quick filtering for related documents.
-* Front end: Saved views are now editable.
-* Front end: Preview documents directly in the browser.
+* Front end:
+  * Clickable tags, correspondents and types allow quick filtering for related documents.
+  * Saved views are now editable.
+  * Preview documents directly in the browser.
+  * Navigation from the dashboard to saved views.
+
 * Fixes:
   * A severe error when trying to use post consume scripts.
+  * An error in the consumer that cause invalid messages of missing files to show up in the log.
 * The documentation now contains information about bare metal installs.
 
 paperless-ng 0.9.3
