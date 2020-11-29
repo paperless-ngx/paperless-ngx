@@ -204,6 +204,7 @@ Docker Route
    simplifies deployment immensely. If you know your way around Docker, feel
    free to tinker around without using compose!
 
+.. _`setup-bare_metal`:
 
 Bare Metal Route
 ================
