@@ -350,6 +350,8 @@ OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
 
+OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
+
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
 

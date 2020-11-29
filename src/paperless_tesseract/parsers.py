@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import subprocess
@@ -118,10 +119,22 @@ class RasterisedDocumentParser(DocumentParser):
                     f"no DPI information is present in this image and "
                     f"OCR_IMAGE_DPI is not set.")
 
+        if settings.OCR_USER_ARGS:
+            try:
+                user_args = json.loads(settings.OCR_USER_ARGS)
+                ocr_args = {**ocr_args, **user_args}
+            except Exception as e:
+                self.log(
+                    "warning",
+                    f"There is an issue with PAPERLESS_OCR_USER_ARGS, so "
+                    f"they will not be used: {e}")
+
         # This forces tesseract to use one core per page.
         os.environ['OMP_THREAD_LIMIT'] = "1"
 
         try:
+            self.log("debug",
+                     f"Calling OCRmyPDF with {str(ocr_args)}")
             ocrmypdf.ocr(**ocr_args)
             # success! announce results
             self.archive_path = archive_path
