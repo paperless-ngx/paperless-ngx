@@ -7,8 +7,9 @@ from unittest import mock
 
 from django.conf import settings
 from django.core.management import call_command, CommandError
-from django.test import override_settings, TestCase
+from django.test import override_settings, TransactionTestCase
 
+from documents.models import Tag
 from documents.consumer import ConsumerError
 from documents.management.commands import document_consumer
 from documents.tests.utils import DirectoriesMixin
@@ -33,7 +34,7 @@ def chunked(size, source):
         yield source[i:i+size]
 
 
-class TestConsumer(DirectoriesMixin, TestCase):
+class TestConsumer(DirectoriesMixin, TransactionTestCase):
 
     sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
@@ -125,6 +126,43 @@ class TestConsumer(DirectoriesMixin, TestCase):
     @override_settings(CONSUMER_POLLING=1)
     def test_consume_existing_file_polling(self):
         self.test_consume_existing_file()
+
+    @override_settings(CONSUMER_RECURSIVE=1)
+    @override_settings(CONSUMER_SUBDIRS_AS_TAGS=1)
+    def test_consume_file_with_path_tags(self):
+
+        tag_names = ("existingTag", "Space Tag")
+        # Create a Tag prior to consuming a file using it in path
+        tag_ids = [Tag.objects.create(name=tag_names[0]).pk,]
+
+        self.t_start()
+
+        path = os.path.join(self.dirs.consumption_dir, *tag_names)
+        os.makedirs(path, exist_ok=True)
+        f = os.path.join(path, "my_file.pdf")
+        # Wait at least inotify read_delay for recursive watchers
+        # to be created for the new directories
+        sleep(1)
+        shutil.copy(self.sample_file, f)
+
+        self.wait_for_task_mock_call()
+
+        self.task_mock.assert_called_once()
+
+        # Add the pk of the Tag created by _consume()
+        tag_ids.append(Tag.objects.get(name=tag_names[1]).pk)
+
+        args, kwargs = self.task_mock.call_args
+        self.assertEqual(args[1], f)
+
+        # assertCountEqual has a bad name, but test that the first
+        # sequence contains the same elements as second, regardless of
+        # their order.
+        self.assertCountEqual(kwargs["override_tag_ids"], tag_ids)
+
+    @override_settings(CONSUMER_POLLING=1)
+    def test_consume_file_with_path_tags_polling(self):
+        self.test_consume_file_with_path_tags()
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
     def test_slow_write_pdf(self, error_logger):
