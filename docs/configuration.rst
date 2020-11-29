@@ -152,6 +152,115 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 
     Defaults to none, which disables this feature.
 
+OCR settings
+############
+
+Paperless uses `OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/>`_ for
+performing OCR on documents and images. Paperless uses sensible defaults for
+most settings, but all of them can be configured to your needs.
+
+
+PAPERLESS_OCR_LANGUAGE=<lang>
+    Customize the language that paperless will attempt to use when
+    parsing documents.
+
+    It should be a 3-letter language code consistent with ISO
+    639: https://www.loc.gov/standards/iso639-2/php/code_list.php
+
+    Set this to the language most of your documents are written in.
+
+    This can be a combination of multiple languages such as ``deu+eng``,
+    in which case tesseract will use whatever language matches best.
+    Keep in mind that tesseract uses much more cpu time with multiple
+    languages enabled.
+
+    Defaults to "eng".
+
+PAPERLESS_OCR_MODE=<mode>
+    Tell paperless when and how to perform ocr on your documents. Three modes
+    are available:
+
+    *   ``skip``: Paperless skips all pages and will perform ocr only on pages
+        where no text is present. This is the safest and fastest option.
+    *   ``redo``: Paperless will OCR all pages of your documents and attempt to
+        replace any existing text layers with new text. This will be useful for
+        documents from scanners that already performed OCR with insufficient
+        results. It will also perform OCR on purely digital documents.
+
+        This option may fail on some documents that have features that cannot
+        be removed, such as forms. In this case, the text from the document is
+        used instead.
+    *   ``force``: Paperless rasterizes your documents, converting any text
+        into images and puts the OCRed text on top. This works for all documents,
+        however, the resulting document may be significantly larger and text
+        won't appear as sharp when zoomed in.
+    
+    The default is ``skip``, which only performs OCR when necessary.
+
+PAPERLESS_OCR_OUTPUT_TYPE=<type>
+    Specify the the type of PDF documents that paperless should produce.
+    
+    *   ``pdf``: Modify the PDF document as little as possible.
+    *   ``pdfa``: Convert PDF documents into PDF/A-2b documents, which is a
+        subset of the entire PDF specification and meant for storing
+        documents long term.
+    *   ``pdfa-1``, ``pdfa-2``, ``pdfa-3`` to specify the exact version of
+        PDF/A you wish to use.
+    
+    If not specified, ``pdfa`` is used. Remember that paperless also keeps
+    the original input file as well as the archived version.
+
+
+PAPERLESS_OCR_PAGES=<num>
+    Tells paperless to use only the specified amount of pages for OCR. Documents
+    with less than the specified amount of pages get OCR'ed completely.
+
+    Specifying 1 here will only use the first page.
+
+    When combined with ``PAPERLESS_OCR_MODE=redo`` or ``PAPERLESS_OCR_MODE=force``,
+    paperless will not modify any text it finds on excluded pages and copy it
+    verbatim.
+
+    Defaults to 0, which disables this feature and always uses all pages.
+
+
+PAPERLESS_OCR_IMAGE_DPI=<num>
+    Paperless will OCR any images you put into the system and convert them
+    into PDF documents. This is useful if your scanner produces images.
+    In order to do so, paperless needs to know the DPI of the image.
+    Most images from scanners will have this information embedded and
+    paperless will detect and use that information. In case this fails, it
+    uses this value as a fallback.
+
+    Set this to the DPI your scanner produces images at.
+
+    Default is none, which causes paperless to fail if no DPI information is
+    present in an image.
+
+
+PAPERLESS_OCR_USER_ARG=<json>
+    OCRmyPDF offers many more options. Use this parameter to specify any
+    additional arguments you wish to pass to OCRmyPDF. Since Paperless uses
+    the API of OCRmyPDF, you have to specify these in a format that can be
+    passed to the API. See `https://ocrmypdf.readthedocs.io/en/latest/api.html#reference`_
+    for valid parameters. All command line options are supported, but they
+    use underscores instead of dashed.
+
+    .. caution::
+
+        Paperless has been tested to work with the OCR options provided
+        above. There are many options that are incompatible with each other,
+        so specifying invalid options may prevent paperless from consuming
+        any documents.
+
+    Specify arguments as a JSON dictionary. Keep note of lower case booleans
+    and double quoted parameter names and strings. Examples:
+
+    .. code:: json
+
+        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}    
+    
+    
 Software tweaks
 ###############
 
@@ -192,79 +301,6 @@ PAPERLESS_TIME_ZONE=<timezone>
 
     Defaults to UTC.
 
-
-PAPERLESS_OCR_LANGUAGE=<lang>
-    Customize the default language that tesseract will attempt to use when
-    parsing documents. The default language is used whenever
-
-    * No language could be detected on a document
-    * No tesseract data files are available for the detected language
-
-    It should be a 3-letter language code consistent with ISO
-    639: https://www.loc.gov/standards/iso639-2/php/code_list.php
-
-    Set this to the language most of your documents are written in.
-
-    Defaults to "eng".
-
-PAPERLESS_OCR_MODE=<mode>
-    Tell paperless when and how to perform ocr on your documents. Three modes
-    are available:
-
-    *   ``skip``: Paperless skips all pages and will perform ocr only on pages
-        where no text is present. This is the safest and fastest option.
-    *   ``redo``: Paperless will OCR all pages of your documents and attempt to
-        replace any existing text layers with new text. This will be useful for
-        documents from scanners that already performed OCR with insufficient
-        results. It will also perform OCR on purely digital documents.
-
-        This option may fail on some documents that have features that cannot
-        be removed, such as forms. In this case, the text from the document is
-        used instead.
-    *   ``force``: Paperless rasterizes your documents, converting any text
-        into images and puts the OCRed text on top. This works for all documents,
-        however, the resulting document may be significantly larger and text
-        won't appear as sharp when zoomed in.
-    
-    The default is ``skip``, which only performs OCR when necessary.
-
-PAPERLESS_OCR_OUTPUT_TYPE=<type>
-    Specify the the type of PDF documents that paperless should produce.
-    
-    *   ``pdf``: Modify the PDF document as little as possible.
-    *   ``pdfa``: Convert PDF documents into PDF/A documents, which is a
-        subset of the entire PDF specification and meant for storing
-        documents long term.
-    
-    If not specified, ``pdfa`` is used. Remember that paperless also keeps
-    the original input file as well as the archived version.
-
-
-PAPERLESS_OCR_PAGES=<num>
-    Tells paperless to use only the specified amount of pages for OCR. Documents
-    with less than the specified amount of pages get OCR'ed completely.
-
-    Specifying 1 here will only use the first page.
-
-    When combined with ``PAPERLESS_OCR_MODE=redo`` or ``PAPERLESS_OCR_MODE=force``,
-    paperless will not modify any text it finds on excluded pages and copy it
-    verbatim.
-
-    Defaults to 0, which disables this feature and always uses all pages.
-
-
-PAPERLESS_OCR_IMAGE_DPI=<num>
-    Paperless will OCR any images you put into the system and convert them
-    into PDF documents. This is useful if your scanner produces images.
-    In order to do so, paperless needs to know the DPI of the image.
-    Most images from scanners will have this information embedded and
-    paperless will detect and use that information. In case this fails, it
-    uses this value as a fallback.
-
-    Set this to the DPI your scanner produces images at.
-
-    Default is none, which causes paperless to fail if no DPI information is
-    present in an image.
 
 PAPERLESS_CONSUMER_POLLING=<num>
     If paperless won't find documents added to your consume folder, it might
