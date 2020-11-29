@@ -21,6 +21,7 @@ def setup_directories():
 
     os.makedirs(dirs.index_dir, exist_ok=True)
     os.makedirs(dirs.originals_dir, exist_ok=True)
+    os.makedirs(dirs.thumbnail_dir, exist_ok=True)
     os.makedirs(dirs.archive_dir, exist_ok=True)
 
     override_settings(
