@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models, DatabaseError
 from django.dispatch import receiver
 from django.utils import timezone
+from rest_framework.reverse import reverse
 
 from .. import index, matching
 from ..file_handling import delete_empty_directories, generate_filename, \
@@ -157,10 +158,10 @@ def run_post_consume_script(sender, document, **kwargs):
         settings.POST_CONSUME_SCRIPT,
         str(document.pk),
         document.file_name,
-        document.source_path,
-        document.thumbnail_path,
-        None,
-        None,
+        os.path.normpath(document.source_path),
+        os.path.normpath(document.thumbnail_path),
+        reverse("document-download", kwargs={"pk": document.pk}),
+        reverse("document-thumb", kwargs={"pk": document.pk}),
         str(document.correspondent),
         str(",".join(document.tags.all().values_list("slug", flat=True)))
     )).wait()

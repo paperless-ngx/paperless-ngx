@@ -36,11 +36,19 @@ export class SavedViewConfigService {
     return this.configs.find(sf => sf.id == id)
   }
 
-  saveConfig(config: SavedViewConfig) {
+  newConfig(config: SavedViewConfig) {
     config.id = uuidv4()
     this.configs.push(config)
 
     this.save()
+  }
+
+  updateConfig(config: SavedViewConfig) {
+    let savedConfig = this.configs.find(c => c.id == config.id)
+    if (savedConfig) {
+      Object.assign(savedConfig, config)
+      this.save()
+    }
   }
 
   private save() {

@@ -14,10 +14,10 @@ export class TagComponent implements OnInit {
   tag: PaperlessTag
 
   @Input()
-  clickable: boolean = false
+  linkTitle: string = ""
 
-  @Output()
-  click = new EventEmitter()
+  @Input()
+  clickable: boolean = false
 
   ngOnInit(): void {
   }

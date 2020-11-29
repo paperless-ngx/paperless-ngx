@@ -5,6 +5,16 @@
 Changelog
 *********
 
+paperless-ng 0.9.4
+##################
+
+* Front end: Clickable tags, correspondents and types allow quick filtering for related documents.
+* Front end: Saved views are now editable.
+* Front end: Preview documents directly in the browser.
+* Fixes:
+  * A severe error when trying to use post consume scripts.
+* The documentation now contains information about bare metal installs.
+
 paperless-ng 0.9.3
 ##################
 
@@ -20,7 +30,7 @@ paperless-ng 0.9.3
     aware of.
   * Issue with the automatic classifier not working with only one tag.
   * A couple issues with the search index being opened to eagerly.
-  
+
 * Added lots of tests for various parts of the application.
 
 paperless-ng 0.9.2
