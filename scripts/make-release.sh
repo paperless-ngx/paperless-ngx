@@ -42,6 +42,7 @@ fi
 mkdir "$PAPERLESS_DIST"
 mkdir "$PAPERLESS_DIST_APP"
 mkdir "$PAPERLESS_DIST_APP/docker"
+mkdir "$PAPERLESS_DIST_APP/scripts"
 mkdir "$PAPERLESS_DIST_DOCKERFILES"
 
 # setup dependencies.
@@ -103,6 +104,11 @@ cp "$PAPERLESS_ROOT/docker/docker-entrypoint.sh" "$PAPERLESS_DIST_APP/docker/"
 cp "$PAPERLESS_ROOT/docker/gunicorn.conf.py" "$PAPERLESS_DIST_APP/docker/"
 cp "$PAPERLESS_ROOT/docker/imagemagick-policy.xml" "$PAPERLESS_DIST_APP/docker/"
 cp "$PAPERLESS_ROOT/docker/supervisord.conf" "$PAPERLESS_DIST_APP/docker/"
+
+# auxiliary files for bare metal installs
+cp "$PAPERLESS_ROOT/scripts/paperless-webserver.service" "$PAPERLESS_DIST_APP/scripts/"
+cp "$PAPERLESS_ROOT/scripts/paperless-consumer.service" "$PAPERLESS_DIST_APP/scripts/"
+cp "$PAPERLESS_ROOT/scripts/paperless-scheduler.service" "$PAPERLESS_DIST_APP/scripts/"
 
 # try to make the docker build.
 
