@@ -321,7 +321,7 @@ class TestDate(TestCase):
         Path(os.path.join(tmp, "notempty", "file")).touch()
         os.makedirs(os.path.join(tmp, "notempty", "empty"))
 
-        delete_empty_directories(os.path.join(tmp, "notempty", "empty"))
+        delete_empty_directories(os.path.join(tmp, "notempty", "empty"), root=settings.ORIGINALS_DIR)
         self.assertEqual(os.path.isdir(os.path.join(tmp, "notempty")), True)
         self.assertEqual(os.path.isfile(
             os.path.join(tmp, "notempty", "file")), True)
