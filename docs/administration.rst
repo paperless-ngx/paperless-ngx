@@ -274,6 +274,7 @@ management command:
 
 This command takes no arguments.
 
+.. _`administration-index`:
 
 Managing the document search index
 ==================================
