@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from whoosh import highlight
-from whoosh.fields import Schema, TEXT, NUMERIC
+from whoosh.fields import Schema, TEXT, NUMERIC, KEYWORD
 from whoosh.highlight import Formatter, get_text
 from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser import MultifieldParser
@@ -59,14 +59,15 @@ def get_schema():
         id=NUMERIC(stored=True, unique=True, numtype=int),
         title=TEXT(stored=True),
         content=TEXT(),
-        correspondent=TEXT(stored=True)
+        correspondent=TEXT(stored=True),
+        tag=KEYWORD(stored=True, commas=True, scorable=True, lowercase=True)
     )
 
 
 def open_index(recreate=False):
     try:
         if exists_in(settings.INDEX_DIR) and not recreate:
-            return open_dir(settings.INDEX_DIR)
+            return open_dir(settings.INDEX_DIR, schema=get_schema())
     except Exception as e:
         logger.error(f"Error while opening the index: {e}, recreating.")
 
@@ -77,11 +78,13 @@ def open_index(recreate=False):
 
 def update_document(writer, doc):
     logger.debug("Indexing {}...".format(doc))
+    tags = ",".join([t.name for t in doc.tags.all()])
     writer.update_document(
         id=doc.pk,
         title=doc.title,
         content=doc.content,
-        correspondent=doc.correspondent.name if doc.correspondent else None
+        correspondent=doc.correspondent.name if doc.correspondent else None,
+        tag=tags if tags else None
     )
 
 
@@ -106,13 +109,21 @@ def remove_document_from_index(document):
 def query_page(ix, query, page):
     searcher = ix.searcher()
     try:
-        query_parser = MultifieldParser(["content", "title", "correspondent"],
-                                        ix.schema).parse(query)
+        query_parser = MultifieldParser(
+            ["content", "title", "correspondent", "tag"],
+            ix.schema).parse(query)
         result_page = searcher.search_page(query_parser, page)
         result_page.results.fragmenter = highlight.ContextFragmenter(
             surround=50)
         result_page.results.formatter = JsonFormatter()
-        yield result_page
+
+        corrected = searcher.correct_query(query_parser, query)
+        if corrected.query != query_parser:
+            corrected_query = corrected.string
+        else:
+            corrected_query = None
+
+        yield result_page, corrected_query
     finally:
         searcher.close()
 

@@ -227,11 +227,13 @@ class SearchView(APIView):
             if page < 1:
                 page = 1
 
-            with index.query_page(self.ix, query, page) as result_page:
+            with index.query_page(self.ix, query, page) as (result_page,
+                                                            corrected_query):
                 return Response(
                     {'count': len(result_page),
                      'page': result_page.pagenum,
                      'page_count': result_page.pagecount,
+                     'corrected_query': corrected_query,
                      'results': list(map(self.add_infos_to_hit, result_page))})
 
         else:
