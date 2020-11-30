@@ -193,6 +193,8 @@ class Consumer(LoggingMixin):
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
 
+                # TODO: not required, since this is done by the file handling
+                #  logic
                 create_source_path_directory(document.source_path)
 
                 self._write(document.storage_type,

@@ -110,10 +110,12 @@ class DocumentApiTest(DirectoriesMixin, APITestCase):
         with open(filename, "wb") as f:
             f.write(content)
 
-        doc = Document.objects.create(title="none", filename=os.path.basename(filename),
+        filename = os.path.basename(filename)
+
+        doc = Document.objects.create(title="none", filename=filename,
                                       mime_type="application/pdf")
 
-        with open(os.path.join(self.dirs.archive_dir, "{:07d}.pdf".format(doc.pk)), "wb") as f:
+        with open(doc.archive_path, "wb") as f:
             f.write(content_archive)
 
         response = self.client.get('/api/documents/{}/download/'.format(doc.pk))
