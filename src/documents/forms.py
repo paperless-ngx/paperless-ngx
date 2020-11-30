@@ -1,5 +1,4 @@
 import os
-import re
 import tempfile
 from datetime import datetime
 from time import mktime
@@ -11,17 +10,6 @@ from django_q.tasks import async_task
 from pathvalidate import validate_filename, ValidationError
 
 from documents.parsers import is_mime_type_supported
-
-class BuldEditForm(forms.Form):
-
-    def clean_ids(self):
-        ids = self.cleaned_data.get("ids")
-        if not re.match(r"[0-9,]+", ids):
-            raise forms.ValidationError("id list invalid")
-        id_list = [int(id) for id in ids.split(",")]
-
-
-
 
 
 class UploadForm(forms.Form):

@@ -23,6 +23,7 @@ from rest_framework.viewsets import (
 import documents.index as index
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
+from .bulk_edit import perform_bulk_edit
 from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
@@ -155,10 +156,10 @@ class DocumentViewSet(RetrieveModelMixin,
 
     @action(methods=['post'], detail=False)
     def bulk_edit(self, request, pk=None):
-        form = BulkEditForm(data=request.POST)
-        if not form.is_valid():
-            return HttpResponseBadRequest("")
-        return Response({'asd': request.POST['content']})
+        try:
+            return Response(perform_bulk_edit(request.data))
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
