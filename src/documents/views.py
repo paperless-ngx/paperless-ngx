@@ -217,7 +217,7 @@ class SearchView(APIView):
                 }
 
     def get(self, request, format=None):
-        if not 'query' in request.query_params:
+        if 'query' not in request.query_params:
             return Response({
                 'count': 0,
                 'page': 0,
