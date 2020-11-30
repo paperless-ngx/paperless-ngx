@@ -13,8 +13,8 @@ paperless-ng 0.9.4
   * Paperless now supports searching by tags, types and dates. In order to have this applied to your
     existing documents, you need to perform a ``document_index reindex`` management command
     (see :ref:`administration-index`)
-    that adds tags to your search index. You only need to do this once, so that paperless can find
-    your documents by tags,types and dates. Paperless keeps your index updated after that whenever
+    that adds the new data to the search index. You only need to do this once, so that paperless can find
+    your documents by tags,types and dates. Paperless keeps the index updated after that whenever
     something changes.
   * Paperless now has spelling corrections ("Did you mean") for misstyped queries.
   * The documentation contains :ref:`information about the query syntax <basic-searching>`.
