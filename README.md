@@ -45,16 +45,16 @@ For a complete list of changes, check out the [changelog](https://paperless-ng.r
 
 # Roadmap for 1.0
 
+- Make the front end nice (except mobile).
 - Test coverage at 90%.
 - Store archived documents with an embedded OCR text layer, while keeping originals available. Making good progress in the `feature-ocrmypdf` branch.
-- Fix whatever bugs I and you find
+- Fix whatever bugs I and you find.
 
 ## Roadmap for versions beyond 1.0
 
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
-  - Provide corrections for mispelled queries
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
 	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
 	- Notifications when a document was added with buttons to open the new document right away.
