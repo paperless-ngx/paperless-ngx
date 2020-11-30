@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SearchHit } from 'src/app/data/search-result';
 import { SearchService } from 'src/app/services/rest/search.service';
 
@@ -9,7 +9,7 @@ import { SearchService } from 'src/app/services/rest/search.service';
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent implements OnInit {
-  
+
   results: SearchHit[] = []
 
   query: string = ""
@@ -22,7 +22,9 @@ export class SearchComponent implements OnInit {
 
   resultCount
 
-  constructor(private searchService: SearchService, private route: ActivatedRoute) { }
+  correctedQuery: string = null
+
+  constructor(private searchService: SearchService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(paramMap => {
@@ -31,7 +33,12 @@ export class SearchComponent implements OnInit {
       this.currentPage = 1
       this.loadPage()
     })
-    
+
+  }
+
+  searchCorrectedQuery() {
+    this.router.navigate(["search"], {queryParams: {query: this.correctedQuery}})
+    this.correctedQuery = null
   }
 
   loadPage(append: boolean = false) {
@@ -44,12 +51,11 @@ export class SearchComponent implements OnInit {
       this.pageCount = result.page_count
       this.searching = false
       this.resultCount = result.count
+      this.correctedQuery = result.corrected_query
     })
   }
 
   onScroll() {
-    console.log(this.currentPage)
-    console.log(this.pageCount)
     if (this.currentPage < this.pageCount) {
       this.currentPage += 1
       this.loadPage(true)

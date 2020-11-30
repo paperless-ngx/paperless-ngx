@@ -8,6 +8,15 @@ Changelog
 paperless-ng 0.9.4
 ##################
 
+* Searching:
+
+  * Paperless now supports searching by tags. In order to have this applied to your
+    existing documents, you need to perform a ``document_index reindex`` management command
+    (see :ref:`administration-index`)
+    that adds tags to your search index. Paperless keeps your index updated after that whenever
+    something changes.
+  * Paperless now has spelling corrections ("Did you mean") for misstyped queries.
+
 * Front end:
 
   * Clickable tags, correspondents and types allow quick filtering for related documents.
