@@ -1,4 +1,5 @@
 import logging
+import mimetypes
 import os
 import re
 import shutil
@@ -40,6 +41,29 @@ logger = logging.getLogger(__name__)
 
 def is_mime_type_supported(mime_type):
     return get_parser_class_for_mime_type(mime_type) is not None
+
+
+def get_default_file_extension(mime_type):
+    for response in document_consumer_declaration.send(None):
+        parser_declaration = response[1]
+        supported_mime_types = parser_declaration["mime_types"]
+
+        if mime_type in supported_mime_types:
+            return supported_mime_types[mime_type]
+
+    return None
+
+
+def get_supported_file_extensions():
+    extensions = set()
+    for response in document_consumer_declaration.send(None):
+        parser_declaration = response[1]
+        supported_mime_types = parser_declaration["mime_types"]
+
+        for mime_type in supported_mime_types:
+            extensions.update(mimetypes.guess_all_extensions(mime_type))
+
+    return extensions
 
 
 def get_parser_class_for_mime_type(mime_type):

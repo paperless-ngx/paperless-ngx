@@ -425,7 +425,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         m = patcher.start()
         m.return_value = [(None, {
             "parser": self.make_dummy_parser,
-            "mime_types": ["application/pdf"],
+            "mime_types": {"application/pdf": ".pdf"},
             "weight": 0
         })]
 
@@ -551,7 +551,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         try:
             self.consumer.try_consume_file(self.get_test_file())
         except ConsumerError as e:
-            self.assertTrue(str(e).startswith("No parsers abvailable"))
+            self.assertTrue("File extension .pdf does not map to any" in str(e))
             return
 
         self.fail("Should throw exception")
@@ -560,7 +560,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def testFaultyParser(self, m):
         m.return_value = [(None, {
             "parser": self.make_faulty_parser,
-            "mime_types": ["application/pdf"],
+            "mime_types": {"application/pdf": ".pdf"},
             "weight": 0
         })]
 

@@ -8,12 +8,31 @@ Changelog
 paperless-ng 0.9.4
 ##################
 
-* Front end: Clickable tags, correspondents and types allow quick filtering for related documents.
-* Front end: Saved views are now editable.
-* Front end: Preview documents directly in the browser.
+* Searching:
+
+  * Paperless now supports searching by tags, types and dates. In order to have this applied to your
+    existing documents, you need to perform a ``document_index reindex`` management command
+    (see :ref:`administration-index`)
+    that adds the new data to the search index. You only need to do this once, so that paperless can find
+    your documents by tags,types and dates. Paperless keeps the index updated after that whenever
+    something changes.
+  * Paperless now has spelling corrections ("Did you mean") for misstyped queries.
+  * The documentation contains :ref:`information about the query syntax <basic-searching>`.
+
+* Front end:
+
+  * Clickable tags, correspondents and types allow quick filtering for related documents.
+  * Saved views are now editable.
+  * Preview documents directly in the browser.
+  * Navigation from the dashboard to saved views.
+
 * Fixes:
+
   * A severe error when trying to use post consume scripts.
-* The documentation now contains information about bare metal installs.
+  * An error in the consumer that cause invalid messages of missing files to show up in the log.
+
+* The documentation now contains information about bare metal installs and a section about
+  how to setup the development environment.
 
 paperless-ng 0.9.3
 ##################

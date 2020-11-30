@@ -5,8 +5,8 @@ def text_consumer_declaration(sender, **kwargs):
     return {
         "parser": TextDocumentParser,
         "weight": 10,
-        "mime_types": [
-            "text/plain",
-            "text/comma-separated-values"
-        ]
+        "mime_types": {
+            "text/plain": ".txt",
+            "text/csv": ".csv",
+        }
     }
