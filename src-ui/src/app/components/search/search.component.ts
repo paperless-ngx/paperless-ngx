@@ -58,7 +58,7 @@ export class SearchComponent implements OnInit {
     }, error => {
       this.searching = false
       this.resultCount = 1
-      this.page_count = 1
+      this.pageCount = 1
       this.results = []
       this.errorMessage = error.error
     })
