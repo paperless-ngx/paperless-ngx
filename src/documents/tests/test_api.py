@@ -12,10 +12,10 @@ from documents.models import Document, Correspondent, DocumentType, Tag
 from documents.tests.utils import DirectoriesMixin
 
 
-class DocumentApiTest(DirectoriesMixin, APITestCase):
+class TestDocumentApi(DirectoriesMixin, APITestCase):
 
     def setUp(self):
-        super(DocumentApiTest, self).setUp()
+        super(TestDocumentApi, self).setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=user)
