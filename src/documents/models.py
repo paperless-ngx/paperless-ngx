@@ -11,6 +11,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
+from documents.file_handling import archive_name_from_filename
 from documents.parsers import get_default_file_extension
 
 
@@ -233,9 +234,10 @@ class Document(models.Model):
 
     @property
     def archive_path(self):
-        fname = "{:07}{}".format(self.pk, ".pdf")
-        if self.storage_type == self.STORAGE_TYPE_GPG:
-            fname += ".gpg"
+        if self.filename:
+            fname = archive_name_from_filename(self.filename)
+        else:
+            fname = "{:07}.pdf".format(self.pk)
 
         return os.path.join(
             settings.ARCHIVE_DIR,
