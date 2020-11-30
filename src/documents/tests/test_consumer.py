@@ -445,6 +445,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         shutil.copy(src, dst)
         return dst
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def testNormalOperation(self):
 
         filename = self.get_test_file()
