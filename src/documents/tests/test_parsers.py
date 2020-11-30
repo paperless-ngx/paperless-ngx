@@ -6,7 +6,10 @@ from unittest import mock
 
 from django.test import TestCase, override_settings
 
-from documents.parsers import get_parser_class, DocumentParser
+from documents.parsers import get_parser_class, get_supported_file_extensions, get_default_file_extension, \
+    get_parser_class_for_mime_type, DocumentParser
+from paperless_tesseract.parsers import RasterisedDocumentParser
+from paperless_text.parsers import TextDocumentParser
 
 
 def fake_magic_from_file(file, mime=False):
@@ -29,7 +32,7 @@ class TestParserDiscovery(TestCase):
             pass
 
         m.return_value = (
-            (None, {"weight": 0, "parser": DummyParser, "mime_types": ["application/pdf"]}),
+            (None, {"weight": 0, "parser": DummyParser, "mime_types": {"application/pdf": ".pdf"}}),
         )
 
         self.assertEqual(
@@ -47,8 +50,8 @@ class TestParserDiscovery(TestCase):
             pass
 
         m.return_value = (
-            (None, {"weight": 0, "parser": DummyParser1, "mime_types": ["application/pdf"]}),
-            (None, {"weight": 1, "parser": DummyParser2, "mime_types": ["application/pdf"]}),
+            (None, {"weight": 0, "parser": DummyParser1, "mime_types": {"application/pdf": ".pdf"}}),
+            (None, {"weight": 1, "parser": DummyParser2, "mime_types": {"application/pdf": ".pdf"}}),
         )
 
         self.assertEqual(
@@ -96,3 +99,20 @@ class TestBaseParser(TestCase):
         path = parser.get_optimised_thumbnail("any", "not important")
         self.assertEqual(path, fake_get_thumbnail(None, None, None))
 
+
+class TestParserAvailability(TestCase):
+
+    def test_file_extensions(self):
+
+        for ext in [".pdf", ".jpe", ".jpg", ".jpeg", ".txt", ".csv"]:
+            self.assertIn(ext, get_supported_file_extensions())
+        self.assertEqual(get_default_file_extension('application/pdf'), ".pdf")
+        self.assertEqual(get_default_file_extension('image/png'), ".png")
+        self.assertEqual(get_default_file_extension('image/jpeg'), ".jpg")
+        self.assertEqual(get_default_file_extension('text/plain'), ".txt")
+        self.assertEqual(get_default_file_extension('text/csv'), ".csv")
+        self.assertEqual(get_default_file_extension('aasdasd/dgfgf'), None)
+
+        self.assertEqual(get_parser_class_for_mime_type('application/pdf'), RasterisedDocumentParser)
+        self.assertEqual(get_parser_class_for_mime_type('text/plain'), TextDocumentParser)
+        self.assertEqual(get_parser_class_for_mime_type('text/sdgsdf'), None)

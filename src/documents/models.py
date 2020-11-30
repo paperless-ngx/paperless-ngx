@@ -1,7 +1,6 @@
 # coding=utf-8
 
 import logging
-import mimetypes
 import os
 import re
 from collections import OrderedDict
@@ -11,6 +10,8 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
+
+from documents.parsers import get_default_file_extension
 
 
 class MatchingModel(models.Model):
@@ -204,7 +205,7 @@ class Document(models.Model):
         ordering = ("correspondent", "title")
 
     def __str__(self):
-        created = self.created.strftime("%Y%m%d%H%M%S")
+        created = self.created.strftime("%Y%m%d")
         if self.correspondent and self.title:
             return "{}: {} - {}".format(
                 created, self.correspondent, self.title)
@@ -255,8 +256,7 @@ class Document(models.Model):
 
     @property
     def file_type(self):
-        # TODO: this is not stable across python versions
-        return mimetypes.guess_extension(str(self.mime_type))
+        return get_default_file_extension(self.mime_type)
 
     @property
     def thumbnail_path(self):
