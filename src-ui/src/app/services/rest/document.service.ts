@@ -66,4 +66,12 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return this.http.post(this.getResourceUrl(null, 'post_document'), formData)
   }
 
+  bulk_edit(ids: number[], method: string, args: any[]) {
+    return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
+      'ids': ids,
+      'method': method,
+      'args': args
+    })
+  }
+
 }
