@@ -176,20 +176,20 @@ further.
 
 Matching documents with logical expressions:
 
-.. code:: none
+.. code::
 
   shopname AND (product1 OR product2)
 
 Matching specific tags, correspondents or types:
 
-.. code:: none
+.. code::
 
   type:invoice tag:unpaid
   correspondent:university certificate
 
 Matching dates:
 
-.. code:: none
+.. code::
   
   created:[2005 to 2009]
   added:yesterday
@@ -197,7 +197,7 @@ Matching dates:
 
 Matching inexact words:
 
-.. code:: none
+.. code::
 
   produ*name
 
