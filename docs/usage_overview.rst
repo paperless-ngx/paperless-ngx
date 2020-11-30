@@ -156,6 +156,62 @@ REST API
 
 You can also submit a document using the REST API, see :ref:`api-file_uploads` for details.
 
+.. _basic-searching:
+
+Searching
+#########
+
+Paperless offers an extensive searching mechanism that is designed to allow you to quickly
+find a document you're looking for (for example, that thing that just broke and you bought
+a couple months ago, that contract you signed 8 years ago).
+
+When you search paperless for a document, it tries to match this query against your documents.
+Paperless will look for matching documents by inspecting their content, title, correspondent,
+type and tags. Paperless returns a scored list of results, so that documents matching your query
+better will appear further up in the search results.
+
+By default, paperless returns only documents which contain all words typed in the search bar.
+However, paperless also offers advanced search syntax if you want to drill down the results
+further.
+
+Matching documents with logical expressions:
+
+.. code:: none
+
+  shopname AND (product1 OR product2)
+
+Matching specific tags, correspondents or types:
+
+.. code:: none
+
+  type:invoice tag:unpaid
+  correspondent:university certificate
+
+Matching dates:
+
+.. code:: none
+  
+  created:[2005 to 2009]
+  added:yesterday
+  modified:today
+
+Matching inexact words:
+
+.. code:: none
+
+  produ*name
+
+.. note::
+
+  Inexact terms are hard for search indexes. These queries might take a while to execute. That's why paperless offers
+  auto complete and query correction.
+
+All of these constructs can be combined as you see fit.
+If you want to learn more about the query language used by paperless, paperless uses Whoosh's default query language. 
+Head over to `Whoosh query language <https://whoosh.readthedocs.io/en/latest/querylang.html>`_.
+For details on what date parsing utilities are available, see
+`Date parsing <https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries>`_.
+ 
 
 .. _usage-recommended_workflow:
 

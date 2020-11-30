@@ -217,16 +217,23 @@ class SearchView(APIView):
                 }
 
     def get(self, request, format=None):
-        if 'query' in request.query_params:
-            query = request.query_params['query']
-            try:
-                page = int(request.query_params.get('page', 1))
-            except (ValueError, TypeError):
-                page = 1
+        if not 'query' in request.query_params:
+            return Response({
+                'count': 0,
+                'page': 0,
+                'page_count': 0,
+                'results': []})
 
-            if page < 1:
-                page = 1
+        query = request.query_params['query']
+        try:
+            page = int(request.query_params.get('page', 1))
+        except (ValueError, TypeError):
+            page = 1
 
+        if page < 1:
+            page = 1
+
+        try:
             with index.query_page(self.ix, query, page) as (result_page,
                                                             corrected_query):
                 return Response(
@@ -235,13 +242,8 @@ class SearchView(APIView):
                      'page_count': result_page.pagecount,
                      'corrected_query': corrected_query,
                      'results': list(map(self.add_infos_to_hit, result_page))})
-
-        else:
-            return Response({
-                'count': 0,
-                'page': 0,
-                'page_count': 0,
-                'results': []})
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 
 
 class SearchAutoCompleteView(APIView):
