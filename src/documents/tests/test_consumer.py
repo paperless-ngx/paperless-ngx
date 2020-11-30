@@ -435,6 +435,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         fd, f = tempfile.mkstemp(suffix=".pdf", dir=self.dirs.scratch_dir)
         return f
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def testNormalOperation(self):
 
         filename = self.get_test_file()
