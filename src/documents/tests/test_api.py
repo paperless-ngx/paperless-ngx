@@ -289,6 +289,22 @@ class DocumentApiTest(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 10)
 
+    def test_search_spelling_correction(self):
+        with AsyncWriter(index.open_index()) as writer:
+            for i in range(55):
+                doc = Document.objects.create(checksum=str(i), pk=i+1, title=f"Document {i+1}", content=f"Things document {i+1}")
+                index.update_document(writer, doc)
+
+        response = self.client.get("/api/search/?query=thing")
+        correction = response.data['corrected_query']
+
+        self.assertEqual(correction, "things")
+
+        response = self.client.get("/api/search/?query=things")
+        correction = response.data['corrected_query']
+
+        self.assertEqual(correction, None)
+
     def test_statistics(self):
 
         doc1 = Document.objects.create(title="none1", checksum="A")

@@ -1,7 +1,13 @@
 <app-page-header title="Search results">
 </app-page-header>
 
-<p>Search string: <i>{{query}}</i></p>
+<p>
+    Search string: <i>{{query}}</i>
+    <ng-container *ngIf="correctedQuery">
+        - Did you mean "<a [routerLink]="" (click)="searchCorrectedQuery()">{{correctedQuery}}</a>"?
+    </ng-container>
+
+</p>
 
 <div [class.result-content-searching]="searching" infiniteScroll (scrolled)="onScroll()">
     <p>{{resultCount}} result(s)</p>
