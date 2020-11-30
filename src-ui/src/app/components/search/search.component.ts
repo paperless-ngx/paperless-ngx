@@ -24,6 +24,8 @@ export class SearchComponent implements OnInit {
 
   correctedQuery: string = null
 
+  errorMessage: string
+
   constructor(private searchService: SearchService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
@@ -38,10 +40,11 @@ export class SearchComponent implements OnInit {
 
   searchCorrectedQuery() {
     this.router.navigate(["search"], {queryParams: {query: this.correctedQuery}})
-    this.correctedQuery = null
   }
 
   loadPage(append: boolean = false) {
+    this.errorMessage = null
+    this.correctedQuery = null
     this.searchService.search(this.query, this.currentPage).subscribe(result => {
       if (append) {
         this.results.push(...result.results)
@@ -52,6 +55,12 @@ export class SearchComponent implements OnInit {
       this.searching = false
       this.resultCount = result.count
       this.correctedQuery = result.corrected_query
+    }, error => {
+      this.searching = false
+      this.resultCount = 1
+      this.page_count = 1
+      this.results = []
+      this.errorMessage = error.error
     })
   }
 

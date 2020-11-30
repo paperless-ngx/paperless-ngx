@@ -1,6 +1,8 @@
 <app-page-header title="Search results">
 </app-page-header>
 
+<div *ngIf="errorMessage" class="alert alert-danger">Invalid search query: {{errorMessage}}</div>
+
 <p>
     Search string: <i>{{query}}</i>
     <ng-container *ngIf="correctedQuery">
@@ -9,7 +11,7 @@
 
 </p>
 
-<div [class.result-content-searching]="searching" infiniteScroll (scrolled)="onScroll()">
+<div *ngIf="!errorMessage" [class.result-content-searching]="searching" infiniteScroll (scrolled)="onScroll()">
     <p>{{resultCount}} result(s)</p>
     <app-document-card-large *ngFor="let result of results"
         [document]="result.document"
