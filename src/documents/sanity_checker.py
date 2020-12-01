@@ -92,7 +92,7 @@ def check_sanity():
             else:
                 if not checksum == doc.archive_checksum:
                     messages.append(SanityError(
-                        f"Checksum mismatch of document {doc.pk}. "
+                        f"Checksum mismatch of archive {doc.pk}. "
                         f"Stored: {doc.checksum}, actual: {checksum}."
                     ))
 
