@@ -278,7 +278,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
         try:
             os.rename(new_source_path, old_source_path)
             os.rename(new_archive_path, old_archive_path)
-        except:
+        except Exception as e:
             # This is fine, since:
             # A: if we managed to move source from A to B, we will also manage
             #  to move it from B to A. If not, we have a serious issue
