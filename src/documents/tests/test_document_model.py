@@ -1,11 +1,28 @@
+import os
+import shutil
+import tempfile
+from pathlib import Path
 from unittest import mock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from ..models import Document, Correspondent
 
 
 class TestDocument(TestCase):
+
+    def setUp(self) -> None:
+        self.originals_dir = tempfile.mkdtemp()
+        self.thumb_dir = tempfile.mkdtemp()
+
+        override_settings(
+            ORIGINALS_DIR=self.originals_dir,
+            THUMBNAIL_DIR=self.thumb_dir,
+        ).enable()
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.originals_dir)
+        shutil.rmtree(self.thumb_dir)
 
     def test_file_deletion(self):
         document = Document.objects.create(
@@ -18,6 +35,9 @@ class TestDocument(TestCase):
 
         file_path = document.source_path
         thumb_path = document.thumbnail_path
+
+        Path(file_path).touch()
+        Path(thumb_path).touch()
 
         with mock.patch("documents.signals.handlers.os.unlink") as mock_unlink:
             document.delete()

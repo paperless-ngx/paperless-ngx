@@ -11,6 +11,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
+from documents.file_handling import archive_name_from_filename
 from documents.parsers import get_default_file_extension
 
 
@@ -158,9 +159,15 @@ class Document(models.Model):
         max_length=32,
         editable=False,
         unique=True,
-        help_text="The checksum of the original document (before it was "
-                  "encrypted).  We use this to prevent duplicate document "
-                  "imports."
+        help_text="The checksum of the original document."
+    )
+
+    archive_checksum = models.CharField(
+        max_length=32,
+        editable=False,
+        blank=True,
+        null=True,
+        help_text="The checksum of the archived document."
     )
 
     created = models.DateTimeField(
@@ -226,8 +233,28 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
+    def archive_path(self):
+        if self.filename:
+            fname = archive_name_from_filename(self.filename)
+        else:
+            fname = "{:07}.pdf".format(self.pk)
+
+        return os.path.join(
+            settings.ARCHIVE_DIR,
+            fname
+        )
+
+    @property
+    def archive_file(self):
+        return open(self.archive_path, "rb")
+
+    @property
     def file_name(self):
         return slugify(str(self)) + self.file_type
+
+    @property
+    def archive_file_name(self):
+        return slugify(str(self)) + ".pdf"
 
     @property
     def file_type(self):

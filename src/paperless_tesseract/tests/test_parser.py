@@ -1,44 +1,15 @@
 import os
-import shutil
-import tempfile
 import uuid
 from typing import ContextManager
 from unittest import mock
 
 from django.test import TestCase, override_settings
-from pyocr.error import TesseractError
 
 from documents.parsers import ParseError, run_convert
-from paperless_tesseract.parsers import RasterisedDocumentParser, get_text_from_pdf, image_to_string, OCRError
+from documents.tests.utils import DirectoriesMixin
+from paperless_tesseract.parsers import RasterisedDocumentParser, get_text_from_pdf, strip_excess_whitespace
 
 image_to_string_calls = []
-
-
-class FakeTesseract(object):
-
-    @staticmethod
-    def can_detect_orientation():
-        return True
-
-    @staticmethod
-    def detect_orientation(file_handle, lang):
-        raise TesseractError("arbitrary status", "message")
-
-    @staticmethod
-    def get_available_languages():
-        return ['eng', 'deu']
-
-    @staticmethod
-    def image_to_string(file_handle, lang):
-        image_to_string_calls.append((file_handle.name, lang))
-        return file_handle.read()
-
-
-class FakePyOcr(object):
-
-    @staticmethod
-    def get_available_tools():
-        return [FakeTesseract]
 
 
 def fake_convert(input_file, output_file, **kwargs):
@@ -48,12 +19,6 @@ def fake_convert(input_file, output_file, **kwargs):
     for i, line in enumerate(lines):
         with open(output_file % i, "w") as f2:
             f2.write(line.strip())
-
-
-def fake_unpaper(pnm):
-    output = pnm + ".unpaper.pnm"
-    shutil.copy(pnm, output)
-    return output
 
 
 class FakeImageFile(ContextManager):
@@ -67,142 +32,50 @@ class FakeImageFile(ContextManager):
         return os.path.basename(self.fname)
 
 
-fake_image = FakeImageFile
 
 
-@mock.patch("paperless_tesseract.parsers.pyocr", FakePyOcr)
-@mock.patch("paperless_tesseract.parsers.run_convert", fake_convert)
-@mock.patch("paperless_tesseract.parsers.run_unpaper", fake_unpaper)
-@mock.patch("paperless_tesseract.parsers.Image.open", open)
-class TestRasterisedDocumentParser(TestCase):
+class TestParser(DirectoriesMixin, TestCase):
 
-    def setUp(self):
-        self.scratch = tempfile.mkdtemp()
+    def assertContainsStrings(self, content, strings):
+        # Asserts that all strings appear in content, in the given order.
+        indices = [content.index(s) for s in strings]
+        self.assertListEqual(indices, sorted(indices))
 
-        global image_to_string_calls
+    text_cases = [
+        ("simple     string", "simple string"),
+        (
+            "simple    newline\n   testing string",
+            "simple newline\ntesting string"
+        ),
+        (
+            "utf-8   строка с пробелами в конце  ",
+            "utf-8 строка с пробелами в конце"
+        )
+    ]
 
-        image_to_string_calls = []
-
-        override_settings(OCR_LANGUAGE="eng", SCRATCH_DIR=self.scratch).enable()
-
-    def tearDown(self):
-        shutil.rmtree(self.scratch)
-
-    def get_input_file(self, pages):
-        _, fname = tempfile.mkstemp(suffix=".pdf", dir=self.scratch)
-        with open(fname, "w") as f:
-            f.writelines([f"line {p}\n" for p in range(pages)])
-        return fname
-
-    @mock.patch("paperless_tesseract.parsers.langdetect.detect", lambda _: "en")
-    def test_parse_text_simple_language_match(self):
-        parser = RasterisedDocumentParser(self.get_input_file(1), uuid.uuid4())
-        text = parser.get_text()
-        self.assertEqual(text, "line 0")
-
-        self.assertListEqual([args[1] for args in image_to_string_calls], ["eng"])
-
-    @mock.patch("paperless_tesseract.parsers.langdetect.detect", lambda _: "en")
-    def test_parse_text_2_pages(self):
-        parser = RasterisedDocumentParser(self.get_input_file(2), uuid.uuid4())
-        text = parser.get_text()
-        self.assertEqual(text, "line 0 line 1")
-
-        self.assertListEqual([args[1] for args in image_to_string_calls], ["eng", "eng"])
-
-    @mock.patch("paperless_tesseract.parsers.langdetect.detect", lambda _: "en")
-    def test_parse_text_3_pages(self):
-        parser = RasterisedDocumentParser(self.get_input_file(3), uuid.uuid4())
-        text = parser.get_text()
-        self.assertEqual(text, "line 0 line 1 line 2")
-
-        self.assertListEqual([args[1] for args in image_to_string_calls], ["eng", "eng", "eng"])
-
-    @mock.patch("paperless_tesseract.parsers.langdetect.detect", lambda _: None)
-    def test_parse_text_lang_detect_failed(self):
-        parser = RasterisedDocumentParser(self.get_input_file(3), uuid.uuid4())
-        text = parser.get_text()
-        self.assertEqual(text, "line 0 line 1 line 2")
-
-        self.assertListEqual([args[1] for args in image_to_string_calls], ["eng", "eng", "eng"])
-
-    @mock.patch("paperless_tesseract.parsers.langdetect.detect", lambda _: "it")
-    def test_parse_text_lang_not_installed(self):
-        parser = RasterisedDocumentParser(self.get_input_file(4), uuid.uuid4())
-        text = parser.get_text()
-        self.assertEqual(text, "line 0 line 1 line 2 line 3")
-
-        self.assertListEqual([args[1] for args in image_to_string_calls], ["eng", "eng", "eng", "eng"])
-
-    @mock.patch("paperless_tesseract.parsers.langdetect.detect", lambda _: "de")
-    def test_parse_text_lang_mismatch(self):
-        parser = RasterisedDocumentParser(self.get_input_file(3), uuid.uuid4())
-        text = parser.get_text()
-        self.assertEqual(text, "line 0 line 1 line 2")
-
-        self.assertListEqual([args[1] for args in image_to_string_calls], ["eng", "deu", "deu", "deu"])
-
-    @mock.patch("paperless_tesseract.parsers.langdetect.detect", lambda _: "de")
-    def test_parse_empty_doc(self):
-        parser = RasterisedDocumentParser(self.get_input_file(0), uuid.uuid4())
-        try:
-            parser.get_text()
-        except ParseError as e:
-            self.assertEqual("Empty document, nothing to do.", str(e))
-        else:
-            self.fail("Should raise exception")
-
-
-class TestAuxilliaryFunctions(TestCase):
-
-    def setUp(self):
-        self.scratch = tempfile.mkdtemp()
-
-        override_settings(SCRATCH_DIR=self.scratch).enable()
-
-    def tearDown(self):
-        shutil.rmtree(self.scratch)
+    def test_strip_excess_whitespace(self):
+        for source, result in self.text_cases:
+            actual_result = strip_excess_whitespace(source)
+            self.assertEqual(
+                result,
+                actual_result,
+                "strip_exceess_whitespace({}) != '{}', but '{}'".format(
+                    source,
+                    result,
+                    actual_result
+                )
+            )
 
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def test_get_text_from_pdf(self):
-        text = get_text_from_pdf(os.path.join(self.SAMPLE_FILES, 'simple.pdf'))
+        text = get_text_from_pdf(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'))
 
-        self.assertEqual(text.strip(), "This is a test document.")
-
-    def test_get_text_from_pdf_error(self):
-        text = get_text_from_pdf(os.path.join(self.SAMPLE_FILES, 'simple.png'))
-
-        self.assertEqual(text.strip(), "")
-
-    def test_image_to_string(self):
-        text = image_to_string((os.path.join(self.SAMPLE_FILES, 'simple.png'), "eng"))
-
-        self.assertEqual(text, "This is a test document.")
-
-    def test_image_to_string_language_unavailable(self):
-        try:
-            image_to_string((os.path.join(self.SAMPLE_FILES, 'simple.png'), "ita"))
-        except OCRError as e:
-            self.assertTrue("Failed loading language" in str(e))
-        else:
-            self.fail("Should raise exception")
-
-    @override_settings(OCR_ALWAYS=False)
-    @mock.patch("paperless_tesseract.parsers.get_text_from_pdf")
-    @mock.patch("paperless_tesseract.parsers.RasterisedDocumentParser._get_greyscale")
-    def test_is_ocred(self, m2, m):
-        parser = RasterisedDocumentParser("", uuid.uuid4())
-        m.return_value = "lots of text lots of text lots of text lots of text lots of text lots of text " \
-                         "lots of text lots of text lots of text lots of text lots of text lots of text " \
-                         "lots of text lots of text lots of text lots of text lots of text lots of text "
-        parser.get_text()
-        self.assertEqual(m.call_count, 2)
-        self.assertEqual(m2.call_count, 0)
+        self.assertContainsStrings(text.strip(), ["This is a test document."])
 
     def test_thumbnail(self):
-        parser = RasterisedDocumentParser(os.path.join(self.SAMPLE_FILES, 'simple.pdf'), uuid.uuid4())
-        parser.get_thumbnail()
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
         # dont really know how to test it, just call it and assert that it does not raise anything.
 
     @mock.patch("paperless_tesseract.parsers.run_convert")
@@ -216,6 +89,161 @@ class TestAuxilliaryFunctions(TestCase):
 
         m.side_effect = call_convert
 
-        parser = RasterisedDocumentParser(os.path.join(self.SAMPLE_FILES, 'simple.pdf'), uuid.uuid4())
-        parser.get_thumbnail()
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
         # dont really know how to test it, just call it and assert that it does not raise anything.
+
+    def test_get_dpi(self):
+        parser = RasterisedDocumentParser(None)
+
+        dpi = parser.get_dpi(os.path.join(self.SAMPLE_FILES, "simple-no-dpi.png"))
+        self.assertEqual(dpi, None)
+
+        dpi = parser.get_dpi(os.path.join(self.SAMPLE_FILES, "simple.png"))
+        self.assertEqual(dpi, 72)
+
+    def test_simple_digital(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple-digital.pdf"), "application/pdf")
+
+        self.assertTrue(os.path.isfile(parser.archive_path))
+
+        self.assertContainsStrings(parser.get_text(), ["This is a test document."])
+
+    def test_with_form(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
+
+        self.assertTrue(os.path.isfile(parser.archive_path))
+
+        self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
+
+    @override_settings(OCR_MODE="redo")
+    def test_with_form_error(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
+
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
+
+    @override_settings(OCR_MODE="redo")
+    @mock.patch("paperless_tesseract.parsers.get_text_from_pdf", lambda _: None)
+    def test_with_form_error_notext(self):
+        parser = RasterisedDocumentParser(None)
+
+        def f():
+            parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
+
+        self.assertRaises(ParseError, f)
+
+    @override_settings(OCR_MODE="force")
+    def test_with_form_force(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
+
+        self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
+
+    def test_image_simple(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple.png"), "image/png")
+
+        self.assertTrue(os.path.isfile(parser.archive_path))
+
+        self.assertContainsStrings(parser.get_text(), ["This is a test document."])
+
+    def test_image_simple_alpha_fail(self):
+        parser = RasterisedDocumentParser(None)
+
+        def f():
+            parser.parse(os.path.join(self.SAMPLE_FILES, "simple-alpha.png"), "image/png")
+
+        self.assertRaises(ParseError, f)
+
+
+    def test_image_no_dpi_fail(self):
+        parser = RasterisedDocumentParser(None)
+
+        def f():
+            parser.parse(os.path.join(self.SAMPLE_FILES, "simple-no-dpi.png"), "image/png")
+
+        self.assertRaises(ParseError, f)
+
+    @override_settings(OCR_IMAGE_DPI=72)
+    def test_image_no_dpi_default(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple-no-dpi.png"), "image/png")
+
+        self.assertTrue(os.path.isfile(parser.archive_path))
+
+        self.assertContainsStrings(parser.get_text().lower(), ["this is a test document."])
+
+    def test_multi_page(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+    @override_settings(OCR_PAGES=2, OCR_MODE="skip")
+    def test_multi_page_pages_skip(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+    @override_settings(OCR_PAGES=2, OCR_MODE="redo")
+    def test_multi_page_pages_redo(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+    @override_settings(OCR_PAGES=2, OCR_MODE="force")
+    def test_multi_page_pages_force(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+    @override_settings(OOCR_MODE="skip")
+    def test_multi_page_analog_pages_skip(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+    @override_settings(OCR_PAGES=2, OCR_MODE="redo")
+    def test_multi_page_analog_pages_redo(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2"])
+        self.assertFalse("page 3" in parser.get_text().lower())
+
+    @override_settings(OCR_PAGES=1, OCR_MODE="force")
+    def test_multi_page_analog_pages_force(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1"])
+        self.assertFalse("page 2" in parser.get_text().lower())
+        self.assertFalse("page 3" in parser.get_text().lower())
+
+    @override_settings(OCR_MODE="skip_noarchive")
+    def test_skip_noarchive_withtext(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+    @override_settings(OCR_MODE="skip_noarchive")
+    def test_skip_noarchive_notext(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
+        self.assertTrue(os.path.join(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])

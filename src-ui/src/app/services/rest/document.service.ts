@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
+import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { AbstractPaperlessService } from './abstract-paperless-service';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -50,20 +51,32 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return super.list(page, pageSize, sortField, sortDirection, this.filterRulesToQueryParams(filterRules))
   }
 
-  getPreviewUrl(id: number): string {
-    return this.getResourceUrl(id, 'preview')
+  getPreviewUrl(id: number, original: boolean = false): string {
+    let url = this.getResourceUrl(id, 'preview')
+    if (original) {
+      url += "?original=true"
+    }
+    return url
   }
 
   getThumbUrl(id: number): string {
     return this.getResourceUrl(id, 'thumb')
   }
 
-  getDownloadUrl(id: number): string {
-    return this.getResourceUrl(id, 'download')
+  getDownloadUrl(id: number, original: boolean = false): string {
+    let url = this.getResourceUrl(id, 'download')
+    if (original) {
+      url += "?original=true"
+    }
+    return url
   }
 
   uploadDocument(formData) {
     return this.http.post(this.getResourceUrl(null, 'post_document'), formData)
+  }
+
+  getMetadata(id: number): Observable<PaperlessDocumentMetadata> {
+    return this.http.get<PaperlessDocumentMetadata>(this.getResourceUrl(id, 'metadata'))
   }
 
 }

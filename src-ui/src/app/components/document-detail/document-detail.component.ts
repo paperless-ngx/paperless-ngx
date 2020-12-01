@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
+import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
@@ -23,9 +24,11 @@ export class DocumentDetailComponent implements OnInit {
 
   documentId: number
   document: PaperlessDocument
+  metadata: PaperlessDocumentMetadata
   title: string
   previewUrl: string
   downloadUrl: string
+  downloadOriginalUrl: string
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
@@ -62,6 +65,7 @@ export class DocumentDetailComponent implements OnInit {
       this.documentId = +paramMap.get('id')
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
+      this.downloadOriginalUrl = this.documentsService.getDownloadUrl(this.documentId, true)
       if (this.openDocumentService.getOpenDocument(this.documentId)) {
         this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
       } else {
@@ -76,6 +80,9 @@ export class DocumentDetailComponent implements OnInit {
 
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
+    this.documentsService.getMetadata(doc.id).subscribe(result => {
+      this.metadata = result
+    })
     this.title = doc.title
     this.documentForm.patchValue(doc)
   }
