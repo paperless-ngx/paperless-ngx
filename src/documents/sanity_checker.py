@@ -67,19 +67,34 @@ def check_sanity():
                 f"Original of document {doc.pk} does not exist."))
         else:
             present_files.remove(os.path.normpath(doc.source_path))
-            checksum = None
             try:
                 with doc.source_file as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
             except OSError as e:
                 messages.append(SanityError(
                     f"Cannot read original file of document {doc.pk}: {e}"))
+            else:
+                if not checksum == doc.checksum:
+                    messages.append(SanityError(
+                        f"Checksum mismatch of document {doc.pk}. "
+                        f"Stored: {doc.checksum}, actual: {checksum}."
+                    ))
 
-            if checksum and not checksum == doc.checksum:
+        if os.path.isfile(doc.archive_path):
+            present_files.remove(os.path.normpath(doc.archive_path))
+            try:
+                with doc.archive_file as f:
+                    checksum = hashlib.md5(f.read()).hexdigest()
+            except OSError as e:
                 messages.append(SanityError(
-                    f"Checksum mismatch of document {doc.pk}. "
-                    f"Stored: {doc.checksum}, actual: {checksum}."
+                    f"Cannot read archive file of document {doc.pk}: {e}"
                 ))
+            else:
+                if not checksum == doc.archive_checksum:
+                    messages.append(SanityError(
+                        f"Checksum mismatch of archive {doc.pk}. "
+                        f"Stored: {doc.checksum}, actual: {checksum}."
+                    ))
 
         if not doc.content:
             messages.append(SanityWarning(

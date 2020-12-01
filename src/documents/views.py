@@ -1,3 +1,5 @@
+import os
+
 from django.db.models import Count, Max
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
@@ -126,17 +128,30 @@ class DocumentViewSet(RetrieveModelMixin,
         index.remove_document_from_index(self.get_object())
         return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
-    def file_response(self, pk, disposition):
+    @staticmethod
+    def original_requested(request):
+        return (
+            'original' in request.query_params and
+            request.query_params['original'] == 'true'
+        )
+
+    def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
-
-        if doc.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
-            file_handle = doc.source_file
+        if not self.original_requested(request) and os.path.isfile(doc.archive_path):  # NOQA: E501
+            file_handle = doc.archive_file
+            filename = doc.archive_file_name
+            mime_type = 'application/pdf'
         else:
-            file_handle = GnuPG.decrypted(doc.source_file)
+            file_handle = doc.source_file
+            filename = doc.file_name
+            mime_type = doc.mime_type
 
-        response = HttpResponse(file_handle, content_type=doc.mime_type)
+        if doc.storage_type == Document.STORAGE_TYPE_GPG:
+            file_handle = GnuPG.decrypted(file_handle)
+
+        response = HttpResponse(file_handle, content_type=mime_type)
         response["Content-Disposition"] = '{}; filename="{}"'.format(
-            disposition, doc.file_name)
+            disposition, filename)
         return response
 
     @action(methods=['post'], detail=False)
@@ -157,6 +172,8 @@ class DocumentViewSet(RetrieveModelMixin,
                 "paperless__checksum": doc.checksum,
                 "paperless__mime_type": doc.mime_type,
                 "paperless__filename": doc.filename,
+                "paperless__has_archive_version":
+                    os.path.isfile(doc.archive_path)
             })
         except Document.DoesNotExist:
             raise Http404()
@@ -164,7 +181,8 @@ class DocumentViewSet(RetrieveModelMixin,
     @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
         try:
-            response = self.file_response(pk, "inline")
+            response = self.file_response(
+                pk, request, "inline")
             return response
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
@@ -181,7 +199,8 @@ class DocumentViewSet(RetrieveModelMixin,
     @action(methods=['get'], detail=True)
     def download(self, request, pk=None):
         try:
-            return self.file_response(pk, "attachment")
+            return self.file_response(
+                pk, request, "attachment")
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
 
