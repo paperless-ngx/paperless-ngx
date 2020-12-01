@@ -32,7 +32,7 @@ class PostConsumeTestCase(TestCase):
 
     @mock.patch("documents.signals.handlers.Popen")
     @override_settings(POST_CONSUME_SCRIPT="script")
-    def test_post_consume_script_simple(self, m):
+    def test_post_consume_script_with_correspondent(self, m):
         c = Correspondent.objects.create(name="my_bank")
         doc = Document.objects.create(title="Test", mime_type="application/pdf", correspondent=c)
         tag1 = Tag.objects.create(name="a")
