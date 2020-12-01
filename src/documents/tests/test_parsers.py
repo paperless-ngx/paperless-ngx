@@ -7,7 +7,7 @@ from unittest import mock
 from django.test import TestCase, override_settings
 
 from documents.parsers import get_parser_class, get_supported_file_extensions, get_default_file_extension, \
-    get_parser_class_for_mime_type, DocumentParser
+    get_parser_class_for_mime_type, DocumentParser, is_file_ext_supported
 from paperless_tesseract.parsers import RasterisedDocumentParser
 from paperless_text.parsers import TextDocumentParser
 
@@ -116,3 +116,6 @@ class TestParserAvailability(TestCase):
         self.assertEqual(get_parser_class_for_mime_type('application/pdf'), RasterisedDocumentParser)
         self.assertEqual(get_parser_class_for_mime_type('text/plain'), TextDocumentParser)
         self.assertEqual(get_parser_class_for_mime_type('text/sdgsdf'), None)
+
+        self.assertTrue(is_file_ext_supported('.pdf'))
+        self.assertFalse(is_file_ext_supported('.hsdfh'))
