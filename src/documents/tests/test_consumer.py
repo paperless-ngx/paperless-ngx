@@ -552,7 +552,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         try:
             self.consumer.try_consume_file(self.get_test_file())
         except ConsumerError as e:
-            self.assertTrue("File extension .pdf does not map to any" in str(e))
+            self.assertTrue("No parsers abvailable for" in str(e))
             return
 
         self.fail("Should throw exception")

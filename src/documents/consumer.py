@@ -41,21 +41,6 @@ class Consumer(LoggingMixin):
             raise ConsumerError("Cannot consume {}: It is not a file".format(
                 self.path))
 
-    def pre_check_file_extension(self):
-        extensions = get_supported_file_extensions()
-        _, ext = os.path.splitext(self.filename)
-
-        if not ext:
-            raise ConsumerError(
-                f"Not consuming {self.filename}: File type unknown."
-            )
-
-        if ext not in extensions:
-            raise ConsumerError(
-                f"Not consuming {self.filename}: File extension {ext} does "
-                f"not map to any known file type ({str(extensions)})"
-            )
-
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
@@ -98,7 +83,6 @@ class Consumer(LoggingMixin):
         # Make sure that preconditions for consuming the file are met.
 
         self.pre_check_file_exists()
-        self.pre_check_file_extension()
         self.pre_check_directories()
         self.pre_check_duplicate()
 
