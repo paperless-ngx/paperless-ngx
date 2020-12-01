@@ -233,3 +233,17 @@ class TestParser(DirectoriesMixin, TestCase):
         self.assertContainsStrings(parser.get_text().lower(), ["page 1"])
         self.assertFalse("page 2" in parser.get_text().lower())
         self.assertFalse("page 3" in parser.get_text().lower())
+
+    @override_settings(OCR_MODE="skip_noarchive")
+    def test_skip_noarchive_withtext(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-digital.pdf"), "application/pdf")
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+    @override_settings(OCR_MODE="skip_noarchive")
+    def test_skip_noarchive_notext(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
+        self.assertTrue(os.path.join(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
