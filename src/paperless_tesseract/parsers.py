@@ -80,6 +80,12 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
     def parse(self, document_path, mime_type):
+        if settings.OCR_MODE == "skip_noarchive":
+            text = get_text_from_pdf(document_path)
+            if text and len(text) > 50:
+                self.text = text
+                return
+
         archive_path = os.path.join(self.tempdir, "archive.pdf")
 
         ocr_args = {
@@ -96,7 +102,7 @@ class RasterisedDocumentParser(DocumentParser):
         if settings.OCR_PAGES > 0:
             ocr_args['pages'] = f"1-{settings.OCR_PAGES}"
 
-        if settings.OCR_MODE == 'skip':
+        if settings.OCR_MODE in ['skip', 'skip_noarchive']:
             ocr_args['skip_text'] = True
         elif settings.OCR_MODE == 'redo':
             ocr_args['redo_ocr'] = True
@@ -184,6 +190,7 @@ def get_text_from_pdf(pdf_file):
         try:
             pdf = pdftotext.PDF(f)
         except pdftotext.Error:
+            # might not be a PDF file
             return None
 
     text = "\n".join(pdf)
