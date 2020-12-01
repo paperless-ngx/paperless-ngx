@@ -57,7 +57,6 @@ def binaries_check(app_configs, **kwargs):
     binaries = (
         settings.CONVERT_BINARY,
         settings.OPTIPNG_BINARY,
-        settings.UNPAPER_BINARY,
         "tesseract"
     )
 

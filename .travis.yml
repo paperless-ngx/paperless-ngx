@@ -1,5 +1,8 @@
 language: python
 
+dist: focal
+os: linux
+
 jobs:
   include:
     - name: "Paperless on Python 3.6"
@@ -33,7 +36,7 @@ jobs:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript
+  - sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
 
 install:
   - pip install --upgrade pipenv
