@@ -54,6 +54,13 @@ def get_default_file_extension(mime_type):
     return None
 
 
+def is_file_ext_supported(ext):
+    if ext:
+        return ext.lower() in get_supported_file_extensions()
+    else:
+        return False
+
+
 def get_supported_file_extensions():
     extensions = set()
     for response in document_consumer_declaration.send(None):

@@ -11,6 +11,7 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
 from documents.models import Tag
+from documents.parsers import is_file_ext_supported
 
 try:
     from inotifyrecursive import INotify, flags
@@ -37,9 +38,17 @@ def _tags_from_path(filepath):
 
 
 def _consume(filepath):
+    if os.path.isdir(filepath):
+        return
+
     if not os.path.isfile(filepath):
         logger.debug(
             f"Not consuming file {filepath}: File has moved.")
+        return
+
+    if not is_file_ext_supported(os.path.splitext(filepath)[1]):
+        logger.debug(
+            f"Not consuming file {filepath}: Unknown file extension.")
         return
 
     tag_ids = None
@@ -181,7 +190,7 @@ class Command(BaseCommand):
 
         try:
             while not self.stop_flag:
-                for event in inotify.read(timeout=1000, read_delay=1000):
+                for event in inotify.read(timeout=1000):
                     if recursive:
                         path = inotify.get_path(event.wd)
                     else:
