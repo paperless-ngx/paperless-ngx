@@ -152,6 +152,8 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 
     Defaults to none, which disables this feature.
 
+.. _configuration-ocr:
+
 OCR settings
 ############
 
@@ -184,6 +186,8 @@ PAPERLESS_OCR_MODE=<mode>
         where no text is present. This is the safest and fastest option.
     *   ``skip_noarchive``: In addition to skip, paperless won't create an
         archived version of your documents when it finds any text in them.
+        This is useful if you don't want to have two almost-identical versions
+        of your digital documents in the media folder.
     *   ``redo``: Paperless will OCR all pages of your documents and attempt to
         replace any existing text layers with new text. This will be useful for
         documents from scanners that already performed OCR with insufficient
@@ -197,7 +201,8 @@ PAPERLESS_OCR_MODE=<mode>
         however, the resulting document may be significantly larger and text
         won't appear as sharp when zoomed in.
     
-    The default is ``skip``, which only performs OCR when necessary.
+    The default is ``skip``, which only performs OCR when necessary and always
+    creates archived documents.
 
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
@@ -244,7 +249,7 @@ PAPERLESS_OCR_USER_ARG=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
     additional arguments you wish to pass to OCRmyPDF. Since Paperless uses
     the API of OCRmyPDF, you have to specify these in a format that can be
-    passed to the API. See `https://ocrmypdf.readthedocs.io/en/latest/api.html#reference`_
+    passed to the API. See `the API reference of OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/api.html#reference>`_
     for valid parameters. All command line options are supported, but they
     use underscores instead of dashed.
 

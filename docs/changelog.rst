@@ -5,6 +5,29 @@
 Changelog
 *********
 
+paperless-ng 0.9.5
+##################
+
+* OCR
+
+  * Paperless now uses `OCRmyPDF <https://github.com/jbarlow83/OCRmyPDF>`_ to perform OCR on documents.
+  * OCRmyPDF creates archived PDF/A documents with embedded text that can be selected in the front end.
+  * Paperless stores archived versions of documents alongside with the originals. The originals can be
+    accessed on the document edit page, if available.
+  * Many of the configuration options regarding OCR have changed. See :ref:`configuration-ocr` for details.
+  * Paperless no longer guesses the language of your documents. It always uses the language that you
+    specified with ``PAPERLESS_OCR_LANGUAGE``. Be sure to set this to the language the majority of your
+    documents are in.
+  * The management command :ref:`document_archiver <utilities-archiver>` can be used to create archived versions for already
+    existing documents.
+
+* Tags from consumption folder.
+
+  * Thanks to `jayme-github`_, paperless now consumes files from sub folders in the consumption folder and is able to assign tags
+    based on the sub folders a document was found in. This can be configured with ``PAPERLESS_CONSUMER_RECURSIVE`` and
+    ``PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS``.
+
+
 paperless-ng 0.9.4
 ##################
 
@@ -750,6 +773,7 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _jayme-github: http://github.com/jayme-github
 .. _Brian Conn: https://github.com/TheConnMan
 .. _Christopher Luu: https://github.com/nuudles
 .. _Florian Jung: https://github.com/the01

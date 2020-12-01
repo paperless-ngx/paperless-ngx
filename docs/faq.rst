@@ -3,6 +3,18 @@
 Frequently asked questions
 **************************
 
+**Q:** *What's the general plan for Paperless-ng?*
+
+**A:** Paperless-ng is already almost feature-complete. This project will remain
+as simple as it is right now. It will see improvements to features that are already there.
+If you need advanced features such as document versions,
+workflows or multi-user with customizable access to individual files, this is
+not the tool for you.
+
+Features that *are* planned are some more quality of life extensions for the searching
+(i.e., search for similar documents, group results by correspondents with "more from this"
+links, etc), bulk editing and hierarchical tags.
+
 **Q:** *I'm using docker. Where are my documents?*
 
 **A:** Your documents are stored inside the docker volume ``paperless_media``.
@@ -20,6 +32,18 @@ is
     Do not mess with this folder. Don't change permissions and don't move
     files around manually. This folder is meant to be entirely managed by docker
     and paperless.
+
+**Q:** *Let's say you don't support this project anymore in a year. Can I easily move to other systems?*
+
+**A:** Your documents are stored as plain files inside the media folder. You can always drag those files
+out of that folder to use them elsewhere. Here are a couple notes about that.
+
+*   Paperless never modifies your original documents. It keeps checksums of all documents and uses a
+    scheduled sanity checker to check that they remain the same.
+*   By default, paperless uses the internal ID of each document as its filename. This might not be very
+    convenient for export. However, you can adjust the way files are stored in paperless by
+    :ref:`configuring the filename format <advanced-file_name_handling>`.
+*   :ref:`The exporter <utilities-exporter>` is another easy way to get your files out of paperless with reasonable file names.
 
 **Q:** *What file types does paperless-ng support?*
 
@@ -53,3 +77,12 @@ in your browser and paperless has to do much less work to serve the data.
 that automatically, I'm all ears. For now, you have to grab the latest release
 archive from the project page and build the image yourself. The release comes
 with the front end already compiled, so you don't have to do this on the Pi.
+
+**Q:** *How do I run this on my toaster?*
+
+**A:** I honestly don't know! As for all other devices that might be able
+to run paperless, you're a bit on your own. If you can't run the docker image,
+the documentation has instructions for bare metal installs. I'm running
+paperless on an i3 processor from 2015 or so. This is also what I use to test
+new releases with. Apart from that, I also have a Raspberry Pi, which I
+occasionally build the image on and see if it works.

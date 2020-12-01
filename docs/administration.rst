@@ -333,6 +333,36 @@ command:
 
 The command takes no arguments and processes all your mail accounts and rules.
 
+.. _utilities-archiver:
+
+Creating archived documents
+===========================
+
+Paperless stores archived PDF/A documents alongside your original documents.
+These archived documents will also contain selectable text for image-only
+originals.
+These documents are derived from the originals, which are always stored
+unmodified. If coming from an earlier version of paperless, your documents
+won't have archived versions.
+
+This command creates PDF/A documents for your documents.
+
+.. code::
+
+    document_archiver --overwrite
+
+This command will only attempt to create archived documents when no archived
+document exists yet, unless ``--overwrite`` is specified.
+
+.. note::
+
+    This command essentially performs OCR on all your documents again,
+    according to your settings. If you run this with ``PAPERLESS_OCR_MODE=redo``,
+    it will potentially run for a very long time. You can cancel the command
+    at any time, since this command will skip already archived versions the next time
+    it is run.
+
+
 .. _utilities-encyption:
 
 Managing encryption
