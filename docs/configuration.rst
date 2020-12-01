@@ -271,6 +271,7 @@ PAPERLESS_TASK_WORKERS=<num>
     maintain the automatic matching algorithm, check emails, consume documents,
     etc. This variable specifies how many things it will do in parallel.
 
+
 PAPERLESS_THREADS_PER_WORKER=<num>
     Furthermore, paperless uses multiple threads when consuming documents to
     speed up OCR. This variable specifies how many pages paperless will process
@@ -295,7 +296,6 @@ PAPERLESS_THREADS_PER_WORKER=<num>
     PAPERLESS_THREADS_PER_WORKER automatically.
 
 
-
 PAPERLESS_TIME_ZONE=<timezone>
     Set the time zone here.
     See https://docs.djangoproject.com/en/3.1/ref/settings/#std:setting-TIME_ZONE
@@ -312,11 +312,31 @@ PAPERLESS_CONSUMER_POLLING=<num>
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
+
 PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>
     When the consumer detects a duplicate document, it will not touch the
     original document. This default behavior can be changed here.
 
     Defaults to false.
+
+
+PAPERLESS_CONSUMER_RECURSIVE=<bool>
+    Enable recursive watching of the consumption directory. Paperless will
+    then pickup files from files in subdirectories within your consumption
+    directory as well.
+
+    Defaults to false.
+
+
+PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>
+    Set the names of subdirectories as tags for consumed files.
+    E.g. <CONSUMPTION_DIR>/foo/bar/file.pdf will add the tags "foo" and "bar" to
+    the consumed file. Paperless will create any tags that don't exist yet.
+
+    PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
+
+    Defaults to false.
+
 
 PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
     On smaller systems, or even in the case of Very Large Documents, the consumer
