@@ -3,10 +3,12 @@ from collections import namedtuple
 from typing import ContextManager
 from unittest import mock
 
+from django.core.management import call_command
 from django.test import TestCase
 from imap_tools import MailMessageFlags, MailboxFolderSelectError
 
 from documents.models import Correspondent
+from paperless_mail import tasks
 from paperless_mail.mail import MailError, MailAccountHandler, get_correspondent, get_title
 from paperless_mail.models import MailRule, MailAccount
 
@@ -390,3 +392,43 @@ class TestMail(TestCase):
         self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(self.async_task.call_count, 5)
+
+class TestManagementCommand(TestCase):
+
+    @mock.patch("paperless_mail.management.commands.mail_fetcher.tasks.process_mail_accounts")
+    def test_mail_fetcher(self, m):
+
+        call_command("mail_fetcher")
+
+        m.assert_called_once()
+
+class TestTasks(TestCase):
+
+    @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
+    def test_all_accounts(self, m):
+        m.side_effect = lambda account: 6
+
+        MailAccount.objects.create(name="A", imap_server="A", username="A", password="A")
+        MailAccount.objects.create(name="B", imap_server="A", username="A", password="A")
+
+        result = tasks.process_mail_accounts()
+
+        self.assertEqual(m.call_count, 2)
+        self.assertIn("Added 12", result)
+
+        m.side_effect = lambda account: 0
+        result = tasks.process_mail_accounts()
+        self.assertIn("No new", result)
+
+    @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
+    def test_single_accounts(self, m):
+
+        MailAccount.objects.create(name="A", imap_server="A", username="A", password="A")
+
+        tasks.process_mail_account("A")
+
+        m.assert_called_once()
+        m.reset_mock()
+
+        tasks.process_mail_account("B")
+        m.assert_not_called()

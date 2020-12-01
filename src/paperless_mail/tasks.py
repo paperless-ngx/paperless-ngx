@@ -17,8 +17,8 @@ def process_mail_accounts():
 
 
 def process_mail_account(name):
-    account = MailAccount.objects.find(name=name)
-    if account:
+    try:
+        account = MailAccount.objects.get(name=name)
         MailAccountHandler().handle_mail_account(account)
-    else:
+    except MailAccount.DoesNotExist:
         logging.error("Unknown mail acccount: {}".format(name))
