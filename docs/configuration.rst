@@ -177,11 +177,13 @@ PAPERLESS_OCR_LANGUAGE=<lang>
     Defaults to "eng".
 
 PAPERLESS_OCR_MODE=<mode>
-    Tell paperless when and how to perform ocr on your documents. Three modes
+    Tell paperless when and how to perform ocr on your documents. Four modes
     are available:
 
     *   ``skip``: Paperless skips all pages and will perform ocr only on pages
         where no text is present. This is the safest and fastest option.
+    *   ``skip_noarchive``: In addition to skip, paperless won't create an
+        archived version of your documents when it finds any text in them.
     *   ``redo``: Paperless will OCR all pages of your documents and attempt to
         replace any existing text layers with new text. This will be useful for
         documents from scanners that already performed OCR with insufficient
