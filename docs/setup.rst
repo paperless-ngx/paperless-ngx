@@ -220,15 +220,23 @@ writing. Windows is not and will never be supported.
     *   ``python3-dev``
 
     *   ``imagemagick`` >= 6 for PDF conversion
-    *   ``unpaper`` for cleaning documents before OCR
-    *   ``ghostscript``
     *   ``optipng`` for optimising thumbnails
-    *   ``tesseract-ocr`` >= 4.0.0 for OCR
-    *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
     *   ``gnupg`` for handling encrypted documents
     *   ``libpoppler-cpp-dev`` for PDF to text conversion
     *   ``libmagic-dev`` for mime type detection
     *   ``libpq-dev`` for PostgreSQL
+
+    These dependencies are required for OCRmyPDF, which is used for text recognition.
+
+    *   ``unpaper``
+    *   ``ghostscript``
+    *   ``icc-profiles-free``
+    *   ``liblept5``
+    *   ``libxml2``
+    *   ``pngquant``
+    *   ``zlib1g``
+    *   ``tesseract-ocr`` >= 4.0.0 for OCR
+    *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
 
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
     for installing some of the python dependencies. You can remove that
