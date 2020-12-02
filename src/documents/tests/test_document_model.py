@@ -1,6 +1,6 @@
-import os
 import shutil
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from unittest import mock
 
@@ -44,3 +44,23 @@ class TestDocument(TestCase):
             mock_unlink.assert_any_call(file_path)
             mock_unlink.assert_any_call(thumb_path)
             self.assertEqual(mock_unlink.call_count, 2)
+
+    def test_file_name(self):
+
+        doc = Document(mime_type="application/pdf", title="test", created=datetime(2020, 12, 25))
+        self.assertEqual(doc.file_name, "20201225-test.pdf")
+
+    def test_file_name_jpg(self):
+
+        doc = Document(mime_type="image/jpeg", title="test", created=datetime(2020, 12, 25))
+        self.assertEqual(doc.file_name, "20201225-test.jpg")
+
+    def test_file_name_unknown(self):
+
+        doc = Document(mime_type="application/zip", title="test", created=datetime(2020, 12, 25))
+        self.assertEqual(doc.file_name, "20201225-test.zip")
+
+    def test_file_name_invalid(self):
+
+        doc = Document(mime_type="image/jpegasd", title="test", created=datetime(2020, 12, 25))
+        self.assertEqual(doc.file_name, "20201225-test")
