@@ -247,3 +247,33 @@ class TestParser(DirectoriesMixin, TestCase):
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
         self.assertTrue(os.path.join(parser.archive_path))
         self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
+
+
+class TestParserFileTypes(DirectoriesMixin, TestCase):
+
+    SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
+
+    def test_bmp(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple.bmp"), "image/bmp")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertTrue("this is a test document" in parser.get_text().lower())
+
+    def test_jpg(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple.jpg"), "image/jpeg")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertTrue("this is a test document" in parser.get_text().lower())
+
+    @override_settings(OCR_IMAGE_DPI=200)
+    def test_gif(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple.gif"), "image/gif")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertTrue("this is a test document" in parser.get_text().lower())
+
+    def test_tiff(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple.tif"), "image/tiff")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertTrue("this is a test document" in parser.get_text().lower())

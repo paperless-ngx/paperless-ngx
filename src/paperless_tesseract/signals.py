@@ -8,6 +8,9 @@ def tesseract_consumer_declaration(sender, **kwargs):
         "mime_types": {
             "application/pdf": ".pdf",
             "image/jpeg": ".jpg",
-            "image/png": ".png"
+            "image/png": ".png",
+            "image/tiff": ".tif",
+            "image/gif": ".gif",
+            "image/bmp": ".bmp",
         }
     }
