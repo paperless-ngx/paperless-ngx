@@ -111,7 +111,8 @@ class TestParserAvailability(TestCase):
         self.assertEqual(get_default_file_extension('image/jpeg'), ".jpg")
         self.assertEqual(get_default_file_extension('text/plain'), ".txt")
         self.assertEqual(get_default_file_extension('text/csv'), ".csv")
-        self.assertEqual(get_default_file_extension('aasdasd/dgfgf'), None)
+        self.assertEqual(get_default_file_extension('application/zip'), ".zip")
+        self.assertEqual(get_default_file_extension('aasdasd/dgfgf'), "")
 
         self.assertEqual(get_parser_class_for_mime_type('application/pdf'), RasterisedDocumentParser)
         self.assertEqual(get_parser_class_for_mime_type('text/plain'), TextDocumentParser)
