@@ -51,7 +51,11 @@ def get_default_file_extension(mime_type):
         if mime_type in supported_mime_types:
             return supported_mime_types[mime_type]
 
-    return None
+    ext = mimetypes.guess_extension(mime_type)
+    if ext:
+        return ext
+    else:
+        return ""
 
 
 def is_file_ext_supported(ext):
