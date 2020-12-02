@@ -92,31 +92,41 @@ export class DocumentListComponent implements OnInit {
   }
 
   filterByTag(t: PaperlessTag) {
-    if (this.filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == t.id)) {
+    let filterRules = this.list.filterRules
+    if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == t.id)) {
       return
     }
 
-    this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: t.id})
+    filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: t.id})
+    this.filterRules = filterRules
     this.applyFilterRules()
   }
 
   filterByCorrespondent(c: PaperlessCorrespondent) {
-    let existing_rule = this.filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
-    if (existing_rule) {
+    let filterRules = this.list.filterRules
+    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
+    if (existing_rule && existing_rule.value == c.id) {
+      return
+    } else if (existing_rule) {
       existing_rule.value = c.id
     } else {
-      this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: c.id})
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: c.id})
     }
+    this.filterRules = filterRules
     this.applyFilterRules()
   }
 
   filterByDocumentType(dt: PaperlessDocumentType) {
-    let existing_rule = this.filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
-    if (existing_rule) {
+    let filterRules = this.list.filterRules
+    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
+    if (existing_rule && existing_rule.value == dt.id) {
+      return
+    } else if (existing_rule) {
       existing_rule.value = dt.id
     } else {
-      this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: dt.id})
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: dt.id})
     }
+    this.filterRules = filterRules
     this.applyFilterRules()
   }
 
