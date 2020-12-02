@@ -5,7 +5,7 @@ from pathlib import Path
 from django.test import TestCase
 
 from documents.models import Document
-from documents.sanity_checker import check_sanity
+from documents.sanity_checker import check_sanity, SanityFailedError
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -81,3 +81,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         doc = self.make_test_data()
         Path(self.dirs.originals_dir, "orphaned").touch()
         self.assertEqual(len(check_sanity()), 1)
+
+    def test_all(self):
+        Document.objects.create(title="test", checksum="dgfhj", archive_checksum="dfhg", content="", pk=1, filename="0000001.pdf")
+        string = str(SanityFailedError(check_sanity()))
