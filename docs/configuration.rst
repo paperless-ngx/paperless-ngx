@@ -183,11 +183,11 @@ PAPERLESS_OCR_MODE=<mode>
     are available:
 
     *   ``skip``: Paperless skips all pages and will perform ocr only on pages
-        where no text is present. This is the safest and fastest option.
+        where no text is present. This is the safest option.
     *   ``skip_noarchive``: In addition to skip, paperless won't create an
         archived version of your documents when it finds any text in them.
         This is useful if you don't want to have two almost-identical versions
-        of your digital documents in the media folder.
+        of your digital documents in the media folder. This is the fastest option.
     *   ``redo``: Paperless will OCR all pages of your documents and attempt to
         replace any existing text layers with new text. This will be useful for
         documents from scanners that already performed OCR with insufficient
