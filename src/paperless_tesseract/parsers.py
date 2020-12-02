@@ -65,7 +65,10 @@ class RasterisedDocumentParser(DocumentParser):
     def is_image(self, mime_type):
         return mime_type in [
             "image/png",
-            "image/jpeg"
+            "image/jpeg",
+            "image/tiff",
+            "image/bmp",
+            "image/gif",
         ]
 
     def get_dpi(self, image):
