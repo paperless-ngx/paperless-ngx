@@ -27,6 +27,10 @@ paperless-ng 0.9.5
     based on the sub folders a document was found in. This can be configured with ``PAPERLESS_CONSUMER_RECURSIVE`` and
     ``PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS``.
 
+* Fixes:
+
+  * A bug with the generation of filenames for files with unsupported types caused the exporter and
+    document saving to crash.
 
 paperless-ng 0.9.4
 ##################
