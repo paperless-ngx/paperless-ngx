@@ -90,7 +90,9 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.openDocumentsSubscription.unsubscribe()
+    if (this.openDocumentsSubscription) {
+      this.openDocumentsSubscription.unsubscribe()
+    }
   }
 
 }
