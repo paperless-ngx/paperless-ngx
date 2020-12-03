@@ -79,11 +79,15 @@ class DocumentTypeField(serializers.PrimaryKeyRelatedField):
 
 class DocumentSerializer(serializers.ModelSerializer):
 
-    correspondent_id = CorrespondentField(
-        allow_null=True, source='correspondent')
-    tags_id = TagsField(many=True, source='tags')
-    document_type_id = DocumentTypeField(
-        allow_null=True, source='document_type')
+    correspondent = CorrespondentField(allow_null=True)
+    tags = TagsField(many=True)
+    document_type = DocumentTypeField(allow_null=True)
+
+    correspondent_object = TagSerializer(
+        read_only=True, source="correspondent")
+    document_type_object = TagSerializer(
+        read_only=True, source="document_type")
+    tags_objects = TagSerializer(many=True, read_only=True, source="tags")
 
     class Meta:
         model = Document
@@ -91,13 +95,13 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "correspondent",
-            "correspondent_id",
+            "correspondent_object",
             "document_type",
-            "document_type_id",
+            "document_type_object",
             "title",
             "content",
             "tags",
-            "tags_id",
+            "tags_objects",
             "created",
             "modified",
             "added",
