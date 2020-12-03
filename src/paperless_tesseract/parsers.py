@@ -7,7 +7,7 @@ import ocrmypdf
 import pdftotext
 from PIL import Image
 from django.conf import settings
-from ocrmypdf import InputFileError
+from ocrmypdf import InputFileError, EncryptedPdfError
 
 from documents.parsers import DocumentParser, ParseError, run_convert
 
@@ -83,11 +83,12 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
     def parse(self, document_path, mime_type):
-        if settings.OCR_MODE == "skip_noarchive":
-            text = get_text_from_pdf(document_path)
-            if text and len(text) > 50:
-                self.text = text
-                return
+        text_original = get_text_from_pdf(document_path)
+        has_text = text_original and len(text_original) > 50
+
+        if settings.OCR_MODE == "skip_noarchive" and has_text:
+            self.text = text_original
+            return
 
         archive_path = os.path.join(self.tempdir, "archive.pdf")
 
@@ -104,6 +105,8 @@ class RasterisedDocumentParser(DocumentParser):
 
         if settings.OCR_PAGES > 0:
             ocr_args['pages'] = f"1-{settings.OCR_PAGES}"
+
+        # Mode selection.
 
         if settings.OCR_MODE in ['skip', 'skip_noarchive']:
             ocr_args['skip_text'] = True
@@ -149,11 +152,11 @@ class RasterisedDocumentParser(DocumentParser):
             self.archive_path = archive_path
             self.text = get_text_from_pdf(archive_path)
 
-        except InputFileError as e:
+        except (InputFileError, EncryptedPdfError) as e:
             # This happens with some PDFs when used with the redo_ocr option.
             # This is not the end of the world, we'll just use what we already
             # have in the document.
-            self.text = get_text_from_pdf(document_path)
+            self.text = text_original
             # Also, no archived file.
             if not self.text:
                 # However, if we don't have anything, fail:
@@ -169,7 +172,7 @@ class RasterisedDocumentParser(DocumentParser):
                 'warning',
                 f"Document {document_path} does not have any text."
                 f"This is probably an error or you tried to add an image "
-                f"without text.")
+                f"without text, or something is wrong with this document.")
             self.text = ""
 
 
