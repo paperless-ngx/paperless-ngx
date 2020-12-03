@@ -18,6 +18,9 @@ export class FilterEditorComponent implements OnInit {
 
   constructor(private documentTypeService: DocumentTypeService, private tagService: TagService, private correspondentService: CorrespondentService) { }
 
+  @Output()
+  clear = new EventEmitter()
+
   @Input()
   filterRules: FilterRule[] = []
 
@@ -48,7 +51,7 @@ export class FilterEditorComponent implements OnInit {
 
   clearClicked() {
     this.filterRules.splice(0,this.filterRules.length)
-    this.apply.next()
+    this.clear.next()
   }
 
   ngOnInit(): void {
