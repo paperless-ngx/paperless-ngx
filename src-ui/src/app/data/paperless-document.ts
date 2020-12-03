@@ -5,13 +5,13 @@ import { PaperlessDocumentType } from './paperless-document-type'
 
 export interface PaperlessDocument extends ObjectWithId {
 
-    correspondent?: PaperlessCorrespondent
+    correspondent_object?: PaperlessCorrespondent
 
-    correspondent_id?: number
+    correspondent?: number
 
-    document_type?: PaperlessDocumentType
+    document_type_object?: PaperlessDocumentType
 
-    document_type_id?: number
+    document_type?: number
 
     title?: string
 
@@ -19,9 +19,9 @@ export interface PaperlessDocument extends ObjectWithId {
 
     file_type?: string
 
-    tags?: PaperlessTag[]
+    tags_objects?: PaperlessTag[]
 
-    tags_id?: number[]
+    tags?: number[]
 
     checksum?: string
 

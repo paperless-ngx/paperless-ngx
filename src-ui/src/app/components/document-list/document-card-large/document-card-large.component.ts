@@ -20,10 +20,10 @@ export class DocumentCardLargeComponent implements OnInit {
   details: any
 
   @Output()
-  clickTag = new EventEmitter<PaperlessTag>()
+  clickTag = new EventEmitter<number>()
 
   @Output()
-  clickCorrespondent = new EventEmitter<PaperlessDocument>()
+  clickCorrespondent = new EventEmitter<number>()
 
   ngOnInit(): void {
   }

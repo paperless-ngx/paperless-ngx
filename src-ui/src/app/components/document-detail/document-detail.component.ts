@@ -37,10 +37,10 @@ export class DocumentDetailComponent implements OnInit {
     title: new FormControl(''),
     content: new FormControl(''),
     created: new FormControl(),
-    correspondent_id: new FormControl(),
-    document_type_id: new FormControl(),
+    correspondent: new FormControl(),
+    document_type: new FormControl(),
     archive_serial_number: new FormControl(),
-    tags_id: new FormControl([])
+    tags: new FormControl([])
   })
 
   constructor(
@@ -93,7 +93,7 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.success.subscribe(newDocumentType => {
       this.documentTypeService.listAll().subscribe(documentTypes => {
         this.documentTypes = documentTypes.results
-        this.documentForm.get('document_type_id').setValue(newDocumentType.id)
+        this.documentForm.get('document_type').setValue(newDocumentType.id)
       })
     })
   }
@@ -104,7 +104,7 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.success.subscribe(newCorrespondent => {
       this.correspondentService.listAll().subscribe(correspondents => {
         this.correspondents = correspondents.results
-        this.documentForm.get('correspondent_id').setValue(newCorrespondent.id)
+        this.documentForm.get('correspondent').setValue(newCorrespondent.id)
       })
     })
   }
