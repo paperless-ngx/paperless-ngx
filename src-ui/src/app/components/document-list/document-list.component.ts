@@ -55,7 +55,7 @@ export class DocumentListComponent implements OnInit {
         this.list.savedView = null
       }
       this.filterRules = this.list.filterRules
-      //this.showFilter = this.filterRules.length > 0
+      this.showFilter = this.filterRules.length > 0
       // prevents temporarily visible results from previous views
       this.list.documents = []
       this.list.reload()
