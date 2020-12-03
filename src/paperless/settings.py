@@ -256,26 +256,43 @@ DISABLE_DBHANDLER = __get_boolean("PAPERLESS_DISABLE_DBHANDLER")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     "handlers": {
-        "dbhandler": {
+        "db": {
+            "level": "DEBUG",
             "class": "documents.loggers.PaperlessHandler",
         },
-        "streamhandler": {
-            "class": "logging.StreamHandler"
+        "console": {
+            "level": "WARNING",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
         }
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
     },
     "loggers": {
         "documents": {
-            "handlers": ["dbhandler", "streamhandler"],
-            "level": "DEBUG"
+            "handlers": ["db"],
+            "propagate": True,
         },
         "paperless_mail": {
-            "handlers": ["dbhandler", "streamhandler"],
-            "level": "DEBUG"
+            "handlers": ["db"],
+            "propagate": True,
         },
         "paperless_tesseract": {
-            "handlers": ["dbhandler", "streamhandler"],
-            "level": "DEBUG"
+            "handlers": ["db"],
+            "propagate": True,
         },
     },
 }
