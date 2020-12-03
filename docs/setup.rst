@@ -553,12 +553,10 @@ configuring some options in paperless can help improve performance immensely:
     sluggish response times during consumption, so you might want to lower these
     settings (example: 2 workers and 1 thread to always have some computing power
     left for other tasks).
-*   Keep ``PAPERLESS_OCR_ALWAYS`` at its default value 'false' and consider OCR'ing
+*   Keep ``PAPERLESS_OCR_MODE`` at its default value ``skip`` and consider OCR'ing
     your documents before feeding them into paperless. Some scanners are able to
-    do this!
-*   Lower ``PAPERLESS_CONVERT_DENSITY`` from its default value 300 to 200. This
-    will still result in rather accurate OCR, but will decrease consumption time
-    by quite a bit.
+    do this! You might want to even specify ``skip_noarchive`` to skip archive
+    file generation for already ocr'ed documents entirely.
 *   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
     times. Thumbnails will be about 20% larger.
 
