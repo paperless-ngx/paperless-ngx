@@ -16,10 +16,10 @@ export class DocumentCardSmallComponent implements OnInit {
   document: PaperlessDocument
 
   @Output()
-  clickTag = new EventEmitter<PaperlessTag>()
+  clickTag = new EventEmitter<number>()
 
   @Output()
-  clickCorrespondent = new EventEmitter<PaperlessDocument>()
+  clickCorrespondent = new EventEmitter<number>()
 
   ngOnInit(): void {
   }
