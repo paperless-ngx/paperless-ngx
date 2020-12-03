@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "55c9136777e78d6cd362628cd1fc0c5ff36b437699b92089ce504d598004371d"
+            "sha256": "bb0b90c2ee89521c6dcd24375b67b52be5a4a786297923519a5abaafe0fe5d0e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -142,11 +142,11 @@
         },
         "django": {
             "hashes": [
-                "sha256:14a4b7cd77297fba516fc0d92444cc2e2e388aa9de32d7a68d4a83d58f5a4927",
-                "sha256:14b87775ffedab2ef6299b73343d1b4b41e5d4e2aa58c6581f114dbec01e3f8f"
+                "sha256:5c866205f15e7a7123f1eec6ab939d22d5bde1416635cab259684af66d8e48a2",
+                "sha256:edb10b5c45e7e9c0fb1dc00b76ec7449aca258a39ffd613dbd078c51d19c9f03"
             ],
             "index": "pypi",
-            "version": "==3.1.3"
+            "version": "==3.1.4"
         },
         "django-cors-headers": {
             "hashes": [
@@ -213,19 +213,19 @@
         },
         "humanfriendly": {
             "hashes": [
-                "sha256:bf52ec91244819c780341a3438d5d7b09f431d3f113a475147ac9b7b167a3d12",
-                "sha256:e78960b31198511f45fd455534ae7645a6207d33e512d2e842c766d15d9c8080"
+                "sha256:175ffa628aa76da2c17369a5da5856084562cc66dfe7f82ae93ca3ef175277a6",
+                "sha256:3c9ab8d28e88e6cc998e41963357736dafd555ee5bb666b50e42f6ce28dd3e3d"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-            "version": "==8.2"
+            "version": "==9.0"
         },
         "imap-tools": {
             "hashes": [
-                "sha256:96e9a4ff6483462635737730a1df28e739faa71967b12a84f4363fb386542246",
-                "sha256:a3ee1827dc4ff185b259b33d0238b091a87d489f63ee59959fcc81716456c602"
+                "sha256:72bf46dc135b039a5d5b59f4e079242ac15eac02a30038e8cb2dec7b153cab65",
+                "sha256:75dc1c72dd76d9e577df26a1e0ec3a809b5eebce77678851458dcd2eae127ac9"
             ],
             "index": "pypi",
-            "version": "==0.32.0"
+            "version": "==0.33.0"
         },
         "img2pdf": {
             "hashes": [
@@ -756,7 +756,7 @@
                 "sha256:5c0d04e06ccc0da1bd3fa5ae4550effcce42fcad947b4a6cafa77bdc9b09ff22",
                 "sha256:9e7b8ab0ecbdbf0595adadd5f0ebbb9e69010e0bd48bbb0c15e550bf2a5292df"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "index": "pypi",
             "version": "==4.54.0"
         },
         "tzlocal": {
