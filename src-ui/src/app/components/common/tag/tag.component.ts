@@ -23,7 +23,11 @@ export class TagComponent implements OnInit {
   }
 
   getColour() {
-    return TAG_COLOURS.find(c => c.id == this.tag.colour)
+    var color = TAG_COLOURS.find(c => c.id == this.tag.colour)
+    if (color) {
+      return color
+    }
+    return { id: this.tag.colour, name: this.tag.colour, textColor: "#ffffff" }
   }
 
 }

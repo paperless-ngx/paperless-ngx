@@ -7,7 +7,7 @@
     </div>
     <div class="modal-body">
       <app-input-text title="Name" formControlName="name"></app-input-text>
-      <app-input-select title="Colour" [items]="getColours()" formControlName="colour" [textColor]="getColor(objectForm.value.colour).textColor" [backgroundColor]="getColor(objectForm.value.colour).value"></app-input-select>
+      <app-input-select title="Colour" [items]="getColours()" formControlName="colour" [textColor]="getColor(objectForm.value.colour).textColor" [backgroundColor]="getColor(objectForm.value.colour).id"></app-input-select>
       <app-input-check title="Inbox tag" formControlName="is_inbox_tag" hint="Inbox tags are automatically assigned to all consumed documents."></app-input-check>
       <app-input-text title="Match" formControlName="match"></app-input-text>
       <app-input-select title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>

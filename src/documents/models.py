@@ -6,6 +6,7 @@ import re
 from collections import OrderedDict
 
 import dateutil.parser
+from colorhash import ColorHash
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -84,29 +85,22 @@ class Correspondent(MatchingModel):
 
 class Tag(MatchingModel):
 
-    COLOURS = (
-        (1, "#a6cee3"),
-        (2, "#1f78b4"),
-        (3, "#b2df8a"),
-        (4, "#33a02c"),
-        (5, "#fb9a99"),
-        (6, "#e31a1c"),
-        (7, "#fdbf6f"),
-        (8, "#ff7f00"),
-        (9, "#cab2d6"),
-        (10, "#6a3d9a"),
-        (11, "#b15928"),
-        (12, "#000000"),
-        (13, "#cccccc")
-    )
-
-    colour = models.PositiveIntegerField(choices=COLOURS, default=1)
+    colour = models.CharField(blank=True, max_length=7)
 
     is_inbox_tag = models.BooleanField(
         default=False,
         help_text="Marks this tag as an inbox tag: All newly consumed "
                   "documents will be tagged with inbox tags."
     )
+
+    def save(self, *args, **kwargs):
+        if self.colour == "":
+            self.colour = ColorHash(
+                self.name,
+                lightness=(0.35, 0.45, 0.55, 0.65),
+                saturation=(0.2, 0.3, 0.4, 0.5)).hex
+
+        super().save(*args, **kwargs)
 
 
 class DocumentType(MatchingModel):
