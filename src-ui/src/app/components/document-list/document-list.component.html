@@ -70,7 +70,7 @@
 <div class="card w-100 mb-3" [hidden]="!showFilter">
   <div class="card-body">
     <h5 class="card-title">Filter</h5>
-    <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()"></app-filter-editor>
+    <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()" (clear)="clearFilterRules()"></app-filter-editor>
   </div>
 </div>
 

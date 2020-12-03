@@ -66,6 +66,11 @@ export class DocumentListComponent implements OnInit {
     this.list.filterRules = this.filterRules
   }
 
+  clearFilterRules() {
+    this.list.filterRules = this.filterRules
+    this.showFilter = false
+  }
+
   loadViewConfig(config: SavedViewConfig) {
     this.filterRules = cloneFilterRules(config.filterRules)
     this.list.load(config)
