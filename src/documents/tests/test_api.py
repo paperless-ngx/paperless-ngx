@@ -358,7 +358,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data['documents_total'], 3)
         self.assertEqual(response.data['documents_inbox'], 1)
 
-    @mock.patch("documents.forms.async_task")
+    @mock.patch("documents.views.async_task")
     def test_upload(self, m):
 
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
@@ -370,8 +370,12 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         args, kwargs = m.call_args
         self.assertEqual(kwargs['override_filename'], "simple.pdf")
+        self.assertIsNone(kwargs['override_title'])
+        self.assertIsNone(kwargs['override_correspondent_id'])
+        self.assertIsNone(kwargs['override_document_type_id'])
+        self.assertIsNone(kwargs['override_tag_ids'])
 
-    @mock.patch("documents.forms.async_task")
+    @mock.patch("documents.views.async_task")
     def test_upload_invalid_form(self, m):
 
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
@@ -379,7 +383,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         m.assert_not_called()
 
-    @mock.patch("documents.forms.async_task")
+    @mock.patch("documents.views.async_task")
     def test_upload_invalid_file(self, m):
 
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.zip"), "rb") as f:
@@ -387,8 +391,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         m.assert_not_called()
 
-    @mock.patch("documents.forms.async_task")
-    @mock.patch("documents.forms.validate_filename")
+    @mock.patch("documents.views.async_task")
+    @mock.patch("documents.serialisers.validate_filename")
     def test_upload_invalid_filename(self, validate_filename, async_task):
         validate_filename.side_effect = ValidationError()
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
@@ -396,3 +400,83 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
 
         async_task.assert_not_called()
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_title(self, async_task):
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f, "title": "my custom title"})
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        self.assertEqual(kwargs['override_title'], "my custom title")
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_correspondent(self, async_task):
+        c = Correspondent.objects.create(name="test-corres")
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f, "correspondent": "test-corres"})
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        self.assertEqual(kwargs['override_correspondent_id'], c.id)
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_new_correspondent(self, async_task):
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f, "correspondent": "test-corres2"})
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        c = Correspondent.objects.get(name="test-corres2")
+        self.assertEqual(kwargs['override_correspondent_id'], c.id)
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_document_type(self, async_task):
+        dt = DocumentType.objects.create(name="invoice")
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f, "document_type": "invoice"})
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        self.assertEqual(kwargs['override_document_type_id'], dt.id)
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_new_document_type(self, async_task):
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f, "document_type": "invoice2"})
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        dt = DocumentType.objects.get(name="invoice2")
+        self.assertEqual(kwargs['override_document_type_id'], dt.id)
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_tags(self, async_task):
+        t1 = Tag.objects.create(name="tag1")
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "tags": ["tag1", "tag2"]})
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        t2 = Tag.objects.get(name="tag2")
+        self.assertCountEqual(kwargs['override_tag_ids'], [t1.id, t2.id])
