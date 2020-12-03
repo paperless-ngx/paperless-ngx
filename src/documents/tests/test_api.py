@@ -41,20 +41,20 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         returned_doc = response.data['results'][0]
         self.assertEqual(returned_doc['id'], doc.id)
         self.assertEqual(returned_doc['title'], doc.title)
-        self.assertEqual(returned_doc['correspondent']['name'], c.name)
-        self.assertEqual(returned_doc['document_type']['name'], dt.name)
-        self.assertEqual(returned_doc['correspondent']['id'], c.id)
-        self.assertEqual(returned_doc['document_type']['id'], dt.id)
-        self.assertEqual(returned_doc['correspondent']['id'], returned_doc['correspondent_id'])
-        self.assertEqual(returned_doc['document_type']['id'], returned_doc['document_type_id'])
+        self.assertEqual(returned_doc['correspondent_object']['name'], c.name)
+        self.assertEqual(returned_doc['document_type_object']['name'], dt.name)
+        self.assertEqual(returned_doc['correspondent_object']['id'], c.id)
+        self.assertEqual(returned_doc['document_type_object']['id'], dt.id)
+        self.assertEqual(returned_doc['correspondent_object']['id'], returned_doc['correspondent'])
+        self.assertEqual(returned_doc['document_type_object']['id'], returned_doc['document_type'])
         self.assertEqual(len(returned_doc['tags']), 1)
-        self.assertEqual(returned_doc['tags'][0]['name'], tag.name)
-        self.assertEqual(returned_doc['tags'][0]['id'], tag.id)
-        self.assertListEqual(returned_doc['tags_id'], [tag.id])
+        self.assertEqual(returned_doc['tags_objects'][0]['name'], tag.name)
+        self.assertEqual(returned_doc['tags_objects'][0]['id'], tag.id)
+        self.assertListEqual(returned_doc['tags'], [tag.id])
 
         c2 = Correspondent.objects.create(name="c2")
 
-        returned_doc['correspondent_id'] = c2.pk
+        returned_doc['correspondent'] = c2.pk
         returned_doc['title'] = "the new title"
 
         response = self.client.put('/api/documents/{}/'.format(doc.pk), returned_doc, format='json')
