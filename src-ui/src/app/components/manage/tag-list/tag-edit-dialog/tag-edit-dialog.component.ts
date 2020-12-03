@@ -13,14 +13,14 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
 
-  constructor(service: TagService, activeModal: NgbActiveModal, toastService: ToastService) { 
+  constructor(service: TagService, activeModal: NgbActiveModal, toastService: ToastService) {
     super(service, activeModal, toastService, 'tag')
   }
 
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      colour: new FormControl(1),
+      colour: new FormControl(''),
       is_inbox_tag: new FormControl(false),
       matching_algorithm: new FormControl(1),
       match: new FormControl(""),
@@ -32,7 +32,7 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
     return TAG_COLOURS
   }
 
-  getColor(id: number) {
+  getColor(id) {
     return TAG_COLOURS.find(c => c.id == id)
   }
 

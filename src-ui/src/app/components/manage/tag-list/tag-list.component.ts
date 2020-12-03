@@ -15,10 +15,14 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
 
   constructor(tagService: TagService, modalService: NgbModal) {
     super(tagService, modalService, TagEditDialogComponent)
-   }
+  }
 
   getColor(id) {
-    return TAG_COLOURS.find(c => c.id == id)
+    var color = TAG_COLOURS.find(c => c.id == id)
+    if (color) {
+      return color
+    }
+    return { id: id, name: id, textColor: "#ffffff" }
   }
 
   getObjectName(object: PaperlessTag) {
