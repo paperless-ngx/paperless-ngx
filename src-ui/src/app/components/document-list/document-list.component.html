@@ -74,7 +74,8 @@
   </div>
 </div>
 
-<div class="row m-0 justify-content-end">
+<div class="d-flex justify-content-between align-items-center">
+  <p>{{list.collectionSize || 0}} document(s)</p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
   [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
 </div>
@@ -126,5 +127,3 @@
 <div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
   <app-document-card-small [document]="d" *ngFor="let d of list.documents" (clickTag)="filterByTag($event)" (clickCorrespondent)="filterByCorrespondent($event)"></app-document-card-small>    
 </div>
-
-<p *ngIf="list.documents.length == 0" class="mx-auto">No results</p>
