@@ -39,6 +39,7 @@ watchdog = "*"
 whoosh="~=2.7.4"
 inotifyrecursive = ">=0.3.4"
 ocrmypdf = "*"
+tqdm = "*"
 
 [dev-packages]
 coveralls = "*"
