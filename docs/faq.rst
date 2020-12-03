@@ -49,7 +49,7 @@ out of that folder to use them elsewhere. Here are a couple notes about that.
 
 **A:** Currently, the following files are supported:
 
-*   PDF documents, PNG images and JPEG images are processed with OCR.
+*   PDF documents, PNG images, JPEG images, TIFF images and GIF images are processed with OCR and converted into PDF documents.
 *   Plain text documents are supported as well and are added verbatim
     to paperless.
 

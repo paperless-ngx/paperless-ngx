@@ -17,7 +17,7 @@ paperless-ng 0.9.5
   * Many of the configuration options regarding OCR have changed. See :ref:`configuration-ocr` for details.
   * Paperless no longer guesses the language of your documents. It always uses the language that you
     specified with ``PAPERLESS_OCR_LANGUAGE``. Be sure to set this to the language the majority of your
-    documents are in.
+    documents are in. Multiple languages can be specified, but that requires more CPU time.
   * The management command :ref:`document_archiver <utilities-archiver>` can be used to create archived versions for already
     existing documents.
 
@@ -26,6 +26,17 @@ paperless-ng 0.9.5
   * Thanks to `jayme-github`_, paperless now consumes files from sub folders in the consumption folder and is able to assign tags
     based on the sub folders a document was found in. This can be configured with ``PAPERLESS_CONSUMER_RECURSIVE`` and
     ``PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS``.
+
+* API
+
+  * The API now offers token authentication.
+  * The endpoint for uploading documents now supports specifying custom titles, correspondents, tags and types.
+    This can be used by clients to override the default behavior of paperless.
+  * The document endpoint of API now serves document in this form:
+    * correspondents, document types and tags are referenced by their ID in the fields ``correspondent``, ``document_type`` and ``tags``. The ``*_id`` versions are gone. These fields are read/write.
+    * in addition to that, ``*_object`` fields serve nested objects. Read only. Don't rely on these, they will probably get removed once I figure out how to better handle asynchronous data in the front end.
+
+* Some minor improvements to the front end, such as document count in the document list, better visibility of the current view, and improvements to the filter behavior.
 
 * Fixes:
 
