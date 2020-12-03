@@ -100,17 +100,17 @@
         {{d.archive_serial_number}}
       </td>
       <td class="d-none d-md-table-cell">
-        <ng-container *ngIf="d.correspondent">
-          <a [routerLink]="" (click)="filterByCorrespondent(d.correspondent)" title="Filter by correspondent">{{d.correspondent.name}}</a>
+        <ng-container *ngIf="d.correspondent_object">
+          <a [routerLink]="" (click)="filterByCorrespondent(d.correspondent)" title="Filter by correspondent">{{d.correspondent_object.name}}</a>
         </ng-container>
       </td>
       <td>
         <a routerLink="/documents/{{d.id}}" title="Edit document">{{d.title}}</a>
-        <app-tag [tag]="t" *ngFor="let t of d.tags" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="filterByTag(t)"></app-tag>
+        <app-tag [tag]="t" *ngFor="let t of d.tags_objects" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="filterByTag(t.id)"></app-tag>
       </td>
       <td class="d-none d-xl-table-cell">
-        <ng-container *ngIf="d.document_type">
-          <a [routerLink]="" (click)="filterByDocumentType(d.document_type)" title="Filter by document type">{{d.document_type.name}}</a>
+        <ng-container *ngIf="d.document_type_object">
+          <a [routerLink]="" (click)="filterByDocumentType(d.document_type)" title="Filter by document type">{{d.document_type_object.name}}</a>
         </ng-container>
       </td>
       <td>

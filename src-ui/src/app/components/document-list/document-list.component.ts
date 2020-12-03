@@ -95,40 +95,40 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  filterByTag(t: PaperlessTag) {
+  filterByTag(tag_id: number) {
     let filterRules = this.list.filterRules
-    if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == t.id)) {
+    if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == tag_id)) {
       return
     }
 
-    filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: t.id})
+    filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: tag_id})
     this.filterRules = filterRules
     this.applyFilterRules()
   }
 
-  filterByCorrespondent(c: PaperlessCorrespondent) {
+  filterByCorrespondent(correspondent_id: number) {
     let filterRules = this.list.filterRules
     let existing_rule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
-    if (existing_rule && existing_rule.value == c.id) {
+    if (existing_rule && existing_rule.value == correspondent_id) {
       return
     } else if (existing_rule) {
-      existing_rule.value = c.id
+      existing_rule.value = correspondent_id
     } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: c.id})
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: correspondent_id})
     }
     this.filterRules = filterRules
     this.applyFilterRules()
   }
 
-  filterByDocumentType(dt: PaperlessDocumentType) {
+  filterByDocumentType(document_type_id: number) {
     let filterRules = this.list.filterRules
     let existing_rule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
-    if (existing_rule && existing_rule.value == dt.id) {
+    if (existing_rule && existing_rule.value == document_type_id) {
       return
     } else if (existing_rule) {
-      existing_rule.value = dt.id
+      existing_rule.value = document_type_id
     } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: dt.id})
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: document_type_id})
     }
     this.filterRules = filterRules
     this.applyFilterRules()
