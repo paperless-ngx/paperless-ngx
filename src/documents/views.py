@@ -1,10 +1,16 @@
 import os
+import tempfile
+from datetime import datetime
+from time import mktime
 
+from django.conf import settings
 from django.db.models import Count, Max
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from django_q.tasks import async_task
+from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.mixins import (
@@ -32,14 +38,14 @@ from .filters import (
     DocumentTypeFilterSet,
     LogFilterSet
 )
-from .forms import UploadForm
 from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
     LogSerializer,
     TagSerializer,
-    DocumentTypeSerializer
+    DocumentTypeSerializer,
+    PostDocumentSerializer
 )
 
 
@@ -154,16 +160,6 @@ class DocumentViewSet(RetrieveModelMixin,
             disposition, filename)
         return response
 
-    @action(methods=['post'], detail=False)
-    def post_document(self, request, pk=None):
-        # TODO: is this a good implementation?
-        form = UploadForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            return Response("OK")
-        else:
-            return HttpResponseBadRequest(str(form.errors))
-
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
         try:
@@ -215,6 +211,56 @@ class LogViewSet(ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = LogFilterSet
     ordering_fields = ("created",)
+
+
+class PostDocumentView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PostDocumentSerializer
+    parser_classes = (parsers.MultiPartParser,)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        document = serializer.validated_data['document']
+        document_data = serializer.validated_data['document_data']
+        correspondent_id = serializer.validated_data['correspondent_id']
+        document_type_id = serializer.validated_data['document_type_id']
+        tag_ids = serializer.validated_data['tag_ids']
+        title = serializer.validated_data['title']
+
+        t = int(mktime(datetime.now().timetuple()))
+
+        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+
+        with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
+                                         dir=settings.SCRATCH_DIR,
+                                         delete=False) as f:
+            f.write(document_data)
+            os.utime(f.name, times=(t, t))
+
+            async_task("documents.tasks.consume_file",
+                       f.name,
+                       override_filename=document.name,
+                       override_title=title,
+                       override_correspondent_id=correspondent_id,
+                       override_document_type_id=document_type_id,
+                       override_tag_ids=tag_ids,
+                       task_name=os.path.basename(document.name)[:100])
+        return Response("OK")
 
 
 class SearchView(APIView):
