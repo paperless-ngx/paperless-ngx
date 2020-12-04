@@ -32,7 +32,7 @@ class TestArchiver(DirectoriesMixin, TestCase):
         shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, "0000001.pdf"))
         self.make_models()
 
-        handle_document(self.d1)
+        handle_document(self.d1.pk)
 
         doc = Document.objects.get(id=self.d1.id)
 
