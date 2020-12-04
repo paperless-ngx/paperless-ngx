@@ -8,12 +8,12 @@
 
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title">    
-            <ng-container *ngIf="document.correspondent_object">
-              <a *ngIf="clickCorrespondent.observers.length ; else nolink" [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{document.correspondent_object.name}}</a>
-              <ng-template #nolink>{{document.correspondent_object.name}}</ng-template>:
+            <ng-container *ngIf="document.correspondent">
+              <a *ngIf="clickCorrespondent.observers.length ; else nolink" [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>
+              <ng-template #nolink>{{(document.correspondent$ | async)?.name}}</ng-template>:
             </ng-container>
             {{document.title}}
-            <app-tag [tag]="t" linkTitle="Filter by tag" *ngFor="let t of document.tags_objects" class="ml-1" (click)="clickTag.emit(t.id)" [clickable]="clickTag.observers.length"></app-tag>
+            <app-tag [tag]="t" linkTitle="Filter by tag" *ngFor="let t of document.tags$ | async" class="ml-1" (click)="clickTag.emit(t.id)" [clickable]="clickTag.observers.length"></app-tag>
           </h5>
           <h5 class="card-title" *ngIf="document.archive_serial_number">#{{document.archive_serial_number}}</h5>
         </div>
