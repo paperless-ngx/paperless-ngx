@@ -53,5 +53,4 @@ class PostConsumeTestCase(TestCase):
         self.assertEqual(command[5], f"/api/documents/{doc.pk}/download/")
         self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(command[7], "my_bank")
-        # TODO: tags are unordered by default.
-        self.assertEqual(command[8], "a,b")
+        self.assertCountEqual(command[8].split(","), ["a", "b"])
