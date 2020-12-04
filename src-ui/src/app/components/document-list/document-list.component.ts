@@ -3,9 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
@@ -49,11 +46,12 @@ export class DocumentListComponent implements OnInit {
       this.displayMode = localStorage.getItem('document-list:displayMode')
     }
     this.route.paramMap.subscribe(params => {
-      this.filterRules = this.list.filterRules
       if (params.has('id')) {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
+        this.filterRules = this.list.filterRules
       } else {
         this.list.savedView = null
+        this.filterRules = this.list.filterRules
         this.showFilter = this.filterRules.length > 0
       }
       this.list.clear()
