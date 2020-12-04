@@ -4,12 +4,13 @@ from typing import ContextManager
 from unittest import mock
 
 from django.core.management import call_command
+from django.db import DatabaseError
 from django.test import TestCase
 from imap_tools import MailMessageFlags, MailboxFolderSelectError
 
 from documents.models import Correspondent
 from paperless_mail import tasks
-from paperless_mail.mail import MailError, MailAccountHandler, get_correspondent, get_title
+from paperless_mail.mail import MailError, MailAccountHandler
 from paperless_mail.models import MailRule, MailAccount
 
 
@@ -165,28 +166,30 @@ class TestMail(TestCase):
         me_localhost = Correspondent.objects.create(name=message2.from_)
         someone_else = Correspondent.objects.create(name="someone else")
 
+        handler = MailAccountHandler()
+
         rule = MailRule(name="a", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING)
-        self.assertIsNone(get_correspondent(message, rule))
+        self.assertIsNone(handler.get_correspondent(message, rule))
 
         rule = MailRule(name="b", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL)
-        c = get_correspondent(message, rule)
+        c = handler.get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "someone@somewhere.com")
-        c = get_correspondent(message2, rule)
+        c = handler.get_correspondent(message2, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "me@localhost.com")
         self.assertEqual(c.id, me_localhost.id)
 
         rule = MailRule(name="c", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME)
-        c = get_correspondent(message, rule)
+        c = handler.get_correspondent(message, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.name, "Someone!")
-        c = get_correspondent(message2, rule)
+        c = handler.get_correspondent(message2, rule)
         self.assertIsNotNone(c)
         self.assertEqual(c.id, me_localhost.id)
 
         rule = MailRule(name="d", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_CUSTOM, assign_correspondent=someone_else)
-        c = get_correspondent(message, rule)
+        c = handler.get_correspondent(message, rule)
         self.assertEqual(c, someone_else)
 
     def test_get_title(self):
@@ -194,10 +197,13 @@ class TestMail(TestCase):
         message.subject = "the message title"
         att = namedtuple('Attachment', [])
         att.filename = "this_is_the_file.pdf"
+
+        handler = MailAccountHandler()
+
         rule = MailRule(name="a", assign_title_from=MailRule.TITLE_FROM_FILENAME)
-        self.assertEqual(get_title(message, att, rule), "this_is_the_file")
+        self.assertEqual(handler.get_title(message, att, rule), "this_is_the_file")
         rule = MailRule(name="b", assign_title_from=MailRule.TITLE_FROM_SUBJECT)
-        self.assertEqual(get_title(message, att, rule), "the message title")
+        self.assertEqual(handler.get_title(message, att, rule), "the message title")
 
     def test_handle_message(self):
         message = create_message(subject="the message title", from_="Myself", num_attachments=2)
@@ -319,7 +325,7 @@ class TestMail(TestCase):
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
-    def test_errors(self):
+    def test_error_login(self):
         account = MailAccount.objects.create(name="test", imap_server="", username="admin", password="wrong")
 
         try:
@@ -329,26 +335,55 @@ class TestMail(TestCase):
         else:
             self.fail("Should raise exception")
 
+    def test_error_skip_account(self):
+        account_faulty = MailAccount.objects.create(name="test", imap_server="", username="admin", password="wroasdng")
+
         account = MailAccount.objects.create(name="test2", imap_server="", username="admin", password="secret")
-        rule = MailRule.objects.create(name="testrule", account=account, folder="uuuh")
+        rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_MOVE,
+                                       action_parameter="spam", filter_subject="Claim")
 
-        try:
-            self.mail_account_handler.handle_mail_account(account)
-        except MailError as e:
-            self.assertTrue("uuuh does not exist" in str(e))
-        else:
-            self.fail("Should raise exception")
+        tasks.process_mail_accounts()
+        self.assertEqual(self.async_task.call_count, 1)
+        self.assertEqual(len(self.bogus_mailbox.messages), 2)
+        self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
-        account = MailAccount.objects.create(name="test3", imap_server="", username="admin", password="secret")
+    def test_error_skip_rule(self):
 
-        rule = MailRule.objects.create(name="testrule2", account=account, action=MailRule.ACTION_MOVE, action_parameter="doesnotexist", filter_subject="Claim")
+        account = MailAccount.objects.create(name="test2", imap_server="", username="admin", password="secret")
+        rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_MOVE,
+                                       action_parameter="spam", filter_subject="Claim", order=1, folder="uuuhhhh")
+        rule2 = MailRule.objects.create(name="testrule2", account=account, action=MailRule.ACTION_MOVE,
+                                       action_parameter="spam", filter_subject="Claim", order=2)
 
-        try:
-            self.mail_account_handler.handle_mail_account(account)
-        except MailError as e:
-            self.assertTrue("Error while processing post-consume actions" in str(e))
-        else:
-            self.fail("Should raise exception")
+        self.mail_account_handler.handle_mail_account(account)
+        self.assertEqual(self.async_task.call_count, 1)
+        self.assertEqual(len(self.bogus_mailbox.messages), 2)
+        self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
+
+
+    @mock.patch("paperless_mail.mail.MailAccountHandler.get_correspondent")
+    def test_error_skip_mail(self, m):
+
+        def get_correspondent_fake(message, rule):
+            if message.from_ == 'amazon@amazon.de':
+                raise ValueError("Does not compute.")
+            else:
+                return None
+
+        m.side_effect = get_correspondent_fake
+
+        account = MailAccount.objects.create(name="test2", imap_server="", username="admin", password="secret")
+        rule = MailRule.objects.create(name="testrule", account=account, action=MailRule.ACTION_MOVE, action_parameter="spam")
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        # test that we still consume mail even if some mails throw errors.
+        self.assertEqual(self.async_task.call_count, 2)
+
+        # faulty mail still in inbox, untouched
+        self.assertEqual(len(self.bogus_mailbox.messages), 1)
+        self.assertEqual(self.bogus_mailbox.messages[0].from_, 'amazon@amazon.de')
+
 
     def test_filters(self):
 
