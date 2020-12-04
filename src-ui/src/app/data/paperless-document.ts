@@ -2,14 +2,15 @@ import { PaperlessCorrespondent } from './paperless-correspondent'
 import { ObjectWithId } from './object-with-id'
 import { PaperlessTag } from './paperless-tag'
 import { PaperlessDocumentType } from './paperless-document-type'
+import { Observable } from 'rxjs'
 
 export interface PaperlessDocument extends ObjectWithId {
 
-    correspondent_object?: PaperlessCorrespondent
+    correspondent$?: Observable<PaperlessCorrespondent>
 
     correspondent?: number
 
-    document_type_object?: PaperlessDocumentType
+    document_type$?: Observable<PaperlessDocumentType>
 
     document_type?: number
 
@@ -19,7 +20,7 @@ export interface PaperlessDocument extends ObjectWithId {
 
     file_type?: string
 
-    tags_objects?: PaperlessTag[]
+    tags$?: Observable<PaperlessTag[]>
 
     tags?: number[]
 

@@ -6,6 +6,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Results } from 'src/app/data/results';
 import { FilterRule } from 'src/app/data/filter-rule';
+import { map } from 'rxjs/operators';
+import { CorrespondentService } from './correspondent.service';
+import { DocumentTypeService } from './document-type.service';
+import { TagService } from './tag.service';
 
 
 export const DOCUMENT_SORT_FIELDS = [
@@ -27,7 +31,7 @@ export const SORT_DIRECTION_DESCENDING = "des"
 })
 export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private correspondentService: CorrespondentService, private documentTypeService: DocumentTypeService, private tagService: TagService) {
     super(http, 'documents')
   }
 
@@ -47,8 +51,26 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     }
   }
 
+  addObservablesToDocument(doc: PaperlessDocument) {
+    if (doc.correspondent) {
+      doc.correspondent$ = this.correspondentService.getCached(doc.correspondent)
+    }
+    if (doc.document_type) {
+      doc.document_type$ = this.documentTypeService.getCached(doc.document_type)
+    }
+    if (doc.tags) {
+      doc.tags$ = this.tagService.getCachedMany(doc.tags)
+    }
+    return doc
+  }
+
   list(page?: number, pageSize?: number, sortField?: string, sortDirection?: string, filterRules?: FilterRule[]): Observable<Results<PaperlessDocument>> {
-    return super.list(page, pageSize, sortField, sortDirection, this.filterRulesToQueryParams(filterRules))
+    return super.list(page, pageSize, sortField, sortDirection, this.filterRulesToQueryParams(filterRules)).pipe(
+      map(results => {
+        results.results.forEach(doc => this.addObservablesToDocument(doc))
+        return results
+      })
+    )
   }
 
   getPreviewUrl(id: number, original: boolean = false): string {
