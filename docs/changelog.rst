@@ -8,15 +8,14 @@ Changelog
 paperless-ng 0.9.5
 ##################
 
-Apart from the API, this finalizes the changes I wanted to get into paperless before 1.0. The next releases will
-focus on fixing bugs, minor changes to the UI, and possibly some changes to the API.
-
 * OCR
 
   * Paperless now uses `OCRmyPDF <https://github.com/jbarlow83/OCRmyPDF>`_ to perform OCR on documents.
+    It still uses tesseract under the hood, but the PDF parser of Paperless has changed considerably and
+    will behave different for some douments.
   * OCRmyPDF creates archived PDF/A documents with embedded text that can be selected in the front end.
   * Paperless stores archived versions of documents alongside with the originals. The originals can be
-    accessed on the document edit page, if available.
+    accessed on the document edit page. If available, a dropdown menu will appear next to the download button.
   * Many of the configuration options regarding OCR have changed. See :ref:`configuration-ocr` for details.
   * Paperless no longer guesses the language of your documents. It always uses the language that you
     specified with ``PAPERLESS_OCR_LANGUAGE``. Be sure to set this to the language the majority of your
@@ -34,8 +33,8 @@ focus on fixing bugs, minor changes to the UI, and possibly some changes to the 
 
   * The API now offers token authentication.
   * The endpoint for uploading documents now supports specifying custom titles, correspondents, tags and types.
-    This can be used by clients to override the default behavior of paperless.
-  * The document endpoint of API now serves document in this form:
+    This can be used by clients to override the default behavior of paperless. See :ref:`api-file_uploads`.
+  * The document endpoint of API now serves documents in this form:
 
     * correspondents, document types and tags are referenced by their ID in the fields ``correspondent``, ``document_type`` and ``tags``. The ``*_id`` versions are gone. These fields are read/write.
     * paperless does not serve nested tags, correspondents or types anymore.
@@ -43,13 +42,15 @@ focus on fixing bugs, minor changes to the UI, and possibly some changes to the 
 * Front end
 
   * Paperless does some basic caching of correspondents, tags and types and will only request them from the server when necessary or when entirely reloading the page.
-  * Document lists should be somewhat faster now, especially when lots of tags/correspondents where present.
+  * Document list fetching is about 10%-30% faster now, especially when lots of tags/correspondents are present.
   * Some minor improvements to the front end, such as document count in the document list, better highlighting of the current page, and improvements to the filter behavior.
 
 * Fixes:
 
   * A bug with the generation of filenames for files with unsupported types caused the exporter and
     document saving to crash.
+  * Mail handling no longer exits entirely when encountering errors. It will skip the account/rule/message on which the error occured.
+  * Assigning correspondents from mail sender names failed for very long names. Paperless no longer assigns correspondents in these cases.
 
 paperless-ng 0.9.4
 ##################
