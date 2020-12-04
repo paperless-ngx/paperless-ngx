@@ -83,25 +83,16 @@ class DocumentSerializer(serializers.ModelSerializer):
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
 
-    correspondent_object = TagSerializer(
-        read_only=True, source="correspondent")
-    document_type_object = TagSerializer(
-        read_only=True, source="document_type")
-    tags_objects = TagSerializer(many=True, read_only=True, source="tags")
-
     class Meta:
         model = Document
         depth = 1
         fields = (
             "id",
             "correspondent",
-            "correspondent_object",
             "document_type",
-            "document_type_object",
             "title",
             "content",
             "tags",
-            "tags_objects",
             "created",
             "modified",
             "added",
