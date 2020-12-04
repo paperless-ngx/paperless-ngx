@@ -349,10 +349,11 @@ This command creates PDF/A documents for your documents.
 
 .. code::
 
-    document_archiver --overwrite
+    document_archiver --overwrite --document <id>
 
 This command will only attempt to create archived documents when no archived
-document exists yet, unless ``--overwrite`` is specified.
+document exists yet, unless ``--overwrite`` is specified. If ``--document <id>``
+is specified, the archiver will only process that document.
 
 .. note::
 
@@ -362,6 +363,11 @@ document exists yet, unless ``--overwrite`` is specified.
     at any time, since this command will skip already archived versions the next time
     it is run.
 
+.. note::
+
+    Some documents will cause errors and cannot be converted into PDF/A documents,
+    such as encrypted PDF documents. The archiver will skip over these Documents
+    each time it sees them.
 
 .. _utilities-encyption:
 
