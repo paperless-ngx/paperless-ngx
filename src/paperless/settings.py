@@ -274,7 +274,7 @@ LOGGING = {
             "class": "documents.loggers.PaperlessHandler",
         },
         "console": {
-            "level": "WARNING",
+            "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         }
