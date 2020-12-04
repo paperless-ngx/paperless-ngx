@@ -1,15 +1,15 @@
 <div class="col p-2 h-100" style="width: 16rem;">
   <div class="card h-100 shadow-sm">
     <div class=" border-bottom doc-img pr-1" [ngStyle]="{'background-image': 'url(' + getThumbUrl() + ')'}">
-      <div class="row" *ngFor="let t of document.tags_objects">
+      <div class="row" *ngFor="let t of document.tags$ | async">
         <app-tag style="font-size: large;" [tag]="t" class="col text-right" (click)="clickTag.emit(t.id)" [clickable]="true" linkTitle="Filter by tag"></app-tag>
       </div>
     </div>
     
     <div class="card-body p-2">
       <p class="card-text">
-        <ng-container *ngIf="document.correspondent_object">
-          <a [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{document.correspondent_object.name}}</a>:
+        <ng-container *ngIf="document.correspondent">
+          <a [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
         {{document.title}}
       </p>
