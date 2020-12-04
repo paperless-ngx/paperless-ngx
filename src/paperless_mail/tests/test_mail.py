@@ -384,6 +384,35 @@ class TestMail(TestCase):
         self.assertEqual(len(self.bogus_mailbox.messages), 1)
         self.assertEqual(self.bogus_mailbox.messages[0].from_, 'amazon@amazon.de')
 
+    def test_error_create_correspondent(self):
+
+        account = MailAccount.objects.create(name="test2", imap_server="", username="admin", password="secret")
+        rule = MailRule.objects.create(
+            name="testrule", filter_from="amazon@amazon.de",
+            account=account, action=MailRule.ACTION_MOVE, action_parameter="spam",
+            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL)
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+
+        c = Correspondent.objects.get(name="amazon@amazon.de")
+        # should work
+        self.assertEquals(kwargs['override_correspondent_id'], c.id)
+
+        self.async_task.reset_mock()
+        self.reset_bogus_mailbox()
+
+        with mock.patch("paperless_mail.mail.Correspondent.objects.get_or_create") as m:
+            m.side_effect = DatabaseError()
+
+            self.mail_account_handler.handle_mail_account(account)
+
+        args, kwargs = self.async_task.call_args
+        self.async_task.assert_called_once()
+        self.assertEquals(kwargs['override_correspondent_id'], None)
+
 
     def test_filters(self):
 
