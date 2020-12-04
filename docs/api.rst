@@ -216,9 +216,7 @@ be instructed to consume the document from there.
 The endpoint supports the following optional form fields:
 
 *   ``title``: Specify a title that the consumer should use for the document.
-*   ``correspondent``: Specify a correspondent that the consumer should use for the document.
-    Case sensitive. If the specified correspondent does not exist, it will be created with this
-    name and default settings.
+*   ``correspondent``: Specify the ID of a correspondent that the consumer should use for the document.
 *   ``document_type``: Similar to correspondent.
 *   ``tags``: Similar to correspondent. Specify this multiple times to have multiple tags added
     to the document.

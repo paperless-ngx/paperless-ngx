@@ -8,6 +8,9 @@ Changelog
 paperless-ng 0.9.5
 ##################
 
+Apart from the API, this finalizes the changes I wanted to get into paperless before 1.0. The next releases will
+focus on fixing bugs, minor changes to the UI, and possibly some changes to the API.
+
 * OCR
 
   * Paperless now uses `OCRmyPDF <https://github.com/jbarlow83/OCRmyPDF>`_ to perform OCR on documents.
@@ -33,10 +36,15 @@ paperless-ng 0.9.5
   * The endpoint for uploading documents now supports specifying custom titles, correspondents, tags and types.
     This can be used by clients to override the default behavior of paperless.
   * The document endpoint of API now serves document in this form:
-    * correspondents, document types and tags are referenced by their ID in the fields ``correspondent``, ``document_type`` and ``tags``. The ``*_id`` versions are gone. These fields are read/write.
-    * in addition to that, ``*_object`` fields serve nested objects. Read only. Don't rely on these, they will probably get removed once I figure out how to better handle asynchronous data in the front end.
 
-* Some minor improvements to the front end, such as document count in the document list, better visibility of the current view, and improvements to the filter behavior.
+    * correspondents, document types and tags are referenced by their ID in the fields ``correspondent``, ``document_type`` and ``tags``. The ``*_id`` versions are gone. These fields are read/write.
+    * paperless does not serve nested tags, correspondents or types anymore.
+
+* Front end
+
+  * Paperless does some basic caching of correspondents, tags and types and will only request them from the server when necessary or when entirely reloading the page.
+  * Document lists should be somewhat faster now, especially when lots of tags/correspondents where present.
+  * Some minor improvements to the front end, such as document count in the document list, better highlighting of the current page, and improvements to the filter behavior.
 
 * Fixes:
 

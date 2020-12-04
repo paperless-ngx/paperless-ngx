@@ -126,22 +126,26 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
-    correspondent = serializers.CharField(
+    correspondent = serializers.PrimaryKeyRelatedField(
+        queryset=Correspondent.objects.all(),
         label="Correspondent",
+        allow_null=True,
         write_only=True,
         required=False,
     )
 
-    document_type = serializers.CharField(
+    document_type = serializers.PrimaryKeyRelatedField(
+        queryset=DocumentType.objects.all(),
         label="Document type",
+        allow_null=True,
         write_only=True,
         required=False,
     )
 
-    tags = serializers.ListField(
-        child=serializers.CharField(),
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all(),
         label="Tags",
-        source="tag",
         write_only=True,
         required=False,
     )
@@ -170,24 +174,19 @@ class PostDocumentSerializer(serializers.Serializer):
 
         correspondent = attrs.get('correspondent')
         if correspondent:
-            c, _ = Correspondent.objects.get_or_create(name=correspondent)
-            attrs['correspondent_id'] = c.id
+            attrs['correspondent_id'] = correspondent.id
         else:
             attrs['correspondent_id'] = None
 
         document_type = attrs.get('document_type')
         if document_type:
-            dt, _ = DocumentType.objects.get_or_create(name=document_type)
-            attrs['document_type_id'] = dt.id
+            attrs['document_type_id'] = document_type.id
         else:
             attrs['document_type_id'] = None
 
-        tags = attrs.get('tag')
+        tags = attrs.get('tags')
         if tags:
-            tag_ids = []
-            for tag in tags:
-                tag, _ = Tag.objects.get_or_create(name=tag)
-                tag_ids.append(tag.id)
+            tag_ids = [tag.id for tag in tags]
             attrs['tag_ids'] = tag_ids
         else:
             attrs['tag_ids'] = None

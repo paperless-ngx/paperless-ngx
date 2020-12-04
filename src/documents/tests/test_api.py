@@ -410,7 +410,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     def test_upload_with_correspondent(self, async_task):
         c = Correspondent.objects.create(name="test-corres")
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
-            response = self.client.post("/api/documents/post_document/", {"document": f, "correspondent": "test-corres"})
+            response = self.client.post("/api/documents/post_document/", {"document": f, "correspondent": c.id})
         self.assertEqual(response.status_code, 200)
 
         async_task.assert_called_once()
@@ -420,23 +420,18 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs['override_correspondent_id'], c.id)
 
     @mock.patch("documents.views.async_task")
-    def test_upload_with_new_correspondent(self, async_task):
+    def test_upload_with_invalid_correspondent(self, async_task):
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
-            response = self.client.post("/api/documents/post_document/", {"document": f, "correspondent": "test-corres2"})
-        self.assertEqual(response.status_code, 200)
+            response = self.client.post("/api/documents/post_document/", {"document": f, "correspondent": 3456})
+        self.assertEqual(response.status_code, 400)
 
-        async_task.assert_called_once()
-
-        args, kwargs = async_task.call_args
-
-        c = Correspondent.objects.get(name="test-corres2")
-        self.assertEqual(kwargs['override_correspondent_id'], c.id)
+        async_task.assert_not_called()
 
     @mock.patch("documents.views.async_task")
     def test_upload_with_document_type(self, async_task):
         dt = DocumentType.objects.create(name="invoice")
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
-            response = self.client.post("/api/documents/post_document/", {"document": f, "document_type": "invoice"})
+            response = self.client.post("/api/documents/post_document/", {"document": f, "document_type": dt.id})
         self.assertEqual(response.status_code, 200)
 
         async_task.assert_called_once()
@@ -446,30 +441,37 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs['override_document_type_id'], dt.id)
 
     @mock.patch("documents.views.async_task")
-    def test_upload_with_new_document_type(self, async_task):
+    def test_upload_with_invalid_document_type(self, async_task):
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
-            response = self.client.post("/api/documents/post_document/", {"document": f, "document_type": "invoice2"})
-        self.assertEqual(response.status_code, 200)
+            response = self.client.post("/api/documents/post_document/", {"document": f, "document_type": 34578})
+        self.assertEqual(response.status_code, 400)
 
-        async_task.assert_called_once()
-
-        args, kwargs = async_task.call_args
-
-        dt = DocumentType.objects.get(name="invoice2")
-        self.assertEqual(kwargs['override_document_type_id'], dt.id)
+        async_task.assert_not_called()
 
     @mock.patch("documents.views.async_task")
     def test_upload_with_tags(self, async_task):
         t1 = Tag.objects.create(name="tag1")
+        t2 = Tag.objects.create(name="tag2")
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
-                {"document": f, "tags": ["tag1", "tag2"]})
+                {"document": f, "tags": [t2.id, t1.id]})
         self.assertEqual(response.status_code, 200)
 
         async_task.assert_called_once()
 
         args, kwargs = async_task.call_args
 
-        t2 = Tag.objects.get(name="tag2")
         self.assertCountEqual(kwargs['override_tag_ids'], [t1.id, t2.id])
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_invalid_tags(self, async_task):
+        t1 = Tag.objects.create(name="tag1")
+        t2 = Tag.objects.create(name="tag2")
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "tags": [t2.id, t1.id, 734563]})
+        self.assertEqual(response.status_code, 400)
+
+        async_task.assert_not_called()
