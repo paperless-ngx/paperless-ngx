@@ -55,10 +55,12 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 ## Roadmap for versions beyond 1.0
 
+These are things that I want to add to paperless eventually. They are sorted by priority.
+
+- **Bulk editing**. Add/remove metadata from multiple documents at once.
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
-- **Bulk editing**. Add/remove metadata from multiple documents at once.
 - **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
 	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
