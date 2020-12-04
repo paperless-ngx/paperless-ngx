@@ -49,6 +49,7 @@ export class DocumentListComponent implements OnInit {
       if (params.has('id')) {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
         this.filterRules = this.list.filterRules
+        this.showFilter = false
       } else {
         this.list.savedView = null
         this.filterRules = this.list.filterRules
