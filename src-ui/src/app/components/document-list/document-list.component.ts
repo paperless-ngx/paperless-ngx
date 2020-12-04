@@ -49,13 +49,13 @@ export class DocumentListComponent implements OnInit {
       this.displayMode = localStorage.getItem('document-list:displayMode')
     }
     this.route.paramMap.subscribe(params => {
+      this.filterRules = this.list.filterRules
       if (params.has('id')) {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
       } else {
         this.list.savedView = null
         this.showFilter = this.filterRules.length > 0
       }
-      this.filterRules = this.list.filterRules
       this.list.clear()
       this.list.reload()
     })
