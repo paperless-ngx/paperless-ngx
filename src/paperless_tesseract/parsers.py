@@ -83,12 +83,26 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
     def parse(self, document_path, mime_type):
+        mode = settings.OCR_MODE
+
         text_original = get_text_from_pdf(document_path)
         has_text = text_original and len(text_original) > 50
 
-        if settings.OCR_MODE == "skip_noarchive" and has_text:
+        if mode == "skip_noarchive" and has_text:
+            self.log("debug",
+                     "Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
             return
+
+        if mode in ['skip', 'skip_noarchive'] and not has_text:
+            # upgrade to redo, since there appears to be no text in the
+            # document. This happens to some weird encrypted documents or
+            # documents with failed OCR attempts for which OCRmyPDF will
+            # still report that there actually is text in them.
+            self.log("debug",
+                     "No text was found in the document and skip is "
+                     "specified. Upgrading OCR mode to redo.")
+            mode = "redo"
 
         archive_path = os.path.join(self.tempdir, "archive.pdf")
 
@@ -108,12 +122,15 @@ class RasterisedDocumentParser(DocumentParser):
 
         # Mode selection.
 
-        if settings.OCR_MODE in ['skip', 'skip_noarchive']:
+        if mode in ['skip', 'skip_noarchive']:
             ocr_args['skip_text'] = True
-        elif settings.OCR_MODE == 'redo':
+        elif mode == 'redo':
             ocr_args['redo_ocr'] = True
-        elif settings.OCR_MODE == 'force':
+        elif mode == 'force':
             ocr_args['force_ocr'] = True
+        else:
+            raise ParseError(
+                f"Invalid ocr mode: {mode}")
 
         if self.is_image(mime_type):
             dpi = self.get_dpi(document_path)
@@ -153,6 +170,10 @@ class RasterisedDocumentParser(DocumentParser):
             self.text = get_text_from_pdf(archive_path)
 
         except (InputFileError, EncryptedPdfError) as e:
+
+            self.log("debug",
+                     f"Encountered an error: {e}. Trying to use text from "
+                     f"original.")
             # This happens with some PDFs when used with the redo_ocr option.
             # This is not the end of the world, we'll just use what we already
             # have in the document.
