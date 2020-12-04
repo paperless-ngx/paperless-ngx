@@ -23,7 +23,9 @@ from ...parsers import get_parser_class_for_mime_type
 logger = logging.getLogger(__name__)
 
 
-def handle_document(document):
+def handle_document(document_id):
+    document = Document.objects.get(id=document_id)
+
     mime_type = document.mime_type
 
     parser_class = get_parser_class_for_mime_type(mime_type)
@@ -98,9 +100,12 @@ class Command(Renderable, BaseCommand):
         else:
             documents = Document.objects.all()
 
-        documents_to_process = list(filter(
-            lambda d: overwrite or not d.archive_checksum,
-            documents
+        document_ids = list(map(
+            lambda doc: doc.id,
+            filter(
+                lambda d: overwrite or not d.archive_checksum,
+                documents
+            )
         ))
 
         logging.getLogger().handlers[0].level = logging.ERROR
@@ -108,7 +113,7 @@ class Command(Renderable, BaseCommand):
             list(tqdm.tqdm(
                 pool.imap_unordered(
                     handle_document,
-                    documents_to_process
+                    document_ids
                 ),
-                total=len(documents_to_process)
+                total=len(document_ids)
             ))
