@@ -50,7 +50,6 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 - Make the front end nice (except mobile).
 - Test coverage at 90%.
-- Store archived documents with an embedded OCR text layer, while keeping originals available. Making good progress in the `feature-ocrmypdf` branch.
 - Fix whatever bugs I and you find.
 
 ## Roadmap for versions beyond 1.0
