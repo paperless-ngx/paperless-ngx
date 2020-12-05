@@ -413,7 +413,14 @@ Migration to paperless-ng is then performed in a few simple steps:
     ``docker-compose.env`` to your needs.
     See `docker route`_ for details on which edits are advised.
 
-6.  In order to find your existing documents with the new search feature, you need
+6.  Since ``docker-compose`` would just use the the old paperless image, we need to
+    manually build a new image:
+
+    .. code:: shell-session
+
+        $ docker-compose build
+
+7.  In order to find your existing documents with the new search feature, you need
     to invoke a one-time operation that will create the search index:
 
     .. code:: shell-session
@@ -423,7 +430,7 @@ Migration to paperless-ng is then performed in a few simple steps:
     This will migrate your database and create the search index. After that,
     paperless will take care of maintaining the index by itself.
 
-7.  Start paperless-ng.
+8.  Start paperless-ng.
 
     .. code:: bash
 
@@ -431,11 +438,11 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     This will run paperless in the background and automatically start it on system boot.
 
-8.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
+9.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
     redirect is still in place and prevents access to the new UI. Clear
     browsing cache in order to fix this.
 
-9.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
+10.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
 
 
 .. _setup-sqlite_to_psql:
