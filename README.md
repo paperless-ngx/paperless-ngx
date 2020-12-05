@@ -25,23 +25,26 @@ Here's what you get:
 
 ![Dashboard](https://github.com/jonaswinkler/paperless-ng/raw/master/docs/_static/screenshots/dashboard.png)
 
-# Why Paperless-ng?
+# Features
 
-I wanted to make big changes to the project that will impact the way it is used by its users greatly. Among the users who currently use paperless in production there are probably many that don't want these changes right away. I also wanted to have more control over what goes into the code and what does not. Therefore, paperless-ng was created. NG stands for both Angular (the framework used for the Frontend) and next-gen. Publishing this project under a different name also avoids confusion between paperless and paperless-ng.
-
-The gist of the changes is the following:
-
-* New front end. This will eventually be mobile friendly as well.
-* New full text search.
-* New email processing.
+* Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
+* Single page application front end. Should be pretty snappy. Will be mobile friendly in the future.
+	* Includes a dashboard that shows basic statistics and has document upload.
+	* Filtering by tags, correspondents, types, and more.
+	* Customizable views can be saved and displayed on the dashboard.
+	* Full text search with auto completion, scored results and query highlighting allows you to quickly find what you need.
+* Email processing: Paperless adds documents from your email accounts.
+	* Configure multiple accounts and filters for each account.
+	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
 * Machine learning powered document matching.
-* A task processor that processes documents in parallel and also tells you when something goes wrong.
-* Code cleanup in many, MANY areas. Some of the code was just overly complicated.
+	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
+* A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
+* Code cleanup in many, MANY areas. Some of the code from OG paperless was just overly complicated.
 * More tests, more stability.
 
 If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
 
-For a complete list of changes, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
+For a complete list of changes from paperless, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
 
 # Roadmap for 1.0
 
@@ -52,9 +55,13 @@ For a complete list of changes, check out the [changelog](https://paperless-ng.r
 
 ## Roadmap for versions beyond 1.0
 
+These are things that I want to add to paperless eventually. They are sorted by priority.
+
+- **Bulk editing**. Add/remove metadata from multiple documents at once.
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
+- **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
 	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
 	- Notifications when a document was added with buttons to open the new document right away.
@@ -86,7 +93,7 @@ Please open an issue and start a discussion about it!
 
 ## Feel like helping out?
 
-There's still lots of things to be done, just have a look at that issue log. If you feel like conctributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome.
+There's still lots of things to be done, just have a look at that issue log. If you feel like contributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome. The documentation has some basic information on how to get started.
 
 If you want to implement something big: Please start a discussion about that in the issues! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested. See the roadmap above.
 
@@ -94,7 +101,7 @@ If you want to implement something big: Please start a discussion about that in 
 
 Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
 
-* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless.
+* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless. We're working on making this compatible.
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
 * [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
