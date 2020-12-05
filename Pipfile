@@ -37,7 +37,7 @@ scikit-learn="~=0.23.2"
 whitenoise = "~=5.2.0"
 watchdog = "*"
 whoosh="~=2.7.4"
-inotifyrecursive = ">=0.3.4"
+inotifyrecursive = "~=0.3.4"
 ocrmypdf = "*"
 tqdm = "*"
 
