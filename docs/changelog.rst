@@ -8,6 +8,9 @@ Changelog
 paperless-ng 0.9.5
 ##################
 
+This release concludes the big changes I wanted to get rolled into paperless. The next releases before 1.0 will
+focus on fixing issues, primarily.
+
 * OCR
 
   * Paperless now uses `OCRmyPDF <https://github.com/jbarlow83/OCRmyPDF>`_ to perform OCR on documents.
