@@ -109,6 +109,7 @@ Result list object returned by the endpoint:
         "count": 1,
         "page": 1,
         "page_count": 1,
+        "corrected_query": "",
         "results": [
             
         ]
@@ -119,6 +120,8 @@ Result list object returned by the endpoint:
     the page you requested, if you requested a page that is behind
     the last page. In that case, the last page is returned.
 *   ``page_count``: The total number of pages.
+*   ``corrected_query``: Corrected version of the query string. Can be null.
+    If not null, can be used verbatim to start a new query.
 *   ``results``: A list of result objects on the current page.
 
 Result object:
