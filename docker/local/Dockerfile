@@ -21,6 +21,7 @@ RUN apt-get update \
 		libxml2 \
 		optipng \
 		pngquant \
+		qpdf \
 		sudo \
 		tesseract-ocr \
 		tesseract-ocr-eng \
