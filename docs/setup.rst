@@ -231,6 +231,7 @@ writing. Windows is not and will never be supported.
     *   ``unpaper``
     *   ``ghostscript``
     *   ``icc-profiles-free``
+    *   ``qpdf``
     *   ``liblept5``
     *   ``libxml2``
     *   ``pngquant``
