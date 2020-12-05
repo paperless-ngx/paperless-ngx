@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "bb0b90c2ee89521c6dcd24375b67b52be5a4a786297923519a5abaafe0fe5d0e"
+            "sha256": "b10db53eb22d917723aa6107ff0970dc4e2aa886ee03d3ae08a994a856d57986"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -365,11 +365,11 @@
         },
         "ocrmypdf": {
             "hashes": [
-                "sha256:20722d89d2f0deeb5b3ffa8622ead59d54af46d44f21848ec0f15ef79ce1a4a3",
-                "sha256:c592e1bb37abafd24f067043bbf98d25405521cbe1e992de30d8b870dbe86928"
+                "sha256:91e7394172cedb3be801a229dbd3d308fb5ae80cbc3a77879fa7954beea407b1",
+                "sha256:e550b8e884150accab7ea41f4a576b5844594cb5cbd6ed514fbf1206720343ad"
             ],
             "index": "pypi",
-            "version": "==11.3.3"
+            "version": "==11.3.4"
         },
         "pathtools": {
             "hashes": [
@@ -763,11 +763,11 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:5c0d04e06ccc0da1bd3fa5ae4550effcce42fcad947b4a6cafa77bdc9b09ff22",
-                "sha256:9e7b8ab0ecbdbf0595adadd5f0ebbb9e69010e0bd48bbb0c15e550bf2a5292df"
+                "sha256:38b658a3e4ecf9b4f6f8ff75ca16221ae3378b2e175d846b6b33ea3a20852cf5",
+                "sha256:d4f413aecb61c9779888c64ddf0c62910ad56dcbe857d8922bb505d4dbff0df1"
             ],
             "index": "pypi",
-            "version": "==4.54.0"
+            "version": "==4.54.1"
         },
         "tzlocal": {
             "hashes": [
@@ -961,11 +961,11 @@
         },
         "faker": {
             "hashes": [
-                "sha256:2ba20a4438429cb08d729175d7bb0435ef3c2c4cedc7b1ceb703ee6da8dad906",
-                "sha256:6279746aed175a693108238e6d1ab8d7e26d0ec7ff8474f61025b9fdaae15d65"
+                "sha256:7bca5b074299ac6532be2f72979e6793f1a2403ca8105cb4cf0b385a964469c4",
+                "sha256:fb21a76064847561033d8cab1cfd11af436ddf2c6fe72eb51b3cda51dff86bdc"
             ],
             "markers": "python_version >= '3.5'",
-            "version": "==4.18.0"
+            "version": "==5.0.0"
         },
         "filelock": {
             "hashes": [
