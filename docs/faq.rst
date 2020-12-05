@@ -86,3 +86,15 @@ the documentation has instructions for bare metal installs. I'm running
 paperless on an i3 processor from 2015 or so. This is also what I use to test
 new releases with. Apart from that, I also have a Raspberry Pi, which I
 occasionally build the image on and see if it works.
+
+**Q:** *How do I proxy this with NGINX?*
+
+.. code::
+
+    location / {
+        proxy_pass http://localhost:8000/
+    }
+
+And that's about it. Paperless serves everything, including static files by itself
+when running the docker image. If you want to do anything fancy, you have to
+install paperless bare metal.
