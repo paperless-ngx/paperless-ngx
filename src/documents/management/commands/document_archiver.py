@@ -5,9 +5,9 @@ import logging
 import os
 import shutil
 import uuid
-from time import sleep
 
 import tqdm
+from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -108,12 +108,21 @@ class Command(Renderable, BaseCommand):
             )
         ))
 
-        logging.getLogger().handlers[0].level = logging.ERROR
-        with multiprocessing.Pool(processes=settings.TASK_WORKERS) as pool:
-            list(tqdm.tqdm(
-                pool.imap_unordered(
-                    handle_document,
-                    document_ids
-                ),
-                total=len(document_ids)
-            ))
+        # Note to future self: this prevents django from reusing database
+        # conncetions between processes, which is bad and does not work
+        # with postgres.
+        db.connections.close_all()
+
+        try:
+
+            logging.getLogger().handlers[0].level = logging.ERROR
+            with multiprocessing.Pool(processes=settings.TASK_WORKERS) as pool:
+                list(tqdm.tqdm(
+                    pool.imap_unordered(
+                        handle_document,
+                        document_ids
+                    ),
+                    total=len(document_ids)
+                ))
+        except KeyboardInterrupt:
+            print("Aborting...")
