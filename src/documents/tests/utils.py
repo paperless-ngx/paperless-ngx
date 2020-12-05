@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 from collections import namedtuple
+from contextlib import contextmanager
 
 from django.test import override_settings
 
@@ -24,7 +25,7 @@ def setup_directories():
     os.makedirs(dirs.thumbnail_dir, exist_ok=True)
     os.makedirs(dirs.archive_dir, exist_ok=True)
 
-    override_settings(
+    dirs.settings_override = override_settings(
         DATA_DIR=dirs.data_dir,
         SCRATCH_DIR=dirs.scratch_dir,
         MEDIA_ROOT=dirs.media_dir,
@@ -35,7 +36,8 @@ def setup_directories():
         INDEX_DIR=dirs.index_dir,
         MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle")
 
-    ).enable()
+    )
+    dirs.settings_override.enable()
 
     return dirs
 
@@ -45,6 +47,18 @@ def remove_dirs(dirs):
     shutil.rmtree(dirs.data_dir, ignore_errors=True)
     shutil.rmtree(dirs.scratch_dir, ignore_errors=True)
     shutil.rmtree(dirs.consumption_dir, ignore_errors=True)
+    dirs.settings_override.disable()
+
+
+@contextmanager
+def paperless_environment():
+    dirs = None
+    try:
+        dirs = setup_directories()
+        yield dirs
+    finally:
+        if dirs:
+            remove_dirs(dirs)
 
 
 class DirectoriesMixin:
