@@ -235,12 +235,11 @@ class PostDocumentView(APIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        document = serializer.validated_data['document']
-        document_data = serializer.validated_data['document_data']
-        correspondent_id = serializer.validated_data['correspondent_id']
-        document_type_id = serializer.validated_data['document_type_id']
-        tag_ids = serializer.validated_data['tag_ids']
-        title = serializer.validated_data['title']
+        doc_name, doc_data = serializer.validated_data.get('document')
+        correspondent_id = serializer.validated_data.get('correspondent')
+        document_type_id = serializer.validated_data.get('document_type')
+        tag_ids = serializer.validated_data.get('tags')
+        title = serializer.validated_data.get('title')
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -249,17 +248,17 @@ class PostDocumentView(APIView):
         with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
                                          dir=settings.SCRATCH_DIR,
                                          delete=False) as f:
-            f.write(document_data)
+            f.write(doc_data)
             os.utime(f.name, times=(t, t))
 
             async_task("documents.tasks.consume_file",
                        f.name,
-                       override_filename=document.name,
+                       override_filename=doc_name,
                        override_title=title,
                        override_correspondent_id=correspondent_id,
                        override_document_type_id=document_type_id,
                        override_tag_ids=tag_ids,
-                       task_name=os.path.basename(document.name)[:100])
+                       task_name=os.path.basename(doc_name)[:100])
         return Response("OK")
 
 
