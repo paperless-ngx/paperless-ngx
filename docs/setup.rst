@@ -220,15 +220,24 @@ writing. Windows is not and will never be supported.
     *   ``python3-dev``
 
     *   ``imagemagick`` >= 6 for PDF conversion
-    *   ``unpaper`` for cleaning documents before OCR
-    *   ``ghostscript``
     *   ``optipng`` for optimising thumbnails
-    *   ``tesseract-ocr`` >= 4.0.0 for OCR
-    *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
     *   ``gnupg`` for handling encrypted documents
     *   ``libpoppler-cpp-dev`` for PDF to text conversion
     *   ``libmagic-dev`` for mime type detection
     *   ``libpq-dev`` for PostgreSQL
+
+    These dependencies are required for OCRmyPDF, which is used for text recognition.
+
+    *   ``unpaper``
+    *   ``ghostscript``
+    *   ``icc-profiles-free``
+    *   ``qpdf``
+    *   ``liblept5``
+    *   ``libxml2``
+    *   ``pngquant``
+    *   ``zlib1g``
+    *   ``tesseract-ocr`` >= 4.0.0 for OCR
+    *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
 
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
     for installing some of the python dependencies. You can remove that
@@ -404,7 +413,14 @@ Migration to paperless-ng is then performed in a few simple steps:
     ``docker-compose.env`` to your needs.
     See `docker route`_ for details on which edits are advised.
 
-6.  In order to find your existing documents with the new search feature, you need
+6.  Since ``docker-compose`` would just use the the old paperless image, we need to
+    manually build a new image:
+
+    .. code:: shell-session
+
+        $ docker-compose build
+
+7.  In order to find your existing documents with the new search feature, you need
     to invoke a one-time operation that will create the search index:
 
     .. code:: shell-session
@@ -414,7 +430,7 @@ Migration to paperless-ng is then performed in a few simple steps:
     This will migrate your database and create the search index. After that,
     paperless will take care of maintaining the index by itself.
 
-7.  Start paperless-ng.
+8.  Start paperless-ng.
 
     .. code:: bash
 
@@ -422,11 +438,11 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     This will run paperless in the background and automatically start it on system boot.
 
-8.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
+9.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
     redirect is still in place and prevents access to the new UI. Clear
     browsing cache in order to fix this.
 
-9.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
+10.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
 
 
 .. _setup-sqlite_to_psql:
@@ -545,12 +561,10 @@ configuring some options in paperless can help improve performance immensely:
     sluggish response times during consumption, so you might want to lower these
     settings (example: 2 workers and 1 thread to always have some computing power
     left for other tasks).
-*   Keep ``PAPERLESS_OCR_ALWAYS`` at its default value 'false' and consider OCR'ing
+*   Keep ``PAPERLESS_OCR_MODE`` at its default value ``skip`` and consider OCR'ing
     your documents before feeding them into paperless. Some scanners are able to
-    do this!
-*   Lower ``PAPERLESS_CONVERT_DENSITY`` from its default value 300 to 200. This
-    will still result in rather accurate OCR, but will decrease consumption time
-    by quite a bit.
+    do this! You might want to even specify ``skip_noarchive`` to skip archive
+    file generation for already ocr'ed documents entirely.
 *   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
     times. Thumbnails will be about 20% larger.
 

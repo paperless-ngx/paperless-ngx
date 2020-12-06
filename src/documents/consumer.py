@@ -6,13 +6,15 @@ import os
 import magic
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
-from .file_handling import generate_filename, create_source_path_directory
+from .file_handling import create_source_path_directory
 from .loggers import LoggingMixin
 from .models import Document, FileInfo, Correspondent, DocumentType, Tag
-from .parsers import ParseError, get_parser_class_for_mime_type
+from .parsers import ParseError, get_parser_class_for_mime_type, \
+    get_supported_file_extensions, parse_date
 from .signals import (
     document_consumption_finished,
     document_consumption_started
@@ -42,7 +44,7 @@ class Consumer(LoggingMixin):
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        if Document.objects.filter(checksum=checksum).exists():
+        if Document.objects.filter(Q(checksum=checksum) | Q(archive_checksum=checksum)).exists():  # NOQA: E501
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             raise ConsumerError(
@@ -53,6 +55,7 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
+        os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
     def try_consume_file(self,
                          path,
@@ -107,7 +110,7 @@ class Consumer(LoggingMixin):
 
         # This doesn't parse the document yet, but gives us a parser.
 
-        document_parser = parser_class(self.path, self.logging_group)
+        document_parser = parser_class(self.logging_group)
 
         # However, this already created working directories which we have to
         # clean up.
@@ -115,13 +118,24 @@ class Consumer(LoggingMixin):
         # Parse the document. This may take some time.
 
         try:
-            self.log("debug", f"Generating thumbnail for {self.filename}...")
-            thumbnail = document_parser.get_optimised_thumbnail()
             self.log("debug", "Parsing {}...".format(self.filename))
+            document_parser.parse(self.path, mime_type)
+
+            self.log("debug", f"Generating thumbnail for {self.filename}...")
+            thumbnail = document_parser.get_optimised_thumbnail(
+                self.path, mime_type)
+
             text = document_parser.get_text()
             date = document_parser.get_date()
+            if not date:
+                date = parse_date(self.filename, text)
+            archive_path = document_parser.get_archive_path()
+
         except ParseError as e:
             document_parser.cleanup()
+            self.log(
+                "error",
+                f"Error while consuming document {self.filename}: {e}")
             raise ConsumerError(e)
 
         # Prepare the document classifier.
@@ -163,9 +177,24 @@ class Consumer(LoggingMixin):
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
 
+                # TODO: not required, since this is done by the file handling
+                #  logic
                 create_source_path_directory(document.source_path)
-                self._write(document, self.path, document.source_path)
-                self._write(document, thumbnail, document.thumbnail_path)
+
+                self._write(document.storage_type,
+                            self.path, document.source_path)
+
+                self._write(document.storage_type,
+                            thumbnail, document.thumbnail_path)
+
+                if archive_path and os.path.isfile(archive_path):
+                    self._write(document.storage_type,
+                                archive_path, document.archive_path)
+
+                    with open(archive_path, 'rb') as f:
+                        document.archive_checksum = hashlib.md5(
+                            f.read()).hexdigest()
+                        document.save()
 
                 # Afte performing all database operations and moving files
                 # into place, tell paperless where the file is.
@@ -178,6 +207,11 @@ class Consumer(LoggingMixin):
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
         except Exception as e:
+            self.log(
+                "error",
+                f"The following error occured while consuming "
+                f"{self.filename}: {e}"
+            )
             raise ConsumerError(e)
         finally:
             document_parser.cleanup()
@@ -242,7 +276,7 @@ class Consumer(LoggingMixin):
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
 
-    def _write(self, document, source, target):
+    def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file:
             with open(target, "wb") as write_file:
                 write_file.write(read_file.read())

@@ -1,31 +1,69 @@
 import logging
 import os
+from pathlib import Path
 from time import sleep
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.text import slugify
 from django_q.tasks import async_task
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
+from documents.models import Tag
+from documents.parsers import is_file_ext_supported
+
 try:
-    from inotify_simple import INotify, flags
+    from inotifyrecursive import INotify, flags
 except ImportError:
     INotify = flags = None
 
 logger = logging.getLogger(__name__)
 
 
-def _consume(file):
-    try:
-        if os.path.isfile(file):
-            async_task("documents.tasks.consume_file",
-                       file,
-                       task_name=os.path.basename(file)[:100])
-        else:
-            logger.debug(
-                f"Not consuming file {file}: File has moved.")
+def _tags_from_path(filepath):
+    """Walk up the directory tree from filepath to CONSUMPTION_DIr
+       and get or create Tag IDs for every directory.
+    """
+    tag_ids = set()
+    path_parts = Path(filepath).relative_to(
+                settings.CONSUMPTION_DIR).parent.parts
+    for part in path_parts:
+        tag_ids.add(Tag.objects.get_or_create(
+            slug=slugify(part),
+            defaults={"name": part},
+        )[0].pk)
 
+    return tag_ids
+
+
+def _consume(filepath):
+    if os.path.isdir(filepath):
+        return
+
+    if not os.path.isfile(filepath):
+        logger.debug(
+            f"Not consuming file {filepath}: File has moved.")
+        return
+
+    if not is_file_ext_supported(os.path.splitext(filepath)[1]):
+        logger.debug(
+            f"Not consuming file {filepath}: Unknown file extension.")
+        return
+
+    tag_ids = None
+    try:
+        if settings.CONSUMER_SUBDIRS_AS_TAGS:
+            tag_ids = _tags_from_path(filepath)
+    except Exception as e:
+        logger.error(
+            "Error creating tags from path: {}".format(e))
+
+    try:
+        async_task("documents.tasks.consume_file",
+                   filepath,
+                   override_tag_ids=tag_ids if tag_ids else None,
+                   task_name=os.path.basename(filepath)[:100])
     except Exception as e:
         # Catch all so that the consumer won't crash.
         # This is also what the test case is listening for to check for
@@ -94,6 +132,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         directory = options["directory"]
+        recursive = settings.CONSUMER_RECURSIVE
 
         if not directory:
             raise CommandError(
@@ -104,24 +143,30 @@ class Command(BaseCommand):
             raise CommandError(
                 f"Consumption directory {directory} does not exist")
 
-        for entry in os.scandir(directory):
-            _consume(entry.path)
+        if recursive:
+            for dirpath, _, filenames in os.walk(directory):
+                for filename in filenames:
+                    filepath = os.path.join(dirpath, filename)
+                    _consume(filepath)
+        else:
+            for entry in os.scandir(directory):
+                _consume(entry.path)
 
         if options["oneshot"]:
             return
 
         if settings.CONSUMER_POLLING == 0 and INotify:
-            self.handle_inotify(directory)
+            self.handle_inotify(directory, recursive)
         else:
-            self.handle_polling(directory)
+            self.handle_polling(directory, recursive)
 
         logger.debug("Consumer exiting.")
 
-    def handle_polling(self, directory):
+    def handle_polling(self, directory, recursive):
         logging.getLogger(__name__).info(
             f"Polling directory for changes: {directory}")
         self.observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
-        self.observer.schedule(Handler(), directory, recursive=False)
+        self.observer.schedule(Handler(), directory, recursive=recursive)
         self.observer.start()
         try:
             while self.observer.is_alive():
@@ -132,18 +177,26 @@ class Command(BaseCommand):
             self.observer.stop()
         self.observer.join()
 
-    def handle_inotify(self, directory):
+    def handle_inotify(self, directory, recursive):
         logging.getLogger(__name__).info(
             f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()
-        descriptor = inotify.add_watch(
-            directory, flags.CLOSE_WRITE | flags.MOVED_TO)
+        inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO
+        if recursive:
+            descriptor = inotify.add_watch_recursive(directory, inotify_flags)
+        else:
+            descriptor = inotify.add_watch(directory, inotify_flags)
+
         try:
             while not self.stop_flag:
-                for event in inotify.read(timeout=1000, read_delay=1000):
-                    file = os.path.join(directory, event.name)
-                    _consume(file)
+                for event in inotify.read(timeout=1000):
+                    if recursive:
+                        path = inotify.get_path(event.wd)
+                    else:
+                        path = directory
+                    filepath = os.path.join(path, event.name)
+                    _consume(filepath)
         except KeyboardInterrupt:
             pass
 

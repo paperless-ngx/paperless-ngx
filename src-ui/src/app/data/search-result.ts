@@ -21,6 +21,8 @@ export interface SearchResult {
   page?: number
   page_count?: number
 
+  corrected_query?: string
+
   results?: SearchHit[]
 
 

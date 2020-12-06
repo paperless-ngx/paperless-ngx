@@ -10,10 +10,13 @@ def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
 
 
-def delete_empty_directories(directory):
+def delete_empty_directories(directory, root):
+    if not os.path.isdir(directory):
+        return
+
     # Go up in the directory hierarchy and try to delete all directories
     directory = os.path.normpath(directory)
-    root = os.path.normpath(settings.ORIGINALS_DIR)
+    root = os.path.normpath(root)
 
     if not directory.startswith(root + os.path.sep):
         # don't do anything outside our originals folder.
@@ -101,3 +104,8 @@ def generate_filename(doc):
         filename += ".gpg"
 
     return filename
+
+
+def archive_name_from_filename(filename):
+
+    return os.path.splitext(filename)[0] + ".pdf"
