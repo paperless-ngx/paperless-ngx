@@ -1,8 +1,12 @@
 <div class="card mb-3 shadow">
   <div class="card-header">
-    <h5 class="card-title mb-0">{{title}}</h5>
+    <div class="d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">{{title}}</h5>
+      <ng-content select ="[header-buttons]"></ng-content>
+    </div>
+    
   </div>
   <div class="card-body text-dark">
-    <ng-content></ng-content>
+    <ng-content select ="[content]"></ng-content>
   </div>
 </div>

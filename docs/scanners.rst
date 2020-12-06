@@ -8,7 +8,7 @@ Scanner recommendations
 As Paperless operates by watching a folder for new files, doesn't care what
 scanner you use, but sometimes finding a scanner that will write to an FTP,
 NFS, or SMB server can be difficult.  This page is here to help you find one
-that works right for you based on recommentations from other Paperless users.
+that works right for you based on recommendations from other Paperless users.
 
 +---------+----------------+-----+-----+-----+----------------+
 | Brand   | Model          | Supports        | Recommended By |

@@ -1,16 +1,20 @@
 # coding=utf-8
-
+import datetime
 import logging
-import mimetypes
 import os
 import re
 from collections import OrderedDict
+
+import pathvalidate
 
 import dateutil.parser
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
+
+from documents.file_handling import archive_name_from_filename
+from documents.parsers import get_default_file_extension
 
 
 class MatchingModel(models.Model):
@@ -157,9 +161,15 @@ class Document(models.Model):
         max_length=32,
         editable=False,
         unique=True,
-        help_text="The checksum of the original document (before it was "
-                  "encrypted).  We use this to prevent duplicate document "
-                  "imports."
+        help_text="The checksum of the original document."
+    )
+
+    archive_checksum = models.CharField(
+        max_length=32,
+        editable=False,
+        blank=True,
+        null=True,
+        help_text="The checksum of the archived document."
     )
 
     created = models.DateTimeField(
@@ -198,13 +208,11 @@ class Document(models.Model):
         ordering = ("correspondent", "title")
 
     def __str__(self):
-        created = self.created.strftime("%Y%m%d%H%M%S")
+        created = datetime.date.isoformat(self.created)
         if self.correspondent and self.title:
-            return "{}: {} - {}".format(
-                created, self.correspondent, self.title)
-        if self.correspondent or self.title:
-            return "{}: {}".format(created, self.correspondent or self.title)
-        return str(created)
+            return f"{created} {self.correspondent} {self.title}"
+        else:
+            return f"{created} {self.title}"
 
     @property
     def source_path(self):
@@ -225,12 +233,40 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
-    def file_name(self):
-        return slugify(str(self)) + self.file_type
+    def archive_path(self):
+        if self.filename:
+            fname = archive_name_from_filename(self.filename)
+        else:
+            fname = "{:07}.pdf".format(self.pk)
+
+        return os.path.join(
+            settings.ARCHIVE_DIR,
+            fname
+        )
+
+    @property
+    def archive_file(self):
+        return open(self.archive_path, "rb")
+
+    def get_public_filename(self, archive=False, counter=0, suffix=None):
+        result = str(self)
+
+        if counter:
+            result += f"_{counter:02}"
+
+        if suffix:
+            result += suffix
+
+        if archive:
+            result += ".pdf"
+        else:
+            result += self.file_type
+
+        return pathvalidate.sanitize_filename(result, replacement_text="-")
 
     @property
     def file_type(self):
-        return mimetypes.guess_extension(str(self.mime_type))
+        return get_default_file_extension(self.mime_type)
 
     @property
     def thumbnail_path(self):

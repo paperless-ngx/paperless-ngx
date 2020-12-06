@@ -1,7 +1,9 @@
+import datetime
 import logging
 import os
 from collections import defaultdict
 
+import pathvalidate
 from django.conf import settings
 from django.template.defaultfilters import slugify
 
@@ -10,10 +12,13 @@ def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
 
 
-def delete_empty_directories(directory):
+def delete_empty_directories(directory, root):
+    if not os.path.isdir(directory):
+        return
+
     # Go up in the directory hierarchy and try to delete all directories
     directory = os.path.normpath(directory)
-    root = os.path.normpath(settings.ORIGINALS_DIR)
+    root = os.path.normpath(root)
 
     if not directory.startswith(root + os.path.sep):
         # don't do anything outside our originals folder.
@@ -72,14 +77,31 @@ def generate_filename(doc):
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
             tags = defaultdict(lambda: slugify(None),
                                many_to_dictionary(doc.tags))
+
+            if doc.correspondent:
+                correspondent = pathvalidate.sanitize_filename(
+                    doc.correspondent.name, replacement_text="-"
+                )
+            else:
+                correspondent = "none"
+
+            if doc.document_type:
+                document_type = pathvalidate.sanitize_filename(
+                    doc.document_type.name, replacement_text="-"
+                )
+            else:
+                document_type = "none"
+
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
-                correspondent=slugify(doc.correspondent),
-                title=slugify(doc.title),
-                created=slugify(doc.created),
+                title=pathvalidate.sanitize_filename(
+                    doc.title, replacement_text="-"),
+                correspondent=correspondent,
+                document_type=document_type,
+                created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
                 created_month=doc.created.month if doc.created else "none",
                 created_day=doc.created.day if doc.created else "none",
-                added=slugify(doc.added),
+                added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
                 added_month=doc.added.month if doc.added else "none",
                 added_day=doc.added.day if doc.added else "none",
@@ -101,3 +123,8 @@ def generate_filename(doc):
         filename += ".gpg"
 
     return filename
+
+
+def archive_name_from_filename(filename):
+
+    return os.path.splitext(filename)[0] + ".pdf"

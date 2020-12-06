@@ -85,7 +85,7 @@ quoted, or triple-quoted string will do:
     problematic_string = 'This is a "string" with "quotes" in it'
 
 In HTML templates, please use double-quotes for tag attributes, and single
-quotes for arguments passed to Django tempalte tags:
+quotes for arguments passed to Django template tags:
 
 .. code:: html
 

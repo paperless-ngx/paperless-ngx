@@ -38,6 +38,50 @@ individual documents:
     are in place. However, if you use these old URLs to access documents, you
     should update your app or script to use the new URLs.
 
+.. note::
+
+    The document endpoint provides tags, document types and correspondents as
+    ids in their corresponding fields. These are writeable. Paperless also
+    offers read-only objects for assigned tags, types and correspondents,
+    however, these might be removed in the future. As for now, the front end
+    requires them.
+
+Authorization
+#############
+
+The REST api provides three different forms of authentication.
+
+1.  Basic authentication
+
+    Authorize by providing a HTTP header in the form
+    
+    .. code::
+
+        Authorization: Basic <credentials>
+    
+    where ``credentials`` is a base64-encoded string of ``<username>:<password>``
+
+2.  Session authentication
+
+    When you're logged into paperless in your browser, you're automatically
+    logged into the API as well and don't need to provide any authorization
+    headers.
+
+3.  Token authentication
+
+    Paperless also offers an endpoint to acquire authentication tokens.
+
+    POST a username and password as a form or json string to ``/api/token/``
+    and paperless will respond with a token, if the login data is correct.
+    This token can be used to authenticate other requests with the
+    following HTTP header:
+
+    .. code::
+
+        Authorization: Token <token>
+    
+    Tokens can be managed and revoked in the paperless admin.
+
 Searching for documents
 #######################
 
@@ -65,6 +109,7 @@ Result list object returned by the endpoint:
         "count": 1,
         "page": 1,
         "page_count": 1,
+        "corrected_query": "",
         "results": [
             
         ]
@@ -75,6 +120,8 @@ Result list object returned by the endpoint:
     the page you requested, if you requested a page that is behind
     the last page. In that case, the last page is returned.
 *   ``page_count``: The total number of pages.
+*   ``corrected_query``: Corrected version of the query string. Can be null.
+    If not null, can be used verbatim to start a new query.
 *   ``results``: A list of result objects on the current page.
 
 Result object:
@@ -94,7 +141,7 @@ Result object:
     }
 
 *   ``id``: the primary key of the found document
-*   ``highlights``: an object containing parseable highlights for the result.
+*   ``highlights``: an object containing parsable highlights for the result.
     See below.
 *   ``score``: The score assigned to the document. A higher score indicates a
     better match with the query. Search results are sorted descending by score.
@@ -166,8 +213,17 @@ The API provides a special endpoint for file uploads:
 
 POST a multipart form to this endpoint, where the form field ``document`` contains
 the document that you want to upload to paperless. The filename is sanitized and
-then used to store the document in the consumption folder, where the consumer will
-detect the document and process it as any other document.
+then used to store the document in a temporary directory, and the consumer will
+be instructed to consume the document from there.
 
-The endpoint will immediately return "OK." if the document was stored in the
-consumption directory.
+The endpoint supports the following optional form fields:
+
+*   ``title``: Specify a title that the consumer should use for the document.
+*   ``correspondent``: Specify the ID of a correspondent that the consumer should use for the document.
+*   ``document_type``: Similar to correspondent.
+*   ``tags``: Similar to correspondent. Specify this multiple times to have multiple tags added
+    to the document.
+
+The endpoint will immediately return "OK" if the document consumption process
+was started successfully. No additional status information about the consumption
+process itself is available, since that happens in a different process.

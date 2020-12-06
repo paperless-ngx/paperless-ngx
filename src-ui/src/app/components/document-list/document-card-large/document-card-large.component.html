@@ -7,11 +7,18 @@
       <div class="card-body">
 
         <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title">{{document.correspondent ? document.correspondent.name + ': ' : ''}}{{document.title}}<app-tag [tag]="t" *ngFor="let t of document.tags" class="ml-1"></app-tag></h5>
+          <h5 class="card-title">    
+            <ng-container *ngIf="document.correspondent">
+              <a *ngIf="clickCorrespondent.observers.length ; else nolink" [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>
+              <ng-template #nolink>{{(document.correspondent$ | async)?.name}}</ng-template>:
+            </ng-container>
+            {{document.title}}
+            <app-tag [tag]="t" linkTitle="Filter by tag" *ngFor="let t of document.tags$ | async" class="ml-1" (click)="clickTag.emit(t.id)" [clickable]="clickTag.observers.length"></app-tag>
+          </h5>
           <h5 class="card-title" *ngIf="document.archive_serial_number">#{{document.archive_serial_number}}</h5>
         </div>
         <p class="card-text">
-          <app-result-hightlight *ngIf="getDetailsAsHighlight()" class="result-content" [highlights]="getDetailsAsHighlight()"></app-result-hightlight>
+          <app-result-highlight *ngIf="getDetailsAsHighlight()" class="result-content" [highlights]="getDetailsAsHighlight()"></app-result-highlight>
           <span *ngIf="getDetailsAsString()" class="result-content">{{getDetailsAsString()}}</span>
         </p>
 
@@ -23,6 +30,13 @@
                 <path fill-rule="evenodd" d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
               </svg>
               Edit
+            </a>
+            <a type="button" class="btn btn-sm btn-outline-secondary" [href]="getPreviewUrl()">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+              </svg>
+              View
             </a>
             <a type="button" class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
               <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
