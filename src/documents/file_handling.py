@@ -8,7 +8,6 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 
-
 def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
 

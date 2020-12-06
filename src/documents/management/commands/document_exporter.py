@@ -51,7 +51,6 @@ class Command(Renderable, BaseCommand):
 
         for index, document_dict in enumerate(manifest):
 
-
             # Force output to unencrypted as that will be the current state.
             # The importer will make the decision to encrypt or not.
             manifest[index]["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED  # NOQA: E501
@@ -62,7 +61,8 @@ class Command(Renderable, BaseCommand):
 
             filename_counter = 0
             while True:
-                original_name = document.get_public_filename(counter=filename_counter)
+                original_name = document.get_public_filename(
+                    counter=filename_counter)
                 original_target = os.path.join(self.target, original_name)
 
                 if not os.path.exists(original_target):
@@ -77,7 +77,8 @@ class Command(Renderable, BaseCommand):
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
             if os.path.exists(document.archive_path):
-                archive_name = document.get_public_filename(archive=True, counter=filename_counter, suffix="_archive")
+                archive_name = document.get_public_filename(
+                    archive=True, counter=filename_counter, suffix="_archive")
                 archive_target = os.path.join(self.target, archive_name)
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
             else:
