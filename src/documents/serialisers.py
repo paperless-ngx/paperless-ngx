@@ -113,6 +113,34 @@ class LogSerializer(serializers.ModelSerializer):
         )
 
 
+class BulkEditSerializer(serializers.Serializer):
+
+    documents = serializers.PrimaryKeyRelatedField(
+        many=True,
+        label="Documents",
+        write_only=True,
+        queryset=Document.objects.all()
+    )
+
+    method = serializers.ChoiceField(
+        choices=[
+            "set_correspondent",
+            "set_document_type",
+            "add_tag",
+            "remove_tag",
+            "delete"
+        ],
+        label="Method",
+        write_only=True,
+    )
+
+    parameters = serializers.DictField(allow_empty=True)
+
+    def validate(self, attrs):
+
+        return attrs
+
+
 class PostDocumentSerializer(serializers.Serializer):
 
     document = serializers.FileField(

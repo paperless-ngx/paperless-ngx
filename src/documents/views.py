@@ -46,7 +46,8 @@ from .serialisers import (
     LogSerializer,
     TagSerializer,
     DocumentTypeSerializer,
-    PostDocumentSerializer
+    PostDocumentSerializer,
+    BulkEditSerializer
 )
 
 
@@ -165,13 +166,6 @@ class DocumentViewSet(RetrieveModelMixin,
             disposition, filename)
         return response
 
-    @action(methods=['post'], detail=False)
-    def bulk_edit(self, request, pk=None):
-        try:
-            return Response(perform_bulk_edit(request.data))
-        except Exception as e:
-            return HttpResponseBadRequest(str(e))
-
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
         try:
@@ -223,6 +217,28 @@ class LogViewSet(ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = LogFilterSet
     ordering_fields = ("created",)
+
+
+class BulkEditView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkEditSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
 
 class PostDocumentView(APIView):
