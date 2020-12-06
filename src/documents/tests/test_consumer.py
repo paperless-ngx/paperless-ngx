@@ -598,7 +598,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.correspondent.name, "Bank")
-        self.assertEqual(document.filename, "bank/new-docs-0000001.pdf")
+        self.assertEqual(document.filename, "Bank/new docs-0000001.pdf")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_filename")
