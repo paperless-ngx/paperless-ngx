@@ -24,3 +24,7 @@ feature-X branches is for experimental stuff that will eventually be merged into
 I'm trying to get most of paperless tested, so please do the same for your code! I know its a hassle, but it makes sure that your code works now and will allow us to detect regressions easily.
 
 To test your code, execute `pytest` in the src/ directory. Executing that in the project root is no good. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
+
+## More info:
+
+... is available in the documentation. https://paperless-ng.readthedocs.io/en/latest/extending.html
