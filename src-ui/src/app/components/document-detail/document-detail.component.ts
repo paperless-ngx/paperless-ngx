@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
+import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
@@ -23,9 +24,11 @@ export class DocumentDetailComponent implements OnInit {
 
   documentId: number
   document: PaperlessDocument
+  metadata: PaperlessDocumentMetadata
   title: string
   previewUrl: string
   downloadUrl: string
+  downloadOriginalUrl: string
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
@@ -34,10 +37,10 @@ export class DocumentDetailComponent implements OnInit {
     title: new FormControl(''),
     content: new FormControl(''),
     created: new FormControl(),
-    correspondent_id: new FormControl(),
-    document_type_id: new FormControl(),
+    correspondent: new FormControl(),
+    document_type: new FormControl(),
     archive_serial_number: new FormControl(),
-    tags_id: new FormControl([])
+    tags: new FormControl([])
   })
 
   constructor(
@@ -62,6 +65,7 @@ export class DocumentDetailComponent implements OnInit {
       this.documentId = +paramMap.get('id')
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
+      this.downloadOriginalUrl = this.documentsService.getDownloadUrl(this.documentId, true)
       if (this.openDocumentService.getOpenDocument(this.documentId)) {
         this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
       } else {
@@ -76,6 +80,9 @@ export class DocumentDetailComponent implements OnInit {
 
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
+    this.documentsService.getMetadata(doc.id).subscribe(result => {
+      this.metadata = result
+    })
     this.title = doc.title
     this.documentForm.patchValue(doc)
   }
@@ -86,7 +93,7 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.success.subscribe(newDocumentType => {
       this.documentTypeService.listAll().subscribe(documentTypes => {
         this.documentTypes = documentTypes.results
-        this.documentForm.get('document_type_id').setValue(newDocumentType.id)
+        this.documentForm.get('document_type').setValue(newDocumentType.id)
       })
     })
   }
@@ -97,7 +104,7 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.success.subscribe(newCorrespondent => {
       this.correspondentService.listAll().subscribe(correspondents => {
         this.correspondents = correspondents.results
-        this.documentForm.get('correspondent_id').setValue(newCorrespondent.id)
+        this.documentForm.get('correspondent').setValue(newCorrespondent.id)
       })
     })
   }

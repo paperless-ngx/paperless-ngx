@@ -13,8 +13,8 @@ from documents.sanity_checker import SanityFailedError
 
 def index_optimize():
     ix = index.open_index()
-    with AsyncWriter(ix) as writer:
-        writer.commit(optimize=True)
+    writer = AsyncWriter(ix)
+    writer.commit(optimize=True)
 
 
 def index_reindex():

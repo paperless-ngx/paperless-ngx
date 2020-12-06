@@ -3,9 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
@@ -51,19 +48,25 @@ export class DocumentListComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       if (params.has('id')) {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
+        this.filterRules = this.list.filterRules
+        this.showFilter = false
       } else {
         this.list.savedView = null
+        this.filterRules = this.list.filterRules
+        this.showFilter = this.filterRules.length > 0
       }
-      this.filterRules = this.list.filterRules
-      //this.showFilter = this.filterRules.length > 0
-      // prevents temporarily visible results from previous views
-      this.list.documents = []
+      this.list.clear()
       this.list.reload()
     })
   }
 
   applyFilterRules() {
     this.list.filterRules = this.filterRules
+  }
+
+  clearFilterRules() {
+    this.list.filterRules = this.filterRules
+    this.showFilter = false
   }
 
   loadViewConfig(config: SavedViewConfig) {
@@ -91,32 +94,42 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  filterByTag(t: PaperlessTag) {
-    if (this.filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == t.id)) {
+  filterByTag(tag_id: number) {
+    let filterRules = this.list.filterRules
+    if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == tag_id)) {
       return
     }
 
-    this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: t.id})
+    filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: tag_id})
+    this.filterRules = filterRules
     this.applyFilterRules()
   }
 
-  filterByCorrespondent(c: PaperlessCorrespondent) {
-    let existing_rule = this.filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
-    if (existing_rule) {
-      existing_rule.value = c.id
+  filterByCorrespondent(correspondent_id: number) {
+    let filterRules = this.list.filterRules
+    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
+    if (existing_rule && existing_rule.value == correspondent_id) {
+      return
+    } else if (existing_rule) {
+      existing_rule.value = correspondent_id
     } else {
-      this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: c.id})
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: correspondent_id})
     }
+    this.filterRules = filterRules
     this.applyFilterRules()
   }
 
-  filterByDocumentType(dt: PaperlessDocumentType) {
-    let existing_rule = this.filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
-    if (existing_rule) {
-      existing_rule.value = dt.id
+  filterByDocumentType(document_type_id: number) {
+    let filterRules = this.list.filterRules
+    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
+    if (existing_rule && existing_rule.value == document_type_id) {
+      return
+    } else if (existing_rule) {
+      existing_rule.value = document_type_id
     } else {
-      this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: dt.id})
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: document_type_id})
     }
+    this.filterRules = filterRules
     this.applyFilterRules()
   }
 

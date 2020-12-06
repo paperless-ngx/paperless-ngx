@@ -47,7 +47,7 @@ def check_sanity():
             present_files.append(os.path.normpath(os.path.join(root, f)))
 
     for doc in Document.objects.all():
-        # Check thumbnail
+        # Check sanity of the thumbnail
         if not os.path.isfile(doc.thumbnail_path):
             messages.append(SanityError(
                 f"Thumbnail of document {doc.pk} does not exist."))
@@ -61,26 +61,49 @@ def check_sanity():
                     f"Cannot read thumbnail file of document {doc.pk}: {e}"
                 ))
 
-        # Check document
+        # Check sanity of the original file
+        # TODO: extract method
         if not os.path.isfile(doc.source_path):
             messages.append(SanityError(
                 f"Original of document {doc.pk} does not exist."))
         else:
             present_files.remove(os.path.normpath(doc.source_path))
-            checksum = None
             try:
                 with doc.source_file as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
             except OSError as e:
                 messages.append(SanityError(
                     f"Cannot read original file of document {doc.pk}: {e}"))
+            else:
+                if not checksum == doc.checksum:
+                    messages.append(SanityError(
+                        f"Checksum mismatch of document {doc.pk}. "
+                        f"Stored: {doc.checksum}, actual: {checksum}."
+                    ))
 
-            if checksum and not checksum == doc.checksum:
+        # Check sanity of the archive file.
+        if doc.archive_checksum:
+            if not os.path.isfile(doc.archive_path):
                 messages.append(SanityError(
-                    f"Checksum mismatch of document {doc.pk}. "
-                    f"Stored: {doc.checksum}, actual: {checksum}."
+                    f"Archived version of document {doc.pk} does not exist."
                 ))
+            else:
+                present_files.remove(os.path.normpath(doc.archive_path))
+                try:
+                    with doc.archive_file as f:
+                        checksum = hashlib.md5(f.read()).hexdigest()
+                except OSError as e:
+                    messages.append(SanityError(
+                        f"Cannot read archive file of document {doc.pk}: {e}"
+                    ))
+                else:
+                    if not checksum == doc.archive_checksum:
+                        messages.append(SanityError(
+                            f"Checksum mismatch of archive {doc.pk}. "
+                            f"Stored: {doc.checksum}, actual: {checksum}."
+                        ))
 
+        # other document checks
         if not doc.content:
             messages.append(SanityWarning(
                 f"Document {doc.pk} has no content."

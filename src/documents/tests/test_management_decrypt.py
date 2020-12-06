@@ -17,7 +17,8 @@ class TestDecryptDocuments(TestCase):
     @override_settings(
         ORIGINALS_DIR=os.path.join(os.path.dirname(__file__), "samples", "originals"),
         THUMBNAIL_DIR=os.path.join(os.path.dirname(__file__), "samples", "thumb"),
-        PASSPHRASE="test"
+        PASSPHRASE="test",
+        PAPERLESS_FILENAME_FORMAT=None
     )
     @mock.patch("documents.management.commands.decrypt_documents.input")
     def test_decrypt(self, m):

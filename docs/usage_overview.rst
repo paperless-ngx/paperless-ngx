@@ -60,6 +60,31 @@ Once you've got Paperless setup, you need to start feeding documents into it.
 Currently, there are three options: the consumption directory, IMAP (email), and
 HTTP POST.
 
+When adding documents to paperless, it will perform the following operations on
+your documents:
+
+1.  OCR the document, if it has no text. Digital documents usually have text,
+    and this step will be skipped for those documents.
+2.  Paperless will create an archiveable PDF/A document from your document.
+    If this document is coming from your scanner, it will have embedded selectable text.
+3.  Paperless performs automatic matching of tags, correspondents and types on the
+    document before storing it in the database.
+
+.. hint::
+
+    This process can be configured to fit your needs. If you don't want paperless
+    to create archived versions for digital documents, you can configure that by
+    configuring ``PAPERLESS_OCR_MODE=skip_noarchive``. Please read the 
+    :ref:`relevant section in the documentation <configuration-ocr>`.
+
+.. note::
+
+    No matter which options you choose, Paperless will always store the original
+    document that it found in the consumption directory or in the mail and
+    will never overwrite that document. Archived versions are stored alongside the
+    digital versions.
+
+
 
 The consumption directory
 =========================
@@ -156,6 +181,62 @@ REST API
 
 You can also submit a document using the REST API, see :ref:`api-file_uploads` for details.
 
+.. _basic-searching:
+
+Searching
+#########
+
+Paperless offers an extensive searching mechanism that is designed to allow you to quickly
+find a document you're looking for (for example, that thing that just broke and you bought
+a couple months ago, that contract you signed 8 years ago).
+
+When you search paperless for a document, it tries to match this query against your documents.
+Paperless will look for matching documents by inspecting their content, title, correspondent,
+type and tags. Paperless returns a scored list of results, so that documents matching your query
+better will appear further up in the search results.
+
+By default, paperless returns only documents which contain all words typed in the search bar.
+However, paperless also offers advanced search syntax if you want to drill down the results
+further.
+
+Matching documents with logical expressions:
+
+.. code::
+
+  shopname AND (product1 OR product2)
+
+Matching specific tags, correspondents or types:
+
+.. code::
+
+  type:invoice tag:unpaid
+  correspondent:university certificate
+
+Matching dates:
+
+.. code::
+  
+  created:[2005 to 2009]
+  added:yesterday
+  modified:today
+
+Matching inexact words:
+
+.. code::
+
+  produ*name
+
+.. note::
+
+  Inexact terms are hard for search indexes. These queries might take a while to execute. That's why paperless offers
+  auto complete and query correction.
+
+All of these constructs can be combined as you see fit.
+If you want to learn more about the query language used by paperless, paperless uses Whoosh's default query language. 
+Head over to `Whoosh query language <https://whoosh.readthedocs.io/en/latest/querylang.html>`_.
+For details on what date parsing utilities are available, see
+`Date parsing <https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries>`_.
+ 
 
 .. _usage-recommended_workflow:
 

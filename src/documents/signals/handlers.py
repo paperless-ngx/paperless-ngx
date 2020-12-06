@@ -13,7 +13,7 @@ from rest_framework.reverse import reverse
 
 from .. import index, matching
 from ..file_handling import delete_empty_directories, generate_filename, \
-    create_source_path_directory
+    create_source_path_directory, archive_name_from_filename
 from ..models import Document, Tag
 
 
@@ -169,13 +169,46 @@ def run_post_consume_script(sender, document, **kwargs):
 
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
-    for f in (instance.source_path, instance.thumbnail_path):
-        try:
-            os.unlink(f)
-        except FileNotFoundError:
-            pass  # The file's already gone, so we're cool with it.
+    for f in (instance.source_path,
+              instance.archive_path,
+              instance.thumbnail_path):
+        if os.path.isfile(f):
+            try:
+                os.unlink(f)
+                logging.getLogger(__name__).debug(
+                    f"Deleted file {f}.")
+            except OSError as e:
+                logging.getLogger(__name__).warning(
+                    f"While deleting document {instance.file_name}, the file "
+                    f"{f} could not be deleted: {e}"
+                )
 
-    delete_empty_directories(os.path.dirname(instance.source_path))
+    delete_empty_directories(
+        os.path.dirname(instance.source_path),
+        root=settings.ORIGINALS_DIR
+    )
+
+    delete_empty_directories(
+        os.path.dirname(instance.archive_path),
+        root=settings.ARCHIVE_DIR
+    )
+
+
+def validate_move(instance, old_path, new_path):
+    if not os.path.isfile(old_path):
+        # Can't do anything if the old file does not exist anymore.
+        logging.getLogger(__name__).fatal(
+            f"Document {str(instance)}: File {old_path} has gone.")
+        return False
+
+    if os.path.isfile(new_path):
+        # Can't do anything if the new file already exists. Skip updating file.
+        logging.getLogger(__name__).warning(
+            f"Document {str(instance)}: Cannot rename file "
+            f"since target path {new_path} already exists.")
+        return False
+
+    return True
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
@@ -183,55 +216,91 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
 def update_filename_and_move_files(sender, instance, **kwargs):
 
     if not instance.filename:
-        # Can't update the filename if there is not filename to begin with
-        # This happens after the consumer creates a new document.
-        # The PK needs to be set first by saving the document once. When this
-        # happens, the file is not yet in the ORIGINALS_DIR, and thus can't be
-        # renamed anyway. In all other cases, instance.filename will be set.
+        # Can't update the filename if there is no filename to begin with
+        # This happens when the consumer creates a new document.
+        # The document is modified and saved multiple times, and only after
+        # everything is done (i.e., the generated filename is final),
+        # filename will be set to the location where the consumer has put
+        # the file.
+        #
+        # This will in turn cause this logic to move the file where it belongs.
         return
 
     old_filename = instance.filename
-    old_path = instance.source_path
     new_filename = generate_filename(instance)
 
     if new_filename == instance.filename:
         # Don't do anything if its the same.
         return
 
-    new_path = os.path.join(settings.ORIGINALS_DIR, new_filename)
+    old_source_path = instance.source_path
+    new_source_path = os.path.join(settings.ORIGINALS_DIR, new_filename)
 
-    if not os.path.isfile(old_path):
-        # Can't do anything if the old file does not exist anymore.
-        logging.getLogger(__name__).fatal(
-            f"Document {str(instance)}: File {old_path} has gone.")
+    if not validate_move(instance, old_source_path, new_source_path):
         return
 
-    if os.path.isfile(new_path):
-        # Can't do anything if the new file already exists. Skip updating file.
-        logging.getLogger(__name__).warning(
-            f"Document {str(instance)}: Cannot rename file "
-            f"since target path {new_path} already exists.")
-        return
+    # archive files are optional, archive checksum tells us if we have one,
+    # since this is None for documents without archived files.
+    if instance.archive_checksum:
+        new_archive_filename = archive_name_from_filename(new_filename)
+        old_archive_path = instance.archive_path
+        new_archive_path = os.path.join(settings.ARCHIVE_DIR,
+                                        new_archive_filename)
 
-    create_source_path_directory(new_path)
+        if not validate_move(instance, old_archive_path, new_archive_path):
+            return
+
+        create_source_path_directory(new_archive_path)
+    else:
+        old_archive_path = None
+        new_archive_path = None
+
+    create_source_path_directory(new_source_path)
 
     try:
-        os.rename(old_path, new_path)
+        os.rename(old_source_path, new_source_path)
+        if instance.archive_checksum:
+            os.rename(old_archive_path, new_archive_path)
         instance.filename = new_filename
         # Don't save here to prevent infinite recursion.
         Document.objects.filter(pk=instance.pk).update(filename=new_filename)
 
         logging.getLogger(__name__).debug(
-            f"Moved file {old_path} to {new_path}.")
+            f"Moved file {old_source_path} to {new_source_path}.")
+
+        if instance.archive_checksum:
+            logging.getLogger(__name__).debug(
+                f"Moved file {old_archive_path} to {new_archive_path}.")
 
     except OSError as e:
         instance.filename = old_filename
+        # this happens when we can't move a file. If that's the case for the
+        # archive file, we try our best to revert the changes.
+        try:
+            os.rename(new_source_path, old_source_path)
+            os.rename(new_archive_path, old_archive_path)
+        except Exception as e:
+            # This is fine, since:
+            # A: if we managed to move source from A to B, we will also manage
+            #  to move it from B to A. If not, we have a serious issue
+            #  that's going to get caught by the santiy checker.
+            #  all files remain in place and will never be overwritten,
+            #  so this is not the end of the world.
+            # B: if moving the orignal file failed, nothing has changed anyway.
+            pass
     except DatabaseError as e:
-        os.rename(new_path, old_path)
+        os.rename(new_source_path, old_source_path)
+        if instance.archive_checksum:
+            os.rename(new_archive_path, old_archive_path)
         instance.filename = old_filename
 
-    if not os.path.isfile(old_path):
-        delete_empty_directories(os.path.dirname(old_path))
+    if not os.path.isfile(old_source_path):
+        delete_empty_directories(os.path.dirname(old_source_path),
+                                 root=settings.ORIGINALS_DIR)
+
+    if old_archive_path and not os.path.isfile(old_archive_path):
+        delete_empty_directories(os.path.dirname(old_archive_path),
+                                 root=settings.ARCHIVE_DIR)
 
 
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
