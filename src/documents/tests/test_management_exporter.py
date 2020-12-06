@@ -66,6 +66,9 @@ class TestExportImport(DirectoriesMixin, TestCase):
     def test_export_missing_files(self):
 
         target = tempfile.mkdtemp()
-        call_command('document_exporter', target)
         Document.objects.create(checksum="AAAAAAAAAAAAAAAAA", title="wow", filename="0000004.pdf", id=3, mime_type="application/pdf")
         self.assertRaises(FileNotFoundError, call_command, 'document_exporter', target)
+
+    def test_duplicate_titles(self):
+        # TODO
+        pass
