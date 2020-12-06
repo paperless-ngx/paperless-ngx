@@ -48,19 +48,19 @@ class TestDocument(TestCase):
     def test_file_name(self):
 
         doc = Document(mime_type="application/pdf", title="test", created=datetime(2020, 12, 25))
-        self.assertEqual(doc.file_name, "20201225-test.pdf")
+        self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
 
     def test_file_name_jpg(self):
 
         doc = Document(mime_type="image/jpeg", title="test", created=datetime(2020, 12, 25))
-        self.assertEqual(doc.file_name, "20201225-test.jpg")
+        self.assertEqual(doc.get_public_filename(), "2020-12-25 test.jpg")
 
     def test_file_name_unknown(self):
 
         doc = Document(mime_type="application/zip", title="test", created=datetime(2020, 12, 25))
-        self.assertEqual(doc.file_name, "20201225-test.zip")
+        self.assertEqual(doc.get_public_filename(), "2020-12-25 test.zip")
 
-    def test_file_name_invalid(self):
+    def test_file_name_invalid_type(self):
 
         doc = Document(mime_type="image/jpegasd", title="test", created=datetime(2020, 12, 25))
-        self.assertEqual(doc.file_name, "20201225-test")
+        self.assertEqual(doc.get_public_filename(), "2020-12-25 test")

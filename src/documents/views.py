@@ -145,11 +145,11 @@ class DocumentViewSet(RetrieveModelMixin,
         doc = Document.objects.get(id=pk)
         if not self.original_requested(request) and os.path.isfile(doc.archive_path):  # NOQA: E501
             file_handle = doc.archive_file
-            filename = doc.archive_file_name
+            filename = doc.get_public_filename(archive=True)
             mime_type = 'application/pdf'
         else:
             file_handle = doc.source_file
-            filename = doc.file_name
+            filename = doc.get_public_filename()
             mime_type = doc.mime_type
 
         if doc.storage_type == Document.STORAGE_TYPE_GPG:
