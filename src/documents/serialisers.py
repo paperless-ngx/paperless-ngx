@@ -150,8 +150,7 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
-    def validate(self, attrs):
-        document = attrs.get('document')
+    def validate_document(self, document):
 
         try:
             validate_filename(document.name)
@@ -163,32 +162,31 @@ class PostDocumentSerializer(serializers.Serializer):
 
         if not is_mime_type_supported(mime_type):
             raise serializers.ValidationError(
-                "This mime type is not supported.")
+                "This file type is not supported.")
 
-        attrs['document_data'] = document_data
+        return document.name, document_data
 
-        title = attrs.get('title')
+    def validate_title(self, title):
+        if title:
+            return title
+        else:
+            # do not return empty strings.
+            return None
 
-        if not title:
-            attrs['title'] = None
-
-        correspondent = attrs.get('correspondent')
+    def validate_correspondent(self, correspondent):
         if correspondent:
-            attrs['correspondent_id'] = correspondent.id
+            return correspondent.id
         else:
-            attrs['correspondent_id'] = None
+            return None
 
-        document_type = attrs.get('document_type')
+    def validate_document_type(self, document_type):
         if document_type:
-            attrs['document_type_id'] = document_type.id
+            return document_type.id
         else:
-            attrs['document_type_id'] = None
+            return None
 
-        tags = attrs.get('tags')
+    def validate_tags(self, tags):
         if tags:
-            tag_ids = [tag.id for tag in tags]
-            attrs['tag_ids'] = tag_ids
+            return [tag.id for tag in tags]
         else:
-            attrs['tag_ids'] = None
-
-        return attrs
+            return None
