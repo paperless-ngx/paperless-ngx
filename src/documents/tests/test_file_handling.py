@@ -1,5 +1,5 @@
+import datetime
 import os
-import shutil
 from pathlib import Path
 from unittest import mock
 
@@ -485,3 +485,23 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(archive))
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(os.path.isfile(doc.archive_path))
+
+class TestFilenameGeneration(TestCase):
+
+    @override_settings(
+        PAPERLESS_FILENAME_FORMAT="{title}"
+    )
+    def test_invalid_characters(self):
+
+        doc = Document.objects.create(title="This. is the title.", mime_type="application/pdf", pk=1, checksum="1")
+        self.assertEqual(generate_filename(doc), "This. is the title-0000001.pdf")
+
+        doc = Document.objects.create(title="my\\invalid/../title:yay", mime_type="application/pdf", pk=2, checksum="2")
+        self.assertEqual(generate_filename(doc), "my-invalid-..-title-yay-0000002.pdf")
+
+    @override_settings(
+        PAPERLESS_FILENAME_FORMAT="{created}"
+    )
+    def test_date(self):
+        doc = Document.objects.create(title="does not matter", created=datetime.datetime(2020,5,21, 7,36,51, 153), mime_type="application/pdf", pk=2, checksum="2")
+        self.assertEqual(generate_filename(doc), "2020-05-21-0000002.pdf")
