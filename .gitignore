@@ -76,16 +76,11 @@ scripts/nuke
 /static/
 
 # Stored PDFs
-/media/documents/originals/*
-/media/documents/thumbnails/*
-
-/data/classification_model.pickle
-/data/db.sqlite3
-/data/index
-
+/media/
+/data/
 /paperless.conf
-/consume
-/export
+/consume/
+/export/
 /src-ui/.vscode
 
 # this is where the compiled frontend is moved to.

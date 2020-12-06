@@ -11,12 +11,17 @@ RUN apt-get update \
 		curl \
 		ghostscript \
 		gnupg \
+		icc-profiles-free \
 		imagemagick \
 		libatlas-base-dev \
+		liblept5 \
 		libmagic-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \
+		libxml2 \
 		optipng \
+		pngquant \
+		qpdf \
 		sudo \
 		tesseract-ocr \
 		tesseract-ocr-eng \
@@ -26,6 +31,7 @@ RUN apt-get update \
 		tesseract-ocr-spa \
 		tzdata \
 		unpaper \
+		zlib1g \
 	&& pip3 install --upgrade supervisor setuptools \
 	&& pip install --no-cache-dir -r requirements.txt \
 	&& apt-get -y purge build-essential \

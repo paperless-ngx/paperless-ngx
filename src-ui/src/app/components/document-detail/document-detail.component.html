@@ -5,12 +5,26 @@
         </svg>
         <span class="d-none d-lg-inline"> Delete</span>
     </button>
-    <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary mr-2">
-        <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#download" />
-        </svg>
-        <span class="d-none d-lg-inline"> Download</span>
-    </a>
+
+    <div class="btn-group mr-2">
+
+        <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
+            <svg class="buttonicon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#download" />
+            </svg>
+            <span class="d-none d-lg-inline"> Download</span>
+        </a>
+    
+        <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.paperless__has_archive_version">
+          <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
+          <div class="dropdown-menu" ngbDropdownMenu>
+            <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
+          </div>
+        </div>
+    
+      </div>
+
+
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#x" />
@@ -39,11 +53,11 @@
                 <textarea class="form-control" id="content" rows="5" formControlName='content'></textarea>
             </div>
 
-            <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent_id" allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
+            <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent" allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
 
-            <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type_id" allowNull="true" (createNew)="createDocumentType()"></app-input-select>
+            <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type" allowNull="true" (createNew)="createDocumentType()"></app-input-select>
 
-            <app-input-tags formControlName="tags_id" title="Tags"></app-input-tags>
+            <app-input-tags formControlName="tags" title="Tags"></app-input-tags>
 
             <button type="button" class="btn btn-outline-secondary" (click)="discard()">Discard</button>&nbsp;
             <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()">Save & edit next</button>&nbsp;

@@ -49,6 +49,7 @@ STATIC_ROOT = os.getenv("PAPERLESS_STATICDIR", os.path.join(BASE_DIR, "..", "sta
 
 MEDIA_ROOT = os.getenv('PAPERLESS_MEDIA_ROOT', os.path.join(BASE_DIR, "..", "media"))
 ORIGINALS_DIR = os.path.join(MEDIA_ROOT, "documents", "originals")
+ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
@@ -85,6 +86,7 @@ INSTALLED_APPS = [
     "django.contrib.admin",
 
     "rest_framework",
+    "rest_framework.authtoken",
     "django_filters",
 
     "django_q",
@@ -96,7 +98,8 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication'
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
     ]
 }
 
@@ -155,6 +158,15 @@ CHANNEL_LAYERS = {
 ###############################################################################
 # Security                                                                    #
 ###############################################################################
+
+AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
+
+if AUTO_LOGIN_USERNAME:
+    _index = MIDDLEWARE.index('django.contrib.auth.middleware.AuthenticationMiddleware')
+    # This overrides everything the auth middleware is doing but still allows
+    # regular login in case the provided user does not exist.
+    MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
+
 
 if DEBUG:
     X_FRAME_OPTIONS = ''
@@ -253,29 +265,48 @@ USE_TZ = True
 # Logging                                                                     #
 ###############################################################################
 
+DISABLE_DBHANDLER = __get_boolean("PAPERLESS_DISABLE_DBHANDLER")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     "handlers": {
-        "dbhandler": {
+        "db": {
+            "level": "DEBUG",
             "class": "documents.loggers.PaperlessHandler",
         },
-        "streamhandler": {
-            "class": "logging.StreamHandler"
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
         }
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
     },
     "loggers": {
         "documents": {
-            "handlers": ["dbhandler", "streamhandler"],
-            "level": "DEBUG"
+            "handlers": ["db"],
+            "propagate": True,
         },
         "paperless_mail": {
-            "handlers": ["dbhandler", "streamhandler"],
-            "level": "DEBUG"
+            "handlers": ["db"],
+            "propagate": True,
         },
         "paperless_tesseract": {
-            "handlers": ["dbhandler", "streamhandler"],
-            "level": "DEBUG"
+            "handlers": ["db"],
+            "propagate": True,
         },
     },
 }
@@ -332,6 +363,10 @@ CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
+CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
+
+CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
+
 OPTIMIZE_THUMBNAILS = __get_boolean("PAPERLESS_OPTIMIZE_THUMBNAILS", "true")
 
 OCR_PAGES = int(os.getenv('PAPERLESS_OCR_PAGES', 0))
@@ -340,9 +375,17 @@ OCR_PAGES = int(os.getenv('PAPERLESS_OCR_PAGES', 0))
 # documents.  It should be a 3-letter language code consistent with ISO 639.
 OCR_LANGUAGE = os.getenv("PAPERLESS_OCR_LANGUAGE", "eng")
 
+# OCRmyPDF --output-type options are available.
+# TODO: validate this setting.
+OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 
-# OCR all documents?
-OCR_ALWAYS = __get_boolean("PAPERLESS_OCR_ALWAYS", "false")
+# skip. redo, force
+# TODO: validate this.
+OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
+
+OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
+
+OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
@@ -351,11 +394,10 @@ GNUPG_HOME = os.getenv("HOME", "/tmp")
 CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY", "convert")
 CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
 CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
-CONVERT_DENSITY = int(os.getenv("PAPERLESS_CONVERT_DENSITY", 300))
 
 GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
+
 OPTIPNG_BINARY = os.getenv("PAPERLESS_OPTIPNG_BINARY", "optipng")
-UNPAPER_BINARY = os.getenv("PAPERLESS_UNPAPER_BINARY", "unpaper")
 
 
 # Pre-2.x versions of Paperless stored your documents locally with GPG

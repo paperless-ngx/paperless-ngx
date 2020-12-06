@@ -3,15 +3,18 @@ import logging
 from django.conf import settings
 from whoosh.writing import AsyncWriter
 
-from documents import index
+from documents import index, sanity_checker
 from documents.classifier import DocumentClassifier, \
     IncompatibleClassifierVersionError
 from documents.consumer import Consumer, ConsumerError
 from documents.models import Document
+from documents.sanity_checker import SanityFailedError
 
 
 def index_optimize():
-    index.open_index().optimize()
+    ix = index.open_index()
+    writer = AsyncWriter(ix)
+    writer.commit(optimize=True)
 
 
 def index_reindex():
@@ -74,3 +77,12 @@ def consume_file(path,
     else:
         raise ConsumerError("Unknown error: Returned document was null, but "
                             "no error message was given.")
+
+
+def sanity_check():
+    messages = sanity_checker.check_sanity()
+
+    if len(messages) > 0:
+        raise SanityFailedError(messages)
+    else:
+        return "No issues detected."
