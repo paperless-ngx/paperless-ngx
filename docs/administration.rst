@@ -274,6 +274,7 @@ management command:
 
 This command takes no arguments.
 
+.. _`administration-index`:
 
 Managing the document search index
 ==================================
@@ -331,6 +332,42 @@ command:
     mail_fetcher
 
 The command takes no arguments and processes all your mail accounts and rules.
+
+.. _utilities-archiver:
+
+Creating archived documents
+===========================
+
+Paperless stores archived PDF/A documents alongside your original documents.
+These archived documents will also contain selectable text for image-only
+originals.
+These documents are derived from the originals, which are always stored
+unmodified. If coming from an earlier version of paperless, your documents
+won't have archived versions.
+
+This command creates PDF/A documents for your documents.
+
+.. code::
+
+    document_archiver --overwrite --document <id>
+
+This command will only attempt to create archived documents when no archived
+document exists yet, unless ``--overwrite`` is specified. If ``--document <id>``
+is specified, the archiver will only process that document.
+
+.. note::
+
+    This command essentially performs OCR on all your documents again,
+    according to your settings. If you run this with ``PAPERLESS_OCR_MODE=redo``,
+    it will potentially run for a very long time. You can cancel the command
+    at any time, since this command will skip already archived versions the next time
+    it is run.
+
+.. note::
+
+    Some documents will cause errors and cannot be converted into PDF/A documents,
+    such as encrypted PDF documents. The archiver will skip over these Documents
+    each time it sees them.
 
 .. _utilities-encyption:
 

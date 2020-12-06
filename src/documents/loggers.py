@@ -28,10 +28,10 @@ class LoggingMixin:
     def renew_logging_group(self):
         self.logging_group = uuid.uuid4()
 
-    def log(self, level, message):
+    def log(self, level, message, **kwargs):
         target = ".".join([self.__class__.__module__, self.__class__.__name__])
         logger = logging.getLogger(target)
 
         getattr(logger, level)(message, extra={
             "group": self.logging_group
-        })
+        }, **kwargs)

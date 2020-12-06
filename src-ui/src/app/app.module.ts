@@ -45,6 +45,7 @@ import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-v
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component';
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component';
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
+import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
 
 @NgModule({
   declarations: [
@@ -82,7 +83,8 @@ import { WidgetFrameComponent } from './components/dashboard/widgets/widget-fram
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
-    WidgetFrameComponent
+    WidgetFrameComponent,
+    WelcomeWidgetComponent
   ],
   imports: [
     BrowserModule,

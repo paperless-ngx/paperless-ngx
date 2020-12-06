@@ -96,11 +96,12 @@
 <div class="card w-100 mb-3" [hidden]="!showFilter">
   <div class="card-body">
     <h5 class="card-title">Filter</h5>
-    <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()"></app-filter-editor>
+    <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()" (clear)="clearFilterRules()"></app-filter-editor>
   </div>
 </div>
 
-<div class="row m-0 justify-content-end">
+<div class="d-flex justify-content-between align-items-center">
+  <p>{{list.collectionSize || 0}} document(s)</p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
   [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
 </div>
@@ -126,16 +127,16 @@
       </td>
       <td class="d-none d-md-table-cell">
         <ng-container *ngIf="d.correspondent">
-          <a [routerLink]="" (click)="filterByCorrespondent(d.correspondent)" title="Filter by correspondent">{{d.correspondent.name}}</a>
+          <a [routerLink]="" (click)="filterByCorrespondent(d.correspondent)" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
         <a routerLink="/documents/{{d.id}}" title="Edit document">{{d.title}}</a>
-        <app-tag [tag]="t" *ngFor="let t of d.tags" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="filterByTag(t)"></app-tag>
+        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="filterByTag(t.id)"></app-tag>
       </td>
       <td class="d-none d-xl-table-cell">
         <ng-container *ngIf="d.document_type">
-          <a [routerLink]="" (click)="filterByDocumentType(d.document_type)" title="Filter by document type">{{d.document_type.name}}</a>
+          <a [routerLink]="" (click)="filterByDocumentType(d.document_type)" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
@@ -152,5 +153,3 @@
 <div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
   <app-document-card-small [document]="d" *ngFor="let d of list.documents" (clickTag)="filterByTag($event)" (clickCorrespondent)="filterByCorrespondent($event)"></app-document-card-small>    
 </div>
-
-<p *ngIf="list.documents.length == 0" class="mx-auto">No results</p>

@@ -4,10 +4,11 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from whoosh import highlight
-from whoosh.fields import Schema, TEXT, NUMERIC
+from whoosh.fields import Schema, TEXT, NUMERIC, KEYWORD, DATETIME
 from whoosh.highlight import Formatter, get_text
 from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser import MultifieldParser
+from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.writing import AsyncWriter
 
 
@@ -59,14 +60,19 @@ def get_schema():
         id=NUMERIC(stored=True, unique=True, numtype=int),
         title=TEXT(stored=True),
         content=TEXT(),
-        correspondent=TEXT(stored=True)
+        correspondent=TEXT(stored=True),
+        tag=KEYWORD(stored=True, commas=True, scorable=True, lowercase=True),
+        type=TEXT(stored=True),
+        created=DATETIME(stored=True, sortable=True),
+        modified=DATETIME(stored=True, sortable=True),
+        added=DATETIME(stored=True, sortable=True),
     )
 
 
 def open_index(recreate=False):
     try:
         if exists_in(settings.INDEX_DIR) and not recreate:
-            return open_dir(settings.INDEX_DIR)
+            return open_dir(settings.INDEX_DIR, schema=get_schema())
     except Exception as e:
         logger.error(f"Error while opening the index: {e}, recreating.")
 
@@ -76,16 +82,27 @@ def open_index(recreate=False):
 
 
 def update_document(writer, doc):
+    # TODO: this line caused many issues all around, since:
+    #  We need to make sure that this method does not get called with
+    #  deserialized documents (i.e, document objects that don't come from
+    #  Django's ORM interfaces directly.
     logger.debug("Indexing {}...".format(doc))
+    tags = ",".join([t.name for t in doc.tags.all()])
     writer.update_document(
         id=doc.pk,
         title=doc.title,
         content=doc.content,
-        correspondent=doc.correspondent.name if doc.correspondent else None
+        correspondent=doc.correspondent.name if doc.correspondent else None,
+        tag=tags if tags else None,
+        type=doc.document_type.name if doc.document_type else None,
+        created=doc.created,
+        added=doc.added,
+        modified=doc.modified,
     )
 
 
 def remove_document(writer, doc):
+    # TODO: see above.
     logger.debug("Removing {} from index...".format(doc))
     writer.delete_by_term('id', doc.pk)
 
@@ -103,16 +120,27 @@ def remove_document_from_index(document):
 
 
 @contextmanager
-def query_page(ix, query, page):
+def query_page(ix, querystring, page):
     searcher = ix.searcher()
     try:
-        query_parser = MultifieldParser(["content", "title", "correspondent"],
-                                        ix.schema).parse(query)
-        result_page = searcher.search_page(query_parser, page)
+        qp = MultifieldParser(
+            ["content", "title", "correspondent", "tag", "type"],
+            ix.schema)
+        qp.add_plugin(DateParserPlugin())
+
+        q = qp.parse(querystring)
+        result_page = searcher.search_page(q, page)
         result_page.results.fragmenter = highlight.ContextFragmenter(
             surround=50)
         result_page.results.formatter = JsonFormatter()
-        yield result_page
+
+        corrected = searcher.correct_query(q, querystring)
+        if corrected.query != q:
+            corrected_query = corrected.string
+        else:
+            corrected_query = None
+
+        yield result_page, corrected_query
     finally:
         searcher.close()
 

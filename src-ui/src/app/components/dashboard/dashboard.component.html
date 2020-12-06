@@ -3,19 +3,15 @@
 </app-page-header>
 
 <div class='row'>
-  <div class="col-lg">
-    <app-widget-frame title="Saved views" *ngIf="savedViews.length == 0">
-      <p class="card-text">This space is reserved to display your saved views. Go to your documents and save a view
-        to have it displayed
-        here!</p>
-    </app-widget-frame>
+  <div class="col-lg-8">
+    <app-welcome-widget *ngIf="savedViews.length == 0"></app-welcome-widget>
 
     <ng-container *ngFor="let v of savedViews">
       <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
     </ng-container>
 
   </div>
-  <div class="col-lg">
+  <div class="col-lg-4">
 
     <app-statistics-widget></app-statistics-widget>
 

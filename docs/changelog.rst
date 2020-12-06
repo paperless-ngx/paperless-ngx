@@ -5,15 +5,83 @@
 Changelog
 *********
 
+paperless-ng 0.9.5
+##################
+
+This release concludes the big changes I wanted to get rolled into paperless. The next releases before 1.0 will
+focus on fixing issues, primarily.
+
+* OCR
+
+  * Paperless now uses `OCRmyPDF <https://github.com/jbarlow83/OCRmyPDF>`_ to perform OCR on documents.
+    It still uses tesseract under the hood, but the PDF parser of Paperless has changed considerably and
+    will behave different for some douments.
+  * OCRmyPDF creates archived PDF/A documents with embedded text that can be selected in the front end.
+  * Paperless stores archived versions of documents alongside with the originals. The originals can be
+    accessed on the document edit page. If available, a dropdown menu will appear next to the download button.
+  * Many of the configuration options regarding OCR have changed. See :ref:`configuration-ocr` for details.
+  * Paperless no longer guesses the language of your documents. It always uses the language that you
+    specified with ``PAPERLESS_OCR_LANGUAGE``. Be sure to set this to the language the majority of your
+    documents are in. Multiple languages can be specified, but that requires more CPU time.
+  * The management command :ref:`document_archiver <utilities-archiver>` can be used to create archived versions for already
+    existing documents.
+
+* Tags from consumption folder.
+
+  * Thanks to `jayme-github`_, paperless now consumes files from sub folders in the consumption folder and is able to assign tags
+    based on the sub folders a document was found in. This can be configured with ``PAPERLESS_CONSUMER_RECURSIVE`` and
+    ``PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS``.
+
+* API
+
+  * The API now offers token authentication.
+  * The endpoint for uploading documents now supports specifying custom titles, correspondents, tags and types.
+    This can be used by clients to override the default behavior of paperless. See :ref:`api-file_uploads`.
+  * The document endpoint of API now serves documents in this form:
+
+    * correspondents, document types and tags are referenced by their ID in the fields ``correspondent``, ``document_type`` and ``tags``. The ``*_id`` versions are gone. These fields are read/write.
+    * paperless does not serve nested tags, correspondents or types anymore.
+
+* Front end
+
+  * Paperless does some basic caching of correspondents, tags and types and will only request them from the server when necessary or when entirely reloading the page.
+  * Document list fetching is about 10%-30% faster now, especially when lots of tags/correspondents are present.
+  * Some minor improvements to the front end, such as document count in the document list, better highlighting of the current page, and improvements to the filter behavior.
+
+* Fixes:
+
+  * A bug with the generation of filenames for files with unsupported types caused the exporter and
+    document saving to crash.
+  * Mail handling no longer exits entirely when encountering errors. It will skip the account/rule/message on which the error occured.
+  * Assigning correspondents from mail sender names failed for very long names. Paperless no longer assigns correspondents in these cases.
+
 paperless-ng 0.9.4
 ##################
 
-* Front end: Clickable tags, correspondents and types allow quick filtering for related documents.
-* Front end: Saved views are now editable.
-* Front end: Preview documents directly in the browser.
+* Searching:
+
+  * Paperless now supports searching by tags, types and dates and correspondents. In order to have this applied to your
+    existing documents, you need to perform a ``document_index reindex`` management command
+    (see :ref:`administration-index`)
+    that adds the data to the search index. You only need to do this once, since the schema of the search index changed.
+    Paperless keeps the index updated after that whenever something changes.
+  * Paperless now has spelling corrections ("Did you mean") for miss-typed queries.
+  * The documentation contains :ref:`information about the query syntax <basic-searching>`.
+
+* Front end:
+
+  * Clickable tags, correspondents and types allow quick filtering for related documents.
+  * Saved views are now editable.
+  * Preview documents directly in the browser.
+  * Navigation from the dashboard to saved views.
+
 * Fixes:
+
   * A severe error when trying to use post consume scripts.
-* The documentation now contains information about bare metal installs.
+  * An error in the consumer that cause invalid messages of missing files to show up in the log.
+
+* The documentation now contains information about bare metal installs and a section about
+  how to setup the development environment.
 
 paperless-ng 0.9.3
 ##################
@@ -732,6 +800,7 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _jayme-github: http://github.com/jayme-github
 .. _Brian Conn: https://github.com/TheConnMan
 .. _Christopher Luu: https://github.com/nuudles
 .. _Florian Jung: https://github.com/the01

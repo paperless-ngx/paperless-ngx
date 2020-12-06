@@ -82,6 +82,12 @@ export class DocumentListViewService {
     this.reload()
   }
 
+  clear() {
+    this.collectionSize = null
+    this.documents = []
+    this.currentPage = 1
+  }
+
   reload(onFinish?) {
     this.isReloading = true
     this.documentService.list(
