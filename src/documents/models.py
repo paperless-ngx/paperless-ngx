@@ -1,9 +1,11 @@
 # coding=utf-8
-
+import datetime
 import logging
 import os
 import re
 from collections import OrderedDict
+
+import pathvalidate
 
 import dateutil.parser
 from django.conf import settings
@@ -206,13 +208,11 @@ class Document(models.Model):
         ordering = ("correspondent", "title")
 
     def __str__(self):
-        created = self.created.strftime("%Y%m%d")
+        created = datetime.date.isoformat(self.created)
         if self.correspondent and self.title:
-            return "{}: {} - {}".format(
-                created, self.correspondent, self.title)
-        if self.correspondent or self.title:
-            return "{}: {}".format(created, self.correspondent or self.title)
-        return str(created)
+            return f"{created} {self.correspondent} {self.title}"
+        else:
+            return f"{created} {self.title}"
 
     @property
     def source_path(self):
@@ -248,13 +248,21 @@ class Document(models.Model):
     def archive_file(self):
         return open(self.archive_path, "rb")
 
-    @property
-    def file_name(self):
-        return slugify(str(self)) + self.file_type
+    def get_public_filename(self, archive=False, counter=0, suffix=None):
+        result = str(self)
 
-    @property
-    def archive_file_name(self):
-        return slugify(str(self)) + ".pdf"
+        if counter:
+            result += f"_{counter:02}"
+
+        if suffix:
+            result += suffix
+
+        if archive:
+            result += ".pdf"
+        else:
+            result += self.file_type
+
+        return pathvalidate.sanitize_filename(result, replacement_text="-")
 
     @property
     def file_type(self):

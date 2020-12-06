@@ -157,7 +157,7 @@ def run_post_consume_script(sender, document, **kwargs):
     Popen((
         settings.POST_CONSUME_SCRIPT,
         str(document.pk),
-        document.file_name,
+        document.get_public_filename(),
         os.path.normpath(document.source_path),
         os.path.normpath(document.thumbnail_path),
         reverse("document-download", kwargs={"pk": document.pk}),
@@ -179,7 +179,7 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
                     f"Deleted file {f}.")
             except OSError as e:
                 logging.getLogger(__name__).warning(
-                    f"While deleting document {instance.file_name}, the file "
+                    f"While deleting document {str(instance)}, the file "
                     f"{f} could not be deleted: {e}"
                 )
 
