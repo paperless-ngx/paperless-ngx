@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
+from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
 from paperless.consumers import StatusConsumer
@@ -16,7 +17,8 @@ from documents.views import (
     SearchView,
     IndexView,
     SearchAutoCompleteView,
-    StatisticsView
+    StatisticsView,
+    PostDocumentView
 )
 from paperless.views import FaviconView
 
@@ -45,6 +47,11 @@ urlpatterns = [
         re_path(r"^statistics/",
                 StatisticsView.as_view(),
                 name="statistics"),
+
+        re_path(r"^documents/post_document/", PostDocumentView.as_view(),
+                name="post_document"),
+
+        path('token/', views.obtain_auth_token)
 
     ] + api_router.urls)),
 

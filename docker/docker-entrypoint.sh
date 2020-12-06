@@ -23,8 +23,9 @@ wait_for_postgres() {
 	echo "Waiting for PostgreSQL to start..."
 
 	host="${PAPERLESS_DBHOST}"
+	port="${PAPERLESS_DBPORT}"
 
-	while !</dev/tcp/$host/5432 ;
+	while !</dev/tcp/$host/$port ;
 	do
 
 		if [ $attempt_num -eq $max_attempts ]

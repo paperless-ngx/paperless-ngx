@@ -1,8 +1,16 @@
+import os
+import tempfile
+from datetime import datetime
+from time import mktime
+
+from django.conf import settings
 from django.db.models import Count, Max
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
+from django_q.tasks import async_task
+from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.mixins import (
@@ -30,14 +38,14 @@ from .filters import (
     DocumentTypeFilterSet,
     LogFilterSet
 )
-from .forms import UploadForm
 from .models import Correspondent, Document, Log, Tag, DocumentType
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
     LogSerializer,
     TagSerializer,
-    DocumentTypeSerializer
+    DocumentTypeSerializer,
+    PostDocumentSerializer
 )
 
 
@@ -126,36 +134,54 @@ class DocumentViewSet(RetrieveModelMixin,
         index.remove_document_from_index(self.get_object())
         return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
-    def file_response(self, pk, disposition):
+    @staticmethod
+    def original_requested(request):
+        return (
+            'original' in request.query_params and
+            request.query_params['original'] == 'true'
+        )
+
+    def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
-
-        if doc.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
-            file_handle = doc.source_file
+        if not self.original_requested(request) and os.path.isfile(doc.archive_path):  # NOQA: E501
+            file_handle = doc.archive_file
+            filename = doc.get_public_filename(archive=True)
+            mime_type = 'application/pdf'
         else:
-            file_handle = GnuPG.decrypted(doc.source_file)
+            file_handle = doc.source_file
+            filename = doc.get_public_filename()
+            mime_type = doc.mime_type
 
-        response = HttpResponse(file_handle, content_type=doc.mime_type)
+        if doc.storage_type == Document.STORAGE_TYPE_GPG:
+            file_handle = GnuPG.decrypted(file_handle)
+
+        response = HttpResponse(file_handle, content_type=mime_type)
         response["Content-Disposition"] = '{}; filename="{}"'.format(
-            disposition, doc.file_name)
+            disposition, filename)
         return response
 
-    @action(methods=['post'], detail=False)
-    def post_document(self, request, pk=None):
-        # TODO: is this a good implementation?
-        form = UploadForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            return Response("OK")
-        else:
-            return HttpResponseBadRequest(str(form.errors))
+    @action(methods=['get'], detail=True)
+    def metadata(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+            return Response({
+                "paperless__checksum": doc.checksum,
+                "paperless__mime_type": doc.mime_type,
+                "paperless__filename": doc.filename,
+                "paperless__has_archive_version":
+                    os.path.isfile(doc.archive_path)
+            })
+        except Document.DoesNotExist:
+            raise Http404()
 
     @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
         try:
-            response = self.file_response(pk, "inline")
+            response = self.file_response(
+                pk, request, "inline")
             return response
-        except FileNotFoundError:
-            raise Http404("Document source file does not exist")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404()
 
     @action(methods=['get'], detail=True)
     @cache_control(public=False, max_age=315360000)
@@ -163,15 +189,16 @@ class DocumentViewSet(RetrieveModelMixin,
         try:
             return HttpResponse(Document.objects.get(id=pk).thumbnail_file,
                                 content_type='image/png')
-        except FileNotFoundError:
-            raise Http404("Document thumbnail does not exist")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404()
 
     @action(methods=['get'], detail=True)
     def download(self, request, pk=None):
         try:
-            return self.file_response(pk, "attachment")
-        except FileNotFoundError:
-            raise Http404("Document source file does not exist")
+            return self.file_response(
+                pk, request, "attachment")
+        except (FileNotFoundError, Document.DoesNotExist):
+            raise Http404()
 
 
 class LogViewSet(ReadOnlyModelViewSet):
@@ -186,11 +213,62 @@ class LogViewSet(ReadOnlyModelViewSet):
     ordering_fields = ("created",)
 
 
+class PostDocumentView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PostDocumentSerializer
+    parser_classes = (parsers.MultiPartParser,)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        doc_name, doc_data = serializer.validated_data.get('document')
+        correspondent_id = serializer.validated_data.get('correspondent')
+        document_type_id = serializer.validated_data.get('document_type')
+        tag_ids = serializer.validated_data.get('tags')
+        title = serializer.validated_data.get('title')
+
+        t = int(mktime(datetime.now().timetuple()))
+
+        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+
+        with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
+                                         dir=settings.SCRATCH_DIR,
+                                         delete=False) as f:
+            f.write(doc_data)
+            os.utime(f.name, times=(t, t))
+
+            async_task("documents.tasks.consume_file",
+                       f.name,
+                       override_filename=doc_name,
+                       override_title=title,
+                       override_correspondent_id=correspondent_id,
+                       override_document_type_id=document_type_id,
+                       override_tag_ids=tag_ids,
+                       task_name=os.path.basename(doc_name)[:100])
+        return Response("OK")
+
+
 class SearchView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    ix = index.open_index()
+    def __init__(self, *args, **kwargs):
+        super(SearchView, self).__init__(*args, **kwargs)
+        self.ix = index.open_index()
 
     def add_infos_to_hit(self, r):
         doc = Document.objects.get(id=r['id'])
@@ -203,33 +281,42 @@ class SearchView(APIView):
                 }
 
     def get(self, request, format=None):
-        if 'query' in request.query_params:
-            query = request.query_params['query']
-            try:
-                page = int(request.query_params.get('page', 1))
-            except (ValueError, TypeError):
-                page = 1
-
-            with index.query_page(self.ix, query, page) as result_page:
-                return Response(
-                    {'count': len(result_page),
-                     'page': result_page.pagenum,
-                     'page_count': result_page.pagecount,
-                     'results': list(map(self.add_infos_to_hit, result_page))})
-
-        else:
+        if 'query' not in request.query_params:
             return Response({
                 'count': 0,
                 'page': 0,
                 'page_count': 0,
                 'results': []})
 
+        query = request.query_params['query']
+        try:
+            page = int(request.query_params.get('page', 1))
+        except (ValueError, TypeError):
+            page = 1
+
+        if page < 1:
+            page = 1
+
+        try:
+            with index.query_page(self.ix, query, page) as (result_page,
+                                                            corrected_query):
+                return Response(
+                    {'count': len(result_page),
+                     'page': result_page.pagenum,
+                     'page_count': result_page.pagecount,
+                     'corrected_query': corrected_query,
+                     'results': list(map(self.add_infos_to_hit, result_page))})
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
+
 
 class SearchAutoCompleteView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    ix = index.open_index()
+    def __init__(self, *args, **kwargs):
+        super(SearchAutoCompleteView, self).__init__(*args, **kwargs)
+        self.ix = index.open_index()
 
     def get(self, request, format=None):
         if 'term' in request.query_params:

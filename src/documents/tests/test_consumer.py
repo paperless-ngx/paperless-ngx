@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 from django.test import TestCase, override_settings
 
+from .utils import DirectoriesMixin
 from ..consumer import Consumer, ConsumerError
 from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
 from ..parsers import DocumentParser, ParseError
@@ -364,35 +365,36 @@ class TestFieldPermutations(TestCase):
 
 class DummyParser(DocumentParser):
 
-    def get_thumbnail(self):
+    def get_thumbnail(self, document_path, mime_type):
         # not important during tests
         raise NotImplementedError()
 
-    def __init__(self, path, logging_group, scratch_dir):
-        super(DummyParser, self).__init__(path, logging_group)
+    def __init__(self, logging_group, scratch_dir, archive_path):
+        super(DummyParser, self).__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
+        self.archive_path = archive_path
 
-    def get_optimised_thumbnail(self):
+    def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def get_text(self):
-        return "The Text"
+    def parse(self, document_path, mime_type):
+        self.text = "The Text"
 
 
 class FaultyParser(DocumentParser):
 
-    def get_thumbnail(self):
+    def get_thumbnail(self, document_path, mime_type):
         # not important during tests
         raise NotImplementedError()
 
-    def __init__(self, path, logging_group, scratch_dir):
-        super(FaultyParser, self).__init__(path, logging_group)
+    def __init__(self, logging_group, scratch_dir):
+        super(FaultyParser, self).__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
 
-    def get_optimised_thumbnail(self):
+    def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def get_text(self):
+    def parse(self, document_path, mime_type):
         raise ParseError("Does not compute.")
 
 
@@ -408,32 +410,22 @@ def fake_magic_from_file(file, mime=False):
 
 
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
-class TestConsumer(TestCase):
+class TestConsumer(DirectoriesMixin, TestCase):
 
-    def make_dummy_parser(self, path, logging_group):
-        return DummyParser(path, logging_group, self.scratch_dir)
+    def make_dummy_parser(self, logging_group):
+        return DummyParser(logging_group, self.dirs.scratch_dir, self.get_test_archive_file())
 
-    def make_faulty_parser(self, path, logging_group):
-        return FaultyParser(path, logging_group, self.scratch_dir)
+    def make_faulty_parser(self, logging_group):
+        return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
-        self.scratch_dir = tempfile.mkdtemp()
-        self.media_dir = tempfile.mkdtemp()
-        self.consumption_dir = tempfile.mkdtemp()
-
-        override_settings(
-            SCRATCH_DIR=self.scratch_dir,
-            MEDIA_ROOT=self.media_dir,
-            ORIGINALS_DIR=os.path.join(self.media_dir, "documents", "originals"),
-            THUMBNAIL_DIR=os.path.join(self.media_dir, "documents", "thumbnails"),
-            CONSUMPTION_DIR=self.consumption_dir
-        ).enable()
+        super(TestConsumer, self).setUp()
 
         patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
         m = patcher.start()
         m.return_value = [(None, {
             "parser": self.make_dummy_parser,
-            "mime_types": ["application/pdf"],
+            "mime_types": {"application/pdf": ".pdf"},
             "weight": 0
         })]
 
@@ -441,15 +433,19 @@ class TestConsumer(TestCase):
 
         self.consumer = Consumer()
 
-    def tearDown(self):
-        shutil.rmtree(self.scratch_dir, ignore_errors=True)
-        shutil.rmtree(self.media_dir, ignore_errors=True)
-        shutil.rmtree(self.consumption_dir, ignore_errors=True)
-
     def get_test_file(self):
-        fd, f = tempfile.mkstemp(suffix=".pdf", dir=self.scratch_dir)
-        return f
+        src = os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000001.pdf")
+        dst = os.path.join(self.dirs.scratch_dir, "sample.pdf")
+        shutil.copy(src, dst)
+        return dst
 
+    def get_test_archive_file(self):
+        src = os.path.join(os.path.dirname(__file__), "samples", "documents", "archive", "0000001.pdf")
+        dst = os.path.join(self.dirs.scratch_dir, "sample_archive.pdf")
+        shutil.copy(src, dst)
+        return dst
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def testNormalOperation(self):
 
         filename = self.get_test_file()
@@ -468,6 +464,13 @@ class TestConsumer(TestCase):
         self.assertTrue(os.path.isfile(
             document.thumbnail_path
         ))
+
+        self.assertTrue(os.path.isfile(
+            document.archive_path
+        ))
+
+        self.assertEqual(document.checksum, "42995833e01aea9b3edee44bbfdd7ce1")
+        self.assertEqual(document.archive_checksum, "62acb0bcbfbcaa62ca6ad3668e4e404b")
 
         self.assertFalse(os.path.isfile(filename))
 
@@ -516,27 +519,7 @@ class TestConsumer(TestCase):
 
         self.fail("Should throw exception")
 
-    @override_settings(CONSUMPTION_DIR=None)
-    def testConsumptionDirUnset(self):
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "The CONSUMPTION_DIR settings variable does not appear to be set.")
-            return
-
-        self.fail("Should throw exception")
-
-    @override_settings(CONSUMPTION_DIR="asd")
-    def testNoConsumptionDir(self):
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "Consumption directory asd does not exist")
-            return
-
-        self.fail("Should throw exception")
-
-    def testDuplicates(self):
+    def testDuplicates1(self):
         self.consumer.try_consume_file(self.get_test_file())
 
         try:
@@ -547,6 +530,21 @@ class TestConsumer(TestCase):
 
         self.fail("Should throw exception")
 
+    def testDuplicates2(self):
+        self.consumer.try_consume_file(self.get_test_file())
+
+        try:
+            self.consumer.try_consume_file(self.get_test_archive_file())
+        except ConsumerError as e:
+            self.assertTrue(str(e).endswith("It is a duplicate."))
+            return
+
+        self.fail("Should throw exception")
+
+    def testDuplicates3(self):
+        self.consumer.try_consume_file(self.get_test_archive_file())
+        self.consumer.try_consume_file(self.get_test_file())
+
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testNoParsers(self, m):
         m.return_value = []
@@ -554,7 +552,7 @@ class TestConsumer(TestCase):
         try:
             self.consumer.try_consume_file(self.get_test_file())
         except ConsumerError as e:
-            self.assertTrue(str(e).startswith("No parsers abvailable"))
+            self.assertTrue("No parsers abvailable for" in str(e))
             return
 
         self.fail("Should throw exception")
@@ -563,7 +561,7 @@ class TestConsumer(TestCase):
     def testFaultyParser(self, m):
         m.return_value = [(None, {
             "parser": self.make_faulty_parser,
-            "mime_types": ["application/pdf"],
+            "mime_types": {"application/pdf": ".pdf"},
             "weight": 0
         })]
 
@@ -598,12 +596,33 @@ class TestConsumer(TestCase):
 
         document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
 
-        print(document.source_path)
-        print("===")
+        self.assertEqual(document.title, "new docs")
+        self.assertEqual(document.correspondent.name, "Bank")
+        self.assertEqual(document.filename, "Bank/new docs-0000001.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
+    @mock.patch("documents.signals.handlers.generate_filename")
+    def testFilenameHandlingUnstableFormat(self, m):
+
+        filenames = ["this", "that", "now this", "i cant decide"]
+
+        def get_filename():
+            f = filenames.pop()
+            filenames.insert(0, f)
+            return f
+
+        m.side_effect = lambda f: get_filename()
+
+        filename = self.get_test_file()
+
+        Tag.objects.create(name="test", is_inbox_tag=True)
+
+        document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.correspondent.name, "Bank")
-        self.assertEqual(document.filename, "bank/new-docs-0000001.pdf")
+        self.assertIsNotNone(os.path.isfile(document.title))
+        self.assertTrue(os.path.isfile(document.source_path))
 
     @mock.patch("documents.consumer.DocumentClassifier")
     def testClassifyDocument(self, m):

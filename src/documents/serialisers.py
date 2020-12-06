@@ -1,6 +1,9 @@
+import magic
+from pathvalidate import validate_filename, ValidationError
 from rest_framework import serializers
 
 from .models import Correspondent, Tag, Document, Log, DocumentType
+from .parsers import is_mime_type_supported
 
 
 class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
@@ -76,11 +79,9 @@ class DocumentTypeField(serializers.PrimaryKeyRelatedField):
 
 class DocumentSerializer(serializers.ModelSerializer):
 
-    correspondent_id = CorrespondentField(
-        allow_null=True, source='correspondent')
-    tags_id = TagsField(many=True, source='tags')
-    document_type_id = DocumentTypeField(
-        allow_null=True, source='document_type')
+    correspondent = CorrespondentField(allow_null=True)
+    tags = TagsField(many=True)
+    document_type = DocumentTypeField(allow_null=True)
 
     class Meta:
         model = Document
@@ -88,19 +89,13 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "correspondent",
-            "correspondent_id",
             "document_type",
-            "document_type_id",
             "title",
             "content",
-            "mime_type",
             "tags",
-            "tags_id",
-            "checksum",
             "created",
             "modified",
             "added",
-            "file_name",
             "archive_serial_number"
         )
 
@@ -116,3 +111,82 @@ class LogSerializer(serializers.ModelSerializer):
             "group",
             "level"
         )
+
+
+class PostDocumentSerializer(serializers.Serializer):
+
+    document = serializers.FileField(
+        label="Document",
+        write_only=True,
+    )
+
+    title = serializers.CharField(
+        label="Title",
+        write_only=True,
+        required=False,
+    )
+
+    correspondent = serializers.PrimaryKeyRelatedField(
+        queryset=Correspondent.objects.all(),
+        label="Correspondent",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    document_type = serializers.PrimaryKeyRelatedField(
+        queryset=DocumentType.objects.all(),
+        label="Document type",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all(),
+        label="Tags",
+        write_only=True,
+        required=False,
+    )
+
+    def validate_document(self, document):
+
+        try:
+            validate_filename(document.name)
+        except ValidationError:
+            raise serializers.ValidationError("Invalid filename.")
+
+        document_data = document.file.read()
+        mime_type = magic.from_buffer(document_data, mime=True)
+
+        if not is_mime_type_supported(mime_type):
+            raise serializers.ValidationError(
+                "This file type is not supported.")
+
+        return document.name, document_data
+
+    def validate_title(self, title):
+        if title:
+            return title
+        else:
+            # do not return empty strings.
+            return None
+
+    def validate_correspondent(self, correspondent):
+        if correspondent:
+            return correspondent.id
+        else:
+            return None
+
+    def validate_document_type(self, document_type):
+        if document_type:
+            return document_type.id
+        else:
+            return None
+
+    def validate_tags(self, tags):
+        if tags:
+            return [tag.id for tag in tags]
+        else:
+            return None

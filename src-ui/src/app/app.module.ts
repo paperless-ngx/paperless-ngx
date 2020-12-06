@@ -23,7 +23,7 @@ import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-di
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { TagComponent } from './components/common/tag/tag.component';
 import { SearchComponent } from './components/search/search.component';
-import { ResultHightlightComponent } from './components/search/result-hightlight/result-hightlight.component';
+import { ResultHighlightComponent } from './components/search/result-highlight/result-highlight.component';
 import { PageHeaderComponent } from './components/common/page-header/page-header.component';
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
@@ -45,6 +45,7 @@ import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-v
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component';
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component';
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
+import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
 import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/consumer-status-widget/consumer-status-widget.component';
 
 @NgModule({
@@ -66,7 +67,7 @@ import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/co
     DocumentTypeEditDialogComponent,
     TagComponent,
     SearchComponent,
-    ResultHightlightComponent,
+    ResultHighlightComponent,
     PageHeaderComponent,
     AppFrameComponent,
     ToastsComponent,
@@ -83,8 +84,9 @@ import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/co
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
-    ConsumerStatusWidgetComponent,
-    WidgetFrameComponent
+    WidgetFrameComponent,
+    WelcomeWidgetComponent,
+    ConsumerStatusWidgetComponent
   ],
   imports: [
     BrowserModule,

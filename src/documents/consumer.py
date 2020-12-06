@@ -8,14 +8,15 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
-from paperless.db import GnuPG
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
-from .file_handling import generate_filename, create_source_path_directory
+from .file_handling import create_source_path_directory
 from .loggers import LoggingMixin
 from .models import Document, FileInfo, Correspondent, DocumentType, Tag
-from .parsers import ParseError, get_parser_class_for_mime_type
+from .parsers import ParseError, get_parser_class_for_mime_type, \
+    get_supported_file_extensions, parse_date
 from .signals import (
     document_consumption_finished,
     document_consumption_started
@@ -58,21 +59,10 @@ class Consumer(LoggingMixin):
             raise ConsumerError("Cannot consume {}: It is not a file".format(
                 self.path))
 
-    def pre_check_consumption_dir(self):
-        if not settings.CONSUMPTION_DIR:
-            raise ConsumerError(
-                "The CONSUMPTION_DIR settings variable does not appear to be "
-                "set.")
-
-        if not os.path.isdir(settings.CONSUMPTION_DIR):
-            raise ConsumerError(
-                "Consumption directory {} does not exist".format(
-                    settings.CONSUMPTION_DIR))
-
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
-        if Document.objects.filter(checksum=checksum).exists():
+        if Document.objects.filter(Q(checksum=checksum) | Q(archive_checksum=checksum)).exists():  # NOQA: E501
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             raise ConsumerError(
@@ -83,6 +73,7 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
+        os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
     def try_consume_file(self,
                          path,
@@ -110,7 +101,6 @@ class Consumer(LoggingMixin):
         # Make sure that preconditions for consuming the file are met.
 
         self.pre_check_file_exists()
-        self.pre_check_consumption_dir()
         self.pre_check_directories()
         self.pre_check_duplicate()
 
@@ -145,7 +135,7 @@ class Consumer(LoggingMixin):
 
         # This doesn't parse the document yet, but gives us a parser.
 
-        document_parser = parser_class(self.path, self.logging_group, progress_callback)
+        document_parser = parser_class(self.logging_group, progress_callback)
 
         # However, this already created working directories which we have to
         # clean up.
@@ -153,19 +143,30 @@ class Consumer(LoggingMixin):
         # Parse the document. This may take some time.
 
         try:
-            self.log("debug", f"Generating thumbnail for {self.filename}...")
-            self._send_progress(self.filename, 10, 100, 'WORKING',
-                                'Generating thumbnail...')
-            thumbnail = document_parser.get_optimised_thumbnail()
-            self.log("debug", "Parsing {}...".format(self.filename))
             self._send_progress(self.filename, 20, 100, 'WORKING',
-                                'Getting text from document...')
+                                'Parsing document...')
+            self.log("debug", "Parsing {}...".format(self.filename))
+            document_parser.parse(self.path, mime_type)
+
+            self.log("debug", f"Generating thumbnail for {self.filename}...")
+            self._send_progress(self.filename, 70, 100, 'WORKING',
+                                'Generating thumbnail...')
+            thumbnail = document_parser.get_optimised_thumbnail(
+                self.path, mime_type)
+
             text = document_parser.get_text()
-            self._send_progress(self.filename, 80, 100, 'WORKING',
-                                'Getting date from document...')
             date = document_parser.get_date()
+            if not date:
+                self._send_progress(self.filename, 90, 100, 'WORKING',
+                                    'Getting date from document...')
+                date = parse_date(self.filename, text)
+            archive_path = document_parser.get_archive_path()
+
         except ParseError as e:
             document_parser.cleanup()
+            self.log(
+                "error",
+                f"Error while consuming document {self.filename}: {e}")
             self._send_progress(self.filename, 100, 100, 'FAILED',
                                 "Failed: {}".format(e))
             raise ConsumerError(e)
@@ -183,7 +184,7 @@ class Consumer(LoggingMixin):
             logging.getLogger(__name__).warning(
                 "Cannot classify documents: {}.".format(e))
             classifier = None
-        self._send_progress(self.filename, 85, 100, 'WORKING',
+        self._send_progress(self.filename, 95, 100, 'WORKING',
                             'Storing the document...')
         # now that everything is done, we can start to store the document
         # in the system. This will be a transaction and reasonably fast.
@@ -200,9 +201,6 @@ class Consumer(LoggingMixin):
                 # If we get here, it was successful. Proceed with post-consume
                 # hooks. If they fail, nothing will get changed.
 
-                self._send_progress(self.filename, 90, 100, 'WORKING',
-                                    'Performing post-consumption tasks...')
-
                 document_consumption_finished.send(
                     sender=self.__class__,
                     document=document,
@@ -213,14 +211,41 @@ class Consumer(LoggingMixin):
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
 
+                # TODO: not required, since this is done by the file handling
+                #  logic
                 create_source_path_directory(document.source_path)
-                self._write(document, self.path, document.source_path)
-                self._write(document, thumbnail, document.thumbnail_path)
+
+                self._write(document.storage_type,
+                            self.path, document.source_path)
+
+                self._write(document.storage_type,
+                            thumbnail, document.thumbnail_path)
+
+                if archive_path and os.path.isfile(archive_path):
+                    self._write(document.storage_type,
+                                archive_path, document.archive_path)
+
+                    with open(archive_path, 'rb') as f:
+                        document.archive_checksum = hashlib.md5(
+                            f.read()).hexdigest()
+                        document.save()
+
+                # Afte performing all database operations and moving files
+                # into place, tell paperless where the file is.
+                document.filename = os.path.basename(document.source_path)
+                # Saving the document now will trigger the filename handling
+                # logic.
+                document.save()
 
                 # Delete the file only if it was successfully consumed
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
         except Exception as e:
+            self.log(
+                "error",
+                f"The following error occured while consuming "
+                f"{self.filename}: {e}"
+            )
             self._send_progress(self.filename, 100, 100, 'FAILED',
                                 "Failed: {}".format(e))
             raise ConsumerError(e)
@@ -250,10 +275,7 @@ class Consumer(LoggingMixin):
         created = file_info.created or date or timezone.make_aware(
             datetime.datetime.fromtimestamp(stats.st_mtime))
 
-        if settings.PASSPHRASE:
-            storage_type = Document.STORAGE_TYPE_GPG
-        else:
-            storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
         with open(self.path, "rb") as f:
             document = Document.objects.create(
@@ -275,12 +297,6 @@ class Consumer(LoggingMixin):
 
         self.apply_overrides(document)
 
-        document.filename = generate_filename(document)
-
-        # We need to save the document twice, since we need the PK of the
-        # document in order to create its filename above.
-        document.save()
-
         return document
 
     def apply_overrides(self, document):
@@ -299,11 +315,7 @@ class Consumer(LoggingMixin):
             for tag_id in self.override_tag_ids:
                 document.tags.add(Tag.objects.get(pk=tag_id))
 
-    def _write(self, document, source, target):
+    def _write(self, storage_type, source, target):
         with open(source, "rb") as read_file:
             with open(target, "wb") as write_file:
-                if document.storage_type == Document.STORAGE_TYPE_UNENCRYPTED:
-                    write_file.write(read_file.read())
-                    return
-                self.log("debug", "Encrypting")
-                write_file.write(GnuPG.encrypted(read_file))
+                write_file.write(read_file.read())

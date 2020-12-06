@@ -1,10 +1,12 @@
 [Unit]
 Description=Paperless consumer
+Requires=redis.service
 
 [Service]
 User=paperless
 Group=paperless
-ExecStart=/home/paperless/project/virtualenv/bin/python /home/paperless/project/src/manage.py document_consumer
+WorkingDirectory=/opt/paperless/src
+ExecStart=python3 manage.py document_consumer
 
 [Install]
 WantedBy=multi-user.target
