@@ -1,5 +1,4 @@
-from documents.models import Document
-
+from documents.models import Document, Correspondent
 
 methods_supported = [
     "set_correspondent"
@@ -36,4 +35,15 @@ def perform_bulk_edit(data):
 
 
 def set_correspondent(ids, args):
-    print("WOW")
+    if not len(args) == 1:
+        raise ValueError()
+
+    if not args[0]:
+        correspondent = None
+    else:
+        if not isinstance(args[0], int):
+            raise ValueError()
+
+        correspondent = Correspondent.objects.get(args[0])
+
+    Document.objects.filter(id__in=ids).update(correspondent=correspondent)
