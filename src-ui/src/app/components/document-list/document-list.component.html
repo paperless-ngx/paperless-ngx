@@ -44,7 +44,7 @@
   </div>
   <div class="btn-group ml-2">
 
-    <button type="button" class="btn btn-sm btn-outline-primary" (click)="showFilter=!showFilter">
+    <button type="button" class="btn btn-sm" [ngClass]="isFiltered ? 'btn-primary' : 'btn-outline-primary'" (click)="showFilter=!showFilter">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#funnel" />
       </svg>
@@ -75,7 +75,7 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center">
-  <p>{{list.collectionSize || 0}} document(s)</p>
+  <p>{{list.collectionSize || 0}} document(s) <span *ngIf="isFiltered">(filtered)</span></p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
   [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
 </div>
