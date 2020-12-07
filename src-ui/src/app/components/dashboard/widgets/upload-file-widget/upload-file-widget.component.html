@@ -1,15 +1,18 @@
 <app-widget-frame title="Upload new documents">
 
-  <form content>
-    <ngx-file-drop 
-      dropZoneLabel="Drop documents here or" (onFileDrop)="dropped($event)"
-      (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)"
-      dropZoneClassName="bg-light card"
-      multiple="true"
-      contentClassName="justify-content-center d-flex align-items-center p-5"
-      [showBrowseBtn]=true
-      browseBtnClassName="btn btn-sm btn-outline-primary ml-2">
+  <div content>
+    <form>
+      <ngx-file-drop dropZoneLabel="Drop documents here or" (onFileDrop)="dropped($event)"
+        (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
+        multiple="true" contentClassName="justify-content-center d-flex align-items-center p-5" [showBrowseBtn]=true
+        browseBtnClassName="btn btn-sm btn-outline-primary ml-2">
 
-    </ngx-file-drop>
-  </form>
+      </ngx-file-drop>
+    </form>
+    <div *ngIf="uploadVisible" class="mt-3">
+      <p>Uploading {{uploadStatus.length}} file(s)</p>
+      <ngb-progressbar [value]="loadedSum" [max]="totalSum" [striped]="true" [animated]="uploadStatus.length > 0">
+      </ngb-progressbar>
+    </div>
+  </div>
 </app-widget-frame>
