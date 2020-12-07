@@ -3,11 +3,10 @@
       <label for="created_date">{{titleDate}}</label>
       <input type="date" class="form-control" id="created_date" [(ngModel)]="dateValue" (change)="dateOrTimeChanged()">
   </div>
-  <div class="form-group col">
+  <div class="form-group col" *ngIf="titleTime">
       <label for="created_time">{{titleTime}}</label>
       <input type="time" class="form-control" id="created_time" [(ngModel)]="timeValue" (change)="dateOrTimeChanged()">
   </div>
-
 </div>
 
 
