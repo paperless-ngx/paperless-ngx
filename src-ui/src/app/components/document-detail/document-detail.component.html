@@ -14,15 +14,15 @@
             </svg>
             <span class="d-none d-lg-inline"> Download</span>
         </a>
-    
+
         <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.paperless__has_archive_version">
-          <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
-          <div class="dropdown-menu" ngbDropdownMenu>
-            <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
-          </div>
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
+            <div class="dropdown-menu" ngbDropdownMenu>
+                <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
+            </div>
         </div>
-    
-      </div>
+
+    </div>
 
 
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="close()">
@@ -36,28 +36,75 @@
 
 <div class="row">
     <div class="col-xl">
+
         <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-            <app-input-text title="Title" formControlName="title"></app-input-text>
+            <ul ngbNav #nav="ngbNav" class="nav-tabs">
+                <li [ngbNavItem]="1">
+                    <a ngbNavLink>Details</a>
+                    <ng-template ngbNavContent>
 
-            <div class="form-group">
-                <label for="archive_serial_number">Archive Serial Number</label>
-                <input type="number" class="form-control" id="archive_serial_number"
-                    formControlName='archive_serial_number'>
-            </div>
+                        <app-input-text title="Title" formControlName="title"></app-input-text>
+                        <div class="form-group">
+                            <label for="archive_serial_number">Archive Serial Number</label>
+                            <input type="number" class="form-control" id="archive_serial_number"
+                                formControlName='archive_serial_number'>
+                        </div>
+                        <app-input-date-time titleDate="Date created" formControlName="created"></app-input-date-time>
+                        <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent"
+                            allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
+                        <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type"
+                            allowNull="true" (createNew)="createDocumentType()"></app-input-select>
+                        <app-input-tags formControlName="tags" title="Tags"></app-input-tags>
 
-            <app-input-date-time title="Date created" titleTime="Time created" formControlName="created"></app-input-date-time>
+                    </ng-template>
+                </li>
 
-            <div class="form-group">
-                <label for="content">Content</label>
-                <textarea class="form-control" id="content" rows="5" formControlName='content'></textarea>
-            </div>
+                <li [ngbNavItem]="2">
+                    <a ngbNavLink>Content</a>
+                    <ng-template ngbNavContent>
+                        <div class="form-group">
+                            <textarea class="form-control" id="content" rows="20" formControlName='content'></textarea>
+                        </div>
+                    </ng-template>
+                </li>
 
-            <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent" allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
+                <li [ngbNavItem]="3">
+                    <a ngbNavLink>Metadata</a>
+                    <ng-template ngbNavContent>
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td>Date modified</td>
+                                    <td>{{document.modified | date}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Date added</td>
+                                    <td>{{document.added | date}}</td>
+                                </tr>
+                                <tr>
+                                    <td>MD5 Checksum</td>
+                                    <td>{{metadata?.paperless__checksum}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Original mime type</td>
+                                    <td>{{metadata?.paperless__mime_type}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Is archived?</td>
+                                    <td>{{metadata?.paperless__has_archive_version | yesno}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Media filename</td>
+                                    <td>{{metadata?.paperless__filename}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </ng-template>
+                </li>
+            </ul>
 
-            <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type" allowNull="true" (createNew)="createDocumentType()"></app-input-select>
-
-            <app-input-tags formControlName="tags" title="Tags"></app-input-tags>
+            <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
             <button type="button" class="btn btn-outline-secondary" (click)="discard()">Discard</button>&nbsp;
             <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()">Save & edit next</button>&nbsp;
@@ -65,7 +112,7 @@
         </form>
     </div>
 
-    <div class="col-xl">
+    <div class="col-xl d-none d-xl-block document-preview sticky-top">
         <object [data]="previewUrl | safe" type="application/pdf" width="100%" height="100%">
             <p>Your browser does not support PDFs.
                 <a href="previewUrl">Download the PDF</a>.</p>
