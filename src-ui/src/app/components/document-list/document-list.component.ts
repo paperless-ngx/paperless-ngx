@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
@@ -8,6 +9,7 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
 import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
+import { environment } from 'src/environments/environment';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
 
 @Component({
@@ -22,7 +24,8 @@ export class DocumentListComponent implements OnInit {
     public savedViewConfigService: SavedViewConfigService,
     public route: ActivatedRoute,
     private toastService: ToastService,
-    public modalService: NgbModal) { }
+    public modalService: NgbModal,
+    private titleService: Title) { }
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
@@ -50,10 +53,12 @@ export class DocumentListComponent implements OnInit {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
         this.filterRules = this.list.filterRules
         this.showFilter = false
+        this.titleService.setTitle(`${this.list.savedView.title} - ${environment.appTitle}`)
       } else {
         this.list.savedView = null
         this.filterRules = this.list.filterRules
         this.showFilter = this.filterRules.length > 0
+        this.titleService.setTitle(`Documents - ${environment.appTitle}`)
       }
       this.list.clear()
       this.list.reload()
