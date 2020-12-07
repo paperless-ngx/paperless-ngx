@@ -13,23 +13,55 @@ available filters and ordering fields.
 
 The API provides 5 main endpoints:
 
+*   ``/api/documents/``: Full CRUD support, except POSTing new documents. See below.
 *   ``/api/correspondents/``: Full CRUD support.
 *   ``/api/document_types/``: Full CRUD support.
-*   ``/api/documents/``: Full CRUD support, except POSTing new documents. See below.
 *   ``/api/logs/``: Read-Only.
 *   ``/api/tags/``: Full CRUD support.
 
-All of these endpoints except for the logging endpoint 
+All of these endpoints except for the logging endpoint
 allow you to fetch, edit and delete individual objects
 by appending their primary key to the path, for example ``/api/documents/454/``.
+
+The objects served by the document endpoint contain the following fields:
+
+*   ``id``: ID of the document. Read-only.
+*   ``title``: Title of the document.
+*   ``content``: Plain text content of the document.
+*   ``tags``: List of IDs of tags assigned to this document, or empty list.
+*   ``document_type``: Document type of this document, or null.
+*   ``correspondent``:  Correspondent of this document or null.
+*   ``created``: The date at which this document was created.
+*   ``modified``: The date at which this document was last edited in paperless. Read-only.
+*   ``added``: The date at which this document was added to paperless. Read-only.
+*   ``archive_serial_number``: The identifier of this document in a physical document archive.
+*   ``original_file_name``: Verbose filename of the original document. Read-only.
+*   ``archived_file_name``: Verbose filename of the archived document. Read-only. Null if no archived document is available.
+
+
+Downloading documents
+#####################
 
 In addition to that, the document endpoint offers these additional actions on
 individual documents:
 
-*   ``/api/documents/<pk>/download/``: Download the original document.
-*   ``/api/documents/<pk>/thumb/``: Download the PNG thumbnail of a document.
-*   ``/api/documents/<pk>/preview/``: Display the original document inline,
+*   ``/api/documents/<pk>/download/``: Download the document.
+*   ``/api/documents/<pk>/preview/``: Display the document inline,
     without downloading it.
+*   ``/api/documents/<pk>/thumb/``: Download the PNG thumbnail of a document.
+
+Paperless generates archived PDF/A documents from consumed files and stores both
+the original files as well as the archived files. By default, the endpoints
+for previews and downloads serve the archived file, if it is available.
+Otherwise, the original file is served.
+Some document cannot be archived.
+
+The endpoints correctly serve the response header fields ``Content-Disposition``
+and ``Content-Type`` to indicate the filename for download and the type of content of
+the document.
+
+In order to download or preview the original document when an archied document is available,
+supply the query parameter ``original=true``.
 
 .. hint::
 
@@ -38,13 +70,6 @@ individual documents:
     are in place. However, if you use these old URLs to access documents, you
     should update your app or script to use the new URLs.
 
-.. note::
-
-    The document endpoint provides tags, document types and correspondents as
-    ids in their corresponding fields. These are writeable. Paperless also
-    offers read-only objects for assigned tags, types and correspondents,
-    however, these might be removed in the future. As for now, the front end
-    requires them.
 
 Authorization
 #############
@@ -54,11 +79,11 @@ The REST api provides three different forms of authentication.
 1.  Basic authentication
 
     Authorize by providing a HTTP header in the form
-    
+
     .. code::
 
         Authorization: Basic <credentials>
-    
+
     where ``credentials`` is a base64-encoded string of ``<username>:<password>``
 
 2.  Session authentication
@@ -79,7 +104,7 @@ The REST api provides three different forms of authentication.
     .. code::
 
         Authorization: Token <token>
-    
+
     Tokens can be managed and revoked in the paperless admin.
 
 Searching for documents
@@ -111,7 +136,7 @@ Result list object returned by the endpoint:
         "page_count": 1,
         "corrected_query": "",
         "results": [
-            
+
         ]
     }
 
@@ -131,12 +156,12 @@ Result object:
     {
         "id": 1,
         "highlights": [
-            
+
         ],
         "score": 6.34234,
         "rank": 23,
         "document": {
-            
+
         }
     }
 
@@ -168,7 +193,7 @@ Each fragment contains a list of strings, and some of them are marked as a highl
             {"text": " fragment with a highlight."}
         ]
     ]
-    
+
 
 
 When ``term`` is present within a string, the word within ``text`` should be highlighted.
