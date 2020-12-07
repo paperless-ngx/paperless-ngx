@@ -1,6 +1,7 @@
 import magic
 from pathvalidate import validate_filename, ValidationError
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 
 from .models import Correspondent, Tag, Document, Log, DocumentType
 from .parsers import is_mime_type_supported
@@ -83,6 +84,18 @@ class DocumentSerializer(serializers.ModelSerializer):
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
 
+    original_file_name = SerializerMethodField()
+    archived_file_name = SerializerMethodField()
+
+    def get_original_file_name(self, obj):
+        return obj.get_public_filename()
+
+    def get_archived_file_name(self, obj):
+        if obj.archive_checksum:
+            return obj.get_public_filename(archive=True)
+        else:
+            return None
+
     class Meta:
         model = Document
         depth = 1
@@ -96,7 +109,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             "created",
             "modified",
             "added",
-            "archive_serial_number"
+            "archive_serial_number",
+            "original_file_name",
+            "archived_file_name",
         )
 
 
