@@ -76,7 +76,7 @@ export class DocumentListComponent implements OnInit {
 
   saveViewConfig() {
     this.savedViewConfigService.updateConfig(this.list.savedView)
-    this.toastService.showToast(Toast.make("Information", `View "${this.list.savedView.title}" saved successfully.`))
+    this.toastService.showInfo(`View "${this.list.savedView.title}" saved successfully.`)
   }
 
   saveViewConfigAs() {
