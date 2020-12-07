@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { kMaxLength } from 'buffer';
 import { LOG_LEVELS, LOG_LEVEL_INFO, PaperlessLog } from 'src/app/data/paperless-log';
 import { LogService } from 'src/app/services/rest/log.service';
 import { environment } from 'src/environments/environment';
