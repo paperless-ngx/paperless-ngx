@@ -195,6 +195,24 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         results = response.data['results']
         self.assertEqual(len(results), 3)
 
+        response = self.client.get("/api/documents/?tags__id__none={}".format(tag_3.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['id'], doc1.id)
+        self.assertEqual(results[1]['id'], doc2.id)
+
+        response = self.client.get("/api/documents/?tags__id__none={},{}".format(tag_3.id, tag_2.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['id'], doc1.id)
+
+        response = self.client.get("/api/documents/?tags__id__none={},{}".format(tag_2.id, tag_inbox.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 0)
+
     def test_search_no_query(self):
         response = self.client.get("/api/search/")
         results = response.data['results']

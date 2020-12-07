@@ -34,7 +34,7 @@ export class FilterEditorComponent implements OnInit {
   documentTypes: PaperlessDocumentType[] = []
 
   newRuleClicked() {
-    this.filterRules.push({type: this.selectedRuleType, value: null})
+    this.filterRules.push({type: this.selectedRuleType, value: this.selectedRuleType.default})
     this.selectedRuleType = this.getRuleTypes().length > 0 ? this.getRuleTypes()[0] : null
   }
 
