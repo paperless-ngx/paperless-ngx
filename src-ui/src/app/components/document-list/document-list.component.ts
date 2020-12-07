@@ -32,6 +32,10 @@ export class DocumentListComponent implements OnInit {
   filterRules: FilterRule[] = []
   showFilter = false
 
+  get isFiltered() {
+    return this.list.filterRules?.length > 0
+  }
+
   getTitle() {
     return this.list.savedViewTitle || "Documents"
   }
