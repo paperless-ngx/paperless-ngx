@@ -50,7 +50,12 @@ class DocumentTypeAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
-    readonly_fields = ("added", "mime_type", "storage_type", "filename")
+    readonly_fields = (
+        "added",
+        "modified",
+        "mime_type",
+        "storage_type",
+        "filename")
 
     list_display_links = ("title",)
 
