@@ -12,7 +12,7 @@ import { DocumentTypeEditDialogComponent } from './document-type-edit-dialog/doc
   templateUrl: './document-type-list.component.html',
   styleUrls: ['./document-type-list.component.scss']
 })
-export class DocumentTypeListComponent extends GenericListComponent<PaperlessDocumentType> {
+export class DocumentTypeListComponent extends GenericListComponent<PaperlessDocumentType> implements OnInit {
 
   constructor(service: DocumentTypeService, modalService: NgbModal, private titleService: Title) {
     super(service, modalService, DocumentTypeEditDialogComponent)
