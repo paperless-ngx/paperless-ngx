@@ -57,7 +57,7 @@ Adding documents to paperless
 #############################
 
 Once you've got Paperless setup, you need to start feeding documents into it.
-Currently, there are three options: the consumption directory, IMAP (email), and
+Currently, there are four options: the consumption directory, the dashboard, IMAP (email), and
 HTTP POST.
 
 When adding documents to paperless, it will perform the following operations on
@@ -82,8 +82,7 @@ your documents:
     No matter which options you choose, Paperless will always store the original
     document that it found in the consumption directory or in the mail and
     will never overwrite that document. Archived versions are stored alongside the
-    digital versions.
-
+    original versions.
 
 
 The consumption directory
@@ -106,6 +105,12 @@ files from the scanner.  Typically, you're looking at an FTP server like
 .. _Samba: http://www.samba.org/
 
 .. TODO: hyperref to configuration of the location of this magic folder.
+
+Dashboard upload
+================
+
+The dashboard has a file drop field to upload documents to paperless. Simply drag a file
+onto this field or select a file with the file dialog. Multiple files are supported.
 
 .. _usage-email:
 
@@ -215,12 +220,12 @@ this is entirely possible.
 .. hint::
 
   This can be used in many different ways. One example: Imagine you're working on a particular
-  tasks, such as signing up for university. Usually you'll need to collect a bunch of different
+  task, such as signing up for university. Usually you'll need to collect a bunch of different
   documents that are already sorted into various folders. With the tag system of paperless,
   you can create a new group of documents that are relevant to this task without destroying
   the already existing organization. When you're done with the task, you could delete the
-  task again, which would be equal to sorting documents back into the folder they belong into.
-  Or keep the tag.
+  tag again, which would be equal to sorting documents back into the folder they belong into.
+  Or keep the tag, up to you.
 
 All of the logic above applies to correspondents as well. Attach them to documents if you
 feel that they help you organize your collection.
