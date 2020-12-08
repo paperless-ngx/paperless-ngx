@@ -14,17 +14,20 @@ This release focusses primarily on many small issues with the UI.
 
   * Paperless now has proper window titles.
   * Fixed an issue with the small cards when more than 7 tags were used.
-  * Navigation of the "Show all" links adjusted.
+  * Navigation of the "Show all" links adjusted. They navigate to the saved view now, if available in the sidebar.
   * Some indication on the document lists that a filter is active was added.
   * There's a new filter to filter for documents that do *not* have a certain tag.
   * The file upload box now shows upload progress.
   * The document edit page was reorganized.
   * The document edit page shows various information about a document.
+  * An issue with the height of the preview was fixed.
   * Table issues with too long document titles fixed.
 
 * API
 
   * The API now serves file names with documents.
+  * The API now serves various metadata about documents.
+  * API documentation updated.
 
 * Other
 
@@ -34,6 +37,12 @@ This release focusses primarily on many small issues with the UI.
     conserve the original correspondents, types and titles as much as possible.
   * The filename formatter does not include the document ID in filenames anymore. It will
     rather append ``_01``, ``_02``, etc when it detects duplicate filenames.
+
+.. note::
+
+  The changes to the filename format will apply to newly added documents and changed documents.
+  If you want all files to reflect these changes, execute the ``document_renamer`` management
+  command.
 
 
 paperless-ng 0.9.5
