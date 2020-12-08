@@ -103,10 +103,7 @@ class MailAccountHandler(LoggingMixin):
 
     def _correspondent_from_name(self, name):
         try:
-            return Correspondent.objects.get_or_create(
-                name=name, defaults={
-                    "slug": slugify(name)
-                })[0]
+            return Correspondent.objects.get_or_create(name=name)[0]
         except DatabaseError as e:
             self.log(
                 "error",

@@ -1,4 +1,5 @@
 import magic
+from django.utils.text import slugify
 from pathvalidate import validate_filename, ValidationError
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -7,11 +8,15 @@ from .models import Correspondent, Tag, Document, Log, DocumentType
 from .parsers import is_mime_type_supported
 
 
-class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
+class CorrespondentSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
 
     last_correspondence = serializers.DateTimeField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Correspondent
@@ -27,9 +32,13 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
+class DocumentTypeSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = DocumentType
@@ -44,9 +53,13 @@ class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Tag
