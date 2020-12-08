@@ -598,10 +598,10 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.correspondent.name, "Bank")
-        self.assertEqual(document.filename, "Bank/new docs-0000001.pdf")
+        self.assertEqual(document.filename, "Bank/new docs.pdf")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
-    @mock.patch("documents.signals.handlers.generate_filename")
+    @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m):
 
         filenames = ["this", "that", "now this", "i cant decide"]
@@ -611,7 +611,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
             filenames.insert(0, f)
             return f
 
-        m.side_effect = lambda f: get_filename()
+        m.side_effect = lambda f, root: get_filename()
 
         filename = self.get_test_file()
 
