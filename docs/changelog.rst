@@ -19,6 +19,7 @@ This release focusses primarily on many small issues with the UI.
   * There's a new filter to filter for documents that do *not* have a certain tag.
   * The file upload box now shows upload progress.
   * The document edit page was reorganized.
+  * The document edit page shows various information about a document.
   * Table issues with too long document titles fixed.
 
 * API
