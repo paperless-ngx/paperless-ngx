@@ -496,7 +496,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         async_task.assert_not_called()
 
     def test_get_metadata(self):
-        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png")
+        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png", archive_checksum="A")
 
         shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), doc.source_path)
         shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), doc.archive_path)
