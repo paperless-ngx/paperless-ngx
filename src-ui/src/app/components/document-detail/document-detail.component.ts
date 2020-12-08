@@ -24,6 +24,9 @@ import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/do
 })
 export class DocumentDetailComponent implements OnInit {
 
+  public expandOriginalMetadata = false;
+  public expandArchivedMetadata = false;
+
   documentId: number
   document: PaperlessDocument
   metadata: PaperlessDocumentMetadata
