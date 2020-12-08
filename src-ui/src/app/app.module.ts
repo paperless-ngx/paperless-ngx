@@ -47,6 +47,7 @@ import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
 import { YesNoPipe } from './pipes/yes-no.pipe';
+import { FileSizePipe } from './pipes/file-size.pipe';
 
 @NgModule({
   declarations: [
@@ -86,7 +87,8 @@ import { YesNoPipe } from './pipes/yes-no.pipe';
     UploadFileWidgetComponent,
     WidgetFrameComponent,
     WelcomeWidgetComponent,
-    YesNoPipe
+    YesNoPipe,
+    FileSizePipe
   ],
   imports: [
     BrowserModule,

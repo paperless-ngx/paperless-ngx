@@ -84,24 +84,28 @@
                                     <td>{{document.added | date}}</td>
                                 </tr>
                                 <tr>
+                                    <td>Media filename</td>
+                                    <td>{{metadata?.media_filename}}</td>
+                                </tr>
+                                <tr>
                                     <td>Original MD5 Checksum</td>
                                     <td>{{metadata?.original_checksum}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Archive MD5 Checksum</td>
-                                    <td>{{metadata?.archived_checksum}}</td>
+                                    <td>Original file size</td>
+                                    <td>{{metadata?.original_size | fileSize}}</td>
                                 </tr>
                                 <tr>
                                     <td>Original mime type</td>
                                     <td>{{metadata?.original_mime_type}}</td>
                                 </tr>
-                                <tr>
-                                    <td>Is archived?</td>
-                                    <td>{{metadata?.has_archive_version | yesno}}</td>
+                                <tr *ngIf="metadata?.has_archive_version">
+                                    <td>Archive MD5 Checksum</td>
+                                    <td>{{metadata?.archive_checksum}}</td>
                                 </tr>
-                                <tr>
-                                    <td>Media filename</td>
-                                    <td>{{metadata?.media_filename}}</td>
+                                <tr *ngIf="metadata?.has_archive_version">
+                                    <td>Archive file size</td>
+                                    <td>{{metadata?.archive_size | fileSize}}</td>
                                 </tr>
                             </tbody>
                         </table>

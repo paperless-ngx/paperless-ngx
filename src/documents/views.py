@@ -196,17 +196,28 @@ class DocumentViewSet(RetrieveModelMixin,
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
-            return Response({
+
+            meta = {
                 "original_checksum": doc.checksum,
-                "archived_checksum": doc.archive_checksum,
+                "original_size": os.stat(doc.source_path).st_size,
                 "original_mime_type": doc.mime_type,
                 "media_filename": doc.filename,
                 "has_archive_version": os.path.isfile(doc.archive_path),
                 "original_metadata": self.get_metadata(
-                    doc.source_path, doc.mime_type),
-                "archive_metadata": self.get_metadata(
+                    doc.source_path, doc.mime_type)
+            }
+
+            if doc.archive_checksum and os.path.isfile(doc.archive_path):
+                meta['archive_checksum'] = doc.archive_checksum
+                meta['archive_size'] = os.stat(doc.archive_path).st_size,
+                meta['archive_metadata'] = self.get_metadata(
                     doc.archive_path, "application/pdf")
-            })
+            else:
+                meta['archive_checksum'] = None
+                meta['archive_size'] = None
+                meta['archive_metadata'] = None
+
+            return Response(meta)
         except Document.DoesNotExist:
             raise Http404()
 
