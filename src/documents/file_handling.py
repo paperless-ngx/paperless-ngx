@@ -70,7 +70,22 @@ def many_to_dictionary(field):
     return mydictionary
 
 
-def generate_filename(doc):
+def generate_unique_filename(doc, root):
+    counter = 0
+
+    while True:
+        new_filename = generate_filename(doc, counter)
+        if new_filename == doc.filename:
+            # still the same as before.
+            return new_filename
+
+        if os.path.exists(os.path.join(root, new_filename)):
+            counter += 1
+        else:
+            return new_filename
+
+
+def generate_filename(doc, counter=0):
     path = ""
 
     try:
@@ -112,11 +127,11 @@ def generate_filename(doc):
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
             f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default")
 
-    # Always append the primary key to guarantee uniqueness of filename
+    counter_str = f"_{counter:02}" if counter else ""
     if len(path) > 0:
-        filename = "%s-%07i%s" % (path, doc.pk, doc.file_type)
+        filename = f"{path}{counter_str}{doc.file_type}"
     else:
-        filename = "%07i%s" % (doc.pk, doc.file_type)
+        filename = f"{doc.pk:07}{counter_str}{doc.file_type}"
 
     # Append .gpg for encrypted files
     if doc.storage_type == doc.STORAGE_TYPE_GPG:
