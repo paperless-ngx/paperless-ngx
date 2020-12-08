@@ -1,8 +1,11 @@
+import logging
 import os
+import re
 import tempfile
 from datetime import datetime
 from time import mktime
 
+import pikepdf
 from django.conf import settings
 from django.db.models import Count, Max
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
@@ -160,16 +163,49 @@ class DocumentViewSet(RetrieveModelMixin,
             disposition, filename)
         return response
 
+    def get_metadata(self, file, type):
+        if not os.path.isfile(file):
+            return None
+
+        namespace_pattern = re.compile(r"\{(.*)\}(.*)")
+
+        result = []
+        if type == 'application/pdf':
+            pdf = pikepdf.open(file)
+            meta = pdf.open_metadata()
+            for key, value in meta.items():
+                if isinstance(value, list):
+                    value = " ".join([str(e) for e in value])
+                value = str(value)
+                try:
+                    m = namespace_pattern.match(key)
+                    result.append({
+                        "namespace": m.group(1),
+                        "prefix": meta.REVERSE_NS[m.group(1)],
+                        "key": m.group(2),
+                        "value": value
+                    })
+                except Exception as e:
+                    logging.getLogger(__name__).warning(
+                        f"Error while reading metadata {key}: {value}. Error: "
+                        f"{e}"
+                    )
+        return result
+
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
             return Response({
-                "paperless__checksum": doc.checksum,
-                "paperless__mime_type": doc.mime_type,
-                "paperless__filename": doc.filename,
-                "paperless__has_archive_version":
-                    os.path.isfile(doc.archive_path)
+                "original_checksum": doc.checksum,
+                "archived_checksum": doc.archive_checksum,
+                "original_mime_type": doc.mime_type,
+                "media_filename": doc.filename,
+                "has_archive_version": os.path.isfile(doc.archive_path),
+                "original_metadata": self.get_metadata(
+                    doc.source_path, doc.mime_type),
+                "archive_metadata": self.get_metadata(
+                    doc.archive_path, "application/pdf")
             })
         except Document.DoesNotExist:
             raise Http404()
