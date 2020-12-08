@@ -206,6 +206,8 @@ class Consumer(LoggingMixin):
                             document.archive_checksum = hashlib.md5(
                                 f.read()).hexdigest()
 
+                # Don't save with the lock active. Saving will cause the file
+                # renaming logic to aquire the lock as well.
                 document.save()
 
                 # Delete the file only if it was successfully consumed
