@@ -15,7 +15,7 @@
             <span class="d-none d-lg-inline"> Download</span>
         </a>
 
-        <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.paperless__has_archive_version">
+        <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
             <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
             <div class="dropdown-menu" ngbDropdownMenu>
                 <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
@@ -72,6 +72,7 @@
                 <li [ngbNavItem]="3">
                     <a ngbNavLink>Metadata</a>
                     <ng-template ngbNavContent>
+
                         <table class="table table-borderless">
                             <tbody>
                                 <tr>
@@ -83,23 +84,76 @@
                                     <td>{{document.added | date}}</td>
                                 </tr>
                                 <tr>
-                                    <td>MD5 Checksum</td>
-                                    <td>{{metadata?.paperless__checksum}}</td>
+                                    <td>Original MD5 Checksum</td>
+                                    <td>{{metadata?.original_checksum}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Archive MD5 Checksum</td>
+                                    <td>{{metadata?.archived_checksum}}</td>
                                 </tr>
                                 <tr>
                                     <td>Original mime type</td>
-                                    <td>{{metadata?.paperless__mime_type}}</td>
+                                    <td>{{metadata?.original_mime_type}}</td>
                                 </tr>
                                 <tr>
                                     <td>Is archived?</td>
-                                    <td>{{metadata?.paperless__has_archive_version | yesno}}</td>
+                                    <td>{{metadata?.has_archive_version | yesno}}</td>
                                 </tr>
                                 <tr>
                                     <td>Media filename</td>
-                                    <td>{{metadata?.paperless__filename}}</td>
+                                    <td>{{metadata?.media_filename}}</td>
                                 </tr>
                             </tbody>
                         </table>
+
+                        <h6 *ngIf="metadata?.original_metadata.length > 0">
+                            <button type="button" class="btn btn-outline-secondary btn-sm mr-2"
+                                (click)="expandOriginalMetadata = !expandOriginalMetadata" aria-controls="collapseExample">
+                                <svg class="buttonicon" fill="currentColor" *ngIf="!expandOriginalMetadata">
+                                    <use xlink:href="assets/bootstrap-icons.svg#caret-down" />
+                                </svg>
+                                <svg class="buttonicon" fill="currentColor" *ngIf="expandOriginalMetadata">
+                                    <use xlink:href="assets/bootstrap-icons.svg#caret-up" />
+                                </svg>
+                            </button>
+                            Original document metadata
+                        </h6>
+
+                        <div #collapse="ngbCollapse" [(ngbCollapse)]="!expandOriginalMetadata">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr *ngFor="let m of metadata?.original_metadata">
+                                        <td>{{m.prefix}}:{{m.key}}</td>
+                                        <td>{{m.value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h6 *ngIf="metadata?.has_archive_version && metadata?.archive_metadata.length > 0">
+                            <button type="button" class="btn btn-outline-secondary btn-sm mr-2"
+                                (click)="expandArchivedMetadata = !expandArchivedMetadata" aria-controls="collapseExample">
+                                <svg class="buttonicon" fill="currentColor" *ngIf="!expandArchivedMetadata">
+                                    <use xlink:href="assets/bootstrap-icons.svg#caret-down" />
+                                </svg>
+                                <svg class="buttonicon" fill="currentColor" *ngIf="expandArchivedMetadata">
+                                    <use xlink:href="assets/bootstrap-icons.svg#caret-up" />
+                                </svg>
+                            </button>
+                            Archived document metadata
+                        </h6>
+
+                        <div #collapse="ngbCollapse" [(ngbCollapse)]="!expandArchivedMetadata">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr *ngFor="let m of metadata?.archive_metadata">
+                                        <td>{{m.prefix}}:{{m.key}}</td>
+                                        <td>{{m.value}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                     </ng-template>
                 </li>
             </ul>
@@ -107,7 +161,8 @@
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
             <button type="button" class="btn btn-outline-secondary" (click)="discard()">Discard</button>&nbsp;
-            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()">Save & edit next</button>&nbsp;
+            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()">Save & edit
+                next</button>&nbsp;
             <button type="submit" class="btn btn-primary">Save</button>&nbsp;
         </form>
     </div>
