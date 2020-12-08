@@ -136,7 +136,7 @@ def set_tags(sender,
 
     message = 'Tagging "{}" with "{}"'
     logger(
-        message.format(document, ", ".join([t.slug for t in relevant_tags])),
+        message.format(document, ", ".join([t.name for t in relevant_tags])),
         logging_group
     )
 
@@ -165,7 +165,7 @@ def run_post_consume_script(sender, document, **kwargs):
         reverse("document-download", kwargs={"pk": document.pk}),
         reverse("document-thumb", kwargs={"pk": document.pk}),
         str(document.correspondent),
-        str(",".join(document.tags.all().values_list("slug", flat=True)))
+        str(",".join(document.tags.all().values_list("name", flat=True)))
     )).wait()
 
 

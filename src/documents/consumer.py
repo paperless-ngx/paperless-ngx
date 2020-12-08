@@ -259,7 +259,7 @@ class Consumer(LoggingMixin):
 
         relevant_tags = set(file_info.tags)
         if relevant_tags:
-            tag_names = ", ".join([t.slug for t in relevant_tags])
+            tag_names = ", ".join([t.name for t in relevant_tags])
             self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
