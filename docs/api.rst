@@ -71,6 +71,43 @@ supply the query parameter ``original=true``.
     should update your app or script to use the new URLs.
 
 
+Getting document metadata
+#########################
+
+The api also has an endpoint to retrieve read-only metadata about specific documents. this
+information is not served along with the document objects, since it requires reading
+files and would therefore slow down document lists considerably.
+
+Access the metadata of a document with an ID ``id`` at ``/api/documents/<id>/metadata/``.
+
+The endpoint reports the following data:
+
+*   ``original_checksum``: MD5 checksum of the original document.
+*   ``original_size``: Size of the original document, in bytes.
+*   ``original_mime_type``: Mime type of the original document.
+*   ``media_filename``: Current filename of the document, under which it is stored inside the media directory.
+*   ``has_archive_version``: True, if this document is archived, false otherwise.
+*   ``original_metadata``: A list of metadata associated with the original document. See below.
+*   ``archive_checksum``: MD5 checksum of the archived document, or null.
+*   ``archive_size``: Size of the archived document in bytes, or null.
+*   ``archive_metadata``: Metadata associated with the archived document, or null. See below.
+
+File metadata is reported as a list of objects in the following form:
+
+.. code:: json
+
+    [
+        {
+            "namespace": "http://ns.adobe.com/pdf/1.3/",
+            "prefix": "pdf",
+            "key": "Producer",
+            "value": "SparklePDF, Fancy edition"
+        },
+    ]
+
+``namespace`` and ``prefix`` can be null. The actual metadata reported depends on the file type and the metadata
+available in that specific document. Paperless only reports PDF metadata at this point.
+
 Authorization
 #############
 
