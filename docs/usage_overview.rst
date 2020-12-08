@@ -183,6 +183,63 @@ You can also submit a document using the REST API, see :ref:`api-file_uploads` f
 
 .. _basic-searching:
 
+
+Best practices
+##############
+
+Paperless offers a couple tools that help you organize your document collection. However,
+it is up to you to use them in a way that helps you organize documents and find specific
+documents when you need them. This section offers a couple ideas for managing your collection.
+
+Document types allow you to classify documents according to what they are. You can define
+types such as "Receipt", "Invoice", or "Contract". If you used to collect all your receipts
+in a single binder, you can recreate that system in paperless by defining a document type,
+assigning documents to that type and then filtering by that type to only see all receipts.
+
+Not all documents need document types. Sometimes its hard to determine what the type of a
+document is or it is hard to justify creating a document type that you only need once or twice.
+This is okay. As long as the types you define help you organize your collection in the way
+you want, paperless is doing its job.
+
+Tags can be used in many different ways. Think of tags are more versatile folders or binders.
+If you have a binder for documents related to university / your car or health care, you can
+create these binders in paperless by creating tags and assigning them to relevant documents.
+Just as with documents, you can filter the document list by tags and only see documents of
+a certain topic.
+
+With physical documents, you'll often need to decide which folder the document belongs to.
+The advantage of tags over folders and binders is that a single document can have multiple
+tags. A physical document cannot magically appear in two different folders, but with tags,
+this is entirely possible.
+
+.. hint::
+
+  This can be used in many different ways. One example: Imagine you're working on a particular
+  tasks, such as signing up for university. Usually you'll need to collect a bunch of different
+  documents that are already sorted into various folders. With the tag system of paperless,
+  you can create a new group of documents that are relevant to this task without destroying
+  the already existing organization. When you're done with the task, you could delete the
+  task again, which would be equal to sorting documents back into the folder they belong into.
+  Or keep the tag.
+
+All of the logic above applies to correspondents as well. Attach them to documents if you
+feel that they help you organize your collection.
+
+When you've started organizing your documents, create a couple saved views for document collections
+you regularly access. This is equal to having labeled physical binders on your desk, except
+that these saved views are dynamic and simply update themselves as you add documents to the system.
+
+Here are a couple examples of tags and types that you could use in your collection.
+
+* An ``inbox`` tag for newly added documents that you haven't manually edited yet.
+* A tag ``car`` for everything car related (repairs, registration, insurance, etc)
+* A tag ``todo`` for documents that you still need to do something with, such as reply, or
+  perform some task online.
+* A tag ``bank account x`` for all bank statement related to that account.
+* A tag ``mail`` for anything that you added to paperless via its mail processing capabilities.
+* A tag ``missing_metadata`` when you still need to add some metadata to a document, but can't
+  or don't want to do this right now.
+
 Searching
 #########
 
