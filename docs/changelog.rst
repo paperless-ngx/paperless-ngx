@@ -5,6 +5,34 @@
 Changelog
 *********
 
+paperless-ng 0.9.6
+##################
+
+This release focusses primarily on many small issues with the UI.
+
+* Front end
+
+  * Paperless now has proper window titles.
+  * Fixed an issue with the small cards when more than 7 tags were used.
+  * Navigation of the "Show all" links adjusted.
+  * Some indication on the document lists that a filter is active was added.
+  * There's a new filter to filter for documents that do *not* have a certain tag.
+  * The file upload box now shows upload progress.
+  * The document edit page was reorganized.
+  * Table issues with too long document titles fixed.
+
+* API
+
+  * The API now serves file names with documents.
+
+* Other
+
+  * Fixed an issue with the docker image when a non-standard PostgreSQL port was used.
+  * ``FILENAME_FORMAT`` placeholder for document types.
+  * The filename formatter is now less restrictive with file names and tries to
+    conserve the original correspondents, types and titles as much as possible.
+
+
 paperless-ng 0.9.5
 ##################
 
