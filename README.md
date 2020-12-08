@@ -38,6 +38,7 @@ Here's what you get:
 	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
 * Machine learning powered document matching.
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
+* We have a mobile app that offers a 'Share with paperless' option over at https://github.com/qcasey/paperless_share. You can use that in combination with any of the mobile scanning apps out there. It's still a little rough around the edges, but it works!
 * A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
 * Code cleanup in many, MANY areas. Some of the code from OG paperless was just overly complicated.
 * More tests, more stability.
@@ -50,7 +51,6 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 - Make the front end nice (except mobile).
 - Test coverage at 90%.
-- Store archived documents with an embedded OCR text layer, while keeping originals available. Making good progress in the `feature-ocrmypdf` branch.
 - Fix whatever bugs I and you find.
 
 ## Roadmap for versions beyond 1.0
