@@ -17,8 +17,6 @@ class CorrespondentAdmin(admin.ModelAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
-    readonly_fields = ("slug",)
-
 
 class TagAdmin(admin.ModelAdmin):
 
@@ -31,8 +29,6 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
-    readonly_fields = ("slug", )
-
 
 class DocumentTypeAdmin(admin.ModelAdmin):
 
@@ -43,8 +39,6 @@ class DocumentTypeAdmin(admin.ModelAdmin):
     )
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
-
-    readonly_fields = ("slug",)
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -106,7 +100,7 @@ class DocumentAdmin(admin.ModelAdmin):
         for tag in obj.tags.all():
             r += self._html_tag(
                 "span",
-                tag.slug + ", "
+                tag.name + ", "
             )
         return r
 
