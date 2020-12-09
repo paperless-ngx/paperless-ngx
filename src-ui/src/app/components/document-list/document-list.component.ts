@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -17,6 +17,7 @@ import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
+import { FilterEditorComponent } from 'src/app/components/filter-editor/filter-editor.component';
 
 @Component({
   selector: 'app-document-list',
@@ -45,6 +46,8 @@ export class DocumentListComponent implements OnInit {
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
 
+  @ViewChild(FilterEditorComponent) filterEditor;
+  
   get isFiltered() {
     return this.list.filterRules?.length > 0
   }
@@ -208,6 +211,10 @@ export class DocumentListComponent implements OnInit {
 
   currentViewIncludesDocumentType(document_type_id: number) {
     return this.findRuleIndex(FILTER_DOCUMENT_TYPE, document_type_id) !== -1
+  }
+
+  currentViewIncludesQuickFilter() {
+    return this.list.filterRules.find(rule => rule.type.id == FILTER_HAS_TAG || rule.type.id == FILTER_CORRESPONDENT || rule.type.id == FILTER_DOCUMENT_TYPE) !== undefined
   }
 
 }
