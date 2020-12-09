@@ -24,7 +24,7 @@
   <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortDirection">
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
-      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+      <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
         <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="list.sortField = f.field"
           [class.active]="list.sortField == f.field">{{f.name}}</button>
       </div>
@@ -53,7 +53,7 @@
 
     <div class="btn-group" ngbDropdown role="group">
       <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
-      <div class="dropdown-menu" ngbDropdownMenu>
+      <div class="dropdown-menu" ngbDropdownMenu class="shadow">
         <ng-container *ngIf="!list.savedViewId" >
           <button ngbDropdownItem *ngFor="let config of savedViewConfigService.getConfigs()" (click)="loadViewConfig(config)">{{config.title}}</button>
           <div class="dropdown-divider" *ngIf="savedViewConfigService.getConfigs().length > 0"></div>
@@ -85,7 +85,7 @@
   </app-document-card-large>
 </div>
 
-<table class="table table-sm border shadow" *ngIf="displayMode == 'details'">
+<table class="table table-sm border shadow-sm" *ngIf="displayMode == 'details'">
   <thead>
     <th class="d-none d-lg-table-cell">ASN</th>
     <th class="d-none d-md-table-cell">Correspondent</th>
