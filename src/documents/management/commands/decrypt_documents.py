@@ -82,7 +82,8 @@ class Command(BaseCommand):
             with open(document.thumbnail_path, "wb") as f:
                 f.write(raw_thumb)
 
-            document.save(update_fields=("storage_type", "filename"))
+            Document.objects.filter(id=document.id).update(
+                storage_type=document.storage_type, filename=document.filename)
 
             for path in old_paths:
                 os.unlink(path)
