@@ -45,6 +45,9 @@ export class DocumentListComponent implements OnInit {
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
+  filterTagsText: string
+  filterCorrespondentsText: string
+  filterDocumentTypesText: string
 
   @ViewChild(FilterEditorComponent) filterEditor;
   
