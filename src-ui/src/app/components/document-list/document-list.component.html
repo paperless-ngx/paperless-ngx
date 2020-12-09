@@ -1,5 +1,4 @@
 <app-page-header [title]="getTitle()">
-
   <div class="btn-group btn-group-toggle" ngbRadioGroup [(ngModel)]="displayMode"
     (ngModelChange)="saveDisplayMode()">
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
@@ -21,6 +20,7 @@
       </svg>
     </label>
   </div>
+
   <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortDirection">
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
@@ -42,13 +42,14 @@
       </svg>
     </label>
   </div>
+
   <div class="btn-group ml-2">
 
     <button type="button" class="btn btn-sm" [ngClass]="isFiltered ? 'btn-primary' : 'btn-outline-primary'" (click)="showFilter=!showFilter">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#funnel" />
       </svg>
-      Filter
+      Advanced Filters
     </button>
 
     <div class="btn-group" ngbDropdown role="group">
@@ -58,18 +59,69 @@
           <button ngbDropdownItem *ngFor="let config of savedViewConfigService.getConfigs()" (click)="loadViewConfig(config)">{{config.title}}</button>
           <div class="dropdown-divider" *ngIf="savedViewConfigService.getConfigs().length > 0"></div>
         </ng-container>
-        
+
         <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId">Save "{{list.savedViewTitle}}"</button>
         <button ngbDropdownItem (click)="saveViewConfigAs()">Save as...</button>
       </div>
     </div>
 
   </div>
+
 </app-page-header>
+
+<div class="row pb-1 mb-3 align-items-right" >
+  <div class="btn-toolbar col-auto">
+    <div class="btn-group ml-2" ngbDropdown role="group">
+      <button class="btn btn-outline-primary btn-sm" id="dropdownTags" ngbDropdownToggle>Tags</button>
+      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="dropdownTags">
+        <div class="list-group list-group-flush">
+          <input class="list-group-item form-control" type="text" [(ngModel)]="searchText" placeholder="Filter tags">
+          <ng-container *ngIf="(tags | filter: searchText).length > 0">
+            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" role="menuitem" *ngFor="let tag of tags | filter: searchText; let i = index" (click)="filterByTag(tag.id, true)">
+              {{tag.name}}
+              <span class="badge bg-primary text-light rounded-pill">{{tag.document_count}}</span>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group ml-2" ngbDropdown role="group">
+      <button class="btn btn-outline-primary btn-sm" id="dropdownCorrespondents" ngbDropdownToggle>Correspondents</button>
+      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="dropdownCorrespondents">
+        <div class="list-group list-group-flush">
+          <input class="list-group-item form-control" type="text" [(ngModel)]="searchText" placeholder="Filter correspondents">
+          <ng-container *ngIf="(correspondents | filter: searchText).length > 0">
+            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" role="menuitem" *ngFor="let correspondent of correspondents | filter: searchText; let i = index" (click)="filterByCorrespondent(correspondent.id, true)">
+              {{correspondent.name}}
+              <span class="badge bg-primary text-light rounded-pill">{{correspondent.document_count}}</span>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group ml-2" ngbDropdown role="group">
+      <button class="btn btn-outline-primary btn-sm" id="dropdownDocumentTypes" ngbDropdownToggle>Document Types</button>
+      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="dropdownDocumentTypes">
+        <div class="list-group list-group-flush">
+          <input class="list-group-item form-control" type="text" [(ngModel)]="searchText" placeholder="Filter tags">
+          <ng-container *ngIf="(documentTypes | filter: searchText).length > 0">
+            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" role="menuitem" *ngFor="let documentType of documentTypes | filter: searchText; let i = index" (click)="filterByDocumentType(documentType.id, true)">
+              {{documentType.name}}
+              <span class="badge bg-primary text-light rounded-pill">{{documentType.document_count}}</span>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <div class="card w-100 mb-3" [hidden]="!showFilter">
   <div class="card-body">
-    <h5 class="card-title">Filter</h5>
+    <h5 class="card-title">Advanced Filters</h5>
     <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()" (clear)="clearFilterRules()"></app-filter-editor>
   </div>
 </div>
@@ -125,5 +177,12 @@
 
 
 <div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
-  <app-document-card-small [document]="d" *ngFor="let d of list.documents" (clickTag)="filterByTag($event)" (clickCorrespondent)="filterByCorrespondent($event)"></app-document-card-small>    
+  <app-document-card-small [document]="d" *ngFor="let d of list.documents" (clickTag)="filterByTag($event)" (clickCorrespondent)="filterByCorrespondent($event)"></app-document-card-small>
 </div>
+
+<script type="text/ng-template" id="customTemplate.html">
+  <a>
+      <img ng-src="http://upload.wikimedia.org/wikipedia/commons/thumb/{{match.model.flag}}" width="16">
+      <span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span>
+  </a>
+</script>

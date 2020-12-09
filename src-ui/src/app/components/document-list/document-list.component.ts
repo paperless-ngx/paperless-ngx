@@ -11,6 +11,12 @@ import { SavedViewConfigService } from 'src/app/services/saved-view-config.servi
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
+import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
+import { TagService } from 'src/app/services/rest/tag.service';
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 
 @Component({
   selector: 'app-document-list',
@@ -25,12 +31,19 @@ export class DocumentListComponent implements OnInit {
     public route: ActivatedRoute,
     private toastService: ToastService,
     public modalService: NgbModal,
-    private titleService: Title) { }
+    private titleService: Title,
+    private tagService: TagService,
+    private correspondentService: CorrespondentService,
+    private documentTypeService: DocumentTypeService) { }
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
   filterRules: FilterRule[] = []
   showFilter = false
+
+  tags: PaperlessTag[] = []
+  correspondents: PaperlessCorrespondent[] = []
+  documentTypes: PaperlessDocumentType[] = []
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
@@ -67,6 +80,9 @@ export class DocumentListComponent implements OnInit {
       this.list.clear()
       this.list.reload()
     })
+    this.tagService.listAll().subscribe(result => this.tags = result.results)
+    this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
+    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
   }
 
   applyFilterRules() {
@@ -103,8 +119,8 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  filterByTag(tag_id: number) {
-    let filterRules = this.list.filterRules
+  filterByTag(tag_id: number, singleton: boolean = false) {
+    let filterRules = singleton ? [] : this.list.filterRules
     if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == tag_id)) {
       return
     }
@@ -114,8 +130,8 @@ export class DocumentListComponent implements OnInit {
     this.applyFilterRules()
   }
 
-  filterByCorrespondent(correspondent_id: number) {
-    let filterRules = this.list.filterRules
+  filterByCorrespondent(correspondent_id: number, singleton: boolean = false) {
+    let filterRules = singleton ? [] : this.list.filterRules
     let existing_rule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
     if (existing_rule && existing_rule.value == correspondent_id) {
       return
@@ -128,8 +144,8 @@ export class DocumentListComponent implements OnInit {
     this.applyFilterRules()
   }
 
-  filterByDocumentType(document_type_id: number) {
-    let filterRules = this.list.filterRules
+  filterByDocumentType(document_type_id: number, singleton: boolean = false) {
+    let filterRules = singleton ? [] : this.list.filterRules
     let existing_rule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
     if (existing_rule && existing_rule.value == document_type_id) {
       return
