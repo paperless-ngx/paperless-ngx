@@ -114,12 +114,12 @@ install_languages() {
     done
 }
 
-initialize
-
 # Install additional languages if specified
 if [[ ! -z "$PAPERLESS_OCR_LANGUAGES"  ]]; then
 		install_languages "$PAPERLESS_OCR_LANGUAGES"
 fi
+
+initialize
 
 if [[ "$1" != "/"* ]]; then
 	exec sudo -HEu paperless python3 manage.py "$@"
