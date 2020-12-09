@@ -73,7 +73,7 @@
   <div class="btn-toolbar col-auto">
     <div class="btn-group ml-2" ngbDropdown role="group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownTags" ngbDropdownToggle>Tags</button>
-      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="dropdownTags">
+      <div class="dropdown-menu quick-filter" ngbDropdownMenu aria-labelledby="dropdownTags">
         <div class="list-group list-group-flush">
           <input class="list-group-item form-control" type="text" [(ngModel)]="searchText" placeholder="Filter tags">
           <ng-container *ngIf="(tags | filter: searchText).length > 0">
@@ -91,7 +91,7 @@
 
     <div class="btn-group ml-2" ngbDropdown role="group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownCorrespondents" ngbDropdownToggle>Correspondents</button>
-      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="dropdownCorrespondents">
+      <div class="dropdown-menu quick-filter" ngbDropdownMenu aria-labelledby="dropdownCorrespondents">
         <div class="list-group list-group-flush">
           <input class="list-group-item form-control" type="text" [(ngModel)]="searchText" placeholder="Filter correspondents">
           <ng-container *ngIf="(correspondents | filter: searchText).length > 0">
@@ -109,7 +109,7 @@
 
     <div class="btn-group ml-2" ngbDropdown role="group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownDocumentTypes" ngbDropdownToggle>Document Types</button>
-      <div class="dropdown-menu" ngbDropdownMenu aria-labelledby="dropdownDocumentTypes">
+      <div class="dropdown-menu quick-filter" ngbDropdownMenu aria-labelledby="dropdownDocumentTypes">
         <div class="list-group list-group-flush">
           <input class="list-group-item form-control" type="text" [(ngModel)]="searchText" placeholder="Filter tags">
           <ng-container *ngIf="(documentTypes | filter: searchText).length > 0">
