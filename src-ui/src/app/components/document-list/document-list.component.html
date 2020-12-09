@@ -116,7 +116,7 @@
       <button class="btn btn-outline-primary btn-sm" id="dropdownDocumentTypes" ngbDropdownToggle>Document Types</button>
       <div class="dropdown-menu quick-filter" ngbDropdownMenu aria-labelledby="dropdownDocumentTypes">
         <div class="list-group list-group-flush">
-          <input class="list-group-item form-control" type="text" [(ngModel)]="filterDocumentTypesText" placeholder="Filter tags">
+          <input class="list-group-item form-control" type="text" [(ngModel)]="filterDocumentTypesText" placeholder="Filter document types">
           <ng-container *ngIf="(documentTypes | filter: filterDocumentTypesText).length > 0">
             <button class="list-group-item list-group-item-action d-flex align-items-center" role="menuitem" *ngFor="let documentType of documentTypes | filter: filterDocumentTypesText; let i = index" (click)="toggleFilterByDocumentType(documentType.id)">
               <div class="selected-icon mr-1">
