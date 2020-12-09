@@ -119,8 +119,8 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  filterByTag(tag_id: number, singleton: boolean = false) {
-    let filterRules = singleton ? [] : this.list.filterRules
+  filterByTag(tag_id: number) {
+    let filterRules = this.list.filterRules
     if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == tag_id)) {
       return
     }
@@ -130,8 +130,8 @@ export class DocumentListComponent implements OnInit {
     this.applyFilterRules()
   }
 
-  filterByCorrespondent(correspondent_id: number, singleton: boolean = false) {
-    let filterRules = singleton ? [] : this.list.filterRules
+  filterByCorrespondent(correspondent_id: number) {
+    let filterRules = this.list.filterRules
     let existing_rule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
     if (existing_rule && existing_rule.value == correspondent_id) {
       return
@@ -144,8 +144,8 @@ export class DocumentListComponent implements OnInit {
     this.applyFilterRules()
   }
 
-  filterByDocumentType(document_type_id: number, singleton: boolean = false) {
-    let filterRules = singleton ? [] : this.list.filterRules
+  filterByDocumentType(document_type_id: number) {
+    let filterRules = this.list.filterRules
     let existing_rule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
     if (existing_rule && existing_rule.value == document_type_id) {
       return
@@ -156,6 +156,58 @@ export class DocumentListComponent implements OnInit {
     }
     this.filterRules = filterRules
     this.applyFilterRules()
+  }
+
+  findRuleIndex(type_id: number, value: any) {
+    return this.list.filterRules.findIndex(rule => rule.type.id == type_id && rule.value == value)
+  }
+
+  toggleFilterByTag(tag_id: number) {
+    let existingRuleIndex = this.findRuleIndex(FILTER_HAS_TAG, tag_id)
+    if (existingRuleIndex !== -1) {
+      let filterRules = this.list.filterRules
+      filterRules.splice(existingRuleIndex, 1)
+      this.filterRules = filterRules
+      this.applyFilterRules()
+    } else {
+      this.filterByTag(tag_id)
+    }
+  }
+
+  toggleFilterByCorrespondent(correspondent_id: number) {
+    let existingRuleIndex = this.findRuleIndex(FILTER_CORRESPONDENT, correspondent_id)
+    if (existingRuleIndex !== -1) {
+      let filterRules = this.list.filterRules
+      filterRules.splice(existingRuleIndex, 1)
+      this.filterRules = filterRules
+      this.applyFilterRules()
+    } else {
+      this.filterByCorrespondent(correspondent_id)
+    }
+  }
+
+  toggleFilterByDocumentType(document_type_id: number) {
+    let existingRuleIndex = this.findRuleIndex(FILTER_DOCUMENT_TYPE, document_type_id)
+    if (existingRuleIndex !== -1) {
+      let filterRules = this.list.filterRules
+      filterRules.splice(existingRuleIndex, 1)
+      this.filterRules = filterRules
+      this.applyFilterRules()
+    } else {
+      this.filterByDocumentType(document_type_id)
+    }
+  }
+
+  currentViewIncludesTag(tag_id: number) {
+    return this.findRuleIndex(FILTER_HAS_TAG, tag_id) !== -1
+  }
+
+  currentViewIncludesCorrespondent(correspondent_id: number) {
+    return this.findRuleIndex(FILTER_CORRESPONDENT, correspondent_id) !== -1
+  }
+
+  currentViewIncludesDocumentType(document_type_id: number) {
+    return this.findRuleIndex(FILTER_DOCUMENT_TYPE, document_type_id) !== -1
   }
 
 }
