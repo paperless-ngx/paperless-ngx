@@ -49,13 +49,13 @@
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#funnel" />
       </svg>
-      Advanced Filters
+      {{ showFilter ? 'Hide' : 'Show' }} Filter Editor
     </button>
 
     <div class="btn-group" ngbDropdown role="group">
       <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
       <div class="dropdown-menu" ngbDropdownMenu>
-        <ng-container *ngIf="!list.savedViewId" >
+        <ng-container *ngIf="!list.savedViewId">
           <button ngbDropdownItem *ngFor="let config of savedViewConfigService.getConfigs()" (click)="loadViewConfig(config)">{{config.title}}</button>
           <div class="dropdown-divider" *ngIf="savedViewConfigService.getConfigs().length > 0"></div>
         </ng-container>
@@ -69,7 +69,7 @@
 
 </app-page-header>
 
-<div class="row pb-1 mb-3 align-items-right" >
+<div class="row pb-1 mb-3 align-items-right">
   <div class="btn-toolbar col-auto">
     <div class="btn-group ml-2" ngbDropdown role="group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownTags" ngbDropdownToggle>Tags</button>
@@ -130,7 +130,7 @@
 
 <div class="card w-100 mb-3" [hidden]="!showFilter">
   <div class="card-body">
-    <h5 class="card-title">Advanced Filters</h5>
+    <h5 class="card-title">Filter Editor</h5>
     <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()" (clear)="clearFilterRules()"></app-filter-editor>
   </div>
 </div>
