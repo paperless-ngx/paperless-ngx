@@ -171,29 +171,30 @@ def run_post_consume_script(sender, document, **kwargs):
 
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
-    for f in (instance.source_path,
-              instance.archive_path,
-              instance.thumbnail_path):
-        if os.path.isfile(f):
-            try:
-                os.unlink(f)
-                logging.getLogger(__name__).debug(
-                    f"Deleted file {f}.")
-            except OSError as e:
-                logging.getLogger(__name__).warning(
-                    f"While deleting document {str(instance)}, the file "
-                    f"{f} could not be deleted: {e}"
-                )
+    with FileLock(settings.MEDIA_LOCK):
+        for f in (instance.source_path,
+                  instance.archive_path,
+                  instance.thumbnail_path):
+            if os.path.isfile(f):
+                try:
+                    os.unlink(f)
+                    logging.getLogger(__name__).debug(
+                        f"Deleted file {f}.")
+                except OSError as e:
+                    logging.getLogger(__name__).warning(
+                        f"While deleting document {str(instance)}, the file "
+                        f"{f} could not be deleted: {e}"
+                    )
 
-    delete_empty_directories(
-        os.path.dirname(instance.source_path),
-        root=settings.ORIGINALS_DIR
-    )
+        delete_empty_directories(
+            os.path.dirname(instance.source_path),
+            root=settings.ORIGINALS_DIR
+        )
 
-    delete_empty_directories(
-        os.path.dirname(instance.archive_path),
-        root=settings.ARCHIVE_DIR
-    )
+        delete_empty_directories(
+            os.path.dirname(instance.archive_path),
+            root=settings.ARCHIVE_DIR
+        )
 
 
 def validate_move(instance, old_path, new_path):
