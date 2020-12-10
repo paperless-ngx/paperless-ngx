@@ -1,6 +1,6 @@
   <div class="btn-group" ngbDropdown role="group">
   <button class="btn btn-outline-primary btn-sm" id="dropdown{{title}}" ngbDropdownToggle>{{title}}</button>
-  <div class="dropdown-menu quick-filter" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+  <div class="dropdown-menu quick-filter shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
       <input class="list-group-item form-control" type="text" [(ngModel)]="filterText" placeholder="Filter {{title}}">
       <ng-container *ngIf="(items | filter: filterText).length > 0">
