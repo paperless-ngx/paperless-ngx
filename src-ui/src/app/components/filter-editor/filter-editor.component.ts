@@ -1,20 +1,21 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ElementRef, AfterViewInit, ViewChild } from '@angular/core';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { TagService } from 'src/app/services/rest/tag.service';
-
+import { fromEvent } from 'rxjs';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-filter-editor',
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss']
 })
-export class FilterEditorComponent implements OnInit {
+export class FilterEditorComponent implements OnInit, AfterViewInit {
 
   constructor(private documentTypeService: DocumentTypeService, private tagService: TagService, private correspondentService: CorrespondentService) { }
 
@@ -27,10 +28,13 @@ export class FilterEditorComponent implements OnInit {
   @Output()
   apply = new EventEmitter()
 
+  @ViewChild('filterTextInput') input: ElementRef;
+
   correspondents: PaperlessCorrespondent[] = []
   tags: PaperlessTag[] = []
   documentTypes: PaperlessDocumentType[] = []
 
+  filterText: string
   filterTagsText: string
   filterCorrespondentsText: string
   filterDocumentTypesText: string
@@ -41,6 +45,7 @@ export class FilterEditorComponent implements OnInit {
 
   clearSelected() {
     this.filterRules.splice(0,this.filterRules.length)
+    this.updateTextFilterInput()
     this.clear.next()
   }
 
@@ -52,10 +57,45 @@ export class FilterEditorComponent implements OnInit {
     this.correspondentService.listAll().subscribe(result => {this.correspondents = result.results})
     this.tagService.listAll().subscribe(result => this.tags = result.results)
     this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
+    this.updateTextFilterInput()
+  }
+
+  ngAfterViewInit() {
+    fromEvent(this.input.nativeElement,'keyup')
+        .pipe(
+            debounceTime(150),
+            distinctUntilChanged(),
+            tap()
+        )
+        .subscribe(event => {
+          this.filterText = event.target.value
+          this.onTextFilterInput()
+        });
   }
 
   findRuleIndex(type_id: number, value: any) {
     return this.filterRules.findIndex(rule => rule.type.id == type_id && rule.value == value)
+  }
+
+  updateTextFilterInput() {
+    let existingTextRule = this.filterRules.find(rule => rule.type.id == FILTER_TITLE)
+    if (existingTextRule) this.filterText = existingTextRule.value
+    else this.filterText = ''
+  }
+
+  onTextFilterInput(event) {
+    let text = this.filterText
+    let filterRules = this.filterRules
+    let existingRule = filterRules.find(rule => rule.type.id == FILTER_TITLE)
+    if (existingRule && existingRule.value == text) {
+      return
+    } else if (existingRule) {
+      existingRule.value = text
+    } else {
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_TITLE), value: text})
+    }
+    this.filterRules = filterRules
+    this.applySelected()
   }
 
   toggleFilterByTag(tag_id: number) {

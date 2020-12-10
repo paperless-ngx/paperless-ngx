@@ -3,7 +3,7 @@
     <div class="text-muted mt-1">Filter by:</div>
   </div>
   <div class="col">
-    <input class="form-control form-control-sm" type="text" placeholder="Title / content">
+    <input class="form-control form-control-sm" type="text" [(ngModel)]="filterText" placeholder="Title" #filterTextInput>
   </div>
 
   <div class="btn-group col-auto" ngbDropdown role="group">
