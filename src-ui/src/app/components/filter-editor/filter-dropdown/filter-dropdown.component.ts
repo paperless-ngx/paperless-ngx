@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FilterRuleType, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
-import { MatchingModel } from 'src/app/data/matching-model';
 
 @Component({
   selector: 'app-filter-dropdown',
@@ -18,8 +17,8 @@ export class FilterDropdownComponent implements OnInit {
   @Output()
   toggle = new EventEmitter()
 
-  items: MatchingModel[] = []
-  itemsActive: MatchingModel[] = []
+  items: ObjectWithId[] = []
+  itemsActive: ObjectWithId[] = []
   title: string
   filterText: string
 
@@ -29,6 +28,6 @@ export class FilterDropdownComponent implements OnInit {
   }
 
   toggleItem(item: ObjectWithId) {
-    this.toggle.emit(item, this.filterRuleTypeID)
+    this.toggle.emit(item)
   }
 }
