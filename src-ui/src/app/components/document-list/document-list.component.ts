@@ -67,8 +67,6 @@ export class DocumentListComponent implements OnInit {
   }
 
   applyFilterRules() {
-    console.log('applyFilterRules');
-
     this.list.filterRules = this.filterRules
   }
 
