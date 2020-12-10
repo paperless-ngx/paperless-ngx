@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -14,9 +14,6 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { TagService } from 'src/app/services/rest/tag.service';
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { FilterEditorComponent } from 'src/app/components/filter-editor/filter-editor.component';
 
 @Component({
@@ -32,25 +29,12 @@ export class DocumentListComponent implements OnInit {
     public route: ActivatedRoute,
     private toastService: ToastService,
     public modalService: NgbModal,
-    private titleService: Title,
-    private tagService: TagService,
-    private correspondentService: CorrespondentService,
-    private documentTypeService: DocumentTypeService) { }
+    private titleService: Title) { }
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
   filterRules: FilterRule[] = []
-  showFilter = false
 
-  tags: PaperlessTag[] = []
-  correspondents: PaperlessCorrespondent[] = []
-  documentTypes: PaperlessDocumentType[] = []
-  filterTagsText: string
-  filterCorrespondentsText: string
-  filterDocumentTypesText: string
-
-  @ViewChild(FilterEditorComponent) filterEditor;
-  
   get isFiltered() {
     return this.list.filterRules?.length > 0
   }
@@ -75,20 +59,15 @@ export class DocumentListComponent implements OnInit {
       if (params.has('id')) {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
         this.filterRules = this.list.filterRules
-        this.showFilter = false
         this.titleService.setTitle(`${this.list.savedView.title} - ${environment.appTitle}`)
       } else {
         this.list.savedView = null
         this.filterRules = this.list.filterRules
-        this.showFilter = this.filterRules.length > 0
         this.titleService.setTitle(`Documents - ${environment.appTitle}`)
       }
       this.list.clear()
       this.list.reload()
     })
-    this.tagService.listAll().subscribe(result => this.tags = result.results)
-    this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
-    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
   }
 
   applyFilterRules() {
@@ -97,7 +76,6 @@ export class DocumentListComponent implements OnInit {
 
   clearFilterRules() {
     this.list.filterRules = this.filterRules
-    this.showFilter = false
   }
 
   loadViewConfig(config: SavedViewConfig) {
@@ -162,62 +140,6 @@ export class DocumentListComponent implements OnInit {
     }
     this.filterRules = filterRules
     this.applyFilterRules()
-  }
-
-  findRuleIndex(type_id: number, value: any) {
-    return this.list.filterRules.findIndex(rule => rule.type.id == type_id && rule.value == value)
-  }
-
-  toggleFilterByTag(tag_id: number) {
-    let existingRuleIndex = this.findRuleIndex(FILTER_HAS_TAG, tag_id)
-    if (existingRuleIndex !== -1) {
-      let filterRules = this.list.filterRules
-      filterRules.splice(existingRuleIndex, 1)
-      this.filterRules = filterRules
-      this.applyFilterRules()
-    } else {
-      this.filterByTag(tag_id)
-    }
-  }
-
-  toggleFilterByCorrespondent(correspondent_id: number) {
-    let existingRuleIndex = this.findRuleIndex(FILTER_CORRESPONDENT, correspondent_id)
-    if (existingRuleIndex !== -1) {
-      let filterRules = this.list.filterRules
-      filterRules.splice(existingRuleIndex, 1)
-      this.filterRules = filterRules
-      this.applyFilterRules()
-    } else {
-      this.filterByCorrespondent(correspondent_id)
-    }
-  }
-
-  toggleFilterByDocumentType(document_type_id: number) {
-    let existingRuleIndex = this.findRuleIndex(FILTER_DOCUMENT_TYPE, document_type_id)
-    if (existingRuleIndex !== -1) {
-      let filterRules = this.list.filterRules
-      filterRules.splice(existingRuleIndex, 1)
-      this.filterRules = filterRules
-      this.applyFilterRules()
-    } else {
-      this.filterByDocumentType(document_type_id)
-    }
-  }
-
-  currentViewIncludesTag(tag_id: number) {
-    return this.findRuleIndex(FILTER_HAS_TAG, tag_id) !== -1
-  }
-
-  currentViewIncludesCorrespondent(correspondent_id: number) {
-    return this.findRuleIndex(FILTER_CORRESPONDENT, correspondent_id) !== -1
-  }
-
-  currentViewIncludesDocumentType(document_type_id: number) {
-    return this.findRuleIndex(FILTER_DOCUMENT_TYPE, document_type_id) !== -1
-  }
-
-  currentViewIncludesQuickFilter() {
-    return this.list.filterRules.find(rule => rule.type.id == FILTER_HAS_TAG || rule.type.id == FILTER_CORRESPONDENT || rule.type.id == FILTER_DOCUMENT_TYPE) !== undefined
   }
 
 }
