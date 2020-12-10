@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FilterRuleType, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { FilterRuleType, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 
 @Component({
@@ -21,10 +21,12 @@ export class FilterDropdownComponent implements OnInit {
   itemsActive: ObjectWithId[] = []
   title: string
   filterText: string
+  display: string
 
   ngOnInit(): void {
     let filterRuleType: FilterRuleType = FILTER_RULE_TYPES.find(t => t.id == this.filterRuleTypeID)
     this.title = filterRuleType.name
+    this.display = filterRuleType.datatype
   }
 
   toggleItem(item: ObjectWithId) {
