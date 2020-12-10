@@ -27,7 +27,7 @@ class TestAttributes(TestCase):
 
         self.assertEqual(file_info.title, title, filename)
 
-        self.assertEqual(tuple([t.slug for t in file_info.tags]), tags, filename)
+        self.assertEqual(tuple([t.name for t in file_info.tags]), tags, filename)
 
     def test_guess_attributes_from_name0(self):
         self._test_guess_attributes_from_name(
@@ -188,7 +188,7 @@ class TestFieldPermutations(TestCase):
             self.assertEqual(info.tags, (), filename)
         else:
             self.assertEqual(
-                [t.slug for t in info.tags], tags.split(','),
+                [t.name for t in info.tags], tags.split(','),
                 filename
             )
 
@@ -342,8 +342,8 @@ class TestFieldPermutations(TestCase):
             info = FileInfo.from_filename(filename)
             self.assertEqual(info.title, "0001")
             self.assertEqual(len(info.tags), 2)
-            self.assertEqual(info.tags[0].slug, "tag1")
-            self.assertEqual(info.tags[1].slug, "tag2")
+            self.assertEqual(info.tags[0].name, "tag1")
+            self.assertEqual(info.tags[1].name, "tag2")
             self.assertIsNone(info.created)
 
         # Complex transformation with date in replacement string
@@ -356,8 +356,8 @@ class TestFieldPermutations(TestCase):
             info = FileInfo.from_filename(filename)
             self.assertEqual(info.title, "0001")
             self.assertEqual(len(info.tags), 2)
-            self.assertEqual(info.tags[0].slug, "tag1")
-            self.assertEqual(info.tags[1].slug, "tag2")
+            self.assertEqual(info.tags[0].name, "tag1")
+            self.assertEqual(info.tags[1].name, "tag2")
             self.assertEqual(info.created.year, 2019)
             self.assertEqual(info.created.month, 9)
             self.assertEqual(info.created.day, 8)
@@ -598,10 +598,10 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.correspondent.name, "Bank")
-        self.assertEqual(document.filename, "bank/new-docs-0000001.pdf")
+        self.assertEqual(document.filename, "Bank/new docs.pdf")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
-    @mock.patch("documents.signals.handlers.generate_filename")
+    @mock.patch("documents.signals.handlers.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m):
 
         filenames = ["this", "that", "now this", "i cant decide"]
@@ -611,7 +611,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
             filenames.insert(0, f)
             return f
 
-        m.side_effect = lambda f: get_filename()
+        m.side_effect = lambda f, root: get_filename()
 
         filename = self.get_test_file()
 

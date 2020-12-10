@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SearchHit } from 'src/app/data/search-result';
 import { SearchService } from 'src/app/services/rest/search.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-search',
@@ -26,7 +28,7 @@ export class SearchComponent implements OnInit {
 
   errorMessage: string
 
-  constructor(private searchService: SearchService, private route: ActivatedRoute, private router: Router) { }
+  constructor(private searchService: SearchService, private route: ActivatedRoute, private router: Router, private titleService: Title) { }
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(paramMap => {
@@ -34,6 +36,7 @@ export class SearchComponent implements OnInit {
       this.searching = true
       this.currentPage = 1
       this.loadPage()
+      this.titleService.setTitle(`Search: ${this.query} - ${environment.appTitle}`)
     })
 
   }

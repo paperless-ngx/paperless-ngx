@@ -73,7 +73,7 @@ in your browser and paperless has to do much less work to serve the data.
 
 **Q:** *How do I install paperless-ng on Raspberry Pi?*
 
-**A:** There is not docker image for ARM available. If you know how to build
+**A:** There is no docker image for ARM available. If you know how to build
 that automatically, I'm all ears. For now, you have to grab the latest release
 archive from the project page and build the image yourself. The release comes
 with the front end already compiled, so you don't have to do this on the Pi.
