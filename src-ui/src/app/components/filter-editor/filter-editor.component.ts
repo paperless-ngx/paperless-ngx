@@ -127,9 +127,9 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
     let filterRuleType: FilterRuleType = FILTER_RULE_TYPES.find(t => t.id == filterRuleTypeID)
     let existingRule = filterRules.find(rule => rule.type.id == filterRuleType.id)
 
-    if (existingRule && existingRule.value == item.id && filterRuleType.id == FILTER_HAS_TAG) {
+    if (existingRule && existingRule.value == item.id) {
       filterRules.splice(filterRules.indexOf(existingRule), 1)
-    } else if (existingRule  && filterRuleType.id == FILTER_HAS_TAG) {
+    } else if (existingRule && filterRuleType.id == FILTER_HAS_TAG) {
       filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == filterRuleType.id), value: item.id})
     } else if (existingRule && existingRule.value == item.id) {
       return
