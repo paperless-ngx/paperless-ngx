@@ -1,11 +1,8 @@
-import logging
 import os
-import re
 import tempfile
 from datetime import datetime
 from time import mktime
 
-import pikepdf
 from django.conf import settings
 from django.db.models import Count, Max
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
@@ -42,6 +39,7 @@ from .filters import (
     LogFilterSet
 )
 from .models import Correspondent, Document, Log, Tag, DocumentType
+from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
@@ -163,34 +161,16 @@ class DocumentViewSet(RetrieveModelMixin,
             disposition, filename)
         return response
 
-    def get_metadata(self, file, type):
+    def get_metadata(self, file, mime_type):
         if not os.path.isfile(file):
             return None
 
-        namespace_pattern = re.compile(r"\{(.*)\}(.*)")
-
-        result = []
-        if type == 'application/pdf':
-            pdf = pikepdf.open(file)
-            meta = pdf.open_metadata()
-            for key, value in meta.items():
-                if isinstance(value, list):
-                    value = " ".join([str(e) for e in value])
-                value = str(value)
-                try:
-                    m = namespace_pattern.match(key)
-                    result.append({
-                        "namespace": m.group(1),
-                        "prefix": meta.REVERSE_NS[m.group(1)],
-                        "key": m.group(2),
-                        "value": value
-                    })
-                except Exception as e:
-                    logging.getLogger(__name__).warning(
-                        f"Error while reading metadata {key}: {value}. Error: "
-                        f"{e}"
-                    )
-        return result
+        parser_class = get_parser_class_for_mime_type(mime_type)
+        if parser_class:
+            parser = parser_class(logging_group=None)
+            return parser.extract_metadata(file, mime_type)
+        else:
+            return []
 
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
