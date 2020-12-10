@@ -65,11 +65,21 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
         });
   }
 
-  setDropdownItems(items: ObjectWithId[], filterRuleTypeID: number) {
+  setDropdownItems(items: ObjectWithId[], filterRuleTypeID: number): void {
     let dropdown: FilterDropdownComponent = this.getDropdownByFilterRuleTypeID(filterRuleTypeID)
     if (dropdown) {
       dropdown.items = items
     }
+    this.updateDropdownActiveItems(dropdown)
+  }
+
+  updateDropdownActiveItems(dropdown: FilterDropdownComponent): void {
+    let activeRulesValues = this.filterRules.filter(r => r.type.id == dropdown.filterRuleTypeID).map(r => r.value)
+    let activeItems = []
+    if (activeRulesValues.length > 0) {
+      activeItems = dropdown.items.filter(i => activeRulesValues.includes(i.id))
+    }
+    dropdown.itemsActive = activeItems
   }
 
   getDropdownByFilterRuleTypeID(filterRuleTypeID: number): FilterDropdownComponent {
@@ -83,6 +93,7 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
   clearSelected() {
     this.filterRules.splice(0,this.filterRules.length)
     this.updateTextFilterInput()
+    this.quickFilterDropdowns.forEach(d => this.updateDropdownActiveItems(d))
     this.clear.next()
   }
 
@@ -118,6 +129,8 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
 
     if (existingRule && existingRule.value == item.id && filterRuleType.id == FILTER_HAS_TAG) {
       filterRules.splice(filterRules.indexOf(existingRule), 1)
+    } else if (existingRule  && filterRuleType.id == FILTER_HAS_TAG) {
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == filterRuleType.id), value: item.id})
     } else if (existingRule && existingRule.value == item.id) {
       return
     } else if (existingRule) {
@@ -125,6 +138,10 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
     } else {
       filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == filterRuleType.id), value: item.id})
     }
+
+    let dropdown = this.getDropdownByFilterRuleTypeID(filterRuleTypeID)
+    this.updateDropdownActiveItems(dropdown)
+
     this.filterRules = filterRules
     this.applySelected()
   }
