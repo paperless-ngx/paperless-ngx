@@ -20,7 +20,6 @@ RUN apt-get update \
 		libpq-dev \
 		libqpdf-dev \
 		libxml2 \
-		libxslt-dev \
 		optipng \
 		pngquant \
 		qpdf \
