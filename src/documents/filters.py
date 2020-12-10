@@ -37,6 +37,10 @@ class DocumentTypeFilterSet(FilterSet):
 
 class TagsFilter(Filter):
 
+    def __init__(self, exclude=False):
+        super(TagsFilter, self).__init__()
+        self.exclude = exclude
+
     def filter(self, qs, value):
         if not value:
             return qs
@@ -47,7 +51,10 @@ class TagsFilter(Filter):
             return qs
 
         for tag_id in tag_ids:
-            qs = qs.filter(tags__id=tag_id)
+            if self.exclude:
+                qs = qs.exclude(tags__id=tag_id)
+            else:
+                qs = qs.filter(tags__id=tag_id)
 
         return qs
 
@@ -73,6 +80,8 @@ class DocumentFilterSet(FilterSet):
     )
 
     tags__id__all = TagsFilter()
+
+    tags__id__none = TagsFilter(exclude=True)
 
     is_in_inbox = InboxFilter()
 

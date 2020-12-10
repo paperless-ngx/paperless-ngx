@@ -1,11 +1,13 @@
 export interface PaperlessDocumentMetadata {
     
-  paperless__checksum?: string
+  original_checksum?: string
 
-  paperless__mime_type?: string
+  archived_checksum?: string
 
-  paperless__filename?: string
+  original_mime_type?: string
 
-  paperless__has_archive_version?: boolean
+  media_filename?: string
+
+  has_archive_version?: boolean
 
 }
