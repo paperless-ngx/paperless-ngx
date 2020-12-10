@@ -11,10 +11,6 @@ import { SavedViewConfigService } from 'src/app/services/saved-view-config.servi
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { FilterEditorComponent } from 'src/app/components/filter-editor/filter-editor.component';
 
 @Component({
   selector: 'app-document-list',
@@ -71,6 +67,8 @@ export class DocumentListComponent implements OnInit {
   }
 
   applyFilterRules() {
+    console.log('applyFilterRules');
+
     this.list.filterRules = this.filterRules
   }
 
@@ -101,45 +99,6 @@ export class DocumentListComponent implements OnInit {
       })
       modal.close()
     })
-  }
-
-  filterByTag(tag_id: number) {
-    let filterRules = this.list.filterRules
-    if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == tag_id)) {
-      return
-    }
-
-    filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: tag_id})
-    this.filterRules = filterRules
-    this.applyFilterRules()
-  }
-
-  filterByCorrespondent(correspondent_id: number) {
-    let filterRules = this.list.filterRules
-    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
-    if (existing_rule && existing_rule.value == correspondent_id) {
-      return
-    } else if (existing_rule) {
-      existing_rule.value = correspondent_id
-    } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: correspondent_id})
-    }
-    this.filterRules = filterRules
-    this.applyFilterRules()
-  }
-
-  filterByDocumentType(document_type_id: number) {
-    let filterRules = this.list.filterRules
-    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
-    if (existing_rule && existing_rule.value == document_type_id) {
-      return
-    } else if (existing_rule) {
-      existing_rule.value = document_type_id
-    } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: document_type_id})
-    }
-    this.filterRules = filterRules
-    this.applyFilterRules()
   }
 
 }
