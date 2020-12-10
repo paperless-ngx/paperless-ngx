@@ -67,8 +67,8 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
             distinctUntilChanged(),
             tap()
         )
-        .subscribe(event => {
-          this.filterText = event.target.value
+        .subscribe((event: Event) => {
+          this.filterText = (event.target as HTMLInputElement).value
           this.onTextFilterInput()
         });
   }
@@ -83,7 +83,7 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
     else this.filterText = ''
   }
 
-  onTextFilterInput(event) {
+  onTextFilterInput() {
     let text = this.filterText
     let filterRules = this.filterRules
     let existingRule = filterRules.find(rule => rule.type.id == FILTER_TITLE)
