@@ -1,6 +1,5 @@
 import magic
 from django.utils.text import slugify
-from pathvalidate import validate_filename, ValidationError
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
@@ -207,12 +206,6 @@ class PostDocumentSerializer(serializers.Serializer):
     )
 
     def validate_document(self, document):
-
-        try:
-            validate_filename(document.name)
-        except ValidationError:
-            raise serializers.ValidationError("Invalid filename.")
-
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
 
