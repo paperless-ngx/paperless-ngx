@@ -47,7 +47,7 @@
 
     <div class="btn-group" ngbDropdown role="group">
       <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle>Saved Views</button>
-      <div class="dropdown-menu" ngbDropdownMenu>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
         <ng-container *ngIf="!list.savedViewId">
           <button ngbDropdownItem *ngFor="let config of savedViewConfigService.getConfigs()" (click)="loadViewConfig(config)">{{config.title}}</button>
           <div class="dropdown-divider" *ngIf="savedViewConfigService.getConfigs().length > 0"></div>
