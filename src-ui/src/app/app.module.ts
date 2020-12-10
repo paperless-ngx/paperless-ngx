@@ -46,6 +46,8 @@ import { StatisticsWidgetComponent } from './components/dashboard/widgets/statis
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component';
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
+import { YesNoPipe } from './pipes/yes-no.pipe';
+import { FileSizePipe } from './pipes/file-size.pipe';
 
 @NgModule({
   declarations: [
@@ -84,7 +86,9 @@ import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-w
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
     WidgetFrameComponent,
-    WelcomeWidgetComponent
+    WelcomeWidgetComponent,
+    YesNoPipe,
+    FileSizePipe
   ],
   imports: [
     BrowserModule,

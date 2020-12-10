@@ -53,6 +53,10 @@ ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
+
+# Lock file for synchronizing changes to the MEDIA directory across multiple
+# threads.
+MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
