@@ -1,3 +1,6 @@
+import logging
+
+import tqdm
 from django.core.management.base import BaseCommand
 
 from documents.models import Document
@@ -18,6 +21,8 @@ class Command(Renderable, BaseCommand):
 
         self.verbosity = options["verbosity"]
 
-        for document in Document.objects.all():
+        logging.getLogger().handlers[0].level = logging.ERROR
+
+        for document in tqdm.tqdm(Document.objects.all()):
             # Saving the document again will generate a new filename and rename
             document.save()
