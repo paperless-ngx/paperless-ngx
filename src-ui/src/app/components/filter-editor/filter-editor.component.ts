@@ -35,22 +35,11 @@ export class FilterEditorComponent implements OnInit {
   filterCorrespondentsText: string
   filterDocumentTypesText: string
 
-  newRuleClicked() {
-    this.filterRules.push({type: this.selectedRuleType, value: this.selectedRuleType.default})
-  }
-
-  removeRuleClicked(rule) {
-    let index = this.filterRules.findIndex(r => r == rule)
-    if (index > -1) {
-      this.filterRules.splice(index, 1)
-    }
-  }
-
-  applyClicked() {
+  applySelected() {
     this.apply.next()
   }
 
-  clearClicked() {
+  clearSelected() {
     this.filterRules.splice(0,this.filterRules.length)
     this.clear.next()
   }
@@ -71,38 +60,42 @@ export class FilterEditorComponent implements OnInit {
 
   toggleFilterByTag(tag_id: number) {
     let existingRuleIndex = this.findRuleIndex(FILTER_HAS_TAG, tag_id)
+    let filterRules = this.filterRules
     if (existingRuleIndex !== -1) {
-      let filterRules = this.filterRules
       filterRules.splice(existingRuleIndex, 1)
-      this.filterRules = filterRules
-      this.applyFilterRules()
     } else {
-      this.filterByTag(tag_id)
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: tag_id})
     }
+    this.filterRules = filterRules
+    this.applySelected()
   }
 
   toggleFilterByCorrespondent(correspondent_id: number) {
-    let existingRuleIndex = this.findRuleIndex(FILTER_CORRESPONDENT, correspondent_id)
-    if (existingRuleIndex !== -1) {
-      let filterRules = this.filterRules
-      filterRules.splice(existingRuleIndex, 1)
-      this.filterRules = filterRules
-      this.applyFilterRules()
+    let filterRules = this.filterRules
+    let existingRule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
+    if (existingRule && existingRule.value == correspondent_id) {
+      return
+    } else if (existingRule) {
+      existingRule.value = correspondent_id
     } else {
-      this.filterByCorrespondent(correspondent_id)
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: correspondent_id})
     }
+    this.filterRules = filterRules
+    this.applySelected()
   }
 
   toggleFilterByDocumentType(document_type_id: number) {
-    let existingRuleIndex = this.findRuleIndex(FILTER_DOCUMENT_TYPE, document_type_id)
-    if (existingRuleIndex !== -1) {
-      let filterRules = this.filterRules
-      filterRules.splice(existingRuleIndex, 1)
-      this.filterRules = filterRules
-      this.applyFilterRules()
+    let filterRules = this.filterRules
+    let existingRule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
+    if (existingRule && existingRule.value == document_type_id) {
+      return
+    } else if (existingRule) {
+      existingRule.value = document_type_id
     } else {
-      this.filterByDocumentType(document_type_id)
+      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: document_type_id})
     }
+    this.filterRules = filterRules
+    this.applySelected()
   }
 
   currentViewIncludesTag(tag_id: number) {
