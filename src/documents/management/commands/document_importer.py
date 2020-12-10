@@ -5,11 +5,13 @@ import shutil
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
+from filelock import FileLock
 
 from documents.models import Document
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
-from ...file_handling import generate_filename, create_source_path_directory
+from ...file_handling import create_source_path_directory, \
+    generate_unique_filename
 from ...mixins import Renderable
 
 
@@ -114,17 +116,20 @@ class Command(Renderable, BaseCommand):
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-            document.filename = generate_filename(document)
+            with FileLock(settings.MEDIA_LOCK):
+                document.filename = generate_unique_filename(
+                    document, settings.ORIGINALS_DIR)
 
-            if os.path.isfile(document.source_path):
-                raise FileExistsError(document.source_path)
+                if os.path.isfile(document.source_path):
+                    raise FileExistsError(document.source_path)
 
-            create_source_path_directory(document.source_path)
+                create_source_path_directory(document.source_path)
 
-            print(f"Moving {document_path} to {document.source_path}")
-            shutil.copy(document_path, document.source_path)
-            shutil.copy(thumbnail_path, document.thumbnail_path)
-            if archive_path:
-                shutil.copy(archive_path, document.archive_path)
+                print(f"Moving {document_path} to {document.source_path}")
+                shutil.copy(document_path, document.source_path)
+                shutil.copy(thumbnail_path, document.thumbnail_path)
+                if archive_path:
+                    create_source_path_directory(document.archive_path)
+                    shutil.copy(archive_path, document.archive_path)
 
             document.save()

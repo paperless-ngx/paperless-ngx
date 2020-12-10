@@ -230,7 +230,7 @@ class TestConsumerTags(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
         tag_names = ("existingTag", "Space Tag")
         # Create a Tag prior to consuming a file using it in path
-        tag_ids = [Tag.objects.create(name=tag_names[0]).pk,]
+        tag_ids = [Tag.objects.create(name="existingtag").pk,]
 
         self.t_start()
 
