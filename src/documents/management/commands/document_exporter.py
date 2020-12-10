@@ -38,6 +38,9 @@ class Command(Renderable, BaseCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
+        if os.listdir(self.target):
+            raise CommandError("That directory is not empty.")
+
         self.dump()
 
     def dump(self):
@@ -54,31 +57,39 @@ class Command(Renderable, BaseCommand):
 
             document = document_map[document_dict["pk"]]
 
-            unique_filename = f"{document.pk:07}_{document.file_name}"
-            file_target = os.path.join(self.target, unique_filename)
+            print(f"Exporting: {document}")
 
-            thumbnail_name = unique_filename + "-thumbnail.png"
+            filename_counter = 0
+            while True:
+                original_name = document.get_public_filename(
+                    counter=filename_counter)
+                original_target = os.path.join(self.target, original_name)
+
+                if not os.path.exists(original_target):
+                    break
+                else:
+                    filename_counter += 1
+
+            thumbnail_name = original_name + "-thumbnail.png"
             thumbnail_target = os.path.join(self.target, thumbnail_name)
 
-            document_dict[EXPORTER_FILE_NAME] = unique_filename
+            document_dict[EXPORTER_FILE_NAME] = original_name
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
             if os.path.exists(document.archive_path):
-                archive_name = \
-                    f"{document.pk:07}_archive_{document.archive_file_name}"
+                archive_name = document.get_public_filename(
+                    archive=True, counter=filename_counter, suffix="_archive")
                 archive_target = os.path.join(self.target, archive_name)
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
             else:
                 archive_target = None
 
-            print(f"Exporting: {file_target}")
-
             t = int(time.mktime(document.created.timetuple()))
             if document.storage_type == Document.STORAGE_TYPE_GPG:
 
-                with open(file_target, "wb") as f:
+                with open(original_target, "wb") as f:
                     f.write(GnuPG.decrypted(document.source_file))
-                    os.utime(file_target, times=(t, t))
+                    os.utime(original_target, times=(t, t))
 
                 with open(thumbnail_target, "wb") as f:
                     f.write(GnuPG.decrypted(document.thumbnail_file))
@@ -90,7 +101,7 @@ class Command(Renderable, BaseCommand):
                         os.utime(archive_target, times=(t, t))
             else:
 
-                shutil.copy(document.source_path, file_target)
+                shutil.copy(document.source_path, original_target)
                 shutil.copy(document.thumbnail_path, thumbnail_target)
 
                 if archive_target:
