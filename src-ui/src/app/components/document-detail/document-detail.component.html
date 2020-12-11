@@ -14,14 +14,14 @@
             </svg>
             <span class="d-none d-lg-inline"> Download</span>
         </a>
-    
+
         <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.paperless__has_archive_version">
           <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
           <div class="dropdown-menu" ngbDropdownMenu>
             <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
           </div>
         </div>
-    
+
       </div>
 
 
@@ -66,10 +66,8 @@
     </div>
 
     <div class="col-xl">
-        <object [data]="previewUrl | safe" type="application/pdf" width="100%" height="100%">
-            <p>Your browser does not support PDFs.
-                <a href="previewUrl">Download the PDF</a>.</p>
-        </object>
-
+      <div class="pdf-viewer-container">
+        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="false"></pdf-viewer>
+      </div>
     </div>
 </div>
