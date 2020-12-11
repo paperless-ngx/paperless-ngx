@@ -1,16 +1,21 @@
 import magic
-from pathvalidate import validate_filename, ValidationError
+from django.utils.text import slugify
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 
 from .models import Correspondent, Tag, Document, Log, DocumentType
 from .parsers import is_mime_type_supported
 
 
-class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
+class CorrespondentSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
 
     last_correspondence = serializers.DateTimeField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Correspondent
@@ -26,9 +31,13 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
+class DocumentTypeSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = DocumentType
@@ -43,9 +52,13 @@ class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Tag
@@ -83,6 +96,18 @@ class DocumentSerializer(serializers.ModelSerializer):
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
 
+    original_file_name = SerializerMethodField()
+    archived_file_name = SerializerMethodField()
+
+    def get_original_file_name(self, obj):
+        return obj.get_public_filename()
+
+    def get_archived_file_name(self, obj):
+        if obj.archive_checksum:
+            return obj.get_public_filename(archive=True)
+        else:
+            return None
+
     class Meta:
         model = Document
         depth = 1
@@ -96,7 +121,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             "created",
             "modified",
             "added",
-            "archive_serial_number"
+            "archive_serial_number",
+            "original_file_name",
+            "archived_file_name",
         )
 
 
@@ -150,45 +177,37 @@ class PostDocumentSerializer(serializers.Serializer):
         required=False,
     )
 
-    def validate(self, attrs):
-        document = attrs.get('document')
-
-        try:
-            validate_filename(document.name)
-        except ValidationError:
-            raise serializers.ValidationError("Invalid filename.")
-
+    def validate_document(self, document):
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
 
         if not is_mime_type_supported(mime_type):
             raise serializers.ValidationError(
-                "This mime type is not supported.")
+                "This file type is not supported.")
 
-        attrs['document_data'] = document_data
+        return document.name, document_data
 
-        title = attrs.get('title')
+    def validate_title(self, title):
+        if title:
+            return title
+        else:
+            # do not return empty strings.
+            return None
 
-        if not title:
-            attrs['title'] = None
-
-        correspondent = attrs.get('correspondent')
+    def validate_correspondent(self, correspondent):
         if correspondent:
-            attrs['correspondent_id'] = correspondent.id
+            return correspondent.id
         else:
-            attrs['correspondent_id'] = None
+            return None
 
-        document_type = attrs.get('document_type')
+    def validate_document_type(self, document_type):
         if document_type:
-            attrs['document_type_id'] = document_type.id
+            return document_type.id
         else:
-            attrs['document_type_id'] = None
+            return None
 
-        tags = attrs.get('tags')
+    def validate_tags(self, tags):
         if tags:
-            tag_ids = [tag.id for tag in tags]
-            attrs['tag_ids'] = tag_ids
+            return [tag.id for tag in tags]
         else:
-            attrs['tag_ids'] = None
-
-        return attrs
+            return None

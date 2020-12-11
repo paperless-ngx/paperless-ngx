@@ -40,7 +40,7 @@ export class DateTimeComponent implements OnInit,ControlValueAccessor  {
   titleDate: string = "Date"
 
   @Input()
-  titleTime: string = "Time"
+  titleTime: string
 
   @Input()
   disabled: boolean = false

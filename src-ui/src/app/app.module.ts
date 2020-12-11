@@ -45,6 +45,10 @@ import { StatisticsWidgetComponent } from './components/dashboard/widgets/statis
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component';
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
+import { YesNoPipe } from './pipes/yes-no.pipe';
+import { FileSizePipe } from './pipes/file-size.pipe';
+import { DocumentTitlePipe } from './pipes/document-title.pipe';
 
 @NgModule({
   declarations: [
@@ -81,7 +85,11 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
-    WidgetFrameComponent
+    WidgetFrameComponent,
+    WelcomeWidgetComponent,
+    YesNoPipe,
+    FileSizePipe,
+    DocumentTitlePipe
   ],
   imports: [
     BrowserModule,

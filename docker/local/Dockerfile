@@ -18,6 +18,7 @@ RUN apt-get update \
 		libmagic-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \
+		libqpdf-dev \
 		libxml2 \
 		optipng \
 		pngquant \
@@ -34,7 +35,7 @@ RUN apt-get update \
 		zlib1g \
 	&& pip3 install --upgrade supervisor setuptools \
 	&& pip install --no-cache-dir -r requirements.txt \
-	&& apt-get -y purge build-essential \
+	&& apt-get -y purge build-essential libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord

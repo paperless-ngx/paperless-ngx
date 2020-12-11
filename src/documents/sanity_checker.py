@@ -46,6 +46,10 @@ def check_sanity():
         for f in files:
             present_files.append(os.path.normpath(os.path.join(root, f)))
 
+    lockfile = os.path.normpath(settings.MEDIA_LOCK)
+    if lockfile in present_files:
+        present_files.remove(lockfile)
+
     for doc in Document.objects.all():
         # Check sanity of the thumbnail
         if not os.path.isfile(doc.thumbnail_path):
