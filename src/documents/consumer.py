@@ -8,13 +8,14 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from filelock import FileLock
 
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
-from .file_handling import create_source_path_directory
+from .file_handling import create_source_path_directory, \
+    generate_unique_filename
 from .loggers import LoggingMixin
 from .models import Document, FileInfo, Correspondent, DocumentType, Tag
-from .parsers import ParseError, get_parser_class_for_mime_type, \
-    get_supported_file_extensions, parse_date
+from .parsers import ParseError, get_parser_class_for_mime_type, parse_date
 from .signals import (
     document_consumption_finished,
     document_consumption_started
@@ -38,6 +39,10 @@ class Consumer(LoggingMixin):
 
     def pre_check_file_exists(self):
         if not os.path.isfile(self.path):
+            self.log(
+                "error",
+                "Cannot consume {}: It is not a file.".format(self.path)
+            )
             raise ConsumerError("Cannot consume {}: It is not a file".format(
                 self.path))
 
@@ -47,6 +52,10 @@ class Consumer(LoggingMixin):
         if Document.objects.filter(Q(checksum=checksum) | Q(archive_checksum=checksum)).exists():  # NOQA: E501
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
+            self.log(
+                "error",
+                "Not consuming {}: It is a duplicate.".format(self.filename)
+            )
             raise ConsumerError(
                 "Not consuming {}: It is a duplicate.".format(self.filename)
             )
@@ -148,8 +157,9 @@ class Consumer(LoggingMixin):
             classifier = DocumentClassifier()
             classifier.reload()
         except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
-            logging.getLogger(__name__).warning(
-                "Cannot classify documents: {}.".format(e))
+            self.log(
+                "warning",
+                f"Cannot classify documents: {e}.")
             classifier = None
 
         # now that everything is done, we can start to store the document
@@ -176,31 +186,28 @@ class Consumer(LoggingMixin):
 
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
+                with FileLock(settings.MEDIA_LOCK):
+                    document.filename = generate_unique_filename(
+                        document, settings.ORIGINALS_DIR)
+                    create_source_path_directory(document.source_path)
 
-                # TODO: not required, since this is done by the file handling
-                #  logic
-                create_source_path_directory(document.source_path)
-
-                self._write(document.storage_type,
-                            self.path, document.source_path)
-
-                self._write(document.storage_type,
-                            thumbnail, document.thumbnail_path)
-
-                if archive_path and os.path.isfile(archive_path):
                     self._write(document.storage_type,
-                                archive_path, document.archive_path)
+                                self.path, document.source_path)
 
-                    with open(archive_path, 'rb') as f:
-                        document.archive_checksum = hashlib.md5(
-                            f.read()).hexdigest()
-                        document.save()
+                    self._write(document.storage_type,
+                                thumbnail, document.thumbnail_path)
 
-                # Afte performing all database operations and moving files
-                # into place, tell paperless where the file is.
-                document.filename = os.path.basename(document.source_path)
-                # Saving the document now will trigger the filename handling
-                # logic.
+                    if archive_path and os.path.isfile(archive_path):
+                        create_source_path_directory(document.archive_path)
+                        self._write(document.storage_type,
+                                    archive_path, document.archive_path)
+
+                        with open(archive_path, 'rb') as f:
+                            document.archive_checksum = hashlib.md5(
+                                f.read()).hexdigest()
+
+                # Don't save with the lock active. Saving will cause the file
+                # renaming logic to aquire the lock as well.
                 document.save()
 
                 # Delete the file only if it was successfully consumed
@@ -241,7 +248,7 @@ class Consumer(LoggingMixin):
         with open(self.path, "rb") as f:
             document = Document.objects.create(
                 correspondent=file_info.correspondent,
-                title=file_info.title,
+                title=(self.override_title or file_info.title)[:127],
                 content=text,
                 mime_type=mime_type,
                 checksum=hashlib.md5(f.read()).hexdigest(),
@@ -252,18 +259,17 @@ class Consumer(LoggingMixin):
 
         relevant_tags = set(file_info.tags)
         if relevant_tags:
-            tag_names = ", ".join([t.slug for t in relevant_tags])
+            tag_names = ", ".join([t.name for t in relevant_tags])
             self.log("debug", "Tagging with {}".format(tag_names))
             document.tags.add(*relevant_tags)
 
         self.apply_overrides(document)
 
+        document.save()
+
         return document
 
     def apply_overrides(self, document):
-        if self.override_title:
-            document.title = self.override_title
-
         if self.override_correspondent_id:
             document.correspondent = Correspondent.objects.get(
                 pk=self.override_correspondent_id)

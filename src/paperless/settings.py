@@ -53,6 +53,10 @@ ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
+
+# Lock file for synchronizing changes to the MEDIA directory across multiple
+# threads.
+MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
@@ -205,6 +209,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # of log entries outweight the benefits of such a safeguard.
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
+COOKIE_PREFIX = os.getenv("PAPERLESS_COOKIE_PREFIX", "")
+
+CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
+SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
+LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
 
 ###############################################################################
 # Database                                                                    #

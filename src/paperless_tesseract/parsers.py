@@ -5,6 +5,7 @@ import subprocess
 
 import ocrmypdf
 import pdftotext
+import pikepdf
 from PIL import Image
 from django.conf import settings
 from ocrmypdf import InputFileError, EncryptedPdfError
@@ -17,6 +18,33 @@ class RasterisedDocumentParser(DocumentParser):
     This parser uses Tesseract to try and get some text out of a rasterised
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
+
+    def extract_metadata(self, document_path, mime_type):
+        namespace_pattern = re.compile(r"\{(.*)\}(.*)")
+
+        result = []
+        if mime_type == 'application/pdf':
+            pdf = pikepdf.open(document_path)
+            meta = pdf.open_metadata()
+            for key, value in meta.items():
+                if isinstance(value, list):
+                    value = " ".join([str(e) for e in value])
+                value = str(value)
+                try:
+                    m = namespace_pattern.match(key)
+                    result.append({
+                        "namespace": m.group(1),
+                        "prefix": meta.REVERSE_NS[m.group(1)],
+                        "key": m.group(2),
+                        "value": value
+                    })
+                except Exception as e:
+                    self.log(
+                        "warning",
+                        f"Error while reading metadata {key}: {value}. Error: "
+                        f"{e}"
+                    )
+        return result
 
     def get_thumbnail(self, document_path, mime_type):
         """

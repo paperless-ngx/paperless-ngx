@@ -210,12 +210,16 @@ class DocumentParser(LoggingMixin):
     def __init__(self, logging_group):
         super().__init__()
         self.logging_group = logging_group
+        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         self.tempdir = tempfile.mkdtemp(
             prefix="paperless-", dir=settings.SCRATCH_DIR)
 
         self.archive_path = None
         self.text = None
         self.date = None
+
+    def extract_metadata(self, document_path, mime_type):
+        return []
 
     def parse(self, document_path, mime_type):
         raise NotImplementedError()

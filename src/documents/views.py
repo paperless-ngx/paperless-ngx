@@ -39,6 +39,7 @@ from .filters import (
     LogFilterSet
 )
 from .models import Correspondent, Document, Log, Tag, DocumentType
+from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
@@ -145,11 +146,11 @@ class DocumentViewSet(RetrieveModelMixin,
         doc = Document.objects.get(id=pk)
         if not self.original_requested(request) and os.path.isfile(doc.archive_path):  # NOQA: E501
             file_handle = doc.archive_file
-            filename = doc.archive_file_name
+            filename = doc.get_public_filename(archive=True)
             mime_type = 'application/pdf'
         else:
             file_handle = doc.source_file
-            filename = doc.file_name
+            filename = doc.get_public_filename()
             mime_type = doc.mime_type
 
         if doc.storage_type == Document.STORAGE_TYPE_GPG:
@@ -160,17 +161,43 @@ class DocumentViewSet(RetrieveModelMixin,
             disposition, filename)
         return response
 
+    def get_metadata(self, file, mime_type):
+        if not os.path.isfile(file):
+            return None
+
+        parser_class = get_parser_class_for_mime_type(mime_type)
+        if parser_class:
+            parser = parser_class(logging_group=None)
+            return parser.extract_metadata(file, mime_type)
+        else:
+            return []
+
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
-            return Response({
-                "paperless__checksum": doc.checksum,
-                "paperless__mime_type": doc.mime_type,
-                "paperless__filename": doc.filename,
-                "paperless__has_archive_version":
-                    os.path.isfile(doc.archive_path)
-            })
+
+            meta = {
+                "original_checksum": doc.checksum,
+                "original_size": os.stat(doc.source_path).st_size,
+                "original_mime_type": doc.mime_type,
+                "media_filename": doc.filename,
+                "has_archive_version": os.path.isfile(doc.archive_path),
+                "original_metadata": self.get_metadata(
+                    doc.source_path, doc.mime_type)
+            }
+
+            if doc.archive_checksum and os.path.isfile(doc.archive_path):
+                meta['archive_checksum'] = doc.archive_checksum
+                meta['archive_size'] = os.stat(doc.archive_path).st_size,
+                meta['archive_metadata'] = self.get_metadata(
+                    doc.archive_path, "application/pdf")
+            else:
+                meta['archive_checksum'] = None
+                meta['archive_size'] = None
+                meta['archive_metadata'] = None
+
+            return Response(meta)
         except Document.DoesNotExist:
             raise Http404()
 
@@ -235,12 +262,11 @@ class PostDocumentView(APIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        document = serializer.validated_data['document']
-        document_data = serializer.validated_data['document_data']
-        correspondent_id = serializer.validated_data['correspondent_id']
-        document_type_id = serializer.validated_data['document_type_id']
-        tag_ids = serializer.validated_data['tag_ids']
-        title = serializer.validated_data['title']
+        doc_name, doc_data = serializer.validated_data.get('document')
+        correspondent_id = serializer.validated_data.get('correspondent')
+        document_type_id = serializer.validated_data.get('document_type')
+        tag_ids = serializer.validated_data.get('tags')
+        title = serializer.validated_data.get('title')
 
         t = int(mktime(datetime.now().timetuple()))
 
@@ -249,17 +275,17 @@ class PostDocumentView(APIView):
         with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
                                          dir=settings.SCRATCH_DIR,
                                          delete=False) as f:
-            f.write(document_data)
+            f.write(doc_data)
             os.utime(f.name, times=(t, t))
 
             async_task("documents.tasks.consume_file",
                        f.name,
-                       override_filename=document.name,
+                       override_filename=doc_name,
                        override_title=title,
                        override_correspondent_id=correspondent_id,
                        override_document_type_id=document_type_id,
                        override_tag_ids=tag_ids,
-                       task_name=os.path.basename(document.name)[:100])
+                       task_name=os.path.basename(doc_name)[:100])
         return Response("OK")
 
 

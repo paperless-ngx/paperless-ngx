@@ -24,13 +24,14 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         file = os.path.join(self.dirs.originals_dir, "0000001.pdf")
 
-        Document.objects.create(content="Content", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", title="wow", filename="0000001.pdf", id=1, mime_type="application/pdf")
-        Document.objects.create(content="Content", checksum="9c9691e51741c1f4f41a20896af31770", title="wow", filename="0000002.pdf.gpg", id=2, mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
+        Document.objects.create(content="Content", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", title="wow", filename="0000001.pdf", mime_type="application/pdf")
+        Document.objects.create(content="Content", checksum="9c9691e51741c1f4f41a20896af31770", title="wow", filename="0000002.pdf.gpg", mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
         Tag.objects.create(name="t")
         DocumentType.objects.create(name="dt")
         Correspondent.objects.create(name="c")
 
         target = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, target)
 
         call_command('document_exporter', target)
 
@@ -66,6 +67,6 @@ class TestExportImport(DirectoriesMixin, TestCase):
     def test_export_missing_files(self):
 
         target = tempfile.mkdtemp()
-        call_command('document_exporter', target)
-        Document.objects.create(checksum="AAAAAAAAAAAAAAAAA", title="wow", filename="0000004.pdf", id=3, mime_type="application/pdf")
+        self.addCleanup(shutil.rmtree, target)
+        Document.objects.create(checksum="AAAAAAAAAAAAAAAAA", title="wow", filename="0000004.pdf", mime_type="application/pdf")
         self.assertRaises(FileNotFoundError, call_command, 'document_exporter', target)
