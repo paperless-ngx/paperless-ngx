@@ -25,23 +25,23 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
 
   {id: FILTER_ASN, name: "ASN is", filtervar: "archive_serial_number", datatype: "number", multi: false},
 
-  {id: FILTER_CORRESPONDENT, name: "Correspondents", filtervar: "correspondent__id", datatype: "correspondent", multi: false},
-  {id: FILTER_DOCUMENT_TYPE, name: "Document types", filtervar: "document_type__id", datatype: "document_type", multi: false},
+  {id: FILTER_CORRESPONDENT, name: "Correspondent is", displayName: "Correspondents", filtervar: "correspondent__id", datatype: "correspondent", multi: false},
+  {id: FILTER_DOCUMENT_TYPE, name: "Document type is", displayName: "Document types", filtervar: "document_type__id", datatype: "document_type", multi: false},
 
   {id: FILTER_IS_IN_INBOX, name: "Is in Inbox", filtervar: "is_in_inbox", datatype: "boolean", multi: false, default: true},
-  {id: FILTER_HAS_TAG, name: "Tags", filtervar: "tags__id__all", datatype: "tag", multi: true},
+  {id: FILTER_HAS_TAG, name: "Has tag", displayName: "Tags", filtervar: "tags__id__all", datatype: "tag", multi: true},
   {id: FILTER_DOES_NOT_HAVE_TAG, name: "Does not have tag", filtervar: "tags__id__none", datatype: "tag", multi: true},
   {id: FILTER_HAS_ANY_TAG, name: "Has any tag", filtervar: "is_tagged", datatype: "boolean", multi: false, default: true},
 
-  {id: FILTER_CREATED_BEFORE, name: "Created before", filtervar: "created__date__lt", datatype: "date", multi: false},
-  {id: FILTER_CREATED_AFTER, name: "Created after", filtervar: "created__date__gt", datatype: "date", multi: false},
+  {id: FILTER_CREATED_BEFORE, name: "Created before", displayName: "Created", filtervar: "created__date__lt", datatype: "date", multi: false},
+  {id: FILTER_CREATED_AFTER, name: "Created after", displayName: "Created", filtervar: "created__date__gt", datatype: "date", multi: false},
 
   {id: FILTER_CREATED_YEAR, name: "Year created is", filtervar: "created__year", datatype: "number", multi: false},
   {id: FILTER_CREATED_MONTH, name: "Month created is", filtervar: "created__month", datatype: "number", multi: false},
   {id: FILTER_CREATED_DAY, name: "Day created is", filtervar: "created__day", datatype: "number", multi: false},
 
-  {id: FILTER_ADDED_BEFORE, name: "Added before", filtervar: "added__date__lt", datatype: "date", multi: false},
-  {id: FILTER_ADDED_AFTER, name: "Added after", filtervar: "added__date__gt", datatype: "date", multi: false},
+  {id: FILTER_ADDED_BEFORE, name: "Added before", displayName: "Added", filtervar: "added__date__lt", datatype: "date", multi: false},
+  {id: FILTER_ADDED_AFTER, name: "Added after", displayName: "Added", filtervar: "added__date__gt", datatype: "date", multi: false},
 
   {id: FILTER_MODIFIED_BEFORE, name: "Modified before", filtervar: "modified__date__lt", datatype: "date", multi: false},
   {id: FILTER_MODIFIED_AFTER, name: "Modified after", filtervar: "modified__date__gt", datatype: "date", multi: false},
@@ -53,5 +53,6 @@ export interface FilterRuleType {
   filtervar: string
   datatype: string //number, string, boolean, date
   multi: boolean
+  displayName?: string
   default?: any
 }
