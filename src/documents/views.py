@@ -278,6 +278,17 @@ class BulkEditView(APIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        method = serializer.validated_data.get("method")
+        parameters = serializer.validated_data.get("parameters")
+        documents = serializer.validated_data.get("documents")
+
+        try:
+            # TODO: parameter validation
+            result = method(documents, **parameters)
+            return Response({"result": result})
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
+
 
 class PostDocumentView(APIView):
 
