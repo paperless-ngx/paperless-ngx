@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ElementRef, AfterViewInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FilterRuleType, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { FilterRuleType, FILTER_RULE_TYPES, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE, FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER, FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER, FILTER_CREATED_YEAR, FILTER_CREATED_MONTH, FILTER_CREATED_DAY } from 'src/app/data/filter-rule-type';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
@@ -31,10 +31,11 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
   @Output()
   apply = new EventEmitter()
 
-  @ViewChild('filterTextInput') input: ElementRef;
+  @ViewChild('filterTextInput') filterTextInput: ElementRef;
   @ViewChildren(FilterDropdownComponent) quickFilterDropdowns!: QueryList<FilterDropdownComponent>;
 
   quickFilterRuleTypeIDs: number[] = [FILTER_HAS_TAG, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE]
+  dateAddedFilterRuleTypeIDs: any[] = [[FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER], [FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER, FILTER_CREATED_YEAR, FILTER_CREATED_MONTH, FILTER_CREATED_DAY]]
 
   correspondents: PaperlessCorrespondent[] = []
   tags: PaperlessTag[] = []
@@ -53,7 +54,7 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    fromEvent(this.input.nativeElement,'keyup')
+    fromEvent(this.filterTextInput.nativeElement,'keyup')
         .pipe(
             debounceTime(150),
             distinctUntilChanged(),

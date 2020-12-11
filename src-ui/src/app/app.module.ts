@@ -29,6 +29,7 @@ import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
 import { FilterEditorComponent } from './components/filter-editor/filter-editor.component';
 import { FilterDropdownComponent } from './components/filter-editor/filter-dropdown/filter-dropdown.component';
+import { FilterDropdownDateComponent } from './components/filter-editor/filter-dropdown/filter-dropdown-date/filter-dropdown-date.component';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
 import { NgxFileDropModule } from 'ngx-file-drop';
@@ -76,6 +77,7 @@ import { FilterPipe } from './pipes/filter.pipe';
     ToastsComponent,
     FilterEditorComponent,
     FilterDropdownComponent,
+    FilterDropdownDateComponent,
     DocumentCardLargeComponent,
     DocumentCardSmallComponent,
     TextComponent,
