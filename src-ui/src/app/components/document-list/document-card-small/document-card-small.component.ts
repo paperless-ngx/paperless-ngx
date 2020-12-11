@@ -13,6 +13,8 @@ export class DocumentCardSmallComponent implements OnInit {
 
   constructor(private documentService: DocumentService) { }
 
+  selected = false
+
   @Input()
   document: PaperlessDocument
 
