@@ -185,6 +185,13 @@ class BulkEditSerializer(serializers.Serializer):
 
     parameters = serializers.DictField(allow_empty=True)
 
+    def validate_documents(self, documents):
+        count = Document.objects.filter(id__in=documents).count()
+        if not count == len(documents):
+            raise serializers.ValidationError(
+                "Some documents don't exist or were specified twice.")
+        return documents
+
     def validate_method(self, method):
         if method == "set_correspondent":
             return bulk_edit.set_correspondent
