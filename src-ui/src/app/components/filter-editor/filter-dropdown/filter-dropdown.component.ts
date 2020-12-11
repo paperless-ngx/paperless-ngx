@@ -17,12 +17,12 @@ export class FilterDropdownComponent implements OnInit {
   @Output()
   toggle = new EventEmitter()
 
-  @ViewChild('filterTextInput') filterTextInput: ElementRef
+  @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
 
   items: ObjectWithId[] = []
   itemsActive: ObjectWithId[] = []
   title: string
-  filterText: string
+  listFilterText: string
   display: string
 
   ngOnInit(): void {
@@ -38,7 +38,7 @@ export class FilterDropdownComponent implements OnInit {
   dropdownOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
-        this.filterTextInput.nativeElement.focus();
+        this.listFilterTextInput.nativeElement.focus();
       }, 0);
     } else {
       this.filterText = ''
