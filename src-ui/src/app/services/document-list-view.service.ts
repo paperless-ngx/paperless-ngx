@@ -90,7 +90,7 @@ export class DocumentListViewService {
 
   reload(onFinish?) {
     this.isReloading = true
-    this.documentService.list(
+    this.documentService.listFiltered(
       this.currentPage,
       this.currentPageSize,
       this.view.sortField,
