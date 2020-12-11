@@ -48,6 +48,7 @@ import { WidgetFrameComponent } from './components/dashboard/widgets/widget-fram
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
 import { YesNoPipe } from './pipes/yes-no.pipe';
 import { FileSizePipe } from './pipes/file-size.pipe';
+import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
 
 @NgModule({
   declarations: [
@@ -88,7 +89,8 @@ import { FileSizePipe } from './pipes/file-size.pipe';
     WidgetFrameComponent,
     WelcomeWidgetComponent,
     YesNoPipe,
-    FileSizePipe
+    FileSizePipe,
+    SelectDialogComponent
   ],
   imports: [
     BrowserModule,
