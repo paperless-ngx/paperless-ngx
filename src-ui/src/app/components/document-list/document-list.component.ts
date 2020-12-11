@@ -2,14 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
+import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
+import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
+import { DocumentService, DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
+import { TagService } from 'src/app/services/rest/tag.service';
 import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
+import { DeleteDialogComponent } from '../common/delete-dialog/delete-dialog.component';
+import { SelectDialogComponent } from '../common/select-dialog/select-dialog.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
 
 @Component({
@@ -25,7 +32,11 @@ export class DocumentListComponent implements OnInit {
     public route: ActivatedRoute,
     private toastService: ToastService,
     public modalService: NgbModal,
-    private titleService: Title) { }
+    private titleService: Title,
+    private correspondentService: CorrespondentService,
+    private documentTypeService: DocumentTypeService,
+    private tagService: TagService,
+    private documentService: DocumentService) { }
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
@@ -142,4 +153,101 @@ export class DocumentListComponent implements OnInit {
     this.applyFilterRules()
   }
 
+  private executeBulkOperation(method: string, args): Observable<any> {
+    return this.documentService.bulkEdit(Array.from(this.list.selected), method, args).pipe(
+      map(r => {
+
+        this.list.reload()
+        this.list.selectNone()
+
+        return r
+      })
+    )
+  }
+
+  bulkSetCorrespondent() {
+    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Select correspondent"
+    modal.componentInstance.message = `Select the correspondent you wish to assign to ${this.list.selected.size} selected document(s):`
+    this.correspondentService.listAll().subscribe(response => {
+      modal.componentInstance.objects = response.results
+    })
+    modal.componentInstance.selectClicked.subscribe(selectedId => {
+      this.executeBulkOperation('set_correspondent', {"correspondent": selectedId}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
+  }
+
+  bulkRemoveCorrespondent() {
+    this.executeBulkOperation('set_correspondent', {"correspondent": null}).subscribe(r => {})
+  }
+
+  bulkSetDocumentType() {
+    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Select document type"
+    modal.componentInstance.message = `Select the document type you wish to assign to ${this.list.selected.size} selected document(s):`
+    this.documentTypeService.listAll().subscribe(response => {
+      modal.componentInstance.objects = response.results
+    })
+    modal.componentInstance.selectClicked.subscribe(selectedId => {
+      this.executeBulkOperation('set_document_type', {"document_type": selectedId}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
+  }
+
+  bulkRemoveDocumentType() {
+    this.executeBulkOperation('set_document_type', {"document_type": null}).subscribe(r => {})
+  }
+
+  bulkAddTag() {
+    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Select tag"
+    modal.componentInstance.message = `Select the tag you wish to assign to ${this.list.selected.size} selected document(s):`
+    this.tagService.listAll().subscribe(response => {
+      modal.componentInstance.objects = response.results
+    })
+    modal.componentInstance.selectClicked.subscribe(selectedId => {
+      this.executeBulkOperation('add_tag', {"tag": selectedId}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
+  }
+
+  bulkRemoveTag() {
+    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Select tag"
+    modal.componentInstance.message = `Select the tag you wish to remove from ${this.list.selected.size} selected document(s):`
+    this.tagService.listAll().subscribe(response => {
+      modal.componentInstance.objects = response.results
+    })
+    modal.componentInstance.selectClicked.subscribe(selectedId => {
+      this.executeBulkOperation('remove_tag', {"tag": selectedId}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
+  }
+
+  bulkDelete() {
+    let modal = this.modalService.open(DeleteDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.delayConfirm(5)
+    modal.componentInstance.message = `This operation will permanently delete all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message2 = `This operation cannot be undone.`
+    modal.componentInstance.deleteClicked.subscribe(() => {
+      this.executeBulkOperation("delete", {}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })    
+  }
 }
