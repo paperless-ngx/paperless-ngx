@@ -131,6 +131,17 @@ class DocumentViewSet(RetrieveModelMixin,
         "added",
         "archive_serial_number")
 
+    def get_serializer(self, *args, **kwargs):
+        fields_param = self.request.query_params.get('fields', None)
+        if fields_param:
+            fields = fields_param.split(",")
+        else:
+            fields = None
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        kwargs.setdefault('fields', fields)
+        return serializer_class(*args, **kwargs)
+
     def update(self, request, *args, **kwargs):
         response = super(DocumentViewSet, self).update(
             request, *args, **kwargs)
