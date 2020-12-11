@@ -46,8 +46,8 @@
           <tbody>
             <tr *ngFor="let config of savedViewConfigService.getConfigs()">
               <td>{{ config.title }}</td>
-              <td>{{ config.showInDashboard }}</td>
-              <td>{{ config.showInSideBar }}</td>
+              <td>{{ config.showInDashboard | yesno }}</td>
+              <td>{{ config.showInSideBar | yesno }}</td>
               <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteViewConfig(config)">Delete</button></td>
             </tr>
           </tbody>

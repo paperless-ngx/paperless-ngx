@@ -94,7 +94,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
   }
 
   uploadDocument(formData) {
-    return this.http.post(this.getResourceUrl(null, 'post_document'), formData)
+    return this.http.post(this.getResourceUrl(null, 'post_document'), formData, {reportProgress: true, observe: "events"})
   }
 
   getMetadata(id: number): Observable<PaperlessDocumentMetadata> {

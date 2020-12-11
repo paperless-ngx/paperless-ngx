@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 from unittest import mock
 
@@ -195,6 +196,24 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         results = response.data['results']
         self.assertEqual(len(results), 3)
 
+        response = self.client.get("/api/documents/?tags__id__none={}".format(tag_3.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['id'], doc1.id)
+        self.assertEqual(results[1]['id'], doc2.id)
+
+        response = self.client.get("/api/documents/?tags__id__none={},{}".format(tag_3.id, tag_2.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['id'], doc1.id)
+
+        response = self.client.get("/api/documents/?tags__id__none={},{}".format(tag_2.id, tag_inbox.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 0)
+
     def test_search_no_query(self):
         response = self.client.get("/api/search/")
         results = response.data['results']
@@ -385,16 +404,6 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         m.assert_not_called()
 
     @mock.patch("documents.views.async_task")
-    @mock.patch("documents.serialisers.validate_filename")
-    def test_upload_invalid_filename(self, validate_filename, async_task):
-        validate_filename.side_effect = ValidationError()
-        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
-            response = self.client.post("/api/documents/post_document/", {"document": f})
-        self.assertEqual(response.status_code, 400)
-
-        async_task.assert_not_called()
-
-    @mock.patch("documents.views.async_task")
     def test_upload_with_title(self, async_task):
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
             response = self.client.post("/api/documents/post_document/", {"document": f, "title": "my custom title"})
@@ -475,3 +484,34 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
 
         async_task.assert_not_called()
+
+    def test_get_metadata(self):
+        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png", archive_checksum="A")
+
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), doc.source_path)
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), doc.archive_path)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
+        self.assertEqual(response.status_code, 200)
+
+        meta = response.data
+
+        self.assertEqual(meta['original_mime_type'], "image/png")
+        self.assertTrue(meta['has_archive_version'])
+        self.assertEqual(len(meta['original_metadata']), 0)
+        self.assertGreater(len(meta['archive_metadata']), 0)
+
+    def test_get_metadata_no_archive(self):
+        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="application/pdf")
+
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), doc.source_path)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
+        self.assertEqual(response.status_code, 200)
+
+        meta = response.data
+
+        self.assertEqual(meta['original_mime_type'], "application/pdf")
+        self.assertFalse(meta['has_archive_version'])
+        self.assertGreater(len(meta['original_metadata']), 0)
+        self.assertIsNone(meta['archive_metadata'])

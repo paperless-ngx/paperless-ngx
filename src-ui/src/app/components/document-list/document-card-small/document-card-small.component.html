@@ -1,8 +1,14 @@
 <div class="col p-2 h-100" style="width: 16rem;">
   <div class="card h-100 shadow-sm">
-    <div class=" border-bottom doc-img pr-1" [ngStyle]="{'background-image': 'url(' + getThumbUrl() + ')'}">
-      <div class="row" *ngFor="let t of document.tags$ | async">
-        <app-tag style="font-size: large;" [tag]="t" class="col text-right" (click)="clickTag.emit(t.id)" [clickable]="true" linkTitle="Filter by tag"></app-tag>
+    <div class="border-bottom">
+      <img class="card-img doc-img" [src]="getThumbUrl()">
+      <div style="top: 0; right: 0; font-size: large" class="text-right position-absolute mr-1">
+        <div *ngFor="let t of getTagsLimited$() | async">
+          <app-tag [tag]="t" (click)="clickTag.emit(t.id)" [clickable]="true" linkTitle="Filter by tag"></app-tag>
+        </div>
+        <div *ngIf="moreTags">
+          <span class="badge badge-secondary">+ {{moreTags}}</span>
+        </div>
       </div>
     </div>
     
@@ -11,7 +17,7 @@
         <ng-container *ngIf="document.correspondent">
           <a [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
-        {{document.title}}
+        {{document.title | documentTitle}}
       </p>
     </div>
     <div class="card-footer">

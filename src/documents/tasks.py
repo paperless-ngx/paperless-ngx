@@ -1,5 +1,6 @@
 import logging
 
+import tqdm
 from django.conf import settings
 from whoosh.writing import AsyncWriter
 
@@ -23,7 +24,7 @@ def index_reindex():
     ix = index.open_index(recreate=True)
 
     with AsyncWriter(ix) as writer:
-        for document in documents:
+        for document in tqdm.tqdm(documents):
             index.update_document(writer, document)
 
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
@@ -11,6 +12,7 @@ import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
+import { environment } from 'src/environments/environment';
 import { DeleteDialogComponent } from '../common/delete-dialog/delete-dialog.component';
 import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
@@ -21,6 +23,9 @@ import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/do
   styleUrls: ['./document-detail.component.scss']
 })
 export class DocumentDetailComponent implements OnInit {
+
+  public expandOriginalMetadata = false;
+  public expandArchivedMetadata = false;
 
   documentId: number
   document: PaperlessDocument
@@ -51,7 +56,8 @@ export class DocumentDetailComponent implements OnInit {
     private router: Router,
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
-    private documentListViewService: DocumentListViewService) { }
+    private documentListViewService: DocumentListViewService,
+    private titleService: Title) { }
 
   ngOnInit(): void {
     this.documentForm.valueChanges.subscribe(wow => {
@@ -80,6 +86,7 @@ export class DocumentDetailComponent implements OnInit {
 
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
+    this.titleService.setTitle(`${doc.title} - ${environment.appTitle}`)
     this.documentsService.getMetadata(doc.id).subscribe(result => {
       this.metadata = result
     })

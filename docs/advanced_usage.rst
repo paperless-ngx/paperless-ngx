@@ -298,6 +298,7 @@ avoids filename clashes.
 Paperless provides the following placeholders withing filenames:
 
 * ``{correspondent}``: The name of the correspondent, or "none".
+* ``{document_type}``: The name of the document type, or "none".
 * ``{title}``: The title of the document.
 * ``{created}``: The full date and time the document was created.
 * ``{created_year}``: Year created only.
@@ -307,7 +308,6 @@ Paperless provides the following placeholders withing filenames:
 * ``{added_year}``: Year added only.
 * ``{added_month}``: Month added only (number 1-12).
 * ``{added_day}``: Day added only (number 1-31).
-* ``{tags}``: I don't know how this works. Look at the source.
 
 Paperless will convert all values for the placeholders into values which are safe
 for use in filenames.

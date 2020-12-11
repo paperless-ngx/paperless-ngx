@@ -29,8 +29,12 @@ export class SavedViewWidgetComponent implements OnInit {
   }
 
   showAll() {
-    this.list.load(this.savedView)
-    this.router.navigate(["documents"])
+    if (this.savedView.showInSideBar) {
+      this.router.navigate(['view', this.savedView.id])
+    } else {
+      this.list.load(this.savedView)
+      this.router.navigate(["documents"])
+      }
   }
 
 }
