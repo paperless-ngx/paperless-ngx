@@ -42,9 +42,6 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
   documentTypes: PaperlessDocumentType[] = []
 
   filterText: string
-  filterTagsText: string
-  filterCorrespondentsText: string
-  filterDocumentTypesText: string
 
   ngOnInit(): void {
     this.updateTextFilterInput()

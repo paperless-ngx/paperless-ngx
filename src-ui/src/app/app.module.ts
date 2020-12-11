@@ -112,7 +112,8 @@ import { FilterPipe } from './pipes/filter.pipe';
       provide: HTTP_INTERCEPTORS,
       useClass: CsrfInterceptor,
       multi: true
-    }
+    },
+    FilterPipe
   ],
   bootstrap: [AppComponent]
 })
