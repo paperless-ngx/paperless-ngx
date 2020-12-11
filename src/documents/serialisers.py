@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from . import bulk_edit
 from .models import Correspondent, Tag, Document, Log, DocumentType
 from .parsers import is_mime_type_supported
 
@@ -164,11 +165,10 @@ class LogSerializer(serializers.ModelSerializer):
 
 class BulkEditSerializer(serializers.Serializer):
 
-    documents = serializers.PrimaryKeyRelatedField(
-        many=True,
+    documents = serializers.ListField(
+        child=serializers.IntegerField(),
         label="Documents",
-        write_only=True,
-        queryset=Document.objects.all()
+        write_only=True
     )
 
     method = serializers.ChoiceField(
@@ -184,6 +184,20 @@ class BulkEditSerializer(serializers.Serializer):
     )
 
     parameters = serializers.DictField(allow_empty=True)
+
+    def validate_method(self, method):
+        if method == "set_correspondent":
+            return bulk_edit.set_correspondent
+        elif method == "set_document_type":
+            return bulk_edit.set_document_type
+        elif method == "add_tag":
+            return bulk_edit.add_tag
+        elif method == "remove_tag":
+            return bulk_edit.remove_tag
+        elif method == "delete":
+            return bulk_edit.delete
+        else:
+            raise serializers.ValidationError("Unsupported method.")
 
     def validate(self, attrs):
 
