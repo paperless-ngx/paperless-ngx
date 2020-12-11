@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ElementRef, ViewChild } from '@angular/core';
 import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 
@@ -17,6 +17,8 @@ export class FilterDropdownComponent implements OnInit {
   @Output()
   toggle = new EventEmitter()
 
+  @ViewChild('filterTextInput') filterTextInput: ElementRef
+
   items: ObjectWithId[] = []
   itemsActive: ObjectWithId[] = []
   title: string
@@ -29,7 +31,17 @@ export class FilterDropdownComponent implements OnInit {
     this.display = filterRuleType.datatype
   }
 
-  toggleItem(item: ObjectWithId) {
+  toggleItem(item: ObjectWithId): void {
     this.toggle.emit(item)
+  }
+
+  dropdownOpenChange(open: boolean): void {
+    if (open) {
+      setTimeout(() => {
+        this.filterTextInput.nativeElement.focus();
+      }, 0);
+    } else {
+      this.filterText = ''
+    }
   }
 }

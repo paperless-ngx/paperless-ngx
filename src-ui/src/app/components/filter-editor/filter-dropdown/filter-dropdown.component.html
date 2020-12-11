@@ -1,8 +1,8 @@
-  <div class="btn-group" ngbDropdown role="group">
+  <div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)">
   <button class="btn btn-outline-primary btn-sm" id="dropdown{{title}}" ngbDropdownToggle>{{title}}</button>
   <div class="dropdown-menu quick-filter shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
-      <input class="list-group-item form-control form-control-sm" type="text" [(ngModel)]="filterText" placeholder="Filter {{title}}">
+      <input class="list-group-item form-control form-control-sm" type="text" [(ngModel)]="filterText" placeholder="Filter {{title}}" #filterTextInput>
       <ng-container *ngIf="(items | filter: filterText).length > 0">
         <button class="list-group-item list-group-item-action d-flex align-items-center" role="menuitem" *ngFor="let item of items | filter: filterText; let i = index" (click)="toggleItem(item)">
           <div class="selected-icon mr-1">
