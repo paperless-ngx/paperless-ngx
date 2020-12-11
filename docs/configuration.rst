@@ -152,6 +152,16 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 
     Defaults to none, which disables this feature.
 
+
+PAPERLESS_COOKIE_PREFIX=<str>
+    Specify a prefix that is added to the cookies used by paperless to identify
+    the currently logged in user. This is useful for when you're running two
+    instances of paperless on the same host.
+
+    After changing this, you will have to login again.
+
+    Defaults to ``""``, which does not alter the cookie names.
+
 .. _configuration-ocr:
 
 OCR settings

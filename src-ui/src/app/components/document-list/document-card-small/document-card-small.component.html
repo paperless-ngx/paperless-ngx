@@ -26,7 +26,7 @@
         <ng-container *ngIf="document.correspondent">
           <a [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
-        {{document.title}}
+        {{document.title | documentTitle}}
       </p>
     </div>
     <div class="card-footer">
