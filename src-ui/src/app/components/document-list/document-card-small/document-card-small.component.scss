@@ -3,3 +3,11 @@
   object-position: top;
   height: 200px;
 }
+
+.document-card-check {
+  display: none
+}
+
+.document-card:hover .document-card-check {
+  display: block;
+}
