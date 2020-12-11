@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -11,6 +11,10 @@ import { SavedViewConfigService } from 'src/app/services/saved-view-config.servi
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
+import { FilterEditorComponent } from './filter-editor/filter-editor.component';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
+import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 
 @Component({
   selector: 'app-document-list',
@@ -30,6 +34,8 @@ export class DocumentListComponent implements OnInit {
   displayMode = 'smallCards' // largeCards, smallCards, details
 
   filterRules: FilterRule[] = []
+
+  @ViewChild('filterEditor') filterEditor: FilterEditorComponent
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
@@ -97,6 +103,18 @@ export class DocumentListComponent implements OnInit {
       })
       modal.close()
     })
+  }
+
+  clickTag(tagID: number) {
+    this.filterEditor.toggleFilterByItem(tagID, FILTER_HAS_TAG)
+  }
+
+  clickCorrespondent(correspondentID: number) {
+    this.filterEditor.toggleFilterByItem(correspondentID, FILTER_CORRESPONDENT)
+  }
+
+  clickDocumentType(documentTypeID: number) {
+    this.filterEditor.toggleFilterByItem(documentTypeID, FILTER_DOCUMENT_TYPE)
   }
 
 }

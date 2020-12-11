@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, ElementRef, AfterViewInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FilterRule } from 'src/app/data/filter-rule';
 import { FilterRuleType, FILTER_RULE_TYPES, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE, FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER, FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER, FILTER_CREATED_YEAR, FILTER_CREATED_MONTH, FILTER_CREATED_DAY } from 'src/app/data/filter-rule-type';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
@@ -120,7 +120,11 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
     this.applySelected()
   }
 
-  toggleFilterByItem(item: ObjectWithId, filterRuleTypeID: number) {
+  toggleFilterByItem(item: any, filterRuleTypeID: number) {
+    let dropdown = this.getDropdownByFilterRuleTypeID(filterRuleTypeID)
+    if (typeof item == 'number') {
+      item = dropdown.items.find(i => i.id == item)
+    }
     let filterRules = this.filterRules
     let filterRuleType: FilterRuleType = FILTER_RULE_TYPES.find(t => t.id == filterRuleTypeID)
     let existingRule = filterRules.find(rule => rule.type.id == filterRuleType.id)
@@ -137,7 +141,6 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
       filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == filterRuleType.id), value: item.id})
     }
 
-    let dropdown = this.getDropdownByFilterRuleTypeID(filterRuleTypeID)
     this.updateDropdownActiveItems(dropdown)
 
     this.filterRules = filterRules
