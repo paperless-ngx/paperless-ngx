@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ElementRef, ViewChild } from '@angular/core';
 import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
+import { FilterPipe } from  'src/app/pipes/filter.pipe';
 
 @Component({
   selector: 'app-filter-dropdown',
@@ -9,7 +10,7 @@ import { ObjectWithId } from 'src/app/data/object-with-id';
 })
 export class FilterDropdownComponent implements OnInit {
 
-  constructor() { }
+  constructor(private filterPipe: FilterPipe) { }
 
   @Input()
   filterRuleTypeID: number
@@ -22,7 +23,7 @@ export class FilterDropdownComponent implements OnInit {
   items: ObjectWithId[] = []
   itemsActive: ObjectWithId[] = []
   title: string
-  listFilterText: string
+  filterText: string
   display: string
 
   ngOnInit(): void {
@@ -43,5 +44,10 @@ export class FilterDropdownComponent implements OnInit {
     } else {
       this.filterText = ''
     }
+  }
+
+  listFilterEnter(): void {
+    let filtered = this.filterPipe.transform(this.items, this.filterText)
+    if (filtered.length == 1) this.toggleItem(filtered.shift())
   }
 }
