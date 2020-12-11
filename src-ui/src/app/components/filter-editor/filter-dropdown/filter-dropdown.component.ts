@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FilterRuleType, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 
 @Component({
@@ -25,7 +25,7 @@ export class FilterDropdownComponent implements OnInit {
 
   ngOnInit(): void {
     let filterRuleType: FilterRuleType = FILTER_RULE_TYPES.find(t => t.id == this.filterRuleTypeID)
-    this.title = filterRuleType.name
+    this.title = filterRuleType.displayName
     this.display = filterRuleType.datatype
   }
 
