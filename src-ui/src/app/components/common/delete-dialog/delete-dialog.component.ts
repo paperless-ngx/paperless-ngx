@@ -22,6 +22,21 @@ export class DeleteDialogComponent implements OnInit {
   @Input()
   message2
 
+  deleteButtonEnabled = true
+  seconds = 0
+
+  delayConfirm(seconds: number) {
+    this.deleteButtonEnabled = false
+    this.seconds = seconds
+    setTimeout(() => {
+      if (this.seconds <= 1) {
+        this.deleteButtonEnabled = true
+      } else {
+        this.delayConfirm(seconds - 1)
+      }
+    }, 1000)
+  }
+
   ngOnInit(): void {
   }
 
