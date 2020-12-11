@@ -210,6 +210,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
+COOKIE_PREFIX = os.getenv("PAPERLESS_COOKIE_PREFIX", "")
+
+CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
+SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
+LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
+
 ###############################################################################
 # Database                                                                    #
 ###############################################################################
