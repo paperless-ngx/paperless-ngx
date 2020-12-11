@@ -118,6 +118,7 @@ export class DocumentListViewService {
     //want changes in the filter editor to propagate into here right away.
     this.view.filterRules = cloneFilterRules(filterRules)
     this.reload()
+    this.reduceSelectionToFilter()
     this.saveDocumentListView()
   }
 
@@ -189,6 +190,49 @@ export class DocumentListViewService {
     if (newPageSize != this.currentPageSize) {
       this.currentPageSize = newPageSize
       //this.reload()
+    }
+  }
+
+  selected = new Set<number>()
+
+  selectNone() {
+    this.selected.clear()
+  }
+
+  private reduceSelectionToFilter() {
+    if (this.selected.size > 0) {
+      this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => {
+        let subset = new Set<number>()
+        for (let id of ids) {
+          if (this.selected.has(id)) {
+            subset.add(id)
+          }
+        }
+        this.selected = subset
+      })
+    }
+  }
+
+  selectAll() {
+    this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => ids.forEach(id => this.selected.add(id)))
+  }
+
+  selectPage() {
+    this.selected.clear()
+    this.documents.forEach(doc => {
+      this.selected.add(doc.id)
+    })
+  }
+
+  isSelected(d: PaperlessDocument) {
+    return this.selected.has(d.id)
+  }
+
+  setSelected(d: PaperlessDocument, value: boolean) {
+    if (value) {
+      this.selected.add(d.id)
+    } else if (!value) {
+      this.selected.delete(d.id)
     }
   }
 
