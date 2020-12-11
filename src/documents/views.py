@@ -31,7 +31,6 @@ from rest_framework.viewsets import (
 import documents.index as index
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
-from .bulk_edit import perform_bulk_edit
 from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
