@@ -90,7 +90,7 @@ def sanity_check():
         return "No issues detected."
 
 
-def bulk_rename_files(ids):
-    qs = Document.objects.filter(id__in=ids)
+def bulk_rename_files(document_ids):
+    qs = Document.objects.filter(id__in=document_ids)
     for doc in qs:
         post_save.send(Document, instance=doc, created=False)
