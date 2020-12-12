@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ElementRef, ViewChild } from '@angular/core';
+import { FilterRule } from 'src/app/data/filter-rule';
 import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { FilterDropdownComponent } from '../filter-dropdown.component'
@@ -18,8 +19,6 @@ export class FilterDropdownDateComponent extends FilterDropdownComponent {
   selected = new EventEmitter()
 
   filterRuleTypes: FilterRuleType[] = []
-  showYear: boolean = false
-  showMonth: boolean = false
   dateAfter: NgbDateStruct
   dateBefore: NgbDateStruct
 
@@ -27,27 +26,36 @@ export class FilterDropdownDateComponent extends FilterDropdownComponent {
     this.filterRuleTypes = this.filterRuleTypeIDs.map(id => FILTER_RULE_TYPES.find(rt => rt.id == id))
     this.filterRuleTypeID = this.filterRuleTypeIDs[0]
     super.ngOnInit()
-
-    this.showYear = this.filterRuleTypes.find(rt => rt.filtervar.indexOf('year') > -1) !== undefined
-    this.showMonth = this.filterRuleTypes.find(rt => rt.filtervar.indexOf('month') > -1) !== undefined
   }
 
-  setQuickFilter(range: any) {
+  setDateQuickFilter(range: any) {
     this.dateAfter = this.dateBefore = undefined
+    let now = new Date()
     switch (typeof range) {
       case 'number':
-        let date = new Date();
-        date.setDate(date.getDate() - range)
-        this.dateAfter = { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() }
+        now.setDate(now.getDate() - range)
+        this.dateAfter = { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() }
+        this.dateSelected(this.dateAfter)
         break;
 
       case 'string':
-        let filterRuleType = this.filterRuleTypes.find(rt => rt.filtervar.indexOf(range) > -1)
-        console.log(range);
+        let date = { year: now.getFullYear(), month: now.getMonth() + 1, day: 1 }
+        if (range == 'year') date.month = 1
+        this.dateAfter = date
+        this.dateSelected(this.dateAfter)
         break;
 
       default:
         break;
+    }
+  }
+
+  dateSelected(date:NgbDateStruct) {
+    let isAfter = this.dateAfter !== undefined
+    let filterRuleType = this.filterRuleTypes.find(rt => rt.filtervar.indexOf(isAfter ? 'gt' : 'lt') > -1)
+    if (filterRuleType) {
+      let dateFilterRule:FilterRule = {value: `${date.year}-${date.month}-${date.day}`, type: filterRuleType}
+      this.selected.emit(dateFilterRule)
     }
   }
 }

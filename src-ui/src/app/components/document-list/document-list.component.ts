@@ -11,7 +11,7 @@ import { SavedViewConfigService } from 'src/app/services/saved-view-config.servi
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
-import { FilterEditorComponent } from './filter-editor/filter-editor.component';
+import { FilterEditorComponent } from 'src/app/components/filter-editor/filter-editor.component';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
