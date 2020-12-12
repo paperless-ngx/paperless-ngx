@@ -14,6 +14,11 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
         self.tag_first = Tag.objects.create(name="tag1", match="first", matching_algorithm=Tag.MATCH_ANY)
         self.tag_second = Tag.objects.create(name="tag2", match="second", matching_algorithm=Tag.MATCH_ANY)
+        self.tag_inbox = Tag.objects.create(name="test", is_inbox_tag=True)
+        self.tag_no_match = Tag.objects.create(name="test2")
+
+        self.d3.tags.add(self.tag_inbox)
+        self.d3.tags.add(self.tag_no_match)
 
         self.correspondent_first = Correspondent.objects.create(
             name="c1", match="first", matching_algorithm=Correspondent.MATCH_ANY)
@@ -38,7 +43,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
         self.assertEqual(d_first.tags.count(), 1)
         self.assertEqual(d_second.tags.count(), 1)
-        self.assertEqual(d_unrelated.tags.count(), 0)
+        self.assertEqual(d_unrelated.tags.count(), 2)
 
         self.assertEqual(d_first.tags.first(), self.tag_first)
         self.assertEqual(d_second.tags.first(), self.tag_second)
@@ -56,3 +61,10 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
         self.assertEqual(d_first.correspondent, self.correspondent_first)
         self.assertEqual(d_second.correspondent, self.correspondent_second)
+
+    def test_force_preserve_inbox(self):
+        call_command('document_retagger', '--tags', '--overwrite')
+
+        d_first, d_second, d_unrelated = self.get_updated_docs()
+
+        self.assertCountEqual([tag.id for tag in d_unrelated.tags.all()], [self.tag_inbox.id, self.tag_no_match.id])
