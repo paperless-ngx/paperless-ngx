@@ -2,6 +2,7 @@ import logging
 
 import tqdm
 from django.core.management.base import BaseCommand
+from django.db.models.signals import post_save
 
 from documents.models import Document
 from ...mixins import Renderable
@@ -24,5 +25,4 @@ class Command(Renderable, BaseCommand):
         logging.getLogger().handlers[0].level = logging.ERROR
 
         for document in tqdm.tqdm(Document.objects.all()):
-            # Saving the document again will generate a new filename and rename
-            document.save()
+            post_save.send(Document, instance=document)
