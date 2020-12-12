@@ -7,6 +7,7 @@ from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, DatabaseError
+from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
@@ -121,11 +122,14 @@ def set_tags(sender,
              classifier=None,
              replace=False,
              **kwargs):
+
     if replace:
-        document.tags.clear()
-        current_tags = set([])
-    else:
-        current_tags = set(document.tags.all())
+        Document.tags.through.objects.filter(document=document).exclude(
+            Q(tag__is_inbox_tag=True)).exclude(
+            Q(tag__match="") & ~Q(tag__matching_algorithm=Tag.MATCH_AUTO)
+        ).delete()
+
+    current_tags = set(document.tags.all())
 
     matched_tags = matching.match_tags(document.content, classifier)
 

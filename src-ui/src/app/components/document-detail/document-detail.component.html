@@ -35,7 +35,7 @@
 
 
 <div class="row">
-    <div class="col-xl">
+    <div class="col mb-4">
 
         <form [formGroup]='documentForm' (ngSubmit)="save()">
 
@@ -171,11 +171,9 @@
         </form>
     </div>
 
-    <div class="col-xl d-none d-xl-block document-preview">
-        <object [data]="previewUrl | safe" type="application/pdf" width="100%" height="100%">
-            <p>Your browser does not support PDFs.
-                <a href="previewUrl">Download the PDF</a>.</p>
-        </object>
-
+    <div class="col-md-6 col-xl-8 mb-3">
+      <div class="pdf-viewer-container" *ngIf="getContentType() == 'application/pdf'">
+        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true"></pdf-viewer>
+      </div>
     </div>
 </div>
