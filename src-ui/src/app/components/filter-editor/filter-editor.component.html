@@ -8,7 +8,7 @@
 
   <app-filter-dropdown class="col-auto" *ngFor="let quickFilterRuleTypeID of quickFilterRuleTypeIDs" [filterRuleTypeID]="quickFilterRuleTypeID" (toggle)="toggleFilterByItem($event, quickFilterRuleTypeID)"></app-filter-dropdown>
 
-  <app-filter-dropdown-date class="col-auto" *ngFor="let dateAddedFilterRuleTypeID of dateAddedFilterRuleTypeIDs" [filterRuleTypeIDs]="dateAddedFilterRuleTypeID" (toggle)="toggleFilterByItem($event, quickFilterRuleTypeID)"></app-filter-dropdown-date>
+  <app-filter-dropdown-date class="col-auto" *ngFor="let dateAddedFilterRuleTypeID of dateAddedFilterRuleTypeIDs" [filterRuleTypeIDs]="dateAddedFilterRuleTypeID" (selected)="setDateFilter($event)"></app-filter-dropdown-date>
 
   <button class="btn btn-link btn-sm" [disabled]="!hasFilters()" (click)="clearSelected()">
     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
