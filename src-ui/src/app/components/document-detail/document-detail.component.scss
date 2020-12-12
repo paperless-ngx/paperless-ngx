@@ -1,5 +1,8 @@
-.document-preview {
-  height: calc(100vh - 180px);
+.pdf-viewer-container {
+  height: calc(100vh - 160px);
   top: 70px;
   position: sticky;
+  padding: 10px;
+  background-color: gray;
+  overflow-y: scroll;
 }
