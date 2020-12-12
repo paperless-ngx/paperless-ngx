@@ -67,4 +67,6 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
         d_first, d_second, d_unrelated = self.get_updated_docs()
 
+        self.assertCountEqual([tag.id for tag in d_first.tags.all()], [self.tag_first.id])
+        self.assertCountEqual([tag.id for tag in d_second.tags.all()], [self.tag_second.id])
         self.assertCountEqual([tag.id for tag in d_unrelated.tags.all()], [self.tag_inbox.id, self.tag_no_match.id])
