@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output, ElementRef, ViewChild }
 import { FilterRule } from 'src/app/data/filter-rule';
 import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
-import { FilterDropdownComponent } from '../filter-dropdown.component'
 import { NgbDate, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -10,7 +9,7 @@ import { NgbDate, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './filter-dropdown-date.component.html',
   styleUrls: ['./filter-dropdown-date.component.scss']
 })
-export class FilterDropdownDateComponent extends FilterDropdownComponent {
+export class FilterDropdownDateComponent {
 
   @Input()
   filterRuleTypeIDs: number[] = []
@@ -19,13 +18,13 @@ export class FilterDropdownDateComponent extends FilterDropdownComponent {
   selected = new EventEmitter()
 
   filterRuleTypes: FilterRuleType[] = []
+  title: string
   dateAfter: NgbDateStruct
   dateBefore: NgbDateStruct
 
   ngOnInit(): void {
     this.filterRuleTypes = this.filterRuleTypeIDs.map(id => FILTER_RULE_TYPES.find(rt => rt.id == id))
-    this.filterRuleTypeID = this.filterRuleTypeIDs[0]
-    super.ngOnInit()
+    this.title = this.filterRuleTypes[0].displayName
   }
 
   setDateQuickFilter(range: any) {
