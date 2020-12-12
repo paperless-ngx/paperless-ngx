@@ -10,6 +10,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { FilterDropdownComponent } from './filter-dropdown/filter-dropdown.component'
+import { FilterDropdownDateComponent } from './filter-dropdown/filter-dropdown-date/filter-dropdown-date.component'
 import { fromEvent } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
@@ -34,6 +35,7 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
 
   @ViewChild('filterTextInput') filterTextInput: ElementRef;
   @ViewChildren(FilterDropdownComponent) quickFilterDropdowns!: QueryList<FilterDropdownComponent>;
+  @ViewChildren(FilterDropdownDateComponent) quickDateFilterDropdowns!: QueryList<FilterDropdownDateComponent>;
 
   quickFilterRuleTypeIDs: number[] = [FILTER_HAS_TAG, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE]
   dateAddedFilterRuleTypeIDs: any[] = [[FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER], [FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER]]
@@ -52,16 +54,15 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    fromEvent(this.filterTextInput.nativeElement,'keyup')
-        .pipe(
-            debounceTime(150),
-            distinctUntilChanged(),
-            tap()
-        )
-        .subscribe((event: Event) => {
-          this.filterText = (event.target as HTMLInputElement).value
-          this.onTextFilterInput()
-        });
+    fromEvent(this.filterTextInput.nativeElement,'keyup').pipe(
+      debounceTime(150),
+      distinctUntilChanged(),
+      tap()
+    ).subscribe((event: Event) => {
+      this.filterText = (event.target as HTMLInputElement).value
+      this.onTextFilterInput()
+    })
+    this.quickDateFilterDropdowns.forEach(d => this.updateDateDropdown(d))
   }
 
   setDropdownItems(items: ObjectWithId[], filterRuleTypeID: number): void {
@@ -69,7 +70,6 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
     if (dropdown) {
       dropdown.items = items
     }
-    this.updateDropdownActiveItems(dropdown)
   }
 
   updateDropdownActiveItems(dropdown: FilterDropdownComponent): void {
@@ -79,6 +79,18 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
       activeItems = dropdown.items.filter(i => activeRulesValues.includes(i.id))
     }
     dropdown.itemsActive = activeItems
+  }
+
+  updateDateDropdown(dateDropdown: FilterDropdownDateComponent) {
+    let activeRules = this.filterRules.filter(r => dateDropdown.filterRuleTypeIDs.includes(r.type.id))
+    if (activeRules.length > 0) {
+      activeRules.forEach(rule => {
+        let date = { year: rule.value.substring(0,4), month: rule.value.substring(5,7), day: rule.value.substring(8,10) }
+        rule.type.filtervar.indexOf('gt') > -1 ? dateDropdown.dateAfter = date : dateDropdown.dateBefore = date
+      })
+    } else {
+      dateDropdown.dateAfter = dateDropdown.dateBefore = undefined
+    }
   }
 
   getDropdownByFilterRuleTypeID(filterRuleTypeID: number): FilterDropdownComponent {
@@ -93,6 +105,7 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
     this.filterRules.splice(0,this.filterRules.length)
     this.updateTextFilterInput()
     this.quickFilterDropdowns.forEach(d => this.updateDropdownActiveItems(d))
+    this.quickDateFilterDropdowns.forEach(d => this.updateDateDropdown(d))
     this.clear.next()
   }
 
