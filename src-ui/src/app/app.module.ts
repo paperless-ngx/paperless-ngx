@@ -14,7 +14,6 @@ import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { SafePipe } from './pipes/safe.pipe';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component';
 import { DeleteDialogComponent } from './components/common/delete-dialog/delete-dialog.component';
@@ -45,6 +44,7 @@ import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-v
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component';
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component';
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
 import { YesNoPipe } from './pipes/yes-no.pipe';
 import { FileSizePipe } from './pipes/file-size.pipe';
@@ -62,7 +62,6 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     DocumentTypeListComponent,
     LogsComponent,
     SettingsComponent,
-    SafePipe,
     NotFoundComponent,
     CorrespondentEditDialogComponent,
     DeleteDialogComponent,
@@ -102,7 +101,8 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     FormsModule,
     ReactiveFormsModule,
     NgxFileDropModule,
-    InfiniteScrollModule
+    InfiniteScrollModule,
+    PdfViewerModule
   ],
   providers: [
     DatePipe,
