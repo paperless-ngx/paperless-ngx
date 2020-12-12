@@ -3,7 +3,7 @@ import { FilterRule } from 'src/app/data/filter-rule';
 import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { FilterDropdownComponent } from '../filter-dropdown.component'
-import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDate, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-filter-dropdown-date',
@@ -53,10 +53,11 @@ export class FilterDropdownDateComponent extends FilterDropdownComponent {
   }
 
   dateSelected(date:NgbDateStruct) {
-    let isAfter = this.dateAfter == date
+    let isAfter = NgbDate.from(this.dateAfter).equals(date)
+
     let filterRuleType = this.filterRuleTypes.find(rt => rt.filtervar.indexOf(isAfter ? 'gt' : 'lt') > -1)
     if (filterRuleType) {
-      let dateFilterRule:FilterRule = {value: `${date.year}-${date.month.toString().padStart(2,0)}-${date.day.toString().padStart(2,0)}`, type: filterRuleType}
+      let dateFilterRule:FilterRule = {value: `${date.year}-${date.month.toString().padStart(2,'0')}-${date.day.toString().padStart(2,'0')}`, type: filterRuleType}
       this.selected.emit(dateFilterRule)
     }
   }
