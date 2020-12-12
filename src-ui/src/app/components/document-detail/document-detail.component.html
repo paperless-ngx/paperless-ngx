@@ -35,7 +35,7 @@
 
 
 <div class="row">
-    <div class="col-md-6 col-xl-4">
+    <div class="col-md-6 col-xl-4 mb-4">
 
         <form [formGroup]='documentForm' (ngSubmit)="save()">
 
@@ -171,7 +171,7 @@
         </form>
     </div>
 
-    <div class="col-md-6 col-xl-8">
+    <div class="col-md-6 col-xl-8 mb-3">
       <div class="pdf-viewer-container">
         <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="false"></pdf-viewer>
       </div>
