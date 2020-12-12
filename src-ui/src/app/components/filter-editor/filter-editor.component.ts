@@ -10,7 +10,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { FilterDropdownComponent } from './filter-dropdown/filter-dropdown.component'
-import { FilterDropdownDateComponent } from './filter-dropdown/filter-dropdown-date/filter-dropdown-date.component'
+import { FilterDropdownDateComponent } from './filter-dropdown-date/filter-dropdown-date.component'
 import { fromEvent } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
