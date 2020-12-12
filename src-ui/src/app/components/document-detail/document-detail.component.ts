@@ -59,6 +59,10 @@ export class DocumentDetailComponent implements OnInit {
     private documentListViewService: DocumentListViewService,
     private titleService: Title) { }
 
+  getContentType() {
+    return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
+  }
+
   ngOnInit(): void {
     this.documentForm.valueChanges.subscribe(wow => {
       Object.assign(this.document, this.documentForm.value)
