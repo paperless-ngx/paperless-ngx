@@ -12,6 +12,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
 import { FilterDropdownComponent } from './filter-dropdown/filter-dropdown.component'
 import { fromEvent } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-filter-editor',
@@ -35,7 +36,7 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
   @ViewChildren(FilterDropdownComponent) quickFilterDropdowns!: QueryList<FilterDropdownComponent>;
 
   quickFilterRuleTypeIDs: number[] = [FILTER_HAS_TAG, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE]
-  dateAddedFilterRuleTypeIDs: any[] = [[FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER], [FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER, FILTER_CREATED_YEAR, FILTER_CREATED_MONTH, FILTER_CREATED_DAY]]
+  dateAddedFilterRuleTypeIDs: any[] = [[FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER], [FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER]]
 
   correspondents: PaperlessCorrespondent[] = []
   tags: PaperlessTag[] = []
@@ -142,6 +143,20 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
     }
 
     this.updateDropdownActiveItems(dropdown)
+
+    this.filterRules = filterRules
+    this.applySelected()
+  }
+
+  setDateFilter(newFilterRule: FilterRule) {
+    let filterRules = this.filterRules
+    let existingRule = filterRules.find(rule => rule.type.id == newFilterRule.type.id)
+
+    if (existingRule) {
+      existingRule.value = newFilterRule.value
+    } else {
+      filterRules.push(newFilterRule)
+    }
 
     this.filterRules = filterRules
     this.applySelected()
