@@ -124,9 +124,9 @@ def set_tags(sender,
              **kwargs):
 
     if replace:
-        document.tags.exclude(
-            Q(is_inbox_tag=True) |
-            (Q(match="") & ~Q(matching_algorithm=Tag.MATCH_AUTO))
+        Document.tags.through.objects.filter(document=document).exclude(
+            Q(tag__is_inbox_tag=True)).exclude(
+            Q(tag__match="") & ~Q(tag__matching_algorithm=Tag.MATCH_AUTO)
         ).delete()
 
     current_tags = set(document.tags.all())
