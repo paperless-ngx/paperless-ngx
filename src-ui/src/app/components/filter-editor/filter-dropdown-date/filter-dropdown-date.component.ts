@@ -43,8 +43,12 @@ export class FilterDropdownDateComponent {
   ngOnChanges(changes: SimpleChange) {
     // this is a hacky workaround perhaps because of https://github.com/angular/angular/issues/11097
     let dateString: string = ''
-    let dateAfterChange: SimpleChange = changes['dateAfter']
-    let dateBeforeChange: SimpleChange = changes['dateBefore']
+    let dateAfterChange: SimpleChange
+    let dateBeforeChange: SimpleChange
+    if (changes) {
+      dateAfterChange = changes['dateAfter']
+      dateBeforeChange = changes['dateBefore']
+    }
 
     if (this.dpBefore && this.dpAfter) {
       let dpAfterElRef: ElementRef = this.dpAfter['_elRef']
@@ -92,5 +96,13 @@ export class FilterDropdownDateComponent {
   onDateSelected(date:NgbDateStruct) {
     let emitter = this._dateAfter && NgbDate.from(this._dateAfter).equals(date) ? this.dateAfterSet : this.dateBeforeSet
     emitter.emit(date)
+  }
+
+  clearAfter() {
+    this.dateAfterSet.next()
+  }
+
+  clearBefore() {
+    this.dateBeforeSet.next()
   }
 }
