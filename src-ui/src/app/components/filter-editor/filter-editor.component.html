@@ -6,7 +6,7 @@
     <input class="form-control form-control-sm" type="text" [(ngModel)]="filterEditorService.filterText" placeholder="Title" #filterTextInput>
   </div>
 
-  <app-filter-dropdown class="col-auto" [(items)]="filterEditorService.tags" [itemsSelected]="filterEditorService.selectedTags" [title]="'Tags'" [display]="'tag'" (toggle)="onToggleTag($event)"></app-filter-dropdown>
+  <app-filter-dropdown class="col-auto" [(items)]="filterEditorService.tags" [itemsSelected]="filterEditorService.selectedTags" [title]="'Tags'" (toggle)="onToggleTag($event)"></app-filter-dropdown>
   <app-filter-dropdown class="col-auto" [(items)]="filterEditorService.correspondents" [itemsSelected]="filterEditorService.selectedCorrespondents" [title]="'Correspondents'" (toggle)="onToggleCorrespondent($event)"></app-filter-dropdown>
   <app-filter-dropdown class="col-auto" [(items)]="filterEditorService.documentTypes" [itemsSelected]="filterEditorService.selectedDocumentTypes" [title]="'Document Types'" (toggle)="onToggleDocumentType($event)"></app-filter-dropdown>
 
