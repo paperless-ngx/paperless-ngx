@@ -108,9 +108,9 @@ export class FilterEditorViewService {
 
     if (existingRules && existingItemRule) {
       filterRules.splice(filterRules.indexOf(existingItemRule), 1) // if exact rule exists just remove
-    } else if (existingItemRule && filterRuleType.multi) { // e.g. tags can have multiple
+    } else if (existingRules.length > 0 && filterRuleType.multi) { // e.g. tags can have multiple
       filterRules.push({type: filterRuleType, value: item.id})
-    } else if (existingRules.length) { // Correspondents & DocumentTypes only one
+    } else if (existingRules.length > 0) { // Correspondents & DocumentTypes only one
       filterRules.find(rule => rule.type.id == filterRuleType.id).value = item.id
     } else {
       filterRules.push({type: filterRuleType, value: item.id})
