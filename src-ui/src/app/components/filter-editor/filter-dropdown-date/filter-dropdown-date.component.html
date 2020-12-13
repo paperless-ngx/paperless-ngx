@@ -7,9 +7,9 @@
     </ng-container>
     {{title}}
   </button>
-  <div class="dropdown-menu date-filter shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+  <div class="dropdown-menu date-filter shadow pt-0" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
-        <button *ngFor="let range of [7, 30, 'month', 'year']" class="list-group-item small list-goup list-group-item-action d-flex" role="menuitem" (click)="setDateQuickFilter(range)">
+        <button *ngFor="let range of [7, 30, 'month', 'year']" class="list-group-item small list-goup list-group-item-action d-flex p-2 pl-3" role="menuitem" (click)="setDateQuickFilter(range)">
           <ng-container *ngIf="isStringRange(range)">This </ng-container>
           {{ range }}
           <ng-container *ngIf="!isStringRange(range)"> days</ng-container>

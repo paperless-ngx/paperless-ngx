@@ -1,5 +1,8 @@
-.quick-filter {
+.dropdown-menu {
   min-width: 250px;
-  max-height: 400px;
-  overflow-y: scroll;
+
+  .items {
+    max-height: 400px;
+    overflow-y: scroll;
+  }
 }
