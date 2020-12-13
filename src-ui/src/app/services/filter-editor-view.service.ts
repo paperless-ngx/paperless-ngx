@@ -16,9 +16,9 @@ import { NgbDate, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
   providedIn: 'root'
 })
 export class FilterEditorViewService {
-  tags$: Observable<Results<PaperlessTag>>
-  correspondents$: Observable<Results<PaperlessCorrespondent>>
-  documentTypes$: Observable<Results<PaperlessDocumentType>>
+  private tags$: Observable<Results<PaperlessTag>>
+  private correspondents$: Observable<Results<PaperlessCorrespondent>>
+  private documentTypes$: Observable<Results<PaperlessDocumentType>>
 
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[]

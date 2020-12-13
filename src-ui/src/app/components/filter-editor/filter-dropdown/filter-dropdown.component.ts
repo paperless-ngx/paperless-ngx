@@ -14,7 +14,7 @@ export class FilterDropdownComponent implements OnInit {
   constructor(private filterPipe: FilterPipe) { }
 
   @Input()
-  items$: Observable<Results<ObjectWithId>>
+  items: ObjectWithId[]
 
   @Input()
   itemsSelected: ObjectWithId[]
@@ -31,11 +31,6 @@ export class FilterDropdownComponent implements OnInit {
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
 
   filterText: string
-  items: ObjectWithId[]
-
-  ngOnInit() {
-    this.items$.subscribe(result => this.items = result.results)
-  }
 
   toggleItem(item: ObjectWithId): void {
     this.toggle.emit(item)
