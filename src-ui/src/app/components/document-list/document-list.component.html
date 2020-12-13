@@ -62,10 +62,8 @@
 
 </app-page-header>
 
-<div class="card w-100 mb-3">
-  <div class="card-body">
-    <app-filter-editor [(filterEditorService)]="filterEditorService" (apply)="applyFilterRules()" (clear)="clearFilterRules()" #filterEditor></app-filter-editor>
-  </div>
+<div class="w-100 mb-4">
+  <app-filter-editor [(filterEditorService)]="filterEditorService" (apply)="applyFilterRules()" (clear)="clearFilterRules()" #filterEditor></app-filter-editor>
 </div>
 
 <div class="d-flex justify-content-between align-items-center">
