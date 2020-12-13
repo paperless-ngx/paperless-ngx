@@ -182,7 +182,14 @@ export class DocumentListComponent implements OnInit {
   }
 
   bulkRemoveCorrespondent() {
-    this.executeBulkOperation('set_correspondent', {"correspondent": null}).subscribe(r => {})
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Remove correspondent"
+    modal.componentInstance.message = `This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      this.executeBulkOperation('set_correspondent', {"correspondent": null}).subscribe(r => {
+        modal.close()
+      })
+    })
   }
 
   bulkSetDocumentType() {
@@ -202,7 +209,14 @@ export class DocumentListComponent implements OnInit {
   }
 
   bulkRemoveDocumentType() {
-    this.executeBulkOperation('set_document_type', {"document_type": null}).subscribe(r => {})
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Remove document type"
+    modal.componentInstance.message = `This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      this.executeBulkOperation('set_document_type', {"document_type": null}).subscribe(r => {
+        modal.close()
+      })
+    })
   }
 
   bulkAddTag() {
