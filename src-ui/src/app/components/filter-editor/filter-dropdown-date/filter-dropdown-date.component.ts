@@ -28,6 +28,11 @@ export class FilterDropdownDateComponent {
   _dateBefore: NgbDateStruct
   _dateAfter: NgbDateStruct
 
+  get _maxDate(): NgbDate {
+    let date = new Date()
+    return NgbDate.from({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})
+  }
+
   setDateQuickFilter(range: any) {
     this._dateAfter = this._dateBefore = undefined
     let date = new Date()
