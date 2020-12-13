@@ -15,7 +15,7 @@ services:
       POSTGRES_PASSWORD: paperless
 
   webserver:
-    image: jonaswinkler/paperless-ng:0.9.5
+    image: jonaswinkler/paperless-ng:0.9.6
     restart: always
     depends_on:
       - db

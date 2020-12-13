@@ -8,7 +8,7 @@
 
     <div class="input-group-append" ngbDropdown placement="top-right">
       <button class="btn btn-outline-secondary" type="button" ngbDropdownToggle></button>
-      <div ngbDropdownMenu class="scrollable-menu">
+      <div ngbDropdownMenu class="scrollable-menu shadow">
         <button type="button" *ngFor="let tag of tags" ngbDropdownItem (click)="addTag(tag.id)">
           <app-tag [tag]="tag"></app-tag>
         </button>

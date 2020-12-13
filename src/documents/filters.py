@@ -51,7 +51,6 @@ class TagsFilter(Filter):
             return qs
 
         for tag_id in tag_ids:
-            print(self.exclude, tag_id)
             if self.exclude:
                 qs = qs.exclude(tags__id=tag_id)
             else:

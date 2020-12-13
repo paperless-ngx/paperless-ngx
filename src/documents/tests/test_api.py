@@ -404,16 +404,6 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         m.assert_not_called()
 
     @mock.patch("documents.views.async_task")
-    @mock.patch("documents.serialisers.validate_filename")
-    def test_upload_invalid_filename(self, validate_filename, async_task):
-        validate_filename.side_effect = ValidationError()
-        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
-            response = self.client.post("/api/documents/post_document/", {"document": f})
-        self.assertEqual(response.status_code, 400)
-
-        async_task.assert_not_called()
-
-    @mock.patch("documents.views.async_task")
     def test_upload_with_title(self, async_task):
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
             response = self.client.post("/api/documents/post_document/", {"document": f, "title": "my custom title"})
