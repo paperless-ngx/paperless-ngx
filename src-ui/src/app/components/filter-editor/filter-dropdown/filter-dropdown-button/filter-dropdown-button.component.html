@@ -5,7 +5,7 @@
     </svg>
   </div>
   <div class="mr-1">
-    <app-tag *ngIf="display == 'tag'; else displayName" [tag]="item" [clickable]="true" linkTitle="Filter by tag"></app-tag>
+    <app-tag *ngIf="isTag; else displayName" [tag]="item" [clickable]="true" linkTitle="Filter by tag"></app-tag>
     <ng-template #displayName><small>{{item.name}}</small></ng-template>
   </div>
   <div class="badge bg-primary text-light rounded-pill ml-auto">{{item.document_count}}</div>

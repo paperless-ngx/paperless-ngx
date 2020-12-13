@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
@@ -8,15 +8,10 @@ import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
   templateUrl: './filter-dropdown-button.component.html',
   styleUrls: ['./filter-dropdown-button.component.scss']
 })
-export class FilterDropdownButtonComponent {
-
-  constructor() { }
+export class FilterDropdownButtonComponent implements OnInit {
 
   @Input()
   item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent
-
-  @Input()
-  display: string
 
   @Input()
   selected: boolean
@@ -24,6 +19,11 @@ export class FilterDropdownButtonComponent {
   @Output()
   toggle = new EventEmitter()
 
+  isTag: boolean
+
+  ngOnInit() {
+    this.isTag = 'is_inbox_tag' in this.item // ~ this.item instanceof PaperlessTag
+  }
 
   toggleItem(): void {
     this.selected = !this.selected
