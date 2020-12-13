@@ -16,7 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component';
-import { DeleteDialogComponent } from './components/common/delete-dialog/delete-dialog.component';
+import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component';
 import { CorrespondentEditDialogComponent } from './components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
@@ -49,6 +49,7 @@ import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-w
 import { YesNoPipe } from './pipes/yes-no.pipe';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import { DocumentTitlePipe } from './pipes/document-title.pipe';
+import { MetadataCollapseComponent } from './components/document-detail/metadata-collapse/metadata-collapse.component';
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
 
 @NgModule({
@@ -64,7 +65,7 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     SettingsComponent,
     NotFoundComponent,
     CorrespondentEditDialogComponent,
-    DeleteDialogComponent,
+    ConfirmDialogComponent,
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     TagComponent,
@@ -91,6 +92,7 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     YesNoPipe,
     FileSizePipe,
     DocumentTitlePipe,
+    MetadataCollapseComponent,
     SelectDialogComponent
   ],
   imports: [

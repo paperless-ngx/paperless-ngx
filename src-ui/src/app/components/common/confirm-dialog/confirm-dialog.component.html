@@ -5,10 +5,13 @@
       </button>
     </div>
     <div class="modal-body">
-      <p><b>{{message}}</b></p>
-      <p *ngIf="message2">{{message2}}</p>
+      <p *ngIf="messageBold"><b>{{messageBold}}</b></p>
+      <p *ngIf="message">{{message}}</p>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-dark" (click)="cancelClicked()">Cancel</button>
-      <button type="button" class="btn btn-danger" (click)="deleteClicked.emit()" [disabled]="!deleteButtonEnabled">Delete<span *ngIf="!deleteButtonEnabled"> ({{seconds}})</span></button>
+      <button type="button" class="btn" [class]="btnClass" (click)="confirmClicked.emit()" [disabled]="!confirmButtonEnabled">
+        {{btnCaption}}
+        <span *ngIf="!confirmButtonEnabled"> ({{seconds}})</span>
+      </button>
     </div>

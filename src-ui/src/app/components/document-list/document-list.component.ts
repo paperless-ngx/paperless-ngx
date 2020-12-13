@@ -15,7 +15,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
 import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
-import { DeleteDialogComponent } from '../common/delete-dialog/delete-dialog.component';
+import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { SelectDialogComponent } from '../common/select-dialog/select-dialog.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
 
@@ -238,11 +238,14 @@ export class DocumentListComponent implements OnInit {
   }
 
   bulkDelete() {
-    let modal = this.modalService.open(DeleteDialogComponent, {backdrop: 'static'})
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.delayConfirm(5)
-    modal.componentInstance.message = `This operation will permanently delete all ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message2 = `This operation cannot be undone.`
-    modal.componentInstance.deleteClicked.subscribe(() => {
+    modal.componentInstance.title = "Delete confirm"
+    modal.componentInstance.messageBold = `This operation will permanently delete all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message = `This operation cannot be undone.`
+    modal.componentInstance.btnClass = "btn-danger"
+    modal.componentInstance.btnCaption = "Delete document(s)"
+    modal.componentInstance.confirmClicked.subscribe(() => {
       this.executeBulkOperation("delete", {}).subscribe(
         response => {
           modal.close()
