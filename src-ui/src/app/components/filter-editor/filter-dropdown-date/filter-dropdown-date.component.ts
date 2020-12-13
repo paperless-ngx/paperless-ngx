@@ -38,20 +38,24 @@ export class FilterDropdownDateComponent {
 
   ngOnChanges(changes: SimpleChange) {
     // this is a hacky workaround perhaps because of https://github.com/angular/angular/issues/11097
-    let dateString: string
+    let dateString: string = ''
     let dateAfterChange: SimpleChange = changes['dateAfter']
     let dateBeforeChange: SimpleChange = changes['dateBefore']
 
-    if (dateAfterChange && dateAfterChange.currentValue && this.dpAfter) {
-      let dateAfterDate = dateAfterChange.currentValue as NgbDateStruct
+    if (this.dpBefore && this.dpAfter) {
       let dpAfterElRef: ElementRef = this.dpAfter['_elRef']
-      dateString = `${dateAfterDate.year}-${dateAfterDate.month.toString().padStart(2,'0')}-${dateAfterDate.day.toString().padStart(2,'0')}`
-      dpAfterElRef.nativeElement.value = dateString
-    } else if (dateBeforeChange && dateBeforeChange.currentValue && this.dpBefore) {
-      let dateBeforeDate = dateBeforeChange.currentValue as NgbDateStruct
       let dpBeforeElRef: ElementRef = this.dpBefore['_elRef']
-      dateString = `${dateBeforeChange.currentValue.year}-${dateBeforeChange.currentValue.month.toString().padStart(2,'0')}-${dateBeforeChange.currentValue.day.toString().padStart(2,'0')}`
-      dpBeforeElRef.nativeElement.value = dateString
+
+      if (dateAfterChange && dateAfterChange.currentValue) {
+        let dateAfterDate = dateAfterChange.currentValue as NgbDateStruct
+        dateString = `${dateAfterDate.year}-${dateAfterDate.month.toString().padStart(2,'0')}-${dateAfterDate.day.toString().padStart(2,'0')}`
+      } else if (dateBeforeChange && dateBeforeChange.currentValue) {
+        let dateBeforeDate = dateBeforeChange.currentValue as NgbDateStruct
+        dateString = `${dateBeforeChange.currentValue.year}-${dateBeforeChange.currentValue.month.toString().padStart(2,'0')}-${dateBeforeChange.currentValue.day.toString().padStart(2,'0')}`
+      } else {
+        dpAfterElRef.nativeElement.value = dateString
+        dpBeforeElRef.nativeElement.value = dateString
+      }
     }
   }
 
