@@ -1,5 +1,5 @@
 import magic
-from pathvalidate import validate_filename, ValidationError
+from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
@@ -7,11 +7,15 @@ from .models import Correspondent, Tag, Document, Log, DocumentType
 from .parsers import is_mime_type_supported
 
 
-class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
+class CorrespondentSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
 
     last_correspondence = serializers.DateTimeField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Correspondent
@@ -27,9 +31,13 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
+class DocumentTypeSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = DocumentType
@@ -44,9 +52,13 @@ class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Tag
@@ -166,12 +178,6 @@ class PostDocumentSerializer(serializers.Serializer):
     )
 
     def validate_document(self, document):
-
-        try:
-            validate_filename(document.name)
-        except ValidationError:
-            raise serializers.ValidationError("Invalid filename.")
-
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
 

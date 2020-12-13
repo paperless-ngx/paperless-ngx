@@ -14,10 +14,9 @@ import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { SafePipe } from './pipes/safe.pipe';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component';
-import { DeleteDialogComponent } from './components/common/delete-dialog/delete-dialog.component';
+import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component';
 import { CorrespondentEditDialogComponent } from './components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
@@ -48,10 +47,13 @@ import { SavedViewWidgetComponent } from './components/dashboard/widgets/saved-v
 import { StatisticsWidgetComponent } from './components/dashboard/widgets/statistics-widget/statistics-widget.component';
 import { UploadFileWidgetComponent } from './components/dashboard/widgets/upload-file-widget/upload-file-widget.component';
 import { WidgetFrameComponent } from './components/dashboard/widgets/widget-frame/widget-frame.component';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
 import { YesNoPipe } from './pipes/yes-no.pipe';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
+import { DocumentTitlePipe } from './pipes/document-title.pipe';
+import { MetadataCollapseComponent } from './components/document-detail/metadata-collapse/metadata-collapse.component';
 
 @NgModule({
   declarations: [
@@ -64,10 +66,9 @@ import { FilterPipe } from './pipes/filter.pipe';
     DocumentTypeListComponent,
     LogsComponent,
     SettingsComponent,
-    SafePipe,
     NotFoundComponent,
     CorrespondentEditDialogComponent,
-    DeleteDialogComponent,
+    ConfirmDialogComponent,
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     TagComponent,
@@ -97,6 +98,8 @@ import { FilterPipe } from './pipes/filter.pipe';
     YesNoPipe,
     FileSizePipe,
     FilterPipe
+    DocumentTitlePipe,
+    MetadataCollapseComponent
   ],
   imports: [
     BrowserModule,
@@ -106,7 +109,8 @@ import { FilterPipe } from './pipes/filter.pipe';
     FormsModule,
     ReactiveFormsModule,
     NgxFileDropModule,
-    InfiniteScrollModule
+    InfiniteScrollModule,
+    PdfViewerModule
   ],
   providers: [
     DatePipe,

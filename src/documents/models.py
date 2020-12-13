@@ -36,7 +36,6 @@ class MatchingModel(models.Model):
     )
 
     name = models.CharField(max_length=128, unique=True)
-    slug = models.SlugField(blank=True, editable=False)
 
     match = models.CharField(max_length=256, blank=True)
     matching_algorithm = models.PositiveIntegerField(
@@ -69,7 +68,6 @@ class MatchingModel(models.Model):
     def save(self, *args, **kwargs):
 
         self.match = self.match.lower()
-        self.slug = slugify(self.name)
 
         models.Model.save(self, *args, **kwargs)
 
@@ -384,9 +382,7 @@ class FileInfo:
     def _get_correspondent(cls, name):
         if not name:
             return None
-        return Correspondent.objects.get_or_create(name=name, defaults={
-            "slug": slugify(name)
-        })[0]
+        return Correspondent.objects.get_or_create(name=name)[0]
 
     @classmethod
     def _get_title(cls, title):
@@ -396,10 +392,7 @@ class FileInfo:
     def _get_tags(cls, tags):
         r = []
         for t in tags.split(","):
-            r.append(Tag.objects.get_or_create(
-                slug=slugify(t),
-                defaults={"name": t}
-            )[0])
+            r.append(Tag.objects.get_or_create(name=t)[0])
         return tuple(r)
 
     @classmethod

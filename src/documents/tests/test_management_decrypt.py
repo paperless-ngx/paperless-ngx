@@ -35,20 +35,20 @@ class TestDecryptDocuments(TestCase):
             PASSPHRASE="test"
         ).enable()
 
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000002.pdf.gpg"), os.path.join(originals_dir, "0000002.pdf.gpg"))
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000002.png.gpg"), os.path.join(thumb_dir, "0000002.png.gpg"))
+        doc = Document.objects.create(checksum="9c9691e51741c1f4f41a20896af31770", title="wow", filename="0000002.pdf.gpg",  mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
 
-        Document.objects.create(checksum="9c9691e51741c1f4f41a20896af31770", title="wow", filename="0000002.pdf.gpg", id=2, mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000002.pdf.gpg"), os.path.join(originals_dir, "0000002.pdf.gpg"))
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", f"0000002.png.gpg"), os.path.join(thumb_dir, f"{doc.id:07}.png.gpg"))
 
         call_command('decrypt_documents')
 
-        doc = Document.objects.get(id=2)
+        doc.refresh_from_db()
 
         self.assertEqual(doc.storage_type, Document.STORAGE_TYPE_UNENCRYPTED)
         self.assertEqual(doc.filename, "0000002.pdf")
         self.assertTrue(os.path.isfile(os.path.join(originals_dir, "0000002.pdf")))
         self.assertTrue(os.path.isfile(doc.source_path))
-        self.assertTrue(os.path.isfile(os.path.join(thumb_dir, "0000002.png")))
+        self.assertTrue(os.path.isfile(os.path.join(thumb_dir, f"{doc.id:07}.png")))
         self.assertTrue(os.path.isfile(doc.thumbnail_path))
 
         with doc.source_file as f:

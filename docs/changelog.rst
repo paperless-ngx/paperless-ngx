@@ -32,6 +32,7 @@ This release focusses primarily on many small issues with the UI.
 * Other
 
   * Fixed an issue with the docker image when a non-standard PostgreSQL port was used.
+  * The docker image was trying check for installed languages before actually installing them.
   * ``FILENAME_FORMAT`` placeholder for document types.
   * The filename formatter is now less restrictive with file names and tries to
     conserve the original correspondents, types and titles as much as possible.

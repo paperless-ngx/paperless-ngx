@@ -29,10 +29,9 @@ def _tags_from_path(filepath):
     path_parts = Path(filepath).relative_to(
                 settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
-        tag_ids.add(Tag.objects.get_or_create(
-            slug=slugify(part),
-            defaults={"name": part},
-        )[0].pk)
+        tag_ids.add(Tag.objects.get_or_create(name__iexact=part, defaults={
+            "name": part
+        })[0].pk)
 
     return tag_ids
 
