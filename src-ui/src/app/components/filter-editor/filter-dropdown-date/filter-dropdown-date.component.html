@@ -9,12 +9,11 @@
   </button>
   <div class="dropdown-menu date-filter shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
-        <div class="list-group-item d-flex flex-column align-items-start">
-          <button class="btn btn-sm btn-link pl-0" (click)="setDateQuickFilter(7)">Last 7 days</button>
-          <button class="btn btn-sm btn-link pl-0" (click)="setDateQuickFilter(30)">Last 30 days</button>
-          <button class="btn btn-sm btn-link pl-0" (click)="setDateQuickFilter('month')">This month</button>
-          <button class="btn btn-sm btn-link pl-0" (click)="setDateQuickFilter('year')">This year</button>
-        </div>
+        <button *ngFor="let range of [7, 30, 'month', 'year']" class="list-group-item small list-goup list-group-item-action d-flex" role="menuitem" (click)="setDateQuickFilter(range)">
+          <ng-container *ngIf="isStringRange(range)">This </ng-container>
+          {{ range }}
+          <ng-container *ngIf="!isStringRange(range)"> days</ng-container>
+        </button>
         <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
           <div class="mb-1"><small>Before</small></div>
           <div class="input-group input-group-sm">

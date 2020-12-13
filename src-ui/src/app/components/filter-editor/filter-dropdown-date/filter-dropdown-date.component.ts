@@ -36,6 +36,10 @@ export class FilterDropdownDateComponent {
     return NgbDate.from({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})
   }
 
+  isStringRange(range: any) {
+    return typeof range == 'string'
+  }
+
   ngOnChanges(changes: SimpleChange) {
     // this is a hacky workaround perhaps because of https://github.com/angular/angular/issues/11097
     let dateString: string = ''
