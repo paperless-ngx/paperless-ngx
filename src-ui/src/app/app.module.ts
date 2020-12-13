@@ -97,7 +97,7 @@ import { MetadataCollapseComponent } from './components/document-detail/metadata
     WelcomeWidgetComponent,
     YesNoPipe,
     FileSizePipe,
-    FilterPipe
+    FilterPipe,
     DocumentTitlePipe,
     MetadataCollapseComponent
   ],
