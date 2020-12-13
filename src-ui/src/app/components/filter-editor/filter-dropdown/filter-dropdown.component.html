@@ -1,10 +1,10 @@
   <div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)">
   <button class="btn btn-outline-primary btn-sm" id="dropdown{{title}}" ngbDropdownToggle>
-      <div class="badge bg-primary text-light rounded-pill ml-auto">
-        <ng-container *ngIf="itemsSelected?.length > 0">
+    <ng-container *ngIf="itemsSelected?.length > 0">
+      <div class="badge bg-secondary text-light rounded-pill ml-auto">
         {{itemsSelected?.length}}
-      </ng-container>
       </div>
+    </ng-container>
     {{title}}
   </button>
   <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
