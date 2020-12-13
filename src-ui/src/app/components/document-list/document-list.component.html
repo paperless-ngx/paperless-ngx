@@ -119,7 +119,7 @@
     <th class="d-none d-xl-table-cell">Added</th>
   </thead>
   <tbody>
-    <tr *ngFor="let d of list.documents">
+    <tr *ngFor="let d of list.documents" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
       <td>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (change)="list.setSelected(d, $event.target.checked)">
