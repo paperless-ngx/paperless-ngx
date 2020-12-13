@@ -3,7 +3,6 @@ import hashlib
 import os
 import random
 import uuid
-from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from unittest import mock
 
@@ -15,7 +14,6 @@ from .utils import DirectoriesMixin
 from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories, \
     generate_unique_filename
 from ..models import Document, Correspondent
-from ..sanity_checker import check_sanity
 
 
 class TestFileHandling(DirectoriesMixin, TestCase):
@@ -573,21 +571,3 @@ def run():
     for i in range(30):
         doc.title = str(random.randrange(1, 5))
         doc.save()
-
-
-class TestSuperMassive(DirectoriesMixin, TestCase):
-
-    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
-    def test_super_massive(self):
-        # try to save as many documents in parallel as possible.
-        # try to make the system fail.
-
-        with ThreadPoolExecutor(max_workers=16) as executor:
-            results = [executor.submit(run) for i in range(16)]
-
-        for r in results:
-            if r.exception():
-                raise r.exception()
-
-        # nope, everything still good. Thank you, lockfiles.
-        self.assertEqual(len(check_sanity()), 0)

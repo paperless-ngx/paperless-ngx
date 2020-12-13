@@ -7,6 +7,7 @@ from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, DatabaseError
+from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
@@ -121,11 +122,14 @@ def set_tags(sender,
              classifier=None,
              replace=False,
              **kwargs):
+
     if replace:
-        document.tags.clear()
-        current_tags = set([])
-    else:
-        current_tags = set(document.tags.all())
+        Document.tags.through.objects.filter(document=document).exclude(
+            Q(tag__is_inbox_tag=True)).exclude(
+            Q(tag__match="") & ~Q(tag__matching_algorithm=Tag.MATCH_AUTO)
+        ).delete()
+
+    current_tags = set(document.tags.all())
 
     matched_tags = matching.match_tags(document.content, classifier)
 
@@ -136,7 +140,7 @@ def set_tags(sender,
 
     message = 'Tagging "{}" with "{}"'
     logger(
-        message.format(document, ", ".join([t.slug for t in relevant_tags])),
+        message.format(document, ", ".join([t.name for t in relevant_tags])),
         logging_group
     )
 
@@ -165,35 +169,36 @@ def run_post_consume_script(sender, document, **kwargs):
         reverse("document-download", kwargs={"pk": document.pk}),
         reverse("document-thumb", kwargs={"pk": document.pk}),
         str(document.correspondent),
-        str(",".join(document.tags.all().values_list("slug", flat=True)))
+        str(",".join(document.tags.all().values_list("name", flat=True)))
     )).wait()
 
 
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
-    for f in (instance.source_path,
-              instance.archive_path,
-              instance.thumbnail_path):
-        if os.path.isfile(f):
-            try:
-                os.unlink(f)
-                logging.getLogger(__name__).debug(
-                    f"Deleted file {f}.")
-            except OSError as e:
-                logging.getLogger(__name__).warning(
-                    f"While deleting document {str(instance)}, the file "
-                    f"{f} could not be deleted: {e}"
-                )
+    with FileLock(settings.MEDIA_LOCK):
+        for f in (instance.source_path,
+                  instance.archive_path,
+                  instance.thumbnail_path):
+            if os.path.isfile(f):
+                try:
+                    os.unlink(f)
+                    logging.getLogger(__name__).debug(
+                        f"Deleted file {f}.")
+                except OSError as e:
+                    logging.getLogger(__name__).warning(
+                        f"While deleting document {str(instance)}, the file "
+                        f"{f} could not be deleted: {e}"
+                    )
 
-    delete_empty_directories(
-        os.path.dirname(instance.source_path),
-        root=settings.ORIGINALS_DIR
-    )
+        delete_empty_directories(
+            os.path.dirname(instance.source_path),
+            root=settings.ORIGINALS_DIR
+        )
 
-    delete_empty_directories(
-        os.path.dirname(instance.archive_path),
-        root=settings.ARCHIVE_DIR
-    )
+        delete_empty_directories(
+            os.path.dirname(instance.archive_path),
+            root=settings.ARCHIVE_DIR
+        )
 
 
 def validate_move(instance, old_path, new_path):

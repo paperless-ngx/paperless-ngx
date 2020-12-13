@@ -17,7 +17,7 @@
 
         <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
             <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
-            <div class="dropdown-menu" ngbDropdownMenu>
+            <div class="dropdown-menu shadow" ngbDropdownMenu>
                 <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
             </div>
         </div>
@@ -35,7 +35,7 @@
 
 
 <div class="row">
-    <div class="col-xl">
+    <div class="col mb-4">
 
         <form [formGroup]='documentForm' (ngSubmit)="save()">
 
@@ -110,53 +110,8 @@
                             </tbody>
                         </table>
 
-                        <h6 *ngIf="metadata?.original_metadata.length > 0">
-                            <button type="button" class="btn btn-outline-secondary btn-sm mr-2"
-                                (click)="expandOriginalMetadata = !expandOriginalMetadata" aria-controls="collapseExample">
-                                <svg class="buttonicon" fill="currentColor" *ngIf="!expandOriginalMetadata">
-                                    <use xlink:href="assets/bootstrap-icons.svg#caret-down" />
-                                </svg>
-                                <svg class="buttonicon" fill="currentColor" *ngIf="expandOriginalMetadata">
-                                    <use xlink:href="assets/bootstrap-icons.svg#caret-up" />
-                                </svg>
-                            </button>
-                            Original document metadata
-                        </h6>
-
-                        <div #collapse="ngbCollapse" [(ngbCollapse)]="!expandOriginalMetadata">
-                            <table class="table table-borderless">
-                                <tbody>
-                                    <tr *ngFor="let m of metadata?.original_metadata">
-                                        <td>{{m.prefix}}:{{m.key}}</td>
-                                        <td>{{m.value}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <h6 *ngIf="metadata?.has_archive_version && metadata?.archive_metadata.length > 0">
-                            <button type="button" class="btn btn-outline-secondary btn-sm mr-2"
-                                (click)="expandArchivedMetadata = !expandArchivedMetadata" aria-controls="collapseExample">
-                                <svg class="buttonicon" fill="currentColor" *ngIf="!expandArchivedMetadata">
-                                    <use xlink:href="assets/bootstrap-icons.svg#caret-down" />
-                                </svg>
-                                <svg class="buttonicon" fill="currentColor" *ngIf="expandArchivedMetadata">
-                                    <use xlink:href="assets/bootstrap-icons.svg#caret-up" />
-                                </svg>
-                            </button>
-                            Archived document metadata
-                        </h6>
-
-                        <div #collapse="ngbCollapse" [(ngbCollapse)]="!expandArchivedMetadata">
-                            <table class="table table-borderless">
-                                <tbody>
-                                    <tr *ngFor="let m of metadata?.archive_metadata">
-                                        <td>{{m.prefix}}:{{m.key}}</td>
-                                        <td>{{m.value}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <app-metadata-collapse title="Original document metadata" [metadata]="metadata.original_metadata" *ngIf="metadata?.original_metadata.length > 0"></app-metadata-collapse>
+                        <app-metadata-collapse title="Archived document metadata" [metadata]="metadata.archive_metadata" *ngIf="metadata?.archive_metadata.length > 0"></app-metadata-collapse>
 
                     </ng-template>
                 </li>
@@ -171,11 +126,9 @@
         </form>
     </div>
 
-    <div class="col-xl d-none d-xl-block document-preview">
-        <object [data]="previewUrl | safe" type="application/pdf" width="100%" height="100%">
-            <p>Your browser does not support PDFs.
-                <a href="previewUrl">Download the PDF</a>.</p>
-        </object>
-
+    <div class="col-md-6 col-xl-8 mb-3">
+      <div class="pdf-viewer-container" *ngIf="getContentType() == 'application/pdf'">
+        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true"></pdf-viewer>
+      </div>
     </div>
 </div>
