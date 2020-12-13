@@ -52,17 +52,17 @@ export class FilterEditorComponent implements AfterViewInit {
   }
 
   onToggleTag(tag: PaperlessTag) {
-    this.filterEditorService.toggleFitlerByTag(tag)
+    this.filterEditorService.toggleFilterByTag(tag)
     this.applyFilters()
   }
 
   onToggleCorrespondent(correspondent: PaperlessCorrespondent) {
-    this.filterEditorService.toggleFitlerByCorrespondent(correspondent)
+    this.filterEditorService.toggleFilterByCorrespondent(correspondent)
     this.applyFilters()
   }
 
   onToggleDocumentType(documentType: PaperlessDocumentType) {
-    this.filterEditorService.toggleFitlerByDocumentType(documentType)
+    this.filterEditorService.toggleFilterByDocumentType(documentType)
     this.applyFilters()
   }
 
