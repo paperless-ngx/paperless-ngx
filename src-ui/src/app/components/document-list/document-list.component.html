@@ -64,7 +64,7 @@
 
 <div class="card w-100 mb-3">
   <div class="card-body">
-    <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()" (clear)="clearFilterRules()" #filterEditor></app-filter-editor>
+    <app-filter-editor [(filterEditorService)]="filterEditorService" (apply)="applyFilterRules()" (clear)="clearFilterRules()" #filterEditor></app-filter-editor>
   </div>
 </div>
 
