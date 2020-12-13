@@ -53,9 +53,11 @@ export class FilterDropdownDateComponent {
       if (dateAfterChange && dateAfterChange.currentValue) {
         let dateAfterDate = dateAfterChange.currentValue as NgbDateStruct
         dateString = `${dateAfterDate.year}-${dateAfterDate.month.toString().padStart(2,'0')}-${dateAfterDate.day.toString().padStart(2,'0')}`
+        dpAfterElRef.nativeElement.value = dateString
       } else if (dateBeforeChange && dateBeforeChange.currentValue) {
         let dateBeforeDate = dateBeforeChange.currentValue as NgbDateStruct
         dateString = `${dateBeforeChange.currentValue.year}-${dateBeforeChange.currentValue.month.toString().padStart(2,'0')}-${dateBeforeChange.currentValue.day.toString().padStart(2,'0')}`
+        dpBeforeElRef.nativeElement.value = dateString
       } else {
         dpAfterElRef.nativeElement.value = dateString
         dpBeforeElRef.nativeElement.value = dateString
