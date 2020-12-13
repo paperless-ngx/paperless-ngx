@@ -16,7 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component';
-import { DeleteDialogComponent } from './components/common/delete-dialog/delete-dialog.component';
+import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component';
 import { CorrespondentEditDialogComponent } from './components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
@@ -63,7 +63,7 @@ import { DocumentTitlePipe } from './pipes/document-title.pipe';
     SettingsComponent,
     NotFoundComponent,
     CorrespondentEditDialogComponent,
-    DeleteDialogComponent,
+    ConfirmDialogComponent,
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     TagComponent,
