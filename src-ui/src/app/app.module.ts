@@ -49,6 +49,7 @@ import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-w
 import { YesNoPipe } from './pipes/yes-no.pipe';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import { DocumentTitlePipe } from './pipes/document-title.pipe';
+import { MetadataCollapseComponent } from './components/document-detail/metadata-collapse/metadata-collapse.component';
 
 @NgModule({
   declarations: [
@@ -89,7 +90,8 @@ import { DocumentTitlePipe } from './pipes/document-title.pipe';
     WelcomeWidgetComponent,
     YesNoPipe,
     FileSizePipe,
-    DocumentTitlePipe
+    DocumentTitlePipe,
+    MetadataCollapseComponent
   ],
   imports: [
     BrowserModule,
