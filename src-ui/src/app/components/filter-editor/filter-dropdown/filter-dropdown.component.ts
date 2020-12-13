@@ -29,6 +29,7 @@ export class FilterDropdownComponent {
   toggle = new EventEmitter()
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
+  @ViewChild('filterDropdown') filterDropdown: NgbDropdown
 
   filterText: string
 
@@ -53,5 +54,6 @@ export class FilterDropdownComponent {
   listFilterEnter(): void {
     let filtered = this.filterPipe.transform(this.items, this.filterText)
     if (filtered.length == 1) this.toggleItem(filtered.shift())
+    this.filterDropdown.close()
   }
 }
