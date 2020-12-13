@@ -104,11 +104,12 @@ export class FilterEditorViewService {
     let filterRules = this.filterRules
     let filterRuleType: FilterRuleType = FILTER_RULE_TYPES.find(t => t.id == filterRuleTypeID)
     let existingRules = filterRules.filter(rule => rule.type.id == filterRuleType.id)
+    let existingItemRule = existingRules?.find(rule => rule.value == item.id)
 
-    if (existingRules && filterRuleType.id == FILTER_HAS_TAG) {
-      let existingItemRule = existingRules?.find(rule => rule.value == item.id)
-      if (existingItemRule) filterRules.splice(filterRules.indexOf(existingItemRule), 1)
-      else filterRules.push({type: filterRuleType, value: item.id})
+    if (existingRules && existingItemRule) {
+      filterRules.splice(filterRules.indexOf(existingItemRule), 1) // if exact rule exists just remove
+    } else if (existingItemRule && filterRuleType.multi) { // e.g. tags can have multiple
+      filterRules.push({type: filterRuleType, value: item.id})
     } else if (existingRules.length) { // Correspondents & DocumentTypes only one
       filterRules.find(rule => rule.type.id == filterRuleType.id).value = item.id
     } else {
