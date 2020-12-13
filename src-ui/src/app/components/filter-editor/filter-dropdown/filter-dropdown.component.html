@@ -5,7 +5,7 @@
       <input class="list-group-item form-control form-control-sm" type="text" [(ngModel)]="filterText" placeholder="Filter {{title}}" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
       <ng-container *ngIf="(items$ | async)?.results as items">
         <ng-container *ngFor="let item of items | filter: filterText; let i = index">
-          <app-filter-dropdown-button [item]="item" [display]="display" [selected]="isItemSelected(item)" (toggle)="toggleItem($event)"></app-filter-dropdown-button>
+          <app-filter-dropdown-button [item]="item" [selected]="isItemSelected(item)" (toggle)="toggleItem($event)"></app-filter-dropdown-button>
         </ng-container>
       </ng-container>
     </div>
