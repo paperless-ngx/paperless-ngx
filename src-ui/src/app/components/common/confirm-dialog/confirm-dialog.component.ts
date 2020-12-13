@@ -2,35 +2,41 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-delete-dialog',
-  templateUrl: './delete-dialog.component.html',
-  styleUrls: ['./delete-dialog.component.scss']
+  selector: 'app-confirm-dialog',
+  templateUrl: './confirm-dialog.component.html',
+  styleUrls: ['./confirm-dialog.component.scss']
 })
-export class DeleteDialogComponent implements OnInit {
+export class ConfirmDialogComponent implements OnInit {
 
   constructor(public activeModal: NgbActiveModal) { }
 
   @Output()
-  public deleteClicked = new EventEmitter()
+  public confirmClicked = new EventEmitter()
 
   @Input()
-  title = "Delete confirmation"
+  title = "Confirmation"
 
   @Input()
-  message = "Do you really want to delete this?"
+  messageBold
 
   @Input()
-  message2
+  message
 
-  deleteButtonEnabled = true
+  @Input()
+  btnClass = "btn-primary"
+
+  @Input()
+  btnCaption = "Confirm"
+
+  confirmButtonEnabled = true
   seconds = 0
 
   delayConfirm(seconds: number) {
-    this.deleteButtonEnabled = false
+    this.confirmButtonEnabled = false
     this.seconds = seconds
     setTimeout(() => {
       if (this.seconds <= 1) {
-        this.deleteButtonEnabled = true
+        this.confirmButtonEnabled = true
       } else {
         this.delayConfirm(seconds - 1)
       }
