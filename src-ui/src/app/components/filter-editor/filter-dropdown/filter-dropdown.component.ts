@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ElementRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ElementRef, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Results } from 'src/app/data/results';
 import { ObjectWithId } from 'src/app/data/object-with-id';
@@ -9,7 +9,7 @@ import { FilterPipe } from  'src/app/pipes/filter.pipe';
   templateUrl: './filter-dropdown.component.html',
   styleUrls: ['./filter-dropdown.component.scss']
 })
-export class FilterDropdownComponent implements OnInit {
+export class FilterDropdownComponent {
 
   constructor(private filterPipe: FilterPipe) { }
 
