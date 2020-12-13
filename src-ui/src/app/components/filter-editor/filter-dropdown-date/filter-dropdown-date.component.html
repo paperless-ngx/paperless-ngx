@@ -15,7 +15,15 @@
           <ng-container *ngIf="!isStringRange(range)"> days</ng-container>
         </button>
         <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
-          <div class="mb-1"><small>Before</small></div>
+          <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
+            <div>Before</div>
+            <a *ngIf="dateBefore" class="btn btn-link p-0 m-0" (click)="clearBefore()">
+              <svg width="0.8em" height="0.8em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+              <small>Clear</small>
+            </a>
+          </div>
           <div class="input-group input-group-sm">
             <input class="form-control" type="text" placeholder="yyyy-mm-dd" name="before" [(ngModel)]="_dateBefore" [maxDate]="this._maxDate" ngbDatepicker (dateSelect)="onDateSelected($event)" #dpBefore="ngbDatepicker">
             <div class="input-group-append">
@@ -29,8 +37,16 @@
           </div>
         </div>
         <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
-          <div class="mb-1"><small>After</small></div>
-          <div class="input-group">
+          <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
+            <div>After</div>
+            <a *ngIf="dateAfter" class="btn btn-link p-0 m-0" (click)="clearAfter()">
+              <svg width="0.8em" height="0.8em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+              <small>Clear</small>
+            </a>
+          </div>
+          <div class="input-group input-group-sm">
             <input class="form-control form-control-sm" type="text" placeholder="yyyy-mm-dd" name="after" [(ngModel)]="_dateAfter" [maxDate]="this._maxDate" ngbDatepicker (dateSelect)="onDateSelected($event)" #dpAfter="ngbDatepicker">
             <div class="input-group-append">
               <button class="btn btn-outline-secondary btn-sm" (click)="dpAfter.toggle()" type="button">
