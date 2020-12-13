@@ -1,14 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output, ElementRef, AfterViewInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { FilterRule } from 'src/app/data/filter-rule';
-import { FilterRuleType, FILTER_RULE_TYPES, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE, FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER, FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER, FILTER_CREATED_YEAR, FILTER_CREATED_MONTH, FILTER_CREATED_DAY } from 'src/app/data/filter-rule-type';
+import { Component, EventEmitter, Input, Output, ElementRef, AfterViewInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
+import { ObjectWithId } from 'src/app/data/object-with-id';
+import { FilterEditorViewService } from 'src/app/services/filter-editor-view.service'
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
-import { ObjectWithId } from 'src/app/data/object-with-id';
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
-import { TagService } from 'src/app/services/rest/tag.service';
 import { FilterDropdownComponent } from './filter-dropdown/filter-dropdown.component'
 import { FilterDropdownDateComponent } from './filter-dropdown-date/filter-dropdown-date.component'
 import { fromEvent } from 'rxjs';
@@ -20,38 +16,20 @@ import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss']
 })
-export class FilterEditorComponent implements OnInit, AfterViewInit {
+export class FilterEditorComponent implements AfterViewInit {
 
-  constructor(private documentTypeService: DocumentTypeService, private tagService: TagService, private correspondentService: CorrespondentService) { }
+  constructor() { }
+
+  @Input()
+  filterEditorService: FilterEditorViewService
 
   @Output()
   clear = new EventEmitter()
-
-  @Input()
-  filterRules: FilterRule[] = []
 
   @Output()
   apply = new EventEmitter()
 
   @ViewChild('filterTextInput') filterTextInput: ElementRef;
-  @ViewChildren(FilterDropdownComponent) quickFilterDropdowns!: QueryList<FilterDropdownComponent>;
-  @ViewChildren(FilterDropdownDateComponent) quickDateFilterDropdowns!: QueryList<FilterDropdownDateComponent>;
-
-  quickFilterRuleTypeIDs: number[] = [FILTER_HAS_TAG, FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE]
-  dateAddedFilterRuleTypeIDs: any[] = [[FILTER_ADDED_BEFORE, FILTER_ADDED_AFTER], [FILTER_CREATED_BEFORE, FILTER_CREATED_AFTER]]
-
-  correspondents: PaperlessCorrespondent[] = []
-  tags: PaperlessTag[] = []
-  documentTypes: PaperlessDocumentType[] = []
-
-  filterText: string
-
-  ngOnInit(): void {
-    this.updateTextFilterInput()
-    this.tagService.listAll().subscribe(result => this.setDropdownItems(result.results, FILTER_HAS_TAG))
-    this.correspondentService.listAll().subscribe(result => this.setDropdownItems(result.results, FILTER_CORRESPONDENT))
-    this.documentTypeService.listAll().subscribe(result => this.setDropdownItems(result.results, FILTER_DOCUMENT_TYPE))
-  }
 
   ngAfterViewInit() {
     fromEvent(this.filterTextInput.nativeElement,'keyup').pipe(
@@ -59,120 +37,52 @@ export class FilterEditorComponent implements OnInit, AfterViewInit {
       distinctUntilChanged(),
       tap()
     ).subscribe((event: Event) => {
-      this.filterText = (event.target as HTMLInputElement).value
-      this.onTextFilterInput()
+      this.filterEditorService.filterText = (event.target as HTMLInputElement).value
+      this.applyFilters()
     })
-    this.quickDateFilterDropdowns.forEach(d => this.updateDateDropdown(d))
   }
 
-  setDropdownItems(items: ObjectWithId[], filterRuleTypeID: number): void {
-    let dropdown: FilterDropdownComponent = this.getDropdownByFilterRuleTypeID(filterRuleTypeID)
-    if (dropdown) {
-      dropdown.items = items
-    }
-  }
-
-  updateDropdownActiveItems(dropdown: FilterDropdownComponent): void {
-    let activeRulesValues = this.filterRules.filter(r => r.type.id == dropdown.filterRuleTypeID).map(r => r.value)
-    let activeItems = []
-    if (activeRulesValues.length > 0) {
-      activeItems = dropdown.items.filter(i => activeRulesValues.includes(i.id))
-    }
-    dropdown.itemsActive = activeItems
-  }
-
-  updateDateDropdown(dateDropdown: FilterDropdownDateComponent) {
-    let activeRules = this.filterRules.filter(r => dateDropdown.filterRuleTypeIDs.includes(r.type.id))
-    if (activeRules.length > 0) {
-      activeRules.forEach(rule => {
-        let date = { year: rule.value.substring(0,4), month: rule.value.substring(5,7), day: rule.value.substring(8,10) }
-        rule.type.filtervar.indexOf('gt') > -1 ? dateDropdown.dateAfter = date : dateDropdown.dateBefore = date
-      })
-    } else {
-      dateDropdown.dateAfter = dateDropdown.dateBefore = undefined
-    }
-  }
-
-  getDropdownByFilterRuleTypeID(filterRuleTypeID: number): FilterDropdownComponent {
-    return this.quickFilterDropdowns.find(d => d.filterRuleTypeID == filterRuleTypeID)
-  }
-
-  applySelected() {
+  applyFilters() {
     this.apply.next()
   }
 
   clearSelected() {
-    this.filterRules.splice(0,this.filterRules.length)
-    this.updateTextFilterInput()
-    this.quickFilterDropdowns.forEach(d => this.updateDropdownActiveItems(d))
-    this.quickDateFilterDropdowns.forEach(d => this.updateDateDropdown(d))
+    this.filterEditorService.clear()
     this.clear.next()
   }
 
-  hasFilters() {
-    return this.filterRules.length > 0
+  onToggleTag(tag: PaperlessTag) {
+    this.filterEditorService.toggleFitlerByTag(tag)
+    this.applyFilters()
   }
 
-  updateTextFilterInput() {
-    let existingTextRule = this.filterRules.find(rule => rule.type.id == FILTER_TITLE)
-    if (existingTextRule) this.filterText = existingTextRule.value
-    else this.filterText = ''
+  onToggleCorrespondent(correspondent: PaperlessCorrespondent) {
+    this.filterEditorService.toggleFitlerByCorrespondent(correspondent)
+    this.applyFilters()
   }
 
-  onTextFilterInput() {
-    let text = this.filterText
-    let filterRules = this.filterRules
-    let existingRule = filterRules.find(rule => rule.type.id == FILTER_TITLE)
-    if (existingRule && existingRule.value == text) {
-      return
-    } else if (existingRule) {
-      existingRule.value = text
-    } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_TITLE), value: text})
-    }
-    this.filterRules = filterRules
-    this.applySelected()
+  onToggleDocumentType(documentType: PaperlessDocumentType) {
+    this.filterEditorService.toggleFitlerByDocumentType(documentType)
+    this.applyFilters()
   }
 
-  toggleFilterByItem(item: any, filterRuleTypeID: number) {
-    let dropdown = this.getDropdownByFilterRuleTypeID(filterRuleTypeID)
-    if (typeof item == 'number') {
-      item = dropdown.items.find(i => i.id == item)
-    }
-    let filterRules = this.filterRules
-    let filterRuleType: FilterRuleType = FILTER_RULE_TYPES.find(t => t.id == filterRuleTypeID)
-    let existingRule = filterRules.find(rule => rule.type.id == filterRuleType.id)
-
-    if (existingRule && existingRule.value == item.id) {
-      filterRules.splice(filterRules.indexOf(existingRule), 1)
-    } else if (existingRule && filterRuleType.id == FILTER_HAS_TAG) {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == filterRuleType.id), value: item.id})
-    } else if (existingRule && existingRule.value == item.id) {
-      return
-    } else if (existingRule) {
-      existingRule.value = item.id
-    } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == filterRuleType.id), value: item.id})
-    }
-
-    this.updateDropdownActiveItems(dropdown)
-
-    this.filterRules = filterRules
-    this.applySelected()
+  onDateCreatedBeforeSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateCreatedBefore(date)
+    this.applyFilters()
   }
 
-  setDateFilter(newFilterRule: FilterRule) {
-    let filterRules = this.filterRules
-    let existingRule = filterRules.find(rule => rule.type.id == newFilterRule.type.id)
-
-    if (existingRule) {
-      existingRule.value = newFilterRule.value
-    } else {
-      filterRules.push(newFilterRule)
-    }
-
-    this.filterRules = filterRules
-    this.applySelected()
+  onDateCreatedAfterSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateCreatedAfter(date)
+    this.applyFilters()
   }
 
+  onDateAddedBeforeSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateAddedBefore(date)
+    this.applyFilters()
+  }
+
+  onDateAddedAfterSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateAddedAfter(date)
+    this.applyFilters()
+  }
 }
