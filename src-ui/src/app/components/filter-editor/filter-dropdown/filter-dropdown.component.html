@@ -1,4 +1,4 @@
-  <div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)">
+<div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #filterDropdown="ngbDropdown">
   <button class="btn btn-outline-primary btn-sm" id="dropdown{{title}}" ngbDropdownToggle>
     <ng-container *ngIf="itemsSelected?.length > 0">
       <div class="badge bg-secondary text-light rounded-pill ml-auto">
