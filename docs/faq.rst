@@ -78,6 +78,12 @@ that automatically, I'm all ears. For now, you have to grab the latest release
 archive from the project page and build the image yourself. The release comes
 with the front end already compiled, so you don't have to do this on the Pi.
 
+**Q:** *How do I run this on unRaid?*
+
+**A:** Head over to `<https://github.com/selfhosters/unRAID-CA-templates>`_,
+`Uli Fahrer <https://github.com/Tooa>`_ created a container template for that.
+I don't exactly know how to use that though, since I don't use unRaid.
+
 **Q:** *How do I run this on my toaster?*
 
 **A:** I honestly don't know! As for all other devices that might be able
