@@ -155,23 +155,27 @@ export class FilterEditorViewService {
     } : undefined
   }
 
-  setDateCreatedBefore(date: NgbDateStruct) {
-    this.setDate(date, FILTER_CREATED_BEFORE)
+  setDateCreatedBefore(date?: NgbDateStruct) {
+    if (date) this.setDateFilter(date, FILTER_CREATED_BEFORE)
+    else this.clearDateFilter(FILTER_CREATED_BEFORE)
   }
 
-  setDateCreatedAfter(date: NgbDateStruct) {
-    this.setDate(date, FILTER_CREATED_AFTER)
+  setDateCreatedAfter(date?: NgbDateStruct) {
+    if (date) this.setDateFilter(date, FILTER_CREATED_AFTER)
+    else this.clearDateFilter(FILTER_CREATED_AFTER)
   }
 
-  setDateAddedBefore(date: NgbDateStruct) {
-    this.setDate(date, FILTER_ADDED_BEFORE)
+  setDateAddedBefore(date?: NgbDateStruct) {
+    if (date) this.setDateFilter(date, FILTER_ADDED_BEFORE)
+    else this.clearDateFilter(FILTER_ADDED_BEFORE)
   }
 
-  setDateAddedAfter(date: NgbDateStruct) {
-    this.setDate(date, FILTER_ADDED_AFTER)
+  setDateAddedAfter(date?: NgbDateStruct) {
+    if (date) this.setDateFilter(date, FILTER_ADDED_AFTER)
+    else this.clearDateFilter(FILTER_ADDED_AFTER)
   }
 
-  setDate(date: NgbDateStruct, dateRuleTypeID: number) {
+  setDateFilter(date: NgbDateStruct, dateRuleTypeID: number) {
     let filterRules = this.filterRules
     let existingRule = filterRules.find(rule => rule.type.id == dateRuleTypeID)
     let newValue = `${date.year}-${date.month.toString().padStart(2,'0')}-${date.day.toString().padStart(2,'0')}` // YYYY-MM-DD
@@ -182,6 +186,13 @@ export class FilterEditorViewService {
       filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == dateRuleTypeID), value: newValue})
     }
 
+    this.filterRules = filterRules
+  }
+
+  clearDateFilter(dateRuleTypeID: number) {
+    let filterRules = this.filterRules
+    let existingRule = filterRules.find(rule => rule.type.id == dateRuleTypeID)
+    filterRules.splice(filterRules.indexOf(existingRule), 1)
     this.filterRules = filterRules
   }
 }
