@@ -11,7 +11,7 @@
         <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
           <div class="mb-1"><small>Before</small></div>
           <div class="input-group input-group-sm">
-            <input class="form-control" type="text" placeholder="yyyy-mm-dd" name="before" [(ngModel)]="dateBefore" ngbDatepicker (dateSelect)="dateSelected($event)" #dpBefore="ngbDatepicker">
+            <input class="form-control" type="text" placeholder="yyyy-mm-dd" name="before" [(ngModel)]="_dateBefore" ngbDatepicker (dateSelect)="onDateSelected($event)" #dpBefore="ngbDatepicker">
             <div class="input-group-append">
               <button class="btn btn-outline-secondary btn-sm" (click)="dpBefore.toggle()" type="button">
                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-calendar-date" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +25,7 @@
         <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
           <div class="mb-1"><small>After</small></div>
           <div class="input-group">
-            <input class="form-control form-control-sm" type="text" placeholder="yyyy-mm-dd" name="after" [(ngModel)]="dateAfter" ngbDatepicker (dateSelect)="dateSelected($event)" #dpAfter="ngbDatepicker">
+            <input class="form-control form-control-sm" type="text" placeholder="yyyy-mm-dd" name="after" [(ngModel)]="_dateAfter" ngbDatepicker (dateSelect)="onDateSelected($event)" #dpAfter="ngbDatepicker">
             <div class="input-group-append">
               <button class="btn btn-outline-secondary btn-sm" (click)="dpAfter.toggle()" type="button">
                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-calendar-date" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

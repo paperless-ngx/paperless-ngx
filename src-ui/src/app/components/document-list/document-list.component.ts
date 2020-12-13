@@ -6,6 +6,7 @@ import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { FilterEditorViewService } from 'src/app/services/filter-editor-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
 import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
@@ -26,6 +27,7 @@ export class DocumentListComponent implements OnInit {
   constructor(
     public list: DocumentListViewService,
     public savedViewConfigService: SavedViewConfigService,
+    public filterEditorService: FilterEditorViewService,
     public route: ActivatedRoute,
     private toastService: ToastService,
     public modalService: NgbModal,
@@ -33,12 +35,16 @@ export class DocumentListComponent implements OnInit {
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
-  filterRules: FilterRule[] = []
-
-  @ViewChild('filterEditor') filterEditor: FilterEditorComponent
-
   get isFiltered() {
     return this.list.filterRules?.length > 0
+  }
+
+  set filterRules(filterRules: FilterRule[]) {
+    this.filterEditorService.filterRules = filterRules
+  }
+
+  get filterRules(): FilterRule[] {
+    return this.filterEditorService.filterRules
   }
 
   getTitle() {
@@ -60,28 +66,29 @@ export class DocumentListComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       if (params.has('id')) {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
-        this.filterRules = this.list.filterRules
+        this.filterEditorService.filterRules = this.list.filterRules
         this.titleService.setTitle(`${this.list.savedView.title} - ${environment.appTitle}`)
       } else {
         this.list.savedView = null
-        this.filterRules = this.list.filterRules
+        this.filterEditorService.filterRules = this.list.filterRules
         this.titleService.setTitle(`Documents - ${environment.appTitle}`)
       }
       this.list.clear()
       this.list.reload()
     })
+    this.filterEditorService.filterRules = this.list.filterRules
   }
 
   applyFilterRules() {
-    this.list.filterRules = this.filterRules
+    this.list.filterRules = this.filterEditorService.filterRules
   }
 
   clearFilterRules() {
-    this.list.filterRules = this.filterRules
+    this.list.filterRules = this.filterEditorService.filterRules
   }
 
   loadViewConfig(config: SavedViewConfig) {
-    this.filterRules = cloneFilterRules(config.filterRules)
+    this.filterEditorService.filterRules = cloneFilterRules(config.filterRules)
     this.list.load(config)
   }
 
@@ -106,15 +113,18 @@ export class DocumentListComponent implements OnInit {
   }
 
   clickTag(tagID: number) {
-    this.filterEditor.toggleFilterByItem(tagID, FILTER_HAS_TAG)
+    this.filterEditorService.toggleFitlerByTagID(tagID)
+    this.applyFilterRules()
   }
 
   clickCorrespondent(correspondentID: number) {
-    this.filterEditor.toggleFilterByItem(correspondentID, FILTER_CORRESPONDENT)
+    this.filterEditorService.toggleFitlerByCorrespondentID(correspondentID)
+    this.applyFilterRules()
   }
 
   clickDocumentType(documentTypeID: number) {
-    this.filterEditor.toggleFilterByItem(documentTypeID, FILTER_DOCUMENT_TYPE)
+    this.filterEditorService.toggleFitlerByDocumentTypeID(documentTypeID)
+    this.applyFilterRules()
   }
 
 }

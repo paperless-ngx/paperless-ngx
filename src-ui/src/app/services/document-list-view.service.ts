@@ -9,7 +9,7 @@ import { DocumentService } from './rest/document.service';
 
 /**
  * This service manages the document list which is displayed using the document list view.
- * 
+ *
  * This service also serves saved views by transparently switching between the document list
  * and saved views on request. See below.
  */
@@ -25,7 +25,7 @@ export class DocumentListViewService {
   currentPage = 1
   currentPageSize: number = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
   collectionSize: number
-  
+
   /**
    * This is the current config for the document list. The service will always remember the last settings used for the document list.
    */
@@ -192,7 +192,7 @@ export class DocumentListViewService {
     }
   }
 
-  constructor(private documentService: DocumentService) { 
+  constructor(private documentService: DocumentService) {
     let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {

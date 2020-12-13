@@ -3,14 +3,17 @@
     <div class="text-muted mt-1">Filter by:</div>
   </div>
   <div class="col">
-    <input class="form-control form-control-sm" type="text" [(ngModel)]="filterText" placeholder="Title" #filterTextInput>
+    <input class="form-control form-control-sm" type="text" [(ngModel)]="filterEditorService.filterText" placeholder="Title" #filterTextInput>
   </div>
 
-  <app-filter-dropdown class="col-auto" *ngFor="let quickFilterRuleTypeID of quickFilterRuleTypeIDs" [filterRuleTypeID]="quickFilterRuleTypeID" (toggle)="toggleFilterByItem($event, quickFilterRuleTypeID)"></app-filter-dropdown>
+  <app-filter-dropdown class="col-auto" [(items$)]="filterEditorService.tags$" [itemsSelected]="filterEditorService.selectedTags" [title]="'Tags'" [display]="'tag'" (toggle)="onToggleTag($event)"></app-filter-dropdown>
+  <app-filter-dropdown class="col-auto" [(items$)]="filterEditorService.correspondents$" [itemsSelected]="filterEditorService.selectedCorrespondents" [title]="'Correspondents'" (toggle)="onToggleCorrespondent($event)"></app-filter-dropdown>
+  <app-filter-dropdown class="col-auto" [(items$)]="filterEditorService.documentTypes$" [itemsSelected]="filterEditorService.selectedDocumentTypes" [title]="'Document Types'" (toggle)="onToggleDocumentType($event)"></app-filter-dropdown>
 
-  <app-filter-dropdown-date class="col-auto" *ngFor="let dateAddedFilterRuleTypeID of dateAddedFilterRuleTypeIDs" [filterRuleTypeIDs]="dateAddedFilterRuleTypeID" (selected)="setDateFilter($event)"></app-filter-dropdown-date>
+  <app-filter-dropdown-date class="col-auto" [dateBefore]="filterEditorService.dateCreatedBefore" [dateAfter]="filterEditorService.dateCreatedAfter" [title]="'Created'" (dateBeforeSet)="onDateCreatedBeforeSet($event)" (dateAfterSet)="onDateCreatedAfterSet($event)"></app-filter-dropdown-date>
+  <app-filter-dropdown-date class="col-auto" [dateBefore]="filterEditorService.dateAddedBefore" [dateAfter]="filterEditorService.dateAddedAfter" [title]="'Added'"  (dateBeforeSet)="onDateAddedBeforeSet($event)" (dateAfterSet)="onDateAddedAfterSet($event)"></app-filter-dropdown-date>
 
-  <button class="btn btn-link btn-sm" [disabled]="!hasFilters()" (click)="clearSelected()">
+  <button class="btn btn-link btn-sm" [disabled]="!filterEditorService.hasFilters()" (click)="clearSelected()">
     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
     </svg>

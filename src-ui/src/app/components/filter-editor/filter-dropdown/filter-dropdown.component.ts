@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ElementRef, ViewChild } from '@angular/core';
-import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { Observable } from 'rxjs';
+import { Results } from 'src/app/data/results';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { FilterPipe } from  'src/app/pipes/filter.pipe';
 
@@ -13,27 +14,35 @@ export class FilterDropdownComponent implements OnInit {
   constructor(private filterPipe: FilterPipe) { }
 
   @Input()
-  filterRuleTypeID: number
+  items$: Observable<Results<ObjectWithId>>
+
+  @Input()
+  itemsSelected: ObjectWithId[]
+
+  @Input()
+  title: string
+
+  @Input()
+  display: string
 
   @Output()
   toggle = new EventEmitter()
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
 
-  items: ObjectWithId[] = []
-  itemsActive: ObjectWithId[] = []
-  title: string
   filterText: string
-  display: string
+  items: ObjectWithId[]
 
-  ngOnInit(): void {
-    let filterRuleType: FilterRuleType = FILTER_RULE_TYPES.find(t => t.id == this.filterRuleTypeID)
-    this.title = filterRuleType.displayName
-    this.display = filterRuleType.datatype
+  ngOnInit() {
+    this.items$.subscribe(result => this.items = result.results)
   }
 
   toggleItem(item: ObjectWithId): void {
     this.toggle.emit(item)
+  }
+
+  isItemSelected(item: ObjectWithId): boolean {
+    return this.itemsSelected?.find(i => i.id == item.id) !== undefined
   }
 
   dropdownOpenChange(open: boolean): void {
