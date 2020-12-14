@@ -113,17 +113,17 @@ export class DocumentListComponent implements OnInit {
   }
 
   clickTag(tagID: number) {
-    this.filterEditorService.toggleFilterByTagID(tagID)
+    this.filterEditorService.toggleFilterByTag(tagID)
     this.applyFilterRules()
   }
 
   clickCorrespondent(correspondentID: number) {
-    this.filterEditorService.toggleFilterByCorrespondentID(correspondentID)
+    this.filterEditorService.toggleFilterByCorrespondent(correspondentID)
     this.applyFilterRules()
   }
 
   clickDocumentType(documentTypeID: number) {
-    this.filterEditorService.toggleFilterByDocumentTypeID(documentTypeID)
+    this.filterEditorService.toggleFilterByDocumentType(documentTypeID)
     this.applyFilterRules()
   }
 
