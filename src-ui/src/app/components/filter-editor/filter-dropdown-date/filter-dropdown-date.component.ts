@@ -1,6 +1,4 @@
-import { Component, EventEmitter, Input, Output, ElementRef, ViewChild, OnChanges, SimpleChange } from '@angular/core';
-import { FilterRule } from 'src/app/data/filter-rule';
-import { ObjectWithId } from 'src/app/data/object-with-id';
+import { Component, EventEmitter, Input, Output, ElementRef, ViewChild, SimpleChange } from '@angular/core';
 import { NgbDate, NgbDateStruct, NgbDatepicker } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
