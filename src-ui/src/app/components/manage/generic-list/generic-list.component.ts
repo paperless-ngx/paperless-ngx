@@ -4,7 +4,7 @@ import { MatchingModel, MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/mat
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
-import { DeleteDialogComponent } from '../../common/delete-dialog/delete-dialog.component';
+import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component';
 
 @Directive()
 export abstract class GenericListComponent<T extends ObjectWithId> implements OnInit {
@@ -88,10 +88,13 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   }
 
   openDeleteDialog(object: T) {
-    var activeModal = this.modalService.open(DeleteDialogComponent, {backdrop: 'static'})
-    activeModal.componentInstance.message = `Do you really want to delete ${this.getObjectName(object)}?`
-    activeModal.componentInstance.message2 = "Associated documents will not be deleted."
-    activeModal.componentInstance.deleteClicked.subscribe(() => {
+    var activeModal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    activeModal.componentInstance.title = "Confirm delete"
+    activeModal.componentInstance.messageBold = `Do you really want to delete ${this.getObjectName(object)}?`
+    activeModal.componentInstance.message = "Associated documents will not be deleted."
+    activeModal.componentInstance.btnClass = "btn-danger"
+    activeModal.componentInstance.btnCaption = "Delete"
+    activeModal.componentInstance.confirmPressed.subscribe(() => {
       this.service.delete(object).subscribe(_ => {
         activeModal.close()
         this.reloadData()

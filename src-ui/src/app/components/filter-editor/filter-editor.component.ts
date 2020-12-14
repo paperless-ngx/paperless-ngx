@@ -1,67 +1,99 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FilterRule } from 'src/app/data/filter-rule';
-import { FilterRuleType, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { FilterEditorViewService } from 'src/app/services/filter-editor-view.service'
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
-import { TagService } from 'src/app/services/rest/tag.service';
-
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-filter-editor',
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss']
 })
-export class FilterEditorComponent implements OnInit {
+export class FilterEditorComponent implements OnInit, OnDestroy {
 
-  constructor(private documentTypeService: DocumentTypeService, private tagService: TagService, private correspondentService: CorrespondentService) { }
+  constructor() { }
+
+  @Input()
+  filterEditorService: FilterEditorViewService
 
   @Output()
   clear = new EventEmitter()
 
-  @Input()
-  filterRules: FilterRule[] = []
-
   @Output()
   apply = new EventEmitter()
 
-  selectedRuleType: FilterRuleType = FILTER_RULE_TYPES[0]
-
-  correspondents: PaperlessCorrespondent[] = []
-  tags: PaperlessTag[] = []
-  documentTypes: PaperlessDocumentType[] = []
-
-  newRuleClicked() {
-    this.filterRules.push({type: this.selectedRuleType, value: this.selectedRuleType.default})
-    this.selectedRuleType = this.getRuleTypes().length > 0 ? this.getRuleTypes()[0] : null
+  get titleFilter() {
+    return this.filterEditorService.titleFilter
   }
 
-  removeRuleClicked(rule) {
-    let index = this.filterRules.findIndex(r => r == rule)
-    if (index > -1) {
-      this.filterRules.splice(index, 1)
-    }
+  set titleFilter(value) {
+    this.titleFilterDebounce.next(value)
   }
 
-  applyClicked() {
+  titleFilterDebounce: Subject<string>
+  subscription: Subscription
+
+  ngOnInit() {
+    this.titleFilterDebounce = new Subject<string>()
+    this.subscription = this.titleFilterDebounce.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(title => {
+      this.filterEditorService.titleFilter = title
+      this.applyFilters()
+    })
+  }
+
+  ngOnDestroy() {
+    this.titleFilterDebounce.complete()
+    // TODO: not sure if both is necessary
+    this.subscription.unsubscribe()
+  }
+
+  applyFilters() {
     this.apply.next()
   }
 
-  clearClicked() {
-    this.filterRules.splice(0,this.filterRules.length)
+  clearSelected() {
+    this.filterEditorService.clear()
     this.clear.next()
   }
 
-  ngOnInit(): void {
-    this.correspondentService.listAll().subscribe(result => {this.correspondents = result.results})
-    this.tagService.listAll().subscribe(result => this.tags = result.results)
-    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
+  onToggleTag(tag: PaperlessTag) {
+    this.filterEditorService.toggleFilterByTag(tag)
+    this.applyFilters()
   }
 
-  getRuleTypes() {
-    return FILTER_RULE_TYPES.filter(rt => rt.multi || !this.filterRules.find(r => r.type == rt))
+  onToggleCorrespondent(correspondent: PaperlessCorrespondent) {
+    this.filterEditorService.toggleFilterByCorrespondent(correspondent)
+    this.applyFilters()
   }
 
+  onToggleDocumentType(documentType: PaperlessDocumentType) {
+    this.filterEditorService.toggleFilterByDocumentType(documentType)
+    this.applyFilters()
+  }
+
+  onDateCreatedBeforeSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateCreatedBefore(date)
+    this.applyFilters()
+  }
+
+  onDateCreatedAfterSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateCreatedAfter(date)
+    this.applyFilters()
+  }
+
+  onDateAddedBeforeSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateAddedBefore(date)
+    this.applyFilters()
+  }
+
+  onDateAddedAfterSet(date: NgbDateStruct) {
+    this.filterEditorService.setDateAddedAfter(date)
+    this.applyFilters()
+  }
 }

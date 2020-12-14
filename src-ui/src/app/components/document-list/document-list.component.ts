@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,11 +6,16 @@ import { cloneFilterRules, FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_CORRESPONDENT, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { SavedViewConfig } from 'src/app/data/saved-view-config';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { FilterEditorViewService } from 'src/app/services/filter-editor-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
 import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
+import { FilterEditorComponent } from 'src/app/components/filter-editor/filter-editor.component';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
+import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 
 @Component({
   selector: 'app-document-list',
@@ -22,6 +27,7 @@ export class DocumentListComponent implements OnInit {
   constructor(
     public list: DocumentListViewService,
     public savedViewConfigService: SavedViewConfigService,
+    public filterEditorService: FilterEditorViewService,
     public route: ActivatedRoute,
     private toastService: ToastService,
     public modalService: NgbModal,
@@ -29,11 +35,16 @@ export class DocumentListComponent implements OnInit {
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
-  filterRules: FilterRule[] = []
-  showFilter = false
-
   get isFiltered() {
     return this.list.filterRules?.length > 0
+  }
+
+  set filterRules(filterRules: FilterRule[]) {
+    this.filterEditorService.filterRules = filterRules
+  }
+
+  get filterRules(): FilterRule[] {
+    return this.filterEditorService.filterRules
   }
 
   getTitle() {
@@ -55,31 +66,29 @@ export class DocumentListComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       if (params.has('id')) {
         this.list.savedView = this.savedViewConfigService.getConfig(params.get('id'))
-        this.filterRules = this.list.filterRules
-        this.showFilter = false
+        this.filterEditorService.filterRules = this.list.filterRules
         this.titleService.setTitle(`${this.list.savedView.title} - ${environment.appTitle}`)
       } else {
         this.list.savedView = null
-        this.filterRules = this.list.filterRules
-        this.showFilter = this.filterRules.length > 0
+        this.filterEditorService.filterRules = this.list.filterRules
         this.titleService.setTitle(`Documents - ${environment.appTitle}`)
       }
       this.list.clear()
       this.list.reload()
     })
+    this.filterEditorService.filterRules = this.list.filterRules
   }
 
   applyFilterRules() {
-    this.list.filterRules = this.filterRules
+    this.list.filterRules = this.filterEditorService.filterRules
   }
 
   clearFilterRules() {
-    this.list.filterRules = this.filterRules
-    this.showFilter = false
+    this.list.filterRules = this.filterEditorService.filterRules
   }
 
   loadViewConfig(config: SavedViewConfig) {
-    this.filterRules = cloneFilterRules(config.filterRules)
+    this.filterEditorService.filterRules = cloneFilterRules(config.filterRules)
     this.list.load(config)
   }
 
@@ -103,42 +112,18 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  filterByTag(tag_id: number) {
-    let filterRules = this.list.filterRules
-    if (filterRules.find(rule => rule.type.id == FILTER_HAS_TAG && rule.value == tag_id)) {
-      return
-    }
-
-    filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_HAS_TAG), value: tag_id})
-    this.filterRules = filterRules
+  clickTag(tagID: number) {
+    this.filterEditorService.toggleFilterByTag(tagID)
     this.applyFilterRules()
   }
 
-  filterByCorrespondent(correspondent_id: number) {
-    let filterRules = this.list.filterRules
-    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_CORRESPONDENT)
-    if (existing_rule && existing_rule.value == correspondent_id) {
-      return
-    } else if (existing_rule) {
-      existing_rule.value = correspondent_id
-    } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_CORRESPONDENT), value: correspondent_id})
-    }
-    this.filterRules = filterRules
+  clickCorrespondent(correspondentID: number) {
+    this.filterEditorService.toggleFilterByCorrespondent(correspondentID)
     this.applyFilterRules()
   }
 
-  filterByDocumentType(document_type_id: number) {
-    let filterRules = this.list.filterRules
-    let existing_rule = filterRules.find(rule => rule.type.id == FILTER_DOCUMENT_TYPE)
-    if (existing_rule && existing_rule.value == document_type_id) {
-      return
-    } else if (existing_rule) {
-      existing_rule.value = document_type_id
-    } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_DOCUMENT_TYPE), value: document_type_id})
-    }
-    this.filterRules = filterRules
+  clickDocumentType(documentTypeID: number) {
+    this.filterEditorService.toggleFilterByDocumentType(documentTypeID)
     this.applyFilterRules()
   }
 
