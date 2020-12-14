@@ -114,12 +114,12 @@ def generate_filename(doc, counter=0):
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=doc.created.month if doc.created else "none",
-                created_day=doc.created.day if doc.created else "none",
+                created_month=f"{doc.created.month:02}" if doc.created else "none",  # NOQA: E501
+                created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
-                added_month=doc.added.month if doc.added else "none",
-                added_day=doc.added.day if doc.added else "none",
+                added_month=f"{doc.added.month:02}" if doc.added else "none",
+                added_day=f"{doc.added.day:02}" if doc.added else "none",
                 tags=tags,
                 tag_list=",".join([tag.name for tag in doc.tags.all()])
             ).strip()
