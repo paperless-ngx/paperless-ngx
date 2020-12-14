@@ -13,7 +13,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
 import { environment } from 'src/environments/environment';
-import { DeleteDialogComponent } from '../common/delete-dialog/delete-dialog.component';
+import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 
@@ -58,6 +58,10 @@ export class DocumentDetailComponent implements OnInit {
     private openDocumentService: OpenDocumentsService,
     private documentListViewService: DocumentListViewService,
     private titleService: Title) { }
+
+  getContentType() {
+    return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
+  }
 
   ngOnInit(): void {
     this.documentForm.valueChanges.subscribe(wow => {
@@ -151,10 +155,13 @@ export class DocumentDetailComponent implements OnInit {
   }
 
   delete() {
-    let modal = this.modalService.open(DeleteDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.message = `Do you really want to delete document '${this.document.title}'?`
-    modal.componentInstance.message2 = `The files for this document will be deleted permanently. This operation cannot be undone.`
-    modal.componentInstance.deleteClicked.subscribe(() => {
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Confirm delete"
+    modal.componentInstance.messageBold = `Do you really want to delete document '${this.document.title}'?`
+    modal.componentInstance.message = `The files for this document will be deleted permanently. This operation cannot be undone.`
+    modal.componentInstance.btnClass = "btn-danger"
+    modal.componentInstance.btnCaption = "Delete document"
+    modal.componentInstance.confirmClicked.subscribe(() => {
       this.documentsService.delete(this.document).subscribe(() => {
         modal.close()  
         this.close()
