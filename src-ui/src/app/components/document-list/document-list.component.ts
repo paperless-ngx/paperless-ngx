@@ -76,6 +76,7 @@ export class DocumentListComponent implements OnInit {
 
   loadViewConfig(view: PaperlessSavedView) {
     this.list.load(view)
+    this.list.reload()
   }
 
   saveViewConfig() {
