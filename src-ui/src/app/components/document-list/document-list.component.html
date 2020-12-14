@@ -21,7 +21,7 @@
     </label>
   </div>
 
-  <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortDirection">
+  <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortReverse">
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
@@ -30,13 +30,13 @@
       </div>
     </div>
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn btn-sm" value="asc">
+      <input ngbButton type="radio" class="btn btn-sm" [value]="false">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
       </svg>
     </label>
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn btn-sm" value="des">
+      <input ngbButton type="radio" class="btn btn-sm" [value]="true">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
       </svg>
@@ -49,8 +49,8 @@
       <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle>Views</button>
       <div class="dropdown-menu shadow" ngbDropdownMenu>
         <ng-container *ngIf="!list.savedViewId">
-          <button ngbDropdownItem *ngFor="let config of savedViewConfigService.getConfigs()" (click)="loadViewConfig(config)">{{config.title}}</button>
-          <div class="dropdown-divider" *ngIf="savedViewConfigService.getConfigs().length > 0"></div>
+          <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
+          <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
         </ng-container>
 
         <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId">Save "{{list.savedViewTitle}}"</button>

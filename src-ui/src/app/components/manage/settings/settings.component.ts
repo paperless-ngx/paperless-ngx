@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { SavedViewConfig } from 'src/app/data/saved-view-config';
+import { map, tap } from 'rxjs/operators';
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { GENERAL_SETTINGS } from 'src/app/data/storage-keys';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
+import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -19,7 +20,7 @@ export class SettingsComponent implements OnInit {
   })
 
   constructor(
-    private savedViewConfigService: SavedViewConfigService,
+    public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
     private titleService: Title
   ) { }
@@ -28,8 +29,8 @@ export class SettingsComponent implements OnInit {
     this.titleService.setTitle(`Settings - ${environment.appTitle}`)
   }
 
-  deleteViewConfig(config: SavedViewConfig) {
-    this.savedViewConfigService.deleteConfig(config)
+  deleteSavedView(savedView: PaperlessSavedView) {
+    this.savedViewService.delete(savedView).subscribe(() => {})
   }
 
   saveSettings() {
