@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { LOG_LEVELS, LOG_LEVEL_INFO, PaperlessLog } from 'src/app/data/paperless-log';
 import { LogService } from 'src/app/services/rest/log.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-logs',
@@ -11,14 +9,13 @@ import { environment } from 'src/environments/environment';
 })
 export class LogsComponent implements OnInit {
 
-  constructor(private logService: LogService, private titleService: Title) { }
+  constructor(private logService: LogService) { }
 
   logs: PaperlessLog[] = []
   level: number = LOG_LEVEL_INFO
 
   ngOnInit(): void {
     this.reload()
-    this.titleService.setTitle(`Logs - ${environment.appTitle}`)
   }
 
   reload() {

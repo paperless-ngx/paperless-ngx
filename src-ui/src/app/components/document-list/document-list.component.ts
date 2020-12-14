@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
@@ -7,7 +6,6 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
-import { environment } from 'src/environments/environment';
 import { FilterEditorComponent } from '../filter-editor/filter-editor.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
 
@@ -24,8 +22,7 @@ export class DocumentListComponent implements OnInit {
     public route: ActivatedRoute,
     private router: Router,
     private toastService: ToastService,
-    public modalService: NgbModal,
-    private titleService: Title) { }
+    public modalService: NgbModal) { }
 
   @ViewChild("filterEditor")
   private filterEditor: FilterEditorComponent
@@ -62,12 +59,10 @@ export class DocumentListComponent implements OnInit {
           }
 
           this.list.savedView = view
-          this.titleService.setTitle(`${this.list.savedView.name} - ${environment.appTitle}`)
           this.list.reload()
         })
       } else {
         this.list.savedView = null
-        this.titleService.setTitle(`Documents - ${environment.appTitle}`)
         this.list.reload()
       }
     })
