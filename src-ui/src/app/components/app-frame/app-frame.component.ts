@@ -5,8 +5,8 @@ import { from, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
+import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { SearchService } from 'src/app/services/rest/search.service';
-import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
 import { DocumentDetailComponent } from '../document-detail/document-detail.component';
   
 @Component({
@@ -21,7 +21,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private openDocumentsService: OpenDocumentsService,
     private searchService: SearchService,
-    public viewConfigService: SavedViewConfigService
+    public savedViewService: SavedViewService
     ) {
   }
 

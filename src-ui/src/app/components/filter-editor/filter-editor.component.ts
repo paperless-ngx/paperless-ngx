@@ -39,22 +39,22 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   get selectedTags(): PaperlessTag[] {
-    let tagRules: FilterRule[] = this.filterRules.filter(fr => fr.type.id == FILTER_HAS_TAG)
+    let tagRules: FilterRule[] = this.filterRules.filter(fr => fr.rule_type == FILTER_HAS_TAG)
     return this.tags?.filter(t => tagRules.find(tr => tr.value == t.id))
   }
 
   get selectedCorrespondents(): PaperlessCorrespondent[] {
-    let correspondentRules: FilterRule[] = this.filterRules.filter(fr => fr.type.id == FILTER_CORRESPONDENT)
+    let correspondentRules: FilterRule[] = this.filterRules.filter(fr => fr.rule_type == FILTER_CORRESPONDENT)
     return this.correspondents?.filter(c => correspondentRules.find(cr => cr.value == c.id))
   }
 
   get selectedDocumentTypes(): PaperlessDocumentType[] {
-    let documentTypeRules: FilterRule[] = this.filterRules.filter(fr => fr.type.id == FILTER_DOCUMENT_TYPE)
+    let documentTypeRules: FilterRule[] = this.filterRules.filter(fr => fr.rule_type == FILTER_DOCUMENT_TYPE)
     return this.documentTypes?.filter(dt => documentTypeRules.find(dtr => dtr.value == dt.id))
   }
 
   get titleFilter() {
-    let existingRule = this.filterRules.find(rule => rule.type.id == FILTER_TITLE)
+    let existingRule = this.filterRules.find(rule => rule.rule_type == FILTER_TITLE)
     return existingRule ? existingRule.value : ''
   }
 
@@ -100,15 +100,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
     let filterRuleType = FILTER_RULE_TYPES.find(t => t.id == filterRuleTypeID)
 
-    let existingRule = this.filterRules.find(rule => rule.type.id == filterRuleTypeID && rule.value == value)
-    let existingRuleOfSameType = this.filterRules.find(rule => rule.type.id == filterRuleTypeID)
+    let existingRule = this.filterRules.find(rule => rule.rule_type == filterRuleTypeID && rule.value == value)
+    let existingRuleOfSameType = this.filterRules.find(rule => rule.rule_type == filterRuleTypeID)
     
     if (existingRule) {
       // if this exact rule already exists, remove it in all cases.
       this.filterRules.splice(this.filterRules.indexOf(existingRule), 1)
     } else if (filterRuleType.multi || !existingRuleOfSameType) {
       // if we allow multiple rules per type, or no rule of this type already exists, push a new rule.
-      this.filterRules.push({type: filterRuleType, value: value})
+      this.filterRules.push({rule_type: filterRuleTypeID, value: value})
     } else {
       // otherwise (i.e., no multi support AND there's already a rule of this type), update the rule.
       existingRuleOfSameType.value = value
@@ -117,12 +117,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   private setTitleRule(title: string) {
-    let existingRule = this.filterRules.find(rule => rule.type.id == FILTER_TITLE)
+    let existingRule = this.filterRules.find(rule => rule.rule_type == FILTER_TITLE)
 
     if (!existingRule && title) {
-      this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_TITLE), value: title})
+      this.filterRules.push({rule_type: FILTER_TITLE, value: title})
     } else if (existingRule && !title) {
-      this.filterRules.splice(this.filterRules.findIndex(rule => rule.type.id == FILTER_TITLE), 1)
+      this.filterRules.splice(this.filterRules.findIndex(rule => rule.rule_type == FILTER_TITLE), 1)
     } else if (existingRule && title) {
       existingRule.value = title
     }
@@ -167,7 +167,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   get dateCreatedBefore(): NgbDateStruct {
-    let createdBeforeRule: FilterRule = this.filterRules.find(fr => fr.type.id == FILTER_CREATED_BEFORE)
+    let createdBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_BEFORE)
     return createdBeforeRule ? {
       year: createdBeforeRule.value.substring(0,4),
       month: createdBeforeRule.value.substring(5,7),
@@ -176,7 +176,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   get dateCreatedAfter(): NgbDateStruct {
-    let createdAfterRule: FilterRule = this.filterRules.find(fr => fr.type.id == FILTER_CREATED_AFTER)
+    let createdAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_AFTER)
     return createdAfterRule ? {
       year: createdAfterRule.value.substring(0,4),
       month: createdAfterRule.value.substring(5,7),
@@ -185,7 +185,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   get dateAddedBefore(): NgbDateStruct {
-    let addedBeforeRule: FilterRule = this.filterRules.find(fr => fr.type.id == FILTER_ADDED_BEFORE)
+    let addedBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_BEFORE)
     return addedBeforeRule ? {
       year: addedBeforeRule.value.substring(0,4),
       month: addedBeforeRule.value.substring(5,7),
@@ -194,7 +194,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   get dateAddedAfter(): NgbDateStruct {
-    let addedAfterRule: FilterRule = this.filterRules.find(fr => fr.type.id == FILTER_ADDED_AFTER)
+    let addedAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_AFTER)
     return addedAfterRule ? {
       year: addedAfterRule.value.substring(0,4),
       month: addedAfterRule.value.substring(5,7),
@@ -224,13 +224,13 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   setDateFilter(date: NgbDateStruct, dateRuleTypeID: number) {
     let filterRules = this.filterRules
-    let existingRule = filterRules.find(rule => rule.type.id == dateRuleTypeID)
+    let existingRule = filterRules.find(rule => rule.rule_type == dateRuleTypeID)
     let newValue = `${date.year}-${date.month.toString().padStart(2,'0')}-${date.day.toString().padStart(2,'0')}` // YYYY-MM-DD
 
     if (existingRule) {
       existingRule.value = newValue
     } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == dateRuleTypeID), value: newValue})
+      filterRules.push({rule_type: dateRuleTypeID, value: newValue})
     }
 
     this.filterRules = filterRules
@@ -238,7 +238,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   clearDateFilter(dateRuleTypeID: number) {
     let filterRules = this.filterRules
-    let existingRule = filterRules.find(rule => rule.type.id == dateRuleTypeID)
+    let existingRule = filterRules.find(rule => rule.rule_type == dateRuleTypeID)
     filterRules.splice(filterRules.indexOf(existingRule), 1)
     this.filterRules = filterRules
   }

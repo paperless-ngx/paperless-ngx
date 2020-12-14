@@ -8,9 +8,9 @@ import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dial
 
 @Directive()
 export abstract class GenericListComponent<T extends ObjectWithId> implements OnInit {
-  
+
   constructor(
-    private service: AbstractPaperlessService<T>, 
+    private service: AbstractPaperlessService<T>,
     private modalService: NgbModal,
     private editDialogComponent: any) {
     }
@@ -60,7 +60,8 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   }
 
   reloadData() {
-    this.service.list(this.page, null, this.sortField, this.sortDirection).subscribe(c => {
+    // TODO: this is a hack
+    this.service.list(this.page, null, this.sortField, this.sortDirection == 'des').subscribe(c => {
       this.data = c.results
       this.collectionSize = c.count
     });

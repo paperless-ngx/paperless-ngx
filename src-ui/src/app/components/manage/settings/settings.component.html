@@ -44,11 +44,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let config of savedViewConfigService.getConfigs()">
-              <td>{{ config.title }}</td>
-              <td>{{ config.showInDashboard | yesno }}</td>
-              <td>{{ config.showInSideBar | yesno }}</td>
-              <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteViewConfig(config)">Delete</button></td>
+            <tr *ngFor="let view of savedViewService.allViews">
+              <td>{{ view.name }}</td>
+              <td>{{ view.show_on_dashboard | yesno }}</td>
+              <td>{{ view.show_in_sidebar | yesno }}</td>
+              <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteSavedView(view)">Delete</button></td>
             </tr>
           </tbody>
         </table>
