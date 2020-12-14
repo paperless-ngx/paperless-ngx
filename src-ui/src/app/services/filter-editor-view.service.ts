@@ -16,9 +16,6 @@ import { NgbDate, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
   providedIn: 'root'
 })
 export class FilterEditorViewService {
-  private tags$: Observable<Results<PaperlessTag>>
-  private correspondents$: Observable<Results<PaperlessCorrespondent>>
-  private documentTypes$: Observable<Results<PaperlessDocumentType>>
 
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[]
@@ -27,12 +24,9 @@ export class FilterEditorViewService {
   filterRules: FilterRule[] = []
 
   constructor(private tagService: TagService, private documentTypeService: DocumentTypeService, private correspondentService: CorrespondentService) {
-    this.tags$ = this.tagService.listAll()
-    this.tags$.subscribe(result => this.tags = result.results)
-    this.correspondents$ = this.correspondentService.listAll()
-    this.correspondents$.subscribe(result => this.correspondents = result.results)
-    this.documentTypes$ = this.documentTypeService.listAll()
-    this.documentTypes$.subscribe(result => this.documentTypes = result.results)
+    this.tagService.listAll().subscribe(result => this.tags = result.results)
+    this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
+    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
   }
 
   clear() {
@@ -43,22 +37,19 @@ export class FilterEditorViewService {
     return this.filterRules.length > 0
   }
 
-  set filterText(text: string) {
-    let filterRules = this.filterRules
-    let existingRule = filterRules.find(rule => rule.type.id == FILTER_TITLE)
-    if (existingRule && (!text || text.length == 0)) {
-      filterRules.splice(filterRules.findIndex(rule => rule.type.id == FILTER_TITLE), 1)
-    } else if (existingRule && existingRule.value == text) {
-      return
-    } else if (existingRule) {
-      existingRule.value = text
-    } else {
-      filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_TITLE), value: text})
+  set titleFilter(title: string) {
+    let existingRule = this.filterRules.find(rule => rule.type.id == FILTER_TITLE)
+
+    if (!existingRule && title) {
+      this.filterRules.push({type: FILTER_RULE_TYPES.find(t => t.id == FILTER_TITLE), value: title})
+    } else if (existingRule && !title) {
+      this.filterRules.splice(this.filterRules.findIndex(rule => rule.type.id == FILTER_TITLE), 1)
+    } else if (existingRule && title) {
+      existingRule.value = title
     }
-    this.filterRules = filterRules
   }
 
-  get filterText(): string {
+  get titleFilter(): string {
     let existingRule = this.filterRules.find(rule => rule.type.id == FILTER_TITLE)
     return existingRule ? existingRule.value : ''
   }
