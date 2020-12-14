@@ -76,28 +76,19 @@ export class FilterEditorViewService {
     return this.documentTypes?.filter(dt => documentTypeRules.find(dtr => dtr.value == dt.id))
   }
 
-  toggleFilterByTag(tag: PaperlessTag) {
+  toggleFilterByTag(tag: PaperlessTag | number) {
+    if (typeof tag == 'number') tag = this.tags?.find(t => t.id == tag)
     this.toggleFilterByItem(tag, FILTER_HAS_TAG)
   }
 
-  toggleFilterByCorrespondent(tag: PaperlessCorrespondent) {
-    this.toggleFilterByItem(tag, FILTER_CORRESPONDENT)
+  toggleFilterByCorrespondent(correspondent: PaperlessCorrespondent | number) {
+    if (typeof correspondent == 'number') correspondent = this.correspondents?.find(t => t.id == correspondent)
+    this.toggleFilterByItem(correspondent, FILTER_CORRESPONDENT)
   }
 
-  toggleFilterByDocumentType(tag: PaperlessDocumentType) {
-    this.toggleFilterByItem(tag, FILTER_DOCUMENT_TYPE)
-  }
-
-  toggleFilterByTagID(tagID: number) {
-    this.toggleFilterByTag(this.tags?.find(t => t.id == tagID))
-  }
-
-  toggleFilterByCorrespondentID(correspondentID: number) {
-    this.toggleFilterByCorrespondent(this.correspondents?.find(t => t.id == correspondentID))
-  }
-
-  toggleFilterByDocumentTypeID(documentTypeID: number) {
-    this.toggleFilterByDocumentType(this.documentTypes?.find(t => t.id == documentTypeID))
+  toggleFilterByDocumentType(documentType: PaperlessDocumentType | number) {
+    if (typeof documentType == 'number') documentType = this.documentTypes?.find(t => t.id == documentType)
+    this.toggleFilterByItem(documentType, FILTER_DOCUMENT_TYPE)
   }
 
   private toggleFilterByItem(item: ObjectWithId, filterRuleTypeID: number) {
