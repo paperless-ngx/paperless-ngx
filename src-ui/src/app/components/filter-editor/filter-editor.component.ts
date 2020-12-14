@@ -4,7 +4,7 @@ import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
@@ -21,7 +21,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private correspondentService: CorrespondentService
+    private correspondentService: CorrespondentService,
+    private dateParser: NgbDateParserFormatter
   ) { }
 
   tags: PaperlessTag[] = []
@@ -76,7 +77,6 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(title => {
-      
       this.setTitleRule(title)
     })
   }
@@ -168,38 +168,22 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   get dateCreatedBefore(): NgbDateStruct {
     let createdBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_BEFORE)
-    return createdBeforeRule ? {
-      year: +createdBeforeRule.value.substring(0,4),
-      month: +createdBeforeRule.value.substring(5,7),
-      day: +createdBeforeRule.value.substring(8,10)
-    } : undefined
+    return createdBeforeRule ? this.dateParser.parse(createdBeforeRule.value) : null
   }
 
   get dateCreatedAfter(): NgbDateStruct {
     let createdAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_AFTER)
-    return createdAfterRule ? {
-      year: +createdAfterRule.value.substring(0,4),
-      month: +createdAfterRule.value.substring(5,7),
-      day: +createdAfterRule.value.substring(8,10)
-    } : undefined
+    return createdAfterRule ? this.dateParser.parse(createdAfterRule.value) : null
   }
 
   get dateAddedBefore(): NgbDateStruct {
     let addedBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_BEFORE)
-    return addedBeforeRule ? {
-      year: +addedBeforeRule.value.substring(0,4),
-      month: +addedBeforeRule.value.substring(5,7),
-      day: +addedBeforeRule.value.substring(8,10)
-    } : undefined
+    return addedBeforeRule ? this.dateParser.parse(addedBeforeRule.value) : null
   }
 
   get dateAddedAfter(): NgbDateStruct {
     let addedAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_AFTER)
-    return addedAfterRule ? {
-      year: +addedAfterRule.value.substring(0,4),
-      month: +addedAfterRule.value.substring(5,7),
-      day: +addedAfterRule.value.substring(8,10)
-    } : undefined
+    return addedAfterRule ? this.dateParser.parse(addedAfterRule.value) : null
   }
 
   setDateCreatedBefore(date?: NgbDateStruct) {
@@ -225,7 +209,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   setDateFilter(date: NgbDateStruct, dateRuleTypeID: number) {
     let filterRules = this.filterRules
     let existingRule = filterRules.find(rule => rule.rule_type == dateRuleTypeID)
-    let newValue = `${date.year}-${date.month.toString().padStart(2,'0')}-${date.day.toString().padStart(2,'0')}` // YYYY-MM-DD
+    let newValue = this.dateParser.format(date)
 
     if (existingRule) {
       existingRule.value = newValue
