@@ -84,15 +84,17 @@ export class DocumentListComponent implements OnInit {
   saveViewConfigAs() {
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {backdrop: 'static'})
     modal.componentInstance.saveClicked.subscribe(formValue => {
-      this.savedViewService.create({
+      let savedView = {
         name: formValue.name,
         show_on_dashboard: formValue.showOnDashboard,
         show_in_sidebar: formValue.showInSideBar,
         filter_rules: this.list.filterRules,
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField
-      }).subscribe(() => {
+      }
+      this.savedViewService.create(savedView).subscribe(() => {
         modal.close()
+        this.toastService.showToast(Toast.make("Information", `View "${savedView.name}" created successfully.`))
       })
     })
   }
