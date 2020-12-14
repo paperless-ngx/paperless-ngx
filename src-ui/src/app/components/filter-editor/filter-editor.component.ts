@@ -10,6 +10,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES, FILTER_TITLE } from 'src/app/data/filter-rule-type';
+import { DateSelection } from './filter-dropdown-date/filter-dropdown-date.component';
 
 @Component({
   selector: 'app-filter-editor',
@@ -146,23 +147,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   // Date handling
 
 
-  onDateCreatedBeforeSet(date: NgbDateStruct) {
-    this.setDateCreatedBefore(date)
+  onDatesCreatedSet(dates: DateSelection) {
+    this.setDateCreatedBefore(dates.before)
+    this.setDateCreatedAfter(dates.after)
     this.applyFilters()
   }
 
-  onDateCreatedAfterSet(date: NgbDateStruct) {
-    this.setDateCreatedAfter(date)
-    this.applyFilters()
-  }
-
-  onDateAddedBeforeSet(date: NgbDateStruct) {
-    this.setDateAddedBefore(date)
-    this.applyFilters()
-  }
-
-  onDateAddedAfterSet(date: NgbDateStruct) {
-    this.setDateAddedAfter(date)
+  onDatesAddedSet(dates: DateSelection) {
+    this.setDateAddedBefore(dates.before)
+    this.setDateAddedAfter(dates.after)
     this.applyFilters()
   }
 

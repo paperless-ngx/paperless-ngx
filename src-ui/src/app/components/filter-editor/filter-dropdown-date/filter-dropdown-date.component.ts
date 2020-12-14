@@ -1,6 +1,13 @@
 import { Component, EventEmitter, Input, Output, ElementRef, ViewChild, SimpleChange } from '@angular/core';
 import { NgbDate, NgbDateStruct, NgbDatepicker } from '@ng-bootstrap/ng-bootstrap';
 
+
+export interface DateSelection {
+  before?: NgbDateStruct
+  after?: NgbDateStruct
+}
+
+
 @Component({
   selector: 'app-filter-dropdown-date',
   templateUrl: './filter-dropdown-date.component.html',
@@ -18,10 +25,7 @@ export class FilterDropdownDateComponent {
   title: string
 
   @Output()
-  dateBeforeSet = new EventEmitter()
-
-  @Output()
-  dateAfterSet = new EventEmitter()
+  datesSet = new EventEmitter<DateSelection>()
 
   @ViewChild('dpAfter') dpAfter: NgbDatepicker
   @ViewChild('dpBefore') dpBefore: NgbDatepicker
@@ -88,19 +92,18 @@ export class FilterDropdownDateComponent {
         break
     }
     this._dateAfter = newDate
-    this.onDateSelected(this._dateAfter)
+    this.datesSet.emit({after: newDate, before: null})
   }
 
-  onDateSelected(date:NgbDateStruct) {
-    let emitter = this._dateAfter && NgbDate.from(this._dateAfter).equals(date) ? this.dateAfterSet : this.dateBeforeSet
-    emitter.emit(date)
+  onBeforeSelected(date: NgbDateStruct) {
+    this.datesSet.emit({after: this._dateAfter, before: date})
   }
 
-  clearAfter() {
-    this.dateAfterSet.next()
+  onAfterSelected(date: NgbDateStruct) {
+    this.datesSet.emit({after: date, before: this._dateBefore})
   }
 
-  clearBefore() {
-    this.dateBeforeSet.next()
+  clear() {
+    this.datesSet.emit({after: null, before: null})
   }
 }
