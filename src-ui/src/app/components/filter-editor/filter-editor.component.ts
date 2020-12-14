@@ -25,29 +25,31 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Output()
   apply = new EventEmitter()
 
-  get filterText() {
-    return this.filterEditorService.filterText
+  get titleFilter() {
+    return this.filterEditorService.titleFilter
   }
 
-  set filterText(value) {
-    this.filterTextDebounce.next(value)
+  set titleFilter(value) {
+    this.titleFilterDebounce.next(value)
   }
 
-  filterTextDebounce: Subject<string>
+  titleFilterDebounce: Subject<string>
   subscription: Subscription
 
   ngOnInit() {
-    this.filterTextDebounce = new Subject<string>()
-    this.subscription = this.filterTextDebounce.pipe(
+    this.titleFilterDebounce = new Subject<string>()
+    this.subscription = this.titleFilterDebounce.pipe(
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(title => {
-      this.filterEditorService.filterText = title
+      this.filterEditorService.titleFilter = title
       this.applyFilters()
     })
   }
 
   ngOnDestroy() {
+    this.titleFilterDebounce.complete()
+    // TODO: not sure if both is necessary
     this.subscription.unsubscribe()
   }
 
