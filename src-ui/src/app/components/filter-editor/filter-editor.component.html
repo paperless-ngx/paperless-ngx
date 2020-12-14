@@ -8,7 +8,7 @@
 
   <app-filter-dropdown class="col-auto" [items]="tags" [itemsSelected]="selectedTags" title="Tags" (toggle)="toggleTag($event.id)"></app-filter-dropdown>
   <app-filter-dropdown class="col-auto" [items]="correspondents" [itemsSelected]="selectedCorrespondents" title="Correspondents" (toggle)="toggleCorrespondent($event.id)"></app-filter-dropdown>
-  <app-filter-dropdown class="col-auto" [items]="documentTypes" [itemsSelected]="selectedDocumentTypes" title="Document Types" (toggle)="toggleDocumentType($event.id)"></app-filter-dropdown>
+  <app-filter-dropdown class="col-auto" [items]="documentTypes" [itemsSelected]="selectedDocumentTypes" title="Document types" (toggle)="toggleDocumentType($event.id)"></app-filter-dropdown>
 
   <app-filter-dropdown-date class="col-auto" [dateBefore]="dateCreatedBefore" [dateAfter]="dateCreatedAfter" title="Created" (dateBeforeSet)="onDateCreatedBeforeSet($event)" (dateAfterSet)="onDateCreatedAfterSet($event)"></app-filter-dropdown-date>
   <app-filter-dropdown-date class="col-auto" [dateBefore]="dateAddedBefore" [dateAfter]="dateAddedAfter" title="Added"  (dateBeforeSet)="onDateAddedBeforeSet($event)" (dateAfterSet)="onDateAddedAfterSet($event)"></app-filter-dropdown-date>
