@@ -12,5 +12,5 @@ export function cloneFilterRules(filterRules: FilterRule[]): FilterRule[] {
 
 export interface FilterRule {
   rule_type: number
-  value: any
+  value: string
 }
