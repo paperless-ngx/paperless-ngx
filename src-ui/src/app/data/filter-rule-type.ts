@@ -22,15 +22,15 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
 
   {id: FILTER_TITLE, name: "Title contains", filtervar: "title__icontains", datatype: "string", multi: false, default: ""},
   {id: FILTER_CONTENT, name: "Content contains", filtervar: "content__icontains", datatype: "string", multi: false, default: ""},
-  
+
   {id: FILTER_ASN, name: "ASN is", filtervar: "archive_serial_number", datatype: "number", multi: false},
-  
+
   {id: FILTER_CORRESPONDENT, name: "Correspondent is", filtervar: "correspondent__id", datatype: "correspondent", multi: false},
   {id: FILTER_DOCUMENT_TYPE, name: "Document type is", filtervar: "document_type__id", datatype: "document_type", multi: false},
 
-  {id: FILTER_IS_IN_INBOX, name: "Is in Inbox", filtervar: "is_in_inbox", datatype: "boolean", multi: false, default: true},  
-  {id: FILTER_HAS_TAG, name: "Has tag", filtervar: "tags__id__all", datatype: "tag", multi: true},  
-  {id: FILTER_DOES_NOT_HAVE_TAG, name: "Does not have tag", filtervar: "tags__id__none", datatype: "tag", multi: true},  
+  {id: FILTER_IS_IN_INBOX, name: "Is in Inbox", filtervar: "is_in_inbox", datatype: "boolean", multi: false, default: true},
+  {id: FILTER_HAS_TAG, name: "Has tag", filtervar: "tags__id__all", datatype: "tag", multi: true},
+  {id: FILTER_DOES_NOT_HAVE_TAG, name: "Does not have tag", filtervar: "tags__id__none", datatype: "tag", multi: true},
   {id: FILTER_HAS_ANY_TAG, name: "Has any tag", filtervar: "is_tagged", datatype: "boolean", multi: false, default: true},
 
   {id: FILTER_CREATED_BEFORE, name: "Created before", filtervar: "created__date__lt", datatype: "date", multi: false},
@@ -42,7 +42,7 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
 
   {id: FILTER_ADDED_BEFORE, name: "Added before", filtervar: "added__date__lt", datatype: "date", multi: false},
   {id: FILTER_ADDED_AFTER, name: "Added after", filtervar: "added__date__gt", datatype: "date", multi: false},
-  
+
   {id: FILTER_MODIFIED_BEFORE, name: "Modified before", filtervar: "modified__date__lt", datatype: "date", multi: false},
   {id: FILTER_MODIFIED_AFTER, name: "Modified after", filtervar: "modified__date__gt", datatype: "date", multi: false},
 ]
