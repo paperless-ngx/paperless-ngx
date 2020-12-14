@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { AbstractPaperlessService } from './abstract-paperless-service';
 

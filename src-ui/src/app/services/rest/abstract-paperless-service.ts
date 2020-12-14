@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http'
-import { Observable, of, Subject } from 'rxjs'
+import { Observable } from 'rxjs'
 import { map, publishReplay, refCount } from 'rxjs/operators'
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { Results } from 'src/app/data/results'

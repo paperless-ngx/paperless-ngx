@@ -188,7 +188,6 @@ export class DocumentListViewService {
     let newPageSize = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
     if (newPageSize != this.currentPageSize) {
       this.currentPageSize = newPageSize
-      //this.reload()
     }
   }
 
