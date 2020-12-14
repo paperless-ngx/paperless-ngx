@@ -287,6 +287,28 @@ class TestFileHandling(DirectoriesMixin, TestCase):
 
         self.assertEqual(doc.source_path, os.path.join(settings.ORIGINALS_DIR, "etc", "something", "doc1.pdf"))
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{created_year}-{created_month}-{created_day}")
+    def test_created_year_month_day(self):
+        d1 = datetime.datetime(2020, 3, 6, 1, 1, 1)
+        doc1 = Document.objects.create(title="doc1", mime_type="application/pdf", created=d1)
+
+        self.assertEqual(generate_filename(doc1), "2020-03-06.pdf")
+
+        doc1.created = datetime.datetime(2020, 11, 16, 1, 1, 1)
+
+        self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{added_year}-{added_month}-{added_day}")
+    def test_added_year_month_day(self):
+        d1 = datetime.datetime(232, 1, 9, 1, 1, 1)
+        doc1 = Document.objects.create(title="doc1", mime_type="application/pdf", added=d1)
+
+        self.assertEqual(generate_filename(doc1), "232-01-09.pdf")
+
+        doc1.added = datetime.datetime(2020, 11, 16, 1, 1, 1)
+
+        self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
         document = Document()
