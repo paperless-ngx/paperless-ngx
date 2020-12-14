@@ -121,7 +121,11 @@ def generate_filename(doc, counter=0):
                 added_month=doc.added.month if doc.added else "none",
                 added_day=doc.added.day if doc.added else "none",
                 tags=tags,
-            )
+                tag_list=",".join([tag.name for tag in doc.tags.all()])
+            ).strip()
+
+            path = path.strip(os.sep)
+
     except (ValueError, KeyError, IndexError):
         logging.getLogger(__name__).warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "

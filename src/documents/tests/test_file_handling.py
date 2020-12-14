@@ -13,7 +13,7 @@ from django.test import TestCase, override_settings
 from .utils import DirectoriesMixin
 from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories, \
     generate_unique_filename
-from ..models import Document, Correspondent
+from ..models import Document, Correspondent, Tag
 
 
 class TestFileHandling(DirectoriesMixin, TestCase):
@@ -266,6 +266,26 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         # Ensure that filename is properly generated
         self.assertEqual(generate_filename(document),
                          "none.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title} {tag_list}")
+    def test_tag_list(self):
+        doc = Document.objects.create(title="doc1", mime_type="application/pdf")
+        doc.tags.create(name="tag2")
+        doc.tags.create(name="tag1")
+
+        self.assertEqual(generate_filename(doc), "doc1 tag1,tag2.pdf")
+
+        doc = Document.objects.create(title="doc2", checksum="B", mime_type="application/pdf")
+
+        self.assertEqual(generate_filename(doc), "doc2.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="//etc/something/{title}")
+    def test_filename_relative(self):
+        doc = Document.objects.create(title="doc1", mime_type="application/pdf")
+        doc.filename = generate_filename(doc)
+        doc.save()
+
+        self.assertEqual(doc.source_path, os.path.join(settings.ORIGINALS_DIR, "etc", "something", "doc1.pdf"))
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
