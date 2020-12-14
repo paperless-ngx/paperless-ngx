@@ -76,11 +76,10 @@ export class DocumentListViewService {
   }
 
   load(view: PaperlessSavedView) {
-    this.view.filter_rules = cloneFilterRules(view.filter_rules)
-    this.view.sort_reverse = view.sort_reverse
-    this.view.sort_field = view.sort_field
+    this.documentListView.filter_rules = cloneFilterRules(view.filter_rules)
+    this.documentListView.sort_reverse = view.sort_reverse
+    this.documentListView.sort_field = view.sort_field
     this.saveDocumentListView()
-    this.reload()
   }
 
   clear() {
