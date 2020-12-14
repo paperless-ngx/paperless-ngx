@@ -3,7 +3,7 @@
     <div class="text-muted mt-1">Filter by:</div>
   </div>
   <div class="col">
-    <input class="form-control form-control-sm" type="text" [(ngModel)]="filterEditorService.filterText" placeholder="Title" #filterTextInput>
+    <input class="form-control form-control-sm" type="text" [(ngModel)]="filterText" placeholder="Title">
   </div>
 
   <app-filter-dropdown class="col-auto" [(items)]="filterEditorService.tags" [itemsSelected]="filterEditorService.selectedTags" [title]="'Tags'" (toggle)="onToggleTag($event)"></app-filter-dropdown>

@@ -1,14 +1,10 @@
-import { Component, EventEmitter, Input, Output, ElementRef, AfterViewInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
-import { ObjectWithId } from 'src/app/data/object-with-id';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
 import { FilterEditorViewService } from 'src/app/services/filter-editor-view.service'
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { FilterDropdownComponent } from './filter-dropdown/filter-dropdown.component'
-import { FilterDropdownDateComponent } from './filter-dropdown-date/filter-dropdown-date.component'
-import { fromEvent } from 'rxjs';
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -16,7 +12,7 @@ import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './filter-editor.component.html',
   styleUrls: ['./filter-editor.component.scss']
 })
-export class FilterEditorComponent implements AfterViewInit {
+export class FilterEditorComponent implements OnInit, OnDestroy {
 
   constructor() { }
 
@@ -29,17 +25,30 @@ export class FilterEditorComponent implements AfterViewInit {
   @Output()
   apply = new EventEmitter()
 
-  @ViewChild('filterTextInput') filterTextInput: ElementRef;
+  get filterText() {
+    return this.filterEditorService.filterText
+  }
 
-  ngAfterViewInit() {
-    fromEvent(this.filterTextInput.nativeElement,'keyup').pipe(
-      debounceTime(150),
-      distinctUntilChanged(),
-      tap()
-    ).subscribe((event: Event) => {
-      this.filterEditorService.filterText = (event.target as HTMLInputElement).value
+  set filterText(value) {
+    this.filterTextDebounce.next(value)
+  }
+
+  filterTextDebounce: Subject<string>
+  subscription: Subscription
+
+  ngOnInit() {
+    this.filterTextDebounce = new Subject<string>()
+    this.subscription = this.filterTextDebounce.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(title => {
+      this.filterEditorService.filterText = title
       this.applyFilters()
     })
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe()
   }
 
   applyFilters() {

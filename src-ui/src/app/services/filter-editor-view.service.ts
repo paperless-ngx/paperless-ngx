@@ -46,7 +46,9 @@ export class FilterEditorViewService {
   set filterText(text: string) {
     let filterRules = this.filterRules
     let existingRule = filterRules.find(rule => rule.type.id == FILTER_TITLE)
-    if (existingRule && existingRule.value == text) {
+    if (existingRule && (!text || text.length == 0)) {
+      filterRules.splice(filterRules.findIndex(rule => rule.type.id == FILTER_TITLE), 1)
+    } else if (existingRule && existingRule.value == text) {
       return
     } else if (existingRule) {
       existingRule.value = text
