@@ -8,6 +8,12 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 
+class defaultdictNoStr(defaultdict):
+
+    def __str__(self):
+        raise ValueError("Don't use {tags} directly.")
+
+
 def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
 
@@ -90,8 +96,8 @@ def generate_filename(doc, counter=0):
 
     try:
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdict(lambda: slugify(None),
-                               many_to_dictionary(doc.tags))
+            tags = defaultdictNoStr(lambda: slugify(None),
+                                    many_to_dictionary(doc.tags))
 
             if doc.correspondent:
                 correspondent = pathvalidate.sanitize_filename(

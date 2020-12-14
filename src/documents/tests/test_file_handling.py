@@ -267,6 +267,15 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(generate_filename(document),
                          "none.pdf")
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags}")
+    def test_tags_without_args(self):
+        document = Document()
+        document.mime_type = "application/pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        self.assertEqual(generate_filename(document), f"{document.pk:07}.pdf")
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="{title} {tag_list}")
     def test_tag_list(self):
         doc = Document.objects.create(title="doc1", mime_type="application/pdf")
