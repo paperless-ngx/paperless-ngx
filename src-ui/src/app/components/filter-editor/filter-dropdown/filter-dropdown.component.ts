@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { Results } from 'src/app/data/results';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { FilterPipe } from  'src/app/pipes/filter.pipe';
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
   selector: 'app-filter-dropdown',
