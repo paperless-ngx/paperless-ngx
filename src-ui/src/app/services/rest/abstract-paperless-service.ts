@@ -22,17 +22,15 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     return url
   }
 
-  private getOrderingQueryParam(sortField: string, sortDirection: string) {
-    if (sortField && sortDirection) {
-      return (sortDirection == 'des' ? '-' : '') + sortField
-    } else if (sortField) {
-      return sortField
+  private getOrderingQueryParam(sortField: string, sortReverse: boolean) {
+    if (sortField) {
+      return (sortReverse ? '-' : '') + sortField
     } else {
       return null
     }
   }
 
-  list(page?: number, pageSize?: number, sortField?: string, sortDirection?: string, extraParams?): Observable<Results<T>> {
+  list(page?: number, pageSize?: number, sortField?: string, sortReverse?: boolean, extraParams?): Observable<Results<T>> {
     let httpParams = new HttpParams()
     if (page) {
       httpParams = httpParams.set('page', page.toString())
@@ -40,7 +38,7 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     if (pageSize) {
       httpParams = httpParams.set('page_size', pageSize.toString())
     }
-    let ordering = this.getOrderingQueryParam(sortField, sortDirection)
+    let ordering = this.getOrderingQueryParam(sortField, sortReverse)
     if (ordering) {
       httpParams = httpParams.set('ordering', ordering)
     }
