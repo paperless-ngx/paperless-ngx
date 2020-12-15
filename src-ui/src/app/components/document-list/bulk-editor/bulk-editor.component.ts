@@ -24,7 +24,7 @@ export class BulkEditorComponent {
   setCorrespondent = new EventEmitter()
 
   @Output()
-  removeCorresponden = new EventEmitter()
+  removeCorrespondent = new EventEmitter()
 
   @Output()
   setDocumentType = new EventEmitter()

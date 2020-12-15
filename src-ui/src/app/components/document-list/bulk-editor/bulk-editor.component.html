@@ -1,16 +1,89 @@
-<div class="btn-group mr-lg-2" role="group" aria-label="Select">
-  <button class="btn btn-sm btn-outline-primary" (click)="this.selectPage.next()">Select page</button>
-  <button class="btn btn-sm btn-outline-primary" (click)="this.selectAll.next()">Select all</button>
-  <button class="btn btn-sm btn-outline-primary" (click)="this.selectNone.next()">Select none</button>
+<div class="card bg-light">
+<div class="card-body px-2 py-2 d-flex justify-content-between flex-wrap align-items-end">
+  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Select">
+    <label class="d-flex mt-1 mr-auto mr-lg-2">Select:</label>
+    <div class="btn-group d-flex">
+      <button class="btn btn-sm btn-outline-primary" (click)="selectPage.next()">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#file-earmark-check" />
+        </svg>
+        Page
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="selectAll.next()">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#check-all" />
+        </svg>
+        All
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="selectNone.next()">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
+        </svg>
+        None
+      </button>
+    </div>
+  </div>
+  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Tags">
+    <label class="d-flex mt-1 mr-auto mr-lg-2">Tags:</label>
+    <div class="btn-group d-flex">
+      <button class="btn btn-sm btn-outline-primary" (click)="addTag.next()">
+        <ng-container *ngTemplateOutlet="add"></ng-container>
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="removeTag.next()">
+        <ng-container *ngTemplateOutlet="remove"></ng-container>
+      </button>
+    </div>
+  </div>
+  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Correspondent">
+    <label class="d-flex mt-1 mr-auto mr-lg-2">Correspondent:</label>
+    <div class="btn-group d-flex">
+      <button class="btn btn-sm btn-outline-primary" (click)="setCorrespondent.next()">
+        <ng-container *ngTemplateOutlet="edit"></ng-container>
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="removeCorrespondent.next()">
+        <ng-container *ngTemplateOutlet="remove"></ng-container>
+      </button>
+    </div>
+  </div>
+  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Document Type">
+    <label class="d-flex mt-1 mr-auto mr-lg-2">Document Type:</label>
+    <div class="btn-group d-flex">
+      <button class="btn btn-sm btn-outline-primary" (click)="setDocumentType.next()">
+        <ng-container *ngTemplateOutlet="edit"></ng-container>
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="removeDocumentType.next()">
+        <ng-container *ngTemplateOutlet="remove"></ng-container>
+      </button>
+    </div>
+  </div>
+  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Delete">
+    <button class="btn btn-sm btn-outline-danger ml-auto" (click)="delete.next()">
+      <svg viewBox="0 0 16 16" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#trash" />
+      </svg>
+      Delete
+    </button>
+  </div>
 </div>
-<div class="btn-group mr-lg-2" role="group" aria-label="Actions">
-  <button class="btn btn-sm btn-outline-primary" (click)="this.setCorrespondent.next()">Set correspondent</button>
-  <button class="btn btn-sm btn-outline-primary" (click)="this.removeCorrespondent.next()">Remove correspondent</button>
-  <button class="btn btn-sm btn-outline-primary" (click)="this.setDocumentType.next()">Set document type</button>
-  <button class="btn btn-sm btn-outline-primary" (click)="this.removeDocumentType.next()">Remove document type</button>
-  <button class="btn btn-sm btn-outline-primary" (click)="this.addTag.next()">Add tag</button>
-  <button class="btn btn-sm btn-outline-primary" (click)="this.removeTag.next()">Remove tag</button>
 </div>
-<div class="btn-group mr-lg-2" role="group" aria-label="Delete">
-  <button class="btn btn-sm btn-outline-primary" (click)="this.delete.next()">Delete</button>
-</div>
+
+<ng-template #add>
+  <svg viewBox="0 0 16 16" fill="currentColor">
+    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
+  </svg>
+  Add
+</ng-template>
+
+<ng-template #edit>
+  <svg viewBox="0 0 16 16" fill="currentColor">
+    <use xlink:href="assets/bootstrap-icons.svg#pencil" />
+  </svg>
+  Edit
+</ng-template>
+
+<ng-template #remove>
+  <svg viewBox="0 0 16 16" fill="currentColor">
+    <use xlink:href="assets/bootstrap-icons.svg#x-circle" />
+  </svg>
+  Remove
+</ng-template>

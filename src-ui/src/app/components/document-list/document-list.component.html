@@ -87,7 +87,7 @@
   [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
 </div>
 
-<div class="w-100 mb-2" [ngbCollapse]="!isBulkEditing">
+<div class="w-100 mb-3" [ngbCollapse]="!isBulkEditing">
   <app-bulk-editor
     (selectPage)="list.selectPage()"
     (selectAll)="list.selectAll()"
