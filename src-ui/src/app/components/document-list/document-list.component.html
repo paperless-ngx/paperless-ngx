@@ -93,16 +93,16 @@
       </td>
       <td class="d-none d-md-table-cell">
         <ng-container *ngIf="d.correspondent">
-          <a [routerLink]="" (click)="clickCorrespondent(d.correspondent)" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+          <a [routerLink]="" (click)="clickCorrespondent(d.correspondent.id)" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
         <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t)"></app-tag>
+        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id)"></app-tag>
       </td>
       <td class="d-none d-xl-table-cell">
         <ng-container *ngIf="d.document_type">
-          <a [routerLink]="" (click)="clickDocumentType(d.document_type)" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+          <a [routerLink]="" (click)="clickDocumentType(d.document_type.id)" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
