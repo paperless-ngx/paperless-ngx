@@ -9,6 +9,7 @@ import pathvalidate
 
 import dateutil.parser
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -303,6 +304,47 @@ class Log(models.Model):
 
     def __str__(self):
         return self.message
+
+
+class SavedView(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=128)
+
+    show_on_dashboard = models.BooleanField()
+    show_in_sidebar = models.BooleanField()
+
+    sort_field = models.CharField(max_length=128)
+    sort_reverse = models.BooleanField(default=False)
+
+
+class SavedViewFilterRule(models.Model):
+    RULE_TYPES = [
+        (0, "Title contains"),
+        (1, "Content contains"),
+        (2, "ASN is"),
+        (3, "Correspondent is"),
+        (4, "Document type is"),
+        (5, "Is in inbox"),
+        (6, "Has tag"),
+        (7, "Has any tag"),
+        (8, "Created before"),
+        (9, "Created after"),
+        (10, "Created year is"),
+        (11, "Created month is"),
+        (12, "Created day is"),
+        (13, "Added before"),
+        (14, "Added after"),
+        (15, "Modified before"),
+        (16, "Modified after"),
+        (17, "Does not have tag"),
+    ]
+
+    saved_view = models.ForeignKey(SavedView, on_delete=models.CASCADE, related_name="filter_rules")
+
+    rule_type = models.PositiveIntegerField(choices=RULE_TYPES)
+
+    value = models.CharField(max_length=128)
 
 
 # TODO: why is this in the models file?

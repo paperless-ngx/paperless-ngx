@@ -37,16 +37,16 @@
           </li>
         </ul>
 
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" *ngIf='viewConfigService.getSideBarConfigs().length > 0'>
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.sidebarViews.length > 0'>
           <span>Saved views</span>
         </h6>
         <ul class="nav flex-column mb-2">
-          <li class="nav-item w-100" *ngFor='let config of viewConfigService.getSideBarConfigs()'>
-            <a class="nav-link text-truncate" routerLink="view/{{config.id}}" routerLinkActive="active" (click)="closeMenu()">
+          <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews">
+            <a class="nav-link text-truncate" routerLink="view/{{view.id}}" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
               </svg>
-              {{config.title}}
+              {{view.name}}
             </a>
           </li>
         </ul>
@@ -132,7 +132,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" href="https://paperless-ng.readthedocs.io/en/latest/">
+            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://paperless-ng.readthedocs.io/en/latest/">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
               </svg>
@@ -140,7 +140,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="https://github.com/jonaswinkler/paperless-ng">
+            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://github.com/jonaswinkler/paperless-ng">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#link"/>
               </svg>

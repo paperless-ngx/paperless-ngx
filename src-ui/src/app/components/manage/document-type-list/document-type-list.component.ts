@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
-import { environment } from 'src/environments/environment';
 import { GenericListComponent } from '../generic-list/generic-list.component';
 import { DocumentTypeEditDialogComponent } from './document-type-edit-dialog/document-type-edit-dialog.component';
 
@@ -12,9 +10,9 @@ import { DocumentTypeEditDialogComponent } from './document-type-edit-dialog/doc
   templateUrl: './document-type-list.component.html',
   styleUrls: ['./document-type-list.component.scss']
 })
-export class DocumentTypeListComponent extends GenericListComponent<PaperlessDocumentType> implements OnInit {
+export class DocumentTypeListComponent extends GenericListComponent<PaperlessDocumentType> {
 
-  constructor(service: DocumentTypeService, modalService: NgbModal, private titleService: Title) {
+  constructor(service: DocumentTypeService, modalService: NgbModal) {
     super(service, modalService, DocumentTypeEditDialogComponent)
   }
 
@@ -22,8 +20,4 @@ export class DocumentTypeListComponent extends GenericListComponent<PaperlessDoc
     return `document type '${object.name}'`
   }
 
-  ngOnInit(): void {
-    super.ngOnInit()
-    this.titleService.setTitle(`Document types - ${environment.appTitle}`)
-  }
 }

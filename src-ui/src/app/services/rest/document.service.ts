@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators';
 import { CorrespondentService } from './correspondent.service';
 import { DocumentTypeService } from './document-type.service';
 import { TagService } from './tag.service';
-
+import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: "correspondent__name", name: "Correspondent" },
@@ -21,10 +21,6 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'added', name: 'Added' },
   { field: 'modified', name: 'Modified' }
 ]
-
-export const SORT_DIRECTION_ASCENDING = "asc"
-export const SORT_DIRECTION_DESCENDING = "des"
-
 
 @Injectable({
   providedIn: 'root'
@@ -39,10 +35,11 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     if (filterRules) {
       let params = {}
       for (let rule of filterRules) {
-        if (rule.type.multi) {
-          params[rule.type.filtervar] = params[rule.type.filtervar] ? params[rule.type.filtervar] + "," + rule.value : rule.value
+        let ruleType = FILTER_RULE_TYPES.find(t => t.id == rule.rule_type)
+        if (ruleType.multi) {
+          params[ruleType.filtervar] = params[ruleType.filtervar] ? params[ruleType.filtervar] + "," + rule.value : rule.value
         } else {
-          params[rule.type.filtervar] = rule.value
+          params[ruleType.filtervar] = rule.value
         }
       }
       return params
@@ -64,8 +61,8 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return doc
   }
 
-  listFiltered(page?: number, pageSize?: number, sortField?: string, sortDirection?: string, filterRules?: FilterRule[], extraParams = {}): Observable<Results<PaperlessDocument>> {
-    return this.list(page, pageSize, sortField, sortDirection, Object.assign(extraParams, this.filterRulesToQueryParams(filterRules))).pipe(
+  listFiltered(page?: number, pageSize?: number, sortField?: string, sortReverse?: boolean, filterRules?: FilterRule[], extraParams = {}): Observable<Results<PaperlessDocument>> {
+    return this.list(page, pageSize, sortField, sortReverse, Object.assign(extraParams, this.filterRulesToQueryParams(filterRules))).pipe(
       map(results => {
         results.results.forEach(doc => this.addObservablesToDocument(doc))
         return results
