@@ -340,7 +340,11 @@ class SavedViewFilterRule(models.Model):
         (17, "Does not have tag"),
     ]
 
-    saved_view = models.ForeignKey(SavedView, on_delete=models.CASCADE, related_name="filter_rules")
+    saved_view = models.ForeignKey(
+        SavedView,
+        on_delete=models.CASCADE,
+        related_name="filter_rules"
+    )
 
     rule_type = models.PositiveIntegerField(choices=RULE_TYPES)
 

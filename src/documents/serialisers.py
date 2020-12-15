@@ -167,14 +167,16 @@ class SavedViewSerializer(serializers.ModelSerializer):
         if rules_data:
             SavedViewFilterRule.objects.filter(saved_view=instance).delete()
             for rule_data in rules_data:
-                SavedViewFilterRule.objects.create(saved_view=instance, **rule_data)
+                SavedViewFilterRule.objects.create(
+                    saved_view=instance, **rule_data)
         return instance
 
     def create(self, validated_data):
         rules_data = validated_data.pop('filter_rules')
         saved_view = SavedView.objects.create(**validated_data)
         for rule_data in rules_data:
-            SavedViewFilterRule.objects.create(saved_view=saved_view, **rule_data)
+            SavedViewFilterRule.objects.create(
+                saved_view=saved_view, **rule_data)
         return saved_view
 
 
