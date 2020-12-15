@@ -1,67 +1,67 @@
 <div class="card bg-light">
-<div class="card-body px-2 py-2 d-flex justify-content-between flex-wrap align-items-end">
-  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Select">
-    <label class="d-flex mt-1 mr-auto mr-lg-2">Select:</label>
+<div class="card-body small px-2 py-2 d-flex flex-column flex-xl-row justify-content-between justify-content-xl-start">
+  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Select">
+    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Select:</label>
     <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary" (click)="selectPage.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="selectPage.next()">
         <svg viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#file-earmark-check" />
         </svg>
-        Page
+        <small>Page</small>
       </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="selectAll.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="selectAll.next()">
         <svg viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#check-all" />
         </svg>
-        All
+        <small>All</small>
       </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="selectNone.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="selectNone.next()">
         <svg viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
         </svg>
-        None
+        <small>None</small>
       </button>
     </div>
   </div>
-  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Tags">
-    <label class="d-flex mt-1 mr-auto mr-lg-2">Tags:</label>
+  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Tags">
+    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Tags:</label>
     <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary" (click)="addTag.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="addTag.next()">
         <ng-container *ngTemplateOutlet="add"></ng-container>
       </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="removeTag.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="removeTag.next()">
         <ng-container *ngTemplateOutlet="remove"></ng-container>
       </button>
     </div>
   </div>
-  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Correspondent">
-    <label class="d-flex mt-1 mr-auto mr-lg-2">Correspondent:</label>
+  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Correspondent">
+    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Correspondent:</label>
     <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary" (click)="setCorrespondent.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="setCorrespondent.next()">
         <ng-container *ngTemplateOutlet="edit"></ng-container>
       </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="removeCorrespondent.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="removeCorrespondent.next()">
         <ng-container *ngTemplateOutlet="remove"></ng-container>
       </button>
     </div>
   </div>
-  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Document Type">
-    <label class="d-flex mt-1 mr-auto mr-lg-2">Document Type:</label>
+  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Document Type">
+    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Document Type:</label>
     <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary" (click)="setDocumentType.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="setDocumentType.next()">
         <ng-container *ngTemplateOutlet="edit"></ng-container>
       </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="removeDocumentType.next()">
+      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="removeDocumentType.next()">
         <ng-container *ngTemplateOutlet="remove"></ng-container>
       </button>
     </div>
   </div>
-  <div class="d-flex flex-grow-1 mb-2 mb-lg-0" role="group" aria-label="Delete">
-    <button class="btn btn-sm btn-outline-danger ml-auto" (click)="delete.next()">
+  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-lg-0 ml-auto ml-lg-0" role="group" aria-label="Delete">
+    <button class="btn btn-sm btn-outline-danger" (click)="delete.next()">
       <svg viewBox="0 0 16 16" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#trash" />
       </svg>
-      Delete
+      <small>Delete</small>
     </button>
   </div>
 </div>
@@ -71,19 +71,19 @@
   <svg viewBox="0 0 16 16" fill="currentColor">
     <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
   </svg>
-  Add
+  <small>Add</small>
 </ng-template>
 
 <ng-template #edit>
   <svg viewBox="0 0 16 16" fill="currentColor">
     <use xlink:href="assets/bootstrap-icons.svg#pencil" />
   </svg>
-  Edit
+  <small>Edit</small>
 </ng-template>
 
 <ng-template #remove>
   <svg viewBox="0 0 16 16" fill="currentColor">
     <use xlink:href="assets/bootstrap-icons.svg#x-circle" />
   </svg>
-  Remove
+  <small>Remove</small>
 </ng-template>
