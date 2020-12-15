@@ -17,8 +17,9 @@ paperless-ng 0.9.7
   
   * `Michael Shamoon`_ replaced the document preview with another component. This should fix compatibility with Safari browsers.
 
-  * Paperless now stores your saved views on the server and associates them with your user account. You
-    will have to recreate your views.
+  * Paperless now stores your saved views on the server and associates them with your user account. 
+    This means that you can access your views on multiple devices and have separate views for different users.
+    You will have to recreate your views.
   
 * Other additions and changes
 
