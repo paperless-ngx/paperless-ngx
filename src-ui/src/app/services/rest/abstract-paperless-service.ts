@@ -92,4 +92,10 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     this._listAll = null
     return this.http.put<T>(this.getResourceUrl(o.id), o)
   }
+
+  patch(o: T): Observable<T> {
+    this._listAll = null
+    return this.http.patch<T>(this.getResourceUrl(o.id), o)
+  }
+
 }

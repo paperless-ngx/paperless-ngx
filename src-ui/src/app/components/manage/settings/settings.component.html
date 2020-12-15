@@ -34,24 +34,35 @@
       <a ngbNavLink>Saved views</a>
       <ng-template ngbNavContent>
 
-        <table class="table table-borderless table-sm">
-          <thead>
-            <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Show in dashboard</th>
-              <th scope="col">Show in sidebar</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let view of savedViewService.allViews">
-              <td>{{ view.name }}</td>
-              <td>{{ view.show_on_dashboard | yesno }}</td>
-              <td>{{ view.show_in_sidebar | yesno }}</td>
-              <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteSavedView(view)">Delete</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <div formGroupName="savedViews">
+          
+            <div *ngFor="let view of savedViews" [formGroupName]="view.id" class="form-row">
+              <div class="form-group col-4 mr-3">
+                <label for="name_{{view.id}}">Name</label>
+                <input type="text" class="form-control" formControlName="name" id="name_{{view.id}}">
+              </div>
+
+              <div class="form-group col-auto mr-3">
+                <label for="show_on_dashboard_{{view.id}}">Appears on</label>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                  <label class="custom-control-label" for="show_on_dashboard_{{view.id}}">Show on dashboard</label>
+                </div>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                  <label class="custom-control-label" for="show_in_sidebar_{{view.id}}">Show in sidebar</label>
+                </div>
+              </div>
+
+              <div class="form-group col-auto">
+                <label for="name_{{view.id}}">Actions</label>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)">Delete</button>
+              </div>
+            </div>
+
+            <div *ngIf="savedViews.length == 0">No saved views defined.</div>
+          
+        </div>
 
       </ng-template>
     </li>

@@ -159,11 +159,15 @@ class SavedViewSerializer(serializers.ModelSerializer):
                   "sort_field", "sort_reverse", "filter_rules"]
 
     def update(self, instance, validated_data):
-        rules_data = validated_data.pop('filter_rules')
+        if 'filter_rules' in validated_data:
+            rules_data = validated_data.pop('filter_rules')
+        else:
+            rules_data = None
         super(SavedViewSerializer, self).update(instance, validated_data)
-        SavedViewFilterRule.objects.filter(saved_view=instance).delete()
-        for rule_data in rules_data:
-            SavedViewFilterRule.objects.create(saved_view=instance, **rule_data)
+        if rules_data:
+            SavedViewFilterRule.objects.filter(saved_view=instance).delete()
+            for rule_data in rules_data:
+                SavedViewFilterRule.objects.create(saved_view=instance, **rule_data)
         return instance
 
     def create(self, validated_data):
