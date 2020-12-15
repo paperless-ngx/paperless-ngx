@@ -200,24 +200,21 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   setDateFilter(date: NgbDateStruct, dateRuleTypeID: number) {
-    let filterRules = this.filterRules
-    let existingRule = filterRules.find(rule => rule.rule_type == dateRuleTypeID)
+    let existingRule = this.filterRules.find(rule => rule.rule_type == dateRuleTypeID)
     let newValue = this.dateParser.format(date)
 
     if (existingRule) {
       existingRule.value = newValue
     } else {
-      filterRules.push({rule_type: dateRuleTypeID, value: newValue})
+      this.filterRules.push({rule_type: dateRuleTypeID, value: newValue})
     }
-
-    this.filterRules = filterRules
   }
 
   clearDateFilter(dateRuleTypeID: number) {
-    let filterRules = this.filterRules
-    let existingRule = filterRules.find(rule => rule.rule_type == dateRuleTypeID)
-    filterRules.splice(filterRules.indexOf(existingRule), 1)
-    this.filterRules = filterRules
+    let ruleIndex = this.filterRules.findIndex(rule => rule.rule_type == dateRuleTypeID)
+    if (ruleIndex != -1) {
+      this.filterRules.splice(ruleIndex, 1)
+    }
   }
 
 }
