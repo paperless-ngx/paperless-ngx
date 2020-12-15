@@ -221,7 +221,7 @@ class Document(models.Model):
         else:
             fname = "{:07}{}".format(self.pk, self.file_type)
             if self.storage_type == self.STORAGE_TYPE_GPG:
-                fname += ".gpg"
+                fname += ".gpg"  # pragma: no cover
 
         return os.path.join(
             settings.ORIGINALS_DIR,
