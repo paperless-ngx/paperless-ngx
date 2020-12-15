@@ -163,8 +163,6 @@ def parse_date(filename, text):
 
     date = None
 
-    next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
-
     # if filename date parsing is enabled, search there first:
     if settings.FILENAME_DATE_ORDER:
         for m in re.finditer(DATE_REGEX, filename):
@@ -176,7 +174,7 @@ def parse_date(filename, text):
                 # Skip all matches that do not parse to a proper date
                 continue
 
-            if date is not None and next_year > date.year > 1900:
+            if date and date.year > 1900 and date <= timezone.now():
                 return date
 
     # Iterate through all regex matches in text and try to parse the date
@@ -189,7 +187,7 @@ def parse_date(filename, text):
             # Skip all matches that do not parse to a proper date
             continue
 
-        if date is not None and next_year > date.year > 1900:
+        if date and date.year > 1900 and date <= timezone.now():
             break
         else:
             date = None
