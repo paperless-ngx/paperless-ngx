@@ -117,8 +117,8 @@ The mobile app over at `<https://github.com/qcasey/paperless_share>`_ allows And
 to share any documents with paperless. This can be combined with any of the mobile
 scanning apps out there, such as Office Lens.
 
-The app is still a little rough around the edges,
-but it gets the job done. This will eventually be rolled into `Paperless App <https://github.com/bauerj/paperless_app>`_ as well.
+Furthermore, there is the  `Paperless App <https://github.com/bauerj/paperless_app>`_ as well,
+which no only has document upload, but also document editing and browsing.
 
 .. _usage-email:
 
