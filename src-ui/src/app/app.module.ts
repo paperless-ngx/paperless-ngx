@@ -32,6 +32,7 @@ import { FilterDropdownButtonComponent } from './components/filter-editor/filter
 import { FilterDropdownDateComponent } from './components/filter-editor/filter-dropdown-date/filter-dropdown-date.component';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
+import { BulkEditorComponent } from './components/document-list/bulk-editor/bulk-editor.component';
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { TextComponent } from './components/common/input/text/text.component';
 import { SelectComponent } from './components/common/input/select/select.component';
@@ -84,6 +85,7 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     FilterDropdownDateComponent,
     DocumentCardLargeComponent,
     DocumentCardSmallComponent,
+    BulkEditorComponent,
     TextComponent,
     SelectComponent,
     CheckComponent,

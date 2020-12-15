@@ -1,25 +1,16 @@
 <app-page-header [title]="getTitle()">
 
   <div ngbDropdown class="d-inline-block mr-2">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
       </svg>
-      Bulk edit
+      Select
     </button>
-    <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
+    <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <button ngbDropdownItem (click)="list.selectPage()">Select page</button>
       <button ngbDropdownItem (click)="list.selectAll()">Select all</button>
       <button ngbDropdownItem (click)="list.selectNone()">Select none</button>
-      <div class="dropdown-divider"></div>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkSetCorrespondent()">Set correspondent</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkRemoveCorrespondent()">Remove correspondent</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkSetDocumentType()">Set document type</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkRemoveDocumentType()">Remove document type</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkAddTag()">Add tag</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkRemoveTag()">Remove tag</button>
-      <div class="dropdown-divider"></div>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkDelete()">Delete</button>
     </div>
   </div>
 
@@ -94,6 +85,21 @@
   <p><span *ngIf="list.selected.size > 0">Selected {{list.selected.size}} of </span>{{list.collectionSize || 0}} document(s) <span *ngIf="isFiltered">(filtered)</span></p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
   [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
+</div>
+
+<div class="w-100 mb-2" [ngbCollapse]="!isBulkEditing">
+  <app-bulk-editor
+    (selectPage)="list.selectPage()"
+    (selectAll)="list.selectAll()"
+    (selectNone)="list.selectNone()"
+    (setCorrespondent)="bulkSetCorrespondent()"
+    (removeCorrespondent)="bulkRemoveCorrespondent()"
+    (setDocumentType)="bulkSetDocumentType()"
+    (removeDocumentType)="bulkRemoveDocumentType()"
+    (addTag)="bulkAddTag()"
+    (removeTag)="bulkRemoveTag()"
+    (delete)="bulkDelete()">
+  </app-bulk-editor>
 </div>
 
 <div *ngIf="displayMode == 'largeCards'">

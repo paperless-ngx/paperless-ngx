@@ -52,6 +52,10 @@ export class DocumentListComponent implements OnInit {
     return DOCUMENT_SORT_FIELDS
   }
 
+  get isBulkEditing(): boolean {
+    return this.list.selected.size > 0
+  }
+
   saveDisplayMode() {
     localStorage.setItem('document-list:displayMode', this.displayMode)
   }
