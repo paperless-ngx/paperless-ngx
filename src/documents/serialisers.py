@@ -164,7 +164,7 @@ class SavedViewSerializer(serializers.ModelSerializer):
         else:
             rules_data = None
         super(SavedViewSerializer, self).update(instance, validated_data)
-        if rules_data:
+        if rules_data is not None:
             SavedViewFilterRule.objects.filter(saved_view=instance).delete()
             for rule_data in rules_data:
                 SavedViewFilterRule.objects.create(
