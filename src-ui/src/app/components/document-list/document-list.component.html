@@ -44,7 +44,8 @@
       </svg>
     </label>
   </div>
-  <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortDirection">
+
+  <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortReverse">
     <div ngbDropdown class="btn-group">
       <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
@@ -53,48 +54,40 @@
       </div>
     </div>
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn btn-sm" value="asc">
+      <input ngbButton type="radio" class="btn btn-sm" [value]="false">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
       </svg>
     </label>
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
-      <input ngbButton type="radio" class="btn btn-sm" value="des">
+      <input ngbButton type="radio" class="btn btn-sm" [value]="true">
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
       </svg>
     </label>
   </div>
+
   <div class="btn-group ml-2">
 
-    <button type="button" class="btn btn-sm" [ngClass]="isFiltered ? 'btn-primary' : 'btn-outline-primary'" (click)="showFilter=!showFilter">
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#funnel" />
-      </svg>
-      Filter
-    </button>
-
     <div class="btn-group" ngbDropdown role="group">
-      <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
-      <div class="dropdown-menu" ngbDropdownMenu class="shadow">
-        <ng-container *ngIf="!list.savedViewId" >
-          <button ngbDropdownItem *ngFor="let config of savedViewConfigService.getConfigs()" (click)="loadViewConfig(config)">{{config.title}}</button>
-          <div class="dropdown-divider" *ngIf="savedViewConfigService.getConfigs().length > 0"></div>
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle>Views</button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <ng-container *ngIf="!list.savedViewId">
+          <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
+          <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
         </ng-container>
-        
+
         <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId">Save "{{list.savedViewTitle}}"</button>
         <button ngbDropdownItem (click)="saveViewConfigAs()">Save as...</button>
       </div>
     </div>
 
   </div>
+
 </app-page-header>
 
-<div class="card w-100 mb-3" [hidden]="!showFilter">
-  <div class="card-body">
-    <h5 class="card-title">Filter</h5>
-    <app-filter-editor [(filterRules)]="filterRules" (apply)="applyFilterRules()" (clear)="clearFilterRules()"></app-filter-editor>
-  </div>
+<div class="w-100 mb-4">
+  <app-filter-editor [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
 </div>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -104,7 +97,7 @@
 </div>
 
 <div *ngIf="displayMode == 'largeCards'">
-  <app-document-card-large *ngFor="let d of list.documents" [document]="d" [details]="d.content" (clickTag)="filterByTag($event)" (clickCorrespondent)="filterByCorrespondent($event)">
+  <app-document-card-large *ngFor="let d of list.documents" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
   </app-document-card-large>
 </div>
 
@@ -131,16 +124,16 @@
       </td>
       <td class="d-none d-md-table-cell">
         <ng-container *ngIf="d.correspondent">
-          <a [routerLink]="" (click)="filterByCorrespondent(d.correspondent)" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+          <a [routerLink]="" (click)="clickCorrespondent(d.correspondent)" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
         <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="filterByTag(t.id)"></app-tag>
+        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t)"></app-tag>
       </td>
       <td class="d-none d-xl-table-cell">
         <ng-container *ngIf="d.document_type">
-          <a [routerLink]="" (click)="filterByDocumentType(d.document_type)" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+          <a [routerLink]="" (click)="clickDocumentType(d.document_type)" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
@@ -155,5 +148,5 @@
 
 
 <div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
-  <app-document-card-small [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)"  [document]="d" *ngFor="let d of list.documents" (clickTag)="filterByTag($event)" (clickCorrespondent)="filterByCorrespondent($event)"></app-document-card-small>    
+  <app-document-card-small [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)"  [document]="d" *ngFor="let d of list.documents" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
 </div>

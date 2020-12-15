@@ -27,6 +27,9 @@ import { PageHeaderComponent } from './components/common/page-header/page-header
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
 import { FilterEditorComponent } from './components/filter-editor/filter-editor.component';
+import { FilterDropdownComponent } from './components/filter-editor/filter-dropdown/filter-dropdown.component';
+import { FilterDropdownButtonComponent } from './components/filter-editor/filter-dropdown/filter-dropdown-button/filter-dropdown-button.component';
+import { FilterDropdownDateComponent } from './components/filter-editor/filter-dropdown-date/filter-dropdown-date.component';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
 import { NgxFileDropModule } from 'ngx-file-drop';
@@ -48,6 +51,7 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { WelcomeWidgetComponent } from './components/dashboard/widgets/welcome-widget/welcome-widget.component';
 import { YesNoPipe } from './pipes/yes-no.pipe';
 import { FileSizePipe } from './pipes/file-size.pipe';
+import { FilterPipe } from './pipes/filter.pipe';
 import { DocumentTitlePipe } from './pipes/document-title.pipe';
 import { MetadataCollapseComponent } from './components/document-detail/metadata-collapse/metadata-collapse.component';
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
@@ -75,6 +79,9 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     AppFrameComponent,
     ToastsComponent,
     FilterEditorComponent,
+    FilterDropdownComponent,
+    FilterDropdownButtonComponent,
+    FilterDropdownDateComponent,
     DocumentCardLargeComponent,
     DocumentCardSmallComponent,
     TextComponent,
@@ -91,6 +98,7 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     WelcomeWidgetComponent,
     YesNoPipe,
     FileSizePipe,
+    FilterPipe,
     DocumentTitlePipe,
     MetadataCollapseComponent,
     SelectDialogComponent
@@ -112,7 +120,8 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
       provide: HTTP_INTERCEPTORS,
       useClass: CsrfInterceptor,
       multi: true
-    }
+    },
+    FilterPipe
   ],
   bootstrap: [AppComponent]
 })
