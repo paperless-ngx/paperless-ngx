@@ -106,7 +106,7 @@ Paperless has been around a while now, and people are starting to build stuff on
 * [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless. Updated to work with paperless-ng.
 * [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
 
-These projects also exist, but their status and compatibility with paperless is unknown.
+These projects also exist, but their status and compatibility with paperless-ng is unknown.
 
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
