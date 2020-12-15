@@ -7,7 +7,7 @@
 
 [Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
-Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, see below.
+Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
 
 This project is still in development and some things may not work as expected.
 
@@ -15,11 +15,13 @@ This project is still in development and some things may not work as expected.
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces.
 
-1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ng.readthedocs.io/en/latest/scanners.html) page.
-2. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
-3. Have the target server run the Paperless consumption script to OCR the file and index it into a local database.
-4. Use the web frontend to sift through the database and find what you want.
-5. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
+1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ng.readthedocs.io/en/latest/scanners.html) page. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
+
+	- Alternatively, you can use any of the mobile scanning apps out there. We have an app that allows you to share documents with paperless, if you're on Android.
+
+2. Wait for paperless to process your files. OCR is expensive, and depending on the power of your machine, this might take a bit of time.
+3. Use the web frontend to sift through the database and find what you want.
+4. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
 
 Here's what you get:
 
@@ -39,7 +41,6 @@ Here's what you get:
 	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
 * Machine learning powered document matching.
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
-* We have a mobile app that offers a 'Share with paperless' option over at https://github.com/qcasey/paperless_share. You can use that in combination with any of the mobile scanning apps out there. It's still a little rough around the edges, but it works!
 * A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
 * Code cleanup in many, MANY areas. Some of the code from OG paperless was just overly complicated.
 * More tests, more stability.
@@ -78,7 +79,7 @@ The recommended way to deploy paperless is docker-compose. Don't clone the repos
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
-Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has information about the individual components of paperless that you need to take care of.
+Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has a step by step guide on how to do it.
 
 # Migrating to paperless-ng
 
@@ -102,12 +103,14 @@ If you want to implement something big: Please start a discussion about that in 
 
 Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
 
-* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless. We're working on making this compatible.
+* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless. Updated to work with paperless-ng.
+* [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
+
+These projects also exist, but their status and compatibility with paperless is unknown.
+
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
 * [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
-
-Compatibility with Paperless-ng is unknown.
 
 # Important Note
 
