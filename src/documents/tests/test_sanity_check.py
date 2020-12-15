@@ -2,6 +2,8 @@ import os
 import shutil
 from pathlib import Path
 
+import filelock
+from django.conf import settings
 from django.test import TestCase
 
 from documents.models import Document
@@ -13,9 +15,11 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
 
     def make_test_data(self):
 
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000001.pdf"), os.path.join(self.dirs.originals_dir, "0000001.pdf"))
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "archive", "0000001.pdf"), os.path.join(self.dirs.archive_dir, "0000001.pdf"))
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), os.path.join(self.dirs.thumbnail_dir, "0000001.png"))
+        with filelock.FileLock(settings.MEDIA_LOCK):
+            # just make sure that the lockfile is present.
+            shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000001.pdf"), os.path.join(self.dirs.originals_dir, "0000001.pdf"))
+            shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "archive", "0000001.pdf"), os.path.join(self.dirs.archive_dir, "0000001.pdf"))
+            shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), os.path.join(self.dirs.thumbnail_dir, "0000001.png"))
 
         return Document.objects.create(title="test", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", content="test", pk=1, filename="0000001.pdf", mime_type="application/pdf")
 
