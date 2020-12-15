@@ -5,6 +5,40 @@
 Changelog
 *********
 
+
+paperless-ng 0.9.7
+##################
+
+
+* Front end
+
+  * Thanks to the hard work of `Michael Shamoon`_, paperless now comes with a much more streamlined UI for
+    filtering documents.
+  
+  * `Michael Shamoon`_ replaced the document preview with another component. This should fix compatibility with Safari browsers.
+
+  * Paperless now stores your saved views on the server and associates them with your user account. You
+    will have to recreate your views.
+  
+* Other additions and changes
+
+  * The GitHub and documentation links now open in new tabs/windows. Thanks to `rYR79435`_.
+  * The new filename format field ``{tag_list}`` inserts a list of tags into the filename, separated by comma.
+  * The ``document_retagger`` no longer removes inbox tags or tags without matching rules.
+  * The new configuration option ``PAPERLESS_COOKIE_PREFIX`` allows you to run multiple instances of paperless on different ports.
+    This option enables you to be logged in into multiple instances by specifying different cookie names for each instance.
+
+* Fixes
+  
+  * Sometimes paperless would assign dates in the future to newly consumed documents.
+  * The filename format fields ``{created_month}`` and ``{created_day}`` now use a leading zero for single digit values.
+  * The filename format field ``{tags}`` can no longer be used without arguments.
+  * Paperless was not able to consume many images (especially images from mobile scanners) due to missing DPI information.
+    Paperless now assumes A4 paper size for PDF generation if no DPI information is present.
+  * Documents with empty titles could not be opened from the table view due to the link being empty.
+  * Fixed an issue with filenames containing special characters such as ``:`` not being accepted for upload.
+
+
 paperless-ng 0.9.6
 ##################
 
@@ -841,6 +875,8 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _rYR79435: https://github.com/rYR79435
+.. _Michael Shamoon: https://github.com/shamoon
 .. _jayme-github: http://github.com/jayme-github
 .. _Brian Conn: https://github.com/TheConnMan
 .. _Christopher Luu: https://github.com/nuudles
