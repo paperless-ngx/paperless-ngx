@@ -11,10 +11,13 @@ import { Toast, ToastService } from 'src/app/services/toast.service';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
+
+  savedViewGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
-    'documentListItemPerPage': new FormControl(+localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT)
+    'documentListItemPerPage': new FormControl(+localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT),
+    'savedViews': this.savedViewGroup
   })
 
   constructor(
@@ -23,14 +26,40 @@ export class SettingsComponent {
     private toastService: ToastService
   ) { }
 
+  savedViews: PaperlessSavedView[]
+
+  ngOnInit() {
+    this.savedViewService.listAll().subscribe(r => {
+      this.savedViews = r.results
+      for (let view of this.savedViews) {
+        this.savedViewGroup.addControl(view.id.toString(), new FormGroup({
+          "id": new FormControl(view.id),
+          "name": new FormControl(view.name),
+          "show_on_dashboard": new FormControl(view.show_on_dashboard),
+          "show_in_sidebar": new FormControl(view.show_in_sidebar)
+        }))
+      }
+    })
+  }
+
   deleteSavedView(savedView: PaperlessSavedView) {
     this.savedViewService.delete(savedView).subscribe(() => {
+      this.savedViewGroup.removeControl(savedView.id.toString())
+      this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
       this.toastService.showToast(Toast.make("Information", `Saved view "${savedView.name} deleted.`))
     })
   }
 
   saveSettings() {
-    localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
-    this.documentListViewService.updatePageSize()
+    let x = []
+    for (let id in this.savedViewGroup.value) {
+      x.push(this.savedViewGroup.value[id])
+    }
+    this.savedViewService.patchMany(x).subscribe(s => {
+      this.toastService.showToast(Toast.make("Information", "Settings saved successfully."))
+      localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
+      this.documentListViewService.updatePageSize()
+    })
+
   }
 }
