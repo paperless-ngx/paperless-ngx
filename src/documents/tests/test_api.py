@@ -4,12 +4,11 @@ import tempfile
 from unittest import mock
 
 from django.contrib.auth.models import User
-from pathvalidate import ValidationError
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 from documents import index
-from documents.models import Document, Correspondent, DocumentType, Tag
+from documents.models import Document, Correspondent, DocumentType, Tag, SavedView
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -18,8 +17,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     def setUp(self):
         super(TestDocumentApi, self).setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_login(user=self.user)
 
     def testDocuments(self):
 
@@ -515,3 +514,87 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertFalse(meta['has_archive_version'])
         self.assertGreater(len(meta['original_metadata']), 0)
         self.assertIsNone(meta['archive_metadata'])
+
+    def test_saved_views(self):
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
+
+        v1 = SavedView.objects.create(user=u1, name="test1", sort_field="", show_on_dashboard=False, show_in_sidebar=False)
+        v2 = SavedView.objects.create(user=u2, name="test2", sort_field="", show_on_dashboard=False, show_in_sidebar=False)
+        v3 = SavedView.objects.create(user=u2, name="test3", sort_field="", show_on_dashboard=False, show_in_sidebar=False)
+
+        response = self.client.get("/api/saved_views/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 0)
+
+        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
+
+        self.client.force_login(user=u1)
+
+        response = self.client.get("/api/saved_views/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+
+        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 200)
+
+        self.client.force_login(user=u2)
+
+        response = self.client.get("/api/saved_views/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 2)
+
+        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
+
+    def test_create_update_patch(self):
+
+        u1 = User.objects.create_user("user1")
+
+        view = {
+            "name": "test",
+            "show_on_dashboard": True,
+            "show_in_sidebar": True,
+            "sort_field": "created2",
+            "filter_rules": [
+                {
+                    "rule_type": 4,
+                    "value": "test"
+                }
+            ]
+        }
+
+        response = self.client.post("/api/saved_views/", view, format='json')
+        self.assertEqual(response.status_code, 201)
+
+        v1 = SavedView.objects.get(name="test")
+        self.assertEqual(v1.sort_field, "created2")
+        self.assertEqual(v1.filter_rules.count(), 1)
+        self.assertEqual(v1.user, self.user)
+
+        response = self.client.patch(f"/api/saved_views/{v1.id}/", {
+            "show_in_sidebar": False
+        }, format='json')
+
+        v1 = SavedView.objects.get(id=v1.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(v1.show_in_sidebar)
+        self.assertEqual(v1.filter_rules.count(), 1)
+
+        view['filter_rules'] = [{
+            "rule_type": 12,
+            "value": "secret"
+        }]
+
+        response = self.client.put(f"/api/saved_views/{v1.id}/", view, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        v1 = SavedView.objects.get(id=v1.id)
+        self.assertEqual(v1.filter_rules.count(), 1)
+        self.assertEqual(v1.filter_rules.first().value, "secret")
+
+        view['filter_rules'] = []
+
+        response = self.client.put(f"/api/saved_views/{v1.id}/", view, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        v1 = SavedView.objects.get(id=v1.id)
+        self.assertEqual(v1.filter_rules.count(), 0)
