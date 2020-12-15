@@ -1,0 +1,19 @@
+<div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #filterDropdown="ngbDropdown">
+  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="itemsSelected?.length > 0 ? 'btn-primary' : 'btn-outline-primary'">
+    {{title}}
+  </button>
+  <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+    <div class="list-group list-group-flush">
+      <div class="list-group-item">
+        <div class="input-group input-group-sm">
+          <input class="form-control" type="text" [(ngModel)]="filterText" placeholder="Filter {{title}}" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
+        </div>
+      </div>
+      <div *ngIf="items" class="items">
+        <ng-container *ngFor="let item of items | filter: filterText; let i = index">
+          <app-filter-dropdown-button [item]="item" [selected]="isItemSelected(item)" (toggle)="toggleItem($event)"></app-filter-dropdown-button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

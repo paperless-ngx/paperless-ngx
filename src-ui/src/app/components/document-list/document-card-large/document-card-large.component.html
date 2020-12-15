@@ -7,7 +7,7 @@
       <div class="card-body">
 
         <div class="d-flex justify-content-between align-items-center">
-          <h5 class="card-title">    
+          <h5 class="card-title">
             <ng-container *ngIf="document.correspondent">
               <a *ngIf="clickCorrespondent.observers.length ; else nolink" [routerLink]="" title="Filter by correspondent" (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>
               <ng-template #nolink>{{(document.correspondent$ | async)?.name}}</ng-template>:

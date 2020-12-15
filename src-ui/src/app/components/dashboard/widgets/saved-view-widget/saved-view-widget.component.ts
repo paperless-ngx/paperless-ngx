@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { SavedViewConfig } from 'src/app/data/saved-view-config';
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
 
@@ -18,18 +18,18 @@ export class SavedViewWidgetComponent implements OnInit {
     private list: DocumentListViewService) { }
   
   @Input()
-  savedView: SavedViewConfig
+  savedView: PaperlessSavedView
 
   documents: PaperlessDocument[] = []
 
   ngOnInit(): void {
-    this.documentService.list(1,10,this.savedView.sortField,this.savedView.sortDirection,this.savedView.filterRules).subscribe(result => {
+    this.documentService.list(1,10,this.savedView.sort_field, this.savedView.sort_reverse, this.savedView.filter_rules).subscribe(result => {
       this.documents = result.results
     })
   }
 
   showAll() {
-    if (this.savedView.showInSideBar) {
+    if (this.savedView.show_in_sidebar) {
       this.router.navigate(['view', this.savedView.id])
     } else {
       this.list.load(this.savedView)

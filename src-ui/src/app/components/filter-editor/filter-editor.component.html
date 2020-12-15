@@ -1,52 +1,22 @@
-<div *ngFor="let rule of filterRules" class="form-row form-group">
-  <div class="col-md-3 col-form-label">
-    <span>{{rule.type.name}}</span>
+<div class="form-row form-group mb-0">
+  <div class="col-auto">
+    <div class="text-muted mt-1">Filter by:</div>
   </div>
   <div class="col">
-    <input *ngIf="rule.type.datatype == 'string'" type="text" class="form-control form-control-sm" [(ngModel)]="rule.value">
-    <input *ngIf="rule.type.datatype == 'number'" type="number" class="form-control form-control-sm" [(ngModel)]="rule.value">
-    <input *ngIf="rule.type.datatype == 'date'" type="date" class="form-control form-control-sm" [(ngModel)]="rule.value">
-
-    <select *ngIf="rule.type.datatype == 'tag'" class="form-control form-control-sm" [(ngModel)]="rule.value">
-      <option *ngFor="let t of tags" [ngValue]="t.id">{{t.name}}</option>
-    </select>
-
-    <select *ngIf="rule.type.datatype == 'document_type'" class="form-control form-control-sm" [(ngModel)]="rule.value">
-      <option *ngFor="let dt of documentTypes" [ngValue]="dt.id">{{dt.name}}</option>
-    </select>
-
-    <select *ngIf="rule.type.datatype == 'correspondent'" class="form-control form-control-sm" [(ngModel)]="rule.value">
-      <option *ngFor="let c of correspondents" [ngValue]="c.id">{{c.name}}</option>
-    </select>
-
-    <select *ngIf="rule.type.datatype == 'boolean'" class="form-control form-control-sm" [(ngModel)]="rule.value">
-      <option [ngValue]="true">Yes</option>
-      <option [ngValue]="false">No</option>
-    </select>
-
+    <input class="form-control form-control-sm" type="text" [(ngModel)]="titleFilter" placeholder="Title">
   </div>
-  <div class="col-auto">
-    <button class="btn btn-sm btn-outline-secondary" (click)="removeRuleClicked(rule)">
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#x"/>
-      </svg>
-    </button>
-  </div>
-</div>
 
-<div class="form-row form-group">
-  <div class="col">
-    <select [(ngModel)]="selectedRuleType" class="form-control form-control-sm">
-      <option *ngFor="let ruleType of getRuleTypes()" [ngValue]="ruleType">{{ruleType.name}}</option>
-    </select>
-  </div>
-  <div class="col-auto">
-    <button (click)="newRuleClicked()" class="btn btn-sm btn-outline-secondary">Add</button>
-  </div>
-  <div class="col-auto">
-    <button (click)="clearClicked()" class="btn btn-sm btn-outline-secondary">Clear</button>
-  </div>
-  <div class="col-auto">
-    <button (click)="applyClicked()" class="btn btn-sm btn-outline-secondary">Apply</button>
-  </div>
+  <app-filter-dropdown class="col-auto" [items]="tags" [itemsSelected]="selectedTags" title="Tags" (toggle)="toggleTag($event.id)"></app-filter-dropdown>
+  <app-filter-dropdown class="col-auto" [items]="correspondents" [itemsSelected]="selectedCorrespondents" title="Correspondents" (toggle)="toggleCorrespondent($event.id)"></app-filter-dropdown>
+  <app-filter-dropdown class="col-auto" [items]="documentTypes" [itemsSelected]="selectedDocumentTypes" title="Document types" (toggle)="toggleDocumentType($event.id)"></app-filter-dropdown>
+
+  <app-filter-dropdown-date class="col-auto" [dateBefore]="dateCreatedBefore" [dateAfter]="dateCreatedAfter" title="Created" (datesSet)="onDatesCreatedSet($event)"></app-filter-dropdown-date>
+  <app-filter-dropdown-date class="col-auto" [dateBefore]="dateAddedBefore" [dateAfter]="dateAddedAfter" title="Added"  (datesSet)="onDatesAddedSet($event)"></app-filter-dropdown-date>
+
+  <button class="btn btn-link btn-sm" [disabled]="!hasFilters()" (click)="clearSelected()">
+    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+    </svg>
+    Clear all filters
+  </button>
 </div>
