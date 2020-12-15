@@ -22,7 +22,7 @@ export class FilterDropdownComponent {
   title: string
 
   @Input()
-  display: string
+  icon: string
 
   @Output()
   toggle = new EventEmitter()
