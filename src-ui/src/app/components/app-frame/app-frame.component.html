@@ -17,6 +17,11 @@
 <div class="container-fluid">
   <div class="row">
     <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" [ngbCollapse]="isMenuCollapsed">
+
+      <div style="position: absolute; bottom: 0; left: 0;" class="text-muted p-1">
+        {{versionString}}
+      </div>
+
       <div class="sidebar-sticky pt-3">
         <ul class="nav flex-column">
           <li class="nav-item">
