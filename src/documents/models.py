@@ -78,6 +78,9 @@ class Correspondent(MatchingModel):
     # better safe than sorry.
     SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
 
+    class Meta:
+        ordering = ("name",)
+
 
 class Tag(MatchingModel):
 
