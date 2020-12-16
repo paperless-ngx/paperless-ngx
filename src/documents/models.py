@@ -13,7 +13,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.functions import Lower
 from django.utils import timezone
-from django.utils.text import slugify
 
 from documents.file_handling import archive_name_from_filename
 from documents.parsers import get_default_file_extension
@@ -79,9 +78,6 @@ class Correspondent(MatchingModel):
     # This regex is probably more restrictive than it needs to be, but it's
     # better safe than sorry.
     SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
-
-    class Meta:
-        ordering = ("name",)
 
 
 class Tag(MatchingModel):
@@ -206,7 +202,7 @@ class Document(models.Model):
     )
 
     class Meta:
-        ordering = ("correspondent", "title")
+        ordering = ("-created",)
 
     def __str__(self):
         created = datetime.date.isoformat(self.created)
