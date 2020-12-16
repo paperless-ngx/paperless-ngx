@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+from PIL import ImageDraw, ImageFont, Image
 from django.conf import settings
 
 from documents.parsers import DocumentParser, ParseError
@@ -12,63 +13,22 @@ class TextDocumentParser(DocumentParser):
     """
 
     def get_thumbnail(self, document_path, mime_type):
-        """
-        The thumbnail of a text file is just a 500px wide image of the text
-        rendered onto a letter-sized page.
-        """
-        # The below is heavily cribbed from https://askubuntu.com/a/590951
-
-        bg_color = "white"  # bg color
-        text_color = "black"  # text color
-        psize = [500, 647]  # icon size
-        n_lines = 50  # number of lines to show
-        out_path = os.path.join(self.tempdir, "convert.png")
-
-        temp_bg = os.path.join(self.tempdir, "bg.png")
-        temp_txlayer = os.path.join(self.tempdir, "tx.png")
-        picsize = "x".join([str(n) for n in psize])
-        txsize = "x".join([str(n - 8) for n in psize])
-
-        def create_bg():
-            work_size = ",".join([str(n - 1) for n in psize])
-            r = str(round(psize[0] / 10))
-            rounded = ",".join([r, r])
-            run_command(
-                settings.CONVERT_BINARY,
-                "-size ", picsize,
-                ' xc:none -draw ',
-                '"fill ', bg_color, ' roundrectangle 0,0,', work_size, ",", rounded, '" ',  # NOQA: E501
-                temp_bg
-            )
 
         def read_text():
             with open(document_path, 'r') as src:
                 lines = [line.strip() for line in src.readlines()]
-                text = "\n".join([line for line in lines[:n_lines]])
+                text = "\n".join([line for line in lines[:50]])
                 return text.replace('"', "'")
 
-        def create_txlayer():
-            run_command(
-                settings.CONVERT_BINARY,
-                "-background none",
-                "-fill",
-                text_color,
-                "-pointsize", "12",
-                "-border 4 -bordercolor none",
-                "-size ", txsize,
-                ' caption:"', read_text(), '" ',
-                temp_txlayer
-            )
+        img = Image.new("RGB", (500, 700), color="white")
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype(
+            "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf", 20,
+            layout_engine=ImageFont.LAYOUT_BASIC)
+        draw.text((5, 5), read_text(), font=font, fill="black")
 
-        create_txlayer()
-        create_bg()
-        run_command(
-            settings.CONVERT_BINARY,
-            temp_bg,
-            temp_txlayer,
-            "-background None -layers merge ",
-            out_path
-        )
+        out_path = os.path.join(self.tempdir, "thumb.png")
+        img.save(out_path)
 
         return out_path
 
