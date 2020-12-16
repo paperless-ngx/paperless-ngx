@@ -17,8 +17,8 @@ class TextDocumentParser(DocumentParser):
         def read_text():
             with open(document_path, 'r') as src:
                 lines = [line.strip() for line in src.readlines()]
-                text = "\n".join([line for line in lines[:50]])
-                return text.replace('"', "'")
+                text = "\n".join(lines[:50])
+                return text
 
         img = Image.new("RGB", (500, 700), color="white")
         draw = ImageDraw.Draw(img)
