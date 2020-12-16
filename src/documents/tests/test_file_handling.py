@@ -9,6 +9,7 @@ from unittest import mock
 from django.conf import settings
 from django.db import DatabaseError
 from django.test import TestCase, override_settings
+from django.utils import timezone
 
 from .utils import DirectoriesMixin
 from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories, \
@@ -298,23 +299,23 @@ class TestFileHandling(DirectoriesMixin, TestCase):
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{created_year}-{created_month}-{created_day}")
     def test_created_year_month_day(self):
-        d1 = datetime.datetime(2020, 3, 6, 1, 1, 1)
+        d1 = timezone.make_aware(datetime.datetime(2020, 3, 6, 1, 1, 1))
         doc1 = Document.objects.create(title="doc1", mime_type="application/pdf", created=d1)
 
         self.assertEqual(generate_filename(doc1), "2020-03-06.pdf")
 
-        doc1.created = datetime.datetime(2020, 11, 16, 1, 1, 1)
+        doc1.created = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
 
         self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{added_year}-{added_month}-{added_day}")
     def test_added_year_month_day(self):
-        d1 = datetime.datetime(232, 1, 9, 1, 1, 1)
+        d1 = timezone.make_aware(datetime.datetime(232, 1, 9, 1, 1, 1))
         doc1 = Document.objects.create(title="doc1", mime_type="application/pdf", added=d1)
 
         self.assertEqual(generate_filename(doc1), "232-01-09.pdf")
 
-        doc1.added = datetime.datetime(2020, 11, 16, 1, 1, 1)
+        doc1.added = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
 
         self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
 
@@ -599,7 +600,7 @@ class TestFilenameGeneration(TestCase):
         PAPERLESS_FILENAME_FORMAT="{created}"
     )
     def test_date(self):
-        doc = Document.objects.create(title="does not matter", created=datetime.datetime(2020,5,21, 7,36,51, 153), mime_type="application/pdf", pk=2, checksum="2")
+        doc = Document.objects.create(title="does not matter", created=timezone.make_aware(datetime.datetime(2020,5,21, 7,36,51, 153)), mime_type="application/pdf", pk=2, checksum="2")
         self.assertEqual(generate_filename(doc), "2020-05-21.pdf")
 
 
