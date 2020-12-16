@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output, ElementRef, ViewChild, SimpleChange } from '@angular/core';
 import { NgbDate, NgbDateStruct, NgbDatepicker } from '@ng-bootstrap/ng-bootstrap';
 
-
 export interface DateSelection {
   before?: NgbDateStruct
   after?: NgbDateStruct
@@ -72,7 +71,6 @@ export class FilterDropdownDateComponent {
   }
 
   setDateQuickFilter(range: any) {
-    this._dateAfter = this._dateBefore = undefined
     let date = new Date()
     let newDate: NgbDateStruct = { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() }
     switch (typeof range) {
@@ -92,18 +90,23 @@ export class FilterDropdownDateComponent {
         break
     }
     this._dateAfter = newDate
+    this._dateBefore = null
     this.datesSet.emit({after: newDate, before: null})
   }
 
   onBeforeSelected(date: NgbDateStruct) {
+    this._dateBefore = date
     this.datesSet.emit({after: this._dateAfter, before: date})
   }
 
   onAfterSelected(date: NgbDateStruct) {
+    this._dateAfter = date
     this.datesSet.emit({after: date, before: this._dateBefore})
   }
 
   clear() {
+    this._dateBefore = null
+    this._dateAfter = null
     this.datesSet.emit({after: null, before: null})
   }
 }
