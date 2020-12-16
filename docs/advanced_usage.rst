@@ -263,10 +263,10 @@ using the identifier which it has assigned to each document. You will end up get
 files like ``0000123.pdf`` in your media directory. This isn't necessarily a bad
 thing, because you normally don't have to access these files manually. However, if
 you wish to name your files differently, you can do that by adjusting the
-``PAPERLESS_FILENAME_FORMAT`` settings variable.
+``PAPERLESS_FILENAME_FORMAT`` configuration option.
 
-This variable allows you to configure the filename (folders are allowed!) using
-placeholders. For example, setting
+This variable allows you to configure the filename (folders are allowed) using
+placeholders. For example, configuring this to
 
 .. code:: bash
 
@@ -277,17 +277,16 @@ will create a directory structure as follows:
 .. code::
 
     2019/
-      my_bank/
-        statement-january-0000001.pdf
-        statement-february-0000002.pdf
+      My bank/
+        Statement January.pdf
+        Statement February.pdf
     2020/
-      my_bank/
-        statement-january-0000003.pdf
-      shoe_store/
-        my_new_shoes-0000004.pdf
-
-Paperless appends the unique identifier of each document to the filename. This
-avoids filename clashes.
+      My bank/
+        Statement January.pdf
+        Letter.pdf
+        Letter_01.pdf
+      Shoe store/
+        My new shoes.pdf
 
 .. danger::
 
@@ -299,6 +298,7 @@ Paperless provides the following placeholders withing filenames:
 
 * ``{correspondent}``: The name of the correspondent, or "none".
 * ``{document_type}``: The name of the document type, or "none".
+* ``{tag_list}``: A comma separated list of all tags assigned to the document.
 * ``{title}``: The title of the document.
 * ``{created}``: The full date and time the document was created.
 * ``{created_year}``: Year created only.
@@ -309,8 +309,14 @@ Paperless provides the following placeholders withing filenames:
 * ``{added_month}``: Month added only (number 1-12).
 * ``{added_day}``: Day added only (number 1-31).
 
-Paperless will convert all values for the placeholders into values which are safe
-for use in filenames.
+
+Paperless will try to conserve the information from your database as much as possible.
+However, some characters that you can use in document titles and correspondent names (such
+as ``: \ /`` and a couple more) are not allowed in filenames and will be replaced with dashes.
+
+If paperless detects that two documents share the same filename, paperless will automatically
+append ``_01``, ``_02``, etc to the filename. This happens if all the placeholders in a filename
+evaluate to the same value.
 
 .. hint::
 

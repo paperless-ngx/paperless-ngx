@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FILTER_HAS_TAG } from 'src/app/data/filter-rule-type';
 import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { TagService } from 'src/app/services/rest/tag.service';
-import { environment } from 'src/environments/environment';
 import { GenericListComponent } from '../generic-list/generic-list.component';
 import { TagEditDialogComponent } from './tag-edit-dialog/tag-edit-dialog.component';
 
@@ -12,16 +13,13 @@ import { TagEditDialogComponent } from './tag-edit-dialog/tag-edit-dialog.compon
   templateUrl: './tag-list.component.html',
   styleUrls: ['./tag-list.component.scss']
 })
-export class TagListComponent extends GenericListComponent<PaperlessTag> implements OnInit {
+export class TagListComponent extends GenericListComponent<PaperlessTag> {
 
-  constructor(tagService: TagService, modalService: NgbModal, private titleService: Title) {
+  constructor(tagService: TagService, modalService: NgbModal,
+    private router: Router,
+    private list: DocumentListViewService
+  ) {
     super(tagService, modalService, TagEditDialogComponent)
-  }
-
-
-  ngOnInit(): void {
-    super.ngOnInit()
-    this.titleService.setTitle(`Tags - ${environment.appTitle}`)
   }
 
   getColor(id) {
@@ -30,5 +28,12 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> impleme
 
   getObjectName(object: PaperlessTag) {
     return `tag '${object.name}'`
+  }
+
+  filterDocuments(object: PaperlessTag) {
+    this.list.documentListView.filter_rules = [
+      {rule_type: FILTER_HAS_TAG, value: object.id.toString()}
+    ]
+    this.router.navigate(["documents"])
   }
 }

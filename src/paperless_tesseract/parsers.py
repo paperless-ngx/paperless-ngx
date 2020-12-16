@@ -5,6 +5,7 @@ import subprocess
 
 import ocrmypdf
 import pdftotext
+import pikepdf
 from PIL import Image
 from django.conf import settings
 from ocrmypdf import InputFileError, EncryptedPdfError
@@ -17,6 +18,33 @@ class RasterisedDocumentParser(DocumentParser):
     This parser uses Tesseract to try and get some text out of a rasterised
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
+
+    def extract_metadata(self, document_path, mime_type):
+        namespace_pattern = re.compile(r"\{(.*)\}(.*)")
+
+        result = []
+        if mime_type == 'application/pdf':
+            pdf = pikepdf.open(document_path)
+            meta = pdf.open_metadata()
+            for key, value in meta.items():
+                if isinstance(value, list):
+                    value = " ".join([str(e) for e in value])
+                value = str(value)
+                try:
+                    m = namespace_pattern.match(key)
+                    result.append({
+                        "namespace": m.group(1),
+                        "prefix": meta.REVERSE_NS[m.group(1)],
+                        "key": m.group(2),
+                        "value": value
+                    })
+                except Exception as e:
+                    self.log(
+                        "warning",
+                        f"Error while reading metadata {key}: {value}. Error: "
+                        f"{e}"
+                    )
+        return result
 
     def get_thumbnail(self, document_path, mime_type):
         """
@@ -82,6 +110,24 @@ class RasterisedDocumentParser(DocumentParser):
                 f"Error while getting DPI from image {image}: {e}")
             return None
 
+    def calculate_a4_dpi(self, image):
+        try:
+            with Image.open(image) as im:
+                width, height = im.size
+                # divide image width by A4 width (210mm) in inches.
+                dpi = int(width / (21 / 2.54))
+                self.log(
+                    'debug',
+                    f"Estimated DPI {dpi} based on image width {width}"
+                )
+                return dpi
+
+        except Exception as e:
+            self.log(
+                'warning',
+                f"Error while calculating DPI for image {image}: {e}")
+            return None
+
     def parse(self, document_path, mime_type):
         mode = settings.OCR_MODE
 
@@ -134,6 +180,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         if self.is_image(mime_type):
             dpi = self.get_dpi(document_path)
+            a4_dpi = self.calculate_a4_dpi(document_path)
             if dpi:
                 self.log(
                     "debug",
@@ -142,6 +189,8 @@ class RasterisedDocumentParser(DocumentParser):
                 ocr_args['image_dpi'] = dpi
             elif settings.OCR_IMAGE_DPI:
                 ocr_args['image_dpi'] = settings.OCR_IMAGE_DPI
+            elif a4_dpi:
+                ocr_args['image_dpi'] = a4_dpi
             else:
                 raise ParseError(
                     f"Cannot produce archive PDF for image {document_path}, "
@@ -212,6 +261,9 @@ def strip_excess_whitespace(text):
 
 
 def get_text_from_pdf(pdf_file):
+
+    if not os.path.isfile(pdf_file):
+        return None
 
     with open(pdf_file, "rb") as f:
         try:

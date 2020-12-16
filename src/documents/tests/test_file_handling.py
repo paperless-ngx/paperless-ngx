@@ -9,11 +9,12 @@ from unittest import mock
 from django.conf import settings
 from django.db import DatabaseError
 from django.test import TestCase, override_settings
+from django.utils import timezone
 
 from .utils import DirectoriesMixin
 from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories, \
     generate_unique_filename
-from ..models import Document, Correspondent
+from ..models import Document, Correspondent, Tag
 
 
 class TestFileHandling(DirectoriesMixin, TestCase):
@@ -266,6 +267,57 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         # Ensure that filename is properly generated
         self.assertEqual(generate_filename(document),
                          "none.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{tags}")
+    def test_tags_without_args(self):
+        document = Document()
+        document.mime_type = "application/pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        self.assertEqual(generate_filename(document), f"{document.pk:07}.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title} {tag_list}")
+    def test_tag_list(self):
+        doc = Document.objects.create(title="doc1", mime_type="application/pdf")
+        doc.tags.create(name="tag2")
+        doc.tags.create(name="tag1")
+
+        self.assertEqual(generate_filename(doc), "doc1 tag1,tag2.pdf")
+
+        doc = Document.objects.create(title="doc2", checksum="B", mime_type="application/pdf")
+
+        self.assertEqual(generate_filename(doc), "doc2.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="//etc/something/{title}")
+    def test_filename_relative(self):
+        doc = Document.objects.create(title="doc1", mime_type="application/pdf")
+        doc.filename = generate_filename(doc)
+        doc.save()
+
+        self.assertEqual(doc.source_path, os.path.join(settings.ORIGINALS_DIR, "etc", "something", "doc1.pdf"))
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{created_year}-{created_month}-{created_day}")
+    def test_created_year_month_day(self):
+        d1 = timezone.make_aware(datetime.datetime(2020, 3, 6, 1, 1, 1))
+        doc1 = Document.objects.create(title="doc1", mime_type="application/pdf", created=d1)
+
+        self.assertEqual(generate_filename(doc1), "2020-03-06.pdf")
+
+        doc1.created = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
+
+        self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{added_year}-{added_month}-{added_day}")
+    def test_added_year_month_day(self):
+        d1 = timezone.make_aware(datetime.datetime(232, 1, 9, 1, 1, 1))
+        doc1 = Document.objects.create(title="doc1", mime_type="application/pdf", added=d1)
+
+        self.assertEqual(generate_filename(doc1), "232-01-09.pdf")
+
+        doc1.added = timezone.make_aware(datetime.datetime(2020, 11, 16, 1, 1, 1))
+
+        self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}")
     def test_nested_directory_cleanup(self):
@@ -548,7 +600,7 @@ class TestFilenameGeneration(TestCase):
         PAPERLESS_FILENAME_FORMAT="{created}"
     )
     def test_date(self):
-        doc = Document.objects.create(title="does not matter", created=datetime.datetime(2020,5,21, 7,36,51, 153), mime_type="application/pdf", pk=2, checksum="2")
+        doc = Document.objects.create(title="does not matter", created=timezone.make_aware(datetime.datetime(2020,5,21, 7,36,51, 153)), mime_type="application/pdf", pk=2, checksum="2")
         self.assertEqual(generate_filename(doc), "2020-05-21.pdf")
 
 

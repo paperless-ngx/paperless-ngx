@@ -1,8 +1,6 @@
-import { ThrowStmt } from '@angular/compiler';
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
 import { TagEditDialogComponent } from 'src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { TagService } from 'src/app/services/rest/tag.service';
