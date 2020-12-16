@@ -201,7 +201,7 @@ export class DocumentListViewService {
         this.documentListView = null
       }
     }
-    if (!this.documentListView) {
+    if (!this.documentListView || !this.documentListView.filter_rules || !this.documentListView.sort_reverse || !this.documentListView.sort_field) {
       this.documentListView = {
         filter_rules: [],
         sort_reverse: true,
