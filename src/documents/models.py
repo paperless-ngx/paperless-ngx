@@ -11,6 +11,7 @@ import dateutil.parser
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -61,7 +62,7 @@ class MatchingModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ("name",)
+        ordering = (Lower("name"),)
 
     def __str__(self):
         return self.name
@@ -307,6 +308,10 @@ class Log(models.Model):
 
 
 class SavedView(models.Model):
+
+    class Meta:
+
+        ordering = (Lower("name"),)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=128)
