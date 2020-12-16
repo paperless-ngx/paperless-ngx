@@ -6,6 +6,15 @@ Changelog
 *********
 
 
+paperless-ng 0.9.8
+##################
+
+This release addresses two severe issues with the previous release.
+
+* The delete buttons for document types, correspondents and tags were not working.
+* The document section in the admin was causing internal server errors (500).
+
+
 paperless-ng 0.9.7
 ##################
 
