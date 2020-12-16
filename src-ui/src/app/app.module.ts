@@ -119,7 +119,8 @@ import { MetadataCollapseComponent } from './components/document-detail/metadata
       useClass: CsrfInterceptor,
       multi: true
     },
-    FilterPipe
+    FilterPipe,
+    DocumentTitlePipe
   ],
   bootstrap: [AppComponent]
 })
