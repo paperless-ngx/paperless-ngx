@@ -34,7 +34,8 @@ def setup_directories():
         ARCHIVE_DIR=dirs.archive_dir,
         CONSUMPTION_DIR=dirs.consumption_dir,
         INDEX_DIR=dirs.index_dir,
-        MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle")
+        MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle"),
+        MEDIA_LOCK=os.path.join(dirs.media_dir, "media.lock")
 
     )
     dirs.settings_override.enable()

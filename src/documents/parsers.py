@@ -163,8 +163,6 @@ def parse_date(filename, text):
 
     date = None
 
-    next_year = timezone.now().year + 5  # Arbitrary 5 year future limit
-
     # if filename date parsing is enabled, search there first:
     if settings.FILENAME_DATE_ORDER:
         for m in re.finditer(DATE_REGEX, filename):
@@ -176,7 +174,7 @@ def parse_date(filename, text):
                 # Skip all matches that do not parse to a proper date
                 continue
 
-            if date is not None and next_year > date.year > 1900:
+            if date and date.year > 1900 and date <= timezone.now():
                 return date
 
     # Iterate through all regex matches in text and try to parse the date
@@ -189,7 +187,7 @@ def parse_date(filename, text):
             # Skip all matches that do not parse to a proper date
             continue
 
-        if date is not None and next_year > date.year > 1900:
+        if date and date.year > 1900 and date <= timezone.now():
             break
         else:
             date = None
@@ -210,12 +208,16 @@ class DocumentParser(LoggingMixin):
     def __init__(self, logging_group):
         super().__init__()
         self.logging_group = logging_group
+        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         self.tempdir = tempfile.mkdtemp(
             prefix="paperless-", dir=settings.SCRATCH_DIR)
 
         self.archive_path = None
         self.text = None
         self.date = None
+
+    def extract_metadata(self, document_path, mime_type):
+        return []
 
     def parse(self, document_path, mime_type):
         raise NotImplementedError()
