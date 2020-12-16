@@ -23,14 +23,18 @@ paperless-ng 0.9.7
     This means that you can access your views on multiple devices and have separate views for different users.
     You will have to recreate your views.
 
+  * The GitHub and documentation links now open in new tabs/windows. Thanks to `rYR79435`_.
+
+  * Paperless now generates default saved view names when saving views with certain filter rules.
+
+  * Added a small version indicator to the front end.
+
 * Other additions and changes
 
-  * The GitHub and documentation links now open in new tabs/windows. Thanks to `rYR79435`_.
   * The new filename format field ``{tag_list}`` inserts a list of tags into the filename, separated by comma.
   * The ``document_retagger`` no longer removes inbox tags or tags without matching rules.
   * The new configuration option ``PAPERLESS_COOKIE_PREFIX`` allows you to run multiple instances of paperless on different ports.
     This option enables you to be logged in into multiple instances by specifying different cookie names for each instance.
-  * Added a small version indicator to the front end.
 
 * Fixes
   
