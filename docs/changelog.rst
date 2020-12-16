@@ -28,6 +28,7 @@ paperless-ng 0.9.7
   * The ``document_retagger`` no longer removes inbox tags or tags without matching rules.
   * The new configuration option ``PAPERLESS_COOKIE_PREFIX`` allows you to run multiple instances of paperless on different ports.
     This option enables you to be logged in into multiple instances by specifying different cookie names for each instance.
+  * Added a small version indicator to the front end.
 
 * Fixes
   
@@ -38,6 +39,7 @@ paperless-ng 0.9.7
     Paperless now assumes A4 paper size for PDF generation if no DPI information is present.
   * Documents with empty titles could not be opened from the table view due to the link being empty.
   * Fixed an issue with filenames containing special characters such as ``:`` not being accepted for upload.
+  * Fixed issues with thumbnail generation for plain text files.
 
 
 paperless-ng 0.9.6
