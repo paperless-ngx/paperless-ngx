@@ -110,8 +110,8 @@
                             </tbody>
                         </table>
 
-                        <app-metadata-collapse title="Original document metadata" [metadata]="metadata.original_metadata" *ngIf="metadata?.original_metadata.length > 0"></app-metadata-collapse>
-                        <app-metadata-collapse title="Archived document metadata" [metadata]="metadata.archive_metadata" *ngIf="metadata?.archive_metadata.length > 0"></app-metadata-collapse>
+                        <app-metadata-collapse title="Original document metadata" [metadata]="metadata.original_metadata" *ngIf="metadata?.original_metadata?.length > 0"></app-metadata-collapse>
+                        <app-metadata-collapse title="Archived document metadata" [metadata]="metadata.archive_metadata" *ngIf="metadata?.archive_metadata?.length > 0"></app-metadata-collapse>
 
                     </ng-template>
                 </li>
