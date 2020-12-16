@@ -30,12 +30,14 @@ def add_mime_types(apps, schema_editor):
     documents = Document.objects.all()
 
     for d in documents:
+        f = open(source_path(d), "rb")
         if d.storage_type == STORAGE_TYPE_GPG:
-            f = GnuPG.decrypted(open(source_path(d), "rb"))
-        else:
-            f = open(source_path(d), "rb")
 
-        d.mime_type = magic.from_buffer(f.read(1024), mime=True)
+            data = GnuPG.decrypted(f)
+        else:
+            data = f.read(1024)
+
+        d.mime_type = magic.from_buffer(data, mime=True)
         d.save()
 
         f.close()

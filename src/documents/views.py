@@ -169,7 +169,12 @@ class DocumentViewSet(RetrieveModelMixin,
         parser_class = get_parser_class_for_mime_type(mime_type)
         if parser_class:
             parser = parser_class(logging_group=None)
-            return parser.extract_metadata(file, mime_type)
+
+            try:
+                return parser.extract_metadata(file, mime_type)
+            except Exception as e:
+                # TODO: cover GPG errors, remove later.
+                return []
         else:
             return []
 
@@ -215,7 +220,12 @@ class DocumentViewSet(RetrieveModelMixin,
     @cache_control(public=False, max_age=315360000)
     def thumb(self, request, pk=None):
         try:
-            return HttpResponse(Document.objects.get(id=pk).thumbnail_file,
+            doc = Document.objects.get(id=pk)
+            if doc.storage_type == Document.STORAGE_TYPE_GPG:
+                handle = GnuPG.decrypted(doc.thumbnail_file)
+            else:
+                handle = doc.thumbnail_file
+            return HttpResponse(handle,
                                 content_type='image/png')
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
