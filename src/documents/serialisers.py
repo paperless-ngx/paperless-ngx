@@ -1,10 +1,10 @@
 import magic
 from django.utils.text import slugify
-from pathvalidate import validate_filename, ValidationError
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
-from .models import Correspondent, Tag, Document, Log, DocumentType
+from .models import Correspondent, Tag, Document, Log, DocumentType, \
+    SavedView, SavedViewFilterRule
 from .parsers import is_mime_type_supported
 
 
@@ -141,6 +141,45 @@ class LogSerializer(serializers.ModelSerializer):
         )
 
 
+class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SavedViewFilterRule
+        fields = ["rule_type", "value"]
+
+
+class SavedViewSerializer(serializers.ModelSerializer):
+
+    filter_rules = SavedViewFilterRuleSerializer(many=True)
+
+    class Meta:
+        model = SavedView
+        depth = 1
+        fields = ["id", "name", "show_on_dashboard", "show_in_sidebar",
+                  "sort_field", "sort_reverse", "filter_rules"]
+
+    def update(self, instance, validated_data):
+        if 'filter_rules' in validated_data:
+            rules_data = validated_data.pop('filter_rules')
+        else:
+            rules_data = None
+        super(SavedViewSerializer, self).update(instance, validated_data)
+        if rules_data is not None:
+            SavedViewFilterRule.objects.filter(saved_view=instance).delete()
+            for rule_data in rules_data:
+                SavedViewFilterRule.objects.create(
+                    saved_view=instance, **rule_data)
+        return instance
+
+    def create(self, validated_data):
+        rules_data = validated_data.pop('filter_rules')
+        saved_view = SavedView.objects.create(**validated_data)
+        for rule_data in rules_data:
+            SavedViewFilterRule.objects.create(
+                saved_view=saved_view, **rule_data)
+        return saved_view
+
+
 class PostDocumentSerializer(serializers.Serializer):
 
     document = serializers.FileField(
@@ -179,12 +218,6 @@ class PostDocumentSerializer(serializers.Serializer):
     )
 
     def validate_document(self, document):
-
-        try:
-            validate_filename(document.name)
-        except ValidationError:
-            raise serializers.ValidationError("Invalid filename.")
-
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
 
