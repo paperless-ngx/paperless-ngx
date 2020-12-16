@@ -69,7 +69,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
     filter_horizontal = ("tags",)
 
-    ordering = ["-created", "correspondent"]
+    ordering = ["-created"]
 
     date_hierarchy = "created"
 
