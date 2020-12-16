@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
@@ -83,6 +84,7 @@ export class DocumentListComponent implements OnInit {
 
   saveViewConfigAs() {
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
     modal.componentInstance.saveClicked.subscribe(formValue => {
       let savedView = {
         name: formValue.name,

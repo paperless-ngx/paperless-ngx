@@ -19,6 +19,26 @@ import { DateSelection } from './filter-dropdown-date/filter-dropdown-date.compo
 })
 export class FilterEditorComponent implements OnInit, OnDestroy {
 
+  generateFilterName() {
+    if (this.filterRules.length == 1) {
+      let rule = this.filterRules[0]
+      switch(this.filterRules[0].rule_type) {
+        
+        case FILTER_CORRESPONDENT:
+          return `Correspondent: ${this.correspondents.find(c => c.id == +rule.value)?.name}`
+
+        case FILTER_DOCUMENT_TYPE:
+          return `Type: ${this.documentTypes.find(dt => dt.id == +rule.value)?.name}`
+
+        case FILTER_HAS_TAG:
+          return `Tag: ${this.tags.find(t => t.id == +rule.value)?.name}`
+
+      }
+    }
+
+    return ""
+  }
+
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
