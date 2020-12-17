@@ -3,7 +3,7 @@ import os
 from contextlib import contextmanager
 
 from django.conf import settings
-from whoosh import highlight
+from whoosh import highlight, classify, query
 from whoosh.fields import Schema, TEXT, NUMERIC, KEYWORD, DATETIME
 from whoosh.highlight import Formatter, get_text
 from whoosh.index import create_in, exists_in, open_dir
@@ -120,22 +120,39 @@ def remove_document_from_index(document):
 
 
 @contextmanager
-def query_page(ix, querystring, page):
+def query_page(ix, page, querystring, more_like_doc_id, more_like_doc_content):
     searcher = ix.searcher()
     try:
-        qp = MultifieldParser(
-            ["content", "title", "correspondent", "tag", "type"],
-            ix.schema)
-        qp.add_plugin(DateParserPlugin())
+        if querystring:
+            qp = MultifieldParser(
+                ["content", "title", "correspondent", "tag", "type"],
+                ix.schema)
+            qp.add_plugin(DateParserPlugin())
+            str_q = qp.parse(querystring)
+            corrected = searcher.correct_query(str_q, querystring)
+        else:
+            str_q = None
+            corrected = None
 
-        q = qp.parse(querystring)
-        result_page = searcher.search_page(q, page)
+        if more_like_doc_id:
+            docnum = searcher.document_number(id=more_like_doc_id)
+            kts = searcher.key_terms_from_text('content', more_like_doc_content, numterms=20,
+                                           model=classify.Bo1Model, normalize=False)
+            more_like_q = query.Or([query.Term('content', word, boost=weight)
+                          for word, weight in kts])
+            result_page = searcher.search_page(more_like_q, page, filter=str_q, mask={docnum})
+        elif str_q:
+            result_page = searcher.search_page(str_q, page)
+        else:
+            raise ValueError(
+                "Either querystring or more_like_doc_id is required."
+            )
+
         result_page.results.fragmenter = highlight.ContextFragmenter(
             surround=50)
         result_page.results.formatter = JsonFormatter()
 
-        corrected = searcher.correct_query(q, querystring)
-        if corrected.query != q:
+        if corrected and corrected.query != str_q:
             corrected_query = corrected.string
         else:
             corrected_query = None

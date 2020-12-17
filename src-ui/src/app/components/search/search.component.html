@@ -3,7 +3,12 @@
 
 <div *ngIf="errorMessage" class="alert alert-danger">Invalid search query: {{errorMessage}}</div>
 
-<p>
+<p *ngIf="more_like">
+    Showing documents similar to
+    <a routerLink="/documents/{{more_like}}">{{more_like_doc?.original_file_name}}</a>
+</p>
+
+<p *ngIf="query">
     Search string: <i>{{query}}</i>
     <ng-container *ngIf="correctedQuery">
         - Did you mean "<a [routerLink]="" (click)="searchCorrectedQuery()">{{correctedQuery}}</a>"?
@@ -15,7 +20,8 @@
     <p>{{resultCount}} result(s)</p>
     <app-document-card-large *ngFor="let result of results"
         [document]="result.document"
-        [details]="result.highlights">
+        [details]="result.highlights"
+        [searchScore]="result.score / maxScore">
 
 </app-document-card-large>
 </div>
