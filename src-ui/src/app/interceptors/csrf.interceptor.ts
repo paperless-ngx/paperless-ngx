@@ -17,8 +17,10 @@ export class CsrfInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-
-    let prefix = this.meta.getTag('name=cookie_prefix').content
+    let prefix = ""
+    if (this.meta.getTag('name=cookie_prefix')) {
+      prefix = this.meta.getTag('name=cookie_prefix').content
+    }    
     let csrfToken = this.cookieService.get(`${prefix?prefix:''}csrftoken`)
     if (csrfToken) {
      request = request.clone({
