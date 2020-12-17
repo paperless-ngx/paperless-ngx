@@ -136,11 +136,14 @@ def query_page(ix, page, querystring, more_like_doc_id, more_like_doc_content):
 
         if more_like_doc_id:
             docnum = searcher.document_number(id=more_like_doc_id)
-            kts = searcher.key_terms_from_text('content', more_like_doc_content, numterms=20,
-                                           model=classify.Bo1Model, normalize=False)
-            more_like_q = query.Or([query.Term('content', word, boost=weight)
-                          for word, weight in kts])
-            result_page = searcher.search_page(more_like_q, page, filter=str_q, mask={docnum})
+            kts = searcher.key_terms_from_text(
+                'content', more_like_doc_content, numterms=20,
+                model=classify.Bo1Model, normalize=False)
+            more_like_q = query.Or(
+                [query.Term('content', word, boost=weight)
+                 for word, weight in kts])
+            result_page = searcher.search_page(
+                more_like_q, page, filter=str_q, mask={docnum})
         elif str_q:
             result_page = searcher.search_page(str_q, page)
         else:
