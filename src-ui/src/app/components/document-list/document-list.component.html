@@ -86,7 +86,7 @@
 
 </app-page-header>
 
-<div class="w-100 mb-4">
+<div class="w-100 mb-2 mb-sm-4">
   <app-filter-editor [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
 </div>
 
@@ -129,7 +129,7 @@
       </td>
       <td>
         <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t)"></app-tag>
+        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id)"></app-tag>
       </td>
       <td class="d-none d-xl-table-cell">
         <ng-container *ngIf="d.document_type">
@@ -147,6 +147,6 @@
 </table>
 
 
-<div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
+<div class="m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
   <app-document-card-small [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)"  [document]="d" *ngFor="let d of list.documents" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
 </div>

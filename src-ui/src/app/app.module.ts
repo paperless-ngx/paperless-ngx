@@ -121,7 +121,8 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
       useClass: CsrfInterceptor,
       multi: true
     },
-    FilterPipe
+    FilterPipe,
+    DocumentTitlePipe
   ],
   bootstrap: [AppComponent]
 })
