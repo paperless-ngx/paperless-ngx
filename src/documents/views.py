@@ -370,8 +370,7 @@ class SearchView(APIView):
             page = 1
 
         try:
-            with index.query_page(self.ix, page, query, more_like_id, more_like_content) as (result_page,
-                                                            corrected_query):
+            with index.query_page(self.ix, page, query, more_like_id, more_like_content) as (result_page, corrected_query):  # NOQA: E501
                 return Response(
                     {'count': len(result_page),
                      'page': result_page.pagenum,
