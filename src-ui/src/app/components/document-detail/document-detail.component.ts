@@ -49,7 +49,7 @@ export class DocumentDetailComponent implements OnInit {
   })
 
   @ViewChild('nav') nav: NgbNav
-  @ViewChild('pdfPreview') set pdfPreview(element): void {
+  @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when compontent added or removed from DOM
     if (element && element.nativeElement.offsetParent !== null) { // its visible
 
