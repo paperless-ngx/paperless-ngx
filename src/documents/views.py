@@ -348,6 +348,14 @@ class SearchView(APIView):
             more_like_id = None
             more_like_content = None
 
+        if not query and not more_like_id:
+            return Response({
+                'count': 0,
+                'page': 0,
+                'page_count': 0,
+                'corrected_query': None,
+                'results': []})
+
         try:
             page = int(request.query_params.get('page', 1))
         except (ValueError, TypeError):
