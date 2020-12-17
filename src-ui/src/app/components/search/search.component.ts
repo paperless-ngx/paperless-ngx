@@ -41,6 +41,7 @@ export class SearchComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(paramMap => {
+      window.scrollTo(0, 0)
       this.query = paramMap.get('query')
       this.more_like = paramMap.has('more_like') ? +paramMap.get('more_like') : null
       if (this.more_like) {
