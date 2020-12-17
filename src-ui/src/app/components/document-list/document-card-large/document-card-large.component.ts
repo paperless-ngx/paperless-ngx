@@ -13,6 +13,9 @@ export class DocumentCardLargeComponent implements OnInit {
   constructor(private documentService: DocumentService, private sanitizer: DomSanitizer) { }
 
   @Input()
+  moreLikeThis: boolean = false
+
+  @Input()
   document: PaperlessDocument
 
   @Input()

@@ -25,7 +25,7 @@
 
         <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group">
-            <a routerLink="/search" [queryParams]="{'more_like': document.id}" class="btn btn-sm btn-outline-secondary">
+            <a routerLink="/search" [queryParams]="{'more_like': document.id}" class="btn btn-sm btn-outline-secondary" *ngIf="moreLikeThis">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
               </svg>
@@ -51,7 +51,7 @@
               </svg>
               Download
             </a>
-            <ngb-progressbar [type]="searchScoreClass" [value]="searchScore" style="width: 100px; height: 5px; margin: 10px;" [max]="1"></ngb-progressbar>
+            <ngb-progressbar *ngIf="searchScore" [type]="searchScoreClass" [value]="searchScore" class="search-score-bar" [max]="1"></ngb-progressbar>
             
           </div>
           

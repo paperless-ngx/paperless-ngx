@@ -21,7 +21,8 @@
     <app-document-card-large *ngFor="let result of results"
         [document]="result.document"
         [details]="result.highlights"
-        [searchScore]="result.score / maxScore">
+        [searchScore]="result.score / maxScore"
+        [moreLikeThis]="true">
 
 </app-document-card-large>
 </div>
