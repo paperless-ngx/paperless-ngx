@@ -5,7 +5,7 @@ services:
     restart: always
 
   webserver:
-    image: jonaswinkler/paperless-ng:0.9.6
+    image: jonaswinkler/paperless-ng:0.9.8
     restart: always
     depends_on:
       - broker
