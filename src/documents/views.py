@@ -335,14 +335,19 @@ class SearchView(APIView):
                 }
 
     def get(self, request, format=None):
-        if 'query' not in request.query_params:
-            return Response({
-                'count': 0,
-                'page': 0,
-                'page_count': 0,
-                'results': []})
 
-        query = request.query_params['query']
+        if 'query' in request.query_params:
+            query = request.query_params['query']
+        else:
+            query = None
+
+        if 'more_like' in request.query_params:
+            more_like_id = request.query_params['more_like']
+            more_like_content = Document.objects.get(id=more_like_id).content
+        else:
+            more_like_id = None
+            more_like_content = None
+
         try:
             page = int(request.query_params.get('page', 1))
         except (ValueError, TypeError):
@@ -352,7 +357,7 @@ class SearchView(APIView):
             page = 1
 
         try:
-            with index.query_page(self.ix, query, page) as (result_page,
+            with index.query_page(self.ix, page, query, more_like_id, more_like_content) as (result_page,
                                                             corrected_query):
                 return Response(
                     {'count': len(result_page),
