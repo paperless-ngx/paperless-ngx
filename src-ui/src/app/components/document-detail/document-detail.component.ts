@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
@@ -48,8 +48,17 @@ export class DocumentDetailComponent implements OnInit {
     tags: new FormControl([])
   })
 
+  @ViewChild('nav') nav: NgbNav
+  @ViewChild('pdfPreview') set pdfPreview(element): void {
+    // this gets called when compontent added or removed from DOM
+    if (element && element.nativeElement.offsetParent !== null) { // its visible
+
+      setTimeout(()=> this.nav?.select(1));
+    }
+  }
+
   constructor(
-    private documentsService: DocumentService, 
+    private documentsService: DocumentService,
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
@@ -128,7 +137,7 @@ export class DocumentDetailComponent implements OnInit {
     }, error => {this.router.navigate(['404'])})
   }
 
-  save() {    
+  save() {
     this.documentsService.update(this.document).subscribe(result => {
       this.close()
     })
@@ -160,7 +169,7 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.message2 = `The files for this document will be deleted permanently. This operation cannot be undone.`
     modal.componentInstance.deleteClicked.subscribe(() => {
       this.documentsService.delete(this.document).subscribe(() => {
-        modal.close()  
+        modal.close()
         this.close()
       })
     })
@@ -169,5 +178,15 @@ export class DocumentDetailComponent implements OnInit {
 
   hasNext() {
     return this.documentListViewService.hasNext(this.documentId)
+  }
+
+  previewCreated() {
+    console.log('Preview Created');
+
+  }
+
+  mobilePreviewCreated() {
+    console.log('Mobile Preview Created');
+
   }
 }
