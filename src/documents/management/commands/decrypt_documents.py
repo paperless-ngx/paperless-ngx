@@ -2,7 +2,6 @@ import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from termcolor import colored as coloured
 
 from documents.models import Document
 from paperless.db import GnuPG
@@ -26,16 +25,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         try:
-            print(coloured(
+            print(
                 "\n\nWARNING: This script is going to work directly on your "
                 "document originals, so\nWARNING: you probably shouldn't run "
                 "this unless you've got a recent backup\nWARNING: handy.  It "
                 "*should* work without a hitch, but be safe and backup your\n"
                 "WARNING: stuff first.\n\nHit Ctrl+C to exit now, or Enter to "
-                "continue.\n\n",
-                "yellow",
-                attrs=("bold",)
-            ))
+                "continue.\n\n"
+            )
             __ = input()
         except KeyboardInterrupt:
             return
@@ -57,8 +54,8 @@ class Command(BaseCommand):
 
         for document in encrypted_files:
 
-            print(coloured("Decrypting {}".format(
-                document).encode('utf-8'), "green"))
+            print("Decrypting {}".format(
+                document).encode('utf-8'))
 
             old_paths = [document.source_path, document.thumbnail_path]
 

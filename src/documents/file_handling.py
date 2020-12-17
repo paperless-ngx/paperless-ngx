@@ -99,6 +99,11 @@ def generate_filename(doc, counter=0):
             tags = defaultdictNoStr(lambda: slugify(None),
                                     many_to_dictionary(doc.tags))
 
+            tag_list = pathvalidate.sanitize_filename(
+                ",".join([tag.name for tag in doc.tags.all()]),
+                replacement_text="-"
+            )
+
             if doc.correspondent:
                 correspondent = pathvalidate.sanitize_filename(
                     doc.correspondent.name, replacement_text="-"
@@ -127,7 +132,7 @@ def generate_filename(doc, counter=0):
                 added_month=f"{doc.added.month:02}" if doc.added else "none",
                 added_day=f"{doc.added.day:02}" if doc.added else "none",
                 tags=tags,
-                tag_list=",".join([tag.name for tag in doc.tags.all()])
+                tag_list=tag_list
             ).strip()
 
             path = path.strip(os.sep)

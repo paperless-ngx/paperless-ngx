@@ -7,6 +7,7 @@ import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { SearchService } from 'src/app/services/rest/search.service';
+import { environment } from 'src/environments/environment';
 import { DocumentDetailComponent } from '../document-detail/document-detail.component';
   
 @Component({
@@ -24,6 +25,8 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     public savedViewService: SavedViewService
     ) {
   }
+
+  versionString = `${environment.appTitle} ${environment.version}`
 
   isMenuCollapsed: boolean = true
 

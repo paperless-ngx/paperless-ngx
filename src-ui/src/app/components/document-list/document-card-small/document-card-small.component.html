@@ -1,4 +1,4 @@
-<div class="col p-2 h-100 document-card" style="width: 16rem;">
+<div class="col p-2 h-100 document-card">
   <div class="card h-100 shadow-sm" [class.card-selected]="selected">
     <div class="border-bottom" [class.doc-img-background-selected]="selected">
       <img class="card-img doc-img" [src]="getThumbUrl()" (click)="selected = !selected">
@@ -9,7 +9,6 @@
           <label class="custom-control-label" for="smallCardCheck{{document.id}}"></label>
         </div>
       </div>
-
 
       <div style="top: 0; right: 0; font-size: large" class="text-right position-absolute mr-1">
         <div *ngFor="let t of getTagsLimited$() | async">
@@ -31,7 +30,7 @@
     </div>
     <div class="card-footer">
 
-      <div class="d-flex justify-content-between align-items-center ml-n2">
+      <div class="d-flex justify-content-between align-items-center mx-n2">
         <div class="btn-group">
           <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" title="Edit">
             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -51,7 +50,7 @@
             </svg>
           </a>
         </div>
-        <small class="text-muted">{{document.created | date}}</small>
+        <small class="text-muted pl-1">{{document.created | date}}</small>
       </div>
 
     </div>
