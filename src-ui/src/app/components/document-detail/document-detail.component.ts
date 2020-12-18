@@ -48,7 +48,7 @@ export class DocumentDetailComponent implements OnInit {
     tags: new FormControl([])
   })
 
-  currentPreviewPage: number = 1
+  previewCurrentPage: number = 1
   previewNumPages: number
 
   constructor(
