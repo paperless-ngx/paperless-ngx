@@ -56,6 +56,7 @@ import { FilterPipe } from './pipes/filter.pipe';
 import { DocumentTitlePipe } from './pipes/document-title.pipe';
 import { MetadataCollapseComponent } from './components/document-detail/metadata-collapse/metadata-collapse.component';
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -114,7 +115,8 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     ReactiveFormsModule,
     NgxFileDropModule,
     InfiniteScrollModule,
-    PdfViewerModule
+    PdfViewerModule,
+    NgSelectModule
   ],
   providers: [
     DatePipe,
@@ -123,7 +125,8 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
       useClass: CsrfInterceptor,
       multi: true
     },
-    FilterPipe
+    FilterPipe,
+    DocumentTitlePipe
   ],
   bootstrap: [AppComponent]
 })

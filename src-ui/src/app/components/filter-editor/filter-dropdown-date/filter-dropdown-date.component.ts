@@ -1,25 +1,37 @@
-import { Component, EventEmitter, Input, Output, ElementRef, ViewChild, SimpleChange } from '@angular/core';
-import { NgbDate, NgbDateStruct, NgbDatepicker } from '@ng-bootstrap/ng-bootstrap';
-
+import { formatDate } from '@angular/common';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface DateSelection {
-  before?: NgbDateStruct
-  after?: NgbDateStruct
+  before?: string
+  after?: string
 }
 
+const FILTER_LAST_7_DAYS = 0
+const FILTER_LAST_MONTH = 1
+const FILTER_LAST_3_MONTHS = 2
+const FILTER_LAST_YEAR = 3
 
 @Component({
   selector: 'app-filter-dropdown-date',
   templateUrl: './filter-dropdown-date.component.html',
   styleUrls: ['./filter-dropdown-date.component.scss']
 })
-export class FilterDropdownDateComponent {
+export class FilterDropdownDateComponent implements OnInit, OnDestroy {
+
+  quickFilters = [
+    {id: FILTER_LAST_7_DAYS, name: "Last 7 days"}, 
+    {id: FILTER_LAST_MONTH, name: "Last month"},
+    {id: FILTER_LAST_3_MONTHS, name: "Last 3 months"},
+    {id: FILTER_LAST_YEAR, name: "Last year"}
+  ]
 
   @Input()
-  dateBefore: NgbDateStruct
+  dateBefore: string
 
   @Input()
-  dateAfter: NgbDateStruct
+  dateAfter: string
 
   @Input()
   title: string
@@ -27,83 +39,65 @@ export class FilterDropdownDateComponent {
   @Output()
   datesSet = new EventEmitter<DateSelection>()
 
-  @ViewChild('dpAfter') dpAfter: NgbDatepicker
-  @ViewChild('dpBefore') dpBefore: NgbDatepicker
+  private datesSetDebounce$ = new Subject()
 
-  _dateBefore: NgbDateStruct
-  _dateAfter: NgbDateStruct
-
-  get _maxDate(): NgbDate {
-    let date = new Date()
-    return NgbDate.from({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})
+  private sub: Subscription
+  
+  ngOnInit() {
+    this.sub = this.datesSetDebounce$.pipe(
+      debounceTime(400)
+    ).subscribe(() => {
+      this.onChange()
+    })
   }
 
-  isStringRange(range: any) {
-    return typeof range == 'string'
-  }
-
-  ngOnChanges(changes: SimpleChange) {
-    // this is a hacky workaround perhaps because of https://github.com/angular/angular/issues/11097
-    let dateString: string = ''
-    let dateAfterChange: SimpleChange
-    let dateBeforeChange: SimpleChange
-    if (changes) {
-      dateAfterChange = changes['dateAfter']
-      dateBeforeChange = changes['dateBefore']
+  ngOnDestroy() {
+    if (this.sub) {
+      this.sub.unsubscribe()
     }
+  }
 
-    if (this.dpBefore && this.dpAfter) {
-      let dpAfterElRef: ElementRef = this.dpAfter['_elRef']
-      let dpBeforeElRef: ElementRef = this.dpBefore['_elRef']
+  setDateQuickFilter(qf: number) {
+    this.dateBefore = null
+    let date = new Date()
+    switch (qf) {
+      case FILTER_LAST_7_DAYS:
+        date.setDate(date.getDate() - 7)
+        break;
 
-      if (dateAfterChange && dateAfterChange.currentValue) {
-        let dateAfterDate = dateAfterChange.currentValue as NgbDateStruct
-        dateString = `${dateAfterDate.year}-${dateAfterDate.month.toString().padStart(2,'0')}-${dateAfterDate.day.toString().padStart(2,'0')}`
-        dpAfterElRef.nativeElement.value = dateString
-      } else if (dateBeforeChange && dateBeforeChange.currentValue) {
-        let dateBeforeDate = dateBeforeChange.currentValue as NgbDateStruct
-        dateString = `${dateBeforeDate.year}-${dateBeforeDate.month.toString().padStart(2,'0')}-${dateBeforeDate.day.toString().padStart(2,'0')}`
-        dpBeforeElRef.nativeElement.value = dateString
-      } else {
-        dpAfterElRef.nativeElement.value = dateString
-        dpBeforeElRef.nativeElement.value = dateString
+      case FILTER_LAST_MONTH:
+        date.setMonth(date.getMonth() - 1)
+        break;
+
+      case FILTER_LAST_3_MONTHS:
+        date.setMonth(date.getMonth() - 3)
+        break
+
+      case FILTER_LAST_YEAR:
+        date.setFullYear(date.getFullYear() - 1)
+        break
+  
       }
-    }
+    this.dateAfter = formatDate(date, 'yyyy-MM-dd', "en-us", "UTC")
+    this.onChange()
   }
 
-  setDateQuickFilter(range: any) {
-    this._dateAfter = this._dateBefore = undefined
-    let date = new Date()
-    let newDate: NgbDateStruct = { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() }
-    switch (typeof range) {
-      case 'number':
-        date.setDate(date.getDate() - range)
-        newDate.year = date.getFullYear()
-        newDate.month = date.getMonth() + 1
-        newDate.day = date.getDate()
-        break
-
-      case 'string':
-        newDate.day = 1
-        if (range == 'year') newDate.month = 1
-        break
-
-      default:
-        break
-    }
-    this._dateAfter = newDate
-    this.datesSet.emit({after: newDate, before: null})
+  onChange() {
+    this.datesSet.emit({after: this.dateAfter, before: this.dateBefore})
   }
 
-  onBeforeSelected(date: NgbDateStruct) {
-    this.datesSet.emit({after: this._dateAfter, before: date})
+  onChangeDebounce() {
+    this.datesSetDebounce$.next({after: this.dateAfter, before: this.dateBefore})
   }
 
-  onAfterSelected(date: NgbDateStruct) {
-    this.datesSet.emit({after: date, before: this._dateBefore})
+  clearBefore() {
+    this.dateBefore = null;
+    this.onChange()
   }
 
-  clear() {
-    this.datesSet.emit({after: null, before: null})
+  clearAfter() {
+    this.dateAfter = null;
+    this.onChange()
   }
+
 }

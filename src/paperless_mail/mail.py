@@ -26,7 +26,7 @@ class BaseMailAction:
         return {}
 
     def post_consume(self, M, message_uids, parameter):
-        pass
+        pass  # pragma: nocover
 
 
 class DeleteMailAction(BaseMailAction):
@@ -69,7 +69,7 @@ def get_rule_action(rule):
     elif rule.action == MailRule.ACTION_MARK_READ:
         return MarkReadMailAction()
     else:
-        raise ValueError("Unknown action.")
+        raise NotImplementedError("Unknown action.")  # pragma: nocover
 
 
 def make_criterias(rule):
@@ -95,7 +95,7 @@ def get_mailbox(server, port, security):
     elif security == MailAccount.IMAP_SECURITY_SSL:
         mailbox = MailBox(server, port)
     else:
-        raise ValueError("Unknown IMAP security")
+        raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
     return mailbox
 
 
@@ -119,7 +119,7 @@ class MailAccountHandler(LoggingMixin):
             return os.path.splitext(os.path.basename(att.filename))[0]
 
         else:
-            raise ValueError("Unknown title selector.")
+            raise NotImplementedError("Unknown title selector.")  # pragma: nocover  # NOQA: E501
 
     def get_correspondent(self, message, rule):
         c_from = rule.assign_correspondent_from
@@ -141,7 +141,7 @@ class MailAccountHandler(LoggingMixin):
             return rule.assign_correspondent
 
         else:
-            raise ValueError("Unknwown correspondent selector")
+            raise NotImplementedError("Unknwown correspondent selector")  # pragma: nocover  # NOQA: E501
 
     def handle_mail_account(self, account):
 
