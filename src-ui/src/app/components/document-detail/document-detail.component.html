@@ -1,5 +1,5 @@
 <app-page-header [(title)]="title">
-    <div class="input-group input-group-sm mr-5">
+    <div class="input-group input-group-sm mr-5" *ngIf="getContentType() == 'application/pdf'">
       <div class="input-group-prepend">
         <div class="input-group-text">Page </div>
       </div>
