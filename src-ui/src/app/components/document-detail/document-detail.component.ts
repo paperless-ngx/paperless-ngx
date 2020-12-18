@@ -117,8 +117,6 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.success.subscribe(newCorrespondent => {
       this.correspondentService.listAll().subscribe(correspondents => {
         this.correspondents = correspondents.results
-        console.log(this.documentForm.get('correspondent'), this.documentForm.get('correspondent').setValue);
-
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
       })
     })
