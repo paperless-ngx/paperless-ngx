@@ -1,7 +1,6 @@
 @import "theme";
-
 @import "node_modules/bootstrap/scss/bootstrap";
-
+@import "~@ng-select/ng-select/themes/default.theme.css";
 
 .toolbaricon {
   width: 1.2em;
@@ -20,7 +19,7 @@
 }
 
 body {
-  font-size: .875rem;
+  font-size: 0.875rem;
 }
 
 .form-control-dark {
@@ -65,4 +64,39 @@ body {
   display: block;
   background-size: 1rem;
   float: right;
+}
+
+.paperless-input-select {
+  .ng-select {
+    position: relative;
+    flex: 1 1 auto;
+    margin-bottom: 0;
+    min-height: calc(1.5em + 0.75rem + 5px);
+    line-height: 1.5;
+
+    .ng-select-container {
+      height: 100%;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+
+      .ng-value-container .ng-input {
+        top: 10px;
+      }
+    }
+
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+      background: none;
+    }
+  }
+}
+
+.paperless-input-tags {
+  .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+    background-color: transparent;
+  }
+
+  .ng-select.ng-select-multiple .ng-select-container .ng-value-container {
+    padding-top: 1px;
+  }
 }

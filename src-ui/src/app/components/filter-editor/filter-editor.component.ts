@@ -179,54 +179,53 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.applyFilters()
   }
 
-  get dateCreatedBefore(): NgbDateStruct {
+  get dateCreatedBefore(): string {
     let createdBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_BEFORE)
-    return createdBeforeRule ? this.dateParser.parse(createdBeforeRule.value) : null
+    return createdBeforeRule ? createdBeforeRule.value : null
   }
 
-  get dateCreatedAfter(): NgbDateStruct {
+  get dateCreatedAfter(): string {
     let createdAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_AFTER)
-    return createdAfterRule ? this.dateParser.parse(createdAfterRule.value) : null
+    return createdAfterRule ? createdAfterRule.value : null
   }
 
-  get dateAddedBefore(): NgbDateStruct {
+  get dateAddedBefore(): string {
     let addedBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_BEFORE)
-    return addedBeforeRule ? this.dateParser.parse(addedBeforeRule.value) : null
+    return addedBeforeRule ? addedBeforeRule.value : null
   }
 
-  get dateAddedAfter(): NgbDateStruct {
+  get dateAddedAfter(): string {
     let addedAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_AFTER)
-    return addedAfterRule ? this.dateParser.parse(addedAfterRule.value) : null
+    return addedAfterRule ? addedAfterRule.value : null
   }
 
-  setDateCreatedBefore(date?: NgbDateStruct) {
+  setDateCreatedBefore(date?: string) {
     if (date) this.setDateFilter(date, FILTER_CREATED_BEFORE)
     else this.clearDateFilter(FILTER_CREATED_BEFORE)
   }
 
-  setDateCreatedAfter(date?: NgbDateStruct) {
+  setDateCreatedAfter(date?: string) {
     if (date) this.setDateFilter(date, FILTER_CREATED_AFTER)
     else this.clearDateFilter(FILTER_CREATED_AFTER)
   }
 
-  setDateAddedBefore(date?: NgbDateStruct) {
+  setDateAddedBefore(date?: string) {
     if (date) this.setDateFilter(date, FILTER_ADDED_BEFORE)
     else this.clearDateFilter(FILTER_ADDED_BEFORE)
   }
 
-  setDateAddedAfter(date?: NgbDateStruct) {
+  setDateAddedAfter(date?: string) {
     if (date) this.setDateFilter(date, FILTER_ADDED_AFTER)
     else this.clearDateFilter(FILTER_ADDED_AFTER)
   }
 
-  setDateFilter(date: NgbDateStruct, dateRuleTypeID: number) {
+  setDateFilter(date: string, dateRuleTypeID: number) {
     let existingRule = this.filterRules.find(rule => rule.rule_type == dateRuleTypeID)
-    let newValue = this.dateParser.format(date)
 
     if (existingRule) {
-      existingRule.value = newValue
+      existingRule.value = date
     } else {
-      this.filterRules.push({rule_type: dateRuleTypeID, value: newValue})
+      this.filterRules.push({rule_type: dateRuleTypeID, value: date})
     }
   }
 
