@@ -80,7 +80,7 @@ body {
       border-bottom-right-radius: 0;
 
       .ng-value-container .ng-input {
-        top: 8px;
+        top: 10px;
       }
     }
 
@@ -94,5 +94,9 @@ body {
 .paperless-input-tags {
   .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
     background-color: transparent;
+  }
+
+  .ng-select.ng-select-multiple .ng-select-container .ng-value-container {
+    padding-top: 1px;
   }
 }
