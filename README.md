@@ -35,7 +35,10 @@ Here's what you get:
 	* Includes a dashboard that shows basic statistics and has document upload.
 	* Filtering by tags, correspondents, types, and more.
 	* Customizable views can be saved and displayed on the dashboard.
-	* Full text search with auto completion, scored results and query highlighting allows you to quickly find what you need.
+* Full text search helps you find what you need.
+	* Auto completion suggests relevant words from your documents.
+	* Results are sorted by relevance to your search query.
+	* Highlighting shows you which parts of the document matched the query.
 * Email processing: Paperless adds documents from your email accounts.
 	* Configure multiple accounts and filters for each account.
 	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
