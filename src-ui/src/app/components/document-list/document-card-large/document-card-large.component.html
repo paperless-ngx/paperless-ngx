@@ -23,7 +23,7 @@
         </p>
 
 
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
           <div class="btn-group">
             <a routerLink="/search" [queryParams]="{'more_like': document.id}" class="btn btn-sm btn-outline-secondary" *ngIf="moreLikeThis">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
@@ -51,9 +51,12 @@
               </svg>
               Download
             </a>
-            <ngb-progressbar *ngIf="searchScore" [type]="searchScoreClass" [value]="searchScore" class="search-score-bar" [max]="1"></ngb-progressbar>
             
           </div>
+
+          <small class="text-muted ml-auto">Score:</small>
+
+          <ngb-progressbar *ngIf="searchScore" [type]="searchScoreClass" [value]="searchScore" class="search-score-bar mx-2" [max]="1"></ngb-progressbar>
           
           <small class="text-muted">Created: {{document.created | date}}</small>
         </div>
