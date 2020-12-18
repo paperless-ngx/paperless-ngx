@@ -5,13 +5,11 @@ import tempfile
 from unittest import mock
 
 from django.contrib.auth.models import User
-from django.test import client
-from pathvalidate import ValidationError
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
-from documents import index, bulk_edit
-from documents.models import Document, Correspondent, DocumentType, Tag
+from documents import index
+from documents.models import Document, Correspondent, DocumentType, Tag, SavedView
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -20,8 +18,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     def setUp(self):
         super(TestDocumentApi, self).setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
+        self.user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_login(user=self.user)
 
     def testDocuments(self):
 
@@ -172,15 +170,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]['id'], doc2.id)
-        self.assertEqual(results[1]['id'], doc3.id)
+        self.assertCountEqual([results[0]['id'], results[1]['id']], [doc2.id, doc3.id])
 
         response = self.client.get("/api/documents/?tags__id__in={},{}".format(tag_inbox.id, tag_3.id))
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]['id'], doc1.id)
-        self.assertEqual(results[1]['id'], doc3.id)
+        self.assertCountEqual([results[0]['id'], results[1]['id']], [doc1.id, doc3.id])
 
         response = self.client.get("/api/documents/?tags__id__all={},{}".format(tag_2.id, tag_3.id))
         self.assertEqual(response.status_code, 200)
@@ -202,8 +198,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]['id'], doc1.id)
-        self.assertEqual(results[1]['id'], doc2.id)
+        self.assertCountEqual([results[0]['id'], results[1]['id']], [doc1.id, doc2.id])
 
         response = self.client.get("/api/documents/?tags__id__none={},{}".format(tag_3.id, tag_2.id))
         self.assertEqual(response.status_code, 200)
@@ -518,114 +513,86 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertGreater(len(meta['original_metadata']), 0)
         self.assertIsNone(meta['archive_metadata'])
 
+    def test_saved_views(self):
+        u1 = User.objects.create_user("user1")
+        u2 = User.objects.create_user("user2")
 
-class TestBulkEdit(DirectoriesMixin, APITestCase):
+        v1 = SavedView.objects.create(user=u1, name="test1", sort_field="", show_on_dashboard=False, show_in_sidebar=False)
+        v2 = SavedView.objects.create(user=u2, name="test2", sort_field="", show_on_dashboard=False, show_in_sidebar=False)
+        v3 = SavedView.objects.create(user=u2, name="test3", sort_field="", show_on_dashboard=False, show_in_sidebar=False)
 
-    def setUp(self):
-        super(TestBulkEdit, self).setUp()
-
-        user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_login(user=user)
-
-        patcher = mock.patch('documents.bulk_edit.async_task')
-        self.async_task = patcher.start()
-        self.addCleanup(patcher.stop)
-        self.c1 = Correspondent.objects.create(name="c1")
-        self.c2 = Correspondent.objects.create(name="c2")
-        self.dt1 = DocumentType.objects.create(name="dt1")
-        self.dt2 = DocumentType.objects.create(name="dt2")
-        self.t1 = Tag.objects.create(name="t1")
-        self.t2 = Tag.objects.create(name="t2")
-        self.doc1 = Document.objects.create(checksum="A", title="A")
-        self.doc2 = Document.objects.create(checksum="B", title="B", correspondent=self.c1, document_type=self.dt1)
-        self.doc3 = Document.objects.create(checksum="C", title="C", correspondent=self.c2, document_type=self.dt2)
-        self.doc4 = Document.objects.create(checksum="D", title="D")
-        self.doc5 = Document.objects.create(checksum="E", title="E")
-        self.doc2.tags.add(self.t1)
-        self.doc3.tags.add(self.t2)
-        self.doc4.tags.add(self.t1, self.t2)
-
-    def test_set_correspondent(self):
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
-        bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], self.c2.id)
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 3)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs['document_ids'], [self.doc1.id, self.doc2.id])
-
-    def test_unset_correspondent(self):
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
-        bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], None)
-        self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 0)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs['document_ids'], [self.doc2.id, self.doc3.id])
-
-    def test_set_document_type(self):
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
-        bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], self.dt2.id)
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 3)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs['document_ids'], [self.doc1.id, self.doc2.id])
-
-    def test_unset_document_type(self):
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
-        bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], None)
-        self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 0)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs['document_ids'], [self.doc2.id, self.doc3.id])
-
-    def test_add_tag(self):
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
-        bulk_edit.add_tag([self.doc1.id, self.doc2.id, self.doc3.id, self.doc4.id], self.t1.id)
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 4)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs['document_ids'], [self.doc1.id, self.doc3.id])
-
-
-    def test_remove_tag(self):
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
-        bulk_edit.remove_tag([self.doc1.id, self.doc3.id, self.doc4.id], self.t1.id)
-        self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 1)
-        self.async_task.assert_called_once()
-        args, kwargs = self.async_task.call_args
-        self.assertCountEqual(kwargs['document_ids'], [self.doc4.id])
-
-    def test_delete(self):
-        self.assertEqual(Document.objects.count(), 5)
-        bulk_edit.delete([self.doc1.id, self.doc2.id])
-        self.assertEqual(Document.objects.count(), 3)
-        self.assertCountEqual([doc.id for doc in Document.objects.all()], [self.doc3.id, self.doc4.id, self.doc5.id])
-
-    def test_api(self):
-        self.assertEqual(Document.objects.count(), 5)
-        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
-            "documents": [self.doc1.id],
-            "method": "delete",
-            "parameters": {}
-        }), content_type='application/json')
+        response = self.client.get("/api/saved_views/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Document.objects.count(), 4)
+        self.assertEqual(response.data['count'], 0)
 
-    def test_api_invalid_doc(self):
-        self.assertEqual(Document.objects.count(), 5)
-        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
-            "documents": [-235],
-            "method": "delete",
-            "parameters": {}
-        }), content_type='application/json')
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Document.objects.count(), 5)
+        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
 
-    def test_api_invalid_method(self):
-        self.assertEqual(Document.objects.count(), 5)
-        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
-            "documents": [self.doc2.id],
-            "method": "exterminate",
-            "parameters": {}
-        }), content_type='application/json')
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Document.objects.count(), 5)
+        self.client.force_login(user=u1)
+
+        response = self.client.get("/api/saved_views/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+
+        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 200)
+
+        self.client.force_login(user=u2)
+
+        response = self.client.get("/api/saved_views/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 2)
+
+        self.assertEqual(self.client.get(f"/api/saved_views/{v1.id}/").status_code, 404)
+
+    def test_create_update_patch(self):
+
+        u1 = User.objects.create_user("user1")
+
+        view = {
+            "name": "test",
+            "show_on_dashboard": True,
+            "show_in_sidebar": True,
+            "sort_field": "created2",
+            "filter_rules": [
+                {
+                    "rule_type": 4,
+                    "value": "test"
+                }
+            ]
+        }
+
+        response = self.client.post("/api/saved_views/", view, format='json')
+        self.assertEqual(response.status_code, 201)
+
+        v1 = SavedView.objects.get(name="test")
+        self.assertEqual(v1.sort_field, "created2")
+        self.assertEqual(v1.filter_rules.count(), 1)
+        self.assertEqual(v1.user, self.user)
+
+        response = self.client.patch(f"/api/saved_views/{v1.id}/", {
+            "show_in_sidebar": False
+        }, format='json')
+
+        v1 = SavedView.objects.get(id=v1.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(v1.show_in_sidebar)
+        self.assertEqual(v1.filter_rules.count(), 1)
+
+        view['filter_rules'] = [{
+            "rule_type": 12,
+            "value": "secret"
+        }]
+
+        response = self.client.put(f"/api/saved_views/{v1.id}/", view, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        v1 = SavedView.objects.get(id=v1.id)
+        self.assertEqual(v1.filter_rules.count(), 1)
+        self.assertEqual(v1.filter_rules.first().value, "secret")
+
+        view['filter_rules'] = []
+
+        response = self.client.put(f"/api/saved_views/{v1.id}/", view, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        v1 = SavedView.objects.get(id=v1.id)
+        self.assertEqual(v1.filter_rules.count(), 0)

@@ -98,6 +98,7 @@ export class DocumentListComponent implements OnInit {
 
   saveViewConfigAs() {
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
     modal.componentInstance.saveClicked.subscribe(formValue => {
       let savedView = {
         name: formValue.name,

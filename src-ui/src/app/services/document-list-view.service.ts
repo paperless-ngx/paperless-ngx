@@ -116,14 +116,14 @@ export class DocumentListViewService {
   set filterRules(filterRules: FilterRule[]) {
     //we're going to clone the filterRules object, since we don't
     //want changes in the filter editor to propagate into here right away.
-    this.view.filter_rules = cloneFilterRules(filterRules)
+    this.view.filter_rules = filterRules
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
   }
 
   get filterRules(): FilterRule[] {
-    return cloneFilterRules(this.view.filter_rules)
+    return this.view.filter_rules
   }
 
   set sortField(field: string) {
@@ -245,7 +245,7 @@ export class DocumentListViewService {
         this.documentListView = null
       }
     }
-    if (!this.documentListView) {
+    if (!this.documentListView || !this.documentListView.filter_rules || !this.documentListView.sort_reverse || !this.documentListView.sort_field) {
       this.documentListView = {
         filter_rules: [],
         sort_reverse: true,

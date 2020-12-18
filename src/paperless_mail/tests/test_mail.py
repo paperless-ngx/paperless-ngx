@@ -399,7 +399,7 @@ class TestMail(TestCase):
 
         c = Correspondent.objects.get(name="amazon@amazon.de")
         # should work
-        self.assertEquals(kwargs['override_correspondent_id'], c.id)
+        self.assertEqual(kwargs['override_correspondent_id'], c.id)
 
         self.async_task.reset_mock()
         self.reset_bogus_mailbox()
@@ -411,7 +411,7 @@ class TestMail(TestCase):
 
         args, kwargs = self.async_task.call_args
         self.async_task.assert_called_once()
-        self.assertEquals(kwargs['override_correspondent_id'], None)
+        self.assertEqual(kwargs['override_correspondent_id'], None)
 
 
     def test_filters(self):
