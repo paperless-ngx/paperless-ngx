@@ -1,7 +1,5 @@
 @import "theme";
-
 @import "node_modules/bootstrap/scss/bootstrap";
-
 @import "~@ng-select/ng-select/themes/default.theme.css";
 
 .toolbaricon {
@@ -21,7 +19,7 @@
 }
 
 body {
-  font-size: .875rem;
+  font-size: 0.875rem;
 }
 
 .form-control-dark {
@@ -85,5 +83,16 @@ body {
         top: 8px;
       }
     }
+
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+      background: none;
+    }
+  }
+}
+
+.paperless-input-tags {
+  .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+    background-color: transparent;
   }
 }

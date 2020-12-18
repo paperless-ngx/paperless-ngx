@@ -52,9 +52,9 @@
                         </div>
                         <app-input-date-time titleDate="Date created" formControlName="created"></app-input-date-time>
                         <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent"
-                            allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
+                            (createNew)="createCorrespondent()"></app-input-select>
                         <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type"
-                            allowNull="true" (createNew)="createDocumentType()"></app-input-select>
+                            (createNew)="createDocumentType()"></app-input-select>
                         <app-input-tags formControlName="tags" title="Tags"></app-input-tags>
 
                     </ng-template>
