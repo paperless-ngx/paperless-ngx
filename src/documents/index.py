@@ -20,32 +20,37 @@ class JsonFormatter(Formatter):
         self.seen = {}
 
     def format_token(self, text, token, replace=False):
-        seen = self.seen
         ttext = self._text(get_text(text, token, replace))
-        if ttext in seen:
-            termnum = seen[ttext]
-        else:
-            termnum = len(seen)
-            seen[ttext] = termnum
-
-        return {'text': ttext, 'term': termnum}
+        return {'text': ttext, 'highlight': 'true'}
 
     def format_fragment(self, fragment, replace=False):
         output = []
         index = fragment.startchar
         text = fragment.text
-
+        amend_token = None
         for t in fragment.matches:
             if t.startchar is None:
                 continue
             if t.startchar < index:
                 continue
             if t.startchar > index:
-                output.append({'text': text[index:t.startchar]})
-            output.append(self.format_token(text, t, replace))
+                text_inbetween = text[index:t.startchar]
+                if amend_token and t.startchar - index < 10:
+                    amend_token['text'] += text_inbetween
+                else:
+                    output.append({'text': text_inbetween,
+                                   'highlight': False})
+                    amend_token = None
+            token = self.format_token(text, t, replace)
+            if amend_token:
+                amend_token['text'] += token['text']
+            else:
+                output.append(token)
+                amend_token = token
             index = t.endchar
         if index < fragment.endchar:
-            output.append({'text': text[index:fragment.endchar]})
+            output.append({'text': text[index:fragment.endchar],
+                           'highlight': False})
         return output
 
     def format(self, fragments, replace=False):
