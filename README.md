@@ -51,6 +51,8 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 # Roadmap for 1.0
 
+- **Bulk editing**. Add/remove metadata from multiple documents at once.
+
 - Make the front end nice (except mobile).
 - Test coverage at 90%.
 - Fix whatever bugs I and you find.
@@ -59,7 +61,6 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 These are things that I want to add to paperless eventually. They are sorted by priority.
 
-- **Bulk editing**. Add/remove metadata from multiple documents at once.
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
   - Ability to search for “Similar documents” in the search results
@@ -68,6 +69,9 @@ These are things that I want to add to paperless eventually. They are sorted by 
 	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
 	- Notifications when a document was added with buttons to open the new document right away.
 - **Arbitrary tag colors**. Allow the selection of any color with a color picker.
+- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc, .docx documents.
+
+Apart from that, paperless is pretty much feature complete.
 
 ## On the chopping block.
 
