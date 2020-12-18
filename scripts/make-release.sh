@@ -5,6 +5,7 @@
 # adjust src/paperless/version.py
 # changelog in the documentation
 # adjust versions in docker/hub/*
+# adjust version in src-ui/src/environments/prod
 # If docker-compose was modified: all compose files are the same.
 
 # Steps:

@@ -6,6 +6,7 @@ import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
+import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
@@ -54,7 +55,8 @@ export class DocumentDetailComponent implements OnInit {
     private router: Router,
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
-    private documentListViewService: DocumentListViewService) { }
+    private documentListViewService: DocumentListViewService,
+    private documentTitlePipe: DocumentTitlePipe) { }
 
   getContentType() {
     return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
@@ -90,7 +92,7 @@ export class DocumentDetailComponent implements OnInit {
     this.documentsService.getMetadata(doc.id).subscribe(result => {
       this.metadata = result
     })
-    this.title = doc.title
+    this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)
   }
 

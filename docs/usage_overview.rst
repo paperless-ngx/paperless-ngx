@@ -57,9 +57,6 @@ Adding documents to paperless
 #############################
 
 Once you've got Paperless setup, you need to start feeding documents into it.
-Currently, there are four options: the consumption directory, the dashboard, IMAP (email), and
-HTTP POST.
-
 When adding documents to paperless, it will perform the following operations on
 your documents:
 
@@ -111,6 +108,17 @@ Dashboard upload
 
 The dashboard has a file drop field to upload documents to paperless. Simply drag a file
 onto this field or select a file with the file dialog. Multiple files are supported.
+
+
+Mobile upload
+=============
+
+The mobile app over at `<https://github.com/qcasey/paperless_share>`_ allows Android users
+to share any documents with paperless. This can be combined with any of the mobile
+scanning apps out there, such as Office Lens.
+
+Furthermore, there is the  `Paperless App <https://github.com/bauerj/paperless_app>`_ as well,
+which no only has document upload, but also document editing and browsing.
 
 .. _usage-email:
 

@@ -50,16 +50,26 @@ export class SettingsComponent implements OnInit {
     })
   }
 
+  private saveLocalSettings() {
+    localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
+    this.documentListViewService.updatePageSize()
+    this.toastService.showToast(Toast.make("Information", "Settings saved successfully."))
+  }
+
   saveSettings() {
     let x = []
     for (let id in this.savedViewGroup.value) {
       x.push(this.savedViewGroup.value[id])
     }
-    this.savedViewService.patchMany(x).subscribe(s => {
-      this.toastService.showToast(Toast.make("Information", "Settings saved successfully."))
-      localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
-      this.documentListViewService.updatePageSize()
-    })
+    if (x.length > 0) {
+      this.savedViewService.patchMany(x).subscribe(s => {
+        this.saveLocalSettings()
+      }, error => {
+        this.toastService.showToast(Toast.makeError(`Error while storing settings on server: ${JSON.stringify(error.error)}`))
+      })
+    } else {
+      this.saveLocalSettings()
+    }
 
   }
 }

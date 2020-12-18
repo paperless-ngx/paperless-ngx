@@ -21,7 +21,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
 
   onChange = (newValue: number[]) => {};
-  
+
   onTouched = () => {};
 
   writeValue(newValue: number[]): void {
@@ -66,19 +66,12 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   removeTag(id) {
     let index = this.displayValue.indexOf(id)
     if (index > -1) {
-      this.displayValue.splice(index, 1)
+      let oldValue = this.displayValue
+      oldValue.splice(index, 1)
+      this.displayValue = [...oldValue]
       this.onChange(this.displayValue)
     }
   }
-
-  addTag(id) {
-    let index = this.displayValue.indexOf(id)
-    if (index == -1) {
-      this.displayValue.push(id)
-      this.onChange(this.displayValue)
-    }
-  }
-
 
   createTag() {
     var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
@@ -86,9 +79,15 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     modal.componentInstance.success.subscribe(newTag => {
       this.tagService.listAll().subscribe(tags => {
         this.tags = tags.results
-        this.addTag(newTag.id)
+        this.displayValue = [...this.displayValue, newTag.id]
+        this.onChange(this.displayValue)
       })
     })
+  }
+
+  ngSelectChange() {
+    this.value = this.displayValue
+    this.onChange(this.displayValue)
   }
 
 }

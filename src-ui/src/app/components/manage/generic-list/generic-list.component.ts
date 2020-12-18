@@ -95,7 +95,7 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
     activeModal.componentInstance.message = "Associated documents will not be deleted."
     activeModal.componentInstance.btnClass = "btn-danger"
     activeModal.componentInstance.btnCaption = "Delete"
-    activeModal.componentInstance.confirmPressed.subscribe(() => {
+    activeModal.componentInstance.confirmClicked.subscribe(() => {
       this.service.delete(object).subscribe(_ => {
         activeModal.close()
         this.reloadData()
