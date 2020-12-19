@@ -17,6 +17,11 @@ export enum SelectableItemState {
   PartiallySelected = 2
 }
 
+export enum FilterableDropdownType {
+  Filtering = 'filtering',
+  Actions = 'actions'
+}
+
 @Component({
   selector: 'app-filterable-dropdown',
   templateUrl: './filterable-dropdown.component.html',
@@ -24,7 +29,10 @@ export enum SelectableItemState {
 })
 export class FilterableDropdownComponent {
 
-  constructor(private filterPipe: FilterPipe) { }
+  @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
+  @ViewChild('dropdown') dropdown: NgbDropdown
+
+  filterText: string
 
   @Input()
   set items(items: ObjectWithId[]) {
@@ -35,7 +43,17 @@ export class FilterableDropdownComponent {
     }
   }
 
-  selectableItems: SelectableItem[] = []
+  _selectableItems: SelectableItem[] = []
+
+  @Input()
+  set selectableItems (selectableItems: SelectableItem[]) {
+    if (this.type == FilterableDropdownType.Actions && this.dropdown?.isOpen()) return
+    else this._selectableItems = selectableItems
+  }
+
+  get selectableItems(): SelectableItem[] {
+    return this._selectableItems
+  }
 
   @Input()
   set itemsSelected(itemsSelected: ObjectWithId[]) {
@@ -54,18 +72,26 @@ export class FilterableDropdownComponent {
   @Input()
   icon: string
 
+  @Input()
+  type: FilterableDropdownType = FilterableDropdownType.Filtering
+
+  @Input()
+  singular: boolean = false
+
   @Output()
   toggle = new EventEmitter()
 
   @Output()
   close = new EventEmitter()
 
-  @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
-  @ViewChild('dropdown') dropdown: NgbDropdown
-
-  filterText: string
+  constructor(private filterPipe: FilterPipe) { }
 
   toggleItem(selectableItem: SelectableItem): void {
+    if (this.singular && selectableItem.state == SelectableItemState.Selected) {
+      this._selectableItems.forEach(si => {
+        if (si.state == SelectableItemState.Selected && si.item.id !== selectableItem.item.id) si.state = SelectableItemState.NotSelected
+      })
+    }
     this.toggle.emit(selectableItem.item)
   }
 
@@ -76,7 +102,7 @@ export class FilterableDropdownComponent {
       }, 0);
     } else {
       this.filterText = ''
-      this.close.next()
+      this.close.emit(this.itemsSelected)
     }
   }
 
