@@ -107,11 +107,11 @@ export class BulkEditorComponent {
     this.setTags.emit(tags)
   }
 
-  applyCorrespondent(selectedCorrespondent: ObjectWithId[]) {
+  applyCorrespondent(selectedCorrespondent: PaperlessCorrespondent[]) {
     this.setCorrespondent.emit(selectedCorrespondent)
   }
 
-  applyDocumentType(selectedDocumentType: ObjectWithId[]) {
+  applyDocumentType(selectedDocumentType: PaperlessDocumentType[]) {
     this.setDocumentType.emit(selectedDocumentType)
   }
 
