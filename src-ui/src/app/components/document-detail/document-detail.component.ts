@@ -172,6 +172,10 @@ export class DocumentDetailComponent implements OnInit {
 
   }
 
+  moreLike() {
+    this.router.navigate(["search"], {queryParams: {more_like:this.document.id}})
+  }
+
   hasNext() {
     return this.documentListViewService.hasNext(this.documentId)
   }

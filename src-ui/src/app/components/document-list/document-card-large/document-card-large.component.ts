@@ -13,6 +13,9 @@ export class DocumentCardLargeComponent implements OnInit {
   constructor(private documentService: DocumentService, private sanitizer: DomSanitizer) { }
 
   @Input()
+  moreLikeThis: boolean = false
+
+  @Input()
   document: PaperlessDocument
 
   @Input()
@@ -23,6 +26,19 @@ export class DocumentCardLargeComponent implements OnInit {
 
   @Output()
   clickCorrespondent = new EventEmitter<number>()
+
+  @Input()
+  searchScore: number
+
+  get searchScoreClass() {
+    if (this.searchScore > 0.7) {
+      return "success"
+    } else if (this.searchScore > 0.3) {
+      return "warning"
+    } else {
+      return "danger"
+    }
+  }
 
   ngOnInit(): void {
   }
