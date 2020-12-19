@@ -1,89 +1,34 @@
-<div class="card bg-light">
-<div class="card-body small px-2 py-2 d-flex flex-column flex-xl-row justify-content-between justify-content-xl-start">
-  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Select">
-    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Select:</label>
-    <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="selectPage.next()">
-        <svg viewBox="0 0 16 16" fill="currentColor">
+<div class="row">
+  <div class="col mb-2 mb-xl-0" role="group" aria-label="Select">
+    <label class="mr-lg-2">Select:</label>
+    <div class="btn-group">
+      <button class="btn btn-sm btn-outline-primary" (click)="selectPage.next()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#file-earmark-check" />
         </svg>
-        <small>Page</small>
+        Page
       </button>
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="selectAll.next()">
-        <svg viewBox="0 0 16 16" fill="currentColor">
+      <button class="btn btn-sm btn-outline-primary" (click)="selectAll.next()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#check-all" />
         </svg>
-        <small>All</small>
+        All
       </button>
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="selectNone.next()">
-        <svg viewBox="0 0 16 16" fill="currentColor">
+      <button class="btn btn-sm btn-outline-primary" (click)="selectNone.next()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
         </svg>
-        <small>None</small>
+        None
       </button>
     </div>
   </div>
-  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Tags">
-    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Tags:</label>
-    <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="addTag.next()">
-        <ng-container *ngTemplateOutlet="add"></ng-container>
-      </button>
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="removeTag.next()">
-        <ng-container *ngTemplateOutlet="remove"></ng-container>
-      </button>
+  <div class="w-100 d-xl-none"></div>
+  <div class="col mb-2 mb-xl-0">
+    <div class="d-flex">
+      <label class="ml-auto mt-1 mr-2">Apply:</label>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Apply Tags" icon="tag-fill" [items]="tags" [itemsSelected]="selectedTags" (close)="applyTags($event)"></app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Set Correspondent" icon="person-fill" [items]="correspondents" [itemsSelected]="selectedCorrespondents" (close)="applyCorrespondent($event)"></app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Set Document Type" icon="file-earmark-fill" [items]="documentTypes" [itemsSelected]="selectedDocumentTypes" (close)="applyDocumentType($event)"></app-filterable-dropdown>
     </div>
-  </div>
-  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Correspondent">
-    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Correspondent:</label>
-    <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="setCorrespondent.next()">
-        <ng-container *ngTemplateOutlet="edit"></ng-container>
-      </button>
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="removeCorrespondent.next()">
-        <ng-container *ngTemplateOutlet="remove"></ng-container>
-      </button>
-    </div>
-  </div>
-  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-xl-0 mr-xl-5" role="group" aria-label="Document Type">
-    <label class="d-flex align-self-center my-0 mr-auto mr-lg-2">Document Type:</label>
-    <div class="btn-group d-flex">
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="setDocumentType.next()">
-        <ng-container *ngTemplateOutlet="edit"></ng-container>
-      </button>
-      <button class="btn btn-sm btn-outline-primary py-1 px-2" (click)="removeDocumentType.next()">
-        <ng-container *ngTemplateOutlet="remove"></ng-container>
-      </button>
-    </div>
-  </div>
-  <div class="d-flex flex-grow-1 flex-xl-grow-0 mb-2 mb-lg-0 ml-auto ml-lg-0 ml-xl-auto" role="group" aria-label="Delete">
-    <button class="btn btn-sm btn-outline-danger" (click)="delete.next()">
-      <svg viewBox="0 0 16 16" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#trash" />
-      </svg>
-      <small>Delete</small>
-    </button>
   </div>
 </div>
-</div>
-
-<ng-template #add>
-  <svg viewBox="0 0 16 16" fill="currentColor">
-    <use xlink:href="assets/bootstrap-icons.svg#plus-circle" />
-  </svg>
-  <small>Add</small>
-</ng-template>
-
-<ng-template #edit>
-  <svg viewBox="0 0 16 16" fill="currentColor">
-    <use xlink:href="assets/bootstrap-icons.svg#pencil" />
-  </svg>
-  <small>Edit</small>
-</ng-template>
-
-<ng-template #remove>
-  <svg viewBox="0 0 16 16" fill="currentColor">
-    <use xlink:href="assets/bootstrap-icons.svg#x-circle" />
-  </svg>
-  <small>Remove</small>
-</ng-template>
