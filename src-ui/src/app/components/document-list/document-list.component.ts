@@ -191,38 +191,6 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  bulkAddTag() {
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select tag"
-    modal.componentInstance.message = `Select the tag you wish to assign to ${this.list.selected.size} selected document(s):`
-    this.tagService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('add_tag', {"tag": selectedId}).subscribe(
-        response => {
-          modal.close()
-        }
-      )
-    })
-  }
-
-  bulkRemoveTag() {
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select tag"
-    modal.componentInstance.message = `Select the tag you wish to remove from ${this.list.selected.size} selected document(s):`
-    this.tagService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('remove_tag', {"tag": selectedId}).subscribe(
-        response => {
-          modal.close()
-        }
-      )
-    })
-  }
-
   bulkDelete() {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.delayConfirm(5)
