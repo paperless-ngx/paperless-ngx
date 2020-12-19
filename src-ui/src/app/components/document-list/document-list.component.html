@@ -1,0 +1,121 @@
+<app-page-header [title]="getTitle()">
+  <div class="btn-group btn-group-toggle" ngbRadioGroup [(ngModel)]="displayMode"
+    (ngModelChange)="saveDisplayMode()">
+    <label ngbButtonLabel class="btn-outline-primary btn-sm">
+      <input ngbButton type="radio" class="btn btn-sm" value="details">
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#list-ul" />
+      </svg>
+    </label>
+    <label ngbButtonLabel class="btn-outline-primary btn-sm">
+      <input ngbButton type="radio" class="btn btn-sm" value="smallCards">
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#grid" />
+      </svg>
+    </label>
+    <label ngbButtonLabel class="btn-outline-primary btn-sm">
+      <input ngbButton type="radio" class="btn btn-sm" value="largeCards">
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#hdd-stack" />
+      </svg>
+    </label>
+  </div>
+
+  <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortReverse">
+    <div ngbDropdown class="btn-group">
+      <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
+      <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
+        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="list.sortField = f.field"
+          [class.active]="list.sortField == f.field">{{f.name}}</button>
+      </div>
+    </div>
+    <label ngbButtonLabel class="btn-outline-primary btn-sm">
+      <input ngbButton type="radio" class="btn btn-sm" [value]="false">
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
+      </svg>
+    </label>
+    <label ngbButtonLabel class="btn-outline-primary btn-sm">
+      <input ngbButton type="radio" class="btn btn-sm" [value]="true">
+      <svg class="toolbaricon" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
+      </svg>
+    </label>
+  </div>
+
+  <div class="btn-group ml-2">
+
+    <div class="btn-group" ngbDropdown role="group">
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle>Views</button>
+      <div class="dropdown-menu shadow" ngbDropdownMenu>
+        <ng-container *ngIf="!list.savedViewId">
+          <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
+          <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
+        </ng-container>
+
+        <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId">Save "{{list.savedViewTitle}}"</button>
+        <button ngbDropdownItem (click)="saveViewConfigAs()">Save as...</button>
+      </div>
+    </div>
+
+  </div>
+
+</app-page-header>
+
+<div class="w-100 mb-2 mb-sm-4">
+  <app-filter-editor [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
+</div>
+
+<div class="d-flex justify-content-between align-items-center">
+  <p>{{list.collectionSize || 0}} document(s) <span *ngIf="isFiltered">(filtered)</span></p>
+  <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
+  [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
+</div>
+
+<div *ngIf="displayMode == 'largeCards'">
+  <app-document-card-large *ngFor="let d of list.documents" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
+  </app-document-card-large>
+</div>
+
+<table class="table table-sm border shadow-sm" *ngIf="displayMode == 'details'">
+  <thead>
+    <th class="d-none d-lg-table-cell">ASN</th>
+    <th class="d-none d-md-table-cell">Correspondent</th>
+    <th>Title</th>
+    <th class="d-none d-xl-table-cell">Document type</th>
+    <th>Created</th>
+    <th class="d-none d-xl-table-cell">Added</th>
+  </thead>
+  <tbody>
+    <tr *ngFor="let d of list.documents">
+      <td class="d-none d-lg-table-cell">
+        {{d.archive_serial_number}}
+      </td>
+      <td class="d-none d-md-table-cell">
+        <ng-container *ngIf="d.correspondent">
+          <a [routerLink]="" (click)="clickCorrespondent(d.correspondent)" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+        </ng-container>
+      </td>
+      <td>
+        <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id)"></app-tag>
+      </td>
+      <td class="d-none d-xl-table-cell">
+        <ng-container *ngIf="d.document_type">
+          <a [routerLink]="" (click)="clickDocumentType(d.document_type)" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+        </ng-container>
+      </td>
+      <td>
+        {{d.created | date}}
+      </td>
+      <td class="d-none d-xl-table-cell">
+        {{d.added | date}}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
+  <app-document-card-small [document]="d" *ngFor="let d of list.documents" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
+</div>

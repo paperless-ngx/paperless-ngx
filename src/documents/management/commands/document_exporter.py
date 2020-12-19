@@ -1,16 +1,16 @@
 import json
 import os
-import time
 import shutil
+import time
 
-from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
+from django.core.management.base import BaseCommand, CommandError
 
-from documents.models import Document, Correspondent, Tag
+from documents.models import Document, Correspondent, Tag, DocumentType
+from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
+    EXPORTER_ARCHIVE_NAME
 from paperless.db import GnuPG
-
 from ...mixins import Renderable
-from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME
 
 
 class Command(Renderable, BaseCommand):
@@ -23,13 +23,6 @@ class Command(Renderable, BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("target")
-        parser.add_argument(
-            "--legacy",
-            action="store_true",
-            help="Don't try to export all of the document data, just dump the "
-                 "original document files out in a format that makes "
-                 "re-consuming them easy."
-        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -45,10 +38,10 @@ class Command(Renderable, BaseCommand):
         if not os.access(self.target, os.W_OK):
             raise CommandError("That path doesn't appear to be writable")
 
-        if options["legacy"]:
-            self.dump_legacy()
-        else:
-            self.dump()
+        if os.listdir(self.target):
+            raise CommandError("That directory is not empty.")
+
+        self.dump()
 
     def dump(self):
 
@@ -64,31 +57,55 @@ class Command(Renderable, BaseCommand):
 
             document = document_map[document_dict["pk"]]
 
-            file_target = os.path.join(self.target, document.file_name)
+            print(f"Exporting: {document}")
 
-            thumbnail_name = document.file_name + "-thumbnail.png"
+            filename_counter = 0
+            while True:
+                original_name = document.get_public_filename(
+                    counter=filename_counter)
+                original_target = os.path.join(self.target, original_name)
+
+                if not os.path.exists(original_target):
+                    break
+                else:
+                    filename_counter += 1
+
+            thumbnail_name = original_name + "-thumbnail.png"
             thumbnail_target = os.path.join(self.target, thumbnail_name)
 
-            document_dict[EXPORTER_FILE_NAME] = document.file_name
+            document_dict[EXPORTER_FILE_NAME] = original_name
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
-            print("Exporting: {}".format(file_target))
+            if os.path.exists(document.archive_path):
+                archive_name = document.get_public_filename(
+                    archive=True, counter=filename_counter, suffix="_archive")
+                archive_target = os.path.join(self.target, archive_name)
+                document_dict[EXPORTER_ARCHIVE_NAME] = archive_name
+            else:
+                archive_target = None
 
             t = int(time.mktime(document.created.timetuple()))
             if document.storage_type == Document.STORAGE_TYPE_GPG:
 
-                with open(file_target, "wb") as f:
+                with open(original_target, "wb") as f:
                     f.write(GnuPG.decrypted(document.source_file))
-                    os.utime(file_target, times=(t, t))
+                    os.utime(original_target, times=(t, t))
 
                 with open(thumbnail_target, "wb") as f:
                     f.write(GnuPG.decrypted(document.thumbnail_file))
                     os.utime(thumbnail_target, times=(t, t))
 
+                if archive_target:
+                    with open(archive_target, "wb") as f:
+                        f.write(GnuPG.decrypted(document.archive_path))
+                        os.utime(archive_target, times=(t, t))
             else:
 
-                shutil.copy(document.source_path, file_target)
+                shutil.copy(document.source_path, original_target)
                 shutil.copy(document.thumbnail_path, thumbnail_target)
+
+                if archive_target:
+                    shutil.copy(document.archive_path, archive_target)
 
         manifest += json.loads(
             serializers.serialize("json", Correspondent.objects.all()))
@@ -96,35 +113,8 @@ class Command(Renderable, BaseCommand):
         manifest += json.loads(serializers.serialize(
             "json", Tag.objects.all()))
 
+        manifest += json.loads(serializers.serialize(
+            "json", DocumentType.objects.all()))
+
         with open(os.path.join(self.target, "manifest.json"), "w") as f:
             json.dump(manifest, f, indent=2)
-
-    def dump_legacy(self):
-
-        for document in Document.objects.all():
-
-            target = os.path.join(
-                self.target, self._get_legacy_file_name(document))
-
-            print("Exporting: {}".format(target))
-
-            with open(target, "wb") as f:
-                f.write(GnuPG.decrypted(document.source_file))
-                t = int(time.mktime(document.created.timetuple()))
-                os.utime(target, times=(t, t))
-
-    @staticmethod
-    def _get_legacy_file_name(doc):
-
-        if not doc.correspondent and not doc.title:
-            return os.path.basename(doc.source_path)
-
-        created = doc.created.strftime("%Y%m%d%H%M%SZ")
-        tags = ",".join([t.slug for t in doc.tags.all()])
-
-        if tags:
-            return "{} - {} - {} - {}.{}".format(
-                created, doc.correspondent, doc.title, tags, doc.file_type)
-
-        return "{} - {} - {}.{}".format(
-            created, doc.correspondent, doc.title, doc.file_type)

@@ -17,16 +17,3 @@ class GnuPG:
             passphrase = settings.PASSPHRASE
 
         return cls.gpg.decrypt_file(file_handle, passphrase=passphrase).data
-
-    @classmethod
-    def encrypted(cls, file_handle, passphrase=None):
-
-        if not passphrase:
-            passphrase = settings.PASSPHRASE
-
-        return cls.gpg.encrypt_file(
-            file_handle,
-            recipients=None,
-            passphrase=passphrase,
-            symmetric=True
-        ).data

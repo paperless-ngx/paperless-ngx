@@ -1,0 +1,21 @@
+<app-page-header title="Dashboard" subTitle="Welcome to paperless-ng!">
+  <img src="assets/logo.svg" height="80" class="m-2 d-none d-md-block">
+</app-page-header>
+
+<div class='row'>
+  <div class="col-lg-8">
+    <app-welcome-widget *ngIf="savedViews.length == 0"></app-welcome-widget>
+
+    <ng-container *ngFor="let v of savedViews">
+      <app-saved-view-widget [savedView]="v"></app-saved-view-widget>
+    </ng-container>
+
+  </div>
+  <div class="col-lg-4">
+
+    <app-statistics-widget></app-statistics-widget>
+
+    <app-upload-file-widget></app-upload-file-widget>
+
+  </div>
+</div>

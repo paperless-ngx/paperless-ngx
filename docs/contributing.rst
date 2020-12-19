@@ -3,6 +3,10 @@
 Contributing to Paperless
 #########################
 
+.. warning::
+
+    This section is not updated to paperless-ng yet.
+    
 Maybe you've been using Paperless for a while and want to add a feature or two,
 or maybe you've come across a bug that you have some ideas how to solve.  The
 beauty of Free software is that you can see what's wrong and help to get it
@@ -81,7 +85,7 @@ quoted, or triple-quoted string will do:
     problematic_string = 'This is a "string" with "quotes" in it'
 
 In HTML templates, please use double-quotes for tag attributes, and single
-quotes for arguments passed to Django tempalte tags:
+quotes for arguments passed to Django template tags:
 
 .. code:: html
 

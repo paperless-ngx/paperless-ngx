@@ -1,0 +1,12 @@
+[Unit]
+Description=Paperless consumer
+Requires=redis.service
+
+[Service]
+User=paperless
+Group=paperless
+WorkingDirectory=/opt/paperless/src
+ExecStart=python3 manage.py qcluster
+
+[Install]
+WantedBy=multi-user.target

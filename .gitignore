@@ -57,16 +57,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# Stored PDFs
-media/documents/*.gpg
-media/documents/thumbnails/*
-media/documents/originals/*
-media/overrides.css
-media/overrides.js
-
-# Sqlite database
-db.sqlite3
-db.sqlite3-journal
 
 # PyCharm
 .idea
@@ -74,12 +64,24 @@ db.sqlite3-journal
 # Other stuff that doesn't belong
 .virtualenv
 virtualenv
-docker-compose.yml
+/venv
 docker-compose.env
+docker-compose.yml
 
 # Used for development
 scripts/import-for-development
 scripts/nuke
 
 # Static files collected by the collectstatic command
-./static/
+/static/
+
+# Stored PDFs
+/media/
+/data/
+/paperless.conf
+/consume/
+/export/
+/src-ui/.vscode
+
+# this is where the compiled frontend is moved to.
+/src/documents/static/frontend/

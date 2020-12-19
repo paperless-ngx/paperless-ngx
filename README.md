@@ -1,88 +1,124 @@
-[ en | [de](README-de.md) | [el](README-el.md) ]
+[![Build Status](https://travis-ci.org/jonaswinkler/paperless-ng.svg?branch=master)](https://travis-ci.org/jonaswinkler/paperless-ng)
+[![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
+[![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
+[![Coverage Status](https://coveralls.io/repos/github/jonaswinkler/paperless-ng/badge.svg?branch=master)](https://coveralls.io/github/jonaswinkler/paperless-ng?branch=master)
 
-![Paperless](https://raw.githubusercontent.com/the-paperless-project/paperless/master/src/paperless/static/paperless/img/logo-dark.png)
+# Paperless-ng
 
-[![Documentation](https://readthedocs.org/projects/paperless/badge/?version=latest)](https://paperless.readthedocs.org/)
-[![Chat](https://badges.gitter.im/the-paperless-project/paperless.svg)](https://gitter.im/danielquinn/paperless)
-[![Travis](https://travis-ci.org/the-paperless-project/paperless.svg?branch=master)](https://travis-ci.org/the-paperless-project/paperless)
-[![Coverage Status](https://coveralls.io/repos/github/the-paperless-project/paperless/badge.svg?branch=master)](https://coveralls.io/github/the-paperless-project/paperless?branch=master)
-[![StackShare](https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat)](https://stackshare.io/the-paperless-project/the-paperless-project)
-[![Thanks](https://img.shields.io/badge/THANKS-md-ff69b4.svg)](https://github.com/the-paperless-project/paperless/blob/master/THANKS.md)
+[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
-Index and archive all of your scanned paper documents
+Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
 
-I hate paper.  Environmental issues aside, it's a tech person's nightmare:
+This project is still in development and some things may not work as expected.
 
-* There's no search feature
-* It takes up physical space
-* Backups mean more paper
+# How it Works
 
-In the past few months I've been bitten more than a few times by the problem of not having the right document around.  Sometimes I recycled a document I needed (who keeps water bills for two years?) and other times I just lost it... because paper.  I wrote this to make my life easier.
+Paperless does not control your scanner, it only helps you deal with what your scanner produces.
 
+1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ng.readthedocs.io/en/latest/scanners.html) page. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
 
-## How it Works
+	- Alternatively, you can use any of the mobile scanning apps out there. We have an app that allows you to share documents with paperless, if you're on Android. See the section on affiliated projects.
 
-Paperless does not control your scanner, it only helps you deal with what your scanner produces
-
-1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless.readthedocs.io/en/latest/scanners.html) page.
-2. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually.  Paperless doesn't care how the documents get into its local consumption directory.
-3. Have the target server run the Paperless consumption script to OCR the file and index it into a local database.
-4. Use the web frontend to sift through the database and find what you want.
-5. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
+2. Wait for paperless to process your files. OCR is expensive, and depending on the power of your machine, this might take a bit of time.
+3. Use the web frontend to sift through the database and find what you want.
+4. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
 
 Here's what you get:
 
-![The before and after](https://raw.githubusercontent.com/the-paperless-project/paperless/master/docs/_static/screenshot.png)
+![Dashboard](https://github.com/jonaswinkler/paperless-ng/raw/master/docs/_static/screenshots/dashboard.png)
 
+# Features
 
-## Documentation
+* Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
+* Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and can be configured freely.
+* Single page application front end. Should be pretty snappy. Will be mobile friendly in the future.
+	* Includes a dashboard that shows basic statistics and has document upload.
+	* Filtering by tags, correspondents, types, and more.
+	* Customizable views can be saved and displayed on the dashboard.
+* Full text search helps you find what you need.
+	* Auto completion suggests relevant words from your documents.
+	* Results are sorted by relevance to your search query.
+	* Highlighting shows you which parts of the document matched the query.
+* Email processing: Paperless adds documents from your email accounts.
+	* Configure multiple accounts and filters for each account.
+	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
+* Machine learning powered document matching.
+	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
+* A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
+* Code cleanup in many, MANY areas. Some of the code from OG paperless was just overly complicated.
+* More tests, more stability.
 
-It's all available on [ReadTheDocs](https://paperless.readthedocs.io/).
+If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
 
+For a complete list of changes from paperless, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
 
-## Requirements
+# Roadmap for 1.0
 
-This is all really a quite simple, shiny, user-friendly wrapper around some very powerful tools.
+- **Bulk editing**. Add/remove metadata from multiple documents at once.
 
-* [ImageMagick](http://imagemagick.org/) converts the images between colour and greyscale.
-* [Tesseract](https://github.com/tesseract-ocr) does the character recognition.
-* [Unpaper](https://github.com/unpaper/unpaper) despeckles and deskews the scanned image.
-* [GNU Privacy Guard](https://gnupg.org/) is used as the encryption backend.
-* [Python 3](https://python.org/) is the language of the project.
-  * [Pillow](https://pypi.python.org/pypi/pillowfight/) loads the image data as a python object to be used with PyOCR.
-  * [PyOCR](https://github.com/jflesch/pyocr) is a slick programmatic wrapper around tesseract.
-  * [Django](https://www.djangoproject.com/) is the framework this project is written against.
-  * [Python-GNUPG](http://pythonhosted.org/python-gnupg/) decrypts the PDFs on-the-fly to allow you to download unencrypted files, leaving the encrypted ones on-disk.
+- Make the front end nice (except mobile).
+- Test coverage at 90%.
+- Fix whatever bugs I and you find.
 
+## Roadmap for versions beyond 1.0
 
-## Project Status
+These are things that I want to add to paperless eventually. They are sorted by priority.
 
-This project has been around since 2015, and there's lots of people using it.  For some reason, it's really popular in Germany -- maybe someone over there can clue me in as to why?
+- **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
+  - Group and limit search results by correspondent, show “more from this” links in the results.
+  - Ability to search for “Similar documents” in the search results
+- **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
+- **An interactive consumer** that shows its progress for documents it processes on the web page.
+	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
+	- Notifications when a document was added with buttons to open the new document right away.
+- **Arbitrary tag colors**. Allow the selection of any color with a color picker.
+- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc, .docx documents.
 
-I am no longer doing new development on Paperless as it does exactly what I need it to and have since turned my attention to my latest project, [Aletheia](https://github.com/danielquinn/aletheia).  However, I'm not abandoning this project.  I am happy to field pull requests and answer questions in the issue queue.  If you're a developer yourself and want a new feature, float it in the issue queue and/or send me a pull request!  I'm happy to add new stuff, but I just don't have the time to do that work myself.
+Apart from that, paperless is pretty much feature complete.
 
+## On the chopping block.
 
-## Affiliated Projects
+- **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
+
+# Getting started
+
+The recommended way to deploy paperless is docker-compose. Don't clone the repository, grab the latest release to get started instead. The dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself (i.e. if you want to run on Raspberry Pi).
+
+Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
+
+Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has a step by step guide on how to do it.
+
+# Migrating to paperless-ng
+
+Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation. Its also entirely possible to go back to paperless by reverting the database migrations.
+
+# Documentation
+
+The documentation for Paperless-ng is available on [ReadTheDocs](https://paperless-ng.readthedocs.io/).
+
+# Suggestions? Questions? Something not working?
+
+Please open an issue and start a discussion about it!
+
+## Feel like helping out?
+
+There's still lots of things to be done, just have a look at that issue log. If you feel like contributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome. The documentation has some basic information on how to get started.
+
+If you want to implement something big: Please start a discussion about that in the issues! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested. See the roadmap above.
+
+# Affiliated Projects
 
 Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
 
-* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless.
+* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless. Updated to work with paperless-ng.
+* [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
+
+These projects also exist, but their status and compatibility with paperless-ng is unknown.
+
 * [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
 * [ansible-role-paperless](https://github.com/ovv/ansible-role-paperless): An easy way to get Paperless running via Ansible.
 * [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
 
-## Similar Projects
+# Important Note
 
-There's another project out there called [Mayan EDMS](https://www.mayan-edms.com/) that has a surprising amount of technical overlap with Paperless.  Also based on Django and using a consumer model with Tesseract and Unpaper, Mayan EDMS is *much* more featureful and comes with a slick UI as well, but still in Python 2. It may be that Paperless consumes fewer resources, but to be honest, this is just a guess as I haven't tested this myself.  One thing's for certain though, *Paperless* is a **way** better name.
-
-
-## Important Note
-
-Document scanners are typically used to scan sensitive documents.  Things like your social insurance number, tax records, invoices, etc.  While Paperless encrypts the original files via the consumption script, the OCR'd text is *not* encrypted and is therefore stored in the clear (it needs to be searchable, so if someone has ideas on how to do that on encrypted data, I'm all ears).  This means that Paperless should never be run on an untrusted host.  Instead, I recommend that if you do want to use it, run it locally on a server in your own home.
-
-
-## Donations
-
-As with all Free software, the power is less in the finances and more in the collective efforts.  I really appreciate every pull request and bug report offered up by Paperless' users, so please keep that stuff coming.  If however, you're not one for coding/design/documentation, and would like to contribute financially, I won't say no ;-)
-
-The thing is, I'm doing ok for money, so I would instead ask you to donate to the [United Nations High Commissioner for Refugees](https://donate.unhcr.org/int-en/general). They're doing important work and they need the money a lot more than I do.
+Document scanners are typically used to scan sensitive documents.  Things like your social insurance number, tax records, invoices, etc.  Everything is stored in the clear without encryption by default (it needs to be searchable, so if someone has ideas on how to do that on encrypted data, I'm all ears).  This means that Paperless should never be run on an untrusted host.  Instead, I recommend that if you do want to use it, run it locally on a server in your own home.

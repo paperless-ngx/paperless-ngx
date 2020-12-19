@@ -1,0 +1,74 @@
+<app-page-header title="Settings">
+
+</app-page-header>
+
+<!-- <p>items per page, documents per view type</p> -->
+<form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+
+  <ul ngbNav #nav="ngbNav" class="nav-tabs">
+    <li [ngbNavItem]="1">
+      <a ngbNavLink>General settings</a>
+      <ng-template ngbNavContent>
+
+        <h4>Document list</h4>
+        
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span>Items per page</span>
+          </div>
+          <div class="col">
+        
+            <select class="form-control" formControlName="documentListItemPerPage">
+              <option [ngValue]="10">10</option>
+              <option [ngValue]="25">25</option>
+              <option [ngValue]="50">50</option>
+              <option [ngValue]="100">100</option>
+            </select>
+        
+          </div>
+        </div>
+
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="2">
+      <a ngbNavLink>Saved views</a>
+      <ng-template ngbNavContent>
+
+        <div formGroupName="savedViews">
+          
+            <div *ngFor="let view of savedViews" [formGroupName]="view.id" class="form-row">
+              <div class="form-group col-4 mr-3">
+                <label for="name_{{view.id}}">Name</label>
+                <input type="text" class="form-control" formControlName="name" id="name_{{view.id}}">
+              </div>
+
+              <div class="form-group col-auto mr-3">
+                <label for="show_on_dashboard_{{view.id}}">Appears on</label>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                  <label class="custom-control-label" for="show_on_dashboard_{{view.id}}">Show on dashboard</label>
+                </div>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                  <label class="custom-control-label" for="show_in_sidebar_{{view.id}}">Show in sidebar</label>
+                </div>
+              </div>
+
+              <div class="form-group col-auto">
+                <label for="name_{{view.id}}">Actions</label>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)">Delete</button>
+              </div>
+            </div>
+
+            <div *ngIf="savedViews.length == 0">No saved views defined.</div>
+          
+        </div>
+
+      </ng-template>
+    </li>
+  </ul>
+
+  <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3 shadow"></div>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>

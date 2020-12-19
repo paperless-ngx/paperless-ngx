@@ -1,17 +1,20 @@
+import shutil
+import tempfile
 from random import randint
 
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 
-from ..models import Correspondent, Document, Tag
+from .. import matching
+from ..models import Correspondent, Document, Tag, DocumentType
 from ..signals import document_consumption_finished
 
 
 class TestMatching(TestCase):
 
     def _test_matching(self, text, algorithm, true, false):
-        for klass in (Tag, Correspondent):
+        for klass in (Tag, Correspondent, DocumentType):
             instance = klass.objects.create(
                 name=str(randint(10000, 99999)),
                 match=text,
@@ -19,12 +22,12 @@ class TestMatching(TestCase):
             )
             for string in true:
                 self.assertTrue(
-                    instance.matches(string),
+                    matching.matches(instance, string),
                     '"%s" should match "%s" but it does not' % (text, string)
                 )
             for string in false:
                 self.assertFalse(
-                    instance.matches(string),
+                    matching.matches(instance, string),
                     '"%s" should not match "%s" but it does' % (text, string)
                 )
 
@@ -212,7 +215,14 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
         TestCase.setUp(self)
         User.objects.create_user(username='test_consumer', password='12345')
         self.doc_contains = Document.objects.create(
-            content="I contain the keyword.", file_type="pdf")
+            content="I contain the keyword.", mime_type="application/pdf")
+
+        self.index_dir = tempfile.mkdtemp()
+        # TODO: we should not need the index here.
+        override_settings(INDEX_DIR=self.index_dir).enable()
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.index_dir, ignore_errors=True)
 
     def test_tag_applied_any(self):
         t1 = Tag.objects.create(

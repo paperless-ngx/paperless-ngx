@@ -3,15 +3,16 @@ import os
 import shutil
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
+from django.core.management.base import BaseCommand, CommandError
+from filelock import FileLock
 
 from documents.models import Document
-from paperless.db import GnuPG
-
+from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
+    EXPORTER_ARCHIVE_NAME
+from ...file_handling import create_source_path_directory, \
+    generate_unique_filename
 from ...mixins import Renderable
-
-from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME
 
 
 class Command(Renderable, BaseCommand):
@@ -80,47 +81,55 @@ class Command(Renderable, BaseCommand):
                     'appear to be in the source directory.'.format(doc_file)
                 )
 
+            if EXPORTER_ARCHIVE_NAME in record:
+                archive_file = record[EXPORTER_ARCHIVE_NAME]
+                if not os.path.exists(os.path.join(self.source, archive_file)):
+                    raise CommandError(
+                        f"The manifest file refers to {archive_file} which "
+                        f"does not appear to be in the source directory."
+                    )
+
     def _import_files_from_manifest(self):
+
+        os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
+        os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
+        os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
         for record in self.manifest:
 
             if not record["model"] == "documents.document":
                 continue
 
-            doc_file = record[EXPORTER_FILE_NAME]
-            thumb_file = record[EXPORTER_THUMBNAIL_NAME]
             document = Document.objects.get(pk=record["pk"])
 
+            doc_file = record[EXPORTER_FILE_NAME]
             document_path = os.path.join(self.source, doc_file)
+
+            thumb_file = record[EXPORTER_THUMBNAIL_NAME]
             thumbnail_path = os.path.join(self.source, thumb_file)
 
-            if settings.PASSPHRASE:
-
-                with open(document_path, "rb") as unencrypted:
-                    with open(document.source_path, "wb") as encrypted:
-                        print("Encrypting {} and saving it to {}".format(
-                            doc_file, document.source_path))
-                        encrypted.write(GnuPG.encrypted(unencrypted))
-
-                with open(thumbnail_path, "rb") as unencrypted:
-                    with open(document.thumbnail_path, "wb") as encrypted:
-                        print("Encrypting {} and saving it to {}".format(
-                            thumb_file, document.thumbnail_path))
-                        encrypted.write(GnuPG.encrypted(unencrypted))
-
+            if EXPORTER_ARCHIVE_NAME in record:
+                archive_file = record[EXPORTER_ARCHIVE_NAME]
+                archive_path = os.path.join(self.source, archive_file)
             else:
+                archive_path = None
 
+            document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+
+            with FileLock(settings.MEDIA_LOCK):
+                document.filename = generate_unique_filename(
+                    document, settings.ORIGINALS_DIR)
+
+                if os.path.isfile(document.source_path):
+                    raise FileExistsError(document.source_path)
+
+                create_source_path_directory(document.source_path)
+
+                print(f"Moving {document_path} to {document.source_path}")
                 shutil.copy(document_path, document.source_path)
                 shutil.copy(thumbnail_path, document.thumbnail_path)
+                if archive_path:
+                    create_source_path_directory(document.archive_path)
+                    shutil.copy(archive_path, document.archive_path)
 
-        # Reset the storage type to whatever we've used while importing
-
-        storage_type = Document.STORAGE_TYPE_UNENCRYPTED
-        if settings.PASSPHRASE:
-            storage_type = Document.STORAGE_TYPE_GPG
-
-        Document.objects.filter(
-            pk__in=[r["pk"] for r in self.manifest]
-        ).update(
-            storage_type=storage_type
-        )
+            document.save()

@@ -1,0 +1,5 @@
+<div class="form-group custom-control custom-checkbox">
+  <input type="checkbox" class="custom-control-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
+  <label class="custom-control-label" [for]="inputId">{{title}}</label>
+  <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+</div>
