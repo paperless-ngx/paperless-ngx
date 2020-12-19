@@ -8,11 +8,11 @@
   <div class="w-100 d-xl-none"></div>
    <div class="col col-xl-auto mb-2 mb-xl-0">
      <div class="d-flex">
-       <app-filter-dropdown class="mr-2 mr-md-3" [items]="tags" [itemsSelected]="selectedTags" title="Tags" icon="tag-fill" (toggle)="toggleTag($event.id)"></app-filter-dropdown>
-       <app-filter-dropdown class="mr-2 mr-md-3" [items]="correspondents" [itemsSelected]="selectedCorrespondents" title="Correspondents" icon="person-fill" (toggle)="toggleCorrespondent($event.id)"></app-filter-dropdown>
-       <app-filter-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [itemsSelected]="selectedDocumentTypes" title="Document types" icon="file-earmark-fill" (toggle)="toggleDocumentType($event.id)"></app-filter-dropdown>
-       <app-filter-dropdown-date class="mr-2 mr-md-3" [dateBefore]="dateCreatedBefore" [dateAfter]="dateCreatedAfter" title="Created" (datesSet)="onDatesCreatedSet($event)"></app-filter-dropdown-date>
-       <app-filter-dropdown-date [dateBefore]="dateAddedBefore" [dateAfter]="dateAddedAfter" title="Added"  (datesSet)="onDatesAddedSet($event)"></app-filter-dropdown-date>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="tags" [itemsSelected]="selectedTags" title="Tags" icon="tag-fill" (toggle)="toggleTag($event.id)"></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="correspondents" [itemsSelected]="selectedCorrespondents" title="Correspondents" icon="person-fill" (toggle)="toggleCorrespondent($event.id)"></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [itemsSelected]="selectedDocumentTypes" title="Document types" icon="file-earmark-fill" (toggle)="toggleDocumentType($event.id)"></app-filterable-dropdown>
+       <app-date-dropdown class="mr-2 mr-md-3" [dateBefore]="dateCreatedBefore" [dateAfter]="dateCreatedAfter" title="Created" (datesSet)="onDatesCreatedSet($event)"></app-date-dropdown>
+       <app-date-dropdown [dateBefore]="dateAddedBefore" [dateAfter]="dateAddedAfter" title="Added"  (datesSet)="onDatesAddedSet($event)"></app-date-dropdown>
      </div>
    </div>
    <div class="w-100 d-xl-none"></div>

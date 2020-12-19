@@ -26,10 +26,10 @@ import { ResultHighlightComponent } from './components/search/result-highlight/r
 import { PageHeaderComponent } from './components/common/page-header/page-header.component';
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
-import { FilterEditorComponent } from './components/filter-editor/filter-editor.component';
-import { FilterDropdownComponent } from './components/filter-editor/filter-dropdown/filter-dropdown.component';
-import { FilterDropdownButtonComponent } from './components/filter-editor/filter-dropdown/filter-dropdown-button/filter-dropdown-button.component';
-import { FilterDropdownDateComponent } from './components/filter-editor/filter-dropdown-date/filter-dropdown-date.component';
+import { FilterEditorComponent } from './components/document-list/filter-editor/filter-editor.component';
+import { FilterableDropdownComponent } from './components/common/filterable-dropdown/filterable-dropdown.component';
+import { FilterableDropdownButtonComponent } from './components/common/filterable-dropdown/filterable-dropdown-button/filterable-dropdown-button.component';
+import { DateDropdownComponent } from './components/common/date-dropdown/date-dropdown.component';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
 import { BulkEditorComponent } from './components/document-list/bulk-editor/bulk-editor.component';
@@ -81,9 +81,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
     AppFrameComponent,
     ToastsComponent,
     FilterEditorComponent,
-    FilterDropdownComponent,
-    FilterDropdownButtonComponent,
-    FilterDropdownDateComponent,
+    FilterableDropdownComponent,
+    FilterableDropdownButtonComponent,
+    DateDropdownComponent,
     DocumentCardLargeComponent,
     DocumentCardSmallComponent,
     BulkEditorComponent,

@@ -4,11 +4,11 @@ import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 
 @Component({
-  selector: 'app-filter-dropdown-button',
-  templateUrl: './filter-dropdown-button.component.html',
-  styleUrls: ['./filter-dropdown-button.component.scss']
+  selector: 'app-filterable-dropdown-button',
+  templateUrl: './filterable-dropdown-button.component.html',
+  styleUrls: ['./filterable-dropdown-button.component.scss']
 })
-export class FilterDropdownButtonComponent implements OnInit {
+export class FilterableDropdownButtonComponent implements OnInit {
 
   @Input()
   item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent
