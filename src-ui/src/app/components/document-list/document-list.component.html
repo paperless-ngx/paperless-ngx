@@ -82,16 +82,13 @@
 
   <app-bulk-editor *ngIf="isBulkEditing"
     [allDocuments]="list.documents"
-    [(documentsSelected)]="list.selected"
+    [(selectedDocuments)]="list.selected"
     (selectPage)="list.selectPage()"
     (selectAll)="list.selectAll()"
     (selectNone)="list.selectNone()"
-    (setCorrespondent)="bulkSetCorrespondent()"
-    (removeCorrespondent)="bulkRemoveCorrespondent()"
-    (setDocumentType)="bulkSetDocumentType()"
-    (removeDocumentType)="bulkRemoveDocumentType()"
-    (addTag)="bulkAddTag()"
-    (removeTag)="bulkRemoveTag()"
+    (setTags)="bulkSetTags($event)"
+    (setCorrespondent)="bulkSetCorrespondent($event)"
+    (setDocumentType)="bulkSetDocumentType($event)"
     (delete)="bulkDelete()">
 </app-bulk-editor>
 </div>

@@ -35,7 +35,7 @@ export class FilterableDropdownButtonComponent implements OnInit {
   getSelectedIconName() {
     let iconName = ''
     if (this.selectableItem?.state == SelectableItemState.Selected) iconName = 'check'
-    else if (this.selectableItem?.state == SelectableItemState.PartiallySelected) iconName = 'minus'
+    else if (this.selectableItem?.state == SelectableItemState.PartiallySelected) iconName = 'dash'
     return iconName
   }
 }

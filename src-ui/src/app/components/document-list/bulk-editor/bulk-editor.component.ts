@@ -7,6 +7,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
+import { SelectableItem, SelectableItemState } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
 
 @Component({
   selector: 'app-bulk-editor',
@@ -16,7 +17,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 export class BulkEditorComponent {
 
   @Input()
-  documentsSelected: Set<number>
+  selectedDocuments: Set<number>
 
   @Input()
   allDocuments: PaperlessDocument[]
@@ -34,19 +35,10 @@ export class BulkEditorComponent {
   setCorrespondent = new EventEmitter()
 
   @Output()
-  removeCorrespondent = new EventEmitter()
-
-  @Output()
   setDocumentType = new EventEmitter()
 
   @Output()
-  removeDocumentType = new EventEmitter()
-
-  @Output()
-  addTag = new EventEmitter()
-
-  @Output()
-  removeTag = new EventEmitter()
+  setTags = new EventEmitter()
 
   @Output()
   delete = new EventEmitter()
@@ -55,34 +47,47 @@ export class BulkEditorComponent {
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
 
-  get selectedTags(): PaperlessTag[] {
-    let selectedTags = []
-    this.allDocuments.forEach(d => {
-      if (this.documentsSelected.has(d.id)) {
-        if (d.tags && !d.tags.every(t => selectedTags.find(st => st.id == t) !== undefined)) d.tags$.subscribe(t => selectedTags = selectedTags.concat(t))
-      }
+  get tagsSelectableItems(): SelectableItem[] {
+    let tagsSelectableItems = []
+    let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
+    this.tags.forEach(t => {
+      let selectedDocumentsWithTag: PaperlessDocument[] = selectedDocuments.filter(d => d.tags.includes(t.id))
+      let state = SelectableItemState.NotSelected
+      if (selectedDocumentsWithTag.length == selectedDocuments.length) state = SelectableItemState.Selected
+      else if (selectedDocumentsWithTag.length > 0 && selectedDocumentsWithTag.length < selectedDocuments.length) state = SelectableItemState.PartiallySelected
+      tagsSelectableItems.push( { item: t, state: state } )
     })
-    return selectedTags
+    return tagsSelectableItems
   }
 
-  get selectedCorrespondents(): PaperlessCorrespondent[]  {
-    let selectedCorrespondents = []
-    this.allDocuments.forEach(d => {
-      if (this.documentsSelected.has(d.id)) {
-        if (d.correspondent && selectedCorrespondents.find(sc => sc.id == d.correspondent) == undefined) d.correspondent$.subscribe(c => selectedCorrespondents.push(c))
-      }
+  get correspondentsSelectableItems(): SelectableItem[] {
+    let correspondentsSelectableItems = []
+    let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
+
+    this.correspondents.forEach(c => {
+      let selectedDocumentsWithCorrespondent: PaperlessDocument[] = selectedDocuments.filter(d => d.correspondent == c.id)
+      let state = SelectableItemState.NotSelected
+      if (selectedDocumentsWithCorrespondent.length == selectedDocuments.length) state = SelectableItemState.Selected
+      else if (selectedDocumentsWithCorrespondent.length > 0 && selectedDocumentsWithCorrespondent.length < selectedDocuments.length) state = SelectableItemState.PartiallySelected
+      correspondentsSelectableItems.push( { item: c, state: state } )
     })
-    return selectedCorrespondents
+
+    return correspondentsSelectableItems
   }
 
-  get selectedDocumentTypes(): PaperlessDocumentType[] {
-    let selectedDocumentTypes = []
-    this.allDocuments.forEach(d => {
-      if (this.documentsSelected.has(d.id)) {
-        if (d.document_type && selectedDocumentTypes.find(sdt => sdt.id == d.document_type) == undefined) d.document_type$.subscribe(dt => selectedDocumentTypes.push(dt))
-      }
+  get documentTypesSelectableItems(): SelectableItem[] {
+    let documentTypesSelectableItems = []
+    let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
+
+    this.documentTypes.forEach(dt => {
+      let selectedDocumentsWithDocumentType: PaperlessDocument[] = selectedDocuments.filter(d => d.document_type == dt.id)
+      let state = SelectableItemState.NotSelected
+      if (selectedDocumentsWithDocumentType.length == selectedDocuments.length) state = SelectableItemState.Selected
+      else if (selectedDocumentsWithDocumentType.length > 0 && selectedDocumentsWithDocumentType.length < selectedDocuments.length) state = SelectableItemState.PartiallySelected
+      documentTypesSelectableItems.push( { item: dt, state: state } )
     })
-    return selectedDocumentTypes
+
+    return documentTypesSelectableItems
   }
 
   constructor(
@@ -98,18 +103,19 @@ export class BulkEditorComponent {
     this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
   }
 
-  applyTags(tags) {
-    console.log(tags);
-
+  applyTags(tags: PaperlessTag[]) {
+    this.setTags.emit(tags)
   }
 
-  applyCorrespondent(correspondent) {
-    console.log(correspondent);
-
+  applyCorrespondent(selectedCorrespondent: ObjectWithId[]) {
+    this.setCorrespondent.emit(selectedCorrespondent)
   }
 
-  applyDocumentType(documentType) {
-    console.log(documentType);
+  applyDocumentType(selectedDocumentType: ObjectWithId[]) {
+    this.setDocumentType.emit(selectedDocumentType)
+  }
 
+  applyDelete() {
+    this.delete.next()
   }
 }
