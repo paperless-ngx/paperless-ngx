@@ -1,4 +1,4 @@
-<div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #filterDropdown="ngbDropdown">
+<div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="itemsSelected?.length > 0 ? 'btn-primary' : 'btn-outline-primary'">
     <div class="d-none d-md-inline">{{title}}</div>
     <div class="d-inline-block d-md-none">
@@ -21,7 +21,7 @@
       </div>
       <div *ngIf="items" class="items">
         <ng-container *ngFor="let item of items | filter: filterText; let i = index">
-          <app-filter-dropdown-button [item]="item" [selected]="isItemSelected(item)" (toggle)="toggleItem($event)"></app-filter-dropdown-button>
+          <app-filterable-dropdown-button [item]="item" [selected]="isItemSelected(item)" (toggle)="toggleItem($event)"></app-filterable-dropdown-button>
         </ng-container>
       </div>
     </div>

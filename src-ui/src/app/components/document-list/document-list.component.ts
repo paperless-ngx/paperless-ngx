@@ -11,7 +11,7 @@ import { DocumentService, DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/doc
 import { TagService } from 'src/app/services/rest/tag.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
-import { FilterEditorComponent } from '../filter-editor/filter-editor.component';
+import { FilterEditorComponent } from './filter-editor/filter-editor.component';
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { SelectDialogComponent } from '../common/select-dialog/select-dialog.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';

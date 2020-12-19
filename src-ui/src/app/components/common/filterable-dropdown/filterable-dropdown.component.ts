@@ -4,11 +4,11 @@ import { FilterPipe } from  'src/app/pipes/filter.pipe';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
-  selector: 'app-filter-dropdown',
-  templateUrl: './filter-dropdown.component.html',
-  styleUrls: ['./filter-dropdown.component.scss']
+  selector: 'app-filterable-dropdown',
+  templateUrl: './filterable-dropdown.component.html',
+  styleUrls: ['./filterable-dropdown.component.scss']
 })
-export class FilterDropdownComponent {
+export class FilterableDropdownComponent {
 
   constructor(private filterPipe: FilterPipe) { }
 
@@ -28,7 +28,7 @@ export class FilterDropdownComponent {
   toggle = new EventEmitter()
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
-  @ViewChild('filterDropdown') filterDropdown: NgbDropdown
+  @ViewChild('dropdown') dropdown: NgbDropdown
 
   filterText: string
 
@@ -53,6 +53,6 @@ export class FilterDropdownComponent {
   listFilterEnter(): void {
     let filtered = this.filterPipe.transform(this.items, this.filterText)
     if (filtered.length == 1) this.toggleItem(filtered.shift())
-    this.filterDropdown.close()
+    this.dropdown.close()
   }
 }
