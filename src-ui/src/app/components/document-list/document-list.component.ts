@@ -142,10 +142,7 @@ export class DocumentListComponent implements OnInit {
     )
   }
 
-  bulkSetCorrespondent(correspondent: PaperlessCorrespondent[]) {
-    if (correspondent.length > 0) correspondent = correspondent.shift()
-    else correspondent = undefined
-
+  bulkSetCorrespondent(correspondent: PaperlessCorrespondent) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Confirm correspondent assignment"
     let messageFragment = correspondent ? `assign the correspondent ${correspondent.name} to` : `remove all correspondents from`
@@ -161,10 +158,7 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  bulkSetDocumentType(documentType: PaperlessDocumentType[]) {
-    if (documentType.length > 0) documentType = documentType.shift()
-    else documentType = undefined
-
+  bulkSetDocumentType(documentType: PaperlessDocumentType) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Confirm Document Type assignment"
     let messageFragment = documentType ? `assign the document type ${documentType.name} to` : `remove all document types from`
@@ -182,7 +176,7 @@ export class DocumentListComponent implements OnInit {
 
   bulkSetTags(tags) {
     console.log('bulkSetTags', tags);
-    // TODO: 
+    // TODO:
   }
 
   bulkAddTag() {

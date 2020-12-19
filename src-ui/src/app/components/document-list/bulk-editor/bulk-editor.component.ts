@@ -108,11 +108,11 @@ export class BulkEditorComponent {
   }
 
   applyCorrespondent(selectedCorrespondent: PaperlessCorrespondent[]) {
-    this.setCorrespondent.emit(selectedCorrespondent)
+    this.setCorrespondent.emit(selectedCorrespondent.length > 0 ? selectedCorrespondent.shift() : null)
   }
 
   applyDocumentType(selectedDocumentType: PaperlessDocumentType[]) {
-    this.setDocumentType.emit(selectedDocumentType)
+    this.setDocumentType.emit(selectedDocumentType.length > 0 ? selectedDocumentType.shift() : null)
   }
 
   applyDelete() {
