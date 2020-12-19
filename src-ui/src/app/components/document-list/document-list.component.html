@@ -78,17 +78,11 @@
 </app-page-header>
 
 <div class="w-100 mb-2 mb-sm-4">
-  <app-filter-editor [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
-</div>
+  <app-filter-editor *ngIf="!isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
 
-<div class="d-flex justify-content-between align-items-center">
-  <p><span *ngIf="list.selected.size > 0">Selected {{list.selected.size}} of </span>{{list.collectionSize || 0}} document(s) <span *ngIf="isFiltered">(filtered)</span></p>
-  <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
-  [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
-</div>
-
-<div class="w-100 mb-3" [ngbCollapse]="!isBulkEditing">
-  <app-bulk-editor
+  <app-bulk-editor *ngIf="isBulkEditing"
+    [allDocuments]="list.documents"
+    [(documentsSelected)]="list.selected"
     (selectPage)="list.selectPage()"
     (selectAll)="list.selectAll()"
     (selectNone)="list.selectNone()"
@@ -99,7 +93,13 @@
     (addTag)="bulkAddTag()"
     (removeTag)="bulkRemoveTag()"
     (delete)="bulkDelete()">
-  </app-bulk-editor>
+</app-bulk-editor>
+</div>
+
+<div class="d-flex justify-content-between align-items-center">
+  <p><span *ngIf="list.selected.size > 0">Selected {{list.selected.size}} of </span>{{list.collectionSize || 0}} document(s) <span *ngIf="isFiltered">(filtered)</span></p>
+  <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
+  [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
 </div>
 
 <div *ngIf="displayMode == 'largeCards'">

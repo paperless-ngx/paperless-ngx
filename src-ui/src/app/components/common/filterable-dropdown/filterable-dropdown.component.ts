@@ -27,6 +27,9 @@ export class FilterableDropdownComponent {
   @Output()
   toggle = new EventEmitter()
 
+  @Output()
+  close = new EventEmitter()
+
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
 
@@ -47,6 +50,7 @@ export class FilterableDropdownComponent {
       }, 0);
     } else {
       this.filterText = ''
+      this.close.emit(this.itemsSelected)
     }
   }
 
