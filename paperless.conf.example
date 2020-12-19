@@ -1,285 +1,62 @@
-# Sample paperless.conf
-# Copy this file to /etc/paperless.conf and modify it to suit your needs.
-# As this file contains passwords it should only be readable by the user
-# running paperless.
+# Have a look at the docs for documentation.
+# https://paperless-ng.readthedocs.io/en/latest/configuration.html
 
+# Debug. Only enable this for development.
 
-###############################################################################
-####                         Paths & Folders                               ####
-###############################################################################
+#PAPERLESS_DEBUG=false
 
-# This where your documents should go to be consumed.  Make sure that it exists
-# and that the user running the paperless service can read/write its contents
-# before you start Paperless.
-PAPERLESS_CONSUMPTION_DIR=""
+# Required services
 
+#PAPERLESS_REDIS=redis://localhost:6379
+#PAPERLESS_DBHOST=localhost
+#PAPERLESS_DBPORT=5432
+#PAPERLESS_DBNAME=paperless
+#PAPERLESS_DBUSER=paperless
+#PAPERLESS_DBPASS=paperless
 
-# You can specify where you want the SQLite database to be stored instead of
-# the default location of /data/ within the install directory.
-#PAPERLESS_DBDIR=/path/to/database/file
+# Paths and folders
 
+#PAPERLESS_CONSUMPTION_DIR=../consume
+#PAPERLESS_DATA_DIR=../data
+#PAPERLESS_MEDIA_ROOT=../media
+#PAPERLESS_STATICDIR=../static
+#PAPERLESS_FILENAME_FORMAT=
 
-# Override the default MEDIA_ROOT here.  This is where all files are stored.
-# The default location is /media/documents/ within the install folder.
-#PAPERLESS_MEDIADIR=/path/to/media
+# Security and hosting
 
+#PAPERLESS_SECRET_KEY=change-me
+#PAPERLESS_ALLOWED_HOSTS=example.com,www.example.com
+#PAPERLESS_CORS_ALLOWED_HOSTS=localhost:8080,example.com,localhost:8000
+#PAPERLESS_FORCE_SCRIPT_NAME=
+#PAPERLESS_STATIC_URL=/static/
+#PAPERLESS_AUTO_LOGIN_USERNAME=
+#PAPERLESS_COOKIE_PREFIX=
 
-# Override the default STATIC_ROOT here.  This is where all static files
-# created using "collectstatic" manager command are stored.
-#PAPERLESS_STATICDIR=""
+# OCR settings
 
-
-# Override the MEDIA_URL here.  Unless you're hosting Paperless off a subdomain
-# like /paperless/, you probably don't need to change this.
-#PAPERLESS_MEDIA_URL="/media/"
-
-# Override the STATIC_URL here.  Unless you're hosting Paperless off a
-# subdomain like /paperless/, you probably don't need to change this.
-#PAPERLESS_STATIC_URL="/static/"
-
-
-# These values are required if you want paperless to check a particular email
-# box every 10 minutes and attempt to consume documents from there.  If you
-# don't define a HOST, mail checking will just be disabled.
-PAPERLESS_CONSUME_MAIL_HOST=""
-PAPERLESS_CONSUME_MAIL_PORT=""
-PAPERLESS_CONSUME_MAIL_USER=""
-PAPERLESS_CONSUME_MAIL_PASS=""
-
-# Override the default IMAP inbox here. If not set Paperless defaults to
-# "INBOX".
-#PAPERLESS_CONSUME_MAIL_INBOX="INBOX"
-
-# Any email sent to the target account that does not contain this text will be
-# ignored.
-PAPERLESS_EMAIL_SECRET=""
-
-# Specify a filename format for the document (directories are supported)
-# Use the following placeholders:
-# * {correspondent}
-# * {title}
-# * {created}
-# * {added}
-# * {tags[KEY]} If your tags conform to key_value or key-value
-# * {tags[INDEX]} If your tags are strings, select the tag by index
-# Uniqueness of filenames is ensured, as an incrementing counter is attached
-# to each filename.
-#PAPERLESS_FILENAME_FORMAT=""
-
-###############################################################################
-####                              Security                                 ####
-###############################################################################
-
-# Controls whether django's debug mode is enabled. Disable this on production
-# systems. Debug mode is enabled by default.
-#PAPERLESS_DEBUG="true"
-
-
-# Paperless can be instructed to attempt to encrypt your PDF files with GPG
-# using the PAPERLESS_PASSPHRASE specified below.  If however you're not
-# concerned about encrypting these files (for example if you have disk
-# encryption locally) then you don't need this and can safely leave this value
-# un-set.
-#
-# One final note about the passphrase.  Once you've consumed a document with
-# one passphrase, DON'T CHANGE IT.  Paperless assumes this to be a constant and
-# can't properly export documents that were encrypted with an old passphrase if
-# you've since changed it to a new one.
-#
-# The default is to not use encryption at all.
-#PAPERLESS_PASSPHRASE="secret"
-
-
-# The secret key has a default that should be fine so long as you're hosting
-# Paperless on a closed network.  However, if you're putting this anywhere
-# public, you should change the key to something unique and verbose.
-#PAPERLESS_SECRET_KEY="change-me"
-
-
-# If you're planning on putting Paperless on the open internet, then you
-# really should set this value to the domain name you're using.  Failing to do
-# so leaves you open to HTTP host header attacks:
-# https://docs.djangoproject.com/en/1.10/topics/security/#host-headers-virtual-hosting
-#
-# Just remember that this is a comma-separated list, so "example.com" is fine,
-# as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
-#PAPERLESS_ALLOWED_HOSTS="example.com,www.example.com"
-
-# If you decide to use the Paperless API in an ajax call, you need to add your
-# servers to the list of allowed hosts that can do CORS calls. By default
-# Paperless allows calls from localhost:8080, but you'd like to change that,
-# you can set this value to a comma-separated list.
-#PAPERLESS_CORS_ALLOWED_HOSTS="localhost:8080,example.com,localhost:8000"
-
-# To host paperless under a subpath url like example.com/paperless you set
-# this value to /paperless. No trailing slash!
-#
-# https://docs.djangoproject.com/en/1.11/ref/settings/#force-script-name
-#PAPERLESS_FORCE_SCRIPT_NAME=""
-
-# If you are using alternative authentication means or are just using paperless
-# as a single user on a small private network, this option allows you to disable
-# user authentication if you set it to "true"
-#PAPERLESS_DISABLE_LOGIN="false"
-
-###############################################################################
-####                          Software Tweaks                              ####
-###############################################################################
-
-# After a document is consumed, Paperless can trigger an arbitrary script if
-# you like.  This script will be passed a number of arguments for you to work
-# with.  The default is blank, which means nothing will be executed.  For more
-# information, take a look at the docs:
-# http://paperless.readthedocs.org/en/latest/consumption.html#hooking-into-the-consumption-process
-#PAPERLESS_POST_CONSUME_SCRIPT="/path/to/an/arbitrary/script.sh"
-
-# By default, when clicking on a document within the web interface, the
-# browser will prompt the user to save the document to disk. By setting this to
-# "true", the document will instead be opened in the browser, if possible.
-#PAPERLESS_INLINE_DOC="false"
-
-# By default, paperless will check the document text for document date information.
-# Uncomment the line below to enable checking the document filename for date
-# information. The date order can be set to any option as specified in
-# https://dateparser.readthedocs.io/en/latest/#settings. The filename will be
-# checked first, and if nothing is found, the document text will be checked
-# as normal.
-#PAPERLESS_FILENAME_DATE_ORDER="YMD"
-
-# Sometimes devices won't create filenames which can be parsed properly
-# by the filename parser (see
-# https://paperless.readthedocs.io/en/latest/guesswork.html).
-#
-# This setting allows to specify a list of transformations
-# in regular expression syntax, which are passed in order to re.sub.
-# Transformation stops after the first match, so at most one transformation
-# is applied.
-#
-# Syntax is a JSON array of dictionaries containing "pattern" and "repl"
-# as keys.
-#
-# The example below transforms filenames created by a Brother ADS-2400N
-# document scanner in its standard configuration `Name_Date_Count', so that
-# count is used as title, name as tag and date can be parsed by paperless.
-#PAPERLESS_FILENAME_PARSE_TRANSFORMS=[{"pattern":"^([a-z]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.", "repl":"\\2\\3Z - \\4 - \\1."}]
-
-#
-# The following values use sensible defaults for modern systems, but if you're
-# running Paperless on a low-resource device (like a Raspberry Pi), modifying
-# some of these values may be necessary.
-#
-
-
-# By default, Paperless will attempt to use all available CPU cores to process
-# a document, but if you would like to limit that, you can set this value to
-# an integer:
-#PAPERLESS_OCR_THREADS=1
-
-
-# Customize the default language that tesseract will attempt to use when
-# parsing documents.  It should be a 3-letter language code consistent with ISO
-# 639: https://www.loc.gov/standards/iso639-2/php/code_list.php
 #PAPERLESS_OCR_LANGUAGE=eng
-
-
-# On smaller systems, or even in the case of Very Large Documents, the consumer
-# may explode, complaining about how it's "unable to extend pixel cache".  In
-# such cases, try setting this to a reasonably low value, like 32000000.  The
-# default is to use whatever is necessary to do everything without writing to
-# disk, and units are in megabytes.
-#
-# For more information on how to use this value, you should probably search
-# the web for "MAGICK_MEMORY_LIMIT".
+#PAPERLESS_OCR_MODE=skip
+#PAPERLESS_OCR_OUTPUT_TYPE=pdfa
+#PAPERLESS_OCR_PAGES=1
+#PAPERLESS_OCR_IMAGE_DPI=300
+#PAPERLESS_OCR_USER_ARG={}
 #PAPERLESS_CONVERT_MEMORY_LIMIT=0
-
-
-# Similar to the memory limit, if you've got a small system and your OS mounts
-# /tmp as tmpfs, you should set this to a path that's on a physical disk, like
-# /home/your_user/tmp or something.  ImageMagick will use this as scratch space
-# when crunching through very large documents.
-#
-# For more information on how to use this value, you should probably search
-# the web for "MAGICK_TMPDIR".
 #PAPERLESS_CONVERT_TMPDIR=/var/tmp/paperless
 
+# Software tweaks
 
-# By default the conversion density setting for documents is 300DPI, in some
-# cases it has proven useful to configure a lesser value.
-# This setting has a high impact on the physical size of tmp page files,
-# the speed of document conversion, and can affect the accuracy of OCR
-# results. Individual results can vary and this setting should be tested
-# thoroughly against the documents you are importing to see if it has any
-# impacts either negative or positive.
-# Testing on limited document sets has shown a setting of 200 can cut the
-# size of tmp files by 1/3, and speed up conversion by up to 4x
-# with little impact to OCR accuracy.
-#PAPERLESS_CONVERT_DENSITY=300
-
-
-# (This setting is ignored on Linux where inotify is used instead of a
-# polling loop.)
-# The number of seconds that Paperless will wait between checking
-# PAPERLESS_CONSUMPTION_DIR.  If you tend to write documents to this directory
-# rarely, you may want to use a higher value than the default (10).
-#PAPERLESS_CONSUMER_LOOP_TIME=10
-
-
-# By default Paperless stops consuming a document if no language can be
-# detected. Set to true to consume documents even if the language detection
-# fails.
-#PAPERLESS_FORGIVING_OCR="false"
-
-
-# By default Paperless does not OCR a document if the text can be retrieved from
-# the document directly. Set to true to always OCR documents.
-#PAPERLESS_OCR_ALWAYS="false"
-
-
-###############################################################################
-####                            Interface                                  ####
-###############################################################################
-
-# Override the default UTC time zone here.
-# See https://docs.djangoproject.com/en/1.10/ref/settings/#std:setting-TIME_ZONE
-# for details on how to set it.
+#PAPERLESS_TASK_WORKERS=1
+#PAPERLESS_THREADS_PER_WORKER=1
 #PAPERLESS_TIME_ZONE=UTC
+#PAPERLESS_CONSUMER_POLLING=10
+#PAPERLESS_CONSUMER_DELETE_DUPLICATES=false
+#PAPERLESS_OPTIMIZE_THUMBNAILS=true
+#PAPERLESS_POST_CONSUME_SCRIPT=/path/to/an/arbitrary/script.sh
+#PAPERLESS_FILENAME_DATE_ORDER=YMD
+#PAPERLESS_FILENAME_PARSE_TRANSFORMS=[]
 
+# Binaries
 
-# If set, Paperless will show document filters per financial year.
-# The dates must be in the format "mm-dd", for example "07-15" for July 15.
-#PAPERLESS_FINANCIAL_YEAR_START="mm-dd"
-#PAPERLESS_FINANCIAL_YEAR_END="mm-dd"
-
-
-# The number of items on each page in the web UI.  This value must be a
-# positive integer, but if you don't define one in paperless.conf, a default of
-# 100 will be used.
-#PAPERLESS_LIST_PER_PAGE=100
-
-
-# The number of years for which a correspondent will be included in the recent
-# correspondents filter.
-#PAPERLESS_RECENT_CORRESPONDENT_YEARS=1
-
-###############################################################################
-####                     Third-Party Binaries                              ####
-###############################################################################
-
-# There are a few external software packages that Paperless expects to find on
-# your system when it starts up.  Unless you've done something creative with
-# their installation, you probably won't need to edit any of these.  However,
-# if you've installed these programs somewhere where simply typing the name of
-# the program doesn't automatically execute it (ie. the program isn't in your
-# $PATH), then you'll need to specify the literal path for that program here.
-
-# Convert (part of the ImageMagick suite)
 #PAPERLESS_CONVERT_BINARY=/usr/bin/convert
-
-# Ghostscript
-#PAPERLESS_GS_BINARY = /usr/bin/gs
-
-# Unpaper
-#PAPERLESS_UNPAPER_BINARY=/usr/bin/unpaper
-
-# Optipng (for optimising thumbnail sizes)
+#PAPERLESS_GS_BINARY=/usr/bin/gs
 #PAPERLESS_OPTIPNG_BINARY=/usr/bin/optipng

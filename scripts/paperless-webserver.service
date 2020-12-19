@@ -2,11 +2,13 @@
 Description=Paperless webserver
 After=network.target
 Wants=network.target
+Requires=redis.service
 
 [Service]
 User=paperless
 Group=paperless
-ExecStart=/home/paperless/project/virtualenv/bin/gunicorn --pythonpath=/home/paperless/project/src paperless.wsgi -w 2
+WorkingDirectory=/opt/paperless/src
+ExecStart=/opt/paperless/.local/bin/gunicorn paperless.wsgi -w 2 -b 0.0.0.0:8000
 
 [Install]
 WantedBy=multi-user.target
