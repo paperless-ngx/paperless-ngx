@@ -174,9 +174,21 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  bulkSetTags(tags) {
-    console.log('bulkSetTags', tags);
-    // TODO:
+  bulkSetTags(tags: PaperlessTag[]) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Confirm Tags assignment"
+    let messageFragment = tags ? `assign the tag(s) ${tags.map(t => t.name).join(', ')} to` : `remove all tags from`
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      // TODO: API endpoint for set multiple tags
+      this.executeBulkOperation('set_tags', {"document_type": tags ? tags.map(t => t.id) : null}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
   }
 
   bulkAddTag() {
