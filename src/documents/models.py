@@ -357,52 +357,10 @@ class SavedViewFilterRule(models.Model):
 # TODO: why is this in the models file?
 class FileInfo:
 
-    # This epic regex *almost* worked for our needs, so I'm keeping it here for
-    # posterity, in the hopes that we might find a way to make it work one day.
-    ALMOST_REGEX = re.compile(
-        r"^((?P<date>\d\d\d\d\d\d\d\d\d\d\d\d\d\dZ){separator})?"
-        r"((?P<correspondent>{non_separated_word}+){separator})??"
-        r"(?P<title>{non_separated_word}+)"
-        r"({separator}(?P<tags>[a-z,0-9-]+))?"
-        r"\.(?P<extension>[a-zA-Z.-]+)$".format(
-            separator=r"\s+-\s+",
-            non_separated_word=r"([\w,. ]|([^\s]-))"
-        )
-    )
     REGEXES = OrderedDict([
-        ("created-correspondent-title-tags", re.compile(
-            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)$",
-            flags=re.IGNORECASE
-        )),
-        ("created-title-tags", re.compile(
-            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)$",
-            flags=re.IGNORECASE
-        )),
-        ("created-correspondent-title", re.compile(
-            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*)$",
-            flags=re.IGNORECASE
-        )),
         ("created-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<title>.*)$",
-            flags=re.IGNORECASE
-        )),
-        ("correspondent-title-tags", re.compile(
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)$",
-            flags=re.IGNORECASE
-        )),
-        ("correspondent-title", re.compile(
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*)?$",
             flags=re.IGNORECASE
         )),
         ("title", re.compile(
@@ -428,21 +386,8 @@ class FileInfo:
             return None
 
     @classmethod
-    def _get_correspondent(cls, name):
-        if not name:
-            return None
-        return Correspondent.objects.get_or_create(name=name)[0]
-
-    @classmethod
     def _get_title(cls, title):
         return title
-
-    @classmethod
-    def _get_tags(cls, tags):
-        r = []
-        for t in tags.split(","):
-            r.append(Tag.objects.get_or_create(name=t)[0])
-        return tuple(r)
 
     @classmethod
     def _mangle_property(cls, properties, name):
@@ -453,15 +398,6 @@ class FileInfo:
 
     @classmethod
     def from_filename(cls, filename):
-        """
-        We use a crude naming convention to make handling the correspondent,
-        title, and tags easier:
-          "<date> - <correspondent> - <title> - <tags>"
-          "<correspondent> - <title> - <tags>"
-          "<correspondent> - <title>"
-          "<title>"
-        """
-
         # Mutate filename in-place before parsing its components
         # by applying at most one of the configured transformations.
         for (pattern, repl) in settings.FILENAME_PARSE_TRANSFORMS:
@@ -492,7 +428,5 @@ class FileInfo:
             if m:
                 properties = m.groupdict()
                 cls._mangle_property(properties, "created")
-                cls._mangle_property(properties, "correspondent")
                 cls._mangle_property(properties, "title")
-                cls._mangle_property(properties, "tags")
                 return cls(**properties)
