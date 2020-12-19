@@ -139,7 +139,9 @@ export class DocumentListComponent implements OnInit {
     )
   }
 
-  bulkSetCorrespondent() {
+  bulkSetCorrespondent(correspondent) {
+    console.log(correspondent);
+
     let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Select correspondent"
     modal.componentInstance.message = `Select the correspondent you wish to assign to ${this.list.selected.size} selected document(s):`
@@ -166,7 +168,9 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  bulkSetDocumentType() {
+  bulkSetDocumentType(documentType) {
+    console.log();
+
     let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Select document type"
     modal.componentInstance.message = `Select the document type you wish to assign to ${this.list.selected.size} selected document(s):`
@@ -191,6 +195,11 @@ export class DocumentListComponent implements OnInit {
         modal.close()
       })
     })
+  }
+
+  bulkSetTags(tags) {
+    console.log('bulkSetTags', tags);
+
   }
 
   bulkAddTag() {
