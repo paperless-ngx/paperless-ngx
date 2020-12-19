@@ -19,9 +19,9 @@
           <input class="form-control" type="text" [(ngModel)]="filterText" placeholder="Filter {{title}}" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
         </div>
       </div>
-      <div *ngIf="items" class="items">
-        <ng-container *ngFor="let item of items | filter: filterText; let i = index">
-          <app-filterable-dropdown-button [item]="item" [selected]="isItemSelected(item)" (toggle)="toggleItem($event)"></app-filterable-dropdown-button>
+      <div *ngIf="selectableItems" class="items">
+        <ng-container *ngFor="let selectableItem of selectableItems | filter: filterText">
+          <app-filterable-dropdown-button [selectableItem]="selectableItem" (toggle)="toggleItem($event)"></app-filterable-dropdown-button>
         </ng-container>
       </div>
     </div>

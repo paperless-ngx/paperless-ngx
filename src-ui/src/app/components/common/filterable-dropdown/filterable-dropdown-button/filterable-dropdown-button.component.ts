@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
+import { SelectableItem, SelectableItemState } from '../filterable-dropdown.component';
 
 @Component({
   selector: 'app-filterable-dropdown-button',
@@ -11,10 +12,11 @@ import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 export class FilterableDropdownButtonComponent implements OnInit {
 
   @Input()
-  item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent
+  selectableItem: SelectableItem
 
-  @Input()
-  selected: boolean
+  get item(): PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent {
+    return this.selectableItem?.item
+  }
 
   @Output()
   toggle = new EventEmitter()
@@ -26,7 +28,14 @@ export class FilterableDropdownButtonComponent implements OnInit {
   }
 
   toggleItem(): void {
-    this.selected = !this.selected
-    this.toggle.emit(this.item)
+    this.selectableItem.state = (this.selectableItem.state == SelectableItemState.NotSelected || this.selectableItem.state == SelectableItemState.PartiallySelected) ? SelectableItemState.Selected : SelectableItemState.NotSelected
+    this.toggle.emit(this.selectableItem)
+  }
+
+  getSelectedIconName() {
+    let iconName = ''
+    if (this.selectableItem?.state == SelectableItemState.Selected) iconName = 'check'
+    else if (this.selectableItem?.state == SelectableItemState.PartiallySelected) iconName = 'minus'
+    return iconName
   }
 }

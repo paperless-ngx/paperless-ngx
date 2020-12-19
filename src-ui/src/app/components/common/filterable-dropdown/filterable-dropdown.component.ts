@@ -1,7 +1,21 @@
 import { Component, EventEmitter, Input, Output, ElementRef, ViewChild } from '@angular/core';
 import { ObjectWithId } from 'src/app/data/object-with-id';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
+import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { FilterPipe } from  'src/app/pipes/filter.pipe';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
+
+export interface SelectableItem {
+  item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent,
+  state: SelectableItemState
+}
+
+export enum SelectableItemState {
+  NotSelected = 0,
+  Selected = 1,
+  PartiallySelected = 2
+}
 
 @Component({
   selector: 'app-filterable-dropdown',
@@ -13,10 +27,26 @@ export class FilterableDropdownComponent {
   constructor(private filterPipe: FilterPipe) { }
 
   @Input()
-  items: ObjectWithId[]
+  set items(items: ObjectWithId[]) {
+    if (items) {
+      this.selectableItems = items.map(i => {
+        return {item: i, state: SelectableItemState.NotSelected}
+      })
+    }
+  }
+
+  selectableItems: SelectableItem[] = []
 
   @Input()
-  itemsSelected: ObjectWithId[]
+  set itemsSelected(itemsSelected: ObjectWithId[]) {
+    this.selectableItems.forEach(i => {
+      i.state = (itemsSelected.find(is => is.id == i.item.id)) ? SelectableItemState.Selected : SelectableItemState.NotSelected
+    })
+  }
+
+  get itemsSelected() :ObjectWithId[] {
+    return this.selectableItems.filter(si => si.state == SelectableItemState.Selected).map(si => si.item)
+  }
 
   @Input()
   title: string
@@ -35,12 +65,8 @@ export class FilterableDropdownComponent {
 
   filterText: string
 
-  toggleItem(item: ObjectWithId): void {
-    this.toggle.emit(item)
-  }
-
-  isItemSelected(item: ObjectWithId): boolean {
-    return this.itemsSelected?.find(i => i.id == item.id) !== undefined
+  toggleItem(selectableItem: SelectableItem): void {
+    this.toggle.emit(selectableItem.item)
   }
 
   dropdownOpenChange(open: boolean): void {
@@ -50,12 +76,12 @@ export class FilterableDropdownComponent {
       }, 0);
     } else {
       this.filterText = ''
-      this.close.emit(this.itemsSelected)
+      this.close.next()
     }
   }
 
   listFilterEnter(): void {
-    let filtered = this.filterPipe.transform(this.items, this.filterText)
+    let filtered = this.filterPipe.transform(this.selectableItems, this.filterText)
     if (filtered.length == 1) this.toggleItem(filtered.shift())
     this.dropdown.close()
   }
