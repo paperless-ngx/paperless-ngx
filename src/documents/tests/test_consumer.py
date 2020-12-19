@@ -642,3 +642,31 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertEqual(document.document_type, dtype)
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
+
+    @override_settings(CONSUMER_DELETE_DUPLICATES=True)
+    def test_delete_duplicate(self):
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        doc = self.consumer.try_consume_file(dst)
+
+        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotNone(doc)
+
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
+        self.assertFalse(os.path.isfile(dst))
+
+    @override_settings(CONSUMER_DELETE_DUPLICATES=False)
+    def test_no_delete_duplicate(self):
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        doc = self.consumer.try_consume_file(dst)
+
+        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotNone(doc)
+
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
+        self.assertTrue(os.path.isfile(dst))
