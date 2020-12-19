@@ -247,7 +247,6 @@ class Consumer(LoggingMixin):
 
         with open(self.path, "rb") as f:
             document = Document.objects.create(
-                correspondent=file_info.correspondent,
                 title=(self.override_title or file_info.title)[:127],
                 content=text,
                 mime_type=mime_type,
@@ -256,12 +255,6 @@ class Consumer(LoggingMixin):
                 modified=created,
                 storage_type=storage_type
             )
-
-        relevant_tags = set(file_info.tags)
-        if relevant_tags:
-            tag_names = ", ".join([t.name for t in relevant_tags])
-            self.log("debug", "Tagging with {}".format(tag_names))
-            document.tags.add(*relevant_tags)
 
         self.apply_overrides(document)
 
