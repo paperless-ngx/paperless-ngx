@@ -1,0 +1,21 @@
+<app-widget-frame [title]="savedView.name">
+
+  <a header-buttons [routerLink]="" (click)="showAll()">Show all</a>
+
+
+  <table content class="table table-sm table-hover table-borderless">
+    <thead>
+      <tr>
+        <th>Created</th>
+        <th scope="col">Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let doc of documents" routerLink="/documents/{{doc.id}}">
+        <td>{{doc.created | date}}</td>
+        <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ml-1"></app-tag>
+      </tr>
+    </tbody>
+  </table>
+
+</app-widget-frame>

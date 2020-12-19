@@ -1,38 +1,120 @@
 import logging
 import os
-import time
+from pathlib import Path
+from time import sleep
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.text import slugify
+from django_q.tasks import async_task
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers.polling import PollingObserver
 
-from ...consumer import Consumer, ConsumerError
-from ...mail import MailFetcher, MailFetcherError
+from documents.models import Tag
+from documents.parsers import is_file_ext_supported
 
 try:
-    from inotify_simple import INotify, flags
+    from inotifyrecursive import INotify, flags
 except ImportError:
     INotify = flags = None
+
+logger = logging.getLogger(__name__)
+
+
+def _tags_from_path(filepath):
+    """Walk up the directory tree from filepath to CONSUMPTION_DIr
+       and get or create Tag IDs for every directory.
+    """
+    tag_ids = set()
+    path_parts = Path(filepath).relative_to(
+                settings.CONSUMPTION_DIR).parent.parts
+    for part in path_parts:
+        tag_ids.add(Tag.objects.get_or_create(name__iexact=part, defaults={
+            "name": part
+        })[0].pk)
+
+    return tag_ids
+
+
+def _consume(filepath):
+    if os.path.isdir(filepath):
+        return
+
+    if not os.path.isfile(filepath):
+        logger.debug(
+            f"Not consuming file {filepath}: File has moved.")
+        return
+
+    if not is_file_ext_supported(os.path.splitext(filepath)[1]):
+        logger.debug(
+            f"Not consuming file {filepath}: Unknown file extension.")
+        return
+
+    tag_ids = None
+    try:
+        if settings.CONSUMER_SUBDIRS_AS_TAGS:
+            tag_ids = _tags_from_path(filepath)
+    except Exception as e:
+        logger.error(
+            "Error creating tags from path: {}".format(e))
+
+    try:
+        async_task("documents.tasks.consume_file",
+                   filepath,
+                   override_tag_ids=tag_ids if tag_ids else None,
+                   task_name=os.path.basename(filepath)[:100])
+    except Exception as e:
+        # Catch all so that the consumer won't crash.
+        # This is also what the test case is listening for to check for
+        # errors.
+        logger.error(
+            "Error while consuming document: {}".format(e))
+
+
+def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
+    mtime = -1
+    current_try = 0
+    while current_try < num_tries:
+        try:
+            new_mtime = os.stat(file).st_mtime
+        except FileNotFoundError:
+            logger.debug(f"File {file} moved while waiting for it to remain "
+                         f"unmodified.")
+            return
+        if new_mtime == mtime:
+            _consume(file)
+            return
+        mtime = new_mtime
+        sleep(wait_time)
+        current_try += 1
+
+    logger.error(f"Timeout while waiting on file {file} to remain unmodified.")
+
+
+class Handler(FileSystemEventHandler):
+
+    def on_created(self, event):
+        _consume_wait_unmodified(event.src_path)
+
+    def on_moved(self, event):
+        _consume_wait_unmodified(event.dest_path)
 
 
 class Command(BaseCommand):
     """
     On every iteration of an infinite loop, consume what we can from the
-    consumption directory, and fetch any mail available.
+    consumption directory.
     """
 
-    ORIGINAL_DOCS = os.path.join(settings.MEDIA_ROOT, "documents", "originals")
-    THUMB_DOCS = os.path.join(settings.MEDIA_ROOT, "documents", "thumbnails")
+    # This is here primarily for the tests and is irrelevant in production.
+    stop_flag = False
 
     def __init__(self, *args, **kwargs):
 
-        self.verbosity = 0
         self.logger = logging.getLogger(__name__)
 
-        self.file_consumer = None
-        self.mail_fetcher = None
-        self.first_iteration = True
-
         BaseCommand.__init__(self, *args, **kwargs)
+        self.observer = None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -42,110 +124,80 @@ class Command(BaseCommand):
             help="The consumption directory."
         )
         parser.add_argument(
-            "--loop-time",
-            default=settings.CONSUMER_LOOP_TIME,
-            type=int,
-            help="Wait time between each loop (in seconds)."
-        )
-        parser.add_argument(
-            "--mail-delta",
-            default=10,
-            type=int,
-            help="Wait time between each mail fetch (in minutes)."
-        )
-        parser.add_argument(
             "--oneshot",
             action="store_true",
             help="Run only once."
         )
-        parser.add_argument(
-            "--no-inotify",
-            action="store_true",
-            help="Don't use inotify, even if it's available.",
-            default=False
-        )
 
     def handle(self, *args, **options):
-
-        self.verbosity = options["verbosity"]
         directory = options["directory"]
-        loop_time = options["loop_time"]
-        mail_delta = options["mail_delta"] * 60
-        use_inotify = INotify is not None and options["no_inotify"] is False
+        recursive = settings.CONSUMER_RECURSIVE
 
-        try:
-            self.file_consumer = Consumer(consume=directory)
-            self.mail_fetcher = MailFetcher(consume=directory)
-        except (ConsumerError, MailFetcherError) as e:
-            raise CommandError(e)
-
-        for d in (self.ORIGINAL_DOCS, self.THUMB_DOCS):
-            os.makedirs(d, exist_ok=True)
-
-        logging.getLogger(__name__).info(
-            "Starting document consumer at {}{}".format(
-                directory,
-                " with inotify" if use_inotify else ""
+        if not directory:
+            raise CommandError(
+                "CONSUMPTION_DIR does not appear to be set."
             )
-        )
+
+        if not os.path.isdir(directory):
+            raise CommandError(
+                f"Consumption directory {directory} does not exist")
+
+        if recursive:
+            for dirpath, _, filenames in os.walk(directory):
+                for filename in filenames:
+                    filepath = os.path.join(dirpath, filename)
+                    _consume(filepath)
+        else:
+            for entry in os.scandir(directory):
+                _consume(entry.path)
 
         if options["oneshot"]:
-            self.loop_step(mail_delta)
+            return
+
+        if settings.CONSUMER_POLLING == 0 and INotify:
+            self.handle_inotify(directory, recursive)
         else:
-            try:
-                if use_inotify:
-                    self.loop_inotify(mail_delta)
-                else:
-                    self.loop(loop_time, mail_delta)
-            except KeyboardInterrupt:
-                print("Exiting")
+            self.handle_polling(directory, recursive)
 
-    def loop(self, loop_time, mail_delta):
-        while True:
-            start_time = time.time()
-            if self.verbosity > 1:
-                print(".", int(start_time))
-            self.loop_step(mail_delta, start_time)
-            # Sleep until the start of the next loop step
-            time.sleep(max(0, start_time + loop_time - time.time()))
+        logger.debug("Consumer exiting.")
 
-    def loop_step(self, mail_delta, time_now=None):
+    def handle_polling(self, directory, recursive):
+        logging.getLogger(__name__).info(
+            f"Polling directory for changes: {directory}")
+        self.observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
+        self.observer.schedule(Handler(), directory, recursive=recursive)
+        self.observer.start()
+        try:
+            while self.observer.is_alive():
+                self.observer.join(1)
+                if self.stop_flag:
+                    self.observer.stop()
+        except KeyboardInterrupt:
+            self.observer.stop()
+        self.observer.join()
 
-        # Occasionally fetch mail and store it to be consumed on the next loop
-        # We fetch email when we first start up so that it is not necessary to
-        # wait for 10 minutes after making changes to the config file.
-        next_mail_time = self.mail_fetcher.last_checked + mail_delta
-        if self.first_iteration or time_now > next_mail_time:
-            self.first_iteration = False
-            self.mail_fetcher.pull()
+    def handle_inotify(self, directory, recursive):
+        logging.getLogger(__name__).info(
+            f"Using inotify to watch directory for changes: {directory}")
 
-        self.file_consumer.consume_new_files()
-
-    def loop_inotify(self, mail_delta):
-        directory = self.file_consumer.consume
         inotify = INotify()
-        inotify.add_watch(directory, flags.CLOSE_WRITE | flags.MOVED_TO)
+        inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO
+        if recursive:
+            descriptor = inotify.add_watch_recursive(directory, inotify_flags)
+        else:
+            descriptor = inotify.add_watch(directory, inotify_flags)
 
-        # Run initial mail fetch and consume all currently existing documents
-        self.loop_step(mail_delta)
-        next_mail_time = self.mail_fetcher.last_checked + mail_delta
+        try:
+            while not self.stop_flag:
+                for event in inotify.read(timeout=1000):
+                    if recursive:
+                        path = inotify.get_path(event.wd)
+                    else:
+                        path = directory
+                    filepath = os.path.join(path, event.name)
+                    _consume(filepath)
+        except KeyboardInterrupt:
+            pass
 
-        while True:
-            # Consume documents until next_mail_time
-            while True:
-                delta = next_mail_time - time.time()
-                if delta > 0:
-                    for event in inotify.read(timeout=delta):
-                        file = os.path.join(directory, event.name)
-                        if os.path.isfile(file):
-                            self.file_consumer.try_consume_file(file)
-                        else:
-                            self.logger.warning(
-                                "Skipping %s as it is not a file",
-                                file
-                            )
-                else:
-                    break
-
-            self.mail_fetcher.pull()
-            next_mail_time = self.mail_fetcher.last_checked + mail_delta
+        inotify.rm_watch(descriptor)
+        inotify.close()

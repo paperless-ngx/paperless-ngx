@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
+from paperless_tesseract.signals import tesseract_consumer_declaration
+
 
 class PaperlessTesseractConfig(AppConfig):
 
@@ -9,8 +11,6 @@ class PaperlessTesseractConfig(AppConfig):
 
         from documents.signals import document_consumer_declaration
 
-        from .signals import ConsumerDeclaration
-
-        document_consumer_declaration.connect(ConsumerDeclaration.handle)
+        document_consumer_declaration.connect(tesseract_consumer_declaration)
 
         AppConfig.ready(self)

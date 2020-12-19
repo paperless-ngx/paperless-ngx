@@ -1,12 +1,14 @@
+
 .. _scanners:
 
-Scanner Recommendations
-=======================
+***********************
+Scanner recommendations
+***********************
 
 As Paperless operates by watching a folder for new files, doesn't care what
 scanner you use, but sometimes finding a scanner that will write to an FTP,
 NFS, or SMB server can be difficult.  This page is here to help you find one
-that works right for you based on recommentations from other Paperless users.
+that works right for you based on recommendations from other Paperless users.
 
 +---------+----------------+-----+-----+-----+----------------+
 | Brand   | Model          | Supports        | Recommended By |
@@ -25,6 +27,8 @@ that works right for you based on recommentations from other Paperless users.
 +---------+----------------+-----+-----+-----+----------------+
 | Epson   | `WF-7710DWF`_  | yes |     | yes | `Skylinar`_    |
 +---------+----------------+-----+-----+-----+----------------+
+| Fujitsu | `S1300i`_      | yes |     | yes | `jonaswinkler`_|
++---------+----------------+-----+-----+-----+----------------+
 
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
@@ -32,6 +36,7 @@ that works right for you based on recommentations from other Paperless users.
 .. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 .. _WF-7710DWF: https://www.epson.de/en/products/printers/inkjet-printers/for-home/workforce-wf-7710dwf
+.. _S1300i: https://www.fujitsu.com/global/products/computing/peripheral/scanners/soho/s1300i/
 
 .. _danielquinn: https://github.com/danielquinn
 .. _ayounggun: https://github.com/ayounggun
@@ -39,3 +44,4 @@ that works right for you based on recommentations from other Paperless users.
 .. _eonist: https://github.com/eonist
 .. _REOLDEV: https://github.com/REOLDEV
 .. _Skylinar: https://github.com/Skylinar
+.. _jonaswinkler: https://github.com/jonaswinkler
