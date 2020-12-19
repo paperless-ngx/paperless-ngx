@@ -29,81 +29,6 @@ class TestAttributes(TestCase):
 
         self.assertEqual(tuple([t.name for t in file_info.tags]), tags, filename)
 
-    def test_guess_attributes_from_name0(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Title.pdf", "Sender", "Title", ())
-
-    def test_guess_attributes_from_name1(self):
-        self._test_guess_attributes_from_name(
-            "Spaced Sender - Title.pdf", "Spaced Sender", "Title", ())
-
-    def test_guess_attributes_from_name2(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Spaced Title.pdf", "Sender", "Spaced Title", ())
-
-    def test_guess_attributes_from_name3(self):
-        self._test_guess_attributes_from_name(
-            "Dashed-Sender - Title.pdf", "Dashed-Sender", "Title", ())
-
-    def test_guess_attributes_from_name4(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Dashed-Title.pdf", "Sender", "Dashed-Title", ())
-
-    def test_guess_attributes_from_name5(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Title - tag1,tag2,tag3.pdf",
-            "Sender",
-            "Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name6(self):
-        self._test_guess_attributes_from_name(
-            "Spaced Sender - Title - tag1,tag2,tag3.pdf",
-            "Spaced Sender",
-            "Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name7(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Spaced Title - tag1,tag2,tag3.pdf",
-            "Sender",
-            "Spaced Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name8(self):
-        self._test_guess_attributes_from_name(
-            "Dashed-Sender - Title - tag1,tag2,tag3.pdf",
-            "Dashed-Sender",
-            "Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name9(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Dashed-Title - tag1,tag2,tag3.pdf",
-            "Sender",
-            "Dashed-Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name10(self):
-        self._test_guess_attributes_from_name(
-            "Σενδερ - Τιτλε - tag1,tag2,tag3.pdf",
-            "Σενδερ",
-            "Τιτλε",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name_when_correspondent_empty(self):
-        self._test_guess_attributes_from_name(
-            ' - weird empty correspondent but should not break.pdf',
-            None,
-            'weird empty correspondent but should not break',
-            ()
-        )
 
     def test_guess_attributes_from_name_when_title_starts_with_dash(self):
         self._test_guess_attributes_from_name(
@@ -120,28 +45,6 @@ class TestAttributes(TestCase):
             'weird but should not break -',
             ()
         )
-
-    def test_guess_attributes_from_name_when_title_is_empty(self):
-        self._test_guess_attributes_from_name(
-            'weird correspondent but should not break - .pdf',
-            'weird correspondent but should not break',
-            '',
-            ()
-        )
-
-    def test_case_insensitive_tag_creation(self):
-        """
-        Tags should be detected and created as lower case.
-        :return:
-        """
-
-        filename = "Title - Correspondent - tAg1,TAG2.pdf"
-        self.assertEqual(len(FileInfo.from_filename(filename).tags), 2)
-
-        path = "Title - Correspondent - tag1,tag2.pdf"
-        self.assertEqual(len(FileInfo.from_filename(filename).tags), 2)
-
-        self.assertEqual(Tag.objects.all().count(), 2)
 
 
 class TestFieldPermutations(TestCase):
@@ -199,69 +102,7 @@ class TestFieldPermutations(TestCase):
             filename = template.format(**spec)
             self._test_guessed_attributes(filename, **spec)
 
-    def test_title_and_correspondent(self):
-        template = '{correspondent} - {title}.pdf'
-        for correspondent in self.valid_correspondents:
-            for title in self.valid_titles:
-                spec = dict(correspondent=correspondent, title=title)
-                filename = template.format(**spec)
-                self._test_guessed_attributes(filename, **spec)
-
-    def test_title_and_correspondent_and_tags(self):
-        template = '{correspondent} - {title} - {tags}.pdf'
-        for correspondent in self.valid_correspondents:
-            for title in self.valid_titles:
-                for tags in self.valid_tags:
-                    spec = dict(correspondent=correspondent, title=title,
-                                tags=tags)
-                    filename = template.format(**spec)
-                    self._test_guessed_attributes(filename, **spec)
-
-    def test_created_and_correspondent_and_title_and_tags(self):
-
-        template = (
-            "{created} - "
-            "{correspondent} - "
-            "{title} - "
-            "{tags}.pdf"
-        )
-
-        for created in self.valid_dates:
-            for correspondent in self.valid_correspondents:
-                for title in self.valid_titles:
-                    for tags in self.valid_tags:
-                        spec = {
-                            "created": created,
-                            "correspondent": correspondent,
-                            "title": title,
-                            "tags": tags,
-                        }
-                        self._test_guessed_attributes(
-                            template.format(**spec), **spec)
-
-    def test_created_and_correspondent_and_title(self):
-
-        template = "{created} - {correspondent} - {title}.pdf"
-
-        for created in self.valid_dates:
-            for correspondent in self.valid_correspondents:
-                for title in self.valid_titles:
-
-                    # Skip cases where title looks like a tag as we can't
-                    # accommodate such cases.
-                    if title.lower() == title:
-                        continue
-
-                    spec = {
-                        "created": created,
-                        "correspondent": correspondent,
-                        "title": title
-                    }
-                    self._test_guessed_attributes(
-                        template.format(**spec), **spec)
-
     def test_created_and_title(self):
-
         template = "{created} - {title}.pdf"
 
         for created in self.valid_dates:
@@ -272,21 +113,6 @@ class TestFieldPermutations(TestCase):
                 }
                 self._test_guessed_attributes(
                     template.format(**spec), **spec)
-
-    def test_created_and_title_and_tags(self):
-
-        template = "{created} - {title} - {tags}.pdf"
-
-        for created in self.valid_dates:
-            for title in self.valid_titles:
-                for tags in self.valid_tags:
-                    spec = {
-                        "created": created,
-                        "title": title,
-                        "tags": tags
-                    }
-                    self._test_guessed_attributes(
-                        template.format(**spec), **spec)
 
     def test_invalid_date_format(self):
         info = FileInfo.from_filename("06112017Z - title.pdf")
@@ -335,32 +161,6 @@ class TestFieldPermutations(TestCase):
                     (all_patt, "anotherall.gif")]):
             info = FileInfo.from_filename(filename)
             self.assertEqual(info.title, "anotherall")
-
-        # Complex transformation without date in replacement string
-        with self.settings(
-                FILENAME_PARSE_TRANSFORMS=[(exact_patt, repl1)]):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "0001")
-            self.assertEqual(len(info.tags), 2)
-            self.assertEqual(info.tags[0].name, "tag1")
-            self.assertEqual(info.tags[1].name, "tag2")
-            self.assertIsNone(info.created)
-
-        # Complex transformation with date in replacement string
-        with self.settings(
-            FILENAME_PARSE_TRANSFORMS=[
-                (none_patt, "none.gif"),
-                (exact_patt, repl2),    # <-- matches
-                (exact_patt, repl1),
-                (all_patt, "all.gif")]):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "0001")
-            self.assertEqual(len(info.tags), 2)
-            self.assertEqual(info.tags[0].name, "tag1")
-            self.assertEqual(info.tags[1].name, "tag2")
-            self.assertEqual(info.created.year, 2019)
-            self.assertEqual(info.created.month, 9)
-            self.assertEqual(info.created.day, 8)
 
 
 class DummyParser(DocumentParser):
@@ -476,15 +276,13 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
     def testOverrideFilename(self):
         filename = self.get_test_file()
-        override_filename = "My Bank - Statement for November.pdf"
+        override_filename = "Statement for November.pdf"
 
         document = self.consumer.try_consume_file(filename, override_filename=override_filename)
 
-        self.assertEqual(document.correspondent.name, "My Bank")
         self.assertEqual(document.title, "Statement for November")
 
     def testOverrideTitle(self):
-
         document = self.consumer.try_consume_file(self.get_test_file(), override_title="Override Title")
         self.assertEqual(document.title, "Override Title")
 
@@ -594,11 +392,10 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def testFilenameHandling(self):
         filename = self.get_test_file()
 
-        document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
+        document = self.consumer.try_consume_file(filename, override_title="new docs")
 
         self.assertEqual(document.title, "new docs")
-        self.assertEqual(document.correspondent.name, "Bank")
-        self.assertEqual(document.filename, "Bank/new docs.pdf")
+        self.assertEqual(document.filename, "none/new docs.pdf")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
@@ -617,10 +414,9 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         Tag.objects.create(name="test", is_inbox_tag=True)
 
-        document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
+        document = self.consumer.try_consume_file(filename, override_title="new docs")
 
         self.assertEqual(document.title, "new docs")
-        self.assertEqual(document.correspondent.name, "Bank")
         self.assertIsNotNone(os.path.isfile(document.title))
         self.assertTrue(os.path.isfile(document.source_path))
 
