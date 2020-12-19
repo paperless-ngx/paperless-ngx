@@ -15,6 +15,9 @@ import { FilterEditorComponent } from './filter-editor/filter-editor.component';
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { SelectDialogComponent } from '../common/select-dialog/select-dialog.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
+import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 
 @Component({
   selector: 'app-document-list',
@@ -139,17 +142,18 @@ export class DocumentListComponent implements OnInit {
     )
   }
 
-  bulkSetCorrespondent(correspondent) {
-    console.log(correspondent);
+  bulkSetCorrespondent(correspondent: PaperlessCorrespondent[]) {
+    if (correspondent.length > 0) correspondent = correspondent.shift()
+    else correspondent = undefined
 
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select correspondent"
-    modal.componentInstance.message = `Select the correspondent you wish to assign to ${this.list.selected.size} selected document(s):`
-    this.correspondentService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": selectedId}).subscribe(
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Confirm correspondent assignment"
+    let messageFragment = correspondent ? `assign the correspondent ${correspondent.name} to` : `remove all correspondents from`
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
         response => {
           modal.close()
         }
@@ -157,49 +161,28 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  bulkRemoveCorrespondent() {
+  bulkSetDocumentType(documentType: PaperlessDocumentType[]) {
+    if (documentType.length > 0) documentType = documentType.shift()
+    else documentType = undefined
+
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Remove correspondent"
-    modal.componentInstance.message = `This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.title = "Confirm Document Type assignment"
+    let messageFragment = documentType ? `assign the document type ${documentType.name} to` : `remove all document types from`
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": null}).subscribe(r => {
-        modal.close()
-      })
-    })
-  }
-
-  bulkSetDocumentType(documentType) {
-    console.log();
-
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select document type"
-    modal.componentInstance.message = `Select the document type you wish to assign to ${this.list.selected.size} selected document(s):`
-    this.documentTypeService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('set_document_type', {"document_type": selectedId}).subscribe(
+      this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
         response => {
           modal.close()
         }
       )
-    })
-  }
-
-  bulkRemoveDocumentType() {
-    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Remove document type"
-    modal.componentInstance.message = `This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_document_type', {"document_type": null}).subscribe(r => {
-        modal.close()
-      })
     })
   }
 
   bulkSetTags(tags) {
     console.log('bulkSetTags', tags);
-
+    // TODO: 
   }
 
   bulkAddTag() {
