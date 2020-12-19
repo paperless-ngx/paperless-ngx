@@ -49,7 +49,7 @@ export class DocumentDetailComponent implements OnInit {
   })
 
   previewCurrentPage: number = 1
-  previewNumPages: number
+  previewNumPages: number = 1
 
   constructor(
     private documentsService: DocumentService,
