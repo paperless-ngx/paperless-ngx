@@ -21,12 +21,11 @@ class TestChecks(DirectoriesMixin, TestCase):
         self.assertEqual(paths_check(None), [])
 
     @override_settings(MEDIA_ROOT="uuh",
-                       STATIC_ROOT="somewhere",
                        DATA_DIR="whatever",
                        CONSUMPTION_DIR="idontcare")
     def test_paths_check_dont_exist(self):
         msgs = paths_check(None)
-        self.assertEqual(len(msgs), 4)
+        self.assertEqual(len(msgs), 3, str(msgs))
 
         for msg in msgs:
             self.assertTrue(msg.msg.endswith("is set but doesn't exist."))
