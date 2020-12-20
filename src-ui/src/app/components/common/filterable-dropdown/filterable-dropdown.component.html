@@ -24,6 +24,12 @@
           <app-toggleable-dropdown-button [toggleableItem]="toggleableItem" [showCounts]="showCounts" (toggle)="toggleItem($event)"></app-toggleable-dropdown-button>
         </ng-container>
       </div>
+      <button *ngIf="type == types.Editing" class="list-group-item list-group-item-action bg-light" (click)="dropdown.close()" [disabled]="!hasBeenToggled || (toggleableItems | filter: filterText).length == 0">
+        <small class="ml-1" [ngClass]="{'font-weight-bold': hasBeenToggled && (toggleableItems | filter: filterText).length > 0}">Apply</small>
+        <svg width="1.5em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
+        </svg>
+      </button>
     </div>
   </div>
 </div>
