@@ -15,7 +15,6 @@ writeable_hint = (
 
 def path_check(var, directory):
     messages = []
-    print(directory)
     if directory:
         if not os.path.exists(directory):
             messages.append(Error(
