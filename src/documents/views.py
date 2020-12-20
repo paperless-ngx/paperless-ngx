@@ -57,6 +57,8 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cookie_prefix'] = settings.COOKIE_PREFIX
+        context['username'] = self.request.user.username
+        context['full_name'] = self.request.user.get_full_name()
         return context
 
 
