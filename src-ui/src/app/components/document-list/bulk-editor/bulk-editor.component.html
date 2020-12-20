@@ -1,5 +1,13 @@
 <div class="row">
-  <div class="col mb-2 mb-xl-0" role="group" aria-label="Select">
+  <div class="col-auto mb-2 mb-xl-0" role="group" aria-label="Select">
+    <button class="btn btn-sm btn-outline-danger" (click)="selectNone.next()">
+      <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
+      </svg>
+      Cancel
+    </button>
+  </div>
+  <div class="col-auto mb-2 mb-xl-0" role="group" aria-label="Select">
     <label class="mr-lg-2">Select:</label>
     <div class="btn-group">
       <button class="btn btn-sm btn-outline-primary" (click)="selectPage.next()">
@@ -14,26 +22,20 @@
         </svg>
         All
       </button>
-      <button class="btn btn-sm btn-outline-primary" (click)="selectNone.next()">
-        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
-        </svg>
-        None
-      </button>
     </div>
   </div>
   <div class="w-100 d-xl-none"></div>
-  <div class="col mb-2 mb-xl-0">
+  <div class="col-auto mb-2 mb-xl-0">
     <div class="d-flex">
-      <label class="ml-auto mt-1 mr-2">Apply:</label>
+      <label class="ml-auto mt-1 mr-2">Edit:</label>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" [toggleableItems]="tagsToggleableItems" [type]="dropdownTypes.Editing" (open)="tagsDropdownOpen()" (editingComplete)="applyTags($event)"></app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" [toggleableItems]="correspondentsToggleableItems" [type]="dropdownTypes.Editing" singular="true" (open)="correspondentsDropdownOpen()" (editingComplete)="applyCorrespondent($event)"></app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" [toggleableItems]="documentTypesToggleableItems" [type]="dropdownTypes.Editing" singular="true" (open)="documentTypesDropdownOpen()" (editingComplete)="applyDocumentType($event)"></app-filterable-dropdown>
     </div>
   </div>
   <div class="w-100 d-xl-none"></div>
-  <div class="col-auto mb-2 mb-xl-0">
-    <button type="button" class="btn btn-sm btn-outline-danger " (click)="applyDelete()">
+  <div class="col mb-2 mb-xl-0 d-flex">
+    <button type="button" class="btn btn-sm btn-outline-danger ml-auto" (click)="applyDelete()">
       <svg class="buttonicon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#trash" />
       </svg>
