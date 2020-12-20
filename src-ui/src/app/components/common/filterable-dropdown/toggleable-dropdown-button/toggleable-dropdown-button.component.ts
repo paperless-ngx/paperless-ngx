@@ -2,14 +2,24 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { ToggleableItem, ToggleableItemState } from '../filterable-dropdown.component';
+
+export interface ToggleableItem {
+  item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent,
+  state: ToggleableItemState
+}
+
+export enum ToggleableItemState {
+  NotSelected = 0,
+  Selected = 1,
+  PartiallySelected = 2
+}
 
 @Component({
-  selector: 'app-filterable-dropdown-button',
-  templateUrl: './filterable-dropdown-button.component.html',
-  styleUrls: ['./filterable-dropdown-button.component.scss']
+  selector: 'app-toggleable-dropdown-button',
+  templateUrl: './toggleable-dropdown-button.component.html',
+  styleUrls: ['./toggleable-dropdown-button.component.scss']
 })
-export class FilterableDropdownButtonComponent {
+export class ToggleableDropdownButtonComponent {
 
   @Input()
   toggleableItem: ToggleableItem

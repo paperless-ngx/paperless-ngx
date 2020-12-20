@@ -5,17 +5,7 @@ import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { FilterPipe } from  'src/app/pipes/filter.pipe';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
-
-export interface ToggleableItem {
-  item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent,
-  state: ToggleableItemState
-}
-
-export enum ToggleableItemState {
-  NotSelected = 0,
-  Selected = 1,
-  PartiallySelected = 2
-}
+import { ToggleableItem, ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component';
 
 export enum FilterableDropdownType {
   Filtering = 'filtering',

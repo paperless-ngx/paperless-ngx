@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ToggleableItem } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
+import { ToggleableItem } from 'src/app/components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
 @Pipe({
   name: 'filter'
