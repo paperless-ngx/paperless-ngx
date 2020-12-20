@@ -1,8 +1,18 @@
+FROM node:15 AS frontend
+
+WORKDIR /usr/src/paperless/src-ui/
+
+COPY src-ui/package* ./
+RUN npm install
+
+COPY src-ui .
+RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false
+
 FROM python:3.7-slim
 
 WORKDIR /usr/src/paperless/
 
-COPY requirements.txt ./
+COPY Pipfile* ./
 
 #Dependencies
 RUN apt-get update \
@@ -33,8 +43,8 @@ RUN apt-get update \
 		tzdata \
 		unpaper \
 		zlib1g \
-	&& pip3 install --upgrade supervisor setuptools \
-	&& pip install --no-cache-dir -r requirements.txt \
+	&& pip3 install --upgrade supervisor setuptools pipenv \
+  && pipenv install --system --deploy --ignore-pipfile --clear \
 	&& apt-get -y purge build-essential libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
@@ -49,6 +59,7 @@ COPY docker/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 
 # copy app
 COPY src/ ./src/
+COPY --from=frontend /usr/src/paperless/src-ui/dist/paperless-ui/ /usr/src/paperless/src/documents/static/frontend/
 
 # add users, setup scripts
 RUN addgroup --gid 1000 paperless \
