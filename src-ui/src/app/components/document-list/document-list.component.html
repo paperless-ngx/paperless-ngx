@@ -81,7 +81,7 @@
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
 
   <app-bulk-editor [hidden]="!isBulkEditing"
-    [allDocuments]="list.documents"
+    [viewDocuments]="list.documents"
     [(selectedDocuments)]="list.selected"
     (selectPage)="list.selectPage()"
     (selectAll)="list.selectAll()"
