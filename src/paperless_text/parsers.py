@@ -35,15 +35,3 @@ class TextDocumentParser(DocumentParser):
     def parse(self, document_path, mime_type):
         with open(document_path, 'r') as f:
             self.text = f.read()
-
-
-def run_command(*args):
-    environment = os.environ.copy()
-    if settings.CONVERT_MEMORY_LIMIT:
-        environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
-    if settings.CONVERT_TMPDIR:
-        environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
-
-    if not subprocess.Popen(' '.join(args), env=environment,
-                            shell=True).wait() == 0:
-        raise ParseError("Convert failed at {}".format(args))

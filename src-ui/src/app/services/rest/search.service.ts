@@ -15,10 +15,16 @@ export class SearchService {
   
   constructor(private http: HttpClient, private documentService: DocumentService) { }
 
-  search(query: string, page?: number): Observable<SearchResult> {
-    let httpParams = new HttpParams().set('query', query)
+  search(query: string, page?: number, more_like?: number): Observable<SearchResult> {
+    let httpParams = new HttpParams()
+    if (query) {
+      httpParams = httpParams.set('query', query)
+    }
     if (page) {
       httpParams = httpParams.set('page', page.toString())
+    }
+    if (more_like) {
+      httpParams = httpParams.set('more_like', more_like.toString())
     }
     return this.http.get<SearchResult>(`${environment.apiBaseUrl}search/`, {params: httpParams}).pipe(
       map(result => {
