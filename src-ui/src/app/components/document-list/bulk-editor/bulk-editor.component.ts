@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ObjectWithId } from 'src/app/data/object-with-id';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
@@ -47,7 +48,12 @@ export class BulkEditorComponent {
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
 
+  private _initialTagsSelectableItems: SelectableItem[]
+  private _initialCorrespondentsSelectableItems: SelectableItem[]
+  private _initialDocumentTypesSelectableItems: SelectableItem[]
+
   dropdownTypes = FilterableDropdownType
+
   get tagsSelectableItems(): SelectableItem[] {
     let tagsSelectableItems = []
     let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
@@ -72,7 +78,6 @@ export class BulkEditorComponent {
       else if (selectedDocumentsWithCorrespondent.length > 0 && selectedDocumentsWithCorrespondent.length < selectedDocuments.length) state = SelectableItemState.PartiallySelected
       correspondentsSelectableItems.push( { item: c, state: state } )
     })
-
     return correspondentsSelectableItems
   }
 
@@ -87,7 +92,6 @@ export class BulkEditorComponent {
       else if (selectedDocumentsWithDocumentType.length > 0 && selectedDocumentsWithDocumentType.length < selectedDocuments.length) state = SelectableItemState.PartiallySelected
       documentTypesSelectableItems.push( { item: dt, state: state } )
     })
-
     return documentTypesSelectableItems
   }
 
@@ -104,16 +108,43 @@ export class BulkEditorComponent {
     this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
   }
 
-  applyTags(tags: PaperlessTag[]) {
-    this.setTags.emit(tags)
+  tagsDropdownOpen() {
+    this._initialTagsSelectableItems = this.tagsSelectableItems
   }
 
-  applyCorrespondent(selectedCorrespondent: PaperlessCorrespondent[]) {
-    this.setCorrespondent.emit(selectedCorrespondent.length > 0 ? selectedCorrespondent.shift() : null)
+  correspondentsDropdownOpen() {
+    this._initialCorrespondentsSelectableItems = this.correspondentsSelectableItems
   }
 
-  applyDocumentType(selectedDocumentType: PaperlessDocumentType[]) {
-    this.setDocumentType.emit(selectedDocumentType.length > 0 ? selectedDocumentType.shift() : null)
+  documentTypesDropdownOpen() {
+    this._initialDocumentTypesSelectableItems = this.documentTypesSelectableItems
+  }
+
+  applyTags(selectedTags: PaperlessTag[]) {
+    let initiallySelectedSelectableTags = this._initialTagsSelectableItems.filter(tsi => tsi.state == SelectableItemState.Selected)
+    let unchanged = this.equateItemsToSelectableItems(selectedTags, initiallySelectedSelectableTags)
+    if (!unchanged) this.setTags.emit(selectedTags)
+    this._initialTagsSelectableItems = null
+  }
+
+  applyCorrespondent(selectedCorrespondents: PaperlessCorrespondent[]) {
+    let initiallySelectedSelectableCorrespondents = this._initialCorrespondentsSelectableItems.filter(csi => csi.state == SelectableItemState.Selected)
+    let unchanged = this.equateItemsToSelectableItems(selectedCorrespondents, initiallySelectedSelectableCorrespondents)
+    if (!unchanged) this.setCorrespondent.emit(selectedCorrespondents?.length > 0 ? selectedCorrespondents.shift() : null)
+    this._initialCorrespondentsSelectableItems = null
+  }
+
+  applyDocumentType(selectedDocumentTypes: PaperlessDocumentType[]) {
+    let initiallySelectedSelectableDocumentTypes = this._initialDocumentTypesSelectableItems.filter(dtsi => dtsi.state == SelectableItemState.Selected)
+    let unchanged = this.equateItemsToSelectableItems(selectedDocumentTypes, initiallySelectedSelectableDocumentTypes)
+    if (!unchanged) this.setDocumentType.emit(selectedDocumentTypes.length > 0 ? selectedDocumentTypes.shift() : null)
+    this._initialDocumentTypesSelectableItems = null
+  }
+
+  equateItemsToSelectableItems(items: ObjectWithId[], selectableItems: SelectableItem[]): boolean {
+    // either both empty or all items must in selectableItems and vice-versa
+    return (selectableItems.length == 0 && items.length == 0) ||
+           (items.every(i => selectableItems.find(si => si.item.id == i.id) !== undefined) && selectableItems.every(si => items.find(i => i.id == si.item.id) !== undefined))
   }
 
   applyDelete() {
