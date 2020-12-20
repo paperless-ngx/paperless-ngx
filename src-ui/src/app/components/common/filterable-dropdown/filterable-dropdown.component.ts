@@ -89,12 +89,15 @@ export class FilterableDropdownComponent {
     return this._showCounts && (this.type == FilterableDropdownType.Editing || (this.type == FilterableDropdownType.Filtering && this.itemsSelected.length == 0))
   }
 
+  hasBeenToggled:boolean = false
+
   constructor(private filterPipe: FilterPipe) { }
 
   toggleItem(toggleableItem: ToggleableItem): void {
     if (this.singular && toggleableItem.state == ToggleableItemState.Selected) {
       this._toggleableItems.filter(ti => ti.item.id !== toggleableItem.item.id).forEach(ti => ti.state = ToggleableItemState.NotSelected)
     }
+    this.hasBeenToggled = true
     this.toggle.emit(toggleableItem.item)
   }
 
@@ -103,6 +106,7 @@ export class FilterableDropdownComponent {
       setTimeout(() => {
         this.listFilterTextInput.nativeElement.focus();
       }, 0)
+      this.hasBeenToggled = false
       this.open.next()
     } else {
       this.filterText = ''
