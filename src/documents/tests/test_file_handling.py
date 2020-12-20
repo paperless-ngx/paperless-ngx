@@ -14,7 +14,7 @@ from django.utils import timezone
 from .utils import DirectoriesMixin
 from ..file_handling import generate_filename, create_source_path_directory, delete_empty_directories, \
     generate_unique_filename
-from ..models import Document, Correspondent, Tag
+from ..models import Document, Correspondent, Tag, DocumentType
 
 
 class TestFileHandling(DirectoriesMixin, TestCase):
@@ -189,6 +189,17 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/test"), True)
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), True)
         self.assertTrue(os.path.isfile(important_file))
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{document_type} - {title}")
+    def test_document_type(self):
+        dt = DocumentType.objects.create(name="my_doc_type")
+        d = Document.objects.create(title="the_doc", mime_type="application/pdf")
+
+        self.assertEqual(generate_filename(d), "none - the_doc.pdf")
+
+        d.document_type = dt
+
+        self.assertEqual(generate_filename(d), "my_doc_type - the_doc.pdf")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
