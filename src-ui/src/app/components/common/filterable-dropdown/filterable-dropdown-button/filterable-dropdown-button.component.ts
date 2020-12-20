@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
-import { SelectableItem, SelectableItemState } from '../filterable-dropdown.component';
+import { ToggleableItem, ToggleableItemState } from '../filterable-dropdown.component';
 
 @Component({
   selector: 'app-filterable-dropdown-button',
@@ -12,10 +12,10 @@ import { SelectableItem, SelectableItemState } from '../filterable-dropdown.comp
 export class FilterableDropdownButtonComponent implements OnInit {
 
   @Input()
-  selectableItem: SelectableItem
+  toggleableItem: ToggleableItem
 
   get item(): PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent {
-    return this.selectableItem?.item
+    return this.toggleableItem?.item
   }
 
   @Output()
@@ -28,14 +28,14 @@ export class FilterableDropdownButtonComponent implements OnInit {
   }
 
   toggleItem(): void {
-    this.selectableItem.state = (this.selectableItem.state == SelectableItemState.NotSelected || this.selectableItem.state == SelectableItemState.PartiallySelected) ? SelectableItemState.Selected : SelectableItemState.NotSelected
-    this.toggle.emit(this.selectableItem)
+    this.toggleableItem.state = (this.toggleableItem.state == ToggleableItemState.NotSelected || this.toggleableItem.state == ToggleableItemState.PartiallySelected) ? ToggleableItemState.Selected : ToggleableItemState.NotSelected
+    this.toggle.emit(this.toggleableItem)
   }
 
   getSelectedIconName() {
     let iconName = ''
-    if (this.selectableItem?.state == SelectableItemState.Selected) iconName = 'check'
-    else if (this.selectableItem?.state == SelectableItemState.PartiallySelected) iconName = 'dash'
+    if (this.toggleableItem?.state == ToggleableItemState.Selected) iconName = 'check'
+    else if (this.toggleableItem?.state == ToggleableItemState.PartiallySelected) iconName = 'dash'
     return iconName
   }
 }

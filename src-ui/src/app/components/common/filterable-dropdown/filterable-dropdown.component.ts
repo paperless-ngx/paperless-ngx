@@ -6,12 +6,12 @@ import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { FilterPipe } from  'src/app/pipes/filter.pipe';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 
-export interface SelectableItem {
+export interface ToggleableItem {
   item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent,
-  state: SelectableItemState
+  state: ToggleableItemState
 }
 
-export enum SelectableItemState {
+export enum ToggleableItemState {
   NotSelected = 0,
   Selected = 1,
   PartiallySelected = 2
@@ -37,33 +37,33 @@ export class FilterableDropdownComponent {
   @Input()
   set items(items: ObjectWithId[]) {
     if (items) {
-      this._selectableItems = items.map(i => {
-        return {item: i, state: SelectableItemState.NotSelected}
+      this._toggleableItems = items.map(i => {
+        return {item: i, state: ToggleableItemState.NotSelected}
       })
     }
   }
 
-  _selectableItems: SelectableItem[] = []
+  _toggleableItems: ToggleableItem[] = []
 
   @Input()
-  set selectableItems (selectableItems: SelectableItem[]) {
+  set toggleableItems (toggleableItems: ToggleableItem[]) {
     if (this.type == FilterableDropdownType.Editing && this.dropdown?.isOpen()) return
-    else this._selectableItems = selectableItems
+    else this._toggleableItems = toggleableItems
   }
 
-  get selectableItems(): SelectableItem[] {
-    return this._selectableItems
+  get toggleableItems(): ToggleableItem[] {
+    return this._toggleableItems
   }
 
   @Input()
   set itemsSelected(itemsSelected: ObjectWithId[]) {
-    this.selectableItems.forEach(i => {
-      i.state = (itemsSelected.find(is => is.id == i.item.id)) ? SelectableItemState.Selected : SelectableItemState.NotSelected
+    this.toggleableItems.forEach(i => {
+      i.state = (itemsSelected.find(is => is.id == i.item.id)) ? ToggleableItemState.Selected : ToggleableItemState.NotSelected
     })
   }
 
   get itemsSelected() :ObjectWithId[] {
-    return this.selectableItems.filter(si => si.state == SelectableItemState.Selected).map(si => si.item)
+    return this.toggleableItems.filter(si => si.state == ToggleableItemState.Selected).map(si => si.item)
   }
 
   @Input()
@@ -91,11 +91,11 @@ export class FilterableDropdownComponent {
 
   constructor(private filterPipe: FilterPipe) { }
 
-  toggleItem(selectableItem: SelectableItem): void {
-    if (this.singular && selectableItem.state == SelectableItemState.Selected) {
-      this._selectableItems.filter(si => si.item.id !== selectableItem.item.id).forEach(si => si.state = SelectableItemState.NotSelected)
+  toggleItem(toggleableItem: ToggleableItem): void {
+    if (this.singular && toggleableItem.state == ToggleableItemState.Selected) {
+      this._toggleableItems.filter(si => si.item.id !== toggleableItem.item.id).forEach(si => si.state = ToggleableItemState.NotSelected)
     }
-    this.toggle.emit(selectableItem.item)
+    this.toggle.emit(toggleableItem.item)
   }
 
   dropdownOpenChange(open: boolean): void {
@@ -111,7 +111,7 @@ export class FilterableDropdownComponent {
   }
 
   listFilterEnter(): void {
-    let filtered = this.filterPipe.transform(this.selectableItems, this.filterText)
+    let filtered = this.filterPipe.transform(this.toggleableItems, this.filterText)
     if (filtered.length == 1) this.toggleItem(filtered.shift())
     this.dropdown.close()
   }
