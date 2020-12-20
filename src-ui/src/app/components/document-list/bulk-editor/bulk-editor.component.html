@@ -7,8 +7,9 @@
       Cancel
     </button>
   </div>
+  <div class="w-100 d-xl-none"></div>
   <div class="col-auto mb-2 mb-xl-0" role="group" aria-label="Select">
-    <label class="mr-lg-2">Select:</label>
+    <label class="mr-2">Select:</label>
     <div class="btn-group">
       <button class="btn btn-sm btn-outline-primary" (click)="selectPage.next()">
         <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
@@ -35,11 +36,11 @@
   </div>
   <div class="w-100 d-xl-none"></div>
   <div class="col mb-2 mb-xl-0 d-flex">
-    <button type="button" class="btn btn-sm btn-outline-danger ml-auto" (click)="applyDelete()">
+    <button type="button" class="btn btn-sm btn-outline-danger ml-0 ml-lg-auto" (click)="applyDelete()">
       <svg class="buttonicon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#trash" />
       </svg>
-      <span class="d-none d-lg-inline"> Delete</span>
+      Delete
     </button>
   </div>
 </div>
