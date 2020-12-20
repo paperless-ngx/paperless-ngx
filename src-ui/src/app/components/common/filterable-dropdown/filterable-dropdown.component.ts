@@ -78,8 +78,15 @@ export class FilterableDropdownComponent {
   @Output()
   editingComplete = new EventEmitter()
 
+  _showCounts: boolean = true
+
+  @Input
+  set showCounts(show: boolean) {
+    this._showCounts = show
+  }
+
   get showCounts(): boolean {
-    return this.type == FilterableDropdownType.Editing || (this.type == FilterableDropdownType.Filtering && this.itemsSelected == 0)
+    return this._showCounts && (this.type == FilterableDropdownType.Editing || (this.type == FilterableDropdownType.Filtering && this.itemsSelected == 0))
   }
 
   constructor(private filterPipe: FilterPipe) { }

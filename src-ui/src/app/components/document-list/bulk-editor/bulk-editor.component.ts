@@ -22,7 +22,7 @@ export class BulkEditorComponent {
   selectedDocuments: Set<number>
 
   @Input()
-  allDocuments: PaperlessDocument[]
+  viewDocuments: PaperlessDocument[]
 
   @Output()
   selectPage = new EventEmitter()
@@ -45,53 +45,61 @@ export class BulkEditorComponent {
   @Output()
   delete = new EventEmitter()
 
-  tags: PaperlessTag[]
-  correspondents: PaperlessCorrespondent[]
-  documentTypes: PaperlessDocumentType[]
+  private tags: PaperlessTag[]
+  private correspondents: PaperlessCorrespondent[]
+  private documentTypes: PaperlessDocumentType[]
 
   private initiallySelectedTagsToggleableItems: ToggleableItem[]
   private initiallySelectedCorrespondentsToggleableItems: ToggleableItem[]
   private initiallySelectedDocumentTypesToggleableItems: ToggleableItem[]
 
-  dropdownTypes = FilterableDropdownType
+  private dropdownTypes = FilterableDropdownType
+
+  get selectionSpansPages(): boolean {
+    return this.selectedDocuments.length > this.viewDocuments.length || !Array.from(this.selectedDocuments).every(sd => this.viewDocuments.find(d => d.id == sd))
+  }
 
   get tagsToggleableItems(): ToggleableItem[] {
     let tagsToggleableItems = []
-    let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
+    let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
+    if (this.selectionSpansPages) selectedDocuments = []
+
     this.tags?.forEach(t => {
       let selectedDocumentsWithTag: PaperlessDocument[] = selectedDocuments.filter(d => d.tags.includes(t.id))
       let state = ToggleableItemState.NotSelected
-      if (selectedDocumentsWithTag.length == selectedDocuments.length) state = ToggleableItemState.Selected
+      if (selectedDocuments.length > 0 && selectedDocumentsWithTag.length == selectedDocuments.length) state = ToggleableItemState.Selected
       else if (selectedDocumentsWithTag.length > 0 && selectedDocumentsWithTag.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
-      tagsToggleableItems.push( { item: t, state: state, count: selectedDocumentsWithTag.length } )
+      tagsToggleableItems.push({item: t, state: state, count: selectedDocumentsWithTag.length})
     })
     return tagsToggleableItems
   }
 
   get correspondentsToggleableItems(): ToggleableItem[] {
     let correspondentsToggleableItems = []
-    let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
+    let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
+    if (this.selectionSpansPages) selectedDocuments = []
 
     this.correspondents?.forEach(c => {
       let selectedDocumentsWithCorrespondent: PaperlessDocument[] = selectedDocuments.filter(d => d.correspondent == c.id)
       let state = ToggleableItemState.NotSelected
-      if (selectedDocumentsWithCorrespondent.length == selectedDocuments.length) state = ToggleableItemState.Selected
+      if (selectedDocuments.length > 0 && selectedDocumentsWithCorrespondent.length == selectedDocuments.length) state = ToggleableItemState.Selected
       else if (selectedDocumentsWithCorrespondent.length > 0 && selectedDocumentsWithCorrespondent.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
-      correspondentsToggleableItems.push( { item: c, state: state, count: selectedDocumentsWithCorrespondent.length } )
+      correspondentsToggleableItems.push({item: c, state: state, count: selectedDocumentsWithCorrespondent.length})
     })
     return correspondentsToggleableItems
   }
 
   get documentTypesToggleableItems(): ToggleableItem[] {
     let documentTypesToggleableItems = []
-    let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
+    let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
+    if (this.selectionSpansPages) selectedDocuments = []
 
     this.documentTypes?.forEach(dt => {
       let selectedDocumentsWithDocumentType: PaperlessDocument[] = selectedDocuments.filter(d => d.document_type == dt.id)
       let state = ToggleableItemState.NotSelected
-      if (selectedDocumentsWithDocumentType.length == selectedDocuments.length) state = ToggleableItemState.Selected
+      if (selectedDocuments.length > 0 && selectedDocumentsWithDocumentType.length == selectedDocuments.length) state = ToggleableItemState.Selected
       else if (selectedDocumentsWithDocumentType.length > 0 && selectedDocumentsWithDocumentType.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
-      documentTypesToggleableItems.push( { item: dt, state: state, count: selectedDocumentsWithDocumentType.length } )
+      documentTypesToggleableItems.push({item: dt, state: state, count: selectedDocumentsWithDocumentType.length})
     })
     return documentTypesToggleableItems
   }
