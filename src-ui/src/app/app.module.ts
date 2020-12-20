@@ -28,7 +28,7 @@ import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
 import { FilterEditorComponent } from './components/document-list/filter-editor/filter-editor.component';
 import { FilterableDropdownComponent } from './components/common/filterable-dropdown/filterable-dropdown.component';
-import { FilterableDropdownButtonComponent } from './components/common/filterable-dropdown/filterable-dropdown-button/filterable-dropdown-button.component';
+import { ToggleableDropdownButtonComponent } from './components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 import { DateDropdownComponent } from './components/common/date-dropdown/date-dropdown.component';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
@@ -82,7 +82,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     ToastsComponent,
     FilterEditorComponent,
     FilterableDropdownComponent,
-    FilterableDropdownButtonComponent,
+    ToggleableDropdownButtonComponent,
     DateDropdownComponent,
     DocumentCardLargeComponent,
     DocumentCardSmallComponent,

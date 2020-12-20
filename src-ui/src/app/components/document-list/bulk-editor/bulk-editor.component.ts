@@ -8,7 +8,8 @@ import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
-import { ToggleableItem, ToggleableItemState, FilterableDropdownType } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
+import { FilterableDropdownType } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
+import { ToggleableItem, ToggleableItemState } from 'src/app/components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
 @Component({
   selector: 'app-bulk-editor',
