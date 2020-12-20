@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, ElementRef, ViewChild } from '@angular/core';
-import { ObjectWithId } from 'src/app/data/object-with-id';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
@@ -25,10 +24,10 @@ export class FilterableDropdownComponent {
   filterText: string
 
   @Input()
-  set items(items: ObjectWithId[]) {
+  set items(items: (PaperlessTag | PaperlessCorrespondent | PaperlessDocumentType)[]) {
     if (items) {
       this._toggleableItems = items.map(i => {
-        return {item: i, state: ToggleableItemState.NotSelected}
+        return {item: i, state: ToggleableItemState.NotSelected, count: i.document_count}
       })
     }
   }
@@ -46,13 +45,13 @@ export class FilterableDropdownComponent {
   }
 
   @Input()
-  set itemsSelected(itemsSelected: ObjectWithId[]) {
+  set itemsSelected(itemsSelected: (PaperlessTag | PaperlessCorrespondent | PaperlessDocumentType)[]) {
     this.toggleableItems.forEach(i => {
       i.state = (itemsSelected.find(is => is.id == i.item.id)) ? ToggleableItemState.Selected : ToggleableItemState.NotSelected
     })
   }
 
-  get itemsSelected() :ObjectWithId[] {
+  get itemsSelected() :(PaperlessTag | PaperlessCorrespondent | PaperlessDocumentType)[] {
     return this.toggleableItems.filter(si => si.state == ToggleableItemState.Selected).map(si => si.item)
   }
 
@@ -78,6 +77,10 @@ export class FilterableDropdownComponent {
 
   @Output()
   editingComplete = new EventEmitter()
+
+  get showCounts(): boolean {
+    return this.type == FilterableDropdownType.Editing || (this.type == FilterableDropdownType.Filtering && this.itemsSelected == 0)
+  }
 
   constructor(private filterPipe: FilterPipe) { }
 

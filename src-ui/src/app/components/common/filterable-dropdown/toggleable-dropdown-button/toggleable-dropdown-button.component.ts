@@ -5,7 +5,8 @@ import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 
 export interface ToggleableItem {
   item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent,
-  state: ToggleableItemState
+  state: ToggleableItemState,
+  count: number
 }
 
 export enum ToggleableItemState {
@@ -23,6 +24,9 @@ export class ToggleableDropdownButtonComponent {
 
   @Input()
   toggleableItem: ToggleableItem
+
+  @Input()
+  showCounts: boolean = true
 
   @Output()
   toggle = new EventEmitter()

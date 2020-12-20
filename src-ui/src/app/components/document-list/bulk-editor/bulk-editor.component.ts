@@ -63,7 +63,7 @@ export class BulkEditorComponent {
       let state = ToggleableItemState.NotSelected
       if (selectedDocumentsWithTag.length == selectedDocuments.length) state = ToggleableItemState.Selected
       else if (selectedDocumentsWithTag.length > 0 && selectedDocumentsWithTag.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
-      tagsToggleableItems.push( { item: t, state: state } )
+      tagsToggleableItems.push( { item: t, state: state, count: selectedDocumentsWithTag.length } )
     })
     return tagsToggleableItems
   }
@@ -77,7 +77,7 @@ export class BulkEditorComponent {
       let state = ToggleableItemState.NotSelected
       if (selectedDocumentsWithCorrespondent.length == selectedDocuments.length) state = ToggleableItemState.Selected
       else if (selectedDocumentsWithCorrespondent.length > 0 && selectedDocumentsWithCorrespondent.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
-      correspondentsToggleableItems.push( { item: c, state: state } )
+      correspondentsToggleableItems.push( { item: c, state: state, count: selectedDocumentsWithCorrespondent.length } )
     })
     return correspondentsToggleableItems
   }
@@ -91,7 +91,7 @@ export class BulkEditorComponent {
       let state = ToggleableItemState.NotSelected
       if (selectedDocumentsWithDocumentType.length == selectedDocuments.length) state = ToggleableItemState.Selected
       else if (selectedDocumentsWithDocumentType.length > 0 && selectedDocumentsWithDocumentType.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
-      documentTypesToggleableItems.push( { item: dt, state: state } )
+      documentTypesToggleableItems.push( { item: dt, state: state, count: selectedDocumentsWithDocumentType.length } )
     })
     return documentTypesToggleableItems
   }
