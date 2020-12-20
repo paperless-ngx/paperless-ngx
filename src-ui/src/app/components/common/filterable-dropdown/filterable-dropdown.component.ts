@@ -37,7 +37,7 @@ export class FilterableDropdownComponent {
   @Input()
   set items(items: ObjectWithId[]) {
     if (items) {
-      this.selectableItems = items.map(i => {
+      this._selectableItems = items.map(i => {
         return {item: i, state: SelectableItemState.NotSelected}
       })
     }
@@ -84,15 +84,16 @@ export class FilterableDropdownComponent {
   toggle = new EventEmitter()
 
   @Output()
-  close = new EventEmitter()
+  open = new EventEmitter()
+
+  @Output()
+  editingComplete = new EventEmitter()
 
   constructor(private filterPipe: FilterPipe) { }
 
   toggleItem(selectableItem: SelectableItem): void {
     if (this.singular && selectableItem.state == SelectableItemState.Selected) {
-      this._selectableItems.forEach(si => {
-        if (si.state == SelectableItemState.Selected && si.item.id !== selectableItem.item.id) si.state = SelectableItemState.NotSelected
-      })
+      this._selectableItems.filter(si => si.item.id !== selectableItem.item.id).forEach(si => si.state = SelectableItemState.NotSelected)
     }
     this.toggle.emit(selectableItem.item)
   }
@@ -101,10 +102,11 @@ export class FilterableDropdownComponent {
     if (open) {
       setTimeout(() => {
         this.listFilterTextInput.nativeElement.focus();
-      }, 0);
+      }, 0)
+      this.open.next()
     } else {
       this.filterText = ''
-      this.close.emit(this.itemsSelected)
+      if (this.type == FilterableDropdownType.Editing) this.editingComplete.emit(this.itemsSelected)
     }
   }
 
