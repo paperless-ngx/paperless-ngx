@@ -67,7 +67,7 @@ export class FilterableDropdownComponent {
   types = FilterableDropdownType
 
   @Input()
-  tingular: boolean = false
+  singular: boolean = false
 
   @Output()
   toggle = new EventEmitter()
@@ -92,7 +92,7 @@ export class FilterableDropdownComponent {
   constructor(private filterPipe: FilterPipe) { }
 
   toggleItem(toggleableItem: ToggleableItem): void {
-    if (this.tingular && toggleableItem.state == ToggleableItemState.Selected) {
+    if (this.singular && toggleableItem.state == ToggleableItemState.Selected) {
       this._toggleableItems.filter(ti => ti.item.id !== toggleableItem.item.id).forEach(ti => ti.state = ToggleableItemState.NotSelected)
     }
     this.toggle.emit(toggleableItem.item)

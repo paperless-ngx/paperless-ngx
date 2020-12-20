@@ -118,39 +118,39 @@ export class BulkEditorComponent {
   }
 
   tagsDropdownOpen() {
-    this.initiallySelectedTagsToggleableItems = this.tagsToggleableItems.filter(tsi => tsi.state == ToggleableItemState.Selected)
+    this.initiallySelectedTagsToggleableItems = this.tagsToggleableItems.filter(tti => tti.state == ToggleableItemState.Selected)
   }
 
   correspondentsDropdownOpen() {
-    this.initiallySelectedCorrespondentsToggleableItems = this.correspondentsToggleableItems.filter(csi => csi.state == ToggleableItemState.Selected)
+    this.initiallySelectedCorrespondentsToggleableItems = this.correspondentsToggleableItems.filter(cti => cti.state == ToggleableItemState.Selected)
   }
 
   documentTypesDropdownOpen() {
-    this.initiallySelectedDocumentTypesToggleableItems = this.documentTypesToggleableItems.filter(dtsi => dtsi.state == ToggleableItemState.Selected)
+    this.initiallySelectedDocumentTypesToggleableItems = this.documentTypesToggleableItems.filter(dtti => dtti.state == ToggleableItemState.Selected)
   }
 
   applyTags(selectedTags: PaperlessTag[]) {
     let unchanged = this.equateItemsToToggleableItems(selectedTags, this.initiallySelectedTagsToggleableItems)
     if (!unchanged) this.setTags.emit(selectedTags)
-    this.initiallySelectedTagsToggleableItems = null
+    this.initiallySelectedTagsToggleableItems = []
   }
 
   applyCorrespondent(selectedCorrespondents: PaperlessCorrespondent[]) {
     let unchanged = this.equateItemsToToggleableItems(selectedCorrespondents, this.initiallySelectedCorrespondentsToggleableItems)
     if (!unchanged) this.setCorrespondent.emit(selectedCorrespondents?.length > 0 ? selectedCorrespondents.shift() : null)
-    this.initiallySelectedCorrespondentsToggleableItems = null
+    this.initiallySelectedCorrespondentsToggleableItems = []
   }
 
   applyDocumentType(selectedDocumentTypes: PaperlessDocumentType[]) {
     let unchanged = this.equateItemsToToggleableItems(selectedDocumentTypes, this.initiallySelectedDocumentTypesToggleableItems)
     if (!unchanged) this.setDocumentType.emit(selectedDocumentTypes.length > 0 ? selectedDocumentTypes.shift() : null)
-    this.initiallySelectedDocumentTypesToggleableItems = null
+    this.initiallySelectedDocumentTypesToggleableItems = []
   }
 
   equateItemsToToggleableItems(items: ObjectWithId[], toggleableItems: ToggleableItem[]): boolean {
     // either both empty or all items must in toggleableItems and vice-versa
     return (toggleableItems.length == 0 && items.length == 0) ||
-           (items.every(i => toggleableItems.find(si => si.item.id == i.id) !== undefined) && toggleableItems.every(si => items.find(i => i.id == si.item.id) !== undefined))
+           (items.every(i => toggleableItems.find(ti => ti.item.id == i.id) !== undefined) && toggleableItems.every(ti => items.find(i => i.id == ti.item.id) !== undefined))
   }
 
   applyDelete() {
