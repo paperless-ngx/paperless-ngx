@@ -48,9 +48,9 @@ export class BulkEditorComponent {
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
 
-  private _initialTagsSelectableItems: SelectableItem[]
-  private _initialCorrespondentsSelectableItems: SelectableItem[]
-  private _initialDocumentTypesSelectableItems: SelectableItem[]
+  private initiallySelectedTagsSelectableItems: SelectableItem[]
+  private initiallySelectedCorrespondentsSelectableItems: SelectableItem[]
+  private initiallySelectedDocumentTypesSelectableItems: SelectableItem[]
 
   dropdownTypes = FilterableDropdownType
 
@@ -109,36 +109,33 @@ export class BulkEditorComponent {
   }
 
   tagsDropdownOpen() {
-    this._initialTagsSelectableItems = this.tagsSelectableItems
+    this.initiallySelectedTagsSelectableItems = this.tagsSelectableItems.filter(tsi => tsi.state == SelectableItemState.Selected)
   }
 
   correspondentsDropdownOpen() {
-    this._initialCorrespondentsSelectableItems = this.correspondentsSelectableItems
+    this.initiallySelectedCorrespondentsSelectableItems = this.correspondentsSelectableItems.filter(csi => csi.state == SelectableItemState.Selected)
   }
 
   documentTypesDropdownOpen() {
-    this._initialDocumentTypesSelectableItems = this.documentTypesSelectableItems
+    this.initiallySelectedDocumentTypesSelectableItems = this.documentTypesSelectableItems.filter(dtsi => dtsi.state == SelectableItemState.Selected)
   }
 
   applyTags(selectedTags: PaperlessTag[]) {
-    let initiallySelectedSelectableTags = this._initialTagsSelectableItems.filter(tsi => tsi.state == SelectableItemState.Selected)
-    let unchanged = this.equateItemsToSelectableItems(selectedTags, initiallySelectedSelectableTags)
+    let unchanged = this.equateItemsToSelectableItems(selectedTags, this.initiallySelectedTagsSelectableItems)
     if (!unchanged) this.setTags.emit(selectedTags)
-    this._initialTagsSelectableItems = null
+    this.initiallySelectedTagsSelectableItems = null
   }
 
   applyCorrespondent(selectedCorrespondents: PaperlessCorrespondent[]) {
-    let initiallySelectedSelectableCorrespondents = this._initialCorrespondentsSelectableItems.filter(csi => csi.state == SelectableItemState.Selected)
-    let unchanged = this.equateItemsToSelectableItems(selectedCorrespondents, initiallySelectedSelectableCorrespondents)
+    let unchanged = this.equateItemsToSelectableItems(selectedCorrespondents, this.initiallySelectedCorrespondentsSelectableItems)
     if (!unchanged) this.setCorrespondent.emit(selectedCorrespondents?.length > 0 ? selectedCorrespondents.shift() : null)
-    this._initialCorrespondentsSelectableItems = null
+    this.initiallySelectedCorrespondentsSelectableItems = null
   }
 
   applyDocumentType(selectedDocumentTypes: PaperlessDocumentType[]) {
-    let initiallySelectedSelectableDocumentTypes = this._initialDocumentTypesSelectableItems.filter(dtsi => dtsi.state == SelectableItemState.Selected)
-    let unchanged = this.equateItemsToSelectableItems(selectedDocumentTypes, initiallySelectedSelectableDocumentTypes)
+    let unchanged = this.equateItemsToSelectableItems(selectedDocumentTypes, this.initiallySelectedDocumentTypesSelectableItems)
     if (!unchanged) this.setDocumentType.emit(selectedDocumentTypes.length > 0 ? selectedDocumentTypes.shift() : null)
-    this._initialDocumentTypesSelectableItems = null
+    this.initiallySelectedDocumentTypesSelectableItems = null
   }
 
   equateItemsToSelectableItems(items: ObjectWithId[], selectableItems: SelectableItem[]): boolean {
