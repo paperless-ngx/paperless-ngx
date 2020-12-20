@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   apiBaseUrl: "http://localhost:8000/api/",
-  appTitle: "DEVELOPMENT P-NG"
+  appTitle: "Paperless-ng",
+  version: "DEVELOPMENT"
 };
 
 /*

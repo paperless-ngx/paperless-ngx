@@ -160,13 +160,6 @@ if AUTO_LOGIN_USERNAME:
     MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
 
 
-if DEBUG:
-    X_FRAME_OPTIONS = ''
-    # this should really be 'allow-from uri' but its not supported in any mayor
-    # browser.
-else:
-    X_FRAME_OPTIONS = 'SAMEORIGIN'
-
 # We allow CORS from localhost:8080
 CORS_ALLOWED_ORIGINS = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","))
 
