@@ -9,22 +9,16 @@ import { ToggleableItem, ToggleableItemState } from '../filterable-dropdown.comp
   templateUrl: './filterable-dropdown-button.component.html',
   styleUrls: ['./filterable-dropdown-button.component.scss']
 })
-export class FilterableDropdownButtonComponent implements OnInit {
+export class FilterableDropdownButtonComponent {
 
   @Input()
   toggleableItem: ToggleableItem
 
-  get item(): PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent {
-    return this.toggleableItem?.item
-  }
-
   @Output()
   toggle = new EventEmitter()
 
-  isTag: boolean
-
-  ngOnInit() {
-    this.isTag = 'is_inbox_tag' in this.item // ~ this.item instanceof PaperlessTag
+  get isTag(): boolean {
+    return 'is_inbox_tag' in this.toggleableItem?.item // ~ this.item instanceof PaperlessTag
   }
 
   toggleItem(): void {
