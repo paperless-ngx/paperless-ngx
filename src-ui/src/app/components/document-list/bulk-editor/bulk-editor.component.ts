@@ -57,7 +57,7 @@ export class BulkEditorComponent {
   get tagsToggleableItems(): ToggleableItem[] {
     let tagsToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
-    this.tags.forEach(t => {
+    this.tags?.forEach(t => {
       let selectedDocumentsWithTag: PaperlessDocument[] = selectedDocuments.filter(d => d.tags.includes(t.id))
       let state = ToggleableItemState.NotSelected
       if (selectedDocumentsWithTag.length == selectedDocuments.length) state = ToggleableItemState.Selected
@@ -71,7 +71,7 @@ export class BulkEditorComponent {
     let correspondentsToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
 
-    this.correspondents.forEach(c => {
+    this.correspondents?.forEach(c => {
       let selectedDocumentsWithCorrespondent: PaperlessDocument[] = selectedDocuments.filter(d => d.correspondent == c.id)
       let state = ToggleableItemState.NotSelected
       if (selectedDocumentsWithCorrespondent.length == selectedDocuments.length) state = ToggleableItemState.Selected
@@ -85,7 +85,7 @@ export class BulkEditorComponent {
     let documentTypesToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))
 
-    this.documentTypes.forEach(dt => {
+    this.documentTypes?.forEach(dt => {
       let selectedDocumentsWithDocumentType: PaperlessDocument[] = selectedDocuments.filter(d => d.document_type == dt.id)
       let state = ToggleableItemState.NotSelected
       if (selectedDocumentsWithDocumentType.length == selectedDocuments.length) state = ToggleableItemState.Selected

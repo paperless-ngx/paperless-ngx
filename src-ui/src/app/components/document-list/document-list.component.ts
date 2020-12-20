@@ -119,14 +119,17 @@ export class DocumentListComponent implements OnInit {
   }
 
   clickTag(tagID: number) {
+    this.list.selectNone()
     this.filterEditor.toggleTag(tagID)
   }
 
   clickCorrespondent(correspondentID: number) {
+    this.list.selectNone()
     this.filterEditor.toggleCorrespondent(correspondentID)
   }
 
   clickDocumentType(documentTypeID: number) {
+    this.list.selectNone()
     this.filterEditor.toggleDocumentType(documentTypeID)
   }
 
