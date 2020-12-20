@@ -26,9 +26,9 @@
   <div class="col mb-2 mb-xl-0">
     <div class="d-flex">
       <label class="ml-auto mt-1 mr-2">Apply:</label>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" [selectableItems]="tagsSelectableItems" type="actions" (close)="applyTags($event)"></app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" [selectableItems]="correspondentsSelectableItems" type="actions" singular="true" (close)="applyCorrespondent($event)"></app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" [selectableItems]="documentTypesSelectableItems" type="actions" singular="true" (close)="applyDocumentType($event)"></app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" [selectableItems]="tagsSelectableItems" [type]="dropdownTypes.Editing" (close)="applyTags($event)"></app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" [selectableItems]="correspondentsSelectableItems" [type]="dropdownTypes.Editing" singular="true" (close)="applyCorrespondent($event)"></app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" [selectableItems]="documentTypesSelectableItems" [type]="dropdownTypes.Editing" singular="true" (close)="applyDocumentType($event)"></app-filterable-dropdown>
     </div>
   </div>
   <div class="w-100 d-xl-none"></div>

@@ -7,7 +7,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
-import { SelectableItem, SelectableItemState } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
+import { SelectableItem, SelectableItemState, FilterableDropdownType } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
 
 @Component({
   selector: 'app-bulk-editor',
@@ -47,6 +47,7 @@ export class BulkEditorComponent {
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
 
+  dropdownTypes = FilterableDropdownType
   get tagsSelectableItems(): SelectableItem[] {
     let tagsSelectableItems = []
     let selectedDocuments: PaperlessDocument[] = this.allDocuments.filter(d => this.selectedDocuments.has(d.id))

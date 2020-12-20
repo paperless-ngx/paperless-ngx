@@ -19,7 +19,7 @@ export enum SelectableItemState {
 
 export enum FilterableDropdownType {
   Filtering = 'filtering',
-  Actions = 'actions'
+  Editing = 'editing'
 }
 
 @Component({
@@ -47,7 +47,7 @@ export class FilterableDropdownComponent {
 
   @Input()
   set selectableItems (selectableItems: SelectableItem[]) {
-    if (this.type == FilterableDropdownType.Actions && this.dropdown?.isOpen()) return
+    if (this.type == FilterableDropdownType.Editing && this.dropdown?.isOpen()) return
     else this._selectableItems = selectableItems
   }
 
@@ -74,6 +74,8 @@ export class FilterableDropdownComponent {
 
   @Input()
   type: FilterableDropdownType = FilterableDropdownType.Filtering
+
+  types = FilterableDropdownType
 
   @Input()
   singular: boolean = false
