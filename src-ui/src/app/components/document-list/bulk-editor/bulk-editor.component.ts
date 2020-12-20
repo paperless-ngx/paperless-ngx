@@ -45,18 +45,18 @@ export class BulkEditorComponent {
   @Output()
   delete = new EventEmitter()
 
-  private tags: PaperlessTag[]
-  private correspondents: PaperlessCorrespondent[]
-  private documentTypes: PaperlessDocumentType[]
+  tags: PaperlessTag[]
+  correspondents: PaperlessCorrespondent[]
+  documentTypes: PaperlessDocumentType[]
 
   private initiallySelectedTagsToggleableItems: ToggleableItem[]
   private initiallySelectedCorrespondentsToggleableItems: ToggleableItem[]
   private initiallySelectedDocumentTypesToggleableItems: ToggleableItem[]
 
-  private dropdownTypes = FilterableDropdownType
+  dropdownTypes = FilterableDropdownType
 
   get selectionSpansPages(): boolean {
-    return this.selectedDocuments.length > this.viewDocuments.length || !Array.from(this.selectedDocuments).every(sd => this.viewDocuments.find(d => d.id == sd))
+    return this.selectedDocuments.size > this.viewDocuments.length || !Array.from(this.selectedDocuments).every(sd => this.viewDocuments.find(d => d.id == sd))
   }
 
   get tagsToggleableItems(): ToggleableItem[] {

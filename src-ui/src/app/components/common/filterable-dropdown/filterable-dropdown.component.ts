@@ -52,7 +52,7 @@ export class FilterableDropdownComponent {
   }
 
   get itemsSelected() :(PaperlessTag | PaperlessCorrespondent | PaperlessDocumentType)[] {
-    return this.toggleableItems.filter(si => si.state == ToggleableItemState.Selected).map(si => si.item)
+    return this.toggleableItems.filter(ti => ti.state == ToggleableItemState.Selected).map(ti => ti.item)
   }
 
   @Input()
@@ -67,7 +67,7 @@ export class FilterableDropdownComponent {
   types = FilterableDropdownType
 
   @Input()
-  singular: boolean = false
+  tingular: boolean = false
 
   @Output()
   toggle = new EventEmitter()
@@ -80,20 +80,20 @@ export class FilterableDropdownComponent {
 
   _showCounts: boolean = true
 
-  @Input
+  @Input()
   set showCounts(show: boolean) {
     this._showCounts = show
   }
 
   get showCounts(): boolean {
-    return this._showCounts && (this.type == FilterableDropdownType.Editing || (this.type == FilterableDropdownType.Filtering && this.itemsSelected == 0))
+    return this._showCounts && (this.type == FilterableDropdownType.Editing || (this.type == FilterableDropdownType.Filtering && this.itemsSelected.length == 0))
   }
 
   constructor(private filterPipe: FilterPipe) { }
 
   toggleItem(toggleableItem: ToggleableItem): void {
-    if (this.singular && toggleableItem.state == ToggleableItemState.Selected) {
-      this._toggleableItems.filter(si => si.item.id !== toggleableItem.item.id).forEach(si => si.state = ToggleableItemState.NotSelected)
+    if (this.tingular && toggleableItem.state == ToggleableItemState.Selected) {
+      this._toggleableItems.filter(ti => ti.item.id !== toggleableItem.item.id).forEach(ti => ti.state = ToggleableItemState.NotSelected)
     }
     this.toggle.emit(toggleableItem.item)
   }
@@ -112,7 +112,11 @@ export class FilterableDropdownComponent {
 
   listFilterEnter(): void {
     let filtered = this.filterPipe.transform(this.toggleableItems, this.filterText)
-    if (filtered.length == 1) this.toggleItem(filtered.shift())
-    this.dropdown.close()
+    if (filtered.length == 1) {
+      let toggleableItem = this.toggleableItems.find(ti => ti.item.id == filtered[0].item.id)
+      if (toggleableItem) toggleableItem.state = ToggleableItemState.Selected
+      this.toggleItem(filtered[0])
+      this.dropdown.close()
+    }
   }
 }
