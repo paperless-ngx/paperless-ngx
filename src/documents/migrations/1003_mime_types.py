@@ -11,6 +11,7 @@ from paperless.db import GnuPG
 STORAGE_TYPE_UNENCRYPTED = "unencrypted"
 STORAGE_TYPE_GPG = "gpg"
 
+
 def source_path(self):
     if self.filename:
         fname = str(self.filename)
