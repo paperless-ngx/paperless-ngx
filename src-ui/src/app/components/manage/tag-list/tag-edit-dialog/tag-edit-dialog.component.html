@@ -11,7 +11,7 @@
 
       <div class="form-group paperless-input-select">
         <label for="colour">Colour</label>
-        <ng-select name="colour" formControlName="colour" [items]="getColours()" bindValue="id" bindLabel="name">
+        <ng-select name="colour" formControlName="colour" [items]="getColours()" bindValue="id" bindLabel="name" [clearable]="false">
           <ng-template ng-option-tmp ng-label-tmp let-item="item">
             <span class="badge" [style.background]="item.value" [style.color]="item.textColor">{{item.name}}</span>
           </ng-template>
