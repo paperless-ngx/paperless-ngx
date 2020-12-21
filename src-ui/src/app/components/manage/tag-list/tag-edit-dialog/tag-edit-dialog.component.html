@@ -7,11 +7,21 @@
     </div>
     <div class="modal-body">
       <app-input-text title="Name" formControlName="name"></app-input-text>
-      <app-input-select title="Colour" [items]="getColours()" formControlName="colour" [textColor]="getColor(objectForm.value.colour).textColor" [backgroundColor]="getColor(objectForm.value.colour).value"></app-input-select>
+
+
+      <div class="form-group paperless-input-select">
+        <label for="colour">Colour</label>
+        <ng-select name="colour" formControlName="colour" [items]="getColours()" bindValue="id" bindLabel="name">
+          <ng-template ng-option-tmp ng-label-tmp let-item="item">
+            <span class="badge" [style.background]="item.value" [style.color]="item.textColor">{{item.name}}</span>
+          </ng-template>
+        </ng-select>
+      </div>
+     
       <app-input-check title="Inbox tag" formControlName="is_inbox_tag" hint="Inbox tags are automatically assigned to all consumed documents."></app-input-check>
-      <app-input-text title="Match" formControlName="match"></app-input-text>
       <app-input-select title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-      <app-input-check title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+      <app-input-text title="Match" formControlName="match" hint="Auto matching does not require you to fill in this field."></app-input-text>
+      <app-input-check title="Case insensitive" formControlName="is_insensitive" hint="Auto matching ignores this option."></app-input-check>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
