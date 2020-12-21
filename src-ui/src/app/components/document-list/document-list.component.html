@@ -78,9 +78,9 @@
 </app-page-header>
 
 <div class="w-100 mb-2 mb-sm-4">
-  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
+  <app-filter-editor *ngIf="!isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
 
-  <app-bulk-editor [hidden]="!isBulkEditing"
+  <app-bulk-editor *ngIf="isBulkEditing"
     [viewDocuments]="list.documents"
     [(selectedDocuments)]="list.selected"
     (selectPage)="list.selectPage()"
