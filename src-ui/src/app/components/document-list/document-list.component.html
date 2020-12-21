@@ -150,6 +150,6 @@
 </table>
 
 
-<div class=" m-n2 row" *ngIf="displayMode == 'smallCards'">
+<div class="m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
   <app-document-card-small [document]="d" [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)" *ngFor="let d of list.documents" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
 </div>
