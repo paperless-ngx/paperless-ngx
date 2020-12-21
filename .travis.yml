@@ -60,9 +60,12 @@ jobs:
       after_success:
         - true
       script:
+        - echo "Starting arm64v8 build, login to docker"
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         # travis_wait 60 tells travis to wait for up to 60 minutes - default is 20, which is too short
+        - echo "Build ..."
         - travis_wait 60 docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 .
+        - echo "Push"
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8
       arch: arm64
       on:
