@@ -8,9 +8,9 @@
     <div class="modal-body">
       
       <app-input-text title="Name" formControlName="name"></app-input-text>
-      <app-input-text title="Match" formControlName="match"></app-input-text>
       <app-input-select title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-      <app-input-check title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+      <app-input-text title="Match" formControlName="match" hint="Auto matching does not require you to fill in this field."></app-input-text>
+      <app-input-check title="Case insensitive" formControlName="is_insensitive" hint="Auto matching ignores this option."></app-input-check>
 
     </div>
     <div class="modal-footer">
