@@ -1,3 +1,14 @@
+FROM ubuntu:20.04 AS jbig2
+
+WORKDIR /usr/src/jbig2enc
+
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential automake libtool libleptonica-dev zlib1g-dev git ca-certificates
+
+RUN git clone https://github.com/agl/jbig2enc .
+RUN ./autogen.sh
+RUN ./configure && make
+
+
 FROM node:15 AS frontend
 
 WORKDIR /usr/src/paperless/src-ui/
@@ -56,6 +67,12 @@ COPY docker/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 COPY docker/gunicorn.conf.py ./
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/docker-entrypoint.sh /sbin/docker-entrypoint.sh
+
+# copy jbic
+COPY --from=jbig2 /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
+COPY --from=jbig2 /usr/src/jbig2enc/src/jbig2 /usr/local/bin/
+COPY --from=jbig2 /usr/src/jbig2enc/src/*.h /usr/local/include/
+
 
 # copy app
 COPY src/ ./src/
