@@ -1,4 +1,14 @@
 <app-page-header [(title)]="title">
+    <div class="input-group input-group-sm mr-5" *ngIf="getContentType() == 'application/pdf'">
+      <div class="input-group-prepend">
+        <div class="input-group-text">Page </div>
+      </div>
+      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
+      <div class="input-group-append">
+        <div class="input-group-text">of {{previewNumPages}}</div>
+      </div>
+    </div>
+
     <button type="button" class="btn btn-sm btn-outline-danger mr-2" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
@@ -24,6 +34,12 @@
 
     </div>
 
+    <button type="button" class="btn btn-sm btn-outline-primary mr-2" (click)="moreLike()">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
+        </svg>
+        <span class="d-none d-lg-inline"> More like this</span>
+    </button>
 
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
@@ -52,9 +68,9 @@
                         </div>
                         <app-input-date-time titleDate="Date created" formControlName="created"></app-input-date-time>
                         <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent"
-                            allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
+                            (createNew)="createCorrespondent()"></app-input-select>
                         <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type"
-                            allowNull="true" (createNew)="createDocumentType()"></app-input-select>
+                            (createNew)="createDocumentType()"></app-input-select>
                         <app-input-tags formControlName="tags" title="Tags"></app-input-tags>
 
                     </ng-template>
@@ -128,7 +144,7 @@
 
     <div class="col-md-6 col-xl-8 mb-3">
       <div class="pdf-viewer-container" *ngIf="getContentType() == 'application/pdf'">
-        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true"></pdf-viewer>
+        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
       </div>
     </div>
 </div>

@@ -1,11 +1,15 @@
-<div class="form-group">
+<div class="form-group paperless-input-select">
   <label [for]="inputId">{{title}}</label>
   <div [class.input-group]="showPlusButton()">
-    <select class="form-control" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()"
-      [disabled]="disabled" [style.color]="textColor" [style.background]="backgroundColor">
-      <option *ngIf="allowNull" [ngValue]="null" class="form-control">---</option>
-      <option *ngFor="let i of items" [ngValue]="i.id" class="form-control">{{i.name}}</option>
-    </select>
+    <ng-select name="inputId" [(ngModel)]="value"
+      [disabled]="disabled"
+      [style.color]="textColor"
+      [style.background]="backgroundColor"
+      (change)="onChange(value)"
+      (blur)="onTouched()">
+      <ng-option *ngFor="let i of items" [value]="i.id">{{i.name}}</ng-option>
+    </ng-select>
+
     <div *ngIf="showPlusButton()" class="input-group-append">
       <button class="btn btn-outline-secondary" type="button" (click)="createNew.emit()">
         <svg class="buttonicon" fill="currentColor">

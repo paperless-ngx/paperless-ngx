@@ -54,6 +54,7 @@ import { FileSizePipe } from './pipes/file-size.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
 import { DocumentTitlePipe } from './pipes/document-title.pipe';
 import { MetadataCollapseComponent } from './components/document-detail/metadata-collapse/metadata-collapse.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
 
 @NgModule({
@@ -112,7 +113,8 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     ReactiveFormsModule,
     NgxFileDropModule,
     InfiniteScrollModule,
-    PdfViewerModule
+    PdfViewerModule,
+    NgSelectModule
   ],
   providers: [
     DatePipe,
