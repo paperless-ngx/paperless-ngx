@@ -352,6 +352,25 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(correction, None)
 
+    def test_search_more_like(self):
+        d1=Document.objects.create(title="invoice", content="the thing i bought at a shop and paid with bank account", checksum="A", pk=1)
+        d2=Document.objects.create(title="bank statement 1", content="things i paid for in august", pk=2, checksum="B")
+        d3=Document.objects.create(title="bank statement 3", content="things i paid for in september", pk=3, checksum="C")
+        with AsyncWriter(index.open_index()) as writer:
+            index.update_document(writer, d1)
+            index.update_document(writer, d2)
+            index.update_document(writer, d3)
+
+        response = self.client.get(f"/api/search/?more_like={d2.id}")
+
+        self.assertEqual(response.status_code, 200)
+
+        results = response.data['results']
+
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]['id'], d3.id)
+        self.assertEqual(results[1]['id'], d1.id)
+
     def test_statistics(self):
 
         doc1 = Document.objects.create(title="none1", checksum="A")
