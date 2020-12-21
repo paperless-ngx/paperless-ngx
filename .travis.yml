@@ -60,14 +60,17 @@ jobs:
       after_success:
         - true
       script:
-        - echo "Starting arm64v8 build, login to docker"
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        # register binfmt stuff for qemu-static binaries so we can use userland-emulation
+        - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        # replace the multi-arch reference with a specific, arm32v7 version. else docker will use the platform specific one,
+        # which is amd64.
+        - sed -i 's/FROM node:15/FROM node@sha256:5a14c8bf5020253f322b8f1f6bec4c34cafb0097acf1c1155506ee17b3c71119/g' Dockerfile
+        - sed -i 's/FROM python:3.7-slim/FROM python@sha256:d75eb820f62221ce8e40c5d8dbe988aa417e88553ef095a4a7591d7318da8486/g' Dockerfile
         # travis_wait 60 tells travis to wait for up to 60 minutes - default is 20, which is too short
-        - echo "Build ..."
         - travis_wait 60 docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 .
-        - echo "Push"
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8
-      arch: arm64
+      arch: amd64
       on:
         condition: '"${BUILD_DOCKER}" = 1'
     
