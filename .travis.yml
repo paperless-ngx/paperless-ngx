@@ -91,6 +91,8 @@ jobs:
         # travis_wait 60 tells travis to wait for up to 60 minutes - default is 20, which is too short
         - travis_wait 60 docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7 .
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7
+      env:
+        - DOCKER_CLI_EXPERIMENTAL=enabled # required for manifest support
       on:
         condition: '"${BUILD_DOCKER}" = 1'
     
