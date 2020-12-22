@@ -40,10 +40,14 @@ export class DocumentListViewService {
   }
 
   set savedView(value: PaperlessSavedView) {
-    if (value) {
+    if (value && !this._savedViewConfig || value && value.id != this._savedViewConfig.id) {
+      //saved view inactive and should be active now, or saved view active, but a different view is requested
       //this is here so that we don't modify value, which might be the actual instance of the saved view.
+      this.selectNone()
       this._savedViewConfig = Object.assign({}, value)
-    } else {
+    } else if (this._savedViewConfig && !value) {
+      //saved view active, but document list requested
+      this.selectNone()
       this._savedViewConfig = null
     }
   }
