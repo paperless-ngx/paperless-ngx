@@ -11,34 +11,34 @@ paperless-ng 0.9.9
 
 Christmas release!
 
-Bulk editing
+* Bulk editing
 
-* Paperless now supports bulk editing.
-* The following operations are available: Add and remove correspondents, tags, document types from selected documents, as well as mass-deleting documents.
-* We've got a more fancy UI in the works that makes these features more accessible, but that's not quite ready yet.
+  * Paperless now supports bulk editing.
+  * The following operations are available: Add and remove correspondents, tags, document types from selected documents, as well as mass-deleting documents.
+  * We've got a more fancy UI in the works that makes these features more accessible, but that's not quite ready yet.
 
-Searching
+* Searching
 
-* Paperless now supports searching for similar documents ("More like this") both from the document detail page as well as from individual search results.
-* A search score indicates how well a document matches the search query, or how similar a document is to a given reference document.
+  * Paperless now supports searching for similar documents ("More like this") both from the document detail page as well as from individual search results.
+  * A search score indicates how well a document matches the search query, or how similar a document is to a given reference document.
 
-Changes
+* Other additions and changes
 
-* Clarification in the UI that the fields "Match" and "Is insensitive" are not relevant for the Auto matching algorithm.
-* New select interface for tags, types and correspondents allows filtering. This also improves tag selection. Thanks again to `Michael Shamoon`_!
-* Page navigation controls for the document viewer, thanks to `Michael Shamoon`_.
-* Layout changes to the small cards document list.
-* The dashboard now displays the username (or full name if specified in the admin) on the dashboard.
+  * Clarification in the UI that the fields "Match" and "Is insensitive" are not relevant for the Auto matching algorithm.
+  * New select interface for tags, types and correspondents allows filtering. This also improves tag selection. Thanks again to `Michael Shamoon`_!
+  * Page navigation controls for the document viewer, thanks to `Michael Shamoon`_.
+  * Layout changes to the small cards document list.
+  * The dashboard now displays the username (or full name if specified in the admin) on the dashboard.
 
-Fixes
+* Fixes
 
-* An error that caused the document importer to crash was fixed.
-* An issue with changes not being possible when ``PAPERLESS_COOKIE_PREFIX`` is used was fixed.
-* The date selection filters now allow manual entry of dates.
+  * An error that caused the document importer to crash was fixed.
+  * An issue with changes not being possible when ``PAPERLESS_COOKIE_PREFIX`` is used was fixed.
+  * The date selection filters now allow manual entry of dates.
 
-Feature Removal
+* Feature Removal
 
-* Most of the guesswork features have been removed. Paperless no longer tries to extract correspondents and tags from file names.
+  * Most of the guesswork features have been removed. Paperless no longer tries to extract correspondents and tags from file names.
 
 paperless-ng 0.9.8
 ##################
