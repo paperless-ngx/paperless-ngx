@@ -73,6 +73,9 @@ class Command(Renderable, BaseCommand):
 
                 self._import_files_from_manifest()
 
+        print("Updating search index...")
+        call_command('document_index', 'reindex')
+
     @staticmethod
     def _check_manifest_exists(path):
         if not os.path.exists(path):
