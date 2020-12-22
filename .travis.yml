@@ -5,33 +5,33 @@ os: linux
 
 jobs:
   include:
-    - name: "Paperless on Python 3.6"
-      python: "3.6"
-
-    - name: "Paperless on Python 3.7"
-      python: "3.7"
-
-    - name: "Paperless on Python 3.8"
-      python: "3.8"
-
-    - name: "Documentation"
-      script:
-        - cd docs/
-        - make html
-      after_success: true
-
-    - name: "Front end"
-      language: node_js
-      node_js:
-        - 15
-      before_install: true
-      install:
-        - cd src-ui/
-        - npm install -g @angular/cli
-        - npm install
-      script:
-        - ng build --prod
-      after_success: true
+#    - name: "Paperless on Python 3.6"
+#      python: "3.6"
+#
+#    - name: "Paperless on Python 3.7"
+#      python: "3.7"
+#
+#    - name: "Paperless on Python 3.8"
+#      python: "3.8"
+#
+#    - name: "Documentation"
+#      script:
+#        - cd docs/
+#        - make html
+#      after_success: true
+#
+#    - name: "Front end"
+#      language: node_js
+#      node_js:
+#        - 15
+#      before_install: true
+#      install:
+#        - cd src-ui/
+#        - npm install -g @angular/cli
+#        - npm install
+#      script:
+#        - ng build --prod
+#      after_success: true
 
     - stage: build_docker
       name: amd64 docker build
