@@ -1,5 +1,6 @@
+@import "/src/theme";
+
 .result-content {
-  color: darkgray;
   overflow-wrap: anywhere;
 }
 
@@ -8,11 +9,31 @@
   object-position: top;
   height: 100%;
   position: absolute;
-
+  mix-blend-mode: multiply;
 }
 
 .search-score-bar {
   width: 100px;
   height: 5px;
   margin-top: 2px;
+}
+
+.document-card-check {
+  display: none
+}
+
+.document-card:hover .document-card-check {
+  display: block;
+}
+
+.card-selected {
+  border-color: $primary;
+}
+
+.doc-img-background {
+  background-color: white;
+}
+
+.doc-img-background-selected {
+  background-color: $primaryFaded;
 }
