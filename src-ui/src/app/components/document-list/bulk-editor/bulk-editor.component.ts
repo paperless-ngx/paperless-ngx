@@ -149,22 +149,34 @@ export class BulkEditorComponent {
     this.initialDocumentTypesToggleableItems = this._documentTypesToggleableItems
   }
 
-  applyTags(newTagsToggleableItems: ToggleableItem[], forceApply:boolean = false) {
+  applyTags(newTagsToggleableItems: ToggleableItem[]) {
     let changedTags = this.checkForChangedItems(this.initialTagsToggleableItems, newTagsToggleableItems)
     if (changedTags.itemsToAdd.length > 0) this.setTags.emit(changedTags.itemsToAdd)
     if (changedTags.itemsToRemove.length > 0) this.removeTags.emit(changedTags.itemsToRemove)
   }
 
-  applyCorrespondent(newCorrespondentsToggleableItems: ToggleableItem[], forceApply:boolean = false) {
+  removeAllTags() {
+    this.setTags.emit(null)
+  }
+
+  applyCorrespondent(newCorrespondentsToggleableItems: ToggleableItem[]) {
     let changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
     if (changedCorrespondents.itemsToAdd.length > 0) this.setCorrespondent.emit(changedCorrespondents.itemsToAdd[0])
     else if (changedCorrespondents.itemsToRemove.length > 0) this.removeCorrespondents.emit(changedCorrespondents.itemsToRemove)
   }
 
-  applyDocumentType(newDocumentTypesToggleableItems: ToggleableItem[], forceApply:boolean = false) {
+  removeAllCorrespondents() {
+    this.setDocumentType.emit(null)
+  }
+
+  applyDocumentType(newDocumentTypesToggleableItems: ToggleableItem[]) {
     let changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
     if (changedDocumentTypes.itemsToAdd.length > 0) this.setDocumentType.emit(changedDocumentTypes.itemsToAdd[0])
     else if (changedDocumentTypes.itemsToRemove.length > 0) this.removeDocumentTypes.emit(changedDocumentTypes.itemsToRemove)
+  }
+
+  removeAllDocumentTypes() {
+    this.setDocumentType.emit(null)
   }
 
   checkForChangedItems(toggleableItemsA: ToggleableItem[], toggleableItemsB: ToggleableItem[]): ChangedItems {

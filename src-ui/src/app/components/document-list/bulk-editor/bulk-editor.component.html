@@ -35,7 +35,7 @@
         [showCounts]="!this.selectionSpansPages"
         [showRemoveAll]="this.selectionSpansPages"
         (open)="tagsDropdownOpen()"
-        (removeAll)="applyTags([], true)"
+        (removeAll)="removeAllTags()"
         (editingComplete)="applyTags($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" singular="true"
@@ -44,7 +44,7 @@
         [showCounts]="!this.selectionSpansPages"
         [showRemoveAll]="this.selectionSpansPages"
         (open)="correspondentsDropdownOpen()"
-        (removeAll)="applyCorrespondent([], true)"
+        (removeAll)="removeAllCorrespondents()"
         (editingComplete)="applyCorrespondent($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" singular="true"
@@ -53,7 +53,7 @@
         [showCounts]="!this.selectionSpansPages"
         [showRemoveAll]="this.selectionSpansPages"
         (open)="documentTypesDropdownOpen()"
-        (removeAll)="applyDocumentType([], true)"
+        (removeAll)="removeAllDocumentTypes()"
         (editingComplete)="applyDocumentType($event)">
       </app-filterable-dropdown>
     </div>
