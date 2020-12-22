@@ -896,7 +896,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         response = self.client.post("/api/documents/bulk_edit/", json.dumps({
             "documents": [self.doc2.id],
             "method": "add_tag",
-            "parameters": {'document_type': 345657}
+            "parameters": {'tag': 345657}
         }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
