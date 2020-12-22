@@ -669,6 +669,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(v1.filter_rules.count(), 0)
 
 
+
 class TestBulkEdit(DirectoriesMixin, APITestCase):
 
     def setUp(self):
@@ -891,11 +892,22 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         doc2 = Document.objects.get(id=self.doc2.id)
         self.assertEqual(doc2.document_type, self.dt1)
 
-    def test_api_invalid_tag(self):
+    def test_api_add_invalid_tag(self):
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
         response = self.client.post("/api/documents/bulk_edit/", json.dumps({
             "documents": [self.doc2.id],
             "method": "add_tag",
+            "parameters": {'tag': 345657}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+        self.assertEqual(list(self.doc2.tags.all()), [self.t1])
+
+    def test_api_delete_invalid_tag(self):
+        self.assertEqual(list(self.doc2.tags.all()), [self.t1])
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "remove_tag",
             "parameters": {'tag': 345657}
         }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
