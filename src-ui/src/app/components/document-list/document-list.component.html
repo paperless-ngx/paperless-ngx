@@ -97,7 +97,7 @@
 </div>
 
 <div *ngIf="displayMode == 'largeCards'">
-  <app-document-card-large *ngFor="let d of list.documents" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
+  <app-document-card-large [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)"   *ngFor="let d of list.documents" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
   </app-document-card-large>
 </div>
 

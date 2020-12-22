@@ -12,6 +12,25 @@ export class DocumentCardLargeComponent implements OnInit {
 
   constructor(private documentService: DocumentService, private sanitizer: DomSanitizer) { }
 
+  _selected = false
+
+  get selected() {
+    return this._selected
+  }
+
+  @Input()
+  set selected(value: boolean) {
+    this._selected = value
+    this.selectedChange.emit(value)
+  }
+
+  @Output()
+  selectedChange = new EventEmitter<boolean>()
+
+  get selectable() {
+    return this.selectedChange.observers.length > 0
+  }
+
   @Input()
   moreLikeThis: boolean = false
 
