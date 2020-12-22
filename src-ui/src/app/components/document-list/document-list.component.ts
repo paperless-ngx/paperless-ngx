@@ -173,7 +173,6 @@ export class DocumentListComponent implements OnInit {
       }
       if (changedTags.itemsToRemove.length > 0) {
         if (!both) {
-          // TODO: API endpoint for remove multiple tags
           action = 'remove_tags'
           tags = changedTags.itemsToRemove
         } else {
@@ -186,6 +185,7 @@ export class DocumentListComponent implements OnInit {
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
+      // TODO: API endpoints for add/remove multiple tags
       this.executeBulkOperation(action, {"tags": tags ? tags.map(t => t.id) : null}).subscribe(
         response => {
           if (!both) modal.close()
