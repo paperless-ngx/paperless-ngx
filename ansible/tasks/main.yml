@@ -169,7 +169,7 @@
       line: "PAPERLESS_OCR_USER_ARG=\"{{ paperlessng_ocrmypdf_args }}{{ ' --jbig2-lossy' if  paperlessng_use_jbig2enc else '' }}\""
     - regexp: "^#?PAPERLESS_TIME_ZONE="
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
-  no_log: true
+  #no_log: true
 
 - name: configure paperless-ng database [sqlite]
   lineinfile:
@@ -209,17 +209,21 @@
     extra_args: --upgrade
 
 - name: collect static files
-  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py collectstatic --clear --no-input"
+  command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py collectstatic --clear --no-input"
+  args:
+    chdir: "{{ paperlessng_directory }}/src"
 
 - name: create database schema
-  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py migrate"
+  command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py migrate"
+  args:
+    chdir: "{{ paperlessng_directory }}/src"
   register: database_schema
   changed_when: '"No migrations to apply." not in database_schema.stdout'
 
 - name: create first paperless user
   # "manage.py createsuperuser" only works on interactive TTYs
   command: |
-    {{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py shell -c "
+    {{ paperlessng_virtualenv }}/bin/python3 manage.py shell -c "
     from django.contrib.auth.models import User
     from django.contrib.auth.hashers import get_hasher
 
@@ -242,6 +246,8 @@
         User.objects.create_superuser('{{ paperlessng_superuser_name }}', '{{ paperlessng_superuser_email }}', '{{ paperlessng_superuser_password }}')
         print('changed')
     "
+  args:
+    chdir: "{{ paperlessng_directory }}/src"
   register: superuser
   changed_when: superuser.stdout == 'changed'
   no_log: true
