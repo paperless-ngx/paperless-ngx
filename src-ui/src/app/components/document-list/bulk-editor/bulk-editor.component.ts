@@ -11,7 +11,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 import { FilterableDropdownType } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItem, ToggleableItemState } from 'src/app/components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
-interface ChangedItems {
+export interface ChangedItems {
   itemsToAdd: any[],
   itemsToRemove: any[]
 }
@@ -42,22 +42,13 @@ export class BulkEditorComponent {
   setTags = new EventEmitter()
 
   @Output()
-  setCorrespondent = new EventEmitter()
+  setCorrespondents = new EventEmitter()
 
   @Output()
-  setDocumentType = new EventEmitter()
+  setDocumentTypes = new EventEmitter()
 
   @Output()
   delete = new EventEmitter()
-
-  @Output()
-  removeTags = new EventEmitter()
-
-  @Output()
-  removeCorrespondents = new EventEmitter()
-
-  @Output()
-  removeDocumentTypes = new EventEmitter()
 
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
@@ -151,8 +142,7 @@ export class BulkEditorComponent {
 
   applyTags(newTagsToggleableItems: ToggleableItem[]) {
     let changedTags = this.checkForChangedItems(this.initialTagsToggleableItems, newTagsToggleableItems)
-    if (changedTags.itemsToAdd.length > 0) this.setTags.emit(changedTags.itemsToAdd)
-    if (changedTags.itemsToRemove.length > 0) this.removeTags.emit(changedTags.itemsToRemove)
+    if (changedTags.itemsToAdd.length > 0 || changedTags.itemsToRemove.length > 0) this.setTags.emit(changedTags)
   }
 
   removeAllTags() {
@@ -161,22 +151,20 @@ export class BulkEditorComponent {
 
   applyCorrespondent(newCorrespondentsToggleableItems: ToggleableItem[]) {
     let changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
-    if (changedCorrespondents.itemsToAdd.length > 0) this.setCorrespondent.emit(changedCorrespondents.itemsToAdd[0])
-    else if (changedCorrespondents.itemsToRemove.length > 0) this.removeCorrespondents.emit(changedCorrespondents.itemsToRemove)
+    if (changedCorrespondents.itemsToAdd.length > 0 || changedCorrespondents.itemsToRemove.length > 0) this.setCorrespondents.emit(changedCorrespondents)
   }
 
   removeAllCorrespondents() {
-    this.setDocumentType.emit(null)
+    this.setDocumentTypes.emit(null)
   }
 
   applyDocumentType(newDocumentTypesToggleableItems: ToggleableItem[]) {
     let changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
-    if (changedDocumentTypes.itemsToAdd.length > 0) this.setDocumentType.emit(changedDocumentTypes.itemsToAdd[0])
-    else if (changedDocumentTypes.itemsToRemove.length > 0) this.removeDocumentTypes.emit(changedDocumentTypes.itemsToRemove)
+    if (changedDocumentTypes.itemsToAdd.length > 0 || changedDocumentTypes.itemsToRemove.length > 0) this.setDocumentTypes.emit(changedDocumentTypes)
   }
 
   removeAllDocumentTypes() {
-    this.setDocumentType.emit(null)
+    this.setDocumentTypes.emit(null)
   }
 
   checkForChangedItems(toggleableItemsA: ToggleableItem[], toggleableItemsB: ToggleableItem[]): ChangedItems {
