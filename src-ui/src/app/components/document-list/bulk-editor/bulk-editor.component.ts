@@ -11,6 +11,11 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 import { FilterableDropdownType } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItem, ToggleableItemState } from 'src/app/components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
+interface ChangedItems {
+  itemsToAdd: any[],
+  itemsToRemove: any[]
+}
+
 @Component({
   selector: 'app-bulk-editor',
   templateUrl: './bulk-editor.component.html',
@@ -34,24 +39,33 @@ export class BulkEditorComponent {
   selectNone = new EventEmitter()
 
   @Output()
+  setTags = new EventEmitter()
+
+  @Output()
   setCorrespondent = new EventEmitter()
 
   @Output()
   setDocumentType = new EventEmitter()
 
   @Output()
-  setTags = new EventEmitter()
+  delete = new EventEmitter()
 
   @Output()
-  delete = new EventEmitter()
+  removeTags = new EventEmitter()
+
+  @Output()
+  removeCorrespondents = new EventEmitter()
+
+  @Output()
+  removeDocumentTypes = new EventEmitter()
 
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
 
-  private initiallySelectedTagsToggleableItems: ToggleableItem[]
-  private initiallySelectedCorrespondentsToggleableItems: ToggleableItem[]
-  private initiallySelectedDocumentTypesToggleableItems: ToggleableItem[]
+  private initialTagsToggleableItems: ToggleableItem[]
+  private initialCorrespondentsToggleableItems: ToggleableItem[]
+  private initialDocumentTypesToggleableItems: ToggleableItem[]
 
   dropdownTypes = FilterableDropdownType
 
@@ -59,6 +73,7 @@ export class BulkEditorComponent {
     return this.selectedDocuments.size > this.viewDocuments.length || !Array.from(this.selectedDocuments).every(sd => this.viewDocuments.find(d => d.id == sd))
   }
 
+  private _tagsToggleableItems: ToggleableItem[]
   get tagsToggleableItems(): ToggleableItem[] {
     let tagsToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
@@ -71,9 +86,11 @@ export class BulkEditorComponent {
       else if (selectedDocumentsWithTag.length > 0 && selectedDocumentsWithTag.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
       tagsToggleableItems.push({item: t, state: state, count: selectedDocumentsWithTag.length})
     })
+    this._tagsToggleableItems = tagsToggleableItems
     return tagsToggleableItems
   }
 
+  private _correspondentsToggleableItems: ToggleableItem[]
   get correspondentsToggleableItems(): ToggleableItem[] {
     let correspondentsToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
@@ -86,9 +103,11 @@ export class BulkEditorComponent {
       else if (selectedDocumentsWithCorrespondent.length > 0 && selectedDocumentsWithCorrespondent.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
       correspondentsToggleableItems.push({item: c, state: state, count: selectedDocumentsWithCorrespondent.length})
     })
+    this._correspondentsToggleableItems = correspondentsToggleableItems
     return correspondentsToggleableItems
   }
 
+  private _documentTypesToggleableItems: ToggleableItem[]
   get documentTypesToggleableItems(): ToggleableItem[] {
     let documentTypesToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
@@ -101,6 +120,7 @@ export class BulkEditorComponent {
       else if (selectedDocumentsWithDocumentType.length > 0 && selectedDocumentsWithDocumentType.length < selectedDocuments.length) state = ToggleableItemState.PartiallySelected
       documentTypesToggleableItems.push({item: dt, state: state, count: selectedDocumentsWithDocumentType.length})
     })
+    this._documentTypesToggleableItems = documentTypesToggleableItems
     return documentTypesToggleableItems
   }
 
@@ -118,39 +138,45 @@ export class BulkEditorComponent {
   }
 
   tagsDropdownOpen() {
-    this.initiallySelectedTagsToggleableItems = this.tagsToggleableItems.filter(tti => tti.state == ToggleableItemState.Selected)
+    this.initialTagsToggleableItems = this._tagsToggleableItems
   }
 
   correspondentsDropdownOpen() {
-    this.initiallySelectedCorrespondentsToggleableItems = this.correspondentsToggleableItems.filter(cti => cti.state == ToggleableItemState.Selected)
+    this.initialCorrespondentsToggleableItems = this._correspondentsToggleableItems
   }
 
   documentTypesDropdownOpen() {
-    this.initiallySelectedDocumentTypesToggleableItems = this.documentTypesToggleableItems.filter(dtti => dtti.state == ToggleableItemState.Selected)
+    this.initialDocumentTypesToggleableItems = this._documentTypesToggleableItems
   }
 
-  applyTags(selectedTags: PaperlessTag[]) {
-    let unchanged = this.equateItemsToToggleableItems(selectedTags, this.initiallySelectedTagsToggleableItems)
-    if (!unchanged) this.setTags.emit(selectedTags)
-    this.initiallySelectedTagsToggleableItems = []
+  applyTags(newTagsToggleableItems: ToggleableItem[], forceApply:boolean = false) {
+    let changedTags = this.checkForChangedItems(this.initialTagsToggleableItems, newTagsToggleableItems)
+    if (changedTags.itemsToAdd.length > 0) this.setTags.emit(changedTags.itemsToAdd)
+    if (changedTags.itemsToRemove.length > 0) this.removeTags.emit(changedTags.itemsToRemove)
   }
 
-  applyCorrespondent(selectedCorrespondents: PaperlessCorrespondent[]) {
-    let unchanged = this.equateItemsToToggleableItems(selectedCorrespondents, this.initiallySelectedCorrespondentsToggleableItems)
-    if (!unchanged) this.setCorrespondent.emit(selectedCorrespondents?.length > 0 ? selectedCorrespondents.shift() : null)
-    this.initiallySelectedCorrespondentsToggleableItems = []
+  applyCorrespondent(newCorrespondentsToggleableItems: ToggleableItem[], forceApply:boolean = false) {
+    let changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
+    if (changedCorrespondents.itemsToAdd.length > 0) this.setCorrespondent.emit(changedCorrespondents.itemsToAdd)
+    else if (changedCorrespondents.itemsToRemove.length > 0) this.removeCorrespondents.emit(changedCorrespondents.itemsToRemove)
   }
 
-  applyDocumentType(selectedDocumentTypes: PaperlessDocumentType[]) {
-    let unchanged = this.equateItemsToToggleableItems(selectedDocumentTypes, this.initiallySelectedDocumentTypesToggleableItems)
-    if (!unchanged) this.setDocumentType.emit(selectedDocumentTypes.length > 0 ? selectedDocumentTypes.shift() : null)
-    this.initiallySelectedDocumentTypesToggleableItems = []
+  applyDocumentType(newDocumentTypesToggleableItems: ToggleableItem[], forceApply:boolean = false) {
+    let changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
+    if (changedDocumentTypes.itemsToAdd.length > 0) this.setDocumentType.emit(changedDocumentTypes.itemsToAdd)
+    else if (changedDocumentTypes.itemsToRemove.length > 0) this.removeDocumentTypes.emit(changedDocumentTypes.itemsToRemove)
   }
 
-  equateItemsToToggleableItems(items: ObjectWithId[], toggleableItems: ToggleableItem[]): boolean {
-    // either both empty or all items must in toggleableItems and vice-versa
-    return (toggleableItems.length == 0 && items.length == 0) ||
-           (items.every(i => toggleableItems.find(ti => ti.item.id == i.id) !== undefined) && toggleableItems.every(ti => items.find(i => i.id == ti.item.id) !== undefined))
+  checkForChangedItems(toggleableItemsA: ToggleableItem[], toggleableItemsB: ToggleableItem[]): ChangedItems {
+    let itemsToAdd: any[] = []
+    let itemsToRemove: any[] = []
+    toggleableItemsA.forEach(oldItem => {
+      let newItem = toggleableItemsB.find(nTTI => nTTI.item.id == oldItem.item.id)
+
+      if (newItem.state == ToggleableItemState.Selected && (oldItem.state == ToggleableItemState.PartiallySelected || oldItem.state == ToggleableItemState.NotSelected)) itemsToAdd.push(newItem.item)
+      else if (newItem.state == ToggleableItemState.NotSelected && (oldItem.state == ToggleableItemState.Selected || oldItem.state == ToggleableItemState.PartiallySelected)) itemsToRemove.push(newItem.item)
+    })
+    return { itemsToAdd: itemsToAdd, itemsToRemove: itemsToRemove }
   }
 
   applyDelete() {
