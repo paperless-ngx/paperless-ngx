@@ -100,7 +100,7 @@
 </div>
 
 <div *ngIf="displayMode == 'largeCards'">
-  <app-document-card-large *ngFor="let d of list.documents" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
+  <app-document-card-large [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)"   *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
   </app-document-card-large>
 </div>
 
@@ -115,7 +115,7 @@
     <th class="d-none d-xl-table-cell">Added</th>
   </thead>
   <tbody>
-    <tr *ngFor="let d of list.documents" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
+    <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
       <td>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (change)="list.setSelected(d, $event.target.checked)">
@@ -149,7 +149,6 @@
   </tbody>
 </table>
 
-
-<div class="m-n2 row m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
-  <app-document-card-small [document]="d" [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)" *ngFor="let d of list.documents" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
+<div class="m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
+  <app-document-card-small [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)"  [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
 </div>

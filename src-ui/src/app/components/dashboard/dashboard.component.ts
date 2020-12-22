@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 
@@ -11,8 +12,29 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 export class DashboardComponent implements OnInit {
 
   constructor(
-    private savedViewService: SavedViewService) { }
+    private savedViewService: SavedViewService,
+    private meta: Meta
+  ) { }
 
+  get displayName() {
+    let tagFullName = this.meta.getTag('name=full_name')
+    let tagUsername = this.meta.getTag('name=username')
+    if (tagFullName && tagFullName.content) {
+      return tagFullName.content
+    } else if (tagUsername && tagUsername.content) {
+      return tagUsername.content
+    } else {
+      return null
+    }
+  }
+
+  get subtitle() {
+    if (this.displayName) {
+      return `Hello ${this.displayName}, welcome to Paperless-ng!`
+    } else {
+      return `Welcome to Paperless-ng!`
+    }
+  }
 
   savedViews: PaperlessSavedView[] = []
 
