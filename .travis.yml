@@ -60,12 +60,13 @@ jobs:
       after_success:
         - true
       script:
+        - uname -a
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         # travis_wait 60 tells travis to wait for up to 60 minutes - default is 20, which is too short
         - travis_wait 60 docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 .
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8
       arch: arm64-graviton2
-      virt: vm      
+      virt: lxc
       on:
         condition: '"${BUILD_DOCKER}" = 1'
     
@@ -85,8 +86,8 @@ jobs:
         - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
         # replace the multi-arch reference with a specific, arm32v7 version. else docker will use the platform specific one,
         # which is amd64.
-        - sed -i 's/FROM node:15/FROM node@sha256:e9bf2028bd59399afd3f6665f427a07b7ddfee07cffdf2061c39d991a3b3e332/g' Dockerfile
-        - sed -i 's/FROM python:3.7-slim/FROM python@sha256:843dd86fa35b923095b5db60c6e2e296013d647c8327aeba0e7638e7f0a43373/g' Dockerfile
+        - sed -i "s/FROM node:15/FROM node@$(docker manifest inspect node:15 | jq -r '.manifests [] | select (.platform.variant == "v7") | .digest')/g" Dockerfile
+        - sed -i "s/FROM python:3.7-slim/FROM python@$(docker manifest inspect python:3.7-slim | jq -r '.manifests [] | select (.platform.variant == "v7") | .digest')/g" Dockerfile
         # travis_wait 60 tells travis to wait for up to 60 minutes - default is 20, which is too short
         - travis_wait 60 docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7 .
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7
