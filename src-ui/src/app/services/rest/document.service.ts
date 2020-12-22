@@ -61,12 +61,18 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return doc
   }
 
-  list(page?: number, pageSize?: number, sortField?: string, sortReverse?: boolean, filterRules?: FilterRule[]): Observable<Results<PaperlessDocument>> {
-    return super.list(page, pageSize, sortField, sortReverse, this.filterRulesToQueryParams(filterRules)).pipe(
+  listFiltered(page?: number, pageSize?: number, sortField?: string, sortReverse?: boolean, filterRules?: FilterRule[], extraParams = {}): Observable<Results<PaperlessDocument>> {
+    return this.list(page, pageSize, sortField, sortReverse, Object.assign(extraParams, this.filterRulesToQueryParams(filterRules))).pipe(
       map(results => {
         results.results.forEach(doc => this.addObservablesToDocument(doc))
         return results
       })
+    )
+  }
+
+  listAllFilteredIds(filterRules?: FilterRule[]): Observable<number[]> {
+    return this.listFiltered(1, 100000, null, null, filterRules, {"fields": "id"}).pipe(
+      map(response => response.results.map(doc => doc.id))
     )
   }
 
@@ -96,6 +102,14 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   getMetadata(id: number): Observable<PaperlessDocumentMetadata> {
     return this.http.get<PaperlessDocumentMetadata>(this.getResourceUrl(id, 'metadata'))
+  }
+
+  bulkEdit(ids: number[], method: string, args: any) {
+    return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
+      'documents': ids,
+      'method': method,
+      'parameters': args
+    })
   }
 
 }

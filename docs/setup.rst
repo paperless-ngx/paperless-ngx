@@ -120,6 +120,8 @@ The `bare metal route`_ is more complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
+.. _setup-docker_route:
+
 Docker Route
 ============
 

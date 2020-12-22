@@ -1,5 +1,24 @@
+@import "/src/theme";
+
 .doc-img {
   object-fit: cover;
   object-position: top;
   height: 200px;
+  mix-blend-mode: multiply;
+}
+
+.document-card-check {
+  display: none
+}
+
+.document-card:hover .document-card-check {
+  display: block;
+}
+
+.card-selected {
+  border-color: $primary;
+}
+
+.doc-img-background-selected {
+  background-color: $primaryFaded;
 }

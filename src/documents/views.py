@@ -47,12 +47,20 @@ from .serialisers import (
     TagSerializer,
     DocumentTypeSerializer,
     PostDocumentSerializer,
-    SavedViewSerializer
+    SavedViewSerializer,
+    BulkEditSerializer
 )
 
 
 class IndexView(TemplateView):
     template_name = "index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cookie_prefix'] = settings.COOKIE_PREFIX
+        context['username'] = self.request.user.username
+        context['full_name'] = self.request.user.get_full_name()
+        return context
 
 
 class CorrespondentViewSet(ModelViewSet):
@@ -103,6 +111,10 @@ class DocumentTypeViewSet(ModelViewSet):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
+class BulkEditForm(object):
+    pass
+
+
 class DocumentViewSet(RetrieveModelMixin,
                       UpdateModelMixin,
                       DestroyModelMixin,
@@ -125,6 +137,17 @@ class DocumentViewSet(RetrieveModelMixin,
         "modified",
         "added",
         "archive_serial_number")
+
+    def get_serializer(self, *args, **kwargs):
+        fields_param = self.request.query_params.get('fields', None)
+        if fields_param:
+            fields = fields_param.split(",")
+        else:
+            fields = None
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        kwargs.setdefault('fields', fields)
+        return serializer_class(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         response = super(DocumentViewSet, self).update(
@@ -267,6 +290,39 @@ class SavedViewViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
 
+class BulkEditView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkEditSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        method = serializer.validated_data.get("method")
+        parameters = serializer.validated_data.get("parameters")
+        documents = serializer.validated_data.get("documents")
+
+        try:
+            # TODO: parameter validation
+            result = method(documents, **parameters)
+            return Response({"result": result})
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
+
+
 class PostDocumentView(APIView):
 
     permission_classes = (IsAuthenticated,)
@@ -335,14 +391,27 @@ class SearchView(APIView):
                 }
 
     def get(self, request, format=None):
-        if 'query' not in request.query_params:
+
+        if 'query' in request.query_params:
+            query = request.query_params['query']
+        else:
+            query = None
+
+        if 'more_like' in request.query_params:
+            more_like_id = request.query_params['more_like']
+            more_like_content = Document.objects.get(id=more_like_id).content
+        else:
+            more_like_id = None
+            more_like_content = None
+
+        if not query and not more_like_id:
             return Response({
                 'count': 0,
                 'page': 0,
                 'page_count': 0,
+                'corrected_query': None,
                 'results': []})
 
-        query = request.query_params['query']
         try:
             page = int(request.query_params.get('page', 1))
         except (ValueError, TypeError):
@@ -352,8 +421,7 @@ class SearchView(APIView):
             page = 1
 
         try:
-            with index.query_page(self.ix, query, page) as (result_page,
-                                                            corrected_query):
+            with index.query_page(self.ix, page, query, more_like_id, more_like_content) as (result_page, corrected_query):  # NOQA: E501
                 return Response(
                     {'count': len(result_page),
                      'page': result_page.pagenum,

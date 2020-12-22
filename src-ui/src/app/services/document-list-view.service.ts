@@ -40,10 +40,14 @@ export class DocumentListViewService {
   }
 
   set savedView(value: PaperlessSavedView) {
-    if (value) {
+    if (value && !this._savedViewConfig || value && value.id != this._savedViewConfig.id) {
+      //saved view inactive and should be active now, or saved view active, but a different view is requested
       //this is here so that we don't modify value, which might be the actual instance of the saved view.
+      this.selectNone()
       this._savedViewConfig = Object.assign({}, value)
-    } else {
+    } else if (this._savedViewConfig && !value) {
+      //saved view active, but document list requested
+      this.selectNone()
       this._savedViewConfig = null
     }
   }
@@ -90,7 +94,7 @@ export class DocumentListViewService {
 
   reload(onFinish?) {
     this.isReloading = true
-    this.documentService.list(
+    this.documentService.listFiltered(
       this.currentPage,
       this.currentPageSize,
       this.view.sort_field,
@@ -118,6 +122,7 @@ export class DocumentListViewService {
     //want changes in the filter editor to propagate into here right away.
     this.view.filter_rules = filterRules
     this.reload()
+    this.reduceSelectionToFilter()
     this.saveDocumentListView()
   }
 
@@ -188,6 +193,49 @@ export class DocumentListViewService {
     let newPageSize = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
     if (newPageSize != this.currentPageSize) {
       this.currentPageSize = newPageSize
+    }
+  }
+
+  selected = new Set<number>()
+
+  selectNone() {
+    this.selected.clear()
+  }
+
+  private reduceSelectionToFilter() {
+    if (this.selected.size > 0) {
+      this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => {
+        let subset = new Set<number>()
+        for (let id of ids) {
+          if (this.selected.has(id)) {
+            subset.add(id)
+          }
+        }
+        this.selected = subset
+      })
+    }
+  }
+
+  selectAll() {
+    this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => ids.forEach(id => this.selected.add(id)))
+  }
+
+  selectPage() {
+    this.selected.clear()
+    this.documents.forEach(doc => {
+      this.selected.add(doc.id)
+    })
+  }
+
+  isSelected(d: PaperlessDocument) {
+    return this.selected.has(d.id)
+  }
+
+  setSelected(d: PaperlessDocument, value: boolean) {
+    if (value) {
+      this.selected.add(d.id)
+    } else if (!value) {
+      this.selected.delete(d.id)
     }
   }
 
