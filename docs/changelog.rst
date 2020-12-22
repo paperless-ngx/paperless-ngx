@@ -27,6 +27,8 @@ Changes
 * Clarification in the UI that the fields "Match" and "Is insensitive" are not relevant for the Auto matching algorithm.
 * New select interface for tags, types and correspondents allows filtering. This also improves tag selection. Thanks again to `Michael Shamoon`_!
 * Page navigation controls for the document viewer, thanks to `Michael Shamoon`_.
+* Layout changes to the small cards document list.
+* The dashboard now displays the username (or full name if specified in the admin) on the dashboard.
 
 Fixes
 
