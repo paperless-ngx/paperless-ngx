@@ -179,7 +179,7 @@ export class DocumentListComponent implements OnInit {
         } else {
           messageFragment += ' and '
         }
-        messageFragment += `remove the correspondent(s) ${changedTags.itemsToRemove.map(t => t.name).join(', ')} from`
+        messageFragment += `remove the tag(s) ${changedTags.itemsToRemove.map(t => t.name).join(', ')} from`
       }
     }
     modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
@@ -203,25 +203,17 @@ export class DocumentListComponent implements OnInit {
   bulkSetCorrespondents(changedCorrespondents: ChangedItems) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Confirm Correspondent Assignment"
-    let action = 'set_correspondent'
-    let correspondents
-    let messageFragment
-    if (!changedCorrespondents) {
-      messageFragment = `remove all correspondents from`
-    } else if (changedCorrespondents.itemsToAdd.length > 0) {
-      correspondents = changedCorrespondents.itemsToAdd[0]
-      messageFragment = `assign the correspondent ${correspondents.name} to`
-    } else {
-      // TODO: API endpoint for remove multiple correspondents
-      action = 'remove_correspondents'
-      correspondents = changedCorrespondents.itemsToRemove
-      messageFragment = `remove the correspondent(s) ${correspondents.map(c => c.name).join(', ')} from`
+    let correspondent
+    let messageFragment = 'remove all correspondents from'
+    if (changedCorrespondents && changedCorrespondents.itemsToAdd.length > 0) {
+      correspondent = changedCorrespondents.itemsToAdd[0]
+      messageFragment = `assign the correspondent ${correspondent.name} to`
     }
     modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation(action, {"correspondents": correspondents ? correspondents.map(c => c.id) : null}).subscribe(
+      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
         response => {
           modal.close()
         }
@@ -231,25 +223,18 @@ export class DocumentListComponent implements OnInit {
 
   bulkSetDocumentTypes(changedDocumentTypes: ChangedItems) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    let action = 'set_document_type'
-    let documentTypes
-    let messageFragment
-    if (!changedDocumentTypes) {
-      messageFragment = `remove all document types from`
-    } else if (changedDocumentTypes.itemsToAdd.length > 0) {
-      documentTypes = changedDocumentTypes.itemsToAdd[0]
-      messageFragment = `assign the document type ${documentTypes.name} to`
-    } else {
-      // TODO: API endpoint for remove multiple doc types
-      action = 'remove_document_types'
-      documentTypes = changedDocumentTypes.itemsToRemove
-      messageFragment = `remove the document type(s) ${documentTypes.map(dt => dt.name).join(', ')} from`
+    modal.componentInstance.title = "Confirm Document Type Assignment"
+    let documentType
+    let messageFragment = 'remove all document types from'
+    if (changedDocumentTypes && changedDocumentTypes.itemsToAdd.length > 0) {
+      documentType = changedDocumentTypes.itemsToAdd[0]
+      messageFragment = `assign the document type ${documentType.name} to`
     }
     modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation(action, {"document_types": documentTypes ? documentTypes.map(dt => dt.id) : null}).subscribe(
+      this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
         response => {
           modal.close()
         }
