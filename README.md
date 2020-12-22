@@ -39,14 +39,13 @@ Here's what you get:
 	* Auto completion suggests relevant words from your documents.
 	* Results are sorted by relevance to your search query.
 	* Highlighting shows you which parts of the document matched the query.
+	* Searching for similar documents ("More like this")
 * Email processing: Paperless adds documents from your email accounts.
 	* Configure multiple accounts and filters for each account.
 	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
 * Machine learning powered document matching.
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 * A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
-* Code cleanup in many, MANY areas. Some of the code from OG paperless was just overly complicated.
-* More tests, more stability.
 
 If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
 
@@ -54,10 +53,7 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 # Roadmap for 1.0
 
-- **Bulk editing**. Add/remove metadata from multiple documents at once.
-
 - Make the front end nice (except mobile).
-- Test coverage at 90%.
 - Fix whatever bugs I and you find.
 
 ## Roadmap for versions beyond 1.0
@@ -66,7 +62,6 @@ These are things that I want to add to paperless eventually. They are sorted by 
 
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
-  - Ability to search for “Similar documents” in the search results
 - **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
 	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
