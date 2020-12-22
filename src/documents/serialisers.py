@@ -3,9 +3,32 @@ from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from . import bulk_edit
 from .models import Correspondent, Tag, Document, Log, DocumentType, \
     SavedView, SavedViewFilterRule
 from .parsers import is_mime_type_supported
+
+
+# https://www.django-rest-framework.org/api-guide/serializers/#example
+class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+    """
+    A ModelSerializer that takes an additional `fields` argument that
+    controls which fields should be displayed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Don't pass the 'fields' arg up to the superclass
+        fields = kwargs.pop('fields', None)
+
+        # Instantiate the superclass normally
+        super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
+
+        if fields is not None:
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
 
 
 class CorrespondentSerializer(serializers.ModelSerializer):
@@ -91,7 +114,7 @@ class DocumentTypeField(serializers.PrimaryKeyRelatedField):
         return DocumentType.objects.all()
 
 
-class DocumentSerializer(serializers.ModelSerializer):
+class DocumentSerializer(DynamicFieldsModelSerializer):
 
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
@@ -178,6 +201,54 @@ class SavedViewSerializer(serializers.ModelSerializer):
             SavedViewFilterRule.objects.create(
                 saved_view=saved_view, **rule_data)
         return saved_view
+
+
+class BulkEditSerializer(serializers.Serializer):
+
+    documents = serializers.ListField(
+        child=serializers.IntegerField(),
+        label="Documents",
+        write_only=True
+    )
+
+    method = serializers.ChoiceField(
+        choices=[
+            "set_correspondent",
+            "set_document_type",
+            "add_tag",
+            "remove_tag",
+            "delete"
+        ],
+        label="Method",
+        write_only=True,
+    )
+
+    parameters = serializers.DictField(allow_empty=True)
+
+    def validate_documents(self, documents):
+        count = Document.objects.filter(id__in=documents).count()
+        if not count == len(documents):
+            raise serializers.ValidationError(
+                "Some documents don't exist or were specified twice.")
+        return documents
+
+    def validate_method(self, method):
+        if method == "set_correspondent":
+            return bulk_edit.set_correspondent
+        elif method == "set_document_type":
+            return bulk_edit.set_document_type
+        elif method == "add_tag":
+            return bulk_edit.add_tag
+        elif method == "remove_tag":
+            return bulk_edit.remove_tag
+        elif method == "delete":
+            return bulk_edit.delete
+        else:
+            raise serializers.ValidationError("Unsupported method.")
+
+    def validate(self, attrs):
+
+        return attrs
 
 
 class PostDocumentSerializer(serializers.Serializer):

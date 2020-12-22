@@ -221,21 +221,16 @@ Each fragment contains a list of strings, and some of them are marked as a highl
 
     [
         [
-            {"text": "This is a sample text with a "},
-            {"text": "highlighted", "term": 0},
-            {"text": " word."}
+            {"text": "This is a sample text with a ", "highlight": false},
+            {"text": "highlighted", "highlight": true},
+            {"text": " word.", "highlight": false}
         ],
         [
-            {"text": "Another", "term": 1},
-            {"text": " fragment with a highlight."}
+            {"text": "Another", "highlight": true},
+            {"text": " fragment with a highlight.", "highlight": false}
         ]
     ]
 
-
-
-When ``term`` is present within a string, the word within ``text`` should be highlighted.
-The term index groups multiple matches together and words with the same index
-should get identical highlighting.
 A client may use this example to produce the following output:
 
 ... This is a sample text with a **highlighted** word. ... **Another** fragment with a highlight. ...
