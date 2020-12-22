@@ -400,11 +400,6 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
 
     Defaults to none, which disables this feature.
 
-PAPERLESS_FILENAME_PARSE_TRANSFORMS
-    Transforms filenames before they are processed by paperless. See
-    :ref:`advanced-transforming_filenames` for details.
-
-    Defaults to none, which disables this feature.
 
 Binaries
 ########

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
@@ -137,6 +138,10 @@ export class DocumentListComponent implements OnInit {
     setTimeout(() => {
       this.filterEditor.toggleDocumentType(documentTypeID)
     })
+  }
+
+  trackByDocumentId(index, item: PaperlessDocument) {
+    return item.id
   }
 
   private executeBulkOperation(method: string, args): Observable<any> {
