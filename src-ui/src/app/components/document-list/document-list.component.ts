@@ -2,8 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type';
+import { tap } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
@@ -17,6 +16,7 @@ import { FilterEditorComponent } from '../filter-editor/filter-editor.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { SelectDialogComponent } from '../common/select-dialog/select-dialog.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
+import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 
 @Component({
   selector: 'app-document-list',
@@ -35,7 +35,8 @@ export class DocumentListComponent implements OnInit {
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private documentService: DocumentService) { }
+    private documentService: DocumentService,
+    private openDocumentService: OpenDocumentsService) { }
 
   @ViewChild("filterEditor")
   private filterEditor: FilterEditorComponent
@@ -131,12 +132,12 @@ export class DocumentListComponent implements OnInit {
 
   private executeBulkOperation(method: string, args): Observable<any> {
     return this.documentService.bulkEdit(Array.from(this.list.selected), method, args).pipe(
-      map(r => {
-
+      tap(() => {
         this.list.reload()
+        this.list.selected.forEach(id => {
+          this.openDocumentService.refreshDocument(id)
+        })
         this.list.selectNone()
-
-        return r
       })
     )
   }
