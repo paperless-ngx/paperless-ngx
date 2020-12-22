@@ -64,6 +64,58 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         self.assertEqual(len(Document.objects.all()), 0)
 
+    def test_document_fields(self):
+        c = Correspondent.objects.create(name="c", pk=41)
+        dt = DocumentType.objects.create(name="dt", pk=63)
+        tag = Tag.objects.create(name="t", pk=85)
+        doc = Document.objects.create(title="WOW", content="the content", correspondent=c, document_type=dt, checksum="123", mime_type="application/pdf")
+
+        response = self.client.get("/api/documents/", format='json')
+        self.assertEqual(response.status_code, 200)
+        results_full = response.data['results']
+        self.assertTrue("content" in results_full[0])
+        self.assertTrue("id" in results_full[0])
+
+        response = self.client.get("/api/documents/?fields=id", format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertFalse("content" in results[0])
+        self.assertTrue("id" in results[0])
+        self.assertEqual(len(results[0]), 1)
+
+        response = self.client.get("/api/documents/?fields=content", format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertTrue("content" in results[0])
+        self.assertFalse("id" in results[0])
+        self.assertEqual(len(results[0]), 1)
+
+        response = self.client.get("/api/documents/?fields=id,content", format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertTrue("content" in results[0])
+        self.assertTrue("id" in results[0])
+        self.assertEqual(len(results[0]), 2)
+
+        response = self.client.get("/api/documents/?fields=id,conteasdnt", format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertFalse("content" in results[0])
+        self.assertTrue("id" in results[0])
+        self.assertEqual(len(results[0]), 1)
+
+        response = self.client.get("/api/documents/?fields=", format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(results_full, results)
+
+        response = self.client.get("/api/documents/?fields=dgfhs", format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results[0]), 0)
+
+
+
     def test_document_actions(self):
 
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
