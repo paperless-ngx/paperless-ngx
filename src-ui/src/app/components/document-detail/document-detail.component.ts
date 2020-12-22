@@ -15,6 +15,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
+import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 
 @Component({
   selector: 'app-document-detail',
@@ -47,8 +48,11 @@ export class DocumentDetailComponent implements OnInit {
     tags: new FormControl([])
   })
 
+  previewCurrentPage: number = 1
+  previewNumPages: number = 1
+
   constructor(
-    private documentsService: DocumentService, 
+    private documentsService: DocumentService,
     private route: ActivatedRoute,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
@@ -126,7 +130,7 @@ export class DocumentDetailComponent implements OnInit {
     }, error => {this.router.navigate(['404'])})
   }
 
-  save() {    
+  save() {
     this.documentsService.update(this.document).subscribe(result => {
       this.close()
     })
@@ -161,14 +165,23 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.btnCaption = "Delete document"
     modal.componentInstance.confirmClicked.subscribe(() => {
       this.documentsService.delete(this.document).subscribe(() => {
-        modal.close()  
+        modal.close()
         this.close()
       })
     })
 
   }
 
+  moreLike() {
+    this.router.navigate(["search"], {queryParams: {more_like:this.document.id}})
+  }
+
   hasNext() {
     return this.documentListViewService.hasNext(this.documentId)
   }
+
+  pdfPreviewLoaded(pdf: PDFDocumentProxy) {
+    this.previewNumPages = pdf.numPages
+  }
+
 }
