@@ -66,7 +66,7 @@ jobs:
         - travis_wait 60 docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 .
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8
       arch: arm64-graviton2
-      virt: lxc
+      virt: vm
       on:
         condition: '"${BUILD_DOCKER}" = 1'
     
