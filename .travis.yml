@@ -67,6 +67,7 @@ jobs:
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8
       arch: arm64-graviton2
       virt: vm
+      group: edge
       on:
         condition: '"${BUILD_DOCKER}" = 1'
     
