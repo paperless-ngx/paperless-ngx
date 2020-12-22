@@ -5,7 +5,7 @@
 
 # Paperless-ng
 
-[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
+[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
 
@@ -64,16 +64,25 @@ These are things that I want to add to paperless eventually. They are sorted by 
   - Group and limit search results by correspondent, show “more from this” links in the results.
 - **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
-	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
+	- With live updates and websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particularly happy about.
 	- Notifications when a document was added with buttons to open the new document right away.
 - **Arbitrary tag colors**. Allow the selection of any color with a color picker.
-- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc, .docx documents.
+- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc and .docx documents.
 
 Apart from that, paperless is pretty much feature complete.
 
 ## On the chopping block.
 
 - **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
+
+## Wont-do list.
+
+These features will probably never make it into paperless, since paperless is meant to be an easy to use set-and-forget solution.
+
+- **Document versions.** I might consider adding the ability to update a document with a newer version, but that's about it. The kind of documents that get added to paperless usually don't change at all.
+- **Workflows.** I don't see a use case for these, yet.
+- **Folders.** Tags are superior in just about every way.
+- **Apps / extension support.** Again, paperless is meant to be simple.
 
 # Getting started
 
