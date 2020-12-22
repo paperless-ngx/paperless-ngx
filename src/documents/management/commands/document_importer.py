@@ -1,8 +1,10 @@
 import json
+import logging
 import os
 import shutil
 from contextlib import contextmanager
 
+import tqdm
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
@@ -42,6 +44,8 @@ class Command(Renderable, BaseCommand):
         self.manifest = None
 
     def handle(self, *args, **options):
+
+        logging.getLogger().handlers[0].level = logging.ERROR
 
         self.source = options["source"]
 
@@ -111,10 +115,13 @@ class Command(Renderable, BaseCommand):
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
-        for record in self.manifest:
+        print("Copy files into paperless...")
 
-            if not record["model"] == "documents.document":
-                continue
+        manifest_documents = list(filter(
+            lambda r: r["model"] == "documents.document",
+            self.manifest))
+
+        for record in tqdm.tqdm(manifest_documents):
 
             document = Document.objects.get(pk=record["pk"])
 
@@ -138,7 +145,6 @@ class Command(Renderable, BaseCommand):
 
                 create_source_path_directory(document.source_path)
 
-                print(f"Moving {document_path} to {document.source_path}")
                 shutil.copy(document_path, document.source_path)
                 shutil.copy(thumbnail_path, document.thumbnail_path)
                 if archive_path:
