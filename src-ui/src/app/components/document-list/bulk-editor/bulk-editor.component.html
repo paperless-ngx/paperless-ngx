@@ -29,9 +29,33 @@
   <div class="col-auto mb-2 mb-xl-0">
     <div class="d-flex">
       <label class="ml-auto mt-1 mb-0 mr-2">Edit:</label>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" [toggleableItems]="tagsToggleableItems" [type]="dropdownTypes.Editing" [showCounts]="!this.selectionSpansPages" (open)="tagsDropdownOpen()" (editingComplete)="applyTags($event)"></app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" [toggleableItems]="correspondentsToggleableItems" [type]="dropdownTypes.Editing" [showCounts]="!this.selectionSpansPages" singular="true" (open)="correspondentsDropdownOpen()" (editingComplete)="applyCorrespondent($event)"></app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" [toggleableItems]="documentTypesToggleableItems" [type]="dropdownTypes.Editing" [showCounts]="!this.selectionSpansPages" singular="true" (open)="documentTypesDropdownOpen()" (editingComplete)="applyDocumentType($event)"></app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill"
+        [toggleableItems]="tagsToggleableItems"
+        [type]="dropdownTypes.Editing"
+        [showCounts]="!this.selectionSpansPages"
+        [showRemoveAll]="this.selectionSpansPages"
+        (open)="tagsDropdownOpen()"
+        (removeAll)="applyTags([], true)"
+        (editingComplete)="applyTags($event)">
+      </app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" singular="true"
+        [toggleableItems]="correspondentsToggleableItems"
+        [type]="dropdownTypes.Editing"
+        [showCounts]="!this.selectionSpansPages"
+        [showRemoveAll]="this.selectionSpansPages"
+        (open)="correspondentsDropdownOpen()"
+        (removeAll)="applyCorrespondent([], true)"
+        (editingComplete)="applyCorrespondent($event)">
+      </app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" singular="true"
+        [toggleableItems]="documentTypesToggleableItems"
+        [type]="dropdownTypes.Editing"
+        [showCounts]="!this.selectionSpansPages"
+        [showRemoveAll]="this.selectionSpansPages"
+        (open)="documentTypesDropdownOpen()"
+        (removeAll)="applyDocumentType([], true)"
+        (editingComplete)="applyDocumentType($event)">
+      </app-filterable-dropdown>
     </div>
   </div>
   <div class="w-100 d-xl-none"></div>

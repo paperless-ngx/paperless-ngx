@@ -69,11 +69,17 @@ export class FilterableDropdownComponent {
   @Input()
   singular: boolean = false
 
+  @Input()
+  showRemoveAll: boolean = false
+
   @Output()
   toggle = new EventEmitter()
 
   @Output()
   open = new EventEmitter()
+
+  @Output()
+  removeAll = new EventEmitter()
 
   @Output()
   editingComplete = new EventEmitter()
@@ -110,7 +116,7 @@ export class FilterableDropdownComponent {
       this.open.next()
     } else {
       this.filterText = ''
-      if (this.type == FilterableDropdownType.Editing) this.editingComplete.emit(this.itemsSelected)
+      if (this.type == FilterableDropdownType.Editing) this.editingComplete.emit(this.toggleableItems)
     }
   }
 

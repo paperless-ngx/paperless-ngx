@@ -87,8 +87,11 @@
     (selectAll)="list.selectAll()"
     (selectNone)="list.selectNone()"
     (setTags)="bulkSetTags($event)"
+    (removeTags)="bulkRemoveTags($event)"
     (setCorrespondent)="bulkSetCorrespondent($event)"
+    (removeCorrespondents)="bulkRemoveCorrespondents($event)"
     (setDocumentType)="bulkSetDocumentType($event)"
+    (removeDocumentTypes)="bulkRemoveDocumentTypes($event)"
     (delete)="bulkDelete()">
 </app-bulk-editor>
 </div>
