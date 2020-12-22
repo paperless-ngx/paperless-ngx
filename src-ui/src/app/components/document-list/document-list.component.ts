@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type';
+import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
@@ -113,4 +114,7 @@ export class DocumentListComponent implements OnInit {
     this.filterEditor.toggleDocumentType(documentTypeID)
   }
 
+  trackByDocumentId(index, item: PaperlessDocument) {
+    return item.id
+  }
 }
