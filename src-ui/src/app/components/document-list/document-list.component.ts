@@ -19,6 +19,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
+import { ChangedItems } from './bulk-editor/bulk-editor.component';
 
 @Component({
   selector: 'app-document-list',
@@ -156,47 +157,71 @@ export class DocumentListComponent implements OnInit {
     )
   }
 
-  bulkSetCorrespondent(correspondent: PaperlessCorrespondent) {
+  bulkSetTags(changedTags: ChangedItems) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Correspondent assignment"
-    let messageFragment = correspondent ? `assign the correspondent ${correspondent.name} to` : `remove all correspondents from`
+    modal.componentInstance.title = "Confirm Tags Assignment"
+    let action = 'set_tags'
+    let tags
+    let messageFragment = ''
+    let both = changedTags && changedTags.itemsToAdd.length > 0 && changedTags.itemsToRemove.length > 0
+    if (!changedTags) {
+      messageFragment = `remove all tags from`
+    } else {
+      if (changedTags.itemsToAdd.length > 0) {
+        tags = changedTags.itemsToAdd
+        messageFragment = `assign the tag(s) ${changedTags.itemsToAdd.map(t => t.name).join(', ')} to`
+      }
+      if (changedTags.itemsToRemove.length > 0) {
+        if (!both) {
+          // TODO: API endpoint for remove multiple tags
+          action = 'remove_tags'
+          tags = changedTags.itemsToRemove
+        } else {
+          messageFragment += ' and '
+        }
+        messageFragment += `remove the correspondent(s) ${changedTags.itemsToRemove.map(t => t.name).join(', ')} from`
+      }
+    }
     modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
+      this.executeBulkOperation(action, {"tags": tags ? tags.map(t => t.id) : null}).subscribe(
         response => {
-          modal.close()
+          if (!both) modal.close()
+          else {
+            this.executeBulkOperation('remove_tags', {"tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
+              response => {
+                modal.close()
+              })
+          }
         }
       )
     })
   }
 
-  bulkRemoveCorrespondents(correspondents: PaperlessCorrespondent[]) {
+  bulkSetCorrespondents(changedCorrespondents: ChangedItems) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Correspondent Removal"
-    modal.componentInstance.message = `This operation will remove the correspondent(s) ${correspondents.map(t => t.name).join(', ')} from all ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = "Confirm"
-    modal.componentInstance.confirmClicked.subscribe(() => {
+    modal.componentInstance.title = "Confirm Correspondent Assignment"
+    let action = 'set_correspondent'
+    let correspondents
+    let messageFragment
+    if (!changedCorrespondents) {
+      messageFragment = `remove all correspondents from`
+    } else if (changedCorrespondents.itemsToAdd.length > 0) {
+      correspondents = changedCorrespondents.itemsToAdd[0]
+      messageFragment = `assign the correspondent ${correspondents.name} to`
+    } else {
       // TODO: API endpoint for remove multiple correspondents
-      this.executeBulkOperation('remove_correspondents', {"correspondents": correspondents.map(t => t.id)}).subscribe(
-        response => {
-          modal.close()
-        }
-      )
-    })
-  }
-
-  bulkSetDocumentType(documentType: PaperlessDocumentType) {
-    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Document Type assignment"
-    let messageFragment = documentType ? `assign the document type ${documentType.name} to` : `remove all document types from`
+      action = 'remove_correspondents'
+      correspondents = changedCorrespondents.itemsToRemove
+      messageFragment = `remove the correspondent(s) ${correspondents.map(c => c.name).join(', ')} from`
+    }
     modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
+      this.executeBulkOperation(action, {"correspondents": correspondents ? correspondents.map(c => c.id) : null}).subscribe(
         response => {
           modal.close()
         }
@@ -204,48 +229,27 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  bulkRemoveDocumentTypes(documentTypes: PaperlessDocumentType[]) {
+  bulkSetDocumentTypes(changedDocumentTypes: ChangedItems) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Document Type Removal"
-    modal.componentInstance.message = `This operation will remove the document type(s) ${documentTypes.map(t => t.name).join(', ')} all ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = "Confirm"
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      // TODO: API endpoint for remove multiple document types
-      this.executeBulkOperation('remove_document_types', {"document_types": documentTypes.map(t => t.id)}).subscribe(
-        response => {
-          modal.close()
-        }
-      )
-    })
-  }
-
-  bulkSetTags(tags: PaperlessTag[]) {
-    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Tags assignment"
-    let messageFragment = tags ? `assign the tag(s) ${tags.map(t => t.name).join(', ')} to` : `remove all tags from`
+    let action = 'set_document_type'
+    let documentTypes
+    let messageFragment
+    if (!changedDocumentTypes) {
+      messageFragment = `remove all document types from`
+    } else if (changedDocumentTypes.itemsToAdd.length > 0) {
+      documentTypes = changedDocumentTypes.itemsToAdd[0]
+      messageFragment = `assign the document type ${documentTypes.name} to`
+    } else {
+      // TODO: API endpoint for remove multiple doc types
+      action = 'remove_document_types'
+      documentTypes = changedDocumentTypes.itemsToRemove
+      messageFragment = `remove the document type(s) ${documentTypes.map(dt => dt.name).join(', ')} from`
+    }
     modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      // TODO: API endpoint for set multiple tags
-      this.executeBulkOperation('set_tags', {"tags": tags ? tags.map(t => t.id) : null}).subscribe(
-        response => {
-          modal.close()
-        }
-      )
-    })
-  }
-
-  bulkRemoveTags(tags: PaperlessTag[]) {
-    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Tags Removal"
-    modal.componentInstance.message = `This operation will remove the tags ${tags.map(t => t.name).join(', ')} from all ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = "Confirm"
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      // TODO: API endpoint for remove multiple tags
-      this.executeBulkOperation('remove_tags', {"tags": tags.map(t => t.id)}).subscribe(
+      this.executeBulkOperation(action, {"document_types": documentTypes ? documentTypes.map(dt => dt.id) : null}).subscribe(
         response => {
           modal.close()
         }
