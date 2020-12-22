@@ -157,13 +157,13 @@ export class BulkEditorComponent {
 
   applyCorrespondent(newCorrespondentsToggleableItems: ToggleableItem[], forceApply:boolean = false) {
     let changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
-    if (changedCorrespondents.itemsToAdd.length > 0) this.setCorrespondent.emit(changedCorrespondents.itemsToAdd)
+    if (changedCorrespondents.itemsToAdd.length > 0) this.setCorrespondent.emit(changedCorrespondents.itemsToAdd[0])
     else if (changedCorrespondents.itemsToRemove.length > 0) this.removeCorrespondents.emit(changedCorrespondents.itemsToRemove)
   }
 
   applyDocumentType(newDocumentTypesToggleableItems: ToggleableItem[], forceApply:boolean = false) {
     let changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
-    if (changedDocumentTypes.itemsToAdd.length > 0) this.setDocumentType.emit(changedDocumentTypes.itemsToAdd)
+    if (changedDocumentTypes.itemsToAdd.length > 0) this.setDocumentType.emit(changedDocumentTypes.itemsToAdd[0])
     else if (changedDocumentTypes.itemsToRemove.length > 0) this.removeDocumentTypes.emit(changedDocumentTypes.itemsToRemove)
   }
 
