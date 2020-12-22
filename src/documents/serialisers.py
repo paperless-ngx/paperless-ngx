@@ -246,7 +246,54 @@ class BulkEditSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("Unsupported method.")
 
+    def _validate_parameters_tags(self, parameters):
+        if 'tag' in parameters:
+            tag_id = parameters['tag']
+            try:
+                Tag.objects.get(id=tag_id)
+            except Tag.DoesNotExist:
+                raise serializers.ValidationError("Tag does not exist")
+        else:
+            raise serializers.ValidationError("tag not specified")
+
+    def _validate_parameters_document_type(self, parameters):
+        if 'document_type' in parameters:
+            document_type_id = parameters['document_type']
+            if document_type_id is None:
+                # None is ok
+                return
+            try:
+                DocumentType.objects.get(id=document_type_id)
+            except DocumentType.DoesNotExist:
+                raise serializers.ValidationError(
+                    "Document type does not exist")
+        else:
+            raise serializers.ValidationError("document_type not specified")
+
+    def _validate_parameters_correspondent(self, parameters):
+        if 'correspondent' in parameters:
+            correspondent_id = parameters['correspondent']
+            if correspondent_id is None:
+                return
+            try:
+                Correspondent.objects.get(id=correspondent_id)
+            except Correspondent.DoesNotExist:
+                raise serializers.ValidationError(
+                    "Correspondent does not exist")
+        else:
+            raise serializers.ValidationError("correspondent not specified")
+
     def validate(self, attrs):
+
+        method = attrs['method']
+        parameters = attrs['parameters']
+
+        if method == bulk_edit.set_correspondent:
+            self._validate_parameters_correspondent(parameters)
+        elif method == bulk_edit.set_document_type:
+            self._validate_parameters_document_type(parameters)
+        elif method == bulk_edit.add_tag or method == bulk_edit.remove_tag:
+            self._validate_parameters_tags(parameters)
 
         return attrs
 
