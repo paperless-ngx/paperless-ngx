@@ -735,7 +735,6 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         args, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs['document_ids'], [self.doc1.id, self.doc3.id])
 
-
     def test_remove_tag(self):
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
         bulk_edit.remove_tag([self.doc1.id, self.doc3.id, self.doc4.id], self.t1.id)
@@ -750,15 +749,103 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(Document.objects.count(), 3)
         self.assertCountEqual([doc.id for doc in Document.objects.all()], [self.doc3.id, self.doc4.id, self.doc5.id])
 
-    def test_api(self):
-        self.assertEqual(Document.objects.count(), 5)
+    @mock.patch("documents.serialisers.bulk_edit.set_correspondent")
+    def test_api_set_correspondent(self, m):
+        m.return_value = "OK"
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc1.id],
+            "method": "set_correspondent",
+            "parameters": {"correspondent": self.c1.id}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs['correspondent'], self.c1.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_correspondent")
+    def test_api_unset_correspondent(self, m):
+        m.return_value = "OK"
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc1.id],
+            "method": "set_correspondent",
+            "parameters": {"correspondent": None}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertIsNone(kwargs['correspondent'])
+
+    @mock.patch("documents.serialisers.bulk_edit.set_document_type")
+    def test_api_set_type(self, m):
+        m.return_value = "OK"
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc1.id],
+            "method": "set_document_type",
+            "parameters": {"document_type": self.dt1.id}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs['document_type'], self.dt1.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_document_type")
+    def test_api_unset_type(self, m):
+        m.return_value = "OK"
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc1.id],
+            "method": "set_document_type",
+            "parameters": {"document_type": None}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertIsNone(kwargs['document_type'])
+
+    @mock.patch("documents.serialisers.bulk_edit.add_tag")
+    def test_api_add_tag(self, m):
+        m.return_value = "OK"
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc1.id],
+            "method": "add_tag",
+            "parameters": {"tag": self.t1.id}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs['tag'], self.t1.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.remove_tag")
+    def test_api_remove_tag(self, m):
+        m.return_value = "OK"
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc1.id],
+            "method": "remove_tag",
+            "parameters": {"tag": self.t1.id}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs['tag'], self.t1.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.delete")
+    def test_api_delete(self, m):
+        m.return_value = "OK"
         response = self.client.post("/api/documents/bulk_edit/", json.dumps({
             "documents": [self.doc1.id],
             "method": "delete",
             "parameters": {}
         }), content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Document.objects.count(), 4)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(len(kwargs), 0)
 
     def test_api_invalid_doc(self):
         self.assertEqual(Document.objects.count(), 5)
@@ -779,3 +866,38 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Document.objects.count(), 5)
+
+    def test_api_invalid_correspondent(self):
+        self.assertEqual(self.doc2.correspondent, self.c1)
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "set_correspondent",
+            "parameters": {'correspondent': 345657}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+        doc2 = Document.objects.get(id=self.doc2.id)
+        self.assertEqual(doc2.correspondent, self.c1)
+
+    def test_api_invalid_document_type(self):
+        self.assertEqual(self.doc2.document_type, self.dt1)
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "set_document_type",
+            "parameters": {'document_type': 345657}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+        doc2 = Document.objects.get(id=self.doc2.id)
+        self.assertEqual(doc2.document_type, self.dt1)
+
+    def test_api_invalid_tag(self):
+        self.assertEqual(list(self.doc2.tags.all()), [self.t1])
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "add_tag",
+            "parameters": {'document_type': 345657}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+        self.assertEqual(list(self.doc2.tags.all()), [self.t1])
