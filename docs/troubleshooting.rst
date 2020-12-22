@@ -39,7 +39,7 @@ Operation not permitted
 
 You might see errors such as:
 
-.. code::
+.. code:: shell-session
 
     chown: changing ownership of '../export': Operation not permitted
 
@@ -49,3 +49,29 @@ to these folders. This happens when pointing these directories to NFS shares,
 for example.
 
 Ensure that `chown` is possible on these directories.
+
+Classifier error: No training data available
+############################################
+
+This indicates that the Auto matching algorithm found no documents to learn from.
+This may have two reasons:
+
+*   You don't use the Auto matching algorithm: The error can be safely ignored in this case.
+*   You are using the Auto matching algorithm: The classifier explicitly excludes documents
+    with Inbox tags. Verify that there are documents in your archive without inbox tags.
+    The algorithm will only learn from documents not in your inbox.
+
+Permission denied errors in the consumption directory
+#####################################################
+
+You might encounter errors such as:
+
+.. code:: shell-session
+
+    The following error occured while consuming document.pdf: [Errno 13] Permission denied: '/usr/src/paperless/src/../consume/document.pdf'
+
+This happens when paperless does not have permission to delete files inside the consumption directory.
+Ensure that ``USERMAP_UID`` and ``USERMAP_GID`` are set to the user id and group id you use on the host operating system, if these are
+different from ``1000``. See :ref:`setup-docker_route`.
+
+Also ensure that you are able to read and write to the consumption directory on the host.
