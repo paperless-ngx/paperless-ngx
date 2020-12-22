@@ -5,6 +5,7 @@
       [disabled]="disabled"
       [style.color]="textColor"
       [style.background]="backgroundColor"
+      [clearable]="allowNull"
       (change)="onChange(value)"
       (blur)="onTouched()">
       <ng-option *ngFor="let i of items" [value]="i.id">{{i.name}}</ng-option>

@@ -51,6 +51,6 @@ def parser_check(app_configs, **kwargs):
 
     if len(parsers) == 0:
         return [Error("No parsers found. This is a bug. The consumer won't be "
-                      "able to onsume any documents without parsers.")]
+                      "able to consume any documents without parsers.")]
     else:
         return []
