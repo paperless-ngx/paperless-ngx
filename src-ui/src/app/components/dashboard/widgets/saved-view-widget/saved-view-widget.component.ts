@@ -23,7 +23,7 @@ export class SavedViewWidgetComponent implements OnInit {
   documents: PaperlessDocument[] = []
 
   ngOnInit(): void {
-    this.documentService.list(1,10,this.savedView.sort_field, this.savedView.sort_reverse, this.savedView.filter_rules).subscribe(result => {
+    this.documentService.listFiltered(1,10,this.savedView.sort_field, this.savedView.sort_reverse, this.savedView.filter_rules).subscribe(result => {
       this.documents = result.results
     })
   }

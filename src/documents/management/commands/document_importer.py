@@ -1,18 +1,29 @@
 import json
 import os
 import shutil
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models.signals import post_save, m2m_changed
 from filelock import FileLock
 
 from documents.models import Document
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
-from ...file_handling import create_source_path_directory, \
-    generate_unique_filename
+from ...file_handling import create_source_path_directory
 from ...mixins import Renderable
+from ...signals.handlers import update_filename_and_move_files
+
+
+@contextmanager
+def disable_signal(sig, receiver, sender):
+    try:
+        sig.disconnect(receiver=receiver, sender=sender)
+        yield
+    finally:
+        sig.connect(receiver=receiver, sender=sender)
 
 
 class Command(Renderable, BaseCommand):
@@ -47,11 +58,16 @@ class Command(Renderable, BaseCommand):
             self.manifest = json.load(f)
 
         self._check_manifest()
+        with disable_signal(post_save,
+                            receiver=update_filename_and_move_files,
+                            sender=Document):
+            with disable_signal(m2m_changed,
+                                receiver=update_filename_and_move_files,
+                                sender=Document.tags.through):
+                # Fill up the database with whatever is in the manifest
+                call_command("loaddata", manifest_path)
 
-        # Fill up the database with whatever is in the manifest
-        call_command("loaddata", manifest_path)
-
-        self._import_files_from_manifest()
+                self._import_files_from_manifest()
 
     @staticmethod
     def _check_manifest_exists(path):
@@ -117,9 +133,6 @@ class Command(Renderable, BaseCommand):
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
             with FileLock(settings.MEDIA_LOCK):
-                document.filename = generate_unique_filename(
-                    document, settings.ORIGINALS_DIR)
-
                 if os.path.isfile(document.source_path):
                     raise FileExistsError(document.source_path)
 
