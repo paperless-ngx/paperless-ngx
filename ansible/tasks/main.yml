@@ -1,0 +1,350 @@
+---
+- name: verify operating system
+  fail:
+    msg: Sorry, only Debian 10 supported at the moment.
+  when: not(ansible_distribution == 'Debian' and ansible_distribution_version == '10')
+
+- name: install base dependencies
+  apt:
+    update_cache: yes
+    pkg:
+      # paperless-ng
+      - python3-dev
+      - python3-pip
+      - imagemagick
+      - unpaper
+      - ghostscript
+      - optipng
+      - tesseract-ocr
+      - gnupg
+      - libpoppler-cpp-dev
+      - libmagic-dev
+      - libpq-dev
+      # OCRmyPDF
+      - icc-profiles-free
+      - qpdf
+      - liblept5
+      - libxml2
+      - pngquant
+      - zlib1g
+      # dev
+      - build-essential
+      - python3-setuptools
+      - python3-wheel
+      - python3-virtualenv
+
+- name: install ocr languages
+  apt:
+    pkg: "{{ paperlessng_ocr_languages | map('regex_replace', '^(.*)$', 'tesseract-ocr-\\1') | list }}"
+
+- name: set up notesalexp repository key (for jbig2enc)
+  apt_key:
+    url: https://notesalexp.org/debian/alexp_key.asc
+    state: present
+  when: paperlessng_use_jbig2enc
+
+- name: set up notesalexp repository (for jbig2enc)
+  apt_repository:
+    repo: deb https://notesalexp.org/debian/buster/ buster main
+    state: present
+  when: paperlessng_use_jbig2enc
+
+- name: set up notesalexp repository pinning
+  copy:
+    content: |
+      Package: *
+      Pin: release o=notesalexp.org
+      Pin-Priority: 1
+
+      Package: jbig2enc
+      Pin: release o=notesalexp.org
+      Pin-Priority: 500
+    dest: /etc/apt/preferences.d/notesalexp
+  when: paperlessng_use_jbig2enc
+
+- name: install jbig2enc
+  apt:
+    pkg: jbig2enc
+    update_cache: yes
+  when: paperlessng_use_jbig2enc
+
+- name: install redis
+  apt:
+    pkg: redis-server
+  when: paperlessng_redis_host == 'localhost' or paperlessng_redis_host == '127.0.0.1'
+
+- name: enable redis
+  systemd:
+    name: redis-server
+    enabled: yes
+    masked: no
+    state: started
+  when: paperlessng_redis_host == 'localhost' or paperlessng_redis_host == '127.0.0.1'
+
+- name: check for paperless-ng installation
+  command:
+    cmd: 'grep -Po "(?<=Paperless-ng )\d+\.\d+\.\d+" {{ paperlessng_directory }}/docs/changelog.html'
+  changed_when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+  failed_when: false
+  ignore_errors: yes
+  register: paperlessng_current_version
+
+- name: backup current paperless-ng installation
+  copy:
+    src: "{{ paperlessng_directory }}"
+    dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
+    remote_src: yes
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: download paperless-ng
+  get_url:
+    url: "https://github.com/jonaswinkler/paperless-ng/releases/download/ng-{{ paperlessng_version }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
+    dest: /opt/paperless-ng-{{ paperlessng_version }}.tar.xz
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: create paperless-ng directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ paperlessng_system_user }}"
+    group: "{{ paperlessng_system_group }}"
+    mode: 0750
+    recurse: yes
+  with_items:
+    - "{{ paperlessng_directory }}"
+    - "{{ paperlessng_consumption_dir }}"
+    - "{{ paperlessng_data_dir }}"
+    - "{{ paperlessng_media_root }}"
+    - "{{ paperlessng_static_dir }}"
+
+- name: create temporary directory
+  tempfile:
+    state: directory
+  register: tempdir
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: extract paperless-ng
+  unarchive:
+    src: /opt/paperless-ng-{{ paperlessng_version }}.tar.xz
+    dest: "{{ tempdir.path }}"
+    remote_src: yes
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: move paperless-ng
+  command:
+    cmd: "cp -R {{ tempdir.path }}/paperless-ng/. {{ paperlessng_directory }}"
+  args:
+    warn: false
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: remove temporary directory
+  file:
+    path: "{{ tempdir.path }}"
+    state: absent
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: configure paperless-ng
+  lineinfile:
+    path: "{{ paperlessng_directory }}/paperless.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: "^#?PAPERLESS_REDIS="
+      line: "PAPERLESS_REDIS=redis://{{ paperlessng_redis_host }}:{{ paperlessng_redis_port }}"
+    - regexp: "^#?PAPERLESS_CONSUMPTION_DIR="
+      line: "PAPERLESS_CONSUMPTION_DIR={{ paperlessng_consumption_dir }}"
+    - regexp: "^#?PAPERLESS_DATA_DIR="
+      line: "PAPERLESS_DATA_DIR={{ paperlessng_data_dir }}"
+    - regexp: "^#?PAPERLESS_MEDIA_ROOT="
+      line: "PAPERLESS_MEDIA_ROOT={{ paperlessng_media_root }}"
+    - regexp: "^#?PAPERLESS_STATICDIR="
+      line: "PAPERLESS_STATICDIR={{ paperlessng_static_dir }}"
+    - regexp: "^#?PAPERLESS_FILENAME_FORMAT="
+      line: "PAPERLESS_FILENAME_FORMAT={{ paperlessng_filename_format }}"
+    - regexp: "^#?PAPERLESS_OCR_LANGUAGE="
+      line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
+    - regexp: "^#PAPERLESS_OCR_USER_ARG="
+      # TODO JSON dict required in conf?
+      # https://paperless-ng.readthedocs.io/en/latest/configuration.html#ocr-settings
+      line: "PAPERLESS_OCR_USER_ARG=\"{{ paperlessng_ocrmypdf_args }}{{ ' --jbig2-lossy' if  paperlessng_use_jbig2enc else '' }}\""
+    - regexp: "^#?PAPERLESS_TIME_ZONE="
+      line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
+  no_log: true
+
+- name: configure paperless-ng database [sqlite]
+  lineinfile:
+    path: "{{ paperlessng_directory }}/paperless.conf"
+    regexp: "^#?PAPERLESS_DBHOST="
+    state: absent
+  when: paperlessng_db_type == 'sqlite'
+
+- name: configure paperless-ng database [postgresql]
+  lineinfile:
+    path: "{{ paperlessng_directory }}/paperless.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: "^#?PAPERLESS_DBHOST="
+      line: "PAPERLESS_DBHOST={{ paperlessng_db_host }}"
+    - regexp: "^#?PAPERLESS_DBPORT="
+      line: "PAPERLESS_DBPORT={{ paperlessng_db_port }}"
+    - regexp: "^#?PAPERLESS_DBNAME="
+      line: "PAPERLESS_DBNAME={{ paperlessng_db_name }}"
+    - regexp: "^#?PAPERLESS_DBUSER="
+      line: "PAPERLESS_DBUSER={{ paperlessng_db_user }}"
+    - regexp: "^#?PAPERLESS_DBPASS="
+      line: "PAPERLESS_DBPASS={{ paperlessng_db_pass }}"
+  when: paperlessng_db_type == 'postgresql'
+  no_log: true
+
+- name: create paperlessng venv
+  command:
+    cmd: "python3 -m virtualenv {{ paperlessng_virtualenv }} -p /usr/bin/python3"
+    creates: "{{ paperlessng_virtualenv }}"
+
+- name: install paperlessng requirements
+  pip:
+    requirements: "{{ paperlessng_directory }}/requirements.txt"
+    virtualenv: "{{ paperlessng_virtualenv }}"
+    extra_args: --upgrade
+
+- name: collect static files
+  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py collectstatic --clear --no-input"
+
+- name: create database schema
+  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py migrate"
+  register: database_schema
+  changed_when: '"No migrations to apply." not in database_schema.stdout'
+
+- name: create first paperless user
+  # "manage.py createsuperuser" only works on interactive TTYs
+  command: |
+    {{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py shell -c "
+    from django.contrib.auth.models import User
+    from django.contrib.auth.hashers import get_hasher
+
+    if User.objects.filter(username='{{ paperlessng_superuser_name }}').exists():
+        user = User.objects.get(username='{{ paperlessng_superuser_name }}')
+        old = user.__dict__.copy()
+
+        user.is_superuser = True
+        user.email = '{{ paperlessng_superuser_email }}'
+        user.set_password('{{ paperlessng_superuser_password }}')
+        user.save()
+        new = user.__dict__
+
+        algorithm, iterations, old_salt, old_hash = old['password'].split('$')
+        new_password_old_salt = get_hasher(algorithm).encode(password='{{ paperlessng_superuser_password }}', salt=old_salt, iterations=int(iterations))
+        _, _, _, new_hash = new_password_old_salt.split('$')
+        if not (old_hash == new_hash and old['is_superuser'] == new['is_superuser'] and old['email'] == new['email']):
+            print('changed')
+    else:
+        User.objects.create_superuser('{{ paperlessng_superuser_name }}', '{{ paperlessng_superuser_email }}', '{{ paperlessng_superuser_password }}')
+        print('changed')
+    "
+  register: superuser
+  changed_when: superuser.stdout == 'changed'
+  no_log: true
+
+- name: configure ghostscript for PDF
+  lineinfile:
+    path: "/etc/ImageMagick-6/policy.xml"
+    regexp: '<policy domain="coder" rights="none" pattern="PDF" />'
+    line: '<policy domain="coder" rights="read|write" pattern="PDF" />'
+
+- name: create paperless group
+  group:
+    name: "{{ paperlessng_system_group }}"
+
+- name: create paperless user
+  user:
+    name: "{{ paperlessng_system_user }}"
+    groups:
+      - "{{ paperlessng_system_group }}"
+    shell: /usr/sbin/nologin
+    # GNUPG_HOME required due to paperless db.py
+    create_home: yes
+
+- name: configure systemd services
+  ini_file:
+    path: "{{ paperlessng_directory }}/scripts/{{ item[0] }}"
+    section: "{{ item[1].section }}"
+    option: "{{ item[1].option  }}"
+    value: "{{ item[1].value }}"
+  with_nested:
+    - [
+        paperless-consumer.service,
+        paperless-scheduler.service,
+        paperless-webserver.service,
+      ]
+    - [
+        {
+          section: "Service",
+          option: "User",
+          value: "{{ paperlessng_system_user }}",
+        },
+        {
+          section: "Service",
+          option: "Group",
+          value: "{{ paperlessng_system_group }}",
+        },
+        {
+          section: "Service",
+          option: "WorkingDirectory",
+          value: "{{ paperlessng_directory }}/src",
+        },
+      ]
+
+- name: configure paperless-consumer service
+  ini_file:
+    path: "{{ paperlessng_directory }}/scripts/paperless-consumer.service"
+    section: "Service"
+    option: "ExecStart"
+    value: "{{ paperlessng_virtualenv }}/bin/python3 manage.py document_consumer"
+
+- name: configure paperless-scheduler service
+  ini_file:
+    path: "{{ paperlessng_directory }}/scripts/paperless-scheduler.service"
+    section: "Service"
+    option: "ExecStart"
+    value: "{{ paperlessng_virtualenv }}/bin/python3 manage.py qcluster"
+
+- name: configure paperless-webserver service
+  ini_file:
+    path: "{{ paperlessng_directory }}/scripts/paperless-webserver.service"
+    section: "Service"
+    option: "ExecStart"
+    value: "{{ paperlessng_virtualenv }}/bin/gunicorn paperless.wsgi -w 2 -b {{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}"
+
+- name: copy systemd services
+  copy:
+    src: "{{ paperlessng_directory }}/scripts/{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    remote_src: yes
+  with_items:
+    - paperless-consumer.service
+    - paperless-scheduler.service
+    - paperless-webserver.service
+  register: paperless_services
+
+- name: reload systemd daemon
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    daemon_reload: yes
+  with_items:
+    - paperless-consumer
+    - paperless-scheduler
+    - paperless-webserver
+  when: paperless_services.changed
+
+- name: enable paperlessng services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    masked: no
+    state: started
+  with_items:
+    - paperless-consumer
+    - paperless-scheduler
+    - paperless-webserver
