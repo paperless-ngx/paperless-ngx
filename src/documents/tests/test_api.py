@@ -669,7 +669,6 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(v1.filter_rules.count(), 0)
 
 
-
 class TestBulkEdit(DirectoriesMixin, APITestCase):
 
     def setUp(self):
@@ -913,3 +912,28 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
 
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
+
+
+class TestApiAuth(APITestCase):
+
+    def test_auth_required(self):
+
+        d = Document.objects.create(title="Test")
+
+        self.assertEqual(self.client.get("/api/documents/").status_code, 401)
+
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/").status_code, 401)
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/download/").status_code, 401)
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/preview/").status_code, 401)
+        self.assertEqual(self.client.get(f"/api/documents/{d.id}/thumb/").status_code, 401)
+
+        self.assertEqual(self.client.get("/api/tags/").status_code, 401)
+        self.assertEqual(self.client.get("/api/correspondents/").status_code, 401)
+        self.assertEqual(self.client.get("/api/document_types/").status_code, 401)
+
+        self.assertEqual(self.client.get("/api/logs/").status_code, 401)
+        self.assertEqual(self.client.get("/api/saved_views/").status_code, 401)
+
+        self.assertEqual(self.client.get("/api/search/").status_code, 401)
+        self.assertEqual(self.client.get("/api/search/auto_complete/").status_code, 401)
+        self.assertEqual(self.client.get("/api/documents/bulk_edit/").status_code, 401)
