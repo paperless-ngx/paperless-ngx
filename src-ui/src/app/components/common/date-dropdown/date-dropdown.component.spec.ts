@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FilterDropdownDateComponent } from './filter-dropdown-date.component';
+import { DateDropdownComponent } from './date-dropdown.component';
 
-describe('FilterDropdownDateComponent', () => {
-  let component: FilterDropdownDateComponent;
-  let fixture: ComponentFixture<FilterDropdownDateComponent>;
+describe('DateDropdownComponent', () => {
+  let component: DateDropdownComponent;
+  let fixture: ComponentFixture<DateDropdownComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FilterDropdownDateComponent ]
+      declarations: [ DateDropdownComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FilterDropdownDateComponent);
+    fixture = TestBed.createComponent(DateDropdownComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

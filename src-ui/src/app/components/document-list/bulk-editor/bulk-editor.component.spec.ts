@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FilterDropodownComponent } from './filter-dropdown.component';
+import { BulkEditorComponent } from './bulk-editor.component';
 
-describe('FilterDropodownComponent', () => {
-  let component: FilterDropodownComponent;
-  let fixture: ComponentFixture<FilterDropodownComponent>;
+describe('BulkEditorComponent', () => {
+  let component: BulkEditorComponent;
+  let fixture: ComponentFixture<BulkEditorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FilterDropodownComponent ]
+      declarations: [ BulkEditorComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FilterDropodownComponent);
+    fixture = TestBed.createComponent(BulkEditorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

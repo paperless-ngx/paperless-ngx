@@ -1,16 +1,17 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { ToggleableItem } from 'src/app/components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
 @Pipe({
   name: 'filter'
 })
 export class FilterPipe implements PipeTransform {
-  transform(items: any[], searchText: string): any[] {
-    if (!items) return [];
-    if (!searchText) return items;
+  transform(toggleableItems: ToggleableItem[], searchText: string): any[] {
+    if (!toggleableItems) return [];
+    if (!searchText) return toggleableItems;
 
-    return items.filter(item => {
-      return Object.keys(item).some(key => {
-        return String(item[key]).toLowerCase().includes(searchText.toLowerCase());
+    return toggleableItems.filter(toggleableItem => {
+      return Object.keys(toggleableItem.item).some(key => {
+        return String(toggleableItem.item[key]).toLowerCase().includes(searchText.toLowerCase());
       });
     });
    }
