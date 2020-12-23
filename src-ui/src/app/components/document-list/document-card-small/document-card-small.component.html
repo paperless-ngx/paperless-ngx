@@ -1,9 +1,9 @@
-<div class="col p-2 h-100 document-card">
+<div class="col p-2 h-100">
   <div class="card h-100 shadow-sm" [class.card-selected]="selected">
     <div class="border-bottom" [class.doc-img-background-selected]="selected">
       <img class="card-img doc-img" [src]="getThumbUrl()" (click)="selected = !selected">
 
-      <div style="top: 0; left: 0" class="position-absolute border-right border-bottom bg-light p-1" [class.document-card-check]="!selected">
+      <div class="border-right border-bottom bg-light p-1 rounded document-card-check">
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (change)="selected = $event.target.checked">
           <label class="custom-control-label" for="smallCardCheck{{document.id}}"></label>
