@@ -1,0 +1,41 @@
+<div class="btn-group" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown">
+  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="type !== types.Editing && itemsSelected?.length > 0 ? 'btn-primary' : 'btn-outline-primary'">
+    <div class="d-none d-md-inline">{{title}}</div>
+    <div class="d-inline-block d-md-none">
+      <svg class="toolbaricon" fill="currentColor">
+        <use attr.xlink:href="assets/bootstrap-icons.svg#{{icon}}" />
+      </svg>
+    </div>
+    <ng-container *ngIf="type !== types.Editing && itemsSelected?.length > 0">
+      <div class="badge bg-secondary text-light rounded-pill badge-corner">
+        {{itemsSelected?.length}}
+      </div>
+    </ng-container>
+  </button>
+  <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+    <div class="list-group list-group-flush">
+      <div class="list-group-item">
+        <div class="input-group input-group-sm">
+          <input class="form-control" type="text" [(ngModel)]="filterText" placeholder="Filter {{title}}" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
+        </div>
+      </div>
+      <button *ngIf="showRemoveAll" role="menuitem" class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-left-0 border-right-0 border-bottom" (click)="removeAll.next()">
+        <svg class="toolbaricon text-danger" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#x" />
+        </svg>
+        <small class="my-1">Remove All</small>
+      </button>
+      <div *ngIf="toggleableItems" class="items">
+        <ng-container *ngFor="let toggleableItem of toggleableItems | filter: filterText">
+          <app-toggleable-dropdown-button [toggleableItem]="toggleableItem" [showCounts]="showCounts" (toggle)="toggleItem($event)"></app-toggleable-dropdown-button>
+        </ng-container>
+      </div>
+      <button *ngIf="type == types.Editing" class="list-group-item list-group-item-action bg-light" (click)="dropdown.close()" [disabled]="!hasBeenToggled || (toggleableItems | filter: filterText).length == 0">
+        <small class="ml-1" [ngClass]="{'font-weight-bold': hasBeenToggled && (toggleableItems | filter: filterText).length > 0}">Apply</small>
+        <svg width="1.5em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

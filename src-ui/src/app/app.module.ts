@@ -26,12 +26,13 @@ import { ResultHighlightComponent } from './components/search/result-highlight/r
 import { PageHeaderComponent } from './components/common/page-header/page-header.component';
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
-import { FilterEditorComponent } from './components/filter-editor/filter-editor.component';
-import { FilterDropdownComponent } from './components/filter-editor/filter-dropdown/filter-dropdown.component';
-import { FilterDropdownButtonComponent } from './components/filter-editor/filter-dropdown/filter-dropdown-button/filter-dropdown-button.component';
-import { FilterDropdownDateComponent } from './components/filter-editor/filter-dropdown-date/filter-dropdown-date.component';
+import { FilterEditorComponent } from './components/document-list/filter-editor/filter-editor.component';
+import { FilterableDropdownComponent } from './components/common/filterable-dropdown/filterable-dropdown.component';
+import { ToggleableDropdownButtonComponent } from './components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
+import { DateDropdownComponent } from './components/common/date-dropdown/date-dropdown.component';
 import { DocumentCardLargeComponent } from './components/document-list/document-card-large/document-card-large.component';
 import { DocumentCardSmallComponent } from './components/document-list/document-card-small/document-card-small.component';
+import { BulkEditorComponent } from './components/document-list/bulk-editor/bulk-editor.component';
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { TextComponent } from './components/common/input/text/text.component';
 import { SelectComponent } from './components/common/input/select/select.component';
@@ -54,8 +55,8 @@ import { FileSizePipe } from './pipes/file-size.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
 import { DocumentTitlePipe } from './pipes/document-title.pipe';
 import { MetadataCollapseComponent } from './components/document-detail/metadata-collapse/metadata-collapse.component';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -80,11 +81,12 @@ import { SelectDialogComponent } from './components/common/select-dialog/select-
     AppFrameComponent,
     ToastsComponent,
     FilterEditorComponent,
-    FilterDropdownComponent,
-    FilterDropdownButtonComponent,
-    FilterDropdownDateComponent,
+    FilterableDropdownComponent,
+    ToggleableDropdownButtonComponent,
+    DateDropdownComponent,
     DocumentCardLargeComponent,
     DocumentCardSmallComponent,
+    BulkEditorComponent,
     TextComponent,
     SelectComponent,
     CheckComponent,
