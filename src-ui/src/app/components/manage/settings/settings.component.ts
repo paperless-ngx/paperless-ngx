@@ -46,14 +46,14 @@ export class SettingsComponent implements OnInit {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
-      this.toastService.showToast(Toast.make("Information", `Saved view "${savedView.name} deleted.`))
+      this.toastService.showToast(Toast.make("Information", $localize`Saved view "${savedView.name} deleted.`))
     })
   }
 
   private saveLocalSettings() {
     localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
     this.documentListViewService.updatePageSize()
-    this.toastService.showToast(Toast.make("Information", "Settings saved successfully."))
+    this.toastService.showToast(Toast.make("Information", $localize`Settings saved successfully.`))
   }
 
   saveSettings() {
@@ -65,7 +65,7 @@ export class SettingsComponent implements OnInit {
       this.savedViewService.patchMany(x).subscribe(s => {
         this.saveLocalSettings()
       }, error => {
-        this.toastService.showToast(Toast.makeError(`Error while storing settings on server: ${JSON.stringify(error.error)}`))
+        this.toastService.showToast(Toast.makeError($localize`Error while storing settings on server: ${JSON.stringify(error.error)}`))
       })
     } else {
       this.saveLocalSettings()

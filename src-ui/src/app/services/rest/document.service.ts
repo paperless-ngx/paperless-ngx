@@ -13,13 +13,13 @@ import { TagService } from './tag.service';
 import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 
 export const DOCUMENT_SORT_FIELDS = [
-  { field: "correspondent__name", name: "Correspondent" },
-  { field: "document_type__name", name: "Document type" },
-  { field: 'title', name: 'Title' },
-  { field: 'archive_serial_number', name: 'ASN' },
-  { field: 'created', name: 'Created' },
-  { field: 'added', name: 'Added' },
-  { field: 'modified', name: 'Modified' }
+  { field: "correspondent__name", name: $localize`Correspondent` },
+  { field: "document_type__name", name: $localize`Document type` },
+  { field: 'title', name: $localize`Title` },
+  { field: 'archive_serial_number', name: $localize`ASN` },
+  { field: 'created', name: $localize`Created` },
+  { field: 'added', name: $localize`Added` },
+  { field: 'modified', name: $localize`Modified` }
 ]
 
 @Injectable({
@@ -61,12 +61,18 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return doc
   }
 
-  list(page?: number, pageSize?: number, sortField?: string, sortReverse?: boolean, filterRules?: FilterRule[]): Observable<Results<PaperlessDocument>> {
-    return super.list(page, pageSize, sortField, sortReverse, this.filterRulesToQueryParams(filterRules)).pipe(
+  listFiltered(page?: number, pageSize?: number, sortField?: string, sortReverse?: boolean, filterRules?: FilterRule[], extraParams = {}): Observable<Results<PaperlessDocument>> {
+    return this.list(page, pageSize, sortField, sortReverse, Object.assign(extraParams, this.filterRulesToQueryParams(filterRules))).pipe(
       map(results => {
         results.results.forEach(doc => this.addObservablesToDocument(doc))
         return results
       })
+    )
+  }
+
+  listAllFilteredIds(filterRules?: FilterRule[]): Observable<number[]> {
+    return this.listFiltered(1, 100000, null, null, filterRules, {"fields": "id"}).pipe(
+      map(response => response.results.map(doc => doc.id))
     )
   }
 
@@ -96,6 +102,14 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   getMetadata(id: number): Observable<PaperlessDocumentMetadata> {
     return this.http.get<PaperlessDocumentMetadata>(this.getResourceUrl(id, 'metadata'))
+  }
+
+  bulkEdit(ids: number[], method: string, args: any) {
+    return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
+      'documents': ids,
+      'method': method,
+      'parameters': args
+    })
   }
 
 }
