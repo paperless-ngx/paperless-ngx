@@ -13,13 +13,13 @@ import { TagService } from './tag.service';
 import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 
 export const DOCUMENT_SORT_FIELDS = [
-  { field: "correspondent__name", name: "Correspondent" },
-  { field: "document_type__name", name: "Document type" },
-  { field: 'title', name: 'Title' },
-  { field: 'archive_serial_number', name: 'ASN' },
-  { field: 'created', name: 'Created' },
-  { field: 'added', name: 'Added' },
-  { field: 'modified', name: 'Modified' }
+  { field: "correspondent__name", name: $localize`Correspondent` },
+  { field: "document_type__name", name: $localize`Document type` },
+  { field: 'title', name: $localize`Title` },
+  { field: 'archive_serial_number', name: $localize`ASN` },
+  { field: 'created', name: $localize`Created` },
+  { field: 'added', name: $localize`Added` },
+  { field: 'modified', name: $localize`Modified` }
 ]
 
 @Injectable({
