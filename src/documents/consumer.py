@@ -103,7 +103,7 @@ class Consumer(LoggingMixin):
 
         parser_class = get_parser_class_for_mime_type(mime_type)
         if not parser_class:
-            raise ConsumerError(f"No parsers abvailable for {self.filename}")
+            raise ConsumerError(f"No parsers available for {self.filename}")
         else:
             self.log("debug",
                      f"Parser: {parser_class.__name__} "
