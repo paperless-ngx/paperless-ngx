@@ -462,6 +462,15 @@ management commands as below.
     load data from an old database schema in SQLite into a newer database
     schema in PostgreSQL, you will run into trouble.
 
+.. warning::
+
+    On some database fields, PostgreSQL enforces predefined limits on maximum
+    length, whereas SQLite does not. The fields in question are the title of documents
+    (128 characters), names of document types, tags and correspondents (128 characters),
+    and filenames (1024 characters). If you have data in these fields that surpasses these
+    limits, migration to PostgreSQL is not possible and will fail with an error.
+
+
 1.  Stop paperless, if it is running.
 2.  Tell paperless to use PostgreSQL:
 
