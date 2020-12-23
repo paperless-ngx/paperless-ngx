@@ -217,6 +217,7 @@ class BulkEditSerializer(serializers.Serializer):
             "set_document_type",
             "add_tag",
             "remove_tag",
+            "modify_tags",
             "delete"
         ],
         label="Method",
@@ -225,11 +226,19 @@ class BulkEditSerializer(serializers.Serializer):
 
     parameters = serializers.DictField(allow_empty=True)
 
-    def validate_documents(self, documents):
+    def _validate_document_id_list(self, documents, name="documents"):
+        if not type(documents) == list:
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all([type(i) == int for i in documents]):
+            raise serializers.ValidationError(f"{name} must be a list of integers")
         count = Document.objects.filter(id__in=documents).count()
         if not count == len(documents):
             raise serializers.ValidationError(
-                "Some documents don't exist or were specified twice.")
+                f"Some documents in {name} don't exist or were specified twice.")
+
+
+    def validate_documents(self, documents):
+        self._validate_document_id_list(documents)
         return documents
 
     def validate_method(self, method):
@@ -241,6 +250,8 @@ class BulkEditSerializer(serializers.Serializer):
             return bulk_edit.add_tag
         elif method == "remove_tag":
             return bulk_edit.remove_tag
+        elif method == "modify_tags":
+            return bulk_edit.modify_tags
         elif method == "delete":
             return bulk_edit.delete
         else:
@@ -283,6 +294,17 @@ class BulkEditSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError("correspondent not specified")
 
+    def _validate_parameters_modify_tags(self, parameters):
+        if "add_tags" in parameters:
+            self._validate_document_id_list(parameters['add_tags'], "add_tags")
+        else:
+            raise serializers.ValidationError("add_tags not specified")
+
+        if "remove_tags" in parameters:
+            self._validate_document_id_list(parameters['remove_tags'], "remove_tags")
+        else:
+            raise serializers.ValidationError("remove_tags not specified")
+
     def validate(self, attrs):
 
         method = attrs['method']
@@ -294,6 +316,8 @@ class BulkEditSerializer(serializers.Serializer):
             self._validate_parameters_document_type(parameters)
         elif method == bulk_edit.add_tag or method == bulk_edit.remove_tag:
             self._validate_parameters_tags(parameters)
+        elif method == bulk_edit.modify_tags:
+            self._validate_parameters_modify_tags(parameters)
 
         return attrs
 

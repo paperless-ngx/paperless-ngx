@@ -1,3 +1,5 @@
+import itertools
+
 from django.db.models import Q
 from django_q.tasks import async_task
 
@@ -60,6 +62,27 @@ def remove_tag(doc_ids, tag):
         Q(document_id__in=affected_docs) &
         Q(tag_id=tag)
     ).delete()
+
+    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+
+    return "OK"
+
+
+def modify_tags(doc_ids, add_tags, remove_tags):
+    qs = Document.objects.filter(id__in=doc_ids)
+    affected_docs = [doc.id for doc in qs]
+
+    DocumentTagRelationship = Document.tags.through
+
+    DocumentTagRelationship.objects.filter(
+        document_id__in=affected_docs,
+        tag_id__in=remove_tags,
+    ).delete()
+
+    DocumentTagRelationship.objects.bulk_create([
+        DocumentTagRelationship(
+            document_id=doc, tag_id=tag) for (doc,tag) in itertools.product(affected_docs, add_tags)
+    ], ignore_conflicts=True)
 
     async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
 
