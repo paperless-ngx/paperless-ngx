@@ -52,9 +52,9 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
 
   private _listAll: Observable<Results<T>>
 
-  listAll(ordering?: string, extraParams?): Observable<Results<T>> {
+  listAll(sortField?: string, sortReverse?: boolean, extraParams?): Observable<Results<T>> {
     if (!this._listAll) {
-      this._listAll = this.list(1, 100000, ordering, extraParams).pipe(
+      this._listAll = this.list(1, 100000, sortField, sortReverse, extraParams).pipe(
         publishReplay(1),
         refCount()
       )

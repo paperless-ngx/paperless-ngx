@@ -2,6 +2,7 @@ import logging
 
 import tqdm
 from django.conf import settings
+from django.db.models.signals import post_save
 from whoosh.writing import AsyncWriter
 
 from documents import index, sanity_checker
@@ -87,3 +88,9 @@ def sanity_check():
         raise SanityFailedError(messages)
     else:
         return "No issues detected."
+
+
+def bulk_rename_files(document_ids):
+    qs = Document.objects.filter(id__in=document_ids)
+    for doc in qs:
+        post_save.send(Document, instance=doc, created=False)

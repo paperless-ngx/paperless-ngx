@@ -28,6 +28,21 @@ export class ConfirmDialogComponent implements OnInit {
   @Input()
   btnCaption = "Confirm"
 
+  confirmButtonEnabled = true
+  seconds = 0
+
+  delayConfirm(seconds: number) {
+    this.confirmButtonEnabled = false
+    this.seconds = seconds
+    setTimeout(() => {
+      if (this.seconds <= 1) {
+        this.confirmButtonEnabled = true
+      } else {
+        this.delayConfirm(seconds - 1)
+      }
+    }, 1000)
+  }
+
   ngOnInit(): void {
   }
 

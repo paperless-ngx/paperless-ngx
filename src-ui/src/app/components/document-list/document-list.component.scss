@@ -1,3 +1,9 @@
+@import "/src/theme";
+
+.table-row-selected {
+  background-color: $primaryFaded;
+}
+
 $paperless-card-breakpoints: (
   0: 2, // xs
   768px: 3, //md
