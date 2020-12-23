@@ -1,8 +1,8 @@
 ---
 - name: verify operating system
   fail:
-    msg: Sorry, only Debian 10 supported at the moment.
-  when: not(ansible_distribution == 'Debian' and ansible_distribution_version == '10')
+    msg: Sorry, only Debian supported at the moment.
+  when: ansible_distribution != 'Debian'
 
 - name: install base dependencies
   apt:
@@ -45,7 +45,7 @@
 
 - name: set up notesalexp repository (for jbig2enc)
   apt_repository:
-    repo: deb https://notesalexp.org/debian/buster/ buster main
+    repo: "deb https://notesalexp.org/debian/{{ ansible_distribution_release }}/ {{ ansible_distribution_release }} main"
     state: present
   when: paperlessng_use_jbig2enc
 
@@ -169,7 +169,7 @@
       line: "PAPERLESS_OCR_USER_ARG=\"{{ paperlessng_ocrmypdf_args }}{{ ' --jbig2-lossy' if  paperlessng_use_jbig2enc else '' }}\""
     - regexp: "^#?PAPERLESS_TIME_ZONE="
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
-  #no_log: true
+  no_log: true
 
 - name: configure paperless-ng database [sqlite]
   lineinfile:
