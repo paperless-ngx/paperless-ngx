@@ -58,7 +58,7 @@
 
                         <app-input-text i18n-title title="Title" formControlName="title"></app-input-text>
                         <div class="form-group">
-                            <label for="archive_serial_number" i18n>Archive Serial Number</label>
+                            <label for="archive_serial_number" i18n>Archive serial number</label>
                             <input type="number" class="form-control" id="archive_serial_number"
                                 formControlName='archive_serial_number'>
                         </div>
@@ -139,7 +139,7 @@
 
     <div class="col-md-6 col-xl-8 mb-3">
       <div class="pdf-viewer-container" *ngIf="getContentType() == 'application/pdf'">
-        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
+        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
       </div>
     </div>
 </div>
