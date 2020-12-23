@@ -10,7 +10,7 @@ import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES, FILTER_TITLE } from 'src/app/data/filter-rule-type';
-import { DateSelection } from './filter-dropdown-date/filter-dropdown-date.component';
+import { DateSelection } from 'src/app/components/common/date-dropdown/date-dropdown.component';
 
 @Component({
   selector: 'app-filter-editor',
@@ -23,7 +23,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this.filterRules.length == 1) {
       let rule = this.filterRules[0]
       switch(this.filterRules[0].rule_type) {
-        
+
         case FILTER_CORRESPONDENT:
           return `Correspondent: ${this.correspondents.find(c => c.id == +rule.value)?.name}`
 
@@ -55,7 +55,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
-  
+
   hasFilters() {
     return this.filterRules.length > 0
   }
@@ -123,7 +123,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
     let existingRule = this.filterRules.find(rule => rule.rule_type == filterRuleTypeID && rule.value == value?.toString())
     let existingRuleOfSameType = this.filterRules.find(rule => rule.rule_type == filterRuleTypeID)
-    
+
     if (existingRule) {
       // if this exact rule already exists, remove it in all cases.
       this.filterRules.splice(this.filterRules.indexOf(existingRule), 1)
