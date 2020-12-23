@@ -743,6 +743,15 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         args, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs['document_ids'], [self.doc4.id])
 
+    def test_modify_tags(self):
+        tag_unrelated = Tag.objects.create(name="unrelated")
+        self.doc2.tags.add(tag_unrelated)
+        self.doc3.tags.add(tag_unrelated)
+        bulk_edit.modify_tags([self.doc2.id, self.doc3.id], add_tags=[self.t2.id], remove_tags=[self.t1.id])
+
+        self.assertCountEqual(list(self.doc2.tags.all()), [self.t2, tag_unrelated])
+        self.assertCountEqual(list(self.doc3.tags.all()), [self.t2, tag_unrelated])
+
     def test_delete(self):
         self.assertEqual(Document.objects.count(), 5)
         bulk_edit.delete([self.doc1.id, self.doc2.id])
