@@ -12,10 +12,11 @@ import { DocumentService, DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/doc
 import { TagService } from 'src/app/services/rest/tag.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
-import { FilterEditorComponent } from '../filter-editor/filter-editor.component';
+import { FilterEditorComponent } from './filter-editor/filter-editor.component';
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { SelectDialogComponent } from '../common/select-dialog/select-dialog.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
+import { ChangedItems } from './bulk-editor/bulk-editor.component';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 
 @Component({
@@ -53,6 +54,10 @@ export class DocumentListComponent implements OnInit {
 
   getSortFields() {
     return DOCUMENT_SORT_FIELDS
+  }
+
+  get isBulkEditing(): boolean {
+    return this.list.selected.size > 0
   }
 
   saveDisplayMode() {
@@ -115,15 +120,24 @@ export class DocumentListComponent implements OnInit {
   }
 
   clickTag(tagID: number) {
-    this.filterEditor.toggleTag(tagID)
+    this.list.selectNone()
+    setTimeout(() => {
+      this.filterEditor.toggleTag(tagID)
+    })
   }
 
   clickCorrespondent(correspondentID: number) {
-    this.filterEditor.toggleCorrespondent(correspondentID)
+    this.list.selectNone()
+    setTimeout(() => {
+      this.filterEditor.toggleCorrespondent(correspondentID)
+    })
   }
 
   clickDocumentType(documentTypeID: number) {
-    this.filterEditor.toggleDocumentType(documentTypeID)
+    this.list.selectNone()
+    setTimeout(() => {
+      this.filterEditor.toggleDocumentType(documentTypeID)
+    })
   }
 
   trackByDocumentId(index, item: PaperlessDocument) {
@@ -142,69 +156,63 @@ export class DocumentListComponent implements OnInit {
     )
   }
 
-  bulkSetCorrespondent() {
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select correspondent"
-    modal.componentInstance.message = `Select the correspondent you wish to assign to ${this.list.selected.size} selected document(s):`
-    this.correspondentService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": selectedId}).subscribe(
-        response => {
-          modal.close()
-        }
-      )
-    })
-  }
-
-  bulkRemoveCorrespondent() {
+  bulkSetTags(changedTags: ChangedItems) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Remove correspondent"
-    modal.componentInstance.message = `This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.title = "Confirm Tags Assignment"
+    let action = 'set_tags'
+    let tags
+    let messageFragment = ''
+    let both = changedTags && changedTags.itemsToAdd.length > 0 && changedTags.itemsToRemove.length > 0
+    if (!changedTags) {
+      messageFragment = `remove all tags from`
+    } else {
+      if (changedTags.itemsToAdd.length > 0) {
+        tags = changedTags.itemsToAdd
+        messageFragment = `assign the tag(s) ${changedTags.itemsToAdd.map(t => t.name).join(', ')} to`
+      }
+      if (changedTags.itemsToRemove.length > 0) {
+        if (!both) {
+          action = 'remove_tags'
+          tags = changedTags.itemsToRemove
+        } else {
+          messageFragment += ' and '
+        }
+        messageFragment += `remove the tag(s) ${changedTags.itemsToRemove.map(t => t.name).join(', ')} from`
+      }
+    }
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": null}).subscribe(r => {
-        modal.close()
-      })
-    })
-  }
-
-  bulkSetDocumentType() {
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select document type"
-    modal.componentInstance.message = `Select the document type you wish to assign to ${this.list.selected.size} selected document(s):`
-    this.documentTypeService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('set_document_type', {"document_type": selectedId}).subscribe(
+      // TODO: API endpoints for add/remove multiple tags
+      this.executeBulkOperation(action, {"tags": tags ? tags.map(t => t.id) : null}).subscribe(
         response => {
-          modal.close()
+          if (!both) modal.close()
+          else {
+            this.executeBulkOperation('remove_tags', {"tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
+              response => {
+                modal.close()
+              })
+          }
         }
       )
     })
   }
 
-  bulkRemoveDocumentType() {
+  bulkSetCorrespondents(changedCorrespondents: ChangedItems) {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Remove document type"
-    modal.componentInstance.message = `This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.title = "Confirm Correspondent Assignment"
+    let correspondent
+    let messageFragment = 'remove all correspondents from'
+    if (changedCorrespondents && changedCorrespondents.itemsToAdd.length > 0) {
+      correspondent = changedCorrespondents.itemsToAdd[0]
+      messageFragment = `assign the correspondent ${correspondent.name} to`
+    }
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_document_type', {"document_type": null}).subscribe(r => {
-        modal.close()
-      })
-    })
-  }
-
-  bulkAddTag() {
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select tag"
-    modal.componentInstance.message = `Select the tag you wish to assign to ${this.list.selected.size} selected document(s):`
-    this.tagService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('add_tag', {"tag": selectedId}).subscribe(
+      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
         response => {
           modal.close()
         }
@@ -212,15 +220,20 @@ export class DocumentListComponent implements OnInit {
     })
   }
 
-  bulkRemoveTag() {
-    let modal = this.modalService.open(SelectDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Select tag"
-    modal.componentInstance.message = `Select the tag you wish to remove from ${this.list.selected.size} selected document(s):`
-    this.tagService.listAll().subscribe(response => {
-      modal.componentInstance.objects = response.results
-    })
-    modal.componentInstance.selectClicked.subscribe(selectedId => {
-      this.executeBulkOperation('remove_tag', {"tag": selectedId}).subscribe(
+  bulkSetDocumentTypes(changedDocumentTypes: ChangedItems) {
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Confirm Document Type Assignment"
+    let documentType
+    let messageFragment = 'remove all document types from'
+    if (changedDocumentTypes && changedDocumentTypes.itemsToAdd.length > 0) {
+      documentType = changedDocumentTypes.itemsToAdd[0]
+      messageFragment = `assign the document type ${documentType.name} to`
+    }
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
         response => {
           modal.close()
         }
