@@ -91,7 +91,8 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center">
-  <p><span *ngIf="list.selected.size > 0">Selected {{list.selected.size}} of </span>{{list.collectionSize || 0}} document(s) <span *ngIf="isFiltered">(filtered)</span></p>
+  <p i18n *ngIf="list.selected.size > 0">Selected {{list.selected.size}} of {{list.collectionSize || 0}} {list.collectionSize, plural, =1 {document} other {documents}}</p>
+  <p i18n *ngIf="list.selected.size == 0">{{list.collectionSize || 0}} {list.collectionSize, plural, =1 {document} other {documents}}</p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
   [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
 </div>
