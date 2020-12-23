@@ -47,7 +47,8 @@ from .serialisers import (
     TagSerializer,
     DocumentTypeSerializer,
     PostDocumentSerializer,
-    SavedViewSerializer
+    SavedViewSerializer,
+    BulkEditSerializer
 )
 
 
@@ -110,6 +111,10 @@ class DocumentTypeViewSet(ModelViewSet):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
+class BulkEditForm(object):
+    pass
+
+
 class DocumentViewSet(RetrieveModelMixin,
                       UpdateModelMixin,
                       DestroyModelMixin,
@@ -132,6 +137,17 @@ class DocumentViewSet(RetrieveModelMixin,
         "modified",
         "added",
         "archive_serial_number")
+
+    def get_serializer(self, *args, **kwargs):
+        fields_param = self.request.query_params.get('fields', None)
+        if fields_param:
+            fields = fields_param.split(",")
+        else:
+            fields = None
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        kwargs.setdefault('fields', fields)
+        return serializer_class(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         response = super(DocumentViewSet, self).update(
@@ -272,6 +288,39 @@ class SavedViewViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class BulkEditView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkEditSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        method = serializer.validated_data.get("method")
+        parameters = serializer.validated_data.get("parameters")
+        documents = serializer.validated_data.get("documents")
+
+        try:
+            # TODO: parameter validation
+            result = method(documents, **parameters)
+            return Response({"result": result})
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 
 
 class PostDocumentView(APIView):

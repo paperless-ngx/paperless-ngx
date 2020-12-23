@@ -120,6 +120,8 @@ The `bare metal route`_ is more complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
+.. _setup-docker_route:
+
 Docker Route
 ============
 
@@ -459,6 +461,15 @@ management commands as below.
     Starting paperless will make sure that this is the case. If your try to
     load data from an old database schema in SQLite into a newer database
     schema in PostgreSQL, you will run into trouble.
+
+.. warning::
+
+    On some database fields, PostgreSQL enforces predefined limits on maximum
+    length, whereas SQLite does not. The fields in question are the title of documents
+    (128 characters), names of document types, tags and correspondents (128 characters),
+    and filenames (1024 characters). If you have data in these fields that surpasses these
+    limits, migration to PostgreSQL is not possible and will fail with an error.
+
 
 1.  Stop paperless, if it is running.
 2.  Tell paperless to use PostgreSQL:

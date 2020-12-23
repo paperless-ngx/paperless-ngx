@@ -28,7 +28,7 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
 
   getMatching(o: MatchingModel) {
     if (o.matching_algorithm == MATCH_AUTO) {
-      return "Automatic"
+      return $localize`Automatic`
     } else if (o.match && o.match.length > 0) {
       return `${o.match} (${MATCHING_ALGORITHMS.find(a => a.id == o.matching_algorithm).name})`
     } else {
@@ -90,11 +90,11 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
 
   openDeleteDialog(object: T) {
     var activeModal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    activeModal.componentInstance.title = "Confirm delete"
-    activeModal.componentInstance.messageBold = `Do you really want to delete ${this.getObjectName(object)}?`
-    activeModal.componentInstance.message = "Associated documents will not be deleted."
+    activeModal.componentInstance.title = $localize`Confirm delete`
+    activeModal.componentInstance.messageBold = $localize`Do you really want to delete ${this.getObjectName(object)}?`
+    activeModal.componentInstance.message = $localize`Associated documents will not be deleted.`
     activeModal.componentInstance.btnClass = "btn-danger"
-    activeModal.componentInstance.btnCaption = "Delete"
+    activeModal.componentInstance.btnCaption = $localize`Delete`
     activeModal.componentInstance.confirmClicked.subscribe(() => {
       this.service.delete(object).subscribe(_ => {
         activeModal.close()
