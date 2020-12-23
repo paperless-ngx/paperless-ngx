@@ -222,7 +222,7 @@
     extra_args: --upgrade
 
 - name: collect static files
-  command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py collectstatic --clear --no-input"
+  command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py collectstatic --no-input"
   args:
     chdir: "{{ paperlessng_directory }}/src"
 
