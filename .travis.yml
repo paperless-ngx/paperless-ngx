@@ -110,7 +110,7 @@ jobs:
         - true
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker manifest create ${DOCKER_REPO}:${TRAVIS_COMMIT} ${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v6
+        - docker manifest create ${DOCKER_REPO}:${TRAVIS_COMMIT} ${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7
         - docker manifest annotate ${DOCKER_REPO}:${TRAVIS_COMMIT} ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7 --os linux --arch arm --variant v7
         - docker manifest annotate ${DOCKER_REPO}:${TRAVIS_COMMIT} ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 --os linux --arch arm64 --variant v8
         - docker manifest push --purge ${DOCKER_REPO}:${TRAVIS_COMMIT}
@@ -124,7 +124,7 @@ jobs:
         - |
           if [ "${DOCKER_TAG}" != "" ]; then
             echo "Create Tag ${DOCKER_TAG}"
-            docker manifest create ${DOCKER_REPO}:${DOCKER_TAG} ${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v6
+            docker manifest create ${DOCKER_REPO}:${DOCKER_TAG} ${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7
             docker manifest annotate ${DOCKER_REPO}:${DOCKER_TAG} ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7 --os linux --arch arm --variant v7
             docker manifest annotate ${DOCKER_REPO}:${DOCKER_TAG} ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm64v8 --os linux --arch arm64 --variant v8
             docker manifest push --purge ${DOCKER_REPO}:${DOCKER_TAG}
