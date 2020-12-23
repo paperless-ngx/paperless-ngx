@@ -41,7 +41,7 @@ RUN apt-get update \
 		libpq-dev \
 		libqpdf-dev \
 		libxml2 \
-		libxslt-dev \
+		libxslt1-dev \
 		optipng \
 		pngquant \
 		qpdf \
@@ -55,9 +55,11 @@ RUN apt-get update \
 		tzdata \
 		unpaper \
 		zlib1g \
-	&& pip3 install --upgrade supervisor setuptools pipenv \
-  && pipenv install --system --deploy --ignore-pipfile --clear \
-	&& apt-get -y purge build-essential libqpdf-dev \
+	&& pip3 install --upgrade supervisor pipenv \
+  && pipenv install --system --deploy --ignore-pipfile \
+  && pipenv --clear \
+  && pip3 uninstall -y pipenv \
+	&& apt-get -y purge build-essential libqpdf-dev libxslt1-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
