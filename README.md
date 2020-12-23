@@ -63,6 +63,7 @@ These are things that I want to add to paperless eventually. They are sorted by 
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
 - **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
+- **Localization.** I won't translate paperless into any other languages except English and German, however, I'll add the necessary means so that anyone can translate paperless into their favorite language.
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
 	- With live updates and websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particularly happy about.
 	- Notifications when a document was added with buttons to open the new document right away.
