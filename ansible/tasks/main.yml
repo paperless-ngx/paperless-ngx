@@ -81,6 +81,19 @@
     state: started
   when: paperlessng_redis_host == 'localhost' or paperlessng_redis_host == '127.0.0.1'
 
+- name: create paperless group
+  group:
+    name: "{{ paperlessng_system_group }}"
+
+- name: create paperless user
+  user:
+    name: "{{ paperlessng_system_user }}"
+    groups:
+      - "{{ paperlessng_system_group }}"
+    shell: /usr/sbin/nologin
+    # GNUPG_HOME required due to paperless db.py
+    create_home: yes
+
 - name: check for paperless-ng installation
   command:
     cmd: 'grep -Po "(?<=Paperless-ng )\d+\.\d+\.\d+" {{ paperlessng_directory }}/docs/changelog.html'
@@ -94,7 +107,7 @@
     src: "{{ paperlessng_directory }}"
     dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
     remote_src: yes
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+  when: '"No such file or directory" not in paperlessng_current_version.stderr and paperlessng_current_version.stdout != paperlessng_version | string'
 
 - name: download paperless-ng
   get_url:
@@ -257,19 +270,6 @@
     path: "/etc/ImageMagick-6/policy.xml"
     regexp: '<policy domain="coder" rights="none" pattern="PDF" />'
     line: '<policy domain="coder" rights="read|write" pattern="PDF" />'
-
-- name: create paperless group
-  group:
-    name: "{{ paperlessng_system_group }}"
-
-- name: create paperless user
-  user:
-    name: "{{ paperlessng_system_user }}"
-    groups:
-      - "{{ paperlessng_system_group }}"
-    shell: /usr/sbin/nologin
-    # GNUPG_HOME required due to paperless db.py
-    create_home: yes
 
 - name: configure systemd services
   ini_file:
