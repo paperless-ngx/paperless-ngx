@@ -60,7 +60,7 @@ export class UploadFileWidgetComponent implements OnInit {
             } else if (event.type == HttpEventType.Response) {
               this.uploadStatus.splice(this.uploadStatus.indexOf(uploadStatusObject), 1)
               this.completedFiles += 1
-              this.toastService.showToast(Toast.make("Information", "The document has been uploaded and will be processed by the consumer shortly."))
+              this.toastService.showToast(Toast.make("Information", $localize`The document has been uploaded and will be processed by the consumer shortly.`))
             }
             
           }, error => {
@@ -68,11 +68,11 @@ export class UploadFileWidgetComponent implements OnInit {
             this.completedFiles += 1
             switch (error.status) {
               case 400: {
-                this.toastService.showToast(Toast.makeError(`There was an error while uploading the document: ${error.error.document}`))
+                this.toastService.showToast(Toast.makeError($localize`There was an error while uploading the document: ${error.error.document}`))
                 break;
               }
               default: {
-                this.toastService.showToast(Toast.makeError("An error has occurred while uploading the document. Sorry!"))
+                this.toastService.showToast(Toast.makeError($localize`An error has occurred while uploading the document. Sorry!`))
                 break;
               }
             }

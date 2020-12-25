@@ -38,7 +38,7 @@
 
   <div class="btn-group btn-group-toggle ml-2" ngbRadioGroup [(ngModel)]="list.sortReverse">
     <div ngbDropdown class="btn-group">
-      <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>Sort by</button>
+      <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort by</button>
       <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
         <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="list.sortField = f.field"
           [class.active]="list.sortField == f.field">{{f.name}}</button>
@@ -61,15 +61,15 @@
   <div class="btn-group ml-2">
 
     <div class="btn-group" ngbDropdown role="group">
-      <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle>Views</button>
+      <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle i18n>Views</button>
       <div class="dropdown-menu shadow" ngbDropdownMenu>
         <ng-container *ngIf="!list.savedViewId">
           <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
           <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
         </ng-container>
 
-        <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId">Save "{{list.savedViewTitle}}"</button>
-        <button ngbDropdownItem (click)="saveViewConfigAs()">Save as...</button>
+        <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId" i18n>Save "{{list.savedViewTitle}}"</button>
+        <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
       </div>
     </div>
 
@@ -83,7 +83,8 @@
 </div>
 
 <div class="d-flex justify-content-between align-items-center">
-  <p><span *ngIf="list.selected.size > 0">Selected {{list.selected.size}} of </span>{{list.collectionSize || 0}} document{{list.collectionSize > 1 ? 's' : ''}} <span *ngIf="isFiltered">(filtered)</span></p>
+  <p i18n *ngIf="list.selected.size > 0">Selected {{list.selected.size}} of {{list.collectionSize || 0}} {list.collectionSize, plural, =1 {document} other {documents}}</p>
+  <p i18n *ngIf="list.selected.size == 0">{{list.collectionSize || 0}} {list.collectionSize, plural, =1 {document} other {documents}}</p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
   [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
 </div>
@@ -96,12 +97,12 @@
 <table class="table table-sm border shadow-sm" *ngIf="displayMode == 'details'">
   <thead>
     <th></th>
-    <th class="d-none d-lg-table-cell">ASN</th>
-    <th class="d-none d-md-table-cell">Correspondent</th>
-    <th>Title</th>
-    <th class="d-none d-xl-table-cell">Document type</th>
-    <th>Created</th>
-    <th class="d-none d-xl-table-cell">Added</th>
+    <th class="d-none d-lg-table-cell" i18n>ASN</th>
+    <th class="d-none d-md-table-cell" i18n>Correspondent</th>
+    <th i18n>Title</th>
+    <th class="d-none d-xl-table-cell" i18n>Document type</th>
+    <th i18n>Created</th>
+    <th class="d-none d-xl-table-cell" i18n>Added</th>
   </thead>
   <tbody>
     <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
