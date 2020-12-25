@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
@@ -7,8 +9,12 @@ import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentService } from 'src/app/services/rest/document.service';
+import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { FilterableDropdownType } from 'src/app/components/common/filterable-dropdown/filterable-dropdown.component';
+import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component';
 import { ToggleableItem, ToggleableItemState } from 'src/app/components/common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
 export interface ChangedItems {
@@ -23,33 +29,6 @@ export interface ChangedItems {
 })
 export class BulkEditorComponent {
 
-  @Input()
-  selectedDocuments: Set<number>
-
-  @Input()
-  viewDocuments: PaperlessDocument[]
-
-  @Output()
-  selectPage = new EventEmitter()
-
-  @Output()
-  selectAll = new EventEmitter()
-
-  @Output()
-  selectNone = new EventEmitter()
-
-  @Output()
-  setTags = new EventEmitter()
-
-  @Output()
-  setCorrespondents = new EventEmitter()
-
-  @Output()
-  setDocumentTypes = new EventEmitter()
-
-  @Output()
-  delete = new EventEmitter()
-
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
@@ -61,13 +40,13 @@ export class BulkEditorComponent {
   dropdownTypes = FilterableDropdownType
 
   get selectionSpansPages(): boolean {
-    return this.selectedDocuments.size > this.viewDocuments.length || !Array.from(this.selectedDocuments).every(sd => this.viewDocuments.find(d => d.id == sd))
+    return this.documentList.selected.size > this.documentList.documents.length || !Array.from(this.documentList.selected).every(sd => this.documentList.documents.find(d => d.id == sd))
   }
 
   private _tagsToggleableItems: ToggleableItem[]
   get tagsToggleableItems(): ToggleableItem[] {
     let tagsToggleableItems = []
-    let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
+    let selectedDocuments: PaperlessDocument[] = this.documentList.documents.filter(d => this.documentList.selected.has(d.id))
     if (this.selectionSpansPages) selectedDocuments = []
 
     this.tags?.forEach(t => {
@@ -84,7 +63,7 @@ export class BulkEditorComponent {
   private _correspondentsToggleableItems: ToggleableItem[]
   get correspondentsToggleableItems(): ToggleableItem[] {
     let correspondentsToggleableItems = []
-    let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
+    let selectedDocuments: PaperlessDocument[] = this.documentList.documents.filter(d => this.documentList.selected.has(d.id))
     if (this.selectionSpansPages) selectedDocuments = []
 
     this.correspondents?.forEach(c => {
@@ -101,7 +80,7 @@ export class BulkEditorComponent {
   private _documentTypesToggleableItems: ToggleableItem[]
   get documentTypesToggleableItems(): ToggleableItem[] {
     let documentTypesToggleableItems = []
-    let selectedDocuments: PaperlessDocument[] = this.viewDocuments.filter(d => this.selectedDocuments.has(d.id))
+    let selectedDocuments: PaperlessDocument[] = this.documentList.documents.filter(d => this.documentList.selected.has(d.id))
     if (this.selectionSpansPages) selectedDocuments = []
 
     this.documentTypes?.forEach(dt => {
@@ -115,11 +94,18 @@ export class BulkEditorComponent {
     return documentTypesToggleableItems
   }
 
+  get documentList(): DocumentListViewService {
+    return this.documentListViewService
+  }
+
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
     private correspondentService: CorrespondentService,
-    private documentService: DocumentService
+    private documentListViewService: DocumentListViewService,
+    private documentService: DocumentService,
+    private modalService: NgbModal,
+    private openDocumentService: OpenDocumentsService
   ) { }
 
   ngOnInit() {
@@ -140,34 +126,7 @@ export class BulkEditorComponent {
     this.initialDocumentTypesToggleableItems = this._documentTypesToggleableItems
   }
 
-  applyTags(newTagsToggleableItems: ToggleableItem[]) {
-    let changedTags = this.checkForChangedItems(this.initialTagsToggleableItems, newTagsToggleableItems)
-    if (changedTags.itemsToAdd.length > 0 || changedTags.itemsToRemove.length > 0) this.setTags.emit(changedTags)
-  }
-
-  removeAllTags() {
-    this.setTags.emit(null)
-  }
-
-  applyCorrespondent(newCorrespondentsToggleableItems: ToggleableItem[]) {
-    let changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
-    if (changedCorrespondents.itemsToAdd.length > 0 || changedCorrespondents.itemsToRemove.length > 0) this.setCorrespondents.emit(changedCorrespondents)
-  }
-
-  removeAllCorrespondents() {
-    this.setDocumentTypes.emit(null)
-  }
-
-  applyDocumentType(newDocumentTypesToggleableItems: ToggleableItem[]) {
-    let changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
-    if (changedDocumentTypes.itemsToAdd.length > 0 || changedDocumentTypes.itemsToRemove.length > 0) this.setDocumentTypes.emit(changedDocumentTypes)
-  }
-
-  removeAllDocumentTypes() {
-    this.setDocumentTypes.emit(null)
-  }
-
-  checkForChangedItems(toggleableItemsA: ToggleableItem[], toggleableItemsB: ToggleableItem[]): ChangedItems {
+  private checkForChangedItems(toggleableItemsA: ToggleableItem[], toggleableItemsB: ToggleableItem[]): ChangedItems {
     let itemsToAdd: any[] = []
     let itemsToRemove: any[] = []
     toggleableItemsA.forEach(oldItem => {
@@ -179,7 +138,135 @@ export class BulkEditorComponent {
     return { itemsToAdd: itemsToAdd, itemsToRemove: itemsToRemove }
   }
 
+  private executeBulkOperation(method: string, args): Observable<any> {
+    return this.documentService.bulkEdit(Array.from(this.documentList.selected), method, args).pipe(
+      tap(() => {
+        this.documentList.reload()
+        this.documentList.selected.forEach(id => {
+          this.openDocumentService.refreshDocument(id)
+        })
+        this.documentList.selectNone()
+      })
+    )
+  }
+
+  setTags(newTagsToggleableItems: ToggleableItem[]) {
+    let changedTags: ChangedItems
+    if (newTagsToggleableItems) {
+      changedTags = this.checkForChangedItems(this.initialTagsToggleableItems, newTagsToggleableItems)
+      if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 0) return
+    }
+
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Confirm Tags Assignment"
+    let action = 'set_tags'
+    let tags
+    let messageFragment = ''
+    let both = changedTags && changedTags.itemsToAdd.length > 0 && changedTags.itemsToRemove.length > 0
+    if (!changedTags) {
+      messageFragment = `remove all tags from`
+    } else {
+      if (changedTags.itemsToAdd.length > 0) {
+        tags = changedTags.itemsToAdd
+        messageFragment = `assign the tag(s) ${changedTags.itemsToAdd.map(t => t.name).join(', ')} to`
+      }
+      if (changedTags.itemsToRemove.length > 0) {
+        if (!both) {
+          action = 'remove_tags'
+          tags = changedTags.itemsToRemove
+        } else {
+          messageFragment += ' and '
+        }
+        messageFragment += `remove the tag(s) ${changedTags.itemsToRemove.map(t => t.name).join(', ')} from`
+      }
+    }
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.documentList.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      // TODO: API endpoints for add/remove multiple tags
+      this.executeBulkOperation(action, {"tags": tags ? tags.map(t => t.id) : null}).subscribe(
+        response => {
+          if (!both) modal.close()
+          else {
+            this.executeBulkOperation('remove_tags', {"tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
+              response => {
+                modal.close()
+              })
+          }
+        }
+      )
+    })
+  }
+
+  setCorrespondents(newCorrespondentsToggleableItems: ToggleableItem[]) {
+    let changedCorrespondents: ChangedItems
+    if (newCorrespondentsToggleableItems) {
+      changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
+      if (changedCorrespondents.itemsToAdd.length == 0 && changedCorrespondents.itemsToRemove.length == 0) return
+    }
+
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Confirm Correspondent Assignment"
+    let correspondent
+    let messageFragment = 'remove all correspondents from'
+    if (changedCorrespondents && changedCorrespondents.itemsToAdd.length > 0) {
+      correspondent = changedCorrespondents.itemsToAdd[0]
+      messageFragment = `assign the correspondent ${correspondent.name} to`
+    }
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.documentList.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
+  }
+
+  setDocumentTypes(newDocumentTypesToggleableItems: ToggleableItem[]) {
+    let changedDocumentTypes: ChangedItems
+    if (newDocumentTypesToggleableItems) {
+      changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
+      if (changedDocumentTypes.itemsToAdd.length == 0 && changedDocumentTypes.itemsToRemove.length == 0) return
+    }
+
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.title = "Confirm Document Type Assignment"
+    let documentType
+    let messageFragment = 'remove all document types from'
+    if (changedDocumentTypes && changedDocumentTypes.itemsToAdd.length > 0) {
+      documentType = changedDocumentTypes.itemsToAdd[0]
+      messageFragment = `assign the document type ${documentType.name} to`
+    }
+    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.documentList.selected.size} selected document(s).`
+    modal.componentInstance.btnClass = "btn-warning"
+    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
+  }
+
   applyDelete() {
-    this.delete.next()
+    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+    modal.componentInstance.delayConfirm(5)
+    modal.componentInstance.title = "Delete confirm"
+    modal.componentInstance.messageBold = `This operation will permanently delete all ${this.documentList.selected.size} selected document(s).`
+    modal.componentInstance.message = `This operation cannot be undone.`
+    modal.componentInstance.btnClass = "btn-danger"
+    modal.componentInstance.btnCaption = "Delete document(s)"
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      this.executeBulkOperation("delete", {}).subscribe(
+        response => {
+          modal.close()
+        }
+      )
+    })
   }
 }
