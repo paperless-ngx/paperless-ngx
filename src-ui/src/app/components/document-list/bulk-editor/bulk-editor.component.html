@@ -32,29 +32,29 @@
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill"
         [toggleableItems]="tagsToggleableItems"
         [type]="dropdownTypes.Editing"
-        [showCounts]="!this.selectionSpansPages"
-        [showRemoveAll]="this.selectionSpansPages"
+        [showCounts]="!selectionSpansPages"
+        [showRemoveAll]="selectionSpansPages"
         (open)="tagsDropdownOpen()"
-        (removeAll)="removeAllTags()"
-        (editingComplete)="applyTags($event)">
+        (removeAll)="setTags(null)"
+        (editingComplete)="setTags($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" singular="true"
         [toggleableItems]="correspondentsToggleableItems"
         [type]="dropdownTypes.Editing"
-        [showCounts]="!this.selectionSpansPages"
-        [showRemoveAll]="this.selectionSpansPages"
+        [showCounts]="!selectionSpansPages"
+        [showRemoveAll]="selectionSpansPages"
         (open)="correspondentsDropdownOpen()"
-        (removeAll)="removeAllCorrespondents()"
-        (editingComplete)="applyCorrespondent($event)">
+        (removeAll)="setCorrespondents(null)"
+        (editingComplete)="setCorrespondents($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" singular="true"
         [toggleableItems]="documentTypesToggleableItems"
         [type]="dropdownTypes.Editing"
-        [showCounts]="!this.selectionSpansPages"
-        [showRemoveAll]="this.selectionSpansPages"
+        [showCounts]="!selectionSpansPages"
+        [showRemoveAll]="selectionSpansPages"
         (open)="documentTypesDropdownOpen()"
-        (removeAll)="removeAllDocumentTypes()"
-        (editingComplete)="applyDocumentType($event)">
+        (removeAll)="setDocumentTypes(null)"
+        (editingComplete)="setDocumentTypes($event)">
       </app-filterable-dropdown>
     </div>
   </div>

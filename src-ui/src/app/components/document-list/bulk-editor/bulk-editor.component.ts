@@ -126,37 +126,6 @@ export class BulkEditorComponent {
     this.initialDocumentTypesToggleableItems = this._documentTypesToggleableItems
   }
 
-  applyTags(newTagsToggleableItems: ToggleableItem[]) {
-    let changedTags = this.checkForChangedItems(this.initialTagsToggleableItems, newTagsToggleableItems)
-    if (changedTags.itemsToAdd.length > 0 || changedTags.itemsToRemove.length > 0) this.bulkSetTags(changedTags)
-  }
-
-  removeAllTags() {
-    this.bulkSetTags(null)
-  }
-
-  applyCorrespondent(newCorrespondentsToggleableItems: ToggleableItem[]) {
-    let changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
-    if (changedCorrespondents.itemsToAdd.length > 0 || changedCorrespondents.itemsToRemove.length > 0) this.bulkSetCorrespondents(changedCorrespondents)
-  }
-
-  removeAllCorrespondents() {
-    this.bulkSetCorrespondents(null)
-  }
-
-  applyDocumentType(newDocumentTypesToggleableItems: ToggleableItem[]) {
-    let changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
-    if (changedDocumentTypes.itemsToAdd.length > 0 || changedDocumentTypes.itemsToRemove.length > 0) this.bulkSetDocumentTypes(changedDocumentTypes)
-  }
-
-  removeAllDocumentTypes() {
-    this.bulkSetDocumentTypes(null)
-  }
-
-  applyDelete() {
-    this.bulkDelete()
-  }
-
   private checkForChangedItems(toggleableItemsA: ToggleableItem[], toggleableItemsB: ToggleableItem[]): ChangedItems {
     let itemsToAdd: any[] = []
     let itemsToRemove: any[] = []
@@ -181,7 +150,13 @@ export class BulkEditorComponent {
     )
   }
 
-  private bulkSetTags(changedTags: ChangedItems) {
+  setTags(newTagsToggleableItems: ToggleableItem[]) {
+    let changedTags: ChangedItems
+    if (newTagsToggleableItems) {
+      changedTags = this.checkForChangedItems(this.initialTagsToggleableItems, newTagsToggleableItems)
+      if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 0) return
+    }
+
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Confirm Tags Assignment"
     let action = 'set_tags'
@@ -224,7 +199,13 @@ export class BulkEditorComponent {
     })
   }
 
-  private bulkSetCorrespondents(changedCorrespondents: ChangedItems) {
+  setCorrespondents(newCorrespondentsToggleableItems: ToggleableItem[]) {
+    let changedCorrespondents: ChangedItems
+    if (newCorrespondentsToggleableItems) {
+      changedCorrespondents = this.checkForChangedItems(this.initialCorrespondentsToggleableItems, newCorrespondentsToggleableItems)
+      if (changedCorrespondents.itemsToAdd.length == 0 && changedCorrespondents.itemsToRemove.length == 0) return
+    }
+
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Confirm Correspondent Assignment"
     let correspondent
@@ -245,7 +226,13 @@ export class BulkEditorComponent {
     })
   }
 
-  private bulkSetDocumentTypes(changedDocumentTypes: ChangedItems) {
+  setDocumentTypes(newDocumentTypesToggleableItems: ToggleableItem[]) {
+    let changedDocumentTypes: ChangedItems
+    if (newDocumentTypesToggleableItems) {
+      changedDocumentTypes = this.checkForChangedItems(this.initialDocumentTypesToggleableItems, newDocumentTypesToggleableItems)
+      if (changedDocumentTypes.itemsToAdd.length == 0 && changedDocumentTypes.itemsToRemove.length == 0) return
+    }
+
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.title = "Confirm Document Type Assignment"
     let documentType
@@ -266,7 +253,7 @@ export class BulkEditorComponent {
     })
   }
 
-  private bulkDelete() {
+  applyDelete() {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.delayConfirm(5)
     modal.componentInstance.title = "Delete confirm"
