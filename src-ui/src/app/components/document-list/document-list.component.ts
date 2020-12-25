@@ -43,7 +43,7 @@ export class DocumentListComponent implements OnInit {
   }
 
   getTitle() {
-    return this.list.savedViewTitle || "Documents"
+    return this.list.savedViewTitle || $localize`Documents`
   }
 
   getSortFields() {
@@ -89,7 +89,7 @@ export class DocumentListComponent implements OnInit {
 
   saveViewConfig() {
     this.savedViewService.update(this.list.savedView).subscribe(result => {
-      this.toastService.showToast(Toast.make("Information", `View "${this.list.savedView.name}" saved successfully.`))
+      this.toastService.showToast(Toast.make("Information", $localize`View "${this.list.savedView.name}" saved successfully.`))
     })
 
   }
@@ -108,7 +108,7 @@ export class DocumentListComponent implements OnInit {
       }
       this.savedViewService.create(savedView).subscribe(() => {
         modal.close()
-        this.toastService.showToast(Toast.make("Information", `View "${savedView.name}" created successfully.`))
+        this.toastService.showToast(Toast.make("Information", $localize`View "${savedView.name}" created successfully.`))
       })
     })
   }

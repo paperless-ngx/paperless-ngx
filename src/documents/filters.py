@@ -98,12 +98,14 @@ class DocumentFilterSet(FilterSet):
             "added": DATE_KWARGS,
             "modified": DATE_KWARGS,
 
+            "correspondent": ["isnull"],
             "correspondent__id": ID_KWARGS,
             "correspondent__name": CHAR_KWARGS,
 
             "tags__id": ID_KWARGS,
             "tags__name": CHAR_KWARGS,
 
+            "document_type": ["isnull"],
             "document_type__id": ID_KWARGS,
             "document_type__name": CHAR_KWARGS,
 

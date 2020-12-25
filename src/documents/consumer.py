@@ -95,19 +95,21 @@ class Consumer(LoggingMixin):
         self.pre_check_directories()
         self.pre_check_duplicate()
 
-        self.log("info", "Consuming {}".format(self.filename))
+        self.log("info", f"Consuming {self.filename}")
 
         # Determine the parser class.
 
         mime_type = magic.from_file(self.path, mime=True)
 
+        self.log("debug", f"Detected mime type: {mime_type}")
+
         parser_class = get_parser_class_for_mime_type(mime_type)
         if not parser_class:
-            raise ConsumerError(f"No parsers abvailable for {self.filename}")
+            raise ConsumerError(
+                f"Unsupported mime type {mime_type} of file {self.filename}")
         else:
             self.log("debug",
-                     f"Parser: {parser_class.__name__} "
-                     f"based on mime type {mime_type}")
+                     f"Parser: {parser_class.__name__}")
 
         # Notify all listeners that we're going to do some work.
 
