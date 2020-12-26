@@ -1,11 +1,11 @@
 <div class="card mb-3 bg-light shadow-sm" [class.card-selected]="selected" [class.document-card]="selectable">
   <div class="row no-gutters">
     <div class="col-md-2 d-none d-lg-block doc-img-background" [class.doc-img-background-selected]="selected">
-      <img [src]="getThumbUrl()" class="card-img doc-img border-right" (click)="selected = selectable ? !selected : false">
+      <img [src]="getThumbUrl()" class="card-img doc-img border-right" (click)="setSelected(selectable ? !selected : false)">
 
       <div style="top: 0; left: 0" class="position-absolute border-right border-bottom bg-light p-1" [class.document-card-check]="!selected">
         <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (change)="selected = $event.target.checked">
+          <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (change)="setSelected($event.target.checked)">
           <label class="custom-control-label" for="smallCardCheck{{document.id}}"></label>
         </div>
       </div>
