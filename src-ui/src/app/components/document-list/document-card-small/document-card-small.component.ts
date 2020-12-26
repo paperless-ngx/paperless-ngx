@@ -12,15 +12,11 @@ export class DocumentCardSmallComponent implements OnInit {
 
   constructor(private documentService: DocumentService) { }
 
-  _selected = false
-
-  get selected() {
-    return this._selected
-  }
-
   @Input()
-  set selected(value: boolean) {
-    this._selected = value
+  selected = false
+
+  setSelected(value: boolean) {
+    this.selected = value
     this.selectedChange.emit(value)
   }
 
