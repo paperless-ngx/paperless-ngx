@@ -48,7 +48,7 @@ jobs:
         - docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64 .
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64
       on:
-        condition: '"${BUILD_DOCKER}" = 1'
+        condition: '"${BUILD_DOCKER}" = 1 and ( branch =~ /^(master|dev|ng-.*)$/)'
     - stage: build_docker
       name: arm64v8 docker build
       services:
@@ -68,8 +68,7 @@ jobs:
       virt: vm
       group: edge
       on:
-        condition: '"${BUILD_DOCKER}" = 1'
-    
+        condition: '"${BUILD_DOCKER}" = 1 and ( branch =~ /^(master|dev|ng-.*)$/)'
     - stage: build_docker
       name: arm32v7 docker build
       services:
@@ -94,8 +93,7 @@ jobs:
       env:
         - DOCKER_CLI_EXPERIMENTAL=enabled # required for manifest support
       on:
-        condition: '"${BUILD_DOCKER}" = 1'
-    
+        condition: '"${BUILD_DOCKER}" = 1 and ( branch =~ /^(master|dev|ng-.*)$/)'
     - stage: publish_manifest
       env:
         - DOCKER_CLI_EXPERIMENTAL=enabled # required for manifest support
@@ -131,7 +129,7 @@ jobs:
             echo "Not a tag and not on master, so not pushing tag/master specific manifest"
           fi
       on:
-        condition: '"${BUILD_DOCKER}" = 1'
+        condition: '"${BUILD_DOCKER}" = 1 and ( branch =~ /^(master|dev|ng-.*)$/)'
 
 
 before_install:
