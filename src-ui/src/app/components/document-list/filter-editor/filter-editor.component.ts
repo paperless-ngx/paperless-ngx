@@ -3,14 +3,13 @@ import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { debounceTime, distinctUntilChanged, filter, flatMap, mergeMap } from 'rxjs/operators';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES, FILTER_TITLE } from 'src/app/data/filter-rule-type';
-import { DateSelection } from 'src/app/components/common/date-dropdown/date-dropdown.component';
+import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 
 @Component({
   selector: 'app-filter-editor',
@@ -46,37 +45,91 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   ) { }
 
   tags: PaperlessTag[] = []
-  correspondents: PaperlessCorrespondent[]
+  correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
 
+  _titleFilter = ""
+
+  tagSelectionModel = new FilterableDropdownSelectionModel()
+  correspondentSelectionModel = new FilterableDropdownSelectionModel()
+  documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+
+  dateCreatedBefore: string
+  dateCreatedAfter: string
+  dateAddedBefore: string
+  dateAddedAfter: string
+
   @Input()
-  filterRules: FilterRule[]
+  set filterRules (value: FilterRule[]) {
+    console.log("SET FILTER RULES")
+    value.forEach(rule => {
+      switch (rule.rule_type) {
+        case FILTER_TITLE:
+          this._titleFilter = rule.value
+          break
+        case FILTER_CREATED_AFTER:
+          this.dateCreatedAfter = rule.value
+          break
+        case FILTER_CREATED_BEFORE:
+          this.dateCreatedBefore = rule.value
+          break
+        case FILTER_ADDED_AFTER:
+          this.dateAddedAfter = rule.value
+          break
+        case FILTER_ADDED_BEFORE:
+          this.dateAddedBefore = rule.value
+          break
+      }
+    })
+
+    this.tagService.getCachedMany(value.filter(v => v.rule_type == FILTER_HAS_TAG).map(rule => +rule.value)).subscribe(tags => {
+      console.log(tags)
+      tags.forEach(tag => this.tagSelectionModel.toggle(tag, false))
+    })
+  }
 
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
+  updateRules() {
+    console.log("UPDATE RULES!!!")
+    let filterRules: FilterRule[] = []
+    if (this._titleFilter) {
+      filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})
+    }
+    this.tagSelectionModel.getSelected().forEach(tag => {
+      filterRules.push({rule_type: FILTER_HAS_TAG, value: tag.id.toString()})
+    })
+    this.correspondentSelectionModel.getSelected().forEach(correspondent => {
+      filterRules.push({rule_type: FILTER_CORRESPONDENT, value: correspondent.id.toString()})
+    })
+    this.documentTypeSelectionModel.getSelected().forEach(documentType => {
+      filterRules.push({rule_type: FILTER_DOCUMENT_TYPE, value: documentType.id.toString()})
+    })
+    if (this.dateCreatedBefore) {
+      filterRules.push({rule_type: FILTER_CREATED_BEFORE, value: this.dateCreatedBefore})
+    }
+    if (this.dateCreatedAfter) {
+      filterRules.push({rule_type: FILTER_CREATED_AFTER, value: this.dateCreatedAfter})
+    }
+    if (this.dateAddedBefore) {
+      filterRules.push({rule_type: FILTER_ADDED_BEFORE, value: this.dateAddedBefore})
+    }
+    if (this.dateAddedAfter) {
+      filterRules.push({rule_type: FILTER_ADDED_AFTER, value: this.dateAddedAfter})
+    }
+    console.log(filterRules)
+    this.filterRulesChange.next(filterRules)
+  }
+
   hasFilters() {
-    return this.filterRules.length > 0
-  }
-
-  get selectedTags(): PaperlessTag[] {
-    let tagRules: FilterRule[] = this.filterRules.filter(fr => fr.rule_type == FILTER_HAS_TAG)
-    return this.tags?.filter(t => tagRules.find(tr => +tr.value == t.id))
-  }
-
-  get selectedCorrespondents(): PaperlessCorrespondent[] {
-    let correspondentRules: FilterRule[] = this.filterRules.filter(fr => fr.rule_type == FILTER_CORRESPONDENT)
-    return this.correspondents?.filter(c => correspondentRules.find(cr => +cr.value == c.id))
-  }
-
-  get selectedDocumentTypes(): PaperlessDocumentType[] {
-    let documentTypeRules: FilterRule[] = this.filterRules.filter(fr => fr.rule_type == FILTER_DOCUMENT_TYPE)
-    return this.documentTypes?.filter(dt => documentTypeRules.find(dtr => +dtr.value == dt.id))
+    return this._titleFilter || 
+      this.dateCreatedAfter || this.dateAddedBefore || this.dateCreatedAfter || this.dateCreatedBefore ||
+      this.tagSelectionModel.selectionSize() || this.correspondentSelectionModel.selectionSize() || this.documentTypeSelectionModel.selectionSize()
   }
 
   get titleFilter() {
-    let existingRule = this.filterRules.find(rule => rule.rule_type == FILTER_TITLE)
-    return existingRule ? existingRule.value : ''
+    return this._titleFilter
   }
 
   set titleFilter(value) {
@@ -97,142 +150,27 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(title => {
-      this.setTitleRule(title)
+      this._titleFilter = title
+      this.updateRules()
     })
   }
 
   ngOnDestroy() {
     this.titleFilterDebounce.complete()
-    // TODO: not sure if both is necessary
-    this.subscription.unsubscribe()
-  }
-
-  applyFilters() {
-    this.filterRulesChange.next(this.filterRules)
   }
 
   clearSelected() {
-    this.filterRules = []
-    this.applyFilters()
-  }
-
-  private toggleFilterRule(filterRuleTypeID: number, value: number) {
-
-    let filterRuleType = FILTER_RULE_TYPES.find(t => t.id == filterRuleTypeID)
-
-    let existingRule = this.filterRules.find(rule => rule.rule_type == filterRuleTypeID && rule.value == value?.toString())
-    let existingRuleOfSameType = this.filterRules.find(rule => rule.rule_type == filterRuleTypeID)
-
-    if (existingRule) {
-      // if this exact rule already exists, remove it in all cases.
-      this.filterRules.splice(this.filterRules.indexOf(existingRule), 1)
-    } else if (filterRuleType.multi || !existingRuleOfSameType) {
-      // if we allow multiple rules per type, or no rule of this type already exists, push a new rule.
-      this.filterRules.push({rule_type: filterRuleTypeID, value: value?.toString()})
-    } else {
-      // otherwise (i.e., no multi support AND there's already a rule of this type), update the rule.
-      existingRuleOfSameType.value = value?.toString()
-    }
-    this.applyFilters()
-  }
-
-  private setTitleRule(title: string) {
-    let existingRule = this.filterRules.find(rule => rule.rule_type == FILTER_TITLE)
-
-    if (!existingRule && title) {
-      this.filterRules.push({rule_type: FILTER_TITLE, value: title})
-    } else if (existingRule && !title) {
-      this.filterRules.splice(this.filterRules.findIndex(rule => rule.rule_type == FILTER_TITLE), 1)
-    } else if (existingRule && title) {
-      existingRule.value = title
-    }
-    this.applyFilters()
+    this._titleFilter = ""
+    this.updateRules()
   }
 
   toggleTag(tagId: number) {
-    this.toggleFilterRule(FILTER_HAS_TAG, tagId)
   }
 
   toggleCorrespondent(correspondentId: number) {
-    this.toggleFilterRule(FILTER_CORRESPONDENT, correspondentId)
   }
 
   toggleDocumentType(documentTypeId: number) {
-    this.toggleFilterRule(FILTER_DOCUMENT_TYPE, documentTypeId)
-  }
-
-
-
-  // Date handling
-
-
-  onDatesCreatedSet(dates: DateSelection) {
-    this.setDateCreatedBefore(dates.before)
-    this.setDateCreatedAfter(dates.after)
-    this.applyFilters()
-  }
-
-  onDatesAddedSet(dates: DateSelection) {
-    this.setDateAddedBefore(dates.before)
-    this.setDateAddedAfter(dates.after)
-    this.applyFilters()
-  }
-
-  get dateCreatedBefore(): string {
-    let createdBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_BEFORE)
-    return createdBeforeRule ? createdBeforeRule.value : null
-  }
-
-  get dateCreatedAfter(): string {
-    let createdAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_CREATED_AFTER)
-    return createdAfterRule ? createdAfterRule.value : null
-  }
-
-  get dateAddedBefore(): string {
-    let addedBeforeRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_BEFORE)
-    return addedBeforeRule ? addedBeforeRule.value : null
-  }
-
-  get dateAddedAfter(): string {
-    let addedAfterRule: FilterRule = this.filterRules.find(fr => fr.rule_type == FILTER_ADDED_AFTER)
-    return addedAfterRule ? addedAfterRule.value : null
-  }
-
-  setDateCreatedBefore(date?: string) {
-    if (date) this.setDateFilter(date, FILTER_CREATED_BEFORE)
-    else this.clearDateFilter(FILTER_CREATED_BEFORE)
-  }
-
-  setDateCreatedAfter(date?: string) {
-    if (date) this.setDateFilter(date, FILTER_CREATED_AFTER)
-    else this.clearDateFilter(FILTER_CREATED_AFTER)
-  }
-
-  setDateAddedBefore(date?: string) {
-    if (date) this.setDateFilter(date, FILTER_ADDED_BEFORE)
-    else this.clearDateFilter(FILTER_ADDED_BEFORE)
-  }
-
-  setDateAddedAfter(date?: string) {
-    if (date) this.setDateFilter(date, FILTER_ADDED_AFTER)
-    else this.clearDateFilter(FILTER_ADDED_AFTER)
-  }
-
-  setDateFilter(date: string, dateRuleTypeID: number) {
-    let existingRule = this.filterRules.find(rule => rule.rule_type == dateRuleTypeID)
-
-    if (existingRule) {
-      existingRule.value = date
-    } else {
-      this.filterRules.push({rule_type: dateRuleTypeID, value: date})
-    }
-  }
-
-  clearDateFilter(dateRuleTypeID: number) {
-    let ruleIndex = this.filterRules.findIndex(rule => rule.rule_type == dateRuleTypeID)
-    if (ruleIndex != -1) {
-      this.filterRules.splice(ruleIndex, 1)
-    }
   }
 
 }

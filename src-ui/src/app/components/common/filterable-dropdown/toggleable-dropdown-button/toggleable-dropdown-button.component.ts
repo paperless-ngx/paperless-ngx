@@ -31,8 +31,7 @@ export class ToggleableDropdownButtonComponent {
   }
 
   toggleItem(): void {
-    this.toggleableItem.state = (this.toggleableItem.state == ToggleableItemState.NotSelected || this.toggleableItem.state == ToggleableItemState.PartiallySelected) ? ToggleableItemState.Selected : ToggleableItemState.NotSelected
-    this.toggle.emit(this.toggleableItem)
+    this.toggle.emit()
   }
 
   getSelectedIconName() {
