@@ -100,3 +100,13 @@ body {
     padding-top: 1px;
   }
 }
+
+@supports (-webkit-touch-callout: none) {
+  input[type="number"],
+  input[type="search"],
+  input[type="text"],
+  select:focus,
+  textarea {
+    font-size: 16px;
+  }
+}
