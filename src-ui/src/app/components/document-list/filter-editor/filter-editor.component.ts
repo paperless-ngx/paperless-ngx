@@ -4,7 +4,7 @@ import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
@@ -42,8 +42,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private correspondentService: CorrespondentService,
-    private dateParser: NgbDateParserFormatter
+    private correspondentService: CorrespondentService
   ) { }
 
   tags: PaperlessTag[] = []

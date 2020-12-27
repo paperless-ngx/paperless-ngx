@@ -1,10 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
+import { MatchingModel } from 'src/app/data/matching-model';
 
 export interface ToggleableItem {
-  item: PaperlessTag | PaperlessDocumentType | PaperlessCorrespondent,
+  item: MatchingModel,
   state: ToggleableItemState,
   count: number
 }
