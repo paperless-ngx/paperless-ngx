@@ -4,6 +4,7 @@ import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 import { ToggleableItem, ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component';
 import { MatchingModel } from 'src/app/data/matching-model';
 import { Subject } from 'rxjs';
+import { ThrowStmt } from '@angular/compiler';
 
 export enum FilterableDropdownType {
   Filtering = 'filtering',
@@ -16,39 +17,56 @@ export class FilterableDropdownSelectionModel {
 
   multiple = false
 
-  items: ToggleableItem[] = []
+  items: MatchingModel[] = []
 
-  getSelected() {
-    return this.items.filter(i => i.state == ToggleableItemState.Selected).map(i => i.item)
+  selection = new Map<number, ToggleableItemState>()
+
+  getSelectedItems() {
+    return this.items.filter(i => this.selection.get(i.id) == ToggleableItemState.Selected)
   }
 
-
-
-  toggle(item: MatchingModel, fireEvent = true) {
-    console.log("TOGGLE TAG")
-    let toggleableItem = this.items.find(i => i.item == item)
-    console.log(toggleableItem)
-
-    if (toggleableItem) {
-      if (toggleableItem.state == ToggleableItemState.Selected) {
-        toggleableItem.state = ToggleableItemState.NotSelected
-      } else {
-        this.items.forEach(i => {
-          if (i.item == item) {
-            i.state = ToggleableItemState.Selected
-          } else if (!this.multiple) {
-            i.state = ToggleableItemState.NotSelected
-          }
-        })
-      }
-      if (fireEvent) {
-        this.changed.next(this)
-      }
+  set(id: number, state: ToggleableItemState, fireEvent = true) {
+    this.selection.set(id, state)
+    if (fireEvent) {
+      this.changed.next(this)
     }
   }
 
+  toggle(id: number, fireEvent = true) {
+    let state = this.selection.get(id)
+    if (state == null || state != ToggleableItemState.Selected) {
+      this.selection.set(id, ToggleableItemState.Selected)
+    } else if (state == ToggleableItemState.Selected) {
+      this.selection.set(id, ToggleableItemState.NotSelected)
+    }
+
+    if (!this.multiple) {
+      for (let key of this.selection.keys()) {
+        if (key != id) {
+          this.selection.set(key, ToggleableItemState.NotSelected)
+        }
+      }
+    }
+
+    if (fireEvent) {
+      this.changed.next(this)
+    }
+    
+  }
+
+  get(id: number) {
+    return this.selection.get(id) || ToggleableItemState.NotSelected
+  }
+
   selectionSize() {
-    return this.getSelected().length
+    return this.getSelectedItems().length
+  }
+
+  clear(fireEvent = true) {
+    this.selection.clear()
+    if (fireEvent) {
+      this.changed.next(this)
+    }
   }
 }
 
@@ -67,14 +85,12 @@ export class FilterableDropdownComponent {
   @Input()
   set items(items: MatchingModel[]) {
     if (items) {
-      this._selectionModel.items = items.map(i => {
-        return {item: i, state: ToggleableItemState.NotSelected, count: i.document_count}
-      })
+      this._selectionModel.items = items
     }
   }
 
   get items(): MatchingModel[] {
-    return this._selectionModel.items.map(i => i.item)
+    return this._selectionModel.items
   }
 
   _selectionModel = new FilterableDropdownSelectionModel()
