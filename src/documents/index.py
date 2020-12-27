@@ -87,11 +87,6 @@ def open_index(recreate=False):
 
 
 def update_document(writer, doc):
-    # TODO: this line caused many issues all around, since:
-    #  We need to make sure that this method does not get called with
-    #  deserialized documents (i.e, document objects that don't come from
-    #  Django's ORM interfaces directly.
-    logger.debug("Indexing {}...".format(doc))
     tags = ",".join([t.name for t in doc.tags.all()])
     writer.update_document(
         id=doc.pk,
@@ -107,9 +102,11 @@ def update_document(writer, doc):
 
 
 def remove_document(writer, doc):
-    # TODO: see above.
-    logger.debug("Removing {} from index...".format(doc))
-    writer.delete_by_term('id', doc.pk)
+    remove_document_by_id(writer, doc.pk)
+
+
+def remove_document_by_id(writer, doc_id):
+    writer.delete_by_term('id', doc_id)
 
 
 def add_or_update_document(document):
