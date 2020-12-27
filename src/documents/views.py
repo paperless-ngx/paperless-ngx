@@ -4,7 +4,7 @@ from datetime import datetime
 from time import mktime
 
 from django.conf import settings
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Case, When, IntegerField
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
@@ -48,7 +48,7 @@ from .serialisers import (
     DocumentTypeSerializer,
     PostDocumentSerializer,
     SavedViewSerializer,
-    BulkEditSerializer
+    BulkEditSerializer, SelectionDataSerializer
 )
 
 
@@ -370,6 +370,62 @@ class PostDocumentView(APIView):
                        override_tag_ids=tag_ids,
                        task_name=os.path.basename(doc_name)[:100])
         return Response("OK")
+
+
+class SelectionDataView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SelectionDataSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ids = serializer.validated_data.get('documents')
+
+        correspondents = Correspondent.objects.annotate(dcount=Count(Case(
+            When(documents__id__in=ids, then=1),
+            output_field=IntegerField()
+        )))
+
+        tags = Tag.objects.annotate(dcount=Count(Case(
+            When(documents__id__in=ids, then=1),
+            output_field=IntegerField()
+        )))
+
+        types = DocumentType.objects.annotate(dcount=Count(Case(
+            When(documents__id__in=ids, then=1),
+            output_field=IntegerField()
+        )))
+
+        r = Response({
+            "selected_correspondents": [{
+                "id": t.id,
+                "dcount": t.dcount
+            } for t in correspondents],
+            "selected_tags": [{
+                "id": t.id,
+                "dcount": t.dcount
+            } for t in tags],
+            "selected_types": [{
+                "id": t.id,
+                "dcount": t.dcount
+            } for t in types]
+        })
+
+        return r
 
 
 class SearchView(APIView):

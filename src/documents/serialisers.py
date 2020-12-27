@@ -393,3 +393,11 @@ class PostDocumentSerializer(serializers.Serializer):
             return [tag.id for tag in tags]
         else:
             return None
+
+
+class SelectionDataSerializer(serializers.Serializer):
+
+    documents = serializers.ListField(
+        required=True,
+        child=serializers.IntegerField()
+    )
