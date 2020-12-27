@@ -36,9 +36,12 @@ export class ToggleableDropdownButtonComponent {
   }
 
   getSelectedIconName() {
-    let iconName = ''
-    if (this.toggleableItem?.state == ToggleableItemState.Selected) iconName = 'check'
-    else if (this.toggleableItem?.state == ToggleableItemState.PartiallySelected) iconName = 'dash'
-    return iconName
+    if (this.toggleableItem?.state == ToggleableItemState.Selected) {
+      return "check"
+    } else if (this.toggleableItem?.state == ToggleableItemState.PartiallySelected) {
+      return "dash"
+    } else {
+      return ""
+    }
   }
 }
