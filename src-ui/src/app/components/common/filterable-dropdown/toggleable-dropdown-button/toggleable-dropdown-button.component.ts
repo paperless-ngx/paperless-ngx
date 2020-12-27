@@ -23,9 +23,6 @@ export class ToggleableDropdownButtonComponent {
   @Input()
   toggleableItem: ToggleableItem
 
-  @Input()
-  showCounts: boolean = true
-
   @Output()
   toggle = new EventEmitter()
 

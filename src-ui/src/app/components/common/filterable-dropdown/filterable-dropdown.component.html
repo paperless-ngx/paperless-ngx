@@ -21,7 +21,7 @@
       </div>
       <div *ngIf="toggleableItems" class="items">
         <ng-container *ngFor="let toggleableItem of toggleableItems | filter: filterText">
-          <app-toggleable-dropdown-button [toggleableItem]="toggleableItem" [showCounts]="showCounts" (toggle)="toggleItem($event)"></app-toggleable-dropdown-button>
+          <app-toggleable-dropdown-button [toggleableItem]="toggleableItem" (toggle)="toggleItem($event)"></app-toggleable-dropdown-button>
         </ng-container>
       </div>
       <button *ngIf="type == types.Editing" class="list-group-item list-group-item-action bg-light" (click)="dropdown.close()" [disabled]="!hasBeenToggled || (toggleableItems | filter: filterText).length == 0">
