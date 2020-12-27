@@ -39,16 +39,11 @@ export class BulkEditorComponent {
 
   dropdownTypes = FilterableDropdownType
 
-  get selectionSpansPages(): boolean {
-    return this.documentList.selected.size > this.documentList.documents.length || !Array.from(this.documentList.selected).every(sd => this.documentList.documents.find(d => d.id == sd))
-  }
-
   private _tagsToggleableItems: ToggleableItem[]
   get tagsToggleableItems(): ToggleableItem[] {
     let tagsToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.documentList.documents.filter(d => this.documentList.selected.has(d.id))
-    if (this.selectionSpansPages) selectedDocuments = []
-
+ 
     this.tags?.forEach(t => {
       let selectedDocumentsWithTag: PaperlessDocument[] = selectedDocuments.filter(d => d.tags.includes(t.id))
       let state = ToggleableItemState.NotSelected
@@ -64,7 +59,6 @@ export class BulkEditorComponent {
   get correspondentsToggleableItems(): ToggleableItem[] {
     let correspondentsToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.documentList.documents.filter(d => this.documentList.selected.has(d.id))
-    if (this.selectionSpansPages) selectedDocuments = []
 
     this.correspondents?.forEach(c => {
       let selectedDocumentsWithCorrespondent: PaperlessDocument[] = selectedDocuments.filter(d => d.correspondent == c.id)
@@ -81,7 +75,6 @@ export class BulkEditorComponent {
   get documentTypesToggleableItems(): ToggleableItem[] {
     let documentTypesToggleableItems = []
     let selectedDocuments: PaperlessDocument[] = this.documentList.documents.filter(d => this.documentList.selected.has(d.id))
-    if (this.selectionSpansPages) selectedDocuments = []
 
     this.documentTypes?.forEach(dt => {
       let selectedDocumentsWithDocumentType: PaperlessDocument[] = selectedDocuments.filter(d => d.document_type == dt.id)
