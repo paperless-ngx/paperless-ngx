@@ -395,17 +395,18 @@ class SelectionDataView(APIView):
 
         ids = serializer.validated_data.get('documents')
 
-        correspondents = Correspondent.objects.annotate(dcount=Count(Case(
+        correspondents = Correspondent.objects.annotate(
+            document_count=Count(Case(
+                When(documents__id__in=ids, then=1),
+                output_field=IntegerField()
+            )))
+
+        tags = Tag.objects.annotate(document_count=Count(Case(
             When(documents__id__in=ids, then=1),
             output_field=IntegerField()
         )))
 
-        tags = Tag.objects.annotate(dcount=Count(Case(
-            When(documents__id__in=ids, then=1),
-            output_field=IntegerField()
-        )))
-
-        types = DocumentType.objects.annotate(dcount=Count(Case(
+        types = DocumentType.objects.annotate(document_count=Count(Case(
             When(documents__id__in=ids, then=1),
             output_field=IntegerField()
         )))
@@ -413,15 +414,15 @@ class SelectionDataView(APIView):
         r = Response({
             "selected_correspondents": [{
                 "id": t.id,
-                "dcount": t.dcount
+                "document_count": t.document_count
             } for t in correspondents],
             "selected_tags": [{
                 "id": t.id,
-                "dcount": t.dcount
+                "document_count": t.document_count
             } for t in tags],
             "selected_types": [{
                 "id": t.id,
-                "dcount": t.dcount
+                "document_count": t.document_count
             } for t in types]
         })
 
