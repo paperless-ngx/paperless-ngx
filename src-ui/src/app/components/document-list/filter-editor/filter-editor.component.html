@@ -8,11 +8,11 @@
   <div class="w-100 d-xl-none"></div>
    <div class="col col-xl-auto mb-2 mb-xl-0">
      <div class="d-flex">
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="tags" [itemsSelected]="selectedTags" title="Tags" icon="tag-fill" (toggle)="toggleTag($event.id)"></app-filterable-dropdown>
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="correspondents" [itemsSelected]="selectedCorrespondents" title="Correspondents" icon="person-fill" (toggle)="toggleCorrespondent($event.id)"></app-filterable-dropdown>
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [itemsSelected]="selectedDocumentTypes" title="Document types" icon="file-earmark-fill" (toggle)="toggleDocumentType($event.id)"></app-filterable-dropdown>
-       <app-date-dropdown class="mr-2 mr-md-3" [dateBefore]="dateCreatedBefore" [dateAfter]="dateCreatedAfter" title="Created" (datesSet)="onDatesCreatedSet($event)"></app-date-dropdown>
-       <app-date-dropdown [dateBefore]="dateAddedBefore" [dateAfter]="dateAddedAfter" title="Added"  (datesSet)="onDatesAddedSet($event)"></app-date-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="tags" [(selectionModel)]="tagSelectionModel" (selectionModelChange)="updateRules()" [multiple]="true" title="Tags" icon="tag-fill"></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="correspondents" [(selectionModel)]="correspondentSelectionModel" (selectionModelChange)="updateRules()" title="Correspondents" icon="person-fill"></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [(selectionModel)]="documentTypeSelectionModel" (selectionModelChange)="updateRules()" title="Document types" icon="file-earmark-fill"></app-filterable-dropdown>
+       <app-date-dropdown class="mr-2 mr-md-3" [(dateBefore)]="dateCreatedBefore" [(dateAfter)]="dateCreatedAfter" title="Created" (datesSet)="updateRules()"></app-date-dropdown>
+       <app-date-dropdown [(dateBefore)]="dateAddedBefore" [(dateAfter)]="dateAddedAfter" title="Added"  (datesSet)="updateRules()"></app-date-dropdown>
      </div>
    </div>
    <div class="w-100 d-xl-none"></div>
