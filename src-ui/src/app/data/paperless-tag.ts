@@ -23,6 +23,5 @@ export interface PaperlessTag extends MatchingModel {
     colour?: number
 
     is_inbox_tag?: boolean
-  
-    document_count?: number
+
 }
