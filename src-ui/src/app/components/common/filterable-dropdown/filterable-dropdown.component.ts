@@ -1,10 +1,8 @@
 import { Component, EventEmitter, Input, Output, ElementRef, ViewChild } from '@angular/core';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
-import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
-import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { FilterPipe } from  'src/app/pipes/filter.pipe';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
 import { ToggleableItem, ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component';
+import { MatchingModel } from 'src/app/data/matching-model';
 
 export enum FilterableDropdownType {
   Filtering = 'filtering',
@@ -24,7 +22,7 @@ export class FilterableDropdownComponent {
   filterText: string
 
   @Input()
-  set items(items: (PaperlessTag | PaperlessCorrespondent | PaperlessDocumentType)[]) {
+  set items(items: MatchingModel[]) {
     if (items) {
       this._toggleableItems = items.map(i => {
         return {item: i, state: ToggleableItemState.NotSelected, count: i.document_count}
@@ -45,13 +43,13 @@ export class FilterableDropdownComponent {
   }
 
   @Input()
-  set itemsSelected(itemsSelected: (PaperlessTag | PaperlessCorrespondent | PaperlessDocumentType)[]) {
+  set itemsSelected(itemsSelected: MatchingModel[]) {
     this.toggleableItems.forEach(i => {
       i.state = (itemsSelected.find(is => is.id == i.item.id)) ? ToggleableItemState.Selected : ToggleableItemState.NotSelected
     })
   }
 
-  get itemsSelected() :(PaperlessTag | PaperlessCorrespondent | PaperlessDocumentType)[] {
+  get itemsSelected(): MatchingModel[] {
     return this.toggleableItems.filter(ti => ti.state == ToggleableItemState.Selected).map(ti => ti.item)
   }
 
