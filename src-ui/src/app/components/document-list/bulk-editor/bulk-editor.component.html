@@ -32,21 +32,18 @@
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill"
         [toggleableItems]="tagsToggleableItems"
         [type]="dropdownTypes.Editing"
-        [showCounts]="!selectionSpansPages"
         (open)="tagsDropdownOpen()"
         (editingComplete)="setTags($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" singular="true"
         [toggleableItems]="correspondentsToggleableItems"
         [type]="dropdownTypes.Editing"
-        [showCounts]="!selectionSpansPages"
         (open)="correspondentsDropdownOpen()"
         (editingComplete)="setCorrespondents($event)">
       </app-filterable-dropdown>
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill" singular="true"
         [toggleableItems]="documentTypesToggleableItems"
         [type]="dropdownTypes.Editing"
-        [showCounts]="!selectionSpansPages"
         (open)="documentTypesDropdownOpen()"
         (editingComplete)="setDocumentTypes($event)">
       </app-filterable-dropdown>
