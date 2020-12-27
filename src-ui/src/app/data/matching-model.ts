@@ -29,4 +29,6 @@ export interface MatchingModel extends ObjectWithId {
 
     is_insensitive?: boolean
 
+    document_count?: number
+
 }
