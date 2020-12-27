@@ -30,8 +30,14 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   @Input()
   dateBefore: string
 
+  @Output()
+  dateBeforeChange = new EventEmitter<string>()
+
   @Input()
   dateAfter: string
+
+  @Output()
+  dateAfterChange = new EventEmitter<string>()
 
   @Input()
   title: string
@@ -83,6 +89,8 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   }
 
   onChange() {
+    this.dateAfterChange.emit(this.dateAfter)
+    this.dateBeforeChange.emit(this.dateBefore)
     this.datesSet.emit({after: this.dateAfter, before: this.dateBefore})
   }
 
@@ -91,12 +99,12 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
   }
 
   clearBefore() {
-    this.dateBefore = null;
+    this.dateBefore = null
     this.onChange()
   }
 
   clearAfter() {
-    this.dateAfter = null;
+    this.dateAfter = null
     this.onChange()
   }
 
