@@ -67,17 +67,11 @@ export class FilterableDropdownComponent {
   @Input()
   singular: boolean = false
 
-  @Input()
-  showRemoveAll: boolean = false
-
   @Output()
   toggle = new EventEmitter()
 
   @Output()
   open = new EventEmitter()
-
-  @Output()
-  removeAll = new EventEmitter()
 
   @Output()
   editingComplete = new EventEmitter()
