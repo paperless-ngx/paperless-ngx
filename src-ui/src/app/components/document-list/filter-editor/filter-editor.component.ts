@@ -3,13 +3,14 @@ import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter, flatMap, mergeMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_RULE_TYPES, FILTER_TITLE } from 'src/app/data/filter-rule-type';
+import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE } from 'src/app/data/filter-rule-type';
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
+import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
 @Component({
   selector: 'app-filter-editor',
@@ -61,7 +62,6 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   @Input()
   set filterRules (value: FilterRule[]) {
-    console.log("SET FILTER RULES")
     value.forEach(rule => {
       switch (rule.rule_type) {
         case FILTER_TITLE:
@@ -79,12 +79,16 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_ADDED_BEFORE:
           this.dateAddedBefore = rule.value
           break
+        case FILTER_HAS_TAG:
+          this.tagSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          break
+        case FILTER_CORRESPONDENT:
+          this.correspondentSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          break
+        case FILTER_DOCUMENT_TYPE:
+          this.documentTypeSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          break
       }
-    })
-
-    this.tagService.getCachedMany(value.filter(v => v.rule_type == FILTER_HAS_TAG).map(rule => +rule.value)).subscribe(tags => {
-      console.log(tags)
-      tags.forEach(tag => this.tagSelectionModel.toggle(tag, false))
     })
   }
 
@@ -92,18 +96,17 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
   updateRules() {
-    console.log("UPDATE RULES!!!")
     let filterRules: FilterRule[] = []
     if (this._titleFilter) {
       filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})
     }
-    this.tagSelectionModel.getSelected().forEach(tag => {
+    this.tagSelectionModel.getSelectedItems().forEach(tag => {
       filterRules.push({rule_type: FILTER_HAS_TAG, value: tag.id.toString()})
     })
-    this.correspondentSelectionModel.getSelected().forEach(correspondent => {
+    this.correspondentSelectionModel.getSelectedItems().forEach(correspondent => {
       filterRules.push({rule_type: FILTER_CORRESPONDENT, value: correspondent.id.toString()})
     })
-    this.documentTypeSelectionModel.getSelected().forEach(documentType => {
+    this.documentTypeSelectionModel.getSelectedItems().forEach(documentType => {
       filterRules.push({rule_type: FILTER_DOCUMENT_TYPE, value: documentType.id.toString()})
     })
     if (this.dateCreatedBefore) {
@@ -118,13 +121,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this.dateAddedAfter) {
       filterRules.push({rule_type: FILTER_ADDED_AFTER, value: this.dateAddedAfter})
     }
-    console.log(filterRules)
     this.filterRulesChange.next(filterRules)
   }
 
   hasFilters() {
     return this._titleFilter || 
-      this.dateCreatedAfter || this.dateAddedBefore || this.dateCreatedAfter || this.dateCreatedBefore ||
+      this.dateAddedAfter || this.dateAddedBefore || this.dateCreatedAfter || this.dateCreatedBefore ||
       this.tagSelectionModel.selectionSize() || this.correspondentSelectionModel.selectionSize() || this.documentTypeSelectionModel.selectionSize()
   }
 
@@ -161,16 +163,26 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   clearSelected() {
     this._titleFilter = ""
+    this.tagSelectionModel.clear(false)
+    this.documentTypeSelectionModel.clear(false)
+    this.correspondentSelectionModel.clear(false)
+    this.dateAddedBefore = null
+    this.dateAddedAfter = null
+    this.dateCreatedBefore = null
+    this.dateCreatedAfter = null
     this.updateRules()
   }
 
   toggleTag(tagId: number) {
+    this.tagSelectionModel.toggle(tagId)
   }
 
   toggleCorrespondent(correspondentId: number) {
+    this.correspondentSelectionModel.toggle(correspondentId)
   }
 
   toggleDocumentType(documentTypeId: number) {
+    this.documentTypeSelectionModel.toggle(documentTypeId)
   }
 
 }
