@@ -8,5 +8,5 @@
     <app-tag *ngIf="isTag; else displayName" [tag]="toggleableItem?.item" [clickable]="true" linkTitle="Filter by tag"></app-tag>
     <ng-template #displayName><small>{{toggleableItem?.item.name}}</small></ng-template>
   </div>
-  <div *ngIf="showCounts" class="badge badge-light rounded-pill ml-auto mr-1">{{toggleableItem?.count}}</div>
+  <div class="badge badge-light rounded-pill ml-auto mr-1">{{toggleableItem?.count}}</div>
 </button>
