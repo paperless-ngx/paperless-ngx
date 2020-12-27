@@ -21,13 +21,19 @@ export enum ToggleableItemState {
 export class ToggleableDropdownButtonComponent {
 
   @Input()
-  toggleableItem: ToggleableItem
+  item: MatchingModel
+
+  @Input()
+  state: ToggleableItemState
+
+  @Input()
+  count: number
 
   @Output()
   toggle = new EventEmitter()
 
   get isTag(): boolean {
-    return 'is_inbox_tag' in this.toggleableItem?.item // ~ this.item instanceof PaperlessTag
+    return 'is_inbox_tag' in this.item
   }
 
   toggleItem(): void {
@@ -35,9 +41,9 @@ export class ToggleableDropdownButtonComponent {
   }
 
   getSelectedIconName() {
-    if (this.toggleableItem?.state == ToggleableItemState.Selected) {
+    if (this.state == ToggleableItemState.Selected) {
       return "check"
-    } else if (this.toggleableItem?.state == ToggleableItemState.PartiallySelected) {
+    } else if (this.state == ToggleableItemState.PartiallySelected) {
       return "dash"
     } else {
       return ""
