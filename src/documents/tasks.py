@@ -94,3 +94,12 @@ def bulk_rename_files(document_ids):
     qs = Document.objects.filter(id__in=document_ids)
     for doc in qs:
         post_save.send(Document, instance=doc, created=False)
+
+
+def bulk_index_documents(document_ids):
+    documents = Document.objects.filter(id__in=document_ids)
+
+    ix = index.open_index()
+    with AsyncWriter(ix) as writer:
+        for doc in documents:
+            index.update_document(writer, doc)

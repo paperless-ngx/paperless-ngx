@@ -1,11 +1,12 @@
 [![Build Status](https://travis-ci.org/jonaswinkler/paperless-ng.svg?branch=master)](https://travis-ci.org/jonaswinkler/paperless-ng)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
+[![Gitter](https://badges.gitter.im/paperless-ng/community.svg)](https://gitter.im/paperless-ng/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
-[![Coverage Status](https://coveralls.io/repos/github/jonaswinkler/paperless-ng/badge.svg?branch=master)](https://coveralls.io/github/jonaswinkler/paperless-ng?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/jonaswinkler/paperless-ng/badge.svg?branch=master)](https://coveralls.io/github/jonaswinkler/paperless-ng?branch=master)  *<sup><-- green badge, yay :)</sup>*
 
 # Paperless-ng
 
-[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and others that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
+[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
 
@@ -39,14 +40,13 @@ Here's what you get:
 	* Auto completion suggests relevant words from your documents.
 	* Results are sorted by relevance to your search query.
 	* Highlighting shows you which parts of the document matched the query.
+	* Searching for similar documents ("More like this")
 * Email processing: Paperless adds documents from your email accounts.
 	* Configure multiple accounts and filters for each account.
 	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
 * Machine learning powered document matching.
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 * A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
-* Code cleanup in many, MANY areas. Some of the code from OG paperless was just overly complicated.
-* More tests, more stability.
 
 If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
 
@@ -54,10 +54,7 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 # Roadmap for 1.0
 
-- **Bulk editing**. Add/remove metadata from multiple documents at once.
-
 - Make the front end nice (except mobile).
-- Test coverage at 90%.
 - Fix whatever bugs I and you find.
 
 ## Roadmap for versions beyond 1.0
@@ -66,19 +63,28 @@ These are things that I want to add to paperless eventually. They are sorted by 
 
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
-  - Ability to search for “Similar documents” in the search results
 - **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
+- **Localization.** I won't translate paperless into any other languages except English and German, however, I'll add the necessary means so that anyone can translate paperless into their favorite language.
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
-	- With live updates ans websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particular happy about.
+	- With live updates and websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particularly happy about.
 	- Notifications when a document was added with buttons to open the new document right away.
 - **Arbitrary tag colors**. Allow the selection of any color with a color picker.
-- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc, .docx documents.
+- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc and .docx documents.
 
 Apart from that, paperless is pretty much feature complete.
 
 ## On the chopping block.
 
 - **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
+
+## Wont-do list.
+
+These features will probably never make it into paperless, since paperless is meant to be an easy to use set-and-forget solution.
+
+- **Document versions.** I might consider adding the ability to update a document with a newer version, but that's about it. The kind of documents that get added to paperless usually don't change at all.
+- **Workflows.** I don't see a use case for these, yet.
+- **Folders.** Tags are superior in just about every way.
+- **Apps / extension support.** Again, paperless is meant to be simple.
 
 # Getting started
 
