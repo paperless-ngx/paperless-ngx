@@ -84,14 +84,14 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
     })
   }
 
-  getObjectName(object: T) {
-    return object.toString()
+  getDeleteMessage(object: T) {
+    return $localize`Do you really want to delete this element?`
   }
 
   openDeleteDialog(object: T) {
     var activeModal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     activeModal.componentInstance.title = $localize`Confirm delete`
-    activeModal.componentInstance.messageBold = $localize`Do you really want to delete ${this.getObjectName(object)}?`
+    activeModal.componentInstance.messageBold = this.getDeleteMessage(object)
     activeModal.componentInstance.message = $localize`Associated documents will not be deleted.`
     activeModal.componentInstance.btnClass = "btn-danger"
     activeModal.componentInstance.btnCaption = $localize`Delete`
