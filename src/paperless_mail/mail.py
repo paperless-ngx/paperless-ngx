@@ -3,9 +3,9 @@ import tempfile
 from datetime import timedelta, date
 
 import magic
+import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
-from django.utils.text import slugify
 from django_q.tasks import async_task
 from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags, \
     MailboxFolderSelectError
@@ -294,7 +294,7 @@ class MailAccountHandler(LoggingMixin):
                 async_task(
                     "documents.tasks.consume_file",
                     path=temp_filename,
-                    override_filename=att.filename,
+                    override_filename=pathvalidate.sanitize_filename(att.filename),  # NOQA: E501
                     override_title=title,
                     override_correspondent_id=correspondent.id if correspondent else None,  # NOQA: E501
                     override_document_type_id=doc_type.id if doc_type else None,  # NOQA: E501

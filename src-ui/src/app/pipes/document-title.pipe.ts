@@ -9,7 +9,7 @@ export class DocumentTitlePipe implements PipeTransform {
     if (value) {
       return value
     } else {
-      return "(no title)"
+      return $localize`(no title)`
     }
   }
 
