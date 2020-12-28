@@ -4,16 +4,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
-import { TagService } from 'src/app/services/rest/tag.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { FilterEditorComponent } from './filter-editor/filter-editor.component';
-import { SelectDialogComponent } from '../common/select-dialog/select-dialog.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
-import { ChangedItems } from './bulk-editor/bulk-editor.component';
 
 @Component({
   selector: 'app-document-list',
@@ -28,10 +23,7 @@ export class DocumentListComponent implements OnInit {
     public route: ActivatedRoute,
     private router: Router,
     private toastService: ToastService,
-    private modalService: NgbModal,
-    private correspondentService: CorrespondentService,
-    private documentTypeService: DocumentTypeService,
-    private tagService: TagService) { }
+    private modalService: NgbModal) { }
 
   @ViewChild("filterEditor")
   private filterEditor: FilterEditorComponent
