@@ -14,7 +14,19 @@ import { ToastService } from 'src/app/services/toast.service';
 export class DocumentTypeEditDialogComponent extends EditDialogComponent<PaperlessDocumentType> {
 
   constructor(service: DocumentTypeService, activeModal: NgbActiveModal, toastService: ToastService) { 
-    super(service, activeModal, toastService, 'document type')
+    super(service, activeModal, toastService)
+  }
+
+  getCreateTitle() {
+    return $localize`Create new document type`
+  }
+
+  getEditTitle() {
+    return $localize`Edit document type`
+  }
+
+  getSaveErrorMessage(error: string) {
+    return $localize`Could not save document type: ${error}`
   }
 
   getForm(): FormGroup {
