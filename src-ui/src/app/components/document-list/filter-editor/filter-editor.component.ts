@@ -25,13 +25,13 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       switch(this.filterRules[0].rule_type) {
 
         case FILTER_CORRESPONDENT:
-          return `Correspondent: ${this.correspondents.find(c => c.id == +rule.value)?.name}`
+          return $localize`Correspondent: ${this.correspondents.find(c => c.id == +rule.value)?.name}`
 
         case FILTER_DOCUMENT_TYPE:
-          return `Type: ${this.documentTypes.find(dt => dt.id == +rule.value)?.name}`
+          return $localize`Type: ${this.documentTypes.find(dt => dt.id == +rule.value)?.name}`
 
         case FILTER_HAS_TAG:
-          return `Tag: ${this.tags.find(t => t.id == +rule.value)?.name}`
+          return $localize`Tag: ${this.tags.find(t => t.id == +rule.value)?.name}`
 
       }
     }

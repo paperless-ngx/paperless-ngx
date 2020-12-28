@@ -15,7 +15,7 @@ export class MetadataCollapseComponent implements OnInit {
   metadata
 
   @Input()
-  title = "Metadata"
+  title = $localize`Metadata`
 
   ngOnInit(): void {
   }

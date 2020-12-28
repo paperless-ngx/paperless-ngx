@@ -4,13 +4,13 @@
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>
-      Select
+      </svg>&nbsp;<ng-container i18n>Select</ng-container>
+      
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
-      <button ngbDropdownItem (click)="list.selectPage()">Select page</button>
-      <button ngbDropdownItem (click)="list.selectAll()">Select all</button>
-      <button ngbDropdownItem (click)="list.selectNone()">Select none</button>
+      <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
+      <button ngbDropdownItem (click)="list.selectPage()" i18n>Select page</button>
+      <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
     </div>
   </div>
 
