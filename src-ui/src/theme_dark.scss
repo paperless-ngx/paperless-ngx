@@ -1,0 +1,232 @@
+$bg-dark-mode: #161618;
+$bg-light-dark-mode: #1c1c1f;
+$text-color-dark-mode: #abb2bf;
+$text-color-dark-mode-accent: lighten($text-color-dark-mode, 10%);
+$border-color-dark-mode: #47494f;
+
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+@mixin dark-mode {
+  background-color: $bg-dark-mode !important;
+  color: $text-color-dark-mode;
+
+  .navbar-brand {
+    color: $text-color-dark-mode;
+  }
+
+  .bg-light {
+    background-color: $bg-light-dark-mode !important;
+
+    a,
+    div {
+      color: $text-color-dark-mode !important;
+    }
+  }
+
+  .border,
+  .border-bottom,
+  .border-left,
+  .border-right {
+    border-color: $border-color-dark-mode !important;
+  }
+
+  .nav-link.active {
+    background-color: $bg-dark-mode;
+    color: $text-color-dark-mode;
+    border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+  }
+
+  .nav-link:hover {
+    border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+  }
+
+  .nav-tabs {
+    border-color: $border-color-dark-mode;
+  }
+
+  .dropdown-menu {
+    background-color: $bg-dark-mode;
+
+    .dropdown-divider {
+      border-color: $border-color-dark-mode;
+    }
+
+    .dropdown-item {
+      color: $text-color-dark-mode;
+
+      &:hover {
+        background-color: $bg-light-dark-mode;
+        color: $text-color-dark-mode;
+      }
+    }
+
+    .dropdown-item.disabled {
+      color: darken($text-color-dark-mode, 20%);
+    }
+  }
+
+  .card {
+    background-color: $bg-light-dark-mode;
+
+    .card-text {
+      color: $text-color-dark-mode;
+    }
+  }
+
+  app-tag .badge {
+    opacity: 0.8;
+    color: $bg-dark-mode !important;
+  }
+
+  .badge-light {
+    background-color: darken($bg-dark-mode, 20%);
+    color: $text-color-dark-mode-accent;
+  }
+
+  .doc-img {
+    background-color: lighten($bg-light-dark-mode, 30%);
+    mix-blend-mode: soft-light;
+  }
+
+  .doc-img-background {
+    background-color: lighten($bg-light-dark-mode, 30%);
+  }
+
+  .doc-img-background-selected {
+    background-color: lighten($bg-light-dark-mode, 35%);
+  }
+
+  .toast {
+    background-color: opacify($bg-light-dark-mode, .85);
+  }
+
+  .toast-header {
+    background-color: opacify($bg-dark-mode, .85);
+  }
+
+  a:hover {
+    color: lighten($primary, 10%);
+  }
+
+  table {
+    background-color: $bg-dark-mode;
+    color: $text-color-dark-mode;
+    border-color: $border-color-dark-mode;
+  }
+
+  .table td,
+  .table th {
+    border-color: $border-color-dark-mode;
+  }
+
+  .table-row-selected {
+    background-color: $bg-light-dark-mode;
+  }
+
+  .close {
+    text-shadow: 0 1px 0 #666;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: darken($primary, 10%);
+    color: $text-color-dark-mode-accent;
+  }
+
+  .btn-outline-secondary {
+    border-color: $border-color-dark-mode;
+    color: $border-color-dark-mode;
+
+    &:hover {
+      background-color: $bg-dark-mode;
+    }
+  }
+
+  .btn-link:hover,
+  .btn-outline-primary:not(:disabled):not(.disabled).active,
+  .btn-outline-primary:not(:disabled):not(.disabled):active,
+  .show > .btn-outline-primary.dropdown-toggle {
+    color: $text-color-dark-mode-accent;
+  }
+
+  .form-control,
+  input,
+  select,
+  textarea {
+    background-color: $bg-dark-mode;
+    color: $text-color-dark-mode;
+    border-color: $border-color-dark-mode;
+
+    &::placeholder {
+      color: $text-color-dark-mode;
+    }
+
+    &:focus {
+      background-color: $bg-light-dark-mode !important;
+      color: darken($text-color-dark-mode, 10%) !important;
+    }
+  }
+
+  .ng-select-container,
+  .ng-select.ng-select-opened > .ng-select-container,
+  .ng-dropdown-panel,
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    background-color: $bg-dark-mode;
+    color: $text-color-dark-mode;
+    border-color: $border-color-dark-mode;
+
+    input:focus {
+      background-color: $bg-dark-mode !important;
+    }
+  }
+
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover {
+    background-color: $bg-light-dark-mode;
+  }
+
+  .custom-control-label:before {
+    background-color: $bg-dark-mode;
+    color: $text-color-dark-mode;
+  }
+
+  .custom-control-input:checked ~ .custom-control-label::before {
+    color: $text-color-dark-mode-accent;
+  }
+
+  .input-group-text {
+    color: $text-color-dark-mode;
+    background-color: $bg-light-dark-mode;
+    border-color: $border-color-dark-mode;
+  }
+
+  .list-group-item {
+    color: $text-color-dark-mode;
+    background-color: $bg-light-dark-mode;
+    border-color: $border-color-dark-mode;
+  }
+
+  .page-item.disabled .page-link {
+    background-color: $bg-dark-mode;
+    border-color: $border-color-dark-mode;
+  }
+
+  .list-group-item,
+  .page-link {
+    background-color: $bg-light-dark-mode;
+    border-color: $border-color-dark-mode;
+  }
+
+  .page-item.active .page-link {
+    border-color: $border-color-dark-mode;
+    color: $text-color-dark-mode-accent;
+  }
+}
+
+body.dark-mode {
+  @include dark-mode;
+}
+@media (prefers-color-scheme: dark) {
+  body.dark-mode-preferred {
+    @include dark-mode;
+  }
+}
