@@ -4,6 +4,7 @@ dist: focal
 os: linux
 
 stages:
+ - name: test
  - name: build_docker
    if: branch =~ /^(master|dev|ng-.*)$/
  - name: publish_manifest
@@ -12,21 +13,26 @@ stages:
 jobs:
   include:
     - name: "Paperless on Python 3.6"
+      stage: test
       python: "3.6"
 
     - name: "Paperless on Python 3.7"
+      stage: test
       python: "3.7"
 
     - name: "Paperless on Python 3.8"
+      stage: test
       python: "3.8"
 
     - name: "Documentation"
+      stage: test
       script:
         - cd docs/
         - make html
       after_success: true
 
     - name: "Front end"
+      stage: test
       language: node_js
       node_js:
         - 15
