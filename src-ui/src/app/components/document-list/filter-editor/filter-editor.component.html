@@ -8,9 +8,9 @@
   <div class="w-100 d-xl-none"></div>
    <div class="col col-xl-auto mb-2 mb-xl-0">
      <div class="d-flex">
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="tags" [(selectionModel)]="tagSelectionModel" (selectionModelChange)="updateRules()" [multiple]="true" title="Tags" icon="tag-fill" i18n-title></app-filterable-dropdown>
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="correspondents" [(selectionModel)]="correspondentSelectionModel" (selectionModelChange)="updateRules()" title="Correspondents" icon="person-fill" i18n-title></app-filterable-dropdown>
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [(selectionModel)]="documentTypeSelectionModel" (selectionModelChange)="updateRules()" title="Document types" icon="file-earmark-fill" i18n-title></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="tags" [(selectionModel)]="tagSelectionModel" (selectionModelChange)="updateRules()" [multiple]="true" [allowSelectNone]="true" title="Tags" icon="tag-fill" i18n-title></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="correspondents" [(selectionModel)]="correspondentSelectionModel" (selectionModelChange)="updateRules()" [allowSelectNone]="true" title="Correspondents" icon="person-fill" i18n-title></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [(selectionModel)]="documentTypeSelectionModel" (selectionModelChange)="updateRules()" [allowSelectNone]="true" title="Document types" icon="file-earmark-fill" i18n-title></app-filterable-dropdown>
        <app-date-dropdown class="mr-2 mr-md-3" [(dateBefore)]="dateCreatedBefore" [(dateAfter)]="dateCreatedAfter" title="Created" (datesSet)="updateRules()" i18n-title></app-date-dropdown>
        <app-date-dropdown [(dateBefore)]="dateAddedBefore" [(dateAfter)]="dateAddedAfter" title="Added"  (datesSet)="updateRules()" i18n-title></app-date-dropdown>
      </div>
