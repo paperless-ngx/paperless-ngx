@@ -196,7 +196,9 @@ export class FilterableDropdownComponent {
       setTimeout(() => {
         this.listFilterTextInput.nativeElement.focus();
       }, 0)
-      this.selectionModel.reset()
+      if (this.editing) {
+        this.selectionModel.reset()
+      }
       this.open.next()
     } else {
       this.filterText = ''
@@ -204,12 +206,14 @@ export class FilterableDropdownComponent {
   }
 
   listFilterEnter(): void {
-    // let filtered = this.filterPipe.transform(this.toggleableItems, this.filterText)
-    // if (filtered.length == 1) {
-    //   let toggleableItem = this.toggleableItems.find(ti => ti.item.id == filtered[0].item.id)
-    //   if (toggleableItem) toggleableItem.state = ToggleableItemState.Selected
-    //   this.toggleItem(filtered[0])
-    //   this.dropdown.close()
-    // }
+    let filtered = this.filterPipe.transform(this.items, this.filterText)
+    if (filtered.length == 1) {
+      this.selectionModel.toggle(filtered[0].id)
+      if (this.editing) {
+        this.applyClicked()
+      } else {
+        this.dropdown.close()
+      }
+    }
   }
 }
