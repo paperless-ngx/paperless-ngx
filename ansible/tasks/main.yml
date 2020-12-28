@@ -81,11 +81,11 @@
     state: started
   when: paperlessng_redis_host == 'localhost' or paperlessng_redis_host == '127.0.0.1'
 
-- name: create paperless group
+- name: create paperless system group
   group:
     name: "{{ paperlessng_system_group }}"
 
-- name: create paperless user
+- name: create paperless system user
   user:
     name: "{{ paperlessng_system_user }}"
     groups:
@@ -105,30 +105,9 @@
 - name: backup current paperless-ng installation
   copy:
     src: "{{ paperlessng_directory }}"
-    dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
     remote_src: yes
+    dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
   when: '"No such file or directory" not in paperlessng_current_version.stderr and paperlessng_current_version.stdout != paperlessng_version | string'
-
-- name: download paperless-ng
-  get_url:
-    url: "https://github.com/jonaswinkler/paperless-ng/releases/download/ng-{{ paperlessng_version }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
-    dest: /opt/paperless-ng-{{ paperlessng_version }}.tar.xz
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
-
-- name: create paperless-ng directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ paperlessng_system_user }}"
-    group: "{{ paperlessng_system_group }}"
-    mode: 0750
-    recurse: yes
-  with_items:
-    - "{{ paperlessng_directory }}"
-    - "{{ paperlessng_consumption_dir }}"
-    - "{{ paperlessng_data_dir }}"
-    - "{{ paperlessng_media_root }}"
-    - "{{ paperlessng_static_dir }}"
 
 - name: create temporary directory
   tempfile:
@@ -138,16 +117,28 @@
 
 - name: extract paperless-ng
   unarchive:
-    src: /opt/paperless-ng-{{ paperlessng_version }}.tar.xz
-    dest: "{{ tempdir.path }}"
+    src: "https://github.com/jonaswinkler/paperless-ng/releases/download/ng-{{ paperlessng_version }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
     remote_src: yes
+    dest: "{{ tempdir.path }}"
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: change permissions of paperless-ng
+  command:
+    cmd: "{{ item }}"
+  with_items:
+  - "find {{ tempdir.path }} -type d -exec chmod 0750 {} ;"
+  - "find {{ tempdir.path }} -type f -exec chmod 0640 {} ;"
   when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
 
 - name: move paperless-ng
-  command:
-    cmd: "cp -R {{ tempdir.path }}/paperless-ng/. {{ paperlessng_directory }}"
-  args:
-    warn: false
+  copy:
+    src: "{{ tempdir.path }}/paperless-ng/"
+    remote_src: yes
+    dest: "{{ paperlessng_directory }}"
+    owner: "{{ paperlessng_system_user }}"
+    group: "{{ paperlessng_system_group }}"
+    mode: preserve
+    directory_mode: preserve
   when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
 
 - name: remove temporary directory
@@ -155,6 +146,20 @@
     path: "{{ tempdir.path }}"
     state: absent
   when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: create paperless-ng directories and set permissions
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ paperlessng_system_user }}"
+    group: "{{ paperlessng_system_group }}"
+    mode: "750"
+  with_items:
+    - "{{ paperlessng_directory }}"  # ansible `copy:` does not set correct permissions on `dest:` for recursive copies
+    - "{{ paperlessng_consumption_dir }}"
+    - "{{ paperlessng_data_dir }}"
+    - "{{ paperlessng_media_root }}"
+    - "{{ paperlessng_static_dir }}"
 
 - name: configure paperless-ng
   lineinfile:
@@ -176,10 +181,10 @@
       line: "PAPERLESS_FILENAME_FORMAT={{ paperlessng_filename_format }}"
     - regexp: "^#?PAPERLESS_OCR_LANGUAGE="
       line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
-    - regexp: "^#PAPERLESS_OCR_USER_ARG="
-      # TODO JSON dict required in conf?
-      # https://paperless-ng.readthedocs.io/en/latest/configuration.html#ocr-settings
-      line: "PAPERLESS_OCR_USER_ARG=\"{{ paperlessng_ocrmypdf_args }}{{ ' --jbig2-lossy' if  paperlessng_use_jbig2enc else '' }}\""
+    # - regexp: "^#PAPERLESS_OCR_USER_ARG="
+    #   # TODO JSON dict required in conf
+    #   # https://paperless-ng.readthedocs.io/en/latest/configuration.html#ocr-settings
+    #   line: "PAPERLESS_OCR_USER_ARG=\"{{ paperlessng_ocrmypdf_args }}{{ ' --jbig2-lossy' if  paperlessng_use_jbig2enc else '' }}\""
     - regexp: "^#?PAPERLESS_TIME_ZONE="
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
   no_log: true
@@ -211,29 +216,45 @@
   no_log: true
 
 - name: create paperlessng venv
+  become: yes
+  become_user: "{{ paperlessng_system_user }}"
   command:
     cmd: "python3 -m virtualenv {{ paperlessng_virtualenv }} -p /usr/bin/python3"
     creates: "{{ paperlessng_virtualenv }}"
+  register: venv
 
 - name: install paperlessng requirements
+  become: yes
+  become_user: "{{ paperlessng_system_user }}"
   pip:
     requirements: "{{ paperlessng_directory }}/requirements.txt"
-    virtualenv: "{{ paperlessng_virtualenv }}"
+    executable: "{{ paperlessng_virtualenv }}/bin/pip3"
     extra_args: --upgrade
+  when: paperlessng_current_version.stdout != paperlessng_version | string
 
 - name: collect static files
+  become: yes
+  become_user: "{{ paperlessng_system_user }}"
   command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py collectstatic --no-input"
   args:
     chdir: "{{ paperlessng_directory }}/src"
+  when: paperlessng_current_version.stdout != paperlessng_version | string
+  register: static_files
+  changed_when: "'188 unmodified' not in static_files.stdout"
 
 - name: create database schema
+  become: yes
+  become_user: "{{ paperlessng_system_user }}"
   command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py migrate"
   args:
     chdir: "{{ paperlessng_directory }}/src"
+  when: paperlessng_current_version.stdout != paperlessng_version | string
   register: database_schema
   changed_when: '"No migrations to apply." not in database_schema.stdout'
 
-- name: create first paperless user
+- name: configure paperless superuser
+  become: yes
+  become_user: "{{ paperlessng_system_user }}"
   # "manage.py createsuperuser" only works on interactive TTYs
   command: |
     {{ paperlessng_virtualenv }}/bin/python3 manage.py shell -c "
@@ -264,6 +285,16 @@
   register: superuser
   changed_when: superuser.stdout == 'changed'
   no_log: true
+
+- name: set ownership and permissions on paperlessng venv
+  file:
+    path: "{{ paperlessng_virtualenv }}"
+    state: directory
+    recurse: yes
+    owner: "{{ paperlessng_system_user }}"
+    group: "{{ paperlessng_system_group }}"
+    mode: g-w,o-rwx
+  when: venv.changed or paperlessng_current_version.stdout != paperlessng_version | string
 
 - name: configure ghostscript for PDF
   lineinfile:
@@ -325,8 +356,8 @@
 - name: copy systemd services
   copy:
     src: "{{ paperlessng_directory }}/scripts/{{ item }}"
-    dest: "/etc/systemd/system/{{ item }}"
     remote_src: yes
+    dest: "/etc/systemd/system/{{ item }}"
   with_items:
     - paperless-consumer.service
     - paperless-scheduler.service
