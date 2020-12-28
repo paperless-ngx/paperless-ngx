@@ -14,7 +14,7 @@ export class ConfirmDialogComponent implements OnInit {
   public confirmClicked = new EventEmitter()
 
   @Input()
-  title = "Confirmation"
+  title = $localize`Confirmation`
 
   @Input()
   messageBold
@@ -26,7 +26,7 @@ export class ConfirmDialogComponent implements OnInit {
   btnClass = "btn-primary"
 
   @Input()
-  btnCaption = "Confirm"
+  btnCaption = $localize`Confirm`
 
   confirmButtonEnabled = true
   seconds = 0

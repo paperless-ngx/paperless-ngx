@@ -30,6 +30,7 @@ RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
 		curl \
+		fonts-liberation \
 		ghostscript \
 		gnupg \
 		icc-profiles-free \
@@ -93,6 +94,7 @@ RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
 
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
+EXPOSE 8000
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"

@@ -24,7 +24,7 @@ export class DashboardComponent implements OnInit {
     } else if (tagUsername && tagUsername.content) {
       return tagUsername.content
     } else {
-      return "null"
+      return null
     }
   }
 

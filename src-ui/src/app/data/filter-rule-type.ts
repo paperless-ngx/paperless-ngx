@@ -25,8 +25,8 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
 
   {id: FILTER_ASN, name: "ASN is", filtervar: "archive_serial_number", datatype: "number", multi: false},
 
-  {id: FILTER_CORRESPONDENT, name: "Correspondent is", filtervar: "correspondent__id", datatype: "correspondent", multi: false},
-  {id: FILTER_DOCUMENT_TYPE, name: "Document type is", filtervar: "document_type__id", datatype: "document_type", multi: false},
+  {id: FILTER_CORRESPONDENT, name: "Correspondent is", filtervar: "correspondent__id", isnull_filtervar: "correspondent__isnull", datatype: "correspondent", multi: false},
+  {id: FILTER_DOCUMENT_TYPE, name: "Document type is", filtervar: "document_type__id", isnull_filtervar: "document_type__isnull", datatype: "document_type", multi: false},
 
   {id: FILTER_IS_IN_INBOX, name: "Is in Inbox", filtervar: "is_in_inbox", datatype: "boolean", multi: false, default: true},
   {id: FILTER_HAS_TAG, name: "Has tag", filtervar: "tags__id__all", datatype: "tag", multi: true},
@@ -51,6 +51,7 @@ export interface FilterRuleType {
   id: number
   name: string
   filtervar: string
+  isnull_filtervar?: string
   datatype: string //number, string, boolean, date
   multi: boolean
   default?: any
