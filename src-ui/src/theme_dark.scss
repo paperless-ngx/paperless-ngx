@@ -93,13 +93,15 @@ $border-color-dark-mode: #47494f;
 
   .doc-img-container {
     border: none !important;
+    border-radius: .25rem;
+    overflow: hidden;
   }
 
   .doc-img {
     mix-blend-mode: normal;
     filter: invert(95%) hue-rotate(180deg);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-color: $border-color-dark-mode;
+    border-radius: 0;
   }
 
   .card-selected .doc-img {
