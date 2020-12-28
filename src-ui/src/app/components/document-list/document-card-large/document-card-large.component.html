@@ -1,7 +1,7 @@
 <div class="card mb-3 bg-light shadow-sm" [class.card-selected]="selected" [class.document-card]="selectable">
   <div class="row no-gutters">
-    <div class="col-md-2 d-none d-lg-block doc-img-background" [class.doc-img-background-selected]="selected">
-      <img [src]="getThumbUrl()" class="card-img doc-img border-right" (click)="setSelected(selectable ? !selected : false)">
+    <div class="col-md-2 d-none d-lg-block doc-img-background rounded-left" [class.doc-img-background-selected]="selected">
+      <img [src]="getThumbUrl()" class="card-img doc-img border-right rounded-left" (click)="setSelected(selectable ? !selected : false)">
 
       <div style="top: 0; left: 0" class="position-absolute border-right border-bottom bg-light p-1" [class.document-card-check]="!selected">
         <div class="custom-control custom-checkbox">
@@ -55,16 +55,16 @@
                 <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
               </svg>&nbsp;<ng-container i18n>Download</ng-container>
             </a>
-            
+
           </div>
 
           <small class="text-muted ml-auto" i18n>Score:</small>
 
           <ngb-progressbar *ngIf="searchScore" [type]="searchScoreClass" [value]="searchScore" class="search-score-bar mx-2" [max]="1"></ngb-progressbar>
-          
+
           <small class="text-muted" i18n>Created: {{document.created | date}}</small>
         </div>
-        
+
       </div>
     </div>
   </div>
