@@ -420,7 +420,7 @@ class SelectionDataView(APIView):
                 "id": t.id,
                 "document_count": t.document_count
             } for t in tags],
-            "selected_types": [{
+            "selected_document_types": [{
                 "id": t.id,
                 "document_count": t.document_count
             } for t in types]
