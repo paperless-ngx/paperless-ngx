@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { AbstractPaperlessService } from './abstract-paperless-service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Results } from 'src/app/data/results';
 import { FilterRule } from 'src/app/data/filter-rule';
@@ -21,6 +21,17 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'added', name: $localize`Added` },
   { field: 'modified', name: $localize`Modified` }
 ]
+
+export interface SelectionDataItem {
+  id: number
+  document_count: number
+}
+
+export interface SelectionData {
+  selected_correspondents: SelectionDataItem[]
+  selected_tags: SelectionDataItem[]
+  selected_document_types: SelectionDataItem[]
+}
 
 @Injectable({
   providedIn: 'root'
@@ -112,6 +123,10 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
       'method': method,
       'parameters': args
     })
+  }
+
+  getSelectionData(ids: number[]): Observable<SelectionData> {
+    return this.http.post<SelectionData>(this.getResourceUrl(null, 'selection_data'), {"documents": ids})
   }
 
 }

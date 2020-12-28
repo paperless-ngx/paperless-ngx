@@ -699,49 +699,63 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
         bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], self.c2.id)
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 3)
-        self.assertEqual(self.async_task.call_count, 2)
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc1.id, self.doc2.id])
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc1.id, self.doc2.id])
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs['document_ids'], [self.doc1.id, self.doc2.id])
 
     def test_unset_correspondent(self):
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
         bulk_edit.set_correspondent([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 0)
-        self.assertEqual(self.async_task.call_count, 2)
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc2.id, self.doc3.id])
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc2.id, self.doc3.id])
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs['document_ids'], [self.doc2.id, self.doc3.id])
 
     def test_set_document_type(self):
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
         bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], self.dt2.id)
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 3)
-        self.assertEqual(self.async_task.call_count, 2)
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc1.id, self.doc2.id])
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc1.id, self.doc2.id])
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs['document_ids'], [self.doc1.id, self.doc2.id])
 
     def test_unset_document_type(self):
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 1)
         bulk_edit.set_document_type([self.doc1.id, self.doc2.id, self.doc3.id], None)
         self.assertEqual(Document.objects.filter(document_type=self.dt2).count(), 0)
-        self.assertEqual(self.async_task.call_count, 2)
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc2.id, self.doc3.id])
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc2.id, self.doc3.id])
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs['document_ids'], [self.doc2.id, self.doc3.id])
 
     def test_add_tag(self):
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
         bulk_edit.add_tag([self.doc1.id, self.doc2.id, self.doc3.id, self.doc4.id], self.t1.id)
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 4)
-        self.assertEqual(self.async_task.call_count, 2)
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc1.id, self.doc3.id])
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc1.id, self.doc3.id])
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs['document_ids'], [self.doc1.id, self.doc3.id])
 
     def test_remove_tag(self):
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)
         bulk_edit.remove_tag([self.doc1.id, self.doc3.id, self.doc4.id], self.t1.id)
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 1)
-        self.assertEqual(self.async_task.call_count, 2)
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc4.id])
-        self.assertCountEqual(self.async_task.call_args_list[0][1]['document_ids'], [self.doc4.id])
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        self.assertCountEqual(kwargs['document_ids'], [self.doc4.id])
+
+    def test_modify_tags(self):
+        tag_unrelated = Tag.objects.create(name="unrelated")
+        self.doc2.tags.add(tag_unrelated)
+        self.doc3.tags.add(tag_unrelated)
+        bulk_edit.modify_tags([self.doc2.id, self.doc3.id], add_tags=[self.t2.id], remove_tags=[self.t1.id])
+
+        self.assertCountEqual(list(self.doc2.tags.all()), [self.t2, tag_unrelated])
+        self.assertCountEqual(list(self.doc3.tags.all()), [self.t2, tag_unrelated])
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+        # TODO: doc3 should not be affected, but the query for that is rather complicated
+        self.assertCountEqual(kwargs['document_ids'], [self.doc2.id, self.doc3.id])
 
     def test_delete(self):
         self.assertEqual(Document.objects.count(), 5)

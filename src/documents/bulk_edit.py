@@ -1,3 +1,5 @@
+import itertools
+
 from django.db.models import Q
 from django_q.tasks import async_task
 from whoosh.writing import AsyncWriter
@@ -16,11 +18,7 @@ def set_correspondent(doc_ids, correspondent):
     qs.update(correspondent=correspondent)
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
@@ -35,11 +33,7 @@ def set_document_type(doc_ids, document_type):
     qs.update(document_type=document_type)
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
@@ -57,11 +51,7 @@ def add_tag(doc_ids, tag):
     ])
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
@@ -79,11 +69,29 @@ def remove_tag(doc_ids, tag):
     ).delete()
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+    return "OK"
+
+
+def modify_tags(doc_ids, add_tags, remove_tags):
+    qs = Document.objects.filter(id__in=doc_ids)
+    affected_docs = [doc.id for doc in qs]
+
+    DocumentTagRelationship = Document.tags.through
+
+    DocumentTagRelationship.objects.filter(
+        document_id__in=affected_docs,
+        tag_id__in=remove_tags,
+    ).delete()
+
+    DocumentTagRelationship.objects.bulk_create([DocumentTagRelationship(
+        document_id=doc, tag_id=tag) for (doc, tag) in itertools.product(
+        affected_docs, add_tags)
+    ], ignore_conflicts=True)
+
+    async_task(
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 

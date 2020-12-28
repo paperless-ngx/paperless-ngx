@@ -15,10 +15,10 @@ export class SelectDialogComponent implements OnInit {
   public selectClicked = new EventEmitter()
 
   @Input()
-  title = "Select"
+  title = $localize`Select`
 
   @Input()
-  message = "Please select an object"
+  message = $localize`Please select an object`
 
   @Input()
   objects: ObjectWithId[] = []
