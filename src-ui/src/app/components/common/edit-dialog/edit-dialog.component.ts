@@ -13,8 +13,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
   constructor(
     private service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
-    private toastService: ToastService,
-    private entityName: string) { }
+    private toastService: ToastService) { }
 
   @Input()
   dialogMode: string = 'create'
@@ -35,12 +34,24 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
     }
   }
 
+  getCreateTitle() {
+    return $localize`Create new item`
+  }
+
+  getEditTitle() {
+    return $localize`Edit item`
+  }
+
+  getSaveErrorMessage(error: string) {
+    return $localize`Could not save element: ${error}`
+  }
+
   getTitle() {
     switch (this.dialogMode) {
       case 'create':
-        return "Create new " + this.entityName
+        return this.getCreateTitle()
       case 'edit':
-        return "Edit " + this.entityName
+        return this.getEditTitle()
       default:
         break;
     }
@@ -66,7 +77,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       this.activeModal.close()
       this.success.emit(result)
     }, error => {
-      this.toastService.showError($localize`Could not save ${this.entityName}: ${error.error.name}`)
+      this.toastService.showError(this.getSaveErrorMessage(error.error.name))
     })
   }
 
