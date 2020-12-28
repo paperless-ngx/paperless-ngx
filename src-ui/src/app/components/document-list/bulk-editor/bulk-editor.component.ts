@@ -147,7 +147,7 @@ export class BulkEditorComponent {
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = $localize`Confirm`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent?.id}).subscribe(
+      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
         response => {
           this.correspondentService.clearCache()
           modal.close()
@@ -170,7 +170,7 @@ export class BulkEditorComponent {
     modal.componentInstance.btnClass = "btn-warning"
     modal.componentInstance.btnCaption = $localize`Confirm`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_document_type', {"document_type": documentType?.id}).subscribe(
+      this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
         response => {
           this.documentService.clearCache()
           modal.close()
