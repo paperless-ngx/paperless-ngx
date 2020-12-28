@@ -22,9 +22,10 @@ export class DocumentTypeListComponent extends GenericListComponent<PaperlessDoc
     super(service, modalService, DocumentTypeEditDialogComponent)
   }
 
-  getObjectName(object: PaperlessDocumentType) {
-    return `document type '${object.name}'`
+  getDeleteMessage(object: PaperlessDocumentType) {
+    return $localize`Do you really want to delete the document type ${object.name}?`
   }
+
 
   filterDocuments(object: PaperlessDocumentType) {
     this.list.documentListView.filter_rules = [
