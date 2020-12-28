@@ -9,6 +9,7 @@ RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
 		curl \
+		file \
 		fonts-liberation \
 		ghostscript \
 		gnupg \
