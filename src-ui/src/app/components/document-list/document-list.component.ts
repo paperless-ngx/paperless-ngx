@@ -81,7 +81,7 @@ export class DocumentListComponent implements OnInit {
 
   saveViewConfig() {
     this.savedViewService.update(this.list.savedView).subscribe(result => {
-      this.toastService.showToast(Toast.make("Information", $localize`View "${this.list.savedView.name}" saved successfully.`))
+      this.toastService.showInfo($localize`View "${this.list.savedView.name}" saved successfully.`)
     })
 
   }
@@ -100,7 +100,7 @@ export class DocumentListComponent implements OnInit {
       }
       this.savedViewService.create(savedView).subscribe(() => {
         modal.close()
-        this.toastService.showToast(Toast.make("Information", $localize`View "${savedView.name}" created successfully.`))
+        this.toastService.showInfo($localize`View "${savedView.name}" created successfully.`)
       })
     })
   }
