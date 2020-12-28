@@ -8,7 +8,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_TAG, FILTER_TITLE } from 'src/app/data/filter-rule-type';
+import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE } from 'src/app/data/filter-rule-type';
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
@@ -100,14 +100,18 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this._titleFilter) {
       filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})
     }
-    this.tagSelectionModel.getSelectedItems().forEach(tag => {
-      filterRules.push({rule_type: FILTER_HAS_TAG, value: tag.id.toString()})
-    })
+    if (this.tagSelectionModel.isNoneSelected()) {
+      filterRules.push({rule_type: FILTER_HAS_ANY_TAG, value: "false"})
+    } else {
+      this.tagSelectionModel.getSelectedItems().filter(tag => tag.id).forEach(tag => {
+        filterRules.push({rule_type: FILTER_HAS_TAG, value: tag.id?.toString()})
+      })  
+    }
     this.correspondentSelectionModel.getSelectedItems().forEach(correspondent => {
-      filterRules.push({rule_type: FILTER_CORRESPONDENT, value: correspondent.id.toString()})
+      filterRules.push({rule_type: FILTER_CORRESPONDENT, value: correspondent.id?.toString()})
     })
     this.documentTypeSelectionModel.getSelectedItems().forEach(documentType => {
-      filterRules.push({rule_type: FILTER_DOCUMENT_TYPE, value: documentType.id.toString()})
+      filterRules.push({rule_type: FILTER_DOCUMENT_TYPE, value: documentType.id?.toString()})
     })
     if (this.dateCreatedBefore) {
       filterRules.push({rule_type: FILTER_CREATED_BEFORE, value: this.dateCreatedBefore})
