@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: debian_buster
+    image: jrei/systemd-debian:10
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    override_command: False
+  # debian 9 stretch only has Python 3.5 which is EOL and breaks multiple dependencies
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
