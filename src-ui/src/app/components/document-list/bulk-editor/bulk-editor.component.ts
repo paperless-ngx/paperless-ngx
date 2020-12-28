@@ -14,6 +14,7 @@ import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component';
 import { ChangedItems, FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
+import { MatchingModel } from 'src/app/data/matching-model';
 
 @Component({
   selector: 'app-bulk-editor',
@@ -88,15 +89,40 @@ export class BulkEditorComponent {
     })
   }
 
+  private _localizeList(items: MatchingModel[]) {
+    if (items.length == 0) {
+      return ""
+    } else if (items.length == 1) {
+      return items[0].name
+    } else if (items.length == 2) {
+      return $localize`${items[0].name} and ${items[1].name}`
+    } else {
+      let list = items.slice(0, items.length - 1).map(i => i.name).join($localize`, `)
+      return $localize`${list} and ${items[items.length - 1].name}`
+    }
+  }
+
   setTags(changedTags: ChangedItems) {
     if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 0) return
 
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Tags Assignment"
-   
-    modal.componentInstance.message = `This operation will modify some tags on all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.title = $localize`Confirm tags assignment`
+    if (changedTags.itemsToAdd.length == 1 && changedTags.itemsToRemove.length == 0) {
+      let tag = changedTags.itemsToAdd[0]
+      modal.componentInstance.message = $localize`This operation will add the tag ${tag.name} to all ${this.list.selected.size} selected document(s).`
+    } else if (changedTags.itemsToAdd.length > 1 && changedTags.itemsToRemove.length == 0) {
+      modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} to all ${this.list.selected.size} selected document(s).`
+    } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 1) {
+      let tag = changedTags.itemsToAdd[0]
+      modal.componentInstance.message = $localize`This operation will remove the tag ${tag.name} from all ${this.list.selected.size} selected document(s).`
+    } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length > 1) {
+      modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(changedTags.itemsToRemove)} from all ${this.list.selected.size} selected document(s).`
+    } else {
+      modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} and remove the tags ${this._localizeList(changedTags.itemsToRemove)} on all ${this.list.selected.size} selected document(s).`
+    }
+    
     modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.btnCaption = $localize`Confirm`
     modal.componentInstance.confirmClicked.subscribe(() => {
       this.executeBulkOperation('modify_tags', {"add_tags": changedTags.itemsToAdd.map(t => t.id), "remove_tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
         response => {
@@ -111,18 +137,17 @@ export class BulkEditorComponent {
     if (changedCorrespondents.itemsToAdd.length == 0 && changedCorrespondents.itemsToRemove.length == 0) return
 
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Correspondent Assignment"
-    let correspondent
-    let messageFragment = 'remove all correspondents from'
-    if (changedCorrespondents && changedCorrespondents.itemsToAdd.length > 0) {
-      correspondent = changedCorrespondents.itemsToAdd[0]
-      messageFragment = `assign the correspondent ${correspondent.name} to`
+    modal.componentInstance.title = $localize`Confirm correspondent assignment`
+    let correspondent = changedCorrespondents.itemsToAdd.length > 0 ? changedCorrespondents.itemsToAdd[0] : null
+    if (correspondent) {
+      modal.componentInstance.message = $localize`This operation will assign the correspondent ${correspondent.name} to all ${this.list.selected.size} selected document(s).`
+    } else {
+      modal.componentInstance.message = $localize`This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
     }
-    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
     modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.btnCaption = $localize`Confirm`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
+      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent?.id}).subscribe(
         response => {
           this.correspondentService.clearCache()
           modal.close()
@@ -135,18 +160,17 @@ export class BulkEditorComponent {
     if (changedDocumentTypes.itemsToAdd.length == 0 && changedDocumentTypes.itemsToRemove.length == 0) return
 
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = "Confirm Document Type Assignment"
-    let documentType
-    let messageFragment = 'remove all document types from'
-    if (changedDocumentTypes && changedDocumentTypes.itemsToAdd.length > 0) {
-      documentType = changedDocumentTypes.itemsToAdd[0]
-      messageFragment = `assign the document type ${documentType.name} to`
+    modal.componentInstance.title = $localize`Confirm document type assignment`
+    let documentType = changedDocumentTypes.itemsToAdd.length > 0 ? changedDocumentTypes.itemsToAdd[0] : null
+    if (documentType) {
+      modal.componentInstance.message = $localize`This operation will assign the document type ${documentType.name} to all ${this.list.selected.size} selected document(s).`
+    } else {
+      modal.componentInstance.message = $localize`This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
     }
-    modal.componentInstance.message = `This operation will ${messageFragment} all ${this.list.selected.size} selected document(s).`
     modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = "Confirm"
+    modal.componentInstance.btnCaption = $localize`Confirm`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
+      this.executeBulkOperation('set_document_type', {"document_type": documentType?.id}).subscribe(
         response => {
           this.documentService.clearCache()
           modal.close()
@@ -158,11 +182,11 @@ export class BulkEditorComponent {
   applyDelete() {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.delayConfirm(5)
-    modal.componentInstance.title = "Delete confirm"
-    modal.componentInstance.messageBold = `This operation will permanently delete all ${this.list.selected.size} selected document(s).`
-    modal.componentInstance.message = `This operation cannot be undone.`
+    modal.componentInstance.title = $localize`Delete confirm`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = "btn-danger"
-    modal.componentInstance.btnCaption = "Delete document(s)"
+    modal.componentInstance.btnCaption = $localize`Delete document(s)`
     modal.componentInstance.confirmClicked.subscribe(() => {
       this.executeBulkOperation("delete", {}).subscribe(
         response => {
