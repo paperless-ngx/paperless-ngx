@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2  } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { GENERAL_SETTINGS } from 'src/app/data/storage-keys';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
+import { AppViewService } from 'src/app/services/app-view.service';
 
 @Component({
   selector: 'app-settings',
@@ -17,16 +18,23 @@ export class SettingsComponent implements OnInit {
 
   settingsForm = new FormGroup({
     'documentListItemPerPage': new FormControl(+localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT),
+    'darkModeUseSystem': new FormControl(
+      localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM) == undefined ? GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM_DEFAULT : JSON.parse(localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM))
+    ),
+    'darkModeEnabled': new FormControl(
+      localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_ENABLED) == undefined ? GENERAL_SETTINGS.DARK_MODE_ENABLED_DEFAULT : JSON.parse(localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_ENABLED))
+    ),
     'savedViews': this.savedViewGroup
   })
+
+  savedViews: PaperlessSavedView[]
 
   constructor(
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private appViewService: AppViewService
   ) { }
-
-  savedViews: PaperlessSavedView[]
 
   ngOnInit() {
     this.savedViewService.listAll().subscribe(r => {
@@ -50,9 +58,20 @@ export class SettingsComponent implements OnInit {
     })
   }
 
+  toggleDarkModeSetting() {
+    if (this.settingsForm.value.darkModeUseSystem) {
+      (this.settingsForm.controls.darkModeEnabled as FormControl).disable()
+    } else {
+      (this.settingsForm.controls.darkModeEnabled as FormControl).enable()
+    }
+  }
+
   private saveLocalSettings() {
     localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
+    localStorage.setItem(GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
+    localStorage.setItem(GENERAL_SETTINGS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
     this.documentListViewService.updatePageSize()
+    this.appViewService.updateDarkModeSettings()
     this.toastService.showToast(Toast.make("Information", $localize`Settings saved successfully.`))
   }
 
