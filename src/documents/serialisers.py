@@ -230,17 +230,20 @@ class BulkEditSerializer(serializers.Serializer):
         if not type(documents) == list:
             raise serializers.ValidationError(f"{name} must be a list")
         if not all([type(i) == int for i in documents]):
-            raise serializers.ValidationError(f"{name} must be a list of integers")
+            raise serializers.ValidationError(
+                f"{name} must be a list of integers")
         count = Document.objects.filter(id__in=documents).count()
         if not count == len(documents):
             raise serializers.ValidationError(
-                f"Some documents in {name} don't exist or were specified twice.")
+                f"Some documents in {name} don't exist or were "
+                f"specified twice.")
 
     def _validate_tag_id_list(self, tags, name="tags"):
         if not type(tags) == list:
             raise serializers.ValidationError(f"{name} must be a list")
         if not all([type(i) == int for i in tags]):
-            raise serializers.ValidationError(f"{name} must be a list of integers")
+            raise serializers.ValidationError(
+                f"{name} must be a list of integers")
         count = Tag.objects.filter(id__in=tags).count()
         if not count == len(tags):
             raise serializers.ValidationError(
@@ -310,7 +313,8 @@ class BulkEditSerializer(serializers.Serializer):
             raise serializers.ValidationError("add_tags not specified")
 
         if "remove_tags" in parameters:
-            self._validate_tag_id_list(parameters['remove_tags'], "remove_tags")
+            self._validate_tag_id_list(parameters['remove_tags'],
+                                       "remove_tags")
         else:
             raise serializers.ValidationError("remove_tags not specified")
 
