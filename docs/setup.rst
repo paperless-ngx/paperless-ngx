@@ -221,8 +221,9 @@ writing. Windows is not and will never be supported.
     *   ``python3-pip``, optionally ``pipenv`` for package installation
     *   ``python3-dev``
 
+    *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
-    *   ``optipng`` for optimising thumbnails
+    *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
     *   ``libpoppler-cpp-dev`` for PDF to text conversion
     *   ``libmagic-dev`` for mime type detection
@@ -242,8 +243,7 @@ writing. Windows is not and will never be supported.
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
 
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
-    for installing some of the python dependencies. You can remove that
-    again after installation.
+    for installing some of the python dependencies.
 
 2.  Install ``redis`` >= 5.0 and configure it to start automatically.
 

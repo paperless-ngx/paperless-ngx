@@ -8,30 +8,36 @@ export interface DateSelection {
   after?: string
 }
 
-const FILTER_LAST_7_DAYS = 0
-const FILTER_LAST_MONTH = 1
-const FILTER_LAST_3_MONTHS = 2
-const FILTER_LAST_YEAR = 3
+const LAST_7_DAYS = 0
+const LAST_MONTH = 1
+const LAST_3_MONTHS = 2
+const LAST_YEAR = 3
 
 @Component({
-  selector: 'app-filter-dropdown-date',
-  templateUrl: './filter-dropdown-date.component.html',
-  styleUrls: ['./filter-dropdown-date.component.scss']
+  selector: 'app-date-dropdown',
+  templateUrl: './date-dropdown.component.html',
+  styleUrls: ['./date-dropdown.component.scss']
 })
-export class FilterDropdownDateComponent implements OnInit, OnDestroy {
+export class DateDropdownComponent implements OnInit, OnDestroy {
 
   quickFilters = [
-    {id: FILTER_LAST_7_DAYS, name: "Last 7 days"}, 
-    {id: FILTER_LAST_MONTH, name: "Last month"},
-    {id: FILTER_LAST_3_MONTHS, name: "Last 3 months"},
-    {id: FILTER_LAST_YEAR, name: "Last year"}
+    {id: LAST_7_DAYS, name: "Last 7 days"},
+    {id: LAST_MONTH, name: "Last month"},
+    {id: LAST_3_MONTHS, name: "Last 3 months"},
+    {id: LAST_YEAR, name: "Last year"}
   ]
 
   @Input()
   dateBefore: string
 
+  @Output()
+  dateBeforeChange = new EventEmitter<string>()
+
   @Input()
   dateAfter: string
+
+  @Output()
+  dateAfterChange = new EventEmitter<string>()
 
   @Input()
   title: string
@@ -42,7 +48,7 @@ export class FilterDropdownDateComponent implements OnInit, OnDestroy {
   private datesSetDebounce$ = new Subject()
 
   private sub: Subscription
-  
+
   ngOnInit() {
     this.sub = this.datesSetDebounce$.pipe(
       debounceTime(400)
@@ -61,28 +67,30 @@ export class FilterDropdownDateComponent implements OnInit, OnDestroy {
     this.dateBefore = null
     let date = new Date()
     switch (qf) {
-      case FILTER_LAST_7_DAYS:
+      case LAST_7_DAYS:
         date.setDate(date.getDate() - 7)
         break;
 
-      case FILTER_LAST_MONTH:
+      case LAST_MONTH:
         date.setMonth(date.getMonth() - 1)
         break;
 
-      case FILTER_LAST_3_MONTHS:
+      case LAST_3_MONTHS:
         date.setMonth(date.getMonth() - 3)
         break
 
-      case FILTER_LAST_YEAR:
+      case LAST_YEAR:
         date.setFullYear(date.getFullYear() - 1)
         break
-  
+
       }
     this.dateAfter = formatDate(date, 'yyyy-MM-dd', "en-us", "UTC")
     this.onChange()
   }
 
   onChange() {
+    this.dateAfterChange.emit(this.dateAfter)
+    this.dateBeforeChange.emit(this.dateBefore)
     this.datesSet.emit({after: this.dateAfter, before: this.dateBefore})
   }
 
@@ -91,12 +99,12 @@ export class FilterDropdownDateComponent implements OnInit, OnDestroy {
   }
 
   clearBefore() {
-    this.dateBefore = null;
+    this.dateBefore = null
     this.onChange()
   }
 
   clearAfter() {
-    this.dateAfter = null;
+    this.dateAfter = null
     this.onChange()
   }
 

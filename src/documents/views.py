@@ -4,7 +4,8 @@ from datetime import datetime
 from time import mktime
 
 from django.conf import settings
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Case, When, IntegerField
+from django.db.models.functions import Lower
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
@@ -48,7 +49,7 @@ from .serialisers import (
     DocumentTypeSerializer,
     PostDocumentSerializer,
     SavedViewSerializer,
-    BulkEditSerializer
+    BulkEditSerializer, SelectionDataSerializer
 )
 
 
@@ -68,7 +69,7 @@ class CorrespondentViewSet(ModelViewSet):
 
     queryset = Correspondent.objects.annotate(
         document_count=Count('documents'),
-        last_correspondence=Max('documents__created')).order_by('name')
+        last_correspondence=Max('documents__created')).order_by(Lower('name'))
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
@@ -87,7 +88,7 @@ class TagViewSet(ModelViewSet):
     model = Tag
 
     queryset = Tag.objects.annotate(
-        document_count=Count('documents')).order_by('name')
+        document_count=Count('documents')).order_by(Lower('name'))
 
     serializer_class = TagSerializer
     pagination_class = StandardPagination
@@ -101,7 +102,7 @@ class DocumentTypeViewSet(ModelViewSet):
     model = DocumentType
 
     queryset = DocumentType.objects.annotate(
-        document_count=Count('documents')).order_by('name')
+        document_count=Count('documents')).order_by(Lower('name'))
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
@@ -370,6 +371,63 @@ class PostDocumentView(APIView):
                        override_tag_ids=tag_ids,
                        task_name=os.path.basename(doc_name)[:100])
         return Response("OK")
+
+
+class SelectionDataView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SelectionDataSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ids = serializer.validated_data.get('documents')
+
+        correspondents = Correspondent.objects.annotate(
+            document_count=Count(Case(
+                When(documents__id__in=ids, then=1),
+                output_field=IntegerField()
+            )))
+
+        tags = Tag.objects.annotate(document_count=Count(Case(
+            When(documents__id__in=ids, then=1),
+            output_field=IntegerField()
+        )))
+
+        types = DocumentType.objects.annotate(document_count=Count(Case(
+            When(documents__id__in=ids, then=1),
+            output_field=IntegerField()
+        )))
+
+        r = Response({
+            "selected_correspondents": [{
+                "id": t.id,
+                "document_count": t.document_count
+            } for t in correspondents],
+            "selected_tags": [{
+                "id": t.id,
+                "document_count": t.document_count
+            } for t in tags],
+            "selected_document_types": [{
+                "id": t.id,
+                "document_count": t.document_count
+            } for t in types]
+        })
+
+        return r
 
 
 class SearchView(APIView):

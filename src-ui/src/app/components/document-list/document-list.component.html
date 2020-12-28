@@ -1,25 +1,16 @@
 <app-page-header [title]="getTitle()">
 
   <div ngbDropdown class="d-inline-block mr-2">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>
-      Bulk edit
+      </svg>&nbsp;<ng-container i18n>Select</ng-container>
+      
     </button>
-    <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
-      <button ngbDropdownItem (click)="list.selectPage()">Select page</button>
-      <button ngbDropdownItem (click)="list.selectAll()">Select all</button>
-      <button ngbDropdownItem (click)="list.selectNone()">Select none</button>
-      <div class="dropdown-divider"></div>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkSetCorrespondent()">Set correspondent</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkRemoveCorrespondent()">Remove correspondent</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkSetDocumentType()">Set document type</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkRemoveDocumentType()">Remove document type</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkAddTag()">Add tag</button>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkRemoveTag()">Remove tag</button>
-      <div class="dropdown-divider"></div>
-      <button ngbDropdownItem [disabled]="list.selected.size == 0" (click)="bulkDelete()">Delete</button>
+    <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
+      <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
+      <button ngbDropdownItem (click)="list.selectPage()" i18n>Select page</button>
+      <button ngbDropdownItem (click)="list.selectAll()" i18n>Select all</button>
     </div>
   </div>
 
@@ -87,7 +78,8 @@
 </app-page-header>
 
 <div class="w-100 mb-2 mb-sm-4">
-  <app-filter-editor [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
+  <app-filter-editor *ngIf="!isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
+  <app-bulk-editor *ngIf="isBulkEditing"></app-bulk-editor>
 </div>
 
 <div class="d-flex justify-content-between align-items-center">
@@ -146,7 +138,6 @@
     </tr>
   </tbody>
 </table>
-
 
 <div class="m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
   <app-document-card-small [selected]="list.isSelected(d)" (selectedChange)="list.setSelected(d, $event)"  [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
