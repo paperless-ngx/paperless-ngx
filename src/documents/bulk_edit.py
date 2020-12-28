@@ -85,9 +85,9 @@ def modify_tags(doc_ids, add_tags, remove_tags):
         tag_id__in=remove_tags,
     ).delete()
 
-    DocumentTagRelationship.objects.bulk_create([
-        DocumentTagRelationship(
-            document_id=doc, tag_id=tag) for (doc,tag) in itertools.product(affected_docs, add_tags)
+    DocumentTagRelationship.objects.bulk_create([DocumentTagRelationship(
+        document_id=doc, tag_id=tag) for (doc, tag) in itertools.product(
+        affected_docs, add_tags)
     ], ignore_conflicts=True)
 
     async_task(
