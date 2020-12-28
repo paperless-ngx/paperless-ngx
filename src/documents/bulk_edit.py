@@ -106,6 +106,10 @@ def modify_tags(doc_ids, add_tags, remove_tags):
             document_id=doc, tag_id=tag) for (doc,tag) in itertools.product(affected_docs, add_tags)
     ], ignore_conflicts=True)
 
+    async_task(
+        "documents.tasks.bulk_index_documents",
+        document_ids=affected_docs
+    )
     async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
 
     return "OK"
