@@ -40,13 +40,12 @@ export class ToggleableDropdownButtonComponent {
     this.toggle.emit()
   }
 
-  getSelectedIconName() {
-    if (this.state == ToggleableItemState.Selected) {
-      return "check"
-    } else if (this.state == ToggleableItemState.PartiallySelected) {
-      return "dash"
-    } else {
-      return ""
-    }
+  isChecked() {
+    return this.state == ToggleableItemState.Selected
   }
+
+  isPartiallyChecked() {
+    return this.state == ToggleableItemState.PartiallySelected
+  }
+
 }
