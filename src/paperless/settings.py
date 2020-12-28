@@ -69,7 +69,7 @@ SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 # Application Definition                                                      #
 ###############################################################################
 
-env_apps = os.getenv("PAPERLESS_APPS") if os.getenv("PAPERLESS_APPS") else []
+env_apps = os.getenv("PAPERLESS_APPS").split(",") if os.getenv("PAPERLESS_APPS") else []
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
