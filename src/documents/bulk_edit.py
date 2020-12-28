@@ -18,11 +18,7 @@ def set_correspondent(doc_ids, correspondent):
     qs.update(correspondent=correspondent)
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
@@ -37,11 +33,7 @@ def set_document_type(doc_ids, document_type):
     qs.update(document_type=document_type)
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
@@ -59,11 +51,7 @@ def add_tag(doc_ids, tag):
     ])
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
@@ -81,11 +69,7 @@ def remove_tag(doc_ids, tag):
     ).delete()
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
@@ -107,10 +91,7 @@ def modify_tags(doc_ids, add_tags, remove_tags):
     ], ignore_conflicts=True)
 
     async_task(
-        "documents.tasks.bulk_index_documents",
-        document_ids=affected_docs
-    )
-    async_task("documents.tasks.bulk_rename_files", document_ids=affected_docs)
+        "documents.tasks.bulk_update_documents", document_ids=affected_docs)
 
     return "OK"
 
