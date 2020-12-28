@@ -6,7 +6,7 @@ import { MatchingModel } from '../data/matching-model';
   name: 'filter'
 })
 export class FilterPipe implements PipeTransform {
-  transform(items: MatchingModel[], searchText: string): any[] {
+  transform(items: MatchingModel[], searchText: string): MatchingModel[] {
     if (!items) return [];
     if (!searchText) return items;
 
