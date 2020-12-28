@@ -1,8 +1,8 @@
 ---
 - name: verify operating system
   fail:
-    msg: Sorry, only Debian supported at the moment.
-  when: ansible_distribution != 'Debian'
+    msg: Sorry, only Debian and Ubuntu supported at the moment.
+  when: not(ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: install base dependencies
   apt:
