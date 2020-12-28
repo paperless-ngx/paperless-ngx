@@ -5,6 +5,7 @@ from time import mktime
 
 from django.conf import settings
 from django.db.models import Count, Max, Case, When, IntegerField
+from django.db.models.functions import Lower
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
@@ -68,7 +69,7 @@ class CorrespondentViewSet(ModelViewSet):
 
     queryset = Correspondent.objects.annotate(
         document_count=Count('documents'),
-        last_correspondence=Max('documents__created')).order_by('name')
+        last_correspondence=Max('documents__created')).order_by(Lower('name'))
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
@@ -87,7 +88,7 @@ class TagViewSet(ModelViewSet):
     model = Tag
 
     queryset = Tag.objects.annotate(
-        document_count=Count('documents')).order_by('name')
+        document_count=Count('documents')).order_by(Lower('name'))
 
     serializer_class = TagSerializer
     pagination_class = StandardPagination
@@ -101,7 +102,7 @@ class DocumentTypeViewSet(ModelViewSet):
     model = DocumentType
 
     queryset = DocumentType.objects.annotate(
-        document_count=Count('documents')).order_by('name')
+        document_count=Count('documents')).order_by(Lower('name'))
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
