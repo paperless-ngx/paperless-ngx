@@ -28,9 +28,9 @@ export interface SelectionDataItem {
 }
 
 export interface SelectionData {
-  correspondents: SelectionDataItem[]
-  tags: SelectionDataItem[]
-  document_types: SelectionDataItem[]
+  selected_correspondents: SelectionDataItem[]
+  selected_tags: SelectionDataItem[]
+  selected_document_types: SelectionDataItem[]
 }
 
 @Injectable({
@@ -125,8 +125,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     })
   }
 
-  selectionData(ids: number[]): Observable<SelectionData> {
-    console.log(ids)
+  getSelectionData(ids: number[]): Observable<SelectionData> {
     return this.http.post<SelectionData>(this.getResourceUrl(null, 'selection_data'), {"documents": ids})
   }
 
