@@ -10,6 +10,8 @@ export class AppViewService {
 
   constructor(rendererFactory: RendererFactory2, @Inject(DOCUMENT) private document) {
     this.renderer = rendererFactory.createRenderer(null, null);
+
+    this.updateDarkModeSettings()
   }
 
   updateDarkModeSettings() {
