@@ -1,3 +1,5 @@
+$primary-dark-mode: #346e2c;
+$danger-dark-mode: #9c142a;
 $bg-dark-mode: #161618;
 $bg-light-dark-mode: #1c1c1f;
 $text-color-dark-mode: #abb2bf;
@@ -7,6 +9,7 @@ $border-color-dark-mode: #47494f;
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+
 @mixin dark-mode {
   background-color: $bg-dark-mode !important;
   color: $text-color-dark-mode;
@@ -74,9 +77,13 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .modal-content, .modal-header, .modal-body, .modal-footer {
+    background-color: $bg-light-dark-mode;
+    border-color: $border-color-dark-mode;
+  }
+
   app-tag .badge {
-    opacity: 0.8;
-    color: $bg-dark-mode !important;
+    filter: brightness(.8);
   }
 
   .badge-light {
@@ -84,17 +91,19 @@ $border-color-dark-mode: #47494f;
     color: $text-color-dark-mode-accent;
   }
 
+  .doc-img-container {
+    border: none !important;
+  }
+
   .doc-img {
-    background-color: lighten($bg-light-dark-mode, 30%);
-    mix-blend-mode: soft-light;
+    mix-blend-mode: normal;
+    filter: invert(95%) hue-rotate(180deg);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
-  .doc-img-background {
-    background-color: lighten($bg-light-dark-mode, 30%);
-  }
-
-  .doc-img-background-selected {
-    background-color: lighten($bg-light-dark-mode, 35%);
+  .card-selected .doc-img {
+    mix-blend-mode: luminosity;
   }
 
   .toast {
@@ -128,18 +137,37 @@ $border-color-dark-mode: #47494f;
     text-shadow: 0 1px 0 #666;
   }
 
-  .btn-outline-primary:hover {
-    background-color: darken($primary, 10%);
-    color: $text-color-dark-mode-accent;
+  .btn-outline-primary{
+    border-color: $primary-dark-mode;
+    color: $primary-dark-mode;
+
+    &:hover {
+      background-color: darken($primary-dark-mode, 10%);
+      color: $text-color-dark-mode-accent;
+    }
   }
 
   .btn-outline-secondary {
-    border-color: $border-color-dark-mode;
-    color: $border-color-dark-mode;
+    border-color: $text-color-dark-mode;
+    color: $text-color-dark-mode;
 
     &:hover {
       background-color: $bg-dark-mode;
     }
+  }
+
+  .btn-outline-danger {
+    border-color: $danger-dark-mode;
+    color: $danger-dark-mode;
+
+    &:hover {
+      background-color: darken($danger-dark-mode, 10%);
+      color: $text-color-dark-mode-accent;
+    }
+  }
+
+  .btn-link:not(:disabled):not(.disabled) {
+    color: $primary-dark-mode;
   }
 
   .btn-link:hover,
@@ -147,6 +175,10 @@ $border-color-dark-mode: #47494f;
   .btn-outline-primary:not(:disabled):not(.disabled):active,
   .show > .btn-outline-primary.dropdown-toggle {
     color: $text-color-dark-mode-accent;
+  }
+
+  button.bg-light:hover {
+    background-color: $bg-dark-mode !important;
   }
 
   .form-control,
