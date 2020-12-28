@@ -53,6 +53,16 @@ export class FilterableDropdownSelectionModel {
       }
     }
 
+    if (!id) {
+      for (let key of this.temporarySelectionStates.keys()) {
+        if (key) {
+          this.temporarySelectionStates.delete(key)
+        }
+      }
+    } else {
+      this.temporarySelectionStates.delete(null)
+    }
+
     if (fireEvent) {
       this.changed.next(this)
     }
@@ -82,6 +92,10 @@ export class FilterableDropdownSelectionModel {
     } else {
       return false
     }
+  }
+
+  isNoneSelected() {
+    return this.selectionSize() == 1 && this.get(null) == ToggleableItemState.Selected
   }
 
   init(map) {
@@ -126,7 +140,11 @@ export class FilterableDropdownComponent {
   @Input()
   set items(items: MatchingModel[]) {
     if (items) {
-      this._selectionModel.items = items
+      this._selectionModel.items = Array.from(items)
+      this._selectionModel.items.unshift({
+        name: "None",
+        id: null
+      })
     }
   }
 
@@ -170,6 +188,9 @@ export class FilterableDropdownComponent {
 
   @Input()
   icon: string
+
+  @Input()
+  allowSelectNone: boolean = false
 
   @Input()
   editing = false
