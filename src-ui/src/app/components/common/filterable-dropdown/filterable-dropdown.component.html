@@ -25,7 +25,7 @@
         </ng-container>
       </div>
       <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!selectionModel.isDirty()">
-        <small class="ml-1" [ngClass]="{'font-weight-bold': selectionModel.isDirty()}">Apply</small>
+        <small class="ml-1" [ngClass]="{'font-weight-bold': selectionModel.isDirty()}" i18n>Apply</small>
         <svg width="1.5em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
         </svg>

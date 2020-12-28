@@ -1,18 +1,18 @@
 <div class="row">
    <div class="col mb-2 mb-xl-0">
      <div class="form-inline d-flex">
-         <label class="text-muted mr-2">Filter by:</label>
-         <input class="form-control form-control-sm flex-grow-1" type="text" [(ngModel)]="titleFilter" placeholder="Title">
+         <label class="text-muted mr-2" i18n>Filter by:</label>
+         <input class="form-control form-control-sm flex-grow-1" type="text" [(ngModel)]="titleFilter" placeholder="Title" i18n-placeholder>
      </div>
   </div>
   <div class="w-100 d-xl-none"></div>
    <div class="col col-xl-auto mb-2 mb-xl-0">
      <div class="d-flex">
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="tags" [(selectionModel)]="tagSelectionModel" (selectionModelChange)="updateRules()" [multiple]="true" title="Tags" icon="tag-fill"></app-filterable-dropdown>
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="correspondents" [(selectionModel)]="correspondentSelectionModel" (selectionModelChange)="updateRules()" title="Correspondents" icon="person-fill"></app-filterable-dropdown>
-       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [(selectionModel)]="documentTypeSelectionModel" (selectionModelChange)="updateRules()" title="Document types" icon="file-earmark-fill"></app-filterable-dropdown>
-       <app-date-dropdown class="mr-2 mr-md-3" [(dateBefore)]="dateCreatedBefore" [(dateAfter)]="dateCreatedAfter" title="Created" (datesSet)="updateRules()"></app-date-dropdown>
-       <app-date-dropdown [(dateBefore)]="dateAddedBefore" [(dateAfter)]="dateAddedAfter" title="Added"  (datesSet)="updateRules()"></app-date-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="tags" [(selectionModel)]="tagSelectionModel" (selectionModelChange)="updateRules()" [multiple]="true" title="Tags" icon="tag-fill" i18n-title></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="correspondents" [(selectionModel)]="correspondentSelectionModel" (selectionModelChange)="updateRules()" title="Correspondents" icon="person-fill" i18n-title></app-filterable-dropdown>
+       <app-filterable-dropdown class="mr-2 mr-md-3" [items]="documentTypes" [(selectionModel)]="documentTypeSelectionModel" (selectionModelChange)="updateRules()" title="Document types" icon="file-earmark-fill" i18n-title></app-filterable-dropdown>
+       <app-date-dropdown class="mr-2 mr-md-3" [(dateBefore)]="dateCreatedBefore" [(dateAfter)]="dateCreatedAfter" title="Created" (datesSet)="updateRules()" i18n-title></app-date-dropdown>
+       <app-date-dropdown [(dateBefore)]="dateAddedBefore" [(dateAfter)]="dateAddedAfter" title="Added"  (datesSet)="updateRules()" i18n-title></app-date-dropdown>
      </div>
    </div>
    <div class="w-100 d-xl-none"></div>
@@ -20,8 +20,8 @@
      <button class="btn btn-link btn-sm px-0 mx-0 ml-xl-n4" [disabled]="!hasFilters()" (click)="clearSelected()">
        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
          <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-       </svg>
-       Clear all filters
+       </svg>&nbsp;<ng-container i18n>Clear all filters</ng-container>
+       
      </button>
    </div>
 </div>
