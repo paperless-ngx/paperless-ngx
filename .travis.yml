@@ -3,24 +3,36 @@ language: python
 dist: focal
 os: linux
 
+stages:
+ - name: test
+ - name: build_docker
+   if: branch =~ /^(master|dev|ng-.*)$/
+ - name: publish_manifest
+   if: branch =~ /^(master|dev|ng-.*)$/
+
 jobs:
   include:
     - name: "Paperless on Python 3.6"
+      stage: test
       python: "3.6"
 
     - name: "Paperless on Python 3.7"
+      stage: test
       python: "3.7"
 
     - name: "Paperless on Python 3.8"
+      stage: test
       python: "3.8"
 
     - name: "Documentation"
+      stage: test
       script:
         - cd docs/
         - make html
       after_success: true
 
     - name: "Front end"
+      stage: test
       language: node_js
       node_js:
         - 15
@@ -47,8 +59,6 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker build -f Dockerfile --tag=${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64 .
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-amd64
-      on:
-        condition: '"${BUILD_DOCKER}" = 1'
     - stage: build_docker
       name: arm64v8 docker build
       services:
@@ -67,9 +77,6 @@ jobs:
       arch: arm64-graviton2
       virt: vm
       group: edge
-      on:
-        condition: '"${BUILD_DOCKER}" = 1'
-    
     - stage: build_docker
       name: arm32v7 docker build
       services:
@@ -93,9 +100,6 @@ jobs:
         - docker push ${DOCKER_REPO}:${TRAVIS_COMMIT}-arm32v7
       env:
         - DOCKER_CLI_EXPERIMENTAL=enabled # required for manifest support
-      on:
-        condition: '"${BUILD_DOCKER}" = 1'
-    
     - stage: publish_manifest
       env:
         - DOCKER_CLI_EXPERIMENTAL=enabled # required for manifest support
@@ -130,8 +134,6 @@ jobs:
           else
             echo "Not a tag and not on master, so not pushing tag/master specific manifest"
           fi
-      on:
-        condition: '"${BUILD_DOCKER}" = 1'
 
 
 before_install:
