@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { MATCHING_ALGORITHMS } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
-import { Toast, ToastService } from 'src/app/services/toast.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Directive()
 export abstract class EditDialogComponent<T extends ObjectWithId> implements OnInit {
@@ -13,8 +13,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
   constructor(
     private service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
-    private toastService: ToastService,
-    private entityName: string) { }
+    private toastService: ToastService) { }
 
   @Input()
   dialogMode: string = 'create'
@@ -35,12 +34,24 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
     }
   }
 
+  getCreateTitle() {
+    return $localize`Create new item`
+  }
+
+  getEditTitle() {
+    return $localize`Edit item`
+  }
+
+  getSaveErrorMessage(error: string) {
+    return $localize`Could not save element: ${error}`
+  }
+
   getTitle() {
     switch (this.dialogMode) {
       case 'create':
-        return "Create new " + this.entityName
+        return this.getCreateTitle()
       case 'edit':
-        return "Edit " + this.entityName
+        return this.getEditTitle()
       default:
         break;
     }
@@ -66,7 +77,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       this.activeModal.close()
       this.success.emit(result)
     }, error => {
-      this.toastService.showToast(Toast.makeError(`Could not save ${this.entityName}: ${error.error.name}`))
+      this.toastService.showError(this.getSaveErrorMessage(error.error.name))
     })
   }
 

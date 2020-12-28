@@ -22,8 +22,8 @@ export class CorrespondentListComponent extends GenericListComponent<PaperlessCo
     super(correspondentsService,modalService,CorrespondentEditDialogComponent)
   }
 
-  getObjectName(object: PaperlessCorrespondent) {
-    return `correspondent '${object.name}'`
+  getDeleteMessage(object: PaperlessCorrespondent) {
+    return $localize`Do you really want to delete the correspondent ${object.name}?`
   }
 
   filterDocuments(object: PaperlessCorrespondent) {

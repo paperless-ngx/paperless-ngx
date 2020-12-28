@@ -26,8 +26,8 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
     return TAG_COLOURS.find(c => c.id == id)
   }
 
-  getObjectName(object: PaperlessTag) {
-    return `tag '${object.name}'`
+  getDeleteMessage(object: PaperlessTag) {
+    return $localize`Do you really want to delete the tag ${object.name}?`
   }
 
   filterDocuments(object: PaperlessTag) {

@@ -1,30 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Subject, zip } from 'rxjs';
 
-export class Toast {
-
-  static make(title: string, content: string, classname?: string, delay?: number): Toast {
-    let t = new Toast()
-    t.title = title
-    t.content = content
-    t.classname = classname
-    if (delay) {
-      t.delay = delay
-    }
-    return t
-  }
-
-  static makeError(content: string) {
-    return Toast.make("Error", content, null, 10000)
-  }
+export interface Toast {
 
   title: string
 
-  classname: string
-
   content: string
 
-  delay: number = 5000
+  delay: number
 
 }
 
@@ -39,9 +22,17 @@ export class ToastService {
 
   private toastsSubject: Subject<Toast[]> = new Subject()
 
-  showToast(toast: Toast) {
+  show(toast: Toast) {
     this.toasts.push(toast)
     this.toastsSubject.next(this.toasts)
+  }
+
+  showError(content: string, delay: number = 10000) {
+    this.show({title: $localize`Error`, content: content, delay: delay})
+  }
+
+  showInfo(content: string, delay: number = 5000) {
+    this.show({title: $localize`Information`, content: content, delay: delay})
   }
 
   closeToast(toast: Toast) {
