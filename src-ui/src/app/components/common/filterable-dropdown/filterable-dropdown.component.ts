@@ -1,14 +1,13 @@
 import { Component, EventEmitter, Input, Output, ElementRef, ViewChild } from '@angular/core';
 import { FilterPipe } from  'src/app/pipes/filter.pipe';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
-import { ToggleableItem, ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component';
+import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component';
 import { MatchingModel } from 'src/app/data/matching-model';
 import { Subject } from 'rxjs';
-import { ThrowStmt } from '@angular/compiler';
 
-export enum FilterableDropdownType {
-  Filtering = 'filtering',
-  Editing = 'editing'
+export interface ChangedItems {
+  itemsToAdd: MatchingModel[],
+  itemsToRemove: MatchingModel[]
 }
 
 export class FilterableDropdownSelectionModel {
@@ -19,31 +18,37 @@ export class FilterableDropdownSelectionModel {
 
   items: MatchingModel[] = []
 
-  selection = new Map<number, ToggleableItemState>()
+  private selectionStates = new Map<number, ToggleableItemState>()
+
+  private temporarySelectionStates = new Map<number, ToggleableItemState>()
 
   getSelectedItems() {
-    return this.items.filter(i => this.selection.get(i.id) == ToggleableItemState.Selected)
+    return this.items.filter(i => this.temporarySelectionStates.get(i.id) == ToggleableItemState.Selected)
   }
 
   set(id: number, state: ToggleableItemState, fireEvent = true) {
-    this.selection.set(id, state)
+    if (state == ToggleableItemState.NotSelected) {
+      this.temporarySelectionStates.delete(id)
+    } else {
+      this.temporarySelectionStates.set(id, state)
+    }
     if (fireEvent) {
       this.changed.next(this)
     }
   }
 
   toggle(id: number, fireEvent = true) {
-    let state = this.selection.get(id)
+    let state = this.temporarySelectionStates.get(id)
     if (state == null || state != ToggleableItemState.Selected) {
-      this.selection.set(id, ToggleableItemState.Selected)
+      this.temporarySelectionStates.set(id, ToggleableItemState.Selected)
     } else if (state == ToggleableItemState.Selected) {
-      this.selection.set(id, ToggleableItemState.NotSelected)
+      this.temporarySelectionStates.delete(id)
     }
 
     if (!this.multiple) {
-      for (let key of this.selection.keys()) {
+      for (let key of this.temporarySelectionStates.keys()) {
         if (key != id) {
-          this.selection.set(key, ToggleableItemState.NotSelected)
+          this.temporarySelectionStates.delete(key)
         }
       }
     }
@@ -55,7 +60,7 @@ export class FilterableDropdownSelectionModel {
   }
 
   get(id: number) {
-    return this.selection.get(id) || ToggleableItemState.NotSelected
+    return this.temporarySelectionStates.get(id) || ToggleableItemState.NotSelected
   }
 
   selectionSize() {
@@ -63,9 +68,45 @@ export class FilterableDropdownSelectionModel {
   }
 
   clear(fireEvent = true) {
-    this.selection.clear()
+    this.temporarySelectionStates.clear()
     if (fireEvent) {
       this.changed.next(this)
+    }
+  }
+
+  isDirty() {
+    if (!Array.from(this.temporarySelectionStates.keys()).every(id => this.temporarySelectionStates.get(id) == this.selectionStates.get(id))) {
+      return true
+    } else if (!Array.from(this.selectionStates.keys()).every(id => this.selectionStates.get(id) == this.temporarySelectionStates.get(id))) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  init(map) {
+    this.temporarySelectionStates = map
+    this.apply()
+  }
+
+  apply() {
+    this.selectionStates.clear()
+    this.temporarySelectionStates.forEach((value, key) => {
+      this.selectionStates.set(key, value)
+    })
+  }
+
+  reset() {
+    this.temporarySelectionStates.clear()
+    this.selectionStates.forEach((value, key) => {
+      this.temporarySelectionStates.set(key, value)
+    })
+  }
+
+  diff(): ChangedItems {
+    return {
+      itemsToAdd: this.items.filter(item => this.temporarySelectionStates.get(item.id) == ToggleableItemState.Selected && this.selectionStates.get(item.id) != ToggleableItemState.Selected),
+      itemsToRemove: this.items.filter(item => !this.temporarySelectionStates.has(item.id) && this.selectionStates.has(item.id)),
     }
   }
 }
@@ -131,35 +172,35 @@ export class FilterableDropdownComponent {
   icon: string
 
   @Input()
-  type: FilterableDropdownType = FilterableDropdownType.Filtering
+  editing = false
 
-  types = FilterableDropdownType
+  @Output()
+  apply = new EventEmitter<ChangedItems>()
 
-  hasBeenToggled:boolean = false
+  @Output()
+  open = new EventEmitter()
 
   constructor(private filterPipe: FilterPipe) {
     this.selectionModel = new FilterableDropdownSelectionModel()
   }
 
-  toggleItem(toggleableItem: ToggleableItem): void {
-    // if (this.singular && toggleableItem.state == ToggleableItemState.Selected) {
-    //   this.selectionModel.items.filter(ti => ti.item.id !== toggleableItem.item.id).forEach(ti => ti.state = ToggleableItemState.NotSelected)
-    // }
-    // this.hasBeenToggled = true
-    // this.toggle.emit(toggleableItem.item)
+  applyClicked() {
+    if (this.selectionModel.isDirty()) {
+      this.dropdown.close()
+      this.apply.emit(this.selectionModel.diff())
+    }
   }
 
   dropdownOpenChange(open: boolean): void {
-    // if (open) {
-    //   setTimeout(() => {
-    //     this.listFilterTextInput.nativeElement.focus();
-    //   }, 0)
-    //   this.hasBeenToggled = false
-    //   this.open.next()
-    // } else {
-    //   this.filterText = ''
-    //   if (this.type == FilterableDropdownType.Editing) this.editingComplete.emit(this.toggleableItems)
-    // }
+    if (open) {
+      setTimeout(() => {
+        this.listFilterTextInput.nativeElement.focus();
+      }, 0)
+      this.selectionModel.reset()
+      this.open.next()
+    } else {
+      this.filterText = ''
+    }
   }
 
   listFilterEnter(): void {
