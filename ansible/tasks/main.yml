@@ -158,9 +158,14 @@
     - "{{ paperlessng_media_root }}"
     - "{{ paperlessng_static_dir }}"
 
+- name: rename initial config
+  command:
+    cmd: "mv {{ paperlessng_directory }}/paperless.conf {{ paperlessng_directory }}/paperless.conf.template"
+    removes: "{{ paperlessng_directory }}/paperless.conf"
+
 - name: configure paperless-ng
   lineinfile:
-    path: "{{ paperlessng_directory }}/paperless.conf"
+    path: "{{ paperlessng_directory }}/paperless.conf.template"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   with_items:
@@ -184,18 +189,18 @@
     #   line: "PAPERLESS_OCR_USER_ARG=\"{{ paperlessng_ocrmypdf_args }}{{ ' --jbig2-lossy' if  paperlessng_use_jbig2enc else '' }}\""
     - regexp: "^#?PAPERLESS_TIME_ZONE="
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
-  no_log: true
+  no_log: yes
 
 - name: configure paperless-ng database [sqlite]
   lineinfile:
-    path: "{{ paperlessng_directory }}/paperless.conf"
+    path: "{{ paperlessng_directory }}/paperless.conf.template"
     regexp: "^#?PAPERLESS_DBHOST="
     state: absent
   when: paperlessng_db_type == 'sqlite'
 
 - name: configure paperless-ng database [postgresql]
   lineinfile:
-    path: "{{ paperlessng_directory }}/paperless.conf"
+    path: "{{ paperlessng_directory }}/paperless.conf.template"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   with_items:
@@ -210,7 +215,17 @@
     - regexp: "^#?PAPERLESS_DBPASS="
       line: "PAPERLESS_DBPASS={{ paperlessng_db_pass }}"
   when: paperlessng_db_type == 'postgresql'
-  no_log: true
+  no_log: yes
+
+- name: deploy paperless-ng configuration
+  copy:
+    src: "{{ paperlessng_directory }}/paperless.conf.template"
+    remote_src: yes
+    dest: /etc/paperless.conf
+    owner: root
+    group: root
+    mode: '0644'
+  register: configuration
 
 - name: create paperlessng venv
   become: yes
@@ -232,9 +247,7 @@
 - name: collect static files
   become: yes
   become_user: "{{ paperlessng_system_user }}"
-  command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py collectstatic --no-input"
-  args:
-    chdir: "{{ paperlessng_directory }}/src"
+  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py collectstatic --no-input"
   when: paperlessng_current_version.stdout != paperlessng_version | string
   register: static_files
   changed_when: "'188 unmodified' not in static_files.stdout"
@@ -242,9 +255,7 @@
 - name: create database schema
   become: yes
   become_user: "{{ paperlessng_system_user }}"
-  command: "{{ paperlessng_virtualenv }}/bin/python3 manage.py migrate"
-  args:
-    chdir: "{{ paperlessng_directory }}/src"
+  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py migrate"
   when: paperlessng_current_version.stdout != paperlessng_version | string
   register: database_schema
   changed_when: '"No migrations to apply." not in database_schema.stdout'
@@ -276,13 +287,10 @@
       else:
           User.objects.create_superuser('{{ paperlessng_superuser_name }}', '{{ paperlessng_superuser_email }}', '{{ paperlessng_superuser_password }}')
           print('changed')
-  command: |
-    {{ paperlessng_virtualenv }}/bin/python3 manage.py shell -c "{{ creation_script }}"
-  args:
-    chdir: "{{ paperlessng_directory }}/src"
+  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py shell -c \"{{ creation_script }}\""
   register: superuser
   changed_when: superuser.stdout == 'changed'
-  no_log: true
+  no_log: yes
 
 - name: set ownership and permissions on paperlessng venv
   file:
@@ -372,7 +380,7 @@
     - paperless-consumer
     - paperless-scheduler
     - paperless-webserver
-  when: paperless_services.changed
+  when: paperless_services.changed or configuration.changed
 
 - name: enable paperlessng services
   systemd:
