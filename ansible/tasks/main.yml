@@ -28,6 +28,7 @@
       - pngquant
       - zlib1g
       # dev
+      - sudo
       - build-essential
       - python3-setuptools
       - python3-wheel
@@ -122,23 +123,19 @@
     dest: "{{ tempdir.path }}"
   when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
 
-- name: change permissions of paperless-ng
+- name: change owner and permissions of paperless-ng
   command:
     cmd: "{{ item }}"
+    warn: false
   with_items:
+  - "chown -R {{ paperlessng_system_user }}:{{ paperlessng_system_group }} {{ tempdir.path }}"
   - "find {{ tempdir.path }} -type d -exec chmod 0750 {} ;"
   - "find {{ tempdir.path }} -type f -exec chmod 0640 {} ;"
   when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
 
 - name: move paperless-ng
-  copy:
-    src: "{{ tempdir.path }}/paperless-ng/"
-    remote_src: yes
-    dest: "{{ paperlessng_directory }}"
-    owner: "{{ paperlessng_system_user }}"
-    group: "{{ paperlessng_system_group }}"
-    mode: preserve
-    directory_mode: preserve
+  command:
+    cmd: "cp -a {{ tempdir.path }}/paperless-ng/ {{ paperlessng_directory }}"
   when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
 
 - name: remove temporary directory
@@ -256,30 +253,31 @@
   become: yes
   become_user: "{{ paperlessng_system_user }}"
   # "manage.py createsuperuser" only works on interactive TTYs
+  vars:
+    creation_script: |
+      from django.contrib.auth.models import User
+      from django.contrib.auth.hashers import get_hasher
+
+      if User.objects.filter(username='{{ paperlessng_superuser_name }}').exists():
+          user = User.objects.get(username='{{ paperlessng_superuser_name }}')
+          old = user.__dict__.copy()
+
+          user.is_superuser = True
+          user.email = '{{ paperlessng_superuser_email }}'
+          user.set_password('{{ paperlessng_superuser_password }}')
+          user.save()
+          new = user.__dict__
+
+          algorithm, iterations, old_salt, old_hash = old['password'].split('$')
+          new_password_old_salt = get_hasher(algorithm).encode(password='{{ paperlessng_superuser_password }}', salt=old_salt, iterations=int(iterations))
+          _, _, _, new_hash = new_password_old_salt.split('$')
+          if not (old_hash == new_hash and old['is_superuser'] == new['is_superuser'] and old['email'] == new['email']):
+              print('changed')
+      else:
+          User.objects.create_superuser('{{ paperlessng_superuser_name }}', '{{ paperlessng_superuser_email }}', '{{ paperlessng_superuser_password }}')
+          print('changed')
   command: |
-    {{ paperlessng_virtualenv }}/bin/python3 manage.py shell -c "
-    from django.contrib.auth.models import User
-    from django.contrib.auth.hashers import get_hasher
-
-    if User.objects.filter(username='{{ paperlessng_superuser_name }}').exists():
-        user = User.objects.get(username='{{ paperlessng_superuser_name }}')
-        old = user.__dict__.copy()
-
-        user.is_superuser = True
-        user.email = '{{ paperlessng_superuser_email }}'
-        user.set_password('{{ paperlessng_superuser_password }}')
-        user.save()
-        new = user.__dict__
-
-        algorithm, iterations, old_salt, old_hash = old['password'].split('$')
-        new_password_old_salt = get_hasher(algorithm).encode(password='{{ paperlessng_superuser_password }}', salt=old_salt, iterations=int(iterations))
-        _, _, _, new_hash = new_password_old_salt.split('$')
-        if not (old_hash == new_hash and old['is_superuser'] == new['is_superuser'] and old['email'] == new['email']):
-            print('changed')
-    else:
-        User.objects.create_superuser('{{ paperlessng_superuser_name }}', '{{ paperlessng_superuser_email }}', '{{ paperlessng_superuser_password }}')
-        print('changed')
-    "
+    {{ paperlessng_virtualenv }}/bin/python3 manage.py shell -c "{{ creation_script }}"
   args:
     chdir: "{{ paperlessng_directory }}/src"
   register: superuser
@@ -298,9 +296,10 @@
 
 - name: configure ghostscript for PDF
   lineinfile:
-    path: "/etc/ImageMagick-6/policy.xml"
-    regexp: '<policy domain="coder" rights="none" pattern="PDF" />'
-    line: '<policy domain="coder" rights="read|write" pattern="PDF" />'
+    path: /etc/ImageMagick-6/policy.xml
+    regexp: '(\s+)<policy domain="coder" rights=".*" pattern="PDF" />'
+    line: '\1<policy domain="coder" rights="read|write" pattern="PDF" />'
+    backrefs: yes
 
 - name: configure systemd services
   ini_file:
