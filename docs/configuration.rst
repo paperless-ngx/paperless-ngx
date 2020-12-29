@@ -277,6 +277,35 @@ PAPERLESS_OCR_USER_ARG=<json>
 
         {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}    
     
+.. _configuration-tika:
+
+Tika settings
+#############
+
+Paperless can make use of `Tika <https://tika.apache.org/>`_ and 
+`Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
+converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
+wish to use this, you must provide a Tika server and a Gotenberg server,
+configure their endpoints, and enable the feature.
+
+If you run paperless on docker, you can add those services to the docker-compose
+file (see the examples provided).
+
+PAPERLESS_TIKA=<bool>
+    Enable (or disable) the Tika parser.
+
+    Defaults to false.
+
+TIKA_SERVER_ENDPOINT=<url>
+    Set the endpoint URL were Paperless can reach your Tika server.
+
+    Defaults to "http://localhost:9998".
+
+GOTENBERG_SERVER_ENDPOINT=<url>
+    Set the endpoint URL were Paperless can reach your Gotenberg server.
+
+    Defaults to "http://localhost:3000".
+
     
 Software tweaks
 ###############
