@@ -56,6 +56,7 @@ export class BulkEditorComponent {
     return this.documentService.bulkEdit(Array.from(this.list.selected), method, args).pipe(
       tap(() => {
         this.list.reload()
+        this.list.reduceSelectionToFilter()
         this.list.selected.forEach(id => {
           this.openDocumentService.refreshDocument(id)
         })
@@ -118,7 +119,7 @@ export class BulkEditorComponent {
       } else if (changedTags.itemsToAdd.length > 1 && changedTags.itemsToRemove.length == 0) {
         modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} to all ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 1) {
-        let tag = changedTags.itemsToAdd[0]
+        let tag = changedTags.itemsToRemove[0]
         modal.componentInstance.message = $localize`This operation will remove the tag ${tag.name} from all ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length > 1) {
         modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(changedTags.itemsToRemove)} from all ${this.list.selected.size} selected document(s).`
@@ -139,7 +140,6 @@ export class BulkEditorComponent {
   private performSetTags(modal, changedTags: ChangedItems) {
     this.executeBulkOperation('modify_tags', {"add_tags": changedTags.itemsToAdd.map(t => t.id), "remove_tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
       response => {
-        this.tagService.clearCache()
         if (modal) {
           modal.close()
         }
@@ -173,7 +173,6 @@ export class BulkEditorComponent {
   private performSetCorrespondents(modal, correspondent: MatchingModel) {
     this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
       response => {
-        this.correspondentService.clearCache()
         if (modal) {
           modal.close()
         }
@@ -207,7 +206,6 @@ export class BulkEditorComponent {
   private performSetDocumentTypes(modal, documentType) {
     this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
       response => {
-        this.documentTypeService.clearCache()
         if (modal) {
           modal.close()
         }
