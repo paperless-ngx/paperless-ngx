@@ -203,7 +203,7 @@ export class DocumentListViewService {
     this.selected.clear()
   }
 
-  private reduceSelectionToFilter() {
+  reduceSelectionToFilter() {
     if (this.selected.size > 0) {
       this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => {
         let subset = new Set<number>()
