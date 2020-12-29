@@ -80,13 +80,16 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.dateAddedBefore = rule.value
           break
         case FILTER_HAS_TAG:
-          this.tagSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          this.tagSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Selected, false)
+          break
+        case FILTER_HAS_ANY_TAG:
+          this.tagSelectionModel.set(null, ToggleableItemState.Selected, false)
           break
         case FILTER_CORRESPONDENT:
-          this.correspondentSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          this.correspondentSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Selected, false)
           break
         case FILTER_DOCUMENT_TYPE:
-          this.documentTypeSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          this.documentTypeSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Selected, false)
           break
       }
     })
