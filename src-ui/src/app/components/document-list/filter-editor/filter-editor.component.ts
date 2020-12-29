@@ -62,6 +62,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   @Input()
   set filterRules (value: FilterRule[]) {
+    this.documentTypeSelectionModel.clear(false)
+    this.tagSelectionModel.clear(false)
+    this.correspondentSelectionModel.clear(false)
+
     value.forEach(rule => {
       switch (rule.rule_type) {
         case FILTER_TITLE:
@@ -95,10 +99,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     })
   }
 
-  @Output()
-  filterRulesChange = new EventEmitter<FilterRule[]>()
-
-  updateRules() {
+  get filterRules() {
     let filterRules: FilterRule[] = []
     if (this._titleFilter) {
       filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})
@@ -128,7 +129,14 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this.dateAddedAfter) {
       filterRules.push({rule_type: FILTER_ADDED_AFTER, value: this.dateAddedAfter})
     }
-    this.filterRulesChange.next(filterRules)
+    return filterRules
+  }
+
+  @Output()
+  filterRulesChange = new EventEmitter<FilterRule[]>()
+
+  updateRules() {
+    this.filterRulesChange.next(this.filterRules)
   }
 
   hasFilters() {
