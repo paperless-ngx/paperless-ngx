@@ -183,8 +183,8 @@
       line: "PAPERLESS_FILENAME_FORMAT={{ paperlessng_filename_format }}"
     - regexp: "^#?PAPERLESS_OCR_LANGUAGE="
       line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
-    - regexp: "^#PAPERLESS_OCR_USER_ARG="
-      line: "PAPERLESS_OCR_USER_ARG={{ paperlessng_ocrmypdf_args | combine({'jbig2_lossy': true} if paperlessng_big2enc_lossy else {}) }}"
+    - regexp: "^#PAPERLESS_OCR_USER_ARGS="
+      line: "PAPERLESS_OCR_USER_ARGS={{ paperlessng_ocrmypdf_args | combine({'jbig2_lossy': true} if paperlessng_big2enc_lossy else {}) | to_json }}"
     - regexp: "^#?PAPERLESS_TIME_ZONE="
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
   no_log: yes
