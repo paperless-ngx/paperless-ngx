@@ -11,12 +11,13 @@ paperlessng_virtualenv: "{{ paperlessng_directory }}/.venv"
 paperlessng_ocr_languages:
   - eng
 paperlessng_time_zone: Europe/Berlin
-paperlessng_ocrmypdf_args: --optimize 1
-# TODO Does optimze==1 really work with jbig2enc?
-# https://ocrmypdf.readthedocs.io/en/latest/jbig2.html#lossy-mode-jbig2
-# Documentation states -O1 only applies lossless transformations
-# https://ocrmypdf.readthedocs.io/en/latest/optimizer.html#lossless-optimizations
+# see https://ocrmypdf.readthedocs.io/en/latest/api.html#ocrmypdf.ocr
+paperlessng_ocrmypdf_args:
+  - "deskew": true
+  - "clean": true
+  - "optimize": 1
 paperlessng_use_jbig2enc: true
+paperlessng_big2enc_lossy: false
 
 paperlessng_superuser_name: paperlessng
 paperlessng_superuser_email: paperlessng@example.com
