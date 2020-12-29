@@ -319,11 +319,11 @@ $border-color-dark-mode: #47494f;
   }
 }
 
-body.dark-mode {
+body.color-scheme-dark {
   @include dark-mode;
 }
-@media (prefers-color-scheme: dark) {
-  body.dark-mode-preferred {
+body.color-scheme-system {
+  @media (prefers-color-scheme: dark) {
     @include dark-mode;
   }
 }
