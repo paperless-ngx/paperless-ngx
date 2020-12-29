@@ -142,7 +142,7 @@ export class FilterableDropdownComponent {
     if (items) {
       this._selectionModel.items = Array.from(items)
       this._selectionModel.items.unshift({
-        name: "None",
+        name: $localize`Not assigned`,
         id: null
       })
     }

@@ -21,10 +21,10 @@ const LAST_YEAR = 3
 export class DateDropdownComponent implements OnInit, OnDestroy {
 
   quickFilters = [
-    {id: LAST_7_DAYS, name: "Last 7 days"},
-    {id: LAST_MONTH, name: "Last month"},
-    {id: LAST_3_MONTHS, name: "Last 3 months"},
-    {id: LAST_YEAR, name: "Last year"}
+    {id: LAST_7_DAYS, name: $localize`Last 7 days`},
+    {id: LAST_MONTH, name: $localize`Last month`},
+    {id: LAST_3_MONTHS, name: $localize`Last 3 months`},
+    {id: LAST_YEAR, name: $localize`Last year`}
   ]
 
   @Input()
