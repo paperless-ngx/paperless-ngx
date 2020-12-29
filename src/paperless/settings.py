@@ -69,6 +69,8 @@ SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 # Application Definition                                                      #
 ###############################################################################
 
+env_apps = os.getenv("PAPERLESS_APPS").split(",") if os.getenv("PAPERLESS_APPS") else []
+
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
 
@@ -95,7 +97,7 @@ INSTALLED_APPS = [
 
     "django_q",
 
-]
+] + env_apps
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
