@@ -1,4 +1,4 @@
-<div class="card mb-3 bg-light shadow-sm" [class.card-selected]="selected" [class.document-card]="selectable">
+<div class="card mb-3 shadow-sm" [class.card-selected]="selected" [class.document-card]="selectable">
   <div class="row no-gutters">
     <div class="col-md-2 d-none d-lg-block doc-img-background rounded-left" [class.doc-img-background-selected]="selected">
       <img [src]="getThumbUrl()" class="card-img doc-img border-right rounded-left" (click)="setSelected(selectable ? !selected : false)">
@@ -12,7 +12,7 @@
 
     </div>
     <div class="col">
-      <div class="card-body">
+      <div class="card-body bg-light">
 
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title">
