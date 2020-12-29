@@ -26,7 +26,14 @@
             </select>
         
           </div>
+
+  
         </div>
+
+        <h4 i18n>Bulk editing</h4>
+
+        <app-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></app-input-check>
+        <app-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></app-input-check>
 
       </ng-template>
     </li>
