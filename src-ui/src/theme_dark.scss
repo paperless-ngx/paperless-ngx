@@ -18,34 +18,65 @@ $border-color-dark-mode: #47494f;
     color: $text-color-dark-mode;
   }
 
+  svg.logo {
+    .leaf {
+      color: $primary-dark-mode !important;
+    }
+    .text {
+      fill: $text-color-dark-mode !important;
+    }
+  }
+
   .bg-light {
     background-color: $bg-light-dark-mode !important;
 
     a,
     div {
-      color: $text-color-dark-mode !important;
+      color: $text-color-dark-mode;
     }
   }
 
-  .border,
-  .border-bottom,
-  .border-left,
-  .border-right {
+  .border {
     border-color: $border-color-dark-mode !important;
   }
 
-  .nav-link.active {
-    background-color: $bg-dark-mode;
-    color: $text-color-dark-mode;
-    border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+  .border-right {
+    border-right: 1px solid $border-color-dark-mode !important;
   }
 
-  .nav-link:hover {
-    border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+  .border-left {
+    border-left: 1px solid $border-color-dark-mode !important;
+  }
+
+  .border-bottom {
+    border-bottom: 1px solid $border-color-dark-mode !important;
+  }
+
+  .nav-link {
+    color: $text-color-dark-mode !important;
+
+    &.active {
+      background-color: $bg-dark-mode;
+      color: $text-color-dark-mode;
+      border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+    }
+
+    &:hover {
+      color: $text-color-dark-mode-accent !important;
+      border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+    }
   }
 
   .nav-tabs {
     border-color: $border-color-dark-mode;
+
+    .nav-link {
+      color: $primary-dark-mode !important;
+
+      &.active {
+        color: $text-color-dark-mode !important;
+      }
+    }
   }
 
   .dropdown-menu {
@@ -77,6 +108,10 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .text-dark {
+    color: $text-color-dark-mode !important;
+  }
+
   .modal-content, .modal-header, .modal-body, .modal-footer {
     background-color: $bg-light-dark-mode;
     border-color: $border-color-dark-mode;
@@ -93,15 +128,20 @@ $border-color-dark-mode: #47494f;
 
   .doc-img-container {
     border: none !important;
-    border-radius: .25rem;
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
     overflow: hidden;
   }
 
   .doc-img {
     mix-blend-mode: normal;
     filter: invert(95%) hue-rotate(180deg);
-    border-color: $border-color-dark-mode;
     border-radius: 0;
+    border-color: $bg-dark-mode;
+
+    &.border-right {
+      border-right: none !important;
+    }
   }
 
   .card-selected .doc-img {
@@ -116,14 +156,23 @@ $border-color-dark-mode: #47494f;
     background-color: opacify($bg-dark-mode, .85);
   }
 
-  a:hover {
-    color: lighten($primary, 10%);
+  a {
+    color: $primary-dark-mode;
+
+    &:hover {
+      color: lighten($primary, 10%);
+    }
   }
 
   table {
-    background-color: $bg-dark-mode;
+    background-color: $bg-light-dark-mode;
     color: $text-color-dark-mode;
     border-color: $border-color-dark-mode;
+
+    tr:hover {
+      background-color: $bg-light-dark-mode;
+      color: $text-color-dark-mode-accent;
+    }
   }
 
   .table td,
@@ -136,6 +185,7 @@ $border-color-dark-mode: #47494f;
   }
 
   .close {
+    color: $text-color-dark-mode;
     text-shadow: 0 1px 0 #666;
   }
 
@@ -164,6 +214,15 @@ $border-color-dark-mode: #47494f;
 
     &:hover {
       background-color: darken($danger-dark-mode, 10%);
+      color: $text-color-dark-mode-accent;
+    }
+  }
+
+  .btn-outline-dark {
+    border-color: $border-color-dark-mode;
+    color: $text-color-dark-mode;
+
+    &:hover {
       color: $text-color-dark-mode-accent;
     }
   }
@@ -253,6 +312,10 @@ $border-color-dark-mode: #47494f;
   .page-item.active .page-link {
     border-color: $border-color-dark-mode;
     color: $text-color-dark-mode-accent;
+  }
+
+  .progress {
+    background-color: $border-color-dark-mode;
   }
 }
 
