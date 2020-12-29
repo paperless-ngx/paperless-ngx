@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db.models import Count, Max, Case, When, IntegerField
 from django.db.models.functions import Lower
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -61,6 +62,10 @@ class IndexView(TemplateView):
         context['cookie_prefix'] = settings.COOKIE_PREFIX
         context['username'] = self.request.user.username
         context['full_name'] = self.request.user.get_full_name()
+        context['styles_css'] = f"frontend/{get_language()}/styles.css"
+        context['runtime_js'] = f"frontend/{get_language()}/runtime.js"
+        context['polyfills_js'] = f"frontend/{get_language()}/polyfills.js"
+        context['main_js'] = f"frontend/{get_language()}/main.js"
         return context
 
 

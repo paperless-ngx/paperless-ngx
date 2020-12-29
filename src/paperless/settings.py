@@ -6,6 +6,8 @@ import re
 
 from dotenv import load_dotenv
 
+from django.utils.translation import gettext_lazy as _
+
 # Tap paperless.conf if it's available
 if os.path.exists("../paperless.conf"):
     load_dotenv("../paperless.conf")
@@ -117,6 +119,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -245,6 +248,11 @@ if os.getenv("PAPERLESS_DBHOST"):
 ###############################################################################
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ("en-us", _("English")),
+    ("de", _("German"))
+]
 
 TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
