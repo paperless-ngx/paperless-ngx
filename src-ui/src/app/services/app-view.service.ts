@@ -19,11 +19,11 @@ export class AppViewService {
     let darkModeEnabled = JSON.parse(localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_ENABLED)) || GENERAL_SETTINGS.DARK_MODE_ENABLED_DEFAULT
 
     if (darkModeUseSystem) {
-      this.renderer.addClass(this.document.body, 'dark-mode-preferred')
-      this.renderer.removeClass(this.document.body, 'dark-mode')
+      this.renderer.addClass(this.document.body, 'color-scheme-system')
+      this.renderer.removeClass(this.document.body, 'color-scheme-dark')
     } else {
-      this.renderer.removeClass(this.document.body, 'dark-mode-preferred')
-      darkModeEnabled ? this.renderer.addClass(this.document.body, 'dark-mode') : this.renderer.removeClass(this.document.body, 'dark-mode')
+      this.renderer.removeClass(this.document.body, 'color-scheme-system')
+      darkModeEnabled ? this.renderer.addClass(this.document.body, 'color-scheme-dark') : this.renderer.removeClass(this.document.body, 'dark-mode')
     }
 
   }
