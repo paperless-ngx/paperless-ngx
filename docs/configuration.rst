@@ -400,6 +400,15 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
 
     Defaults to none, which disables this feature.
 
+PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
+    Paperless creates thumbnails for plain text files by rendering the content
+    of the file on an image and uses a predefined font for that. This
+    font can be changed here.
+
+    Note that this won't have any effect on already generated thumbnails.
+
+    Defaults to ``/usr/share/fonts/liberation/LiberationSerif-Regular.ttf``.
+
 
 Binaries
 ########
