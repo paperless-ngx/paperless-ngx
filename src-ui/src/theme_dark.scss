@@ -269,7 +269,7 @@ $border-color-dark-mode: #47494f;
     border-color: $border-color-dark-mode;
 
     input:focus {
-      background-color: $bg-dark-mode !important;
+      background-color: transparent !important;
     }
   }
 
