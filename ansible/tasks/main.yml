@@ -310,7 +310,7 @@
 - name: configure systemd services
   ini_file:
     path: "{{ paperlessng_directory }}/scripts/{{ item[0] }}"
-    section: "{{ item[1].section }}"
+    section: "Service"
     option: "{{ item[1].option  }}"
     value: "{{ item[1].value }}"
   with_nested:
@@ -320,21 +320,35 @@
         paperless-webserver.service,
       ]
     - [
+        # https://www.freedesktop.org/software/systemd/man/systemd.exec.html
         {
-          section: "Service",
           option: "User",
           value: "{{ paperlessng_system_user }}",
         },
         {
-          section: "Service",
           option: "Group",
           value: "{{ paperlessng_system_group }}",
         },
         {
-          section: "Service",
           option: "WorkingDirectory",
           value: "{{ paperlessng_directory }}/src",
         },
+        {
+          option: "ProtectSystem",
+          value: "full",
+        },
+        {
+          option: "NoNewPrivileges",
+          value: "true",
+        },
+        {
+          option: "PrivateUsers",
+          value: "true",
+        },
+        {
+          option: "PrivateDevices",
+          value: "true",
+        }
       ]
 
 - name: configure paperless-consumer service
