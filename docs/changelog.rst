@@ -5,6 +5,35 @@
 Changelog
 *********
 
+paperless-ng 0.9.10
+###################
+
+* Bulk editing
+
+  * Thanks to `Michael Shamoon`_, we've got a new interface for the bulk editor.
+  * There are some configuration options in the settings to alter the behavior.
+
+* Other changes and additions
+  
+  * The Paperless-ng logo now navigates to the dashboard.
+  * Filter for documents that don't have any correspondents, types or tags assigned.
+  * Tags, types and correspondents are now sorted case insensitive.
+  * Lots of preparation work for localization support.
+
+* Fixes
+
+  * Added missing dependencies for Raspberry Pi builds.
+  * Fixed an issue with plain text file consumption: Thumbnail generation failed due to missing fonts.
+  * An issue with the search index reporting missing documents after bulk deletes was fixed.
+
+.. note::
+
+  The bulk delete operations did not update the search index. Therefore, documents that you deleted remained in the index and
+  caused the search to return messages about missing documents when searching. Further bulk operations will properly update
+  the index.
+  
+  However, this change is not retroactive: If you used the delete method of the bulk editor, you need to reindex your search index
+  by :ref:`running the management command document_index with the argument reindex <administration-index>`.
 
 paperless-ng 0.9.9
 ##################
