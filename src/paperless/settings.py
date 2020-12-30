@@ -254,6 +254,10 @@ LANGUAGES = [
     ("de", _("German"))
 ]
 
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, "locale")
+]
+
 TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
 USE_I18N = True
