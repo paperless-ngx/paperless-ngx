@@ -847,6 +847,21 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs['tag'], self.t1.id)
 
+    @mock.patch("documents.serialisers.bulk_edit.modify_tags")
+    def test_api_modify_tags(self, m):
+        m.return_value = "OK"
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc1.id, self.doc3.id],
+            "method": "modify_tags",
+            "parameters": {"add_tags": [self.t1.id], "remove_tags": [self.t2.id]}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
+        self.assertEqual(kwargs['add_tags'], [self.t1.id])
+        self.assertEqual(kwargs['remove_tags'], [self.t2.id])
+
     @mock.patch("documents.serialisers.bulk_edit.delete")
     def test_api_delete(self, m):
         m.return_value = "OK"
@@ -927,6 +942,38 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
 
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
 
+    def test_api_modify_invalid_tags(self):
+        self.assertEqual(list(self.doc2.tags.all()), [self.t1])
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "modify_tags",
+            "parameters": {'add_tags': [self.t2.id, 1657], "remove_tags": [1123123]}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_api_selection_data_empty(self):
+        response = self.client.post("/api/documents/selection_data/", json.dumps({
+            "documents": []
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        for field, Entity in [('selected_correspondents', Correspondent), ('selected_tags', Tag), ('selected_document_types', DocumentType)]:
+            self.assertEqual(len(response.data[field]), Entity.objects.count())
+            for correspondent in response.data[field]:
+                self.assertEqual(correspondent['document_count'], 0)
+            self.assertCountEqual(
+                map(lambda c: c['id'], response.data[field]),
+                map(lambda c: c['id'], Entity.objects.values('id')))
+
+    def test_api_selection_data(self):
+        response = self.client.post("/api/documents/selection_data/", json.dumps({
+            "documents": [self.doc1.id, self.doc2.id, self.doc4.id, self.doc5.id]
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        self.assertCountEqual(response.data['selected_correspondents'], [{"id": self.c1.id, "document_count": 1}, {"id": self.c2.id, "document_count": 0}])
+        self.assertCountEqual(response.data['selected_tags'], [{"id": self.t1.id, "document_count": 2}, {"id": self.t2.id, "document_count": 1}])
+        self.assertCountEqual(response.data['selected_document_types'], [{"id": self.c1.id, "document_count": 1}, {"id": self.c2.id, "document_count": 0}])
+
 
 class TestApiAuth(APITestCase):
 
@@ -951,3 +998,4 @@ class TestApiAuth(APITestCase):
         self.assertEqual(self.client.get("/api/search/").status_code, 401)
         self.assertEqual(self.client.get("/api/search/auto_complete/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/bulk_edit/").status_code, 401)
+        self.assertEqual(self.client.get("/api/documents/selection_data/").status_code, 401)

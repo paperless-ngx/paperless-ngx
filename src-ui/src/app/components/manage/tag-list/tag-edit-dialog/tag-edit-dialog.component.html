@@ -10,7 +10,7 @@
 
 
       <div class="form-group paperless-input-select">
-        <label for="colour">Colour</label>
+        <label for="colour" i18n>Color</label>
         <ng-select name="colour" formControlName="colour" [items]="getColours()" bindValue="id" bindLabel="name" [clearable]="false">
           <ng-template ng-option-tmp ng-label-tmp let-item="item">
             <span class="badge" [style.background]="item.value" [style.color]="item.textColor">{{item.name}}</span>
@@ -18,13 +18,13 @@
         </ng-select>
       </div>
      
-      <app-input-check title="Inbox tag" formControlName="is_inbox_tag" hint="Inbox tags are automatically assigned to all consumed documents."></app-input-check>
-      <app-input-select title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-      <app-input-text title="Match" formControlName="match" hint="Auto matching does not require you to fill in this field."></app-input-text>
-      <app-input-check title="Case insensitive" formControlName="is_insensitive" hint="Auto matching ignores this option."></app-input-check>
+      <app-input-check i18n-title title="Inbox tag" formControlName="is_inbox_tag" i18n-hint hint="Inbox tags are automatically assigned to all consumed documents."></app-input-check>
+      <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
+      <app-input-text i18n-title title="Match" formControlName="match" i18n-hint hint="Auto matching does not require you to fill in this field."></app-input-text>
+      <app-input-check i18n-title title="Case insensitive" formControlName="is_insensitive" i18n-hint hint="Auto matching ignores this option."></app-input-check>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-outline-dark" (click)="cancel()" i18n>Cancel</button>
+      <button type="submit" class="btn btn-primary" i18n>Save</button>
     </div>
   </form>
