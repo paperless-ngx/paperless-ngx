@@ -35,9 +35,9 @@ def train_classifier():
     try:
         # load the classifier, since we might not have to train it again.
         classifier.reload()
-    except (FileNotFoundError, IncompatibleClassifierVersionError):
+    except (OSError, EOFError, IncompatibleClassifierVersionError):
         # This is what we're going to fix here.
-        pass
+        classifier = DocumentClassifier()
 
     try:
         if classifier.train():
