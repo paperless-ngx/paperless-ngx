@@ -15,6 +15,7 @@ import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog
 import { ChangedItems, FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 import { MatchingModel } from 'src/app/data/matching-model';
+import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-bulk-editor',
@@ -38,8 +39,12 @@ export class BulkEditorComponent {
     public list: DocumentListViewService,
     private documentService: DocumentService,
     private modalService: NgbModal,
-    private openDocumentService: OpenDocumentsService
+    private openDocumentService: OpenDocumentsService,
+    private settings: SettingsService
   ) { }
+
+  applyOnClose: boolean = this.settings.get(SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE)
+  showConfirmationDialogs: boolean = this.settings.get(SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS)
 
   ngOnInit() {
     this.tagService.listAll().subscribe(result => this.tags = result.results)
@@ -51,10 +56,10 @@ export class BulkEditorComponent {
     return this.documentService.bulkEdit(Array.from(this.list.selected), method, args).pipe(
       tap(() => {
         this.list.reload()
+        this.list.reduceSelectionToFilter()
         this.list.selected.forEach(id => {
           this.openDocumentService.refreshDocument(id)
         })
-        this.list.selectNone()
       })
     )
   }
@@ -105,30 +110,39 @@ export class BulkEditorComponent {
   setTags(changedTags: ChangedItems) {
     if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 0) return
 
-    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = $localize`Confirm tags assignment`
-    if (changedTags.itemsToAdd.length == 1 && changedTags.itemsToRemove.length == 0) {
-      let tag = changedTags.itemsToAdd[0]
-      modal.componentInstance.message = $localize`This operation will add the tag ${tag.name} to all ${this.list.selected.size} selected document(s).`
-    } else if (changedTags.itemsToAdd.length > 1 && changedTags.itemsToRemove.length == 0) {
-      modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} to all ${this.list.selected.size} selected document(s).`
-    } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 1) {
-      let tag = changedTags.itemsToAdd[0]
-      modal.componentInstance.message = $localize`This operation will remove the tag ${tag.name} from all ${this.list.selected.size} selected document(s).`
-    } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length > 1) {
-      modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(changedTags.itemsToRemove)} from all ${this.list.selected.size} selected document(s).`
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+      modal.componentInstance.title = $localize`Confirm tags assignment`
+      if (changedTags.itemsToAdd.length == 1 && changedTags.itemsToRemove.length == 0) {
+        let tag = changedTags.itemsToAdd[0]
+        modal.componentInstance.message = $localize`This operation will add the tag ${tag.name} to all ${this.list.selected.size} selected document(s).`
+      } else if (changedTags.itemsToAdd.length > 1 && changedTags.itemsToRemove.length == 0) {
+        modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} to all ${this.list.selected.size} selected document(s).`
+      } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 1) {
+        let tag = changedTags.itemsToRemove[0]
+        modal.componentInstance.message = $localize`This operation will remove the tag ${tag.name} from all ${this.list.selected.size} selected document(s).`
+      } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length > 1) {
+        modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(changedTags.itemsToRemove)} from all ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} and remove the tags ${this._localizeList(changedTags.itemsToRemove)} on all ${this.list.selected.size} selected document(s).`
+      }
+      
+      modal.componentInstance.btnClass = "btn-warning"
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked.subscribe(() => {
+        this.performSetTags(modal, changedTags)
+      })
     } else {
-      modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} and remove the tags ${this._localizeList(changedTags.itemsToRemove)} on all ${this.list.selected.size} selected document(s).`
+      this.performSetTags(null, changedTags)
     }
-    
-    modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = $localize`Confirm`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('modify_tags', {"add_tags": changedTags.itemsToAdd.map(t => t.id), "remove_tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
-        response => {
-          this.tagService.clearCache()
+  }
+
+  private performSetTags(modal, changedTags: ChangedItems) {
+    this.executeBulkOperation('modify_tags', {"add_tags": changedTags.itemsToAdd.map(t => t.id), "remove_tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
+      response => {
+        if (modal) {
           modal.close()
-        })
+        }
       }
     )
   }
@@ -136,47 +150,67 @@ export class BulkEditorComponent {
   setCorrespondents(changedCorrespondents: ChangedItems) {
     if (changedCorrespondents.itemsToAdd.length == 0 && changedCorrespondents.itemsToRemove.length == 0) return
 
-    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = $localize`Confirm correspondent assignment`
     let correspondent = changedCorrespondents.itemsToAdd.length > 0 ? changedCorrespondents.itemsToAdd[0] : null
-    if (correspondent) {
-      modal.componentInstance.message = $localize`This operation will assign the correspondent ${correspondent.name} to all ${this.list.selected.size} selected document(s).`
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+      modal.componentInstance.title = $localize`Confirm correspondent assignment`
+      if (correspondent) {
+        modal.componentInstance.message = $localize`This operation will assign the correspondent ${correspondent.name} to all ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
+      }
+      modal.componentInstance.btnClass = "btn-warning"
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked.subscribe(() => {
+        this.performSetCorrespondents(modal, correspondent)
+      })
     } else {
-      modal.componentInstance.message = $localize`This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
+      this.performSetCorrespondents(null, correspondent)
     }
-    modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = $localize`Confirm`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_correspondent', {"correspondent": correspondent?.id}).subscribe(
-        response => {
-          this.correspondentService.clearCache()
+  }
+
+  private performSetCorrespondents(modal, correspondent: MatchingModel) {
+    this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
+      response => {
+        if (modal) {
           modal.close()
         }
-      )
-    })
+      }
+    )
   }
 
   setDocumentTypes(changedDocumentTypes: ChangedItems) {
     if (changedDocumentTypes.itemsToAdd.length == 0 && changedDocumentTypes.itemsToRemove.length == 0) return
 
-    let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = $localize`Confirm document type assignment`
     let documentType = changedDocumentTypes.itemsToAdd.length > 0 ? changedDocumentTypes.itemsToAdd[0] : null
-    if (documentType) {
-      modal.componentInstance.message = $localize`This operation will assign the document type ${documentType.name} to all ${this.list.selected.size} selected document(s).`
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+      modal.componentInstance.title = $localize`Confirm document type assignment`
+      if (documentType) {
+        modal.componentInstance.message = $localize`This operation will assign the document type ${documentType.name} to all ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
+      }
+      modal.componentInstance.btnClass = "btn-warning"
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked.subscribe(() => {
+        this.performSetDocumentTypes(modal, documentType)
+      })
     } else {
-      modal.componentInstance.message = $localize`This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
+      this.performSetDocumentTypes(null, documentType)
     }
-    modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = $localize`Confirm`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation('set_document_type', {"document_type": documentType?.id}).subscribe(
-        response => {
-          this.documentService.clearCache()
+  }
+
+  private performSetDocumentTypes(modal, documentType) {
+    this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
+      response => {
+        if (modal) {
           modal.close()
         }
-      )
-    })
+      }
+    )
   }
 
   applyDelete() {

@@ -142,7 +142,7 @@ export class FilterableDropdownComponent {
     if (items) {
       this._selectionModel.items = Array.from(items)
       this._selectionModel.items.unshift({
-        name: "None",
+        name: $localize`Not assigned`,
         id: null
       })
     }
@@ -195,6 +195,9 @@ export class FilterableDropdownComponent {
   @Input()
   editing = false
 
+  @Input()
+  applyOnClose = false
+
   @Output()
   apply = new EventEmitter<ChangedItems>()
 
@@ -208,7 +211,9 @@ export class FilterableDropdownComponent {
   applyClicked() {
     if (this.selectionModel.isDirty()) {
       this.dropdown.close()
-      this.apply.emit(this.selectionModel.diff())
+      if (!this.applyOnClose) {
+        this.apply.emit(this.selectionModel.diff())
+      }
     }
   }
 
@@ -223,6 +228,9 @@ export class FilterableDropdownComponent {
       this.open.next()
     } else {
       this.filterText = ''
+      if (this.applyOnClose && this.selectionModel.isDirty()) {
+        this.apply.emit(this.selectionModel.diff())
+      }
     }
   }
 
