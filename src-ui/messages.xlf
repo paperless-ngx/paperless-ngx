@@ -149,8 +149,8 @@
           <context context-type="linenumber">161</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5277522254327902345" datatype="html">
-        <source>Do you really want to delete document &apos;<x id="PH" equiv-text="this.document.title"/>&apos;?</source>
+      <trans-unit id="5382975254277698192" datatype="html">
+        <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">162</context>
@@ -373,11 +373,11 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="2133075428913430816" datatype="html">
-        <source>Do you really want to delete the tag <x id="PH" equiv-text="object.name"/>?</source>
+      <trans-unit id="93754014749412887" datatype="html">
+        <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="70a67e04629f6d412db0a12d51820b480788d795" datatype="html">
@@ -436,8 +436,8 @@
           <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3954409824493602446" datatype="html">
-        <source>Do you really want to delete the document type <x id="PH" equiv-text="object.name"/>?</source>
+      <trans-unit id="4990731724078522539" datatype="html">
+        <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">26</context>
@@ -576,8 +576,8 @@
           <context context-type="linenumber">7</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="2337099367951805921" datatype="html">
-        <source>Do you really want to delete the correspondent <x id="PH" equiv-text="object.name"/>?</source>
+      <trans-unit id="7427874343955308724" datatype="html">
+        <source>Do you really want to delete the correspondent &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">26</context>
@@ -878,11 +878,32 @@
           <context context-type="linenumber">4</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="02d184c288f567825a1fcbf83bcd3099a10853d5" datatype="html">
+        <source>Filter tags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4b089ca12c472cf0b46167bb5afe4b527b301bbc" datatype="html">
+        <source>Filter correspondents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0ad509732aaf702b7ea8c771c7809fa84bc85908" datatype="html">
+        <source>Filter document types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="2f33515a935c36763660e8420940b8a7e11fb1f4" datatype="html">
         <source>Clear all filters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">47</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
@@ -891,6 +912,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
           <context context-type="linenumber">145</context>
         </context-group>
+        <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
       </trans-unit>
       <trans-unit id="c2d0ac9f528bbd5f53fd34269fde8b59e029621b" datatype="html">
         <source>Apply</source>
@@ -990,11 +1012,19 @@
           <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5033601776243148314" datatype="html">
-        <source><x id="PH" equiv-text="items[0].name"/> and <x id="PH_1" equiv-text="items[1].name"/></source>
+      <trans-unit id="8639884465898458690" datatype="html">
+        <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">103</context>
+        </context-group>
+        <note priority="1" from="description">This is for messages like &apos;modify &quot;tag1&quot; and &quot;tag2&quot;&apos;</note>
+      </trans-unit>
+      <trans-unit id="7894972847287473517" datatype="html">
+        <source>&quot;<x id="PH" equiv-text="i.name"/>&quot;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="760986369763309193" datatype="html">
@@ -1003,6 +1033,15 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
+        <note priority="1" from="description">this is used to separate enumerations and should probably be a comma and a whitespace in most languages</note>
+      </trans-unit>
+      <trans-unit id="1822679894391095557" datatype="html">
+        <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+        <note priority="1" from="description">this is for messages like &apos;modify &quot;tag1&quot;, &quot;tag2&quot; and &quot;tag3&quot;&apos;</note>
       </trans-unit>
       <trans-unit id="4137232459980262849" datatype="html">
         <source>Confirm tags assignment</source>
@@ -1011,36 +1050,36 @@
           <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5778291417880283825" datatype="html">
-        <source>This operation will add the tag <x id="PH" equiv-text="tag.name"/> to all <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="6619516195038467207" datatype="html">
+        <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">118</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4791265247184178563" datatype="html">
-        <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to all <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="1894412783609570695" datatype="html">
+        <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">120</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7202114001606049276" datatype="html">
-        <source>This operation will remove the tag <x id="PH" equiv-text="tag.name"/> from all <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="7181166515756808573" datatype="html">
+        <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="247266594076352528" datatype="html">
-        <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from all <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="3819792277998068944" datatype="html">
+        <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4286636723521919383" datatype="html">
-        <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> on all <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="2739066218579571288" datatype="html">
+        <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">127</context>
@@ -1053,15 +1092,15 @@
           <context context-type="linenumber">157</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="9000739289559833849" datatype="html">
-        <source>This operation will assign the correspondent <x id="PH" equiv-text="correspondent.name"/> to all <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="6900893559485781849" datatype="html">
+        <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5197985579238314950" datatype="html">
-        <source>This operation will remove the correspondent from all <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="1257522660364398440" datatype="html">
+        <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">161</context>
@@ -1074,15 +1113,15 @@
           <context context-type="linenumber">190</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="471313288900612996" datatype="html">
-        <source>This operation will assign the document type <x id="PH" equiv-text="documentType.name"/> to all <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="332180123895325027" datatype="html">
+        <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">192</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6005206188202839923" datatype="html">
-        <source>This operation will remove the document type from all <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="2236642492594872779" datatype="html">
+        <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">194</context>
@@ -1095,8 +1134,8 @@
           <context context-type="linenumber">219</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3928393581343272038" datatype="html">
-        <source>This operation will permanently delete all <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
+      <trans-unit id="4303174930844518780" datatype="html">
+        <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">220</context>
@@ -1214,8 +1253,15 @@
           <context context-type="linenumber">5</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="1be5ea6494cb95abc74f42ee9cfddb7ba3a53709" datatype="html">
-        <source>Uploading <x id="INTERPOLATION" equiv-text="{{uploadStatus.length}}"/> file(s)</source>
+      <trans-unit id="a7b50b2df68e875a918d1f4f98f358d756139c13" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {file} =other {<x id="INTERPOLATION"/> files}}</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ec37c68a90632530f5cc8b7e5245cab89ef8bf82" datatype="html">
+        <source>Uploading <x id="ICU" equiv-text="{uploadStatus.length, plural, =1 {file} =other {{{uploadStatus.length}} files}}"/>...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
@@ -1235,15 +1281,15 @@
           <context context-type="linenumber">5</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="73d73c4f994d21fcb441cf316884db54693be3fa" datatype="html">
-        <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and have them displayed on the dashboard instead of this message.</source>
+      <trans-unit id="ea8d9a9486d5639d1c38c012900b8d34d5e4135d" datatype="html">
+        <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="0b87e4267fd45103b1a9c474d243b3366dbf12ee" datatype="html">
-        <source>Paperless offers some more features that try to make your life easier, such as:</source>
+      <trans-unit id="cf5f85690feaba6e29343f9881e57a6c0ea6e82b" datatype="html">
+        <source>Paperless offers some more features that try to make your life easier:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
