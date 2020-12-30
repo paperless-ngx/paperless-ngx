@@ -23,7 +23,7 @@ export class DocumentTypeListComponent extends GenericListComponent<PaperlessDoc
   }
 
   getDeleteMessage(object: PaperlessDocumentType) {
-    return $localize`Do you really want to delete the document type ${object.name}?`
+    return $localize`Do you really want to delete the document type "${object.name}"?`
   }
 
 
