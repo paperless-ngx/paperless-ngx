@@ -39,14 +39,16 @@
               <label class="custom-control-label" for="darkModeEnabled">Enabled</label>
             </div>
           </div>
-
-  
         </div>
 
-        <h4 i18n>Bulk editing</h4>
+        <h4 class="mt-4" i18n>Bulk editing</h4>
 
-        <app-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></app-input-check>
-        <app-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></app-input-check>
+        <div class="form-row form-group">
+          <div class="offset-md-3 col">
+            <app-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></app-input-check>
+            <app-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></app-input-check>
+          </div>
+        </div>
 
       </ng-template>
     </li>
