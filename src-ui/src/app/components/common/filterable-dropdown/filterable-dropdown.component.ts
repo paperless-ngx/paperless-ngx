@@ -142,7 +142,7 @@ export class FilterableDropdownComponent {
     if (items) {
       this._selectionModel.items = Array.from(items)
       this._selectionModel.items.unshift({
-        name: $localize`Not assigned`,
+        name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
         id: null
       })
     }
@@ -185,6 +185,9 @@ export class FilterableDropdownComponent {
 
   @Input()
   title: string
+
+  @Input()
+  filterPlaceholder: string = ""
 
   @Input()
   icon: string

@@ -100,10 +100,10 @@ export class BulkEditorComponent {
     } else if (items.length == 1) {
       return items[0].name
     } else if (items.length == 2) {
-      return $localize`${items[0].name} and ${items[1].name}`
+      return $localize`:This is for messages like 'modify "tag1" and "tag2"':"${items[0].name}" and "${items[1].name}"`
     } else {
-      let list = items.slice(0, items.length - 1).map(i => i.name).join($localize`, `)
-      return $localize`${list} and ${items[items.length - 1].name}`
+      let list = items.slice(0, items.length - 1).map(i => $localize`"${i.name}"`).join($localize`:this is used to separate enumerations and should probably be a comma and a whitespace in most languages:, `)
+      return $localize`:this is for messages like 'modify "tag1", "tag2" and "tag3"':${list} and "${items[items.length - 1].name}"`
     }
   }
 
@@ -115,12 +115,12 @@ export class BulkEditorComponent {
       modal.componentInstance.title = $localize`Confirm tags assignment`
       if (changedTags.itemsToAdd.length == 1 && changedTags.itemsToRemove.length == 0) {
         let tag = changedTags.itemsToAdd[0]
-        modal.componentInstance.message = $localize`This operation will add the tag ${tag.name} to all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will add the tag "${tag.name}" to all ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length > 1 && changedTags.itemsToRemove.length == 0) {
         modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} to all ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 1) {
         let tag = changedTags.itemsToRemove[0]
-        modal.componentInstance.message = $localize`This operation will remove the tag ${tag.name} from all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the tag "${tag.name}" from all ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length > 1) {
         modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(changedTags.itemsToRemove)} from all ${this.list.selected.size} selected document(s).`
       } else {
@@ -156,7 +156,7 @@ export class BulkEditorComponent {
       let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
       modal.componentInstance.title = $localize`Confirm correspondent assignment`
       if (correspondent) {
-        modal.componentInstance.message = $localize`This operation will assign the correspondent ${correspondent.name} to all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the correspondent "${correspondent.name}" to all ${this.list.selected.size} selected document(s).`
       } else {
         modal.componentInstance.message = $localize`This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
       }
@@ -189,7 +189,7 @@ export class BulkEditorComponent {
       let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
       modal.componentInstance.title = $localize`Confirm document type assignment`
       if (documentType) {
-        modal.componentInstance.message = $localize`This operation will assign the document type ${documentType.name} to all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the document type "${documentType.name}" to all ${this.list.selected.size} selected document(s).`
       } else {
         modal.componentInstance.message = $localize`This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
       }

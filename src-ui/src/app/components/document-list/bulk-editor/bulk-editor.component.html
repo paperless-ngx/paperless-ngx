@@ -26,7 +26,8 @@
   <div class="col-auto mb-2 mb-xl-0">
     <div class="d-flex">
       <label class="ml-auto mt-1 mb-0 mr-2" i18n>Edit:</label>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill"
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" i18n-title
+        filterPlaceholder="Filter tags" i18n-filterPlaceholder
         [items]="tags"
         [editing]="true"
         [multiple]="true"
@@ -35,7 +36,8 @@
         [(selectionModel)]="tagSelectionModel"
         (apply)="setTags($event)">
       </app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill"
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" i18n-title
+        filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
         [items]="correspondents"
         [editing]="true"
         [applyOnClose]="applyOnClose"
@@ -43,7 +45,8 @@
         [(selectionModel)]="correspondentSelectionModel"
         (apply)="setCorrespondents($event)">
       </app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill"
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document type" icon="file-earmark-fill" i18n-title
+        filterPlaceholder="Filter document types" i18n-filterPlaceholder
         [items]="documentTypes"
         [editing]="true"
         [applyOnClose]="applyOnClose"
