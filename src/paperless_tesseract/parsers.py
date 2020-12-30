@@ -60,6 +60,7 @@ class RasterisedDocumentParser(DocumentParser):
                         alpha="remove",
                         strip=True,
                         trim=False,
+                        auto_orient=True,
                         input_file="{}[0]".format(document_path),
                         output_file=out_path,
                         logging_group=self.logging_group)
@@ -84,6 +85,7 @@ class RasterisedDocumentParser(DocumentParser):
                         alpha="remove",
                         strip=True,
                         trim=False,
+                        auto_orient=True,
                         input_file=gs_out_path,
                         output_file=out_path,
                         logging_group=self.logging_group)
