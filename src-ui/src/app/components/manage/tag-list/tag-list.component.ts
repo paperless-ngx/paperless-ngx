@@ -27,7 +27,8 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
   }
 
   getDeleteMessage(object: PaperlessTag) {
-    return $localize`Do you really want to delete the tag ${object.name}?`
+    
+    return $localize`Do you really want to delete the tag "${object.name}"?`
   }
 
   filterDocuments(object: PaperlessTag) {

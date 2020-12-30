@@ -23,7 +23,7 @@ export class CorrespondentListComponent extends GenericListComponent<PaperlessCo
   }
 
   getDeleteMessage(object: PaperlessCorrespondent) {
-    return $localize`Do you really want to delete the correspondent ${object.name}?`
+    return $localize`Do you really want to delete the correspondent "${object.name}"?`
   }
 
   filterDocuments(object: PaperlessCorrespondent) {
