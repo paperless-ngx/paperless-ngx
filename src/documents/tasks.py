@@ -94,7 +94,10 @@ def bulk_update_documents(document_ids):
     documents = Document.objects.filter(id__in=document_ids)
 
     ix = index.open_index()
+
+    for doc in documents:
+        post_save.send(Document, instance=doc, created=False)
+
     with AsyncWriter(ix) as writer:
         for doc in documents:
             index.update_document(writer, doc)
-            post_save.send(Document, instance=doc, created=False)
