@@ -1,9 +1,9 @@
 import { Component, OnInit, Renderer2  } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
-import { GENERAL_SETTINGS } from 'src/app/data/storage-keys';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
+import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { AppViewService } from 'src/app/services/app-view.service';
 
@@ -17,13 +17,11 @@ export class SettingsComponent implements OnInit {
   savedViewGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
-    'documentListItemPerPage': new FormControl(+localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT),
-    'darkModeUseSystem': new FormControl(
-      localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM) == undefined ? GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM_DEFAULT : JSON.parse(localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM))
-    ),
-    'darkModeEnabled': new FormControl(
-      localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_ENABLED) == undefined ? GENERAL_SETTINGS.DARK_MODE_ENABLED_DEFAULT : JSON.parse(localStorage.getItem(GENERAL_SETTINGS.DARK_MODE_ENABLED))
-    ),
+    'bulkEditConfirmationDialogs': new FormControl(this.settings.get(SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS)),
+    'bulkEditApplyOnClose': new FormControl(this.settings.get(SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE)),
+    'documentListItemPerPage': new FormControl(this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)),
+    'darkModeUseSystem': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)),
+    'darkModeEnabled': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED)),
     'savedViews': this.savedViewGroup
   })
 
@@ -33,6 +31,7 @@ export class SettingsComponent implements OnInit {
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
     private toastService: ToastService,
+    private settings: SettingsService,
     private appViewService: AppViewService
   ) { }
 
@@ -67,9 +66,11 @@ export class SettingsComponent implements OnInit {
   }
 
   private saveLocalSettings() {
-    localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
-    localStorage.setItem(GENERAL_SETTINGS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
-    localStorage.setItem(GENERAL_SETTINGS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
+    this.settings.set(SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE, this.settingsForm.value.bulkEditApplyOnClose)
+    this.settings.set(SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS, this.settingsForm.value.bulkEditConfirmationDialogs)
+    this.settings.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
+    this.settings.set(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
+    this.settings.set(SETTINGS_KEYS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
     this.documentListViewService.updatePageSize()
     this.appViewService.updateDarkModeSettings()
     this.toastService.showInfo($localize`Settings saved successfully.`)

@@ -62,6 +62,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   @Input()
   set filterRules (value: FilterRule[]) {
+    this.documentTypeSelectionModel.clear(false)
+    this.tagSelectionModel.clear(false)
+    this.correspondentSelectionModel.clear(false)
+
     value.forEach(rule => {
       switch (rule.rule_type) {
         case FILTER_TITLE:
@@ -80,22 +84,22 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.dateAddedBefore = rule.value
           break
         case FILTER_HAS_TAG:
-          this.tagSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          this.tagSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Selected, false)
+          break
+        case FILTER_HAS_ANY_TAG:
+          this.tagSelectionModel.set(null, ToggleableItemState.Selected, false)
           break
         case FILTER_CORRESPONDENT:
-          this.correspondentSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          this.correspondentSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Selected, false)
           break
         case FILTER_DOCUMENT_TYPE:
-          this.documentTypeSelectionModel.set(+rule.value, ToggleableItemState.Selected, false)
+          this.documentTypeSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Selected, false)
           break
       }
     })
   }
 
-  @Output()
-  filterRulesChange = new EventEmitter<FilterRule[]>()
-
-  updateRules() {
+  get filterRules() {
     let filterRules: FilterRule[] = []
     if (this._titleFilter) {
       filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})
@@ -125,7 +129,14 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this.dateAddedAfter) {
       filterRules.push({rule_type: FILTER_ADDED_AFTER, value: this.dateAddedAfter})
     }
-    this.filterRulesChange.next(filterRules)
+    return filterRules
+  }
+
+  @Output()
+  filterRulesChange = new EventEmitter<FilterRule[]>()
+
+  updateRules() {
+    this.filterRulesChange.next(this.filterRules)
   }
 
   hasFilters() {

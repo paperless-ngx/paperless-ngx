@@ -30,6 +30,7 @@
         [items]="tags"
         [editing]="true"
         [multiple]="true"
+        [applyOnClose]="applyOnClose"
         (open)="openTagsDropdown()"
         [(selectionModel)]="tagSelectionModel"
         (apply)="setTags($event)">
@@ -37,6 +38,7 @@
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill"
         [items]="correspondents"
         [editing]="true"
+        [applyOnClose]="applyOnClose"
         (open)="openCorrespondentDropdown()"
         [(selectionModel)]="correspondentSelectionModel"
         (apply)="setCorrespondents($event)">
@@ -44,6 +46,7 @@
       <app-filterable-dropdown class="mr-2 mr-md-3" title="Document Type" icon="file-earmark-fill"
         [items]="documentTypes"
         [editing]="true"
+        [applyOnClose]="applyOnClose"
         (open)="openDocumentTypeDropdown()"
         [(selectionModel)]="documentTypeSelectionModel"
         (apply)="setDocumentTypes($event)">
