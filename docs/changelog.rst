@@ -15,6 +15,7 @@ paperless-ng 0.9.10
 
 * Other changes and additions
   
+  * Thanks to `zjean`_, paperless now publishes a webmanifest, which is useful for adding the application to home screens on mobile devices.
   * The Paperless-ng logo now navigates to the dashboard.
   * Filter for documents that don't have any correspondents, types or tags assigned.
   * Tags, types and correspondents are now sorted case insensitive.
@@ -958,6 +959,7 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _zjean: https://github.com/zjean
 .. _rYR79435: https://github.com/rYR79435
 .. _Michael Shamoon: https://github.com/shamoon
 .. _jayme-github: http://github.com/jayme-github
