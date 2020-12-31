@@ -122,7 +122,6 @@ class DocumentType(MatchingModel):
         verbose_name_plural = _("document types")
 
 
-
 class Document(models.Model):
 
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
@@ -230,8 +229,8 @@ class Document(models.Model):
 
     class Meta:
         ordering = ("-created",)
-        verbose_name = _("Document")
-        verbose_name_plural = _("Documents")
+        verbose_name = _("document")
+        verbose_name_plural = _("documents")
 
     def __str__(self):
         created = datetime.date.isoformat(self.created)
