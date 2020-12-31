@@ -291,17 +291,17 @@ configure their endpoints, and enable the feature.
 If you run paperless on docker, you can add those services to the docker-compose
 file (see the examples provided).
 
-PAPERLESS_TIKA=<bool>
+PAPERLESS_TIKA_ENABLED=<bool>
     Enable (or disable) the Tika parser.
 
     Defaults to false.
 
-TIKA_SERVER_ENDPOINT=<url>
+PAPERLESS_TIKA_ENDPOINT=<url>
     Set the endpoint URL were Paperless can reach your Tika server.
 
     Defaults to "http://localhost:9998".
 
-GOTENBERG_SERVER_ENDPOINT=<url>
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
     Set the endpoint URL were Paperless can reach your Gotenberg server.
 
     Defaults to "http://localhost:3000".
