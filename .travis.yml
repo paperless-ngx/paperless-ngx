@@ -33,16 +33,6 @@ jobs:
         - ng build --prod
       after_success: true
 
-    - name: "Ansible role"
-      sudo: required
-      services:
-        - docker
-      install:
-        - python3 -m pip install molecule[ansible,docker]
-      script:
-        - cd ansible/
-        - molecule test
-      after_success: true
 
 before_install:
   - sudo apt-get update -qq
