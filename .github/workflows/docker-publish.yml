@@ -15,7 +15,7 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          DOCKER_IMAGE=MarkSchmitt/paperless-ng
+          DOCKER_IMAGE=moztr/paperless-ng
           DOCKER_PLATFORMS=linux/amd64,linux/arm/v7,linux/arm64/v8
           VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
