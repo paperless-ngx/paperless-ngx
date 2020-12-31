@@ -74,27 +74,31 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     )
   }
 
+  clearCache() {
+    this._listAll = null
+  }
+
   get(id: number): Observable<T> {
     return this.http.get<T>(this.getResourceUrl(id))
   }
 
   create(o: T): Observable<T> {
-    this._listAll = null
+    this.clearCache()
     return this.http.post<T>(this.getResourceUrl(), o)
   }
 
   delete(o: T): Observable<any> {
-    this._listAll = null
+    this.clearCache()
     return this.http.delete(this.getResourceUrl(o.id))
   }
 
   update(o: T): Observable<T> {
-    this._listAll = null
+    this.clearCache()
     return this.http.put<T>(this.getResourceUrl(o.id), o)
   }
 
   patch(o: T): Observable<T> {
-    this._listAll = null
+    this.clearCache()
     return this.http.patch<T>(this.getResourceUrl(o.id), o)
   }
 

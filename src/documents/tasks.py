@@ -35,9 +35,9 @@ def train_classifier():
     try:
         # load the classifier, since we might not have to train it again.
         classifier.reload()
-    except (FileNotFoundError, IncompatibleClassifierVersionError):
+    except (OSError, EOFError, IncompatibleClassifierVersionError):
         # This is what we're going to fix here.
-        pass
+        classifier = DocumentClassifier()
 
     try:
         if classifier.train():
@@ -90,7 +90,14 @@ def sanity_check():
         return "No issues detected."
 
 
-def bulk_rename_files(document_ids):
-    qs = Document.objects.filter(id__in=document_ids)
-    for doc in qs:
+def bulk_update_documents(document_ids):
+    documents = Document.objects.filter(id__in=document_ids)
+
+    ix = index.open_index()
+
+    for doc in documents:
         post_save.send(Document, instance=doc, created=False)
+
+    with AsyncWriter(ix) as writer:
+        for doc in documents:
+            index.update_document(writer, doc)
