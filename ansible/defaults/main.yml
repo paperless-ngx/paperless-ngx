@@ -1,5 +1,5 @@
 ---
-paperlessng_version: 0.9.9
+paperlessng_version: 0.9.10
 paperlessng_directory: /opt/paperless-ng
 paperlessng_consumption_dir: "{{ paperlessng_directory }}/consumption"
 paperlessng_data_dir: "{{ paperlessng_directory }}/data"
