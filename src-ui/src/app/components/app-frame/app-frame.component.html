@@ -8,7 +8,7 @@
     <img src="assets/logo-dark-notext.svg" height="18px" class="mr-2">
     <ng-container i18n="app title">Paperless-ng</ng-container>
   </a>
-  <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 mr-sm-auto order-3 order-sm-1">
+  <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 pl-md-4 mr-sm-auto order-3 order-sm-1">
     <form (ngSubmit)="search()" class="form-inline flex-grow-1">
       <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
         [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)" i18n-placeholder>
