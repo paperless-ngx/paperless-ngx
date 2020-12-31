@@ -6,8 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  
+
   constructor () {
+    (window as any).pdfWorkerSrc = '/assets/js/pdf.worker.min.js';
   }
 
 
