@@ -25,6 +25,8 @@ paperless-ng 0.9.10
   * Added missing dependencies for Raspberry Pi builds.
   * Fixed an issue with plain text file consumption: Thumbnail generation failed due to missing fonts.
   * An issue with the search index reporting missing documents after bulk deletes was fixed.
+  * Issue with the tag selector not clearing input correctly.
+  * The consumer used to stop working when encountering an incomplete classifier model file.
 
 .. note::
 
