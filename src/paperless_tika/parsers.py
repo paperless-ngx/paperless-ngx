@@ -70,49 +70,46 @@ class TikaDocumentParser(DocumentParser):
 
     def parse(self, document_path, mime_type):
         self.log("info", f"[TIKA_PARSE] Sending {document_path} to Tika server")
+        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
 
         try:
-            parsed = parser.from_file(document_path)
+            parsed = parser.from_file(document_path, tika_server)
         except requests.exceptions.HTTPError as err:
-            raise ParseError(f"Could not parse {document_path} with tika server: {err}")
-
-        try:
-            content = parsed["content"].strip()
-        except:
-            content = ""
-
-        try:
-            creation_date = dateutil.parser.isoparse(
-                parsed["metadata"]["Creation-Date"]
+            raise ParseError(
+                f"Could not parse {document_path} with tika server at {tika_server}: {err}"
             )
+
+        try:
+            self.text = parsed["content"].strip()
         except:
-            creation_date = None
+            pass
+
+        try:
+            self.date = dateutil.parser.isoparse(parsed["metadata"]["Creation-Date"])
+        except:
+            pass
 
         archive_path = os.path.join(self.tempdir, "convert.pdf")
-        convert_to_pdf(self, document_path, archive_path)
-
+        convert_to_pdf(document_path, archive_path)
         self.archive_path = archive_path
-        self.date = creation_date
-        self.text = content
 
+    def convert_to_pdf(document_path, pdf_path):
+        pdf_path = os.path.join(self.tempdir, "convert.pdf")
+        gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+        url = gotenberg_server + "/convert/office"
 
-def convert_to_pdf(self, document_path, pdf_path):
-    pdf_path = os.path.join(self.tempdir, "convert.pdf")
-    gotenberg_server = settings.GOTENBERG_SERVER_ENDPOINT
-    url = gotenberg_server + "/convert/office"
+        self.log("info", f"[TIKA] Converting {document_path} to PDF as {pdf_path}")
+        files = {"files": open(document_path, "rb")}
+        headers = {}
 
-    self.log("info", f"[TIKA] Converting {document_path} to PDF as {pdf_path}")
-    files = {"files": open(document_path, "rb")}
-    headers = {}
+        try:
+            response = requests.post(url, files=files, headers=headers)
+            response.raise_for_status()  # ensure we notice bad responses
+        except requests.exceptions.HTTPError as err:
+            raise ParseError(
+                f"Could not contact gotenberg server at {gotenberg_server}: {err}"
+            )
 
-    try:
-        response = requests.post(url, files=files, headers=headers)
-        response.raise_for_status()  # ensure we notice bad responses
-    except requests.exceptions.HTTPError as err:
-        raise ParseError(
-            f"Could not contact gotenberg server at {gotenberg_server}: {err}"
-        )
-
-    file = open(pdf_path, "wb")
-    file.write(response.content)
-    file.close()
+        file = open(pdf_path, "wb")
+        file.write(response.content)
+        file.close()
