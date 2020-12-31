@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
-import { GENERAL_SETTINGS } from 'src/app/data/storage-keys';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
-import { Toast, ToastService } from 'src/app/services/toast.service';
+import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'app-settings',
@@ -16,14 +16,17 @@ export class SettingsComponent implements OnInit {
   savedViewGroup = new FormGroup({})
 
   settingsForm = new FormGroup({
-    'documentListItemPerPage': new FormControl(+localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT),
+    'bulkEditConfirmationDialogs': new FormControl(this.settings.get(SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS)),
+    'bulkEditApplyOnClose': new FormControl(this.settings.get(SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE)),
+    'documentListItemPerPage': new FormControl(this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)),
     'savedViews': this.savedViewGroup
   })
 
   constructor(
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private settings: SettingsService
   ) { }
 
   savedViews: PaperlessSavedView[]
@@ -46,14 +49,16 @@ export class SettingsComponent implements OnInit {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
-      this.toastService.showToast(Toast.make("Information", `Saved view "${savedView.name} deleted.`))
+      this.toastService.showInfo($localize`Saved view "${savedView.name} deleted.`)
     })
   }
 
   private saveLocalSettings() {
-    localStorage.setItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
+    this.settings.set(SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE, this.settingsForm.value.bulkEditApplyOnClose)
+    this.settings.set(SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS, this.settingsForm.value.bulkEditConfirmationDialogs)
+    this.settings.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
     this.documentListViewService.updatePageSize()
-    this.toastService.showToast(Toast.make("Information", "Settings saved successfully."))
+    this.toastService.showInfo($localize`Settings saved successfully.`)
   }
 
   saveSettings() {
@@ -65,7 +70,7 @@ export class SettingsComponent implements OnInit {
       this.savedViewService.patchMany(x).subscribe(s => {
         this.saveLocalSettings()
       }, error => {
-        this.toastService.showToast(Toast.makeError(`Error while storing settings on server: ${JSON.stringify(error.error)}`))
+        this.toastService.showError($localize`Error while storing settings on server: ${JSON.stringify(error.error)}`)
       })
     } else {
       this.saveLocalSettings()

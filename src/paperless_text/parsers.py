@@ -1,10 +1,9 @@
 import os
-import subprocess
 
 from PIL import ImageDraw, ImageFont, Image
 from django.conf import settings
 
-from documents.parsers import DocumentParser, ParseError
+from documents.parsers import DocumentParser
 
 
 class TextDocumentParser(DocumentParser):
@@ -23,7 +22,8 @@ class TextDocumentParser(DocumentParser):
         img = Image.new("RGB", (500, 700), color="white")
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype(
-            "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf", 20,
+            font=settings.THUMBNAIL_FONT_NAME,
+            size=20,
             layout_engine=ImageFont.LAYOUT_BASIC)
         draw.text((5, 5), read_text(), font=font, fill="black")
 
