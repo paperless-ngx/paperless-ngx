@@ -1,23 +1,19 @@
-
 @import "/src/theme";
-
-  /*
+/*
  * Sidebar
  */
-
- .sidebar {
+.sidebar {
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   z-index: 100; /* Behind the navbar */
-  padding: 48px 0 0; /* Height of navbar */
+  padding: 50px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
-
 @media (max-width: 767.98px) {
   .sidebar {
-    top: 3rem;
+    top: 3.5rem;
   }
 }
 
@@ -26,11 +22,11 @@
   top: 0;
   /* height: calc(100vh - 48px); */
   height: 100%;
-  padding-top: .5rem;
+  padding-top: 0.5rem;
   overflow-x: hidden;
-  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  overflow-y: auto;
+  /* Scrollable contents if viewport is shorter than content. */
 }
-
 @supports ((position: -webkit-sticky) or (position: sticky)) {
   .sidebar-sticky {
     position: -webkit-sticky;
@@ -53,25 +49,31 @@
   font-weight: bold;
 }
 
-.sidebar .nav-link:hover .sidebaricon,
-.sidebar .nav-link.active .sidebaricon {
+.sidebar .nav-link.active .sidebaricon,
+.sidebar .nav-link:hover .sidebaricon {
   color: inherit;
 }
 
 .sidebar-heading {
-  font-size: .75rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
-
 
 /*
  * Navbar
  */
-
- .navbar-brand {
-  padding-top: .75rem;
-  padding-bottom: .75rem;
+.navbar-brand {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
   font-size: 1rem;
+}
+
+.navbar-toggler {
+}
+
+.dropdown-toggle::after {
+  margin-left: 0.4em;
+  vertical-align: 0.155em;
 }
 
 .navbar .search-form-container {
@@ -91,16 +93,16 @@
   }
 
   .form-control {
-    color: rgba(255, 255, 255, 0.5);
-    background-color: rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(0, 0, 0, 0.15);
     padding-left: 1.8rem;
-    border-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
     transition: flex 0.3s ease;
     max-width: 600px;
     min-width: 300px; // 1/2 max
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.4);
     }
 
     &:focus {
