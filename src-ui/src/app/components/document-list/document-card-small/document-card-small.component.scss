@@ -8,7 +8,15 @@
 }
 
 .document-card-check {
-  display: none
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  .custom-control {
+    margin-left: 4px;
+    margin-right: -3px;
+  }
 }
 
 .document-card:hover .document-card-check {
@@ -17,6 +25,10 @@
 
 .card-selected {
   border-color: $primary;
+
+  .document-card-check {
+    display: block;
+  }
 }
 
 .doc-img-background-selected {

@@ -19,7 +19,8 @@ from documents.views import (
     StatisticsView,
     PostDocumentView,
     SavedViewViewSet,
-    BulkEditView
+    BulkEditView,
+    SelectionDataView
 )
 from paperless.views import FaviconView
 
@@ -53,9 +54,11 @@ urlpatterns = [
         re_path(r"^documents/post_document/", PostDocumentView.as_view(),
                 name="post_document"),
 
-
         re_path(r"^documents/bulk_edit/", BulkEditView.as_view(),
                 name="bulk_edit"),
+
+        re_path(r"^documents/selection_data/", SelectionDataView.as_view(),
+                name="selection_data"),
 
         path('token/', views.obtain_auth_token)
 

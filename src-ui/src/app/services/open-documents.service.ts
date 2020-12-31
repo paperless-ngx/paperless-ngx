@@ -28,6 +28,9 @@ export class OpenDocumentsService {
     if (index > -1) {
       this.documentService.get(id).subscribe(doc => {
         this.openDocuments[index] = doc
+      }, error => {
+        this.openDocuments.splice(index, 1)
+        this.save()
       })
     }
   }

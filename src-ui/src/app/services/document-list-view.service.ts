@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
 import { PaperlessDocument } from '../data/paperless-document';
 import { PaperlessSavedView } from '../data/paperless-saved-view';
-import { DOCUMENT_LIST_SERVICE, GENERAL_SETTINGS } from '../data/storage-keys';
+import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
 import { DocumentService } from './rest/document.service';
+import { SettingsService, SETTINGS_KEYS } from './settings.service';
 
 
 /**
@@ -23,7 +25,7 @@ export class DocumentListViewService {
   isReloading: boolean = false
   documents: PaperlessDocument[] = []
   currentPage = 1
-  currentPageSize: number = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
+  currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
   collectionSize: number
 
   /**
@@ -154,6 +156,14 @@ export class DocumentListViewService {
     sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(this.documentListView))
   }
 
+  quickFilter(filterRules: FilterRule[]) {
+    this.savedView = null
+    this.view.filter_rules = filterRules
+    this.reduceSelectionToFilter()
+    this.saveDocumentListView()
+    this.router.navigate(["documents"])
+  }
+
   getLastPage(): number {
     return Math.ceil(this.collectionSize / this.currentPageSize)
   }
@@ -190,7 +200,7 @@ export class DocumentListViewService {
   }
 
   updatePageSize() {
-    let newPageSize = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
+    let newPageSize = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
     if (newPageSize != this.currentPageSize) {
       this.currentPageSize = newPageSize
     }
@@ -202,7 +212,7 @@ export class DocumentListViewService {
     this.selected.clear()
   }
 
-  private reduceSelectionToFilter() {
+  reduceSelectionToFilter() {
     if (this.selected.size > 0) {
       this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => {
         let subset = new Set<number>()
@@ -239,7 +249,7 @@ export class DocumentListViewService {
     }
   }
 
-  constructor(private documentService: DocumentService) {
+  constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
     let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {
