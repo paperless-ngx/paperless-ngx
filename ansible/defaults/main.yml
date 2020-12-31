@@ -13,8 +13,7 @@ paperlessng_ocr_languages:
 paperlessng_time_zone: Europe/Berlin
 # see https://ocrmypdf.readthedocs.io/en/latest/api.html#ocrmypdf.ocr
 paperlessng_ocrmypdf_args:
-  - "deskew": true
-  - "clean": true
+  #- "deskew": true
   - "optimize": 1
 paperlessng_use_jbig2enc: true
 paperlessng_big2enc_lossy: false
