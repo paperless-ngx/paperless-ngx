@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
@@ -16,20 +15,16 @@ import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/co
 export class CorrespondentListComponent extends GenericListComponent<PaperlessCorrespondent> {
 
   constructor(correspondentsService: CorrespondentService, modalService: NgbModal,
-    private router: Router,
     private list: DocumentListViewService
   ) { 
     super(correspondentsService,modalService,CorrespondentEditDialogComponent)
   }
 
   getDeleteMessage(object: PaperlessCorrespondent) {
-    return $localize`Do you really want to delete the correspondent ${object.name}?`
+    return $localize`Do you really want to delete the correspondent "${object.name}"?`
   }
 
   filterDocuments(object: PaperlessCorrespondent) {
-    this.list.documentListView.filter_rules = [
-      {rule_type: FILTER_CORRESPONDENT, value: object.id.toString()}
-    ]
-    this.router.navigate(["documents"])
+    this.list.quickFilter([{rule_type: FILTER_CORRESPONDENT, value: object.id.toString()}])
   }
 }

@@ -15,6 +15,7 @@ paperless-ng 0.9.10
 
 * Other changes and additions
   
+  * Thanks to `zjean`_, paperless now publishes a webmanifest, which is useful for adding the application to home screens on mobile devices.
   * The Paperless-ng logo now navigates to the dashboard.
   * Filter for documents that don't have any correspondents, types or tags assigned.
   * Tags, types and correspondents are now sorted case insensitive.
@@ -25,6 +26,8 @@ paperless-ng 0.9.10
   * Added missing dependencies for Raspberry Pi builds.
   * Fixed an issue with plain text file consumption: Thumbnail generation failed due to missing fonts.
   * An issue with the search index reporting missing documents after bulk deletes was fixed.
+  * Issue with the tag selector not clearing input correctly.
+  * The consumer used to stop working when encountering an incomplete classifier model file.
 
 .. note::
 
@@ -956,6 +959,7 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _zjean: https://github.com/zjean
 .. _rYR79435: https://github.com/rYR79435
 .. _Michael Shamoon: https://github.com/shamoon
 .. _jayme-github: http://github.com/jayme-github
