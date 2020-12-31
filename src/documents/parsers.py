@@ -117,6 +117,7 @@ def run_convert(input_file,
                 trim=False,
                 type=None,
                 depth=None,
+                auto_orient=False,
                 extra=None,
                 logging_group=None):
 
@@ -134,6 +135,7 @@ def run_convert(input_file,
     args += ['-trim'] if trim else []
     args += ['-type', str(type)] if type else []
     args += ['-depth', str(depth)] if depth else []
+    args += ['-auto-orient'] if auto_orient else []
     args += [input_file, output_file]
 
     logger.debug("Execute: " + " ".join(args), extra={'group': logging_group})
