@@ -5,6 +5,13 @@
 Changelog
 *********
 
+
+paperless-ng 0.9.11
+###################
+
+* Fixed an issue with the docker image not starting at all due to a configuration change of the web server.
+
+
 paperless-ng 0.9.10
 ###################
 
