@@ -158,7 +158,7 @@ class Consumer(LoggingMixin):
         try:
             classifier = DocumentClassifier()
             classifier.reload()
-        except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
+        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
             self.log(
                 "warning",
                 f"Cannot classify documents: {e}.")
