@@ -19,11 +19,11 @@
 
 .sidebar-sticky {
   position: relative;
-  top: 0;  /* height: calc(100vh - 48px); */
+  top: 0; /* height: calc(100vh - 48px); */
   height: 100%;
   padding-top: 0.5rem;
   overflow-x: hidden;
-  overflow-y: auto;  /* Scrollable contents if viewport is shorter than content. */
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
 }
 @supports ((position: -webkit-sticky) or (position: sticky)) {
   .sidebar-sticky {
