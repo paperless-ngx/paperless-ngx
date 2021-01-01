@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-31 14:39+0000\n"
+"POT-Creation-Date: 2021-01-01 19:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -366,11 +366,11 @@ msgid "Use STARTTLS"
 msgstr ""
 
 #: paperless_mail/models.py:25
-msgid "imap server"
+msgid "IMAP server"
 msgstr ""
 
 #: paperless_mail/models.py:29
-msgid "imap port"
+msgid "IMAP port"
 msgstr ""
 
 #: paperless_mail/models.py:32
@@ -380,7 +380,7 @@ msgid ""
 msgstr ""
 
 #: paperless_mail/models.py:36
-msgid "imap security"
+msgid "IMAP security"
 msgstr ""
 
 #: paperless_mail/models.py:42
@@ -417,6 +417,10 @@ msgstr ""
 
 #: paperless_mail/models.py:82
 msgid "Do not assign a correspondent"
+msgstr ""
+
+#: paperless_mail/models.py:84
+msgid "Use mail address"
 msgstr ""
 
 #: paperless_mail/models.py:86

@@ -22,18 +22,18 @@ class MailAccount(models.Model):
         max_length=256, unique=True)
 
     imap_server = models.CharField(
-        _("imap server"),
+        _("IMAP server"),
         max_length=256)
 
     imap_port = models.IntegerField(
-        _("imap port"),
+        _("IMAP port"),
         blank=True,
         null=True,
         help_text=_("This is usually 143 for unencrypted and STARTTLS "
                     "connections, and 993 for SSL connections."))
 
     imap_security = models.PositiveIntegerField(
-        _("imap security"),
+        _("IMAP security"),
         choices=IMAP_SECURITY_OPTIONS,
         default=IMAP_SECURITY_SSL
     )
@@ -81,7 +81,7 @@ class MailRule(models.Model):
         (CORRESPONDENT_FROM_NOTHING,
          _("Do not assign a correspondent")),
         (CORRESPONDENT_FROM_EMAIL,
-         "Use mail address"),
+         _("Use mail address")),
         (CORRESPONDENT_FROM_NAME,
          _("Use name (or mail address if not available)")),
         (CORRESPONDENT_FROM_CUSTOM,
