@@ -10,12 +10,16 @@ export const SETTINGS_KEYS = {
   BULK_EDIT_CONFIRMATION_DIALOGS: 'general-settings:bulk-edit:confirmation-dialogs',
   BULK_EDIT_APPLY_ON_CLOSE: 'general-settings:bulk-edit:apply-on-close',
   DOCUMENT_LIST_SIZE: 'general-settings:documentListSize',
+  DARK_MODE_USE_SYSTEM: 'general-settings:dark-mode:use-system',
+  DARK_MODE_ENABLED: 'general-settings:dark-mode:enabled'
 }
 
 const SETTINGS: PaperlessSettings[] = [
   {key: SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS, type: "boolean", default: true},
   {key: SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE, type: "boolean", default: false},
-  {key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE, type: "number", default: 50}
+  {key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE, type: "number", default: 50},
+  {key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: "boolean", default: false}
 ]
 
 @Injectable({
