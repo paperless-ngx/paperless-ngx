@@ -10,6 +10,7 @@ export class AppComponent {
 
   constructor (appViewService: AppViewService) {
     appViewService.updateDarkModeSettings()
+    (window as any).pdfWorkerSrc = '/assets/js/pdf.worker.min.js';
   }
 
 
