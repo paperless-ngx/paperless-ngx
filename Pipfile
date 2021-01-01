@@ -42,6 +42,7 @@ whoosh="~=2.7.4"
 inotifyrecursive = "~=0.3.4"
 ocrmypdf = "*"
 tqdm = "*"
+tika = "*"
 
 [dev-packages]
 coveralls = "*"
