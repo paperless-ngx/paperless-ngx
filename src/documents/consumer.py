@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+from subprocess import Popen
 
 import magic
 from django.conf import settings
@@ -8,6 +9,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from filelock import FileLock
+from rest_framework.reverse import reverse
 
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .file_handling import create_source_path_directory, \
@@ -65,6 +67,39 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
+    def run_pre_consume_script(self):
+        if not settings.PRE_CONSUME_SCRIPT:
+            return
+
+        try:
+            Popen((settings.PRE_CONSUME_SCRIPT, self.path)).wait()
+        except Exception as e:
+            raise ConsumerError(
+                f"Error while executing pre-consume script: {e}"
+            )
+
+    def run_post_consume_script(self, document):
+        if not settings.POST_CONSUME_SCRIPT:
+            return
+
+        try:
+            Popen((
+                settings.POST_CONSUME_SCRIPT,
+                str(document.pk),
+                document.get_public_filename(),
+                os.path.normpath(document.source_path),
+                os.path.normpath(document.thumbnail_path),
+                reverse("document-download", kwargs={"pk": document.pk}),
+                reverse("document-thumb", kwargs={"pk": document.pk}),
+                str(document.correspondent),
+                str(",".join(document.tags.all().values_list(
+                    "name", flat=True)))
+            )).wait()
+        except Exception as e:
+            raise ConsumerError(
+                f"Error while executing pre-consume script: {e}"
+            )
+
     def try_consume_file(self,
                          path,
                          override_filename=None,
@@ -117,6 +152,8 @@ class Consumer(LoggingMixin):
             filename=self.path,
             logging_group=self.logging_group
         )
+
+        self.run_pre_consume_script()
 
         # This doesn't parse the document yet, but gives us a parser.
 
@@ -214,6 +251,9 @@ class Consumer(LoggingMixin):
                 # Delete the file only if it was successfully consumed
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
+
+                self.run_post_consume_script(document)
+
         except Exception as e:
             self.log(
                 "error",
