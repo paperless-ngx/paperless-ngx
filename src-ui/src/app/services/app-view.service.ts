@@ -18,7 +18,7 @@ export class AppViewService {
     this.updateDarkModeSettings()
   }
 
-  updateDarkModeSettings() {
+  updateDarkModeSettings(): void {
     let darkModeUseSystem = this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)
     let darkModeEnabled = this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED)
 
