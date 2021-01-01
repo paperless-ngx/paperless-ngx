@@ -1,0 +1,43 @@
+version: "3.4"
+services:
+  broker:
+    image: redis:6.0
+    restart: always
+
+  webserver:
+    build: .
+    restart: always
+    depends_on:
+      - broker
+    ports:
+      - 8000:8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    env_file: docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+
+  gotenberg:
+    image: thecodingmachine/gotenberg
+    restart: unless-stopped
+    environment:
+      DISABLE_GOOGLE_CHROME: 1
+
+  tika:
+    image: apache/tika
+    restart: unless-stopped
+
+volumes:
+  data:
+  media:
