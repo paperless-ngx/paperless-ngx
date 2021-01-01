@@ -89,11 +89,14 @@
 
 .navbar .search-form-container {
   max-width: 550px;
-  position: relative;
+
+  form {
+    position: relative;
+  }
 
   svg {
     position: absolute;
-    left: 2rem;
+    left: 0.6rem;
     color: rgba(255, 255, 255, 0.6);
   }
 
