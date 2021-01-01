@@ -5,7 +5,6 @@ import { DocumentListViewService } from 'src/app/services/document-list-view.ser
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { AppViewService } from 'src/app/services/app-view.service';
 
 @Component({
   selector: 'app-settings',
@@ -31,8 +30,7 @@ export class SettingsComponent implements OnInit {
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
     private toastService: ToastService,
-    private settings: SettingsService,
-    private appViewService: AppViewService
+    private settings: SettingsService
   ) { }
 
   ngOnInit() {
@@ -72,7 +70,7 @@ export class SettingsComponent implements OnInit {
     this.settings.set(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
     this.documentListViewService.updatePageSize()
-    this.appViewService.updateDarkModeSettings()
+    this.settings.updateDarkModeSettings()
     this.toastService.showInfo($localize`Settings saved successfully.`)
   }
 

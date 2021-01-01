@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 
 export interface PaperlessSettings {
   key: string
@@ -27,7 +28,30 @@ const SETTINGS: PaperlessSettings[] = [
 })
 export class SettingsService {
 
-  constructor() { }
+  private renderer: Renderer2;
+
+  constructor(
+    private rendererFactory: RendererFactory2,
+    @Inject(DOCUMENT) private document
+  ) {
+    this.renderer = rendererFactory.createRenderer(null, null);
+
+    this.updateDarkModeSettings()
+  }
+
+  updateDarkModeSettings(): void {
+    let darkModeUseSystem = this.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)
+    let darkModeEnabled = this.get(SETTINGS_KEYS.DARK_MODE_ENABLED)
+
+    if (darkModeUseSystem) {
+      this.renderer.addClass(this.document.body, 'color-scheme-system')
+      this.renderer.removeClass(this.document.body, 'color-scheme-dark')
+    } else {
+      this.renderer.removeClass(this.document.body, 'color-scheme-system')
+      darkModeEnabled ? this.renderer.addClass(this.document.body, 'color-scheme-dark') : this.renderer.removeClass(this.document.body, 'color-scheme-dark')
+    }
+
+  }
 
   get(key: string): any {
     let setting = SETTINGS.find(s => s.key == key)
