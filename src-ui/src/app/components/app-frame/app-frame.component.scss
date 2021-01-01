@@ -62,18 +62,29 @@
 /*
  * Navbar
  */
+
 .navbar-brand {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
   font-size: 1rem;
 }
 
-.navbar-toggler {
+.dropdown.show .dropdown-toggle,
+.dropdown-toggle:hover {
+  opacity: 0.7;
 }
 
 .dropdown-toggle::after {
   margin-left: 0.4em;
   vertical-align: 0.155em;
+}
+
+.navbar .dropdown-menu {
+  font-size: 0.875rem; // body size
+
+  a svg {
+    opacity: 0.6;
+  }
 }
 
 .navbar .search-form-container {

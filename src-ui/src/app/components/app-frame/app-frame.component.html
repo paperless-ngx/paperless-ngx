@@ -20,21 +20,28 @@
   <ul ngbNav class="order-sm-3">
     <li ngbDropdown class="nav-item dropdown">
       <button class="btn text-light" id="userDropdown" ngbDropdownToggle>
+        <span *ngIf="displayName" class="navbar-text small mr-2 text-light d-none d-sm-inline">
+          {{displayName}}
+        </span>
         <svg width="1.3em" height="1.3em">
           <use xlink:href="assets/bootstrap-icons.svg#person-circle"/>
         </svg>
       </button>
       <div ngbDropdownMenu class="dropdown-menu-right shadow mr-2" aria-labelledby="userDropdown">
-          <a ngbDropdownItem class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()">
-            <svg class="sidebaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#gear"/>
-            </svg>&nbsp;<ng-container i18n>Settings</ng-container>
-          </a>
-          <a ngbDropdownItem class="nav-link" href="accounts/logout/">
-            <svg class="sidebaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#door-open"/>
-            </svg>&nbsp;<ng-container i18n>Logout</ng-container>
-          </a>
+        <div *ngIf="displayName" class="d-sm-none">
+          <p class="small mb-0 px-3" i18n>Logged in as {{displayName}}</p>
+          <div class="dropdown-divider"></div>
+        </div>
+        <a ngbDropdownItem class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()">
+          <svg class="sidebaricon mr-2" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#gear"/>
+          </svg><ng-container i18n>Settings</ng-container>
+        </a>
+        <a ngbDropdownItem class="nav-link" href="accounts/logout/">
+          <svg class="sidebaricon mr-2" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#door-open"/>
+          </svg><ng-container i18n>Logout</ng-container>
+        </a>
       </div>
     </li>
   </ul>
