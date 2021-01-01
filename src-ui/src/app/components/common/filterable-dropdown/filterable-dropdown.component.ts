@@ -18,6 +18,18 @@ export class FilterableDropdownSelectionModel {
 
   items: MatchingModel[] = []
 
+  get itemsSorted(): MatchingModel[] {
+    return this.items.sort((a,b) => {
+      if (this.getNonTemporary(a.id) == ToggleableItemState.NotSelected && this.getNonTemporary(b.id) != ToggleableItemState.NotSelected) {
+        return 1
+      } else if (this.getNonTemporary(a.id) != ToggleableItemState.NotSelected && this.getNonTemporary(b.id) == ToggleableItemState.NotSelected) {
+        return -1
+      } else {
+        return a.name.localeCompare(b.name)
+      }
+    })
+  }
+
   private selectionStates = new Map<number, ToggleableItemState>()
 
   private temporarySelectionStates = new Map<number, ToggleableItemState>()
@@ -67,6 +79,10 @@ export class FilterableDropdownSelectionModel {
       this.changed.next(this)
     }
     
+  }
+
+  private getNonTemporary(id: number) {
+    return this.selectionStates.get(id) || ToggleableItemState.NotSelected
   }
 
   get(id: number) {

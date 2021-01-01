@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FILTER_HAS_TAG } from 'src/app/data/filter-rule-type';
 import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
@@ -16,7 +15,6 @@ import { TagEditDialogComponent } from './tag-edit-dialog/tag-edit-dialog.compon
 export class TagListComponent extends GenericListComponent<PaperlessTag> {
 
   constructor(tagService: TagService, modalService: NgbModal,
-    private router: Router,
     private list: DocumentListViewService
   ) {
     super(tagService, modalService, TagEditDialogComponent)
@@ -27,14 +25,11 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
   }
 
   getDeleteMessage(object: PaperlessTag) {
-    
     return $localize`Do you really want to delete the tag "${object.name}"?`
   }
 
   filterDocuments(object: PaperlessTag) {
-    this.list.documentListView.filter_rules = [
-      {rule_type: FILTER_HAS_TAG, value: object.id.toString()}
-    ]
-    this.router.navigate(["documents"])
+    this.list.quickFilter([{rule_type: FILTER_HAS_TAG, value: object.id.toString()}])
+
   }
 }

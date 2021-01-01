@@ -78,8 +78,8 @@
 </app-page-header>
 
 <div class="w-100 mb-2 mb-sm-4">
-  <app-filter-editor *ngIf="!isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
-  <app-bulk-editor *ngIf="isBulkEditing"></app-bulk-editor>
+  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
+  <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 
 <div class="d-flex justify-content-between align-items-center">

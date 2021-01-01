@@ -23,6 +23,7 @@ def _process_document(doc_in):
     finally:
         parser.cleanup()
 
+
 class Command(Renderable, BaseCommand):
 
     help = """
@@ -62,4 +63,6 @@ class Command(Renderable, BaseCommand):
         db.connections.close_all()
 
         with multiprocessing.Pool() as pool:
-            list(tqdm.tqdm(pool.imap_unordered(_process_document, ids), total=len(ids)))
+            list(tqdm.tqdm(
+                pool.imap_unordered(_process_document, ids), total=len(ids)
+            ))
