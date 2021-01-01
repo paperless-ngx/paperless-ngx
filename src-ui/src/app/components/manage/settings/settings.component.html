@@ -10,30 +10,45 @@
       <a ngbNavLink i18n>General settings</a>
       <ng-template ngbNavContent>
 
-        <h4 i18n>Document list</h4>
-        
+        <h4 i18n>Appearance</h4>
+
         <div class="form-row form-group">
           <div class="col-md-3 col-form-label">
             <span i18n>Items per page</span>
           </div>
           <div class="col">
-        
+
             <select class="form-control" formControlName="documentListItemPerPage">
               <option [ngValue]="10">10</option>
               <option [ngValue]="25">25</option>
               <option [ngValue]="50">50</option>
               <option [ngValue]="100">100</option>
             </select>
-        
-          </div>
 
-  
+          </div>
         </div>
 
-        <h4 i18n>Bulk editing</h4>
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Dark mode</span>
+          </div>
+          <div class="col">
+            <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem" (change)="toggleDarkModeSetting()"></app-input-check>
+            <div class="custom-control custom-switch" *ngIf="!settingsForm.value.darkModeUseSystem">
+              <input type="checkbox" class="custom-control-input" id="darkModeEnabled" formControlName="darkModeEnabled" [checked]="settingsForm.value.darkModeEnabled">
+              <label class="custom-control-label" for="darkModeEnabled">Enabled</label>
+            </div>
+          </div>
+        </div>
 
-        <app-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></app-input-check>
-        <app-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></app-input-check>
+        <h4 class="mt-4" i18n>Bulk editing</h4>
+
+        <div class="form-row form-group">
+          <div class="offset-md-3 col">
+            <app-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></app-input-check>
+            <app-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></app-input-check>
+          </div>
+        </div>
 
       </ng-template>
     </li>
@@ -42,7 +57,7 @@
       <ng-template ngbNavContent>
 
         <div formGroupName="savedViews">
-          
+
             <div *ngFor="let view of savedViews" [formGroupName]="view.id" class="form-row">
               <div class="form-group col-4 mr-3">
                 <label for="name_{{view.id}}" i18n>Name</label>
@@ -68,7 +83,7 @@
             </div>
 
             <div *ngIf="savedViews.length == 0" i18n>No saved views defined.</div>
-          
+
         </div>
 
       </ng-template>

@@ -115,16 +115,16 @@ export class BulkEditorComponent {
       modal.componentInstance.title = $localize`Confirm tags assignment`
       if (changedTags.itemsToAdd.length == 1 && changedTags.itemsToRemove.length == 0) {
         let tag = changedTags.itemsToAdd[0]
-        modal.componentInstance.message = $localize`This operation will add the tag "${tag.name}" to all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will add the tag "${tag.name}" to ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length > 1 && changedTags.itemsToRemove.length == 0) {
-        modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} to all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} to ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length == 1) {
         let tag = changedTags.itemsToRemove[0]
-        modal.componentInstance.message = $localize`This operation will remove the tag "${tag.name}" from all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the tag "${tag.name}" from ${this.list.selected.size} selected document(s).`
       } else if (changedTags.itemsToAdd.length == 0 && changedTags.itemsToRemove.length > 1) {
-        modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(changedTags.itemsToRemove)} from all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the tags ${this._localizeList(changedTags.itemsToRemove)} from ${this.list.selected.size} selected document(s).`
       } else {
-        modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} and remove the tags ${this._localizeList(changedTags.itemsToRemove)} on all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} and remove the tags ${this._localizeList(changedTags.itemsToRemove)} on ${this.list.selected.size} selected document(s).`
       }
       
       modal.componentInstance.btnClass = "btn-warning"
@@ -156,9 +156,9 @@ export class BulkEditorComponent {
       let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
       modal.componentInstance.title = $localize`Confirm correspondent assignment`
       if (correspondent) {
-        modal.componentInstance.message = $localize`This operation will assign the correspondent "${correspondent.name}" to all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the correspondent "${correspondent.name}" to ${this.list.selected.size} selected document(s).`
       } else {
-        modal.componentInstance.message = $localize`This operation will remove the correspondent from all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the correspondent from ${this.list.selected.size} selected document(s).`
       }
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Confirm`
@@ -189,9 +189,9 @@ export class BulkEditorComponent {
       let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
       modal.componentInstance.title = $localize`Confirm document type assignment`
       if (documentType) {
-        modal.componentInstance.message = $localize`This operation will assign the document type "${documentType.name}" to all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will assign the document type "${documentType.name}" to ${this.list.selected.size} selected document(s).`
       } else {
-        modal.componentInstance.message = $localize`This operation will remove the document type from all ${this.list.selected.size} selected document(s).`
+        modal.componentInstance.message = $localize`This operation will remove the document type from ${this.list.selected.size} selected document(s).`
       }
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Confirm`
@@ -217,7 +217,7 @@ export class BulkEditorComponent {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
     modal.componentInstance.delayConfirm(5)
     modal.componentInstance.title = $localize`Delete confirm`
-    modal.componentInstance.messageBold = $localize`This operation will permanently delete all ${this.list.selected.size} selected document(s).`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete ${this.list.selected.size} selected document(s).`
     modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = "btn-danger"
     modal.componentInstance.btnCaption = $localize`Delete document(s)`

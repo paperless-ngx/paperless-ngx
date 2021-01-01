@@ -5,7 +5,9 @@
     <ng-select name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="displayValue"
       [multiple]="true"
       [closeOnSelect]="false"
+      [clearSearchOnAdd]="true"
       [disabled]="disabled"
+      [hideSelected]="true"
       (change)="ngSelectChange()">
 
       <ng-template ng-label-tmp let-item="item">
