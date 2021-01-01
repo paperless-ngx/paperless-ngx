@@ -38,10 +38,6 @@ jobs:
       - name: install buildx
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@v3.1.0
-
-      - name: Docker Buildx (build)
-        run: |
-          docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
       - name: Docker Login
         if: success() && github.event_name != 'pull_request'
         env:
