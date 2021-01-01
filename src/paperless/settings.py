@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "documents.apps.DocumentsConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
+    "paperless_tika.apps.PaperlessTikaConfig",
     "paperless_mail.apps.PaperlessMailConfig",
 
     "django.contrib.admin",
@@ -424,3 +425,10 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
 PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
 
 THUMBNAIL_FONT_NAME = os.getenv("PAPERLESS_THUMBNAIL_FONT_NAME", "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf")
+
+# Tika settings
+PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
+PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
+    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
+)
