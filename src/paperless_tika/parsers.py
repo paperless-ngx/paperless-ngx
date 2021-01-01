@@ -21,26 +21,44 @@ class TikaDocumentParser(DocumentParser):
         return make_thumbnail_from_pdf(
             self.archive_path, self.tempdir, self.logging_group)
 
+    def extract_metadata(self, document_path, mime_type):
+        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+        try:
+            parsed = parser.from_file(document_path, tika_server)
+        except Exception as e:
+            self.log("warning", f"Error while fetching document metadata for "
+                                f"{document_path}: {e}")
+            return []
+
+        return [
+            {
+                "namespace": "",
+                "prefix": "",
+                "key": key,
+                "value": parsed['metadata'][key]
+            } for key in parsed['metadata']
+        ]
+
     def parse(self, document_path, mime_type):
-        self.log("info", f"[TIKA_PARSE] Sending {document_path} to Tika server")
+        self.log("info", f"Sending {document_path} to Tika server")
         tika_server = settings.PAPERLESS_TIKA_ENDPOINT
 
         try:
             parsed = parser.from_file(document_path, tika_server)
-        except requests.exceptions.HTTPError as err:
+        except Exception as err:
             raise ParseError(
-                f"Could not parse {document_path} with tika server at {tika_server}: {err}"
+                f"Could not parse {document_path} with tika server at "
+                f"{tika_server}: {err}"
             )
 
-        try:
-            self.text = parsed["content"].strip()
-        except:
-            pass
+        self.text = parsed["content"].strip()
 
         try:
-            self.date = dateutil.parser.isoparse(parsed["metadata"]["Creation-Date"])
-        except:
-            pass
+            self.date = dateutil.parser.isoparse(
+                parsed["metadata"]["Creation-Date"])
+        except Exception as e:
+            self.log("warning", f"Unable to extract date for document "
+                                f"{document_path}: {e}")
 
         self.archive_path = self.convert_to_pdf(document_path)
 
@@ -49,16 +67,16 @@ class TikaDocumentParser(DocumentParser):
         gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/convert/office"
 
-        self.log("info", f"[TIKA] Converting {document_path} to PDF as {pdf_path}")
+        self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
         files = {"files": open(document_path, "rb")}
         headers = {}
 
         try:
             response = requests.post(url, files=files, headers=headers)
             response.raise_for_status()  # ensure we notice bad responses
-        except requests.exceptions.HTTPError as err:
+        except Exception as err:
             raise ParseError(
-                f"Could not contact gotenberg server at {gotenberg_server}: {err}"
+                f"Error while converting document to PDF: {err}"
             )
 
         file = open(pdf_path, "wb")
