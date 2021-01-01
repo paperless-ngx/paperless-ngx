@@ -1,7 +1,6 @@
 import json
 import os
 import re
-import subprocess
 
 import ocrmypdf
 import pdftotext
@@ -10,7 +9,8 @@ from PIL import Image
 from django.conf import settings
 from ocrmypdf import InputFileError, EncryptedPdfError
 
-from documents.parsers import DocumentParser, ParseError, run_convert
+from documents.parsers import DocumentParser, ParseError, \
+    make_thumbnail_from_pdf
 
 
 class RasterisedDocumentParser(DocumentParser):
@@ -47,50 +47,8 @@ class RasterisedDocumentParser(DocumentParser):
         return result
 
     def get_thumbnail(self, document_path, mime_type):
-        """
-        The thumbnail of a PDF is just a 500px wide image of the first page.
-        """
-
-        out_path = os.path.join(self.tempdir, "convert.png")
-
-        # Run convert to get a decent thumbnail
-        try:
-            run_convert(density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=False,
-                        auto_orient=True,
-                        input_file="{}[0]".format(document_path),
-                        output_file=out_path,
-                        logging_group=self.logging_group)
-        except ParseError:
-            # if convert fails, fall back to extracting
-            # the first PDF page as a PNG using Ghostscript
-            self.log(
-                'warning',
-                "Thumbnail generation with ImageMagick failed, falling back "
-                "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!")
-            gs_out_path = os.path.join(self.tempdir, "gs_out.png")
-            cmd = [settings.GS_BINARY,
-                   "-q",
-                   "-sDEVICE=pngalpha",
-                   "-o", gs_out_path,
-                   document_path]
-            if not subprocess.Popen(cmd).wait() == 0:
-                raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
-            # then run convert on the output from gs
-            run_convert(density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=False,
-                        auto_orient=True,
-                        input_file=gs_out_path,
-                        output_file=out_path,
-                        logging_group=self.logging_group)
-
-        return out_path
+        return make_thumbnail_from_pdf(
+            document_path, self.tempdir, self.logging_group)
 
     def is_image(self, mime_type):
         return mime_type in [
@@ -130,7 +88,7 @@ class RasterisedDocumentParser(DocumentParser):
                 f"Error while calculating DPI for image {image}: {e}")
             return None
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         mode = settings.OCR_MODE
 
         text_original = get_text_from_pdf(document_path)
