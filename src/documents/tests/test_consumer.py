@@ -177,7 +177,7 @@ class DummyParser(DocumentParser):
     def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         self.text = "The Text"
 
 
@@ -194,7 +194,7 @@ class FaultyParser(DocumentParser):
     def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         raise ParseError("Does not compute.")
 
 

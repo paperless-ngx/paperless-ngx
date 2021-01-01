@@ -1,6 +1,5 @@
 import datetime
 import hashlib
-import logging
 import os
 
 import magic
@@ -130,7 +129,7 @@ class Consumer(LoggingMixin):
 
         try:
             self.log("debug", "Parsing {}...".format(self.filename))
-            document_parser.parse(self.path, mime_type)
+            document_parser.parse(self.path, mime_type, self.filename)
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
             thumbnail = document_parser.get_optimised_thumbnail(
