@@ -653,8 +653,8 @@
           <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="180092a6b8a6151a05f4a7552a2fb75fd159dfa8" datatype="html">
-        <source>Match</source>
+      <trans-unit id="eab7fc7cf2d663e54de934b779fce4275a303f0f" datatype="html">
+        <source>Matching pattern</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
@@ -875,21 +875,42 @@
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8170755470576301659" datatype="html">
+        <source>Without correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8705701325879965907" datatype="html">
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4362173610367509215" datatype="html">
+        <source>Without document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6494566478302448576" datatype="html">
+        <source>Without any tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ddb40946e790522301687ecddb9ce1cb8ad40dd1" datatype="html">
@@ -1582,22 +1603,43 @@
           <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3184700926171002527" datatype="html">
-        <source>Any</source>
+      <trans-unit id="5851669019930456395" datatype="html">
+        <source>Any word</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="1616102757855967475" datatype="html">
-        <source>All</source>
+      <trans-unit id="7517655726614958140" datatype="html">
+        <source>Any: Document contains any of these words (space separated)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="700315718208181326" datatype="html">
+        <source>All words</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="1968183742008490888" datatype="html">
-        <source>Literal</source>
+      <trans-unit id="111914402588955480" datatype="html">
+        <source>All: Document contains all of these words (space separated)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9180173992399180575" datatype="html">
+        <source>Exact match</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7109184332944610787" datatype="html">
+        <source>Exact: Document contains this string</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
@@ -1610,15 +1652,29 @@
           <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="701356546322112069" datatype="html">
-        <source>Fuzzy match</source>
+      <trans-unit id="7548151332424148033" datatype="html">
+        <source>Regular expression: Document matches this regular expression</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1856513373880048959" datatype="html">
+        <source>Fuzzy word</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="616064537937996961" datatype="html">
-        <source>Auto</source>
+      <trans-unit id="8419167206585286450" datatype="html">
+        <source>Fuzzy: Document contains a word similar to this word</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/matching-model.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2147958104253035821" datatype="html">
+        <source>Auto: Learn matching automatically.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>

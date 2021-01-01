@@ -351,7 +351,10 @@ class SavedViewFilterRule(models.Model):
 
     rule_type = models.PositiveIntegerField(choices=RULE_TYPES)
 
-    value = models.CharField(max_length=128)
+    value = models.CharField(
+        max_length=128,
+        blank=True,
+        null=True)
 
 
 # TODO: why is this in the models file?
