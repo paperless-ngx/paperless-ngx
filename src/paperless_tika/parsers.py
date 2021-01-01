@@ -39,7 +39,7 @@ class TikaDocumentParser(DocumentParser):
             } for key in parsed['metadata']
         ]
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         self.log("info", f"Sending {document_path} to Tika server")
         tika_server = settings.PAPERLESS_TIKA_ENDPOINT
 
@@ -60,15 +60,15 @@ class TikaDocumentParser(DocumentParser):
             self.log("warning", f"Unable to extract date for document "
                                 f"{document_path}: {e}")
 
-        self.archive_path = self.convert_to_pdf(document_path)
+        self.archive_path = self.convert_to_pdf(document_path, file_name)
 
-    def convert_to_pdf(self, document_path):
+    def convert_to_pdf(self, document_path, file_name):
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
         gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/convert/office"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
-        files = {"files": open(document_path, "rb")}
+        files = {"files": (file_name, open(document_path, "rb"))}
         headers = {}
 
         try:

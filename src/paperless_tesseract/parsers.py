@@ -88,7 +88,7 @@ class RasterisedDocumentParser(DocumentParser):
                 f"Error while calculating DPI for image {image}: {e}")
             return None
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         mode = settings.OCR_MODE
 
         text_original = get_text_from_pdf(document_path)
