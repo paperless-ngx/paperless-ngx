@@ -26,8 +26,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     public savedViewService: SavedViewService,
     private meta: Meta
     ) {
-      console.log(meta);
-
+      
   }
 
   versionString = `${environment.appTitle} ${environment.version}`

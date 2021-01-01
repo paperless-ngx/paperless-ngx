@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AppViewService } from './services/app-view.service';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
@@ -8,10 +8,10 @@ import { AppViewService } from './services/app-view.service';
 })
 export class AppComponent {
 
-  constructor (appViewService: AppViewService) {
-    (window as any).pdfWorkerSrc = '/assets/js/pdf.worker.min.js';
-    appViewService.updateDarkModeSettings()
+  constructor (private settings: SettingsService) {
+    let anyWindow = (window as any)
+    anyWindow.pdfWorkerSrc = '/assets/js/pdf.worker.min.js';
+    this.settings.updateDarkModeSettings()
   }
-
 
 }
