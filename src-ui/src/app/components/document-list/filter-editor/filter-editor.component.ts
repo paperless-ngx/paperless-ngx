@@ -25,13 +25,26 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       switch(this.filterRules[0].rule_type) {
 
         case FILTER_CORRESPONDENT:
-          return $localize`Correspondent: ${this.correspondents.find(c => c.id == +rule.value)?.name}`
+          if (rule.value) {
+            return $localize`Correspondent: ${this.correspondents.find(c => c.id == +rule.value)?.name}`
+          } else {
+            return $localize`Without correspondent`
+          }
 
         case FILTER_DOCUMENT_TYPE:
-          return $localize`Type: ${this.documentTypes.find(dt => dt.id == +rule.value)?.name}`
+          if (rule.value) {
+            return $localize`Type: ${this.documentTypes.find(dt => dt.id == +rule.value)?.name}`
+          } else {
+            return $localize`Without document type`
+          }
 
         case FILTER_HAS_TAG:
           return $localize`Tag: ${this.tags.find(t => t.id == +rule.value)?.name}`
+        
+        case FILTER_HAS_ANY_TAG:
+          if (rule.value == "false") {
+            return $localize`Without any tag`
+          }
 
       }
     }

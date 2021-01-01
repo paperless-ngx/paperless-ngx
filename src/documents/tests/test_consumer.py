@@ -177,7 +177,7 @@ class DummyParser(DocumentParser):
     def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         self.text = "The Text"
 
 
@@ -194,7 +194,7 @@ class FaultyParser(DocumentParser):
     def get_optimised_thumbnail(self, document_path, mime_type):
         return self.fake_thumb
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         raise ParseError("Does not compute.")
 
 
@@ -466,3 +466,53 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(dst))
         self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
         self.assertTrue(os.path.isfile(dst))
+
+
+class PostConsumeTestCase(TestCase):
+
+    @mock.patch("documents.signals.handlers.Popen")
+    @override_settings(POST_CONSUME_SCRIPT=None)
+    def test_no_post_consume_script(self, m):
+        doc = Document.objects.create(title="Test", mime_type="application/pdf")
+        tag1 = Tag.objects.create(name="a")
+        tag2 = Tag.objects.create(name="b")
+        doc.tags.add(tag1)
+        doc.tags.add(tag2)
+
+        Consumer().run_post_consume_script(doc)
+
+        m.assert_not_called()
+
+    @mock.patch("documents.signals.handlers.Popen")
+    @override_settings(POST_CONSUME_SCRIPT="script")
+    def test_post_consume_script_simple(self, m):
+        doc = Document.objects.create(title="Test", mime_type="application/pdf")
+
+        Consumer().run_post_consume_script(doc)
+
+        m.assert_called_once()
+
+    @mock.patch("documents.signals.handlers.Popen")
+    @override_settings(POST_CONSUME_SCRIPT="script")
+    def test_post_consume_script_with_correspondent(self, m):
+        c = Correspondent.objects.create(name="my_bank")
+        doc = Document.objects.create(title="Test", mime_type="application/pdf", correspondent=c)
+        tag1 = Tag.objects.create(name="a")
+        tag2 = Tag.objects.create(name="b")
+        doc.tags.add(tag1)
+        doc.tags.add(tag2)
+
+        Consumer().run_post_consume_script(doc)
+
+        m.assert_called_once()
+
+        args, kwargs = m.call_args
+
+        command = args[0]
+
+        self.assertEqual(command[0], "script")
+        self.assertEqual(command[1], str(doc.pk))
+        self.assertEqual(command[5], f"/api/documents/{doc.pk}/download/")
+        self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
+        self.assertEqual(command[7], "my_bank")
+        self.assertCountEqual(command[8].split(","), ["a", "b"])
