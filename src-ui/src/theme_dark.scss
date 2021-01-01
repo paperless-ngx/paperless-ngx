@@ -1,5 +1,5 @@
-$primary-dark-mode: #346e2c;
-$danger-dark-mode: #9c142a;
+$primary-dark-mode: #45973a;
+$danger-dark-mode: #b71631;
 $bg-dark-mode: #161618;
 $bg-light-dark-mode: #1c1c1f;
 $text-color-dark-mode: #abb2bf;
@@ -160,7 +160,8 @@ $border-color-dark-mode: #47494f;
     background-color: opacify($bg-dark-mode, .85);
   }
 
-  a {
+  a,
+  .card-title a {
     color: $primary-dark-mode;
 
     &:hover {
@@ -169,7 +170,7 @@ $border-color-dark-mode: #47494f;
   }
 
   table {
-    background-color: $bg-light-dark-mode;
+    background-color: $bg-dark-mode;
     color: $text-color-dark-mode;
     border-color: $border-color-dark-mode;
 
@@ -193,12 +194,14 @@ $border-color-dark-mode: #47494f;
     text-shadow: 0 1px 0 #666;
   }
 
-  .btn-outline-primary{
+  .btn-outline-primary {
     border-color: $primary-dark-mode;
     color: $primary-dark-mode;
 
-    &:hover {
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):hover {
       background-color: darken($primary-dark-mode, 10%);
+      border-color: darken($primary-dark-mode, 10%);
       color: $text-color-dark-mode-accent;
     }
   }
@@ -207,7 +210,7 @@ $border-color-dark-mode: #47494f;
     border-color: $text-color-dark-mode;
     color: $text-color-dark-mode;
 
-    &:hover {
+    &:not(:disabled):not(.disabled):hover {
       background-color: $bg-dark-mode;
     }
   }
@@ -216,8 +219,9 @@ $border-color-dark-mode: #47494f;
     border-color: $danger-dark-mode;
     color: $danger-dark-mode;
 
-    &:hover {
+    &:not(:disabled):not(.disabled):hover {
       background-color: darken($danger-dark-mode, 10%);
+      border-color: darken($danger-dark-mode, 10%);
       color: $text-color-dark-mode-accent;
     }
   }
@@ -226,7 +230,7 @@ $border-color-dark-mode: #47494f;
     border-color: $border-color-dark-mode;
     color: $text-color-dark-mode;
 
-    &:hover {
+    &:not(:disabled):not(.disabled):hover {
       color: $text-color-dark-mode-accent;
     }
   }
