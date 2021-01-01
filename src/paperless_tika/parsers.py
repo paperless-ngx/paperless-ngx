@@ -1,14 +1,11 @@
 import os
-import subprocess
-import tika
 import requests
 import dateutil.parser
 
-from PIL import ImageDraw, ImageFont, Image
 from django.conf import settings
 
-from documents.parsers import DocumentParser, ParseError, run_convert
-from paperless_tesseract.parsers import RasterisedDocumentParser
+from documents.parsers import DocumentParser, ParseError, \
+    make_thumbnail_from_pdf
 from tika import parser
 
 
@@ -18,55 +15,11 @@ class TikaDocumentParser(DocumentParser):
     """
 
     def get_thumbnail(self, document_path, mime_type):
-        self.log("info", f"[TIKA_THUMB] Generating thumbnail for{document_path}")
-        archive_path = self.archive_path
+        if not self.archive_path:
+            self.archive_path = self.convert_to_pdf(document_path)
 
-        out_path = os.path.join(self.tempdir, "convert.png")
-
-        # Run convert to get a decent thumbnail
-        try:
-            run_convert(
-                density=300,
-                scale="500x5000>",
-                alpha="remove",
-                strip=True,
-                trim=False,
-                input_file="{}[0]".format(archive_path),
-                output_file=out_path,
-                logging_group=self.logging_group,
-            )
-        except ParseError:
-            # if convert fails, fall back to extracting
-            # the first PDF page as a PNG using Ghostscript
-            self.log(
-                "warning",
-                "Thumbnail generation with ImageMagick failed, falling back "
-                "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!",
-            )
-            gs_out_path = os.path.join(self.tempdir, "gs_out.png")
-            cmd = [
-                settings.GS_BINARY,
-                "-q",
-                "-sDEVICE=pngalpha",
-                "-o",
-                gs_out_path,
-                archive_path,
-            ]
-            if not subprocess.Popen(cmd).wait() == 0:
-                raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
-            # then run convert on the output from gs
-            run_convert(
-                density=300,
-                scale="500x5000>",
-                alpha="remove",
-                strip=True,
-                trim=False,
-                input_file=gs_out_path,
-                output_file=out_path,
-                logging_group=self.logging_group,
-            )
-
-        return out_path
+        return make_thumbnail_from_pdf(
+            self.archive_path, self.tempdir, self.logging_group)
 
     def parse(self, document_path, mime_type):
         self.log("info", f"[TIKA_PARSE] Sending {document_path} to Tika server")
@@ -89,11 +42,9 @@ class TikaDocumentParser(DocumentParser):
         except:
             pass
 
-        archive_path = os.path.join(self.tempdir, "convert.pdf")
-        convert_to_pdf(document_path, archive_path)
-        self.archive_path = archive_path
+        self.archive_path = self.convert_to_pdf(document_path)
 
-    def convert_to_pdf(document_path, pdf_path):
+    def convert_to_pdf(self, document_path):
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
         gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/convert/office"
@@ -113,3 +64,5 @@ class TikaDocumentParser(DocumentParser):
         file = open(pdf_path, "wb")
         file.write(response.content)
         file.close()
+
+        return pdf_path
