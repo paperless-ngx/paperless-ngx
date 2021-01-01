@@ -104,6 +104,10 @@
     svg {
       display: none;
     }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0);
+    }
   }
 
   .form-control {
@@ -121,7 +125,7 @@
 
     &:focus {
       background-color: #fff;
-      color: initial;
+      color: #212529;
       flex-grow: 1;
       padding-left: 0.5rem;
     }
