@@ -276,13 +276,6 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             Document.objects.filter(pk=instance.pk).update(
                 filename=new_filename)
 
-            logging.getLogger(__name__).debug(
-                f"Moved file {old_source_path} to {new_source_path}.")
-
-            if instance.archive_checksum:
-                logging.getLogger(__name__).debug(
-                    f"Moved file {old_archive_path} to {new_archive_path}.")
-
         except OSError as e:
             instance.filename = old_filename
             # this happens when we can't move a file. If that's the case for

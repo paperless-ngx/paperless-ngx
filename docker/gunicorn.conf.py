@@ -1,4 +1,4 @@
-bind = ['[::]:8000', 'localhost:8000']
+bind = '0.0.0.0:8000'
 backlog = 2048
 workers = 3
 worker_class = 'sync'
