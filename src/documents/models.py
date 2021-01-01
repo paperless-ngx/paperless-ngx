@@ -29,12 +29,12 @@ class MatchingModel(models.Model):
     MATCH_AUTO = 6
 
     MATCHING_ALGORITHMS = (
-        (MATCH_ANY, _("Any")),
-        (MATCH_ALL, _("All")),
-        (MATCH_LITERAL, _("Literal")),
-        (MATCH_REGEX, _("Regular Expression")),
-        (MATCH_FUZZY, _("Fuzzy Match")),
-        (MATCH_AUTO, _("Automatic Classification")),
+        (MATCH_ANY, _("Any word")),
+        (MATCH_ALL, _("All words")),
+        (MATCH_LITERAL, _("Exact match")),
+        (MATCH_REGEX, _("Regular expression")),
+        (MATCH_FUZZY, _("Fuzzy word")),
+        (MATCH_AUTO, _("Automatic")),
     )
 
     name = models.CharField(
@@ -312,11 +312,11 @@ class Document(models.Model):
 class Log(models.Model):
 
     LEVELS = (
-        (logging.DEBUG, "Debugging"),
-        (logging.INFO, "Informational"),
-        (logging.WARNING, "Warning"),
-        (logging.ERROR, "Error"),
-        (logging.CRITICAL, "Critical"),
+        (logging.DEBUG, _("debug")),
+        (logging.INFO, _("information")),
+        (logging.WARNING, _("warning")),
+        (logging.ERROR, _("error")),
+        (logging.CRITICAL, _("critical")),
     )
 
     group = models.UUIDField(

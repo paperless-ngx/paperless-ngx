@@ -7,6 +7,10 @@ from django.utils.translation import gettext_lazy as _
 
 class MailAccount(models.Model):
 
+    class Meta:
+        verbose_name = _("mail account")
+        verbose_name_plural = _("mail accounts")
+
     IMAP_SECURITY_NONE = 1
     IMAP_SECURITY_SSL = 2
     IMAP_SECURITY_STARTTLS = 3
@@ -51,6 +55,10 @@ class MailAccount(models.Model):
 
 
 class MailRule(models.Model):
+
+    class Meta:
+        verbose_name = _("mail rule")
+        verbose_name_plural = _("mail rules")
 
     ACTION_DELETE = 1
     ACTION_MOVE = 2

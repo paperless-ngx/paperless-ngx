@@ -7,6 +7,8 @@ from django.views.generic import RedirectView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
+from django.utils.translation import gettext_lazy as _
+
 from documents.views import (
     CorrespondentViewSet,
     DocumentViewSet,
@@ -103,4 +105,4 @@ admin.site.site_header = 'Paperless-ng'
 # Text at the end of each page's <title>.
 admin.site.site_title = 'Paperless-ng'
 # Text at the top of the admin index page.
-admin.site.index_title = 'Paperless-ng administration'
+admin.site.index_title = _('Paperless-ng administration')
