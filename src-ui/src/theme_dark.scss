@@ -36,6 +36,10 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .text-light {
+    color: $text-color-dark-mode !important;
+  }
+
   .border {
     border-color: $border-color-dark-mode !important;
   }
