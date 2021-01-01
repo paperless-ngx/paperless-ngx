@@ -144,6 +144,52 @@ def run_convert(input_file,
         raise ParseError("Convert failed at {}".format(args))
 
 
+def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
+    """
+    The thumbnail of a PDF is just a 500px wide image of the first page.
+    """
+    out_path = os.path.join(temp_dir, "convert.png")
+
+    # Run convert to get a decent thumbnail
+    try:
+        run_convert(density=300,
+                    scale="500x5000>",
+                    alpha="remove",
+                    strip=True,
+                    trim=False,
+                    auto_orient=True,
+                    input_file="{}[0]".format(in_path),
+                    output_file=out_path,
+                    logging_group=logging_group)
+    except ParseError:
+        # if convert fails, fall back to extracting
+        # the first PDF page as a PNG using Ghostscript
+        logger.warning(
+            "Thumbnail generation with ImageMagick failed, falling back "
+            "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!",
+            extra={'group': logging_group}
+        )
+        gs_out_path = os.path.join(temp_dir, "gs_out.png")
+        cmd = [settings.GS_BINARY,
+               "-q",
+               "-sDEVICE=pngalpha",
+               "-o", gs_out_path,
+               in_path]
+        if not subprocess.Popen(cmd).wait() == 0:
+            raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
+        # then run convert on the output from gs
+        run_convert(density=300,
+                    scale="500x5000>",
+                    alpha="remove",
+                    strip=True,
+                    trim=False,
+                    auto_orient=True,
+                    input_file=gs_out_path,
+                    output_file=out_path,
+                    logging_group=logging_group)
+
+    return out_path
+
 def parse_date(filename, text):
     """
     Returns the date of the document.
@@ -221,7 +267,7 @@ class DocumentParser(LoggingMixin):
     def extract_metadata(self, document_path, mime_type):
         return []
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         raise NotImplementedError()
 
     def get_archive_path(self):

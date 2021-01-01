@@ -32,6 +32,6 @@ class TextDocumentParser(DocumentParser):
 
         return out_path
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         with open(document_path, 'r') as f:
             self.text = f.read()

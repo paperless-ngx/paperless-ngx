@@ -404,7 +404,9 @@ class SavedViewFilterRule(models.Model):
 
     value = models.CharField(
         _("value"),
-        max_length=128)
+        max_length=128,
+        blank=True,
+        null=True)
 
     class Meta:
         verbose_name = _("filter rule")
