@@ -68,7 +68,8 @@ class TikaDocumentParser(DocumentParser):
         url = gotenberg_server + "/convert/office"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
-        files = {"files": (file_name, open(document_path, "rb"))}
+        files = {"files": (file_name or os.path.basename(document_path),
+                           open(document_path, "rb"))}
         headers = {}
 
         try:
