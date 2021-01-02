@@ -51,7 +51,7 @@ export class SettingsComponent implements OnInit {
     this.savedViewService.delete(savedView).subscribe(() => {
       this.savedViewGroup.removeControl(savedView.id.toString())
       this.savedViews.splice(this.savedViews.indexOf(savedView), 1)
-      this.toastService.showInfo($localize`Saved view "${savedView.name} deleted.`)
+      this.toastService.showInfo($localize`Saved view "${savedView.name}" deleted.`)
     })
   }
 
