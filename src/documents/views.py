@@ -57,15 +57,29 @@ from .serialisers import (
 class IndexView(TemplateView):
     template_name = "index.html"
 
+    def get_language(self):
+        # This is here for the following reason:
+        # Django identifies languages in the form "en-us"
+        # However, angular generates locales as "en-US".
+        # this translates between these two forms.
+        lang = get_language()
+        if "-" in lang:
+            first = lang[:lang.index("-")]
+            second = lang[lang.index("-")+1:]
+            return f"{first}-{second.upper()}"
+        else:
+            return lang
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cookie_prefix'] = settings.COOKIE_PREFIX
         context['username'] = self.request.user.username
         context['full_name'] = self.request.user.get_full_name()
-        context['styles_css'] = f"frontend/{get_language()}/styles.css"
-        context['runtime_js'] = f"frontend/{get_language()}/runtime.js"
-        context['polyfills_js'] = f"frontend/{get_language()}/polyfills.js"
-        context['main_js'] = f"frontend/{get_language()}/main.js"
+        context['styles_css'] = f"frontend/{self.get_language()}/styles.css"
+        context['runtime_js'] = f"frontend/{self.get_language()}/runtime.js"
+        context['polyfills_js'] = f"frontend/{self.get_language()}/polyfills.js"  # NOQA: E501
+        context['main_js'] = f"frontend/{self.get_language()}/main.js"
+        context['manifest'] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
         return context
 
 
