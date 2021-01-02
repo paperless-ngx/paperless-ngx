@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-01 19:09+0000\n"
+"POT-Creation-Date: 2021-01-02 00:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,32 +17,36 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: documents/apps.py:10
+msgid "Documents"
+msgstr ""
+
 #: documents/models.py:32
-msgid "Any"
+msgid "Any word"
 msgstr ""
 
 #: documents/models.py:33
-msgid "All"
+msgid "All words"
 msgstr ""
 
 #: documents/models.py:34
-msgid "Literal"
+msgid "Exact match"
 msgstr ""
 
 #: documents/models.py:35
-msgid "Regular Expression"
+msgid "Regular expression"
 msgstr ""
 
 #: documents/models.py:36
-msgid "Fuzzy Match"
+msgid "Fuzzy word"
 msgstr ""
 
 #: documents/models.py:37
-msgid "Automatic Classification"
+msgid "Automatic"
 msgstr ""
 
-#: documents/models.py:41 documents/models.py:354 paperless_mail/models.py:21
-#: paperless_mail/models.py:92
+#: documents/models.py:41 documents/models.py:354 paperless_mail/models.py:25
+#: paperless_mail/models.py:100
 msgid "name"
 msgstr ""
 
@@ -178,6 +182,26 @@ msgstr ""
 msgid "documents"
 msgstr ""
 
+#: documents/models.py:315
+msgid "debug"
+msgstr ""
+
+#: documents/models.py:316
+msgid "information"
+msgstr ""
+
+#: documents/models.py:317
+msgid "warning"
+msgstr ""
+
+#: documents/models.py:318
+msgid "error"
+msgstr ""
+
+#: documents/models.py:319
+msgid "critical"
+msgstr ""
+
 #: documents/models.py:323
 msgid "group"
 msgstr ""
@@ -306,20 +330,24 @@ msgstr ""
 msgid "value"
 msgstr ""
 
-#: documents/models.py:410
+#: documents/models.py:412
 msgid "filter rule"
 msgstr ""
 
-#: documents/models.py:411
+#: documents/models.py:413
 msgid "filter rules"
 msgstr ""
 
-#: paperless/settings.py:253
+#: paperless/settings.py:254
 msgid "English"
 msgstr ""
 
-#: paperless/settings.py:254
+#: paperless/settings.py:255
 msgid "German"
+msgstr ""
+
+#: paperless/urls.py:108
+msgid "Paperless-ng administration"
 msgstr ""
 
 #: paperless_mail/admin.py:24
@@ -353,146 +381,166 @@ msgid ""
 "process all matching rules that you have defined."
 msgstr ""
 
-#: paperless_mail/models.py:15
+#: paperless_mail/apps.py:9
+msgid "Paperless mail"
+msgstr ""
+
+#: paperless_mail/models.py:11
+msgid "mail account"
+msgstr ""
+
+#: paperless_mail/models.py:12
+msgid "mail accounts"
+msgstr ""
+
+#: paperless_mail/models.py:19
 msgid "No encryption"
 msgstr ""
 
-#: paperless_mail/models.py:16
+#: paperless_mail/models.py:20
 msgid "Use SSL"
 msgstr ""
 
-#: paperless_mail/models.py:17
+#: paperless_mail/models.py:21
 msgid "Use STARTTLS"
 msgstr ""
 
-#: paperless_mail/models.py:25
+#: paperless_mail/models.py:29
 msgid "IMAP server"
 msgstr ""
 
-#: paperless_mail/models.py:29
+#: paperless_mail/models.py:33
 msgid "IMAP port"
 msgstr ""
 
-#: paperless_mail/models.py:32
+#: paperless_mail/models.py:36
 msgid ""
 "This is usually 143 for unencrypted and STARTTLS connections, and 993 for "
 "SSL connections."
 msgstr ""
 
-#: paperless_mail/models.py:36
+#: paperless_mail/models.py:40
 msgid "IMAP security"
 msgstr ""
 
-#: paperless_mail/models.py:42
+#: paperless_mail/models.py:46
 msgid "username"
 msgstr ""
 
-#: paperless_mail/models.py:46
+#: paperless_mail/models.py:50
 msgid "password"
 msgstr ""
 
+#: paperless_mail/models.py:60
+msgid "mail rule"
+msgstr ""
+
 #: paperless_mail/models.py:61
+msgid "mail rules"
+msgstr ""
+
+#: paperless_mail/models.py:69
 msgid "Mark as read, don't process read mails"
 msgstr ""
 
-#: paperless_mail/models.py:62
+#: paperless_mail/models.py:70
 msgid "Flag the mail, don't process flagged mails"
 msgstr ""
 
-#: paperless_mail/models.py:63
+#: paperless_mail/models.py:71
 msgid "Move to specified folder"
 msgstr ""
 
-#: paperless_mail/models.py:64
+#: paperless_mail/models.py:72
 msgid "Delete"
 msgstr ""
 
-#: paperless_mail/models.py:71
+#: paperless_mail/models.py:79
 msgid "Use subject as title"
 msgstr ""
 
-#: paperless_mail/models.py:72
+#: paperless_mail/models.py:80
 msgid "Use attachment filename as title"
 msgstr ""
 
-#: paperless_mail/models.py:82
+#: paperless_mail/models.py:90
 msgid "Do not assign a correspondent"
 msgstr ""
 
-#: paperless_mail/models.py:84
+#: paperless_mail/models.py:92
 msgid "Use mail address"
 msgstr ""
 
-#: paperless_mail/models.py:86
+#: paperless_mail/models.py:94
 msgid "Use name (or mail address if not available)"
 msgstr ""
 
-#: paperless_mail/models.py:88
+#: paperless_mail/models.py:96
 msgid "Use correspondent selected below"
 msgstr ""
 
-#: paperless_mail/models.py:96
+#: paperless_mail/models.py:104
 msgid "order"
 msgstr ""
 
-#: paperless_mail/models.py:103
+#: paperless_mail/models.py:111
 msgid "account"
 msgstr ""
 
-#: paperless_mail/models.py:107
+#: paperless_mail/models.py:115
 msgid "folder"
 msgstr ""
 
-#: paperless_mail/models.py:111
+#: paperless_mail/models.py:119
 msgid "filter from"
 msgstr ""
 
-#: paperless_mail/models.py:114
+#: paperless_mail/models.py:122
 msgid "filter subject"
 msgstr ""
 
-#: paperless_mail/models.py:117
+#: paperless_mail/models.py:125
 msgid "filter body"
 msgstr ""
 
-#: paperless_mail/models.py:121
+#: paperless_mail/models.py:129
 msgid "maximum age"
 msgstr ""
 
-#: paperless_mail/models.py:123
+#: paperless_mail/models.py:131
 msgid "Specified in days."
 msgstr ""
 
-#: paperless_mail/models.py:126
+#: paperless_mail/models.py:134
 msgid "action"
 msgstr ""
 
-#: paperless_mail/models.py:132
+#: paperless_mail/models.py:140
 msgid "action parameter"
 msgstr ""
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:142
 msgid ""
 "Additional parameter for the action selected above, i.e., the target folder "
 "of the move to folder action."
 msgstr ""
 
-#: paperless_mail/models.py:140
+#: paperless_mail/models.py:148
 msgid "assign title from"
 msgstr ""
 
-#: paperless_mail/models.py:150
+#: paperless_mail/models.py:158
 msgid "assign this tag"
 msgstr ""
 
-#: paperless_mail/models.py:158
+#: paperless_mail/models.py:166
 msgid "assign this document type"
 msgstr ""
 
-#: paperless_mail/models.py:162
+#: paperless_mail/models.py:170
 msgid "assign correspondent from"
 msgstr ""
 
-#: paperless_mail/models.py:172
+#: paperless_mail/models.py:180
 msgid "assign this correspondent"
 msgstr ""
