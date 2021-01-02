@@ -470,7 +470,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
 class PostConsumeTestCase(TestCase):
 
-    @mock.patch("documents.signals.handlers.Popen")
+    @mock.patch("documents.consumer.Popen")
     @override_settings(POST_CONSUME_SCRIPT=None)
     def test_no_post_consume_script(self, m):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
@@ -483,7 +483,7 @@ class PostConsumeTestCase(TestCase):
 
         m.assert_not_called()
 
-    @mock.patch("documents.signals.handlers.Popen")
+    @mock.patch("documents.consumer.Popen")
     @override_settings(POST_CONSUME_SCRIPT="script")
     def test_post_consume_script_simple(self, m):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
@@ -492,7 +492,7 @@ class PostConsumeTestCase(TestCase):
 
         m.assert_called_once()
 
-    @mock.patch("documents.signals.handlers.Popen")
+    @mock.patch("documents.consumer.Popen")
     @override_settings(POST_CONSUME_SCRIPT="script")
     def test_post_consume_script_with_correspondent(self, m):
         c = Correspondent.objects.create(name="my_bank")
