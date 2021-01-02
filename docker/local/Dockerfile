@@ -63,6 +63,8 @@ WORKDIR /usr/src/paperless/src/
 
 RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
 
+RUN sudo -HEu paperless python3 manage.py compilemessages
+
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
 EXPOSE 8000

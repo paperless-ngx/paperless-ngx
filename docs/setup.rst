@@ -292,6 +292,9 @@ writing. Windows is not and will never be supported.
         
         # This creates the database schema.
         python3 manage.py migrate
+        
+        # This creates the translation files for paperless.
+        python3 manage.py compilemessages
 
         # This creates your first paperless user
         python3 manage.py createsuperuser
