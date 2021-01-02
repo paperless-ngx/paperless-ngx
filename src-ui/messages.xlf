@@ -79,15 +79,8 @@
           <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="546b2014cc578af06b6023a7f38fa77aa9d58f5d" datatype="html">
-        <source>{VAR_PLURAL, plural, =1 {document} other {documents}}</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">86</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="3c298bb50741c8b2641889b0a0e0009769e66370" datatype="html">
-        <source>Selected <x id="INTERPOLATION" equiv-text="{{list.selected.size}}"/> of <x id="INTERPOLATION_1" equiv-text="{{list.collectionSize || 0}}"/> <x id="ICU" equiv-text="{list.collectionSize, plural, =1 {document} other {documents}}"/></source>
+      <trans-unit id="08064670ae1497e47fb040ce7f610e55744b8889" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">86</context>
@@ -1019,13 +1012,6 @@
           <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="9c5fdf21ec2cc7baa6f062f2dc417af45c8dbe60" datatype="html">
-        <source>Score:</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">61</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="1b29a8153575e5ad26cc7dd8bd75c4f45f6bfe7e" datatype="html">
         <source>Created: <x id="INTERPOLATION" equiv-text="{{document.created | date}}"/></source>
         <context-group purpose="location">
@@ -1045,6 +1031,13 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9c5fdf21ec2cc7baa6f062f2dc417af45c8dbe60" datatype="html">
+        <source>Score:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2840db547019ce8c76b2cdbe3a1653c5b68b06af" datatype="html">
@@ -1295,15 +1288,8 @@
           <context context-type="linenumber">5</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="a7b50b2df68e875a918d1f4f98f358d756139c13" datatype="html">
-        <source>{VAR_PLURAL, plural, =1 {file} =other {<x id="INTERPOLATION"/> files}}</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="ec37c68a90632530f5cc8b7e5245cab89ef8bf82" datatype="html">
-        <source>Uploading <x id="ICU" equiv-text="{uploadStatus.length, plural, =1 {file} =other {{{uploadStatus.length}} files}}"/>...</source>
+      <trans-unit id="33c76d75ce25ce3b05ab22877f1b6b09dcf603ae" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {Uploading file...} =other {Uploading <x id="INTERPOLATION"/> files...}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
