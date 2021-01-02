@@ -521,9 +521,9 @@
           <context context-type="linenumber">7</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="1153806754022288374">
-        <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/> deleted.</source>
-        <target>Ansicht <x equiv-text="savedView.name" id="PH"/> gelöscht.</target>
+      <trans-unit datatype="html" id="5610279464668232148">
+        <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; deleted.</source>
+        <target>Gespeicherte Ansicht &quot;<x equiv-text="savedView.name" id="PH"/>&quot; gelöscht.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">54</context>
