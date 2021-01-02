@@ -30,10 +30,14 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
-    - name: Upgrade pip, Install dependencies
+    - name: Upgrade pip
       run: |
         pip install --upgrade pip pipenv sphinx
+    - name: Gather pip requirements
+      run: |
         pipenv lock -r > requirements.txt
+    - name: Insall pip requirements
+      run: |
         pip install -r requirements.txt
     - name: Run sphinx
       run: |
