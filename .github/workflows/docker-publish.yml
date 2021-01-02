@@ -23,10 +23,10 @@ jobs:
         sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
     - name: Upgrade pip
       run: |
-        pip install --upgrade pip pipenv sphinx pytest pytest-cov
+        pip install --upgrade pip pipenv sphinx
     - name: Gather pip requirements
       run: |
-        pipenv lock -r > requirements.txt
+        pipenv lock --dev -r > requirements.txt
     - name: Install pip requirements
       run: |
         pip install -r requirements.txt
