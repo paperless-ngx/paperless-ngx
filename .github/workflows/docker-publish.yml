@@ -5,6 +5,47 @@ on:
     branches: travis-multiarch-builds
 
 jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.7, 3.8, 3.9]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+    - name: Persistent Github pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip${{ matrix.python-version }}
+    - name: Update system, install system requirements
+      run: |
+        apt-get update -qq
+        apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
+    - name: Upgrade pip, Install dependencies
+      run: |
+        pip install --upgrade pip pipenv sphinx
+        pipenv lock -r > requirements.txt
+        pip install -r requirements.txt
+    - name: Run sphinx
+      run: |
+        sphinx-build -b html ../docs ../docs/_build -W    
+    - name: Execute Tests
+      run: |
+        cd src/
+        pytest --cov
+        pycodestyle
+    - name: Execute coveralls
+      run: |
+        coveralls
   # Build and push image to docker hub.
   buildx:
     runs-on: ubuntu-latest
