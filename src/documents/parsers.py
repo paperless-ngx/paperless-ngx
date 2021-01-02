@@ -190,6 +190,7 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
 
     return out_path
 
+
 def parse_date(filename, text):
     """
     Returns the date of the document.
