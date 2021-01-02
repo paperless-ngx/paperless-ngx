@@ -58,7 +58,7 @@
 
           </div>
 
-          <small class="text-muted ml-auto" i18n>Score:</small>
+          <small *ngIf="searchScore" class="text-muted ml-auto" i18n>Score:</small>
 
           <ngb-progressbar *ngIf="searchScore" [type]="searchScoreClass" [value]="searchScore" class="search-score-bar mx-2" [max]="1"></ngb-progressbar>
 
