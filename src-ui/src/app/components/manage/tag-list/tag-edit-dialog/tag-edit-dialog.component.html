@@ -21,7 +21,7 @@
       <app-input-check i18n-title title="Inbox tag" formControlName="is_inbox_tag" i18n-hint hint="Inbox tags are automatically assigned to all consumed documents."></app-input-check>
       <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
       <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match"></app-input-text>
-      <app-input-check i18n-title title="Case insensitive" formControlName="is_insensitive" i18n-hint hint="Auto matching ignores this option."></app-input-check>
+      <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-dark" (click)="cancel()" i18n>Cancel</button>
