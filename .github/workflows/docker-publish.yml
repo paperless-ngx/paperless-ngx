@@ -36,17 +36,17 @@ jobs:
     - name: Gather pip requirements
       run: |
         pipenv lock -r > requirements.txt
-    - name: Insall pip requirements
+    - name: Install pip requirements
       run: |
         pip install -r requirements.txt
-    - name: Run sphinx
-      run: |
-        sphinx-build -b html ../docs ../docs/_build -W    
     - name: Execute Tests
       run: |
         cd src/
         pytest --cov
         pycodestyle
+    - name: Run sphinx
+      run: |
+        sphinx-build -b html ../docs ../docs/_build -W    
     - name: Execute coveralls
       run: |
         coveralls
