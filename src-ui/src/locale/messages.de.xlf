@@ -89,25 +89,17 @@
           <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="546b2014cc578af06b6023a7f38fa77aa9d58f5d">
-        <source>{VAR_PLURAL, plural, =1 {document} other {documents}}</source>
-        <target>{VAR_PLURAL, plural, =1 {Dokument} other {Dokumente}}</target>
+      <trans-unit datatype="html" id="439e7cc3c1ecefded167ed4d37f7d22dad6a9159">
+        <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
+        <target>{VAR_PLURAL, plural, =1 { <x id="INTERPOLATION"/> von 1 Dokumente ausgewählt} other {<x id="INTERPOLATION"/> von <x id="INTERPOLATION_1"/> Dokumente ausgewählt}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="3c298bb50741c8b2641889b0a0e0009769e66370">
-        <source>Selected <x equiv-text="{{list.selected.size}}" id="INTERPOLATION"/> of <x equiv-text="{{list.collectionSize || 0}}" id="INTERPOLATION_1"/> <x equiv-text="{list.collectionSize, plural, =1 {document} other {documents}}" id="ICU"/></source>
-        <target><x equiv-text="{{list.selected.size}}" id="INTERPOLATION"/> von <x equiv-text="{{list.collectionSize || 0}}" id="INTERPOLATION_1"/> <x equiv-text="{list.collectionSize, plural, =1 {document} other {documents}}" id="ICU"/> ausgewählt</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">86</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="8b04a8e375ac6760a54aabaf5df0287d53ce4a4a">
-        <source>{VAR_PLURAL, plural, =1 {1 document} other {<x id="INTERPOLATION"/> documents}}</source>
-        <target>{VAR_PLURAL, plural, =1 {1 Dokument} other {<x id="INTERPOLATION"/> Dokumente}}</target>
+      <trans-unit datatype="html" id="bb773fdeaad5e7fb8e6cd77e1cc558e1b194a0c9">
+        <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
+        <target>{VAR_PLURAL, plural, =1 {Ein Dokument} other {<x id="INTERPOLATION"/> Dokumente}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">87</context>
@@ -553,6 +545,14 @@
           <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
+        <source>Settings</source>
+        <target>Einstellungen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="11ebd254cc9294717105c5982eb0cd2af30a446d">
         <source>General settings</source>
         <target>Allgemeine Einstellungen</target>
@@ -914,14 +914,6 @@
           <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
-        <source>Settings</source>
-        <target>Einstellungen</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">40</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="bb694b49d408265c91c62799c2b3a7e3151c824d">
         <source>Logout</source>
         <target>Abmelden</target>
@@ -1163,14 +1155,6 @@
           <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="9c5fdf21ec2cc7baa6f062f2dc417af45c8dbe60">
-        <source>Score:</source>
-        <target>Relevanz:</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">61</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="1b29a8153575e5ad26cc7dd8bd75c4f45f6bfe7e">
         <source>Created: <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></source>
         <target>Erstellt: <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></target>
@@ -1193,6 +1177,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="9c5fdf21ec2cc7baa6f062f2dc417af45c8dbe60">
+        <source>Score:</source>
+        <target>Relevanz:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2840db547019ce8c76b2cdbe3a1653c5b68b06af">
@@ -1478,17 +1470,9 @@
           <context context-type="linenumber">5</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="a7b50b2df68e875a918d1f4f98f358d756139c13">
-        <source>{VAR_PLURAL, plural, =1 {file} =other {<x id="INTERPOLATION"/> files}}</source>
-        <target>{VAR_PLURAL, plural, =1 {Datei} =other {<x id="INTERPOLATION"/> Dateien}}</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="ec37c68a90632530f5cc8b7e5245cab89ef8bf82">
-        <source>Uploading <x equiv-text="{uploadStatus.length, plural, =1 {file} =other {{{uploadStatus.length}} files}}" id="ICU"/>...</source>
-        <target>Lade <x equiv-text="{uploadStatus.length, plural, =1 {file} =other {{{uploadStatus.length}} files}}" id="ICU"/> hoch...</target>
+      <trans-unit datatype="html" id="33c76d75ce25ce3b05ab22877f1b6b09dcf603ae">
+        <source>{VAR_PLURAL, plural, =1 {Uploading file...} =other {Uploading <x id="INTERPOLATION"/> files...}}</source>
+        <target>{VAR_PLURAL, plural, =1 {Lade Datei hoch...} =other {Lade <x id="INTERPOLATION"/> Dateien hoch...}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
