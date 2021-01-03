@@ -100,7 +100,9 @@ def generate_filename(doc, counter=0):
                                     many_to_dictionary(doc.tags))
 
             tag_list = pathvalidate.sanitize_filename(
-                ",".join([tag.name for tag in doc.tags.all()]),
+                ",".join(sorted(
+                    [tag.name for tag in doc.tags.all()]
+                )),
                 replacement_text="-"
             )
 
