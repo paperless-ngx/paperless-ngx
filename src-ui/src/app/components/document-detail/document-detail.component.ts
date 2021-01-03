@@ -16,6 +16,7 @@ import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.
 import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { PDFDocumentProxy } from 'ng2-pdf-viewer';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'app-document-detail',
@@ -64,7 +65,8 @@ export class DocumentDetailComponent implements OnInit {
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
     private documentListViewService: DocumentListViewService,
-    private documentTitlePipe: DocumentTitlePipe) { }
+    private documentTitlePipe: DocumentTitlePipe,
+    private toastService: ToastService) { }
 
   getContentType() {
     return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
@@ -182,9 +184,13 @@ export class DocumentDetailComponent implements OnInit {
     modal.componentInstance.btnClass = "btn-danger"
     modal.componentInstance.btnCaption = $localize`Delete document`
     modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled = false
       this.documentsService.delete(this.document).subscribe(() => {
         modal.close()
         this.close()
+      }, error => {
+        this.toastService.showError($localize`Error deleting document: ${JSON.stringify(error)}`)
+        modal.componentInstance.buttonsEnabled = true
       })
     })
 
