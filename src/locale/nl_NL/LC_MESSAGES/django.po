@@ -133,7 +133,7 @@ msgstr ""
 
 #: documents/models.py:164
 msgid "mime type"
-msgstr ""
+msgstr "mimetype"
 
 #: documents/models.py:175
 msgid "checksum"
@@ -141,7 +141,7 @@ msgstr "checksum"
 
 #: documents/models.py:179
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Het controlecijfer van het originele document."
 
 #: documents/models.py:183
 msgid "archive checksum"
@@ -173,15 +173,15 @@ msgstr "bestandsnaam"
 
 #: documents/models.py:217
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Huidige bestandsnaam in opslag"
 
 #: documents/models.py:221
 msgid "archive serial number"
-msgstr ""
+msgstr "serienummer in archief"
 
 #: documents/models.py:226
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "De positie van dit document in je fysieke documentenarchief."
 
 #: documents/models.py:232
 msgid "document"
@@ -193,7 +193,7 @@ msgstr "documenten"
 
 #: documents/models.py:315
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:316
 msgid "information"
@@ -225,19 +225,19 @@ msgstr "niveau"
 
 #: documents/models.py:336
 msgid "log"
-msgstr ""
+msgstr "bericht"
 
 #: documents/models.py:337
 msgid "logs"
-msgstr ""
+msgstr "berichten"
 
 #: documents/models.py:348 documents/models.py:398
 msgid "saved view"
-msgstr ""
+msgstr "opgeslagen view"
 
 #: documents/models.py:349
 msgid "saved views"
-msgstr ""
+msgstr "opgeslagen views"
 
 #: documents/models.py:352
 msgid "user"
@@ -393,10 +393,13 @@ msgid ""
 "do not assign tags, types or correspondents here, paperless will still "
 "process all matching rules that you have defined."
 msgstr ""
+"Automatisch metadata toewijzen aan documenten vanuit deze regel. Indien je "
+"geen etiketten, documenttypes of correspondenten toewijst, zal Paperless nog"
+" steeds alle regels verwerken die je hebt gedefinieerd."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless email"
 
 #: paperless_mail/models.py:11
 msgid "mail account"
@@ -496,7 +499,7 @@ msgstr "Gebruik de hieronder aangeduide correspondent"
 
 #: paperless_mail/models.py:104
 msgid "order"
-msgstr ""
+msgstr "volgorde"
 
 #: paperless_mail/models.py:111
 msgid "account"
@@ -544,7 +547,7 @@ msgstr ""
 
 #: paperless_mail/models.py:148
 msgid "assign title from"
-msgstr ""
+msgstr "wijs titel toe van"
 
 #: paperless_mail/models.py:158
 msgid "assign this tag"
