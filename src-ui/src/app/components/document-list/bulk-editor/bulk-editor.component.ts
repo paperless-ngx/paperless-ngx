@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
@@ -16,6 +14,7 @@ import { ChangedItems, FilterableDropdownSelectionModel } from '../../common/fil
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 import { MatchingModel } from 'src/app/data/matching-model';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'app-bulk-editor',
@@ -40,7 +39,8 @@ export class BulkEditorComponent {
     private documentService: DocumentService,
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
-    private settings: SettingsService
+    private settings: SettingsService,
+    private toastService: ToastService
   ) { }
 
   applyOnClose: boolean = this.settings.get(SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE)
@@ -52,15 +52,26 @@ export class BulkEditorComponent {
     this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
   }
 
-  private executeBulkOperation(method: string, args): Observable<any> {
-    return this.documentService.bulkEdit(Array.from(this.list.selected), method, args).pipe(
-      tap(() => {
+  private executeBulkOperation(modal, method: string, args) {
+    if (modal) {
+      modal.componentInstance.buttonsEnabled = false
+    }
+    this.documentService.bulkEdit(Array.from(this.list.selected), method, args).subscribe(
+      response => {
         this.list.reload()
         this.list.reduceSelectionToFilter()
         this.list.selected.forEach(id => {
           this.openDocumentService.refreshDocument(id)
         })
-      })
+        if (modal) {
+          modal.close()
+        }
+      }, error => {
+        if (modal) {
+          modal.componentInstance.buttonsEnabled = true
+        }
+        this.toastService.showError($localize`Error executing bulk operation: ${JSON.stringify(error.error)}`)
+      }
     )
   }
 
@@ -130,21 +141,11 @@ export class BulkEditorComponent {
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked.subscribe(() => {
-        this.performSetTags(modal, changedTags)
+        this.executeBulkOperation(modal, 'modify_tags', {"add_tags": changedTags.itemsToAdd.map(t => t.id), "remove_tags": changedTags.itemsToRemove.map(t => t.id)})
       })
     } else {
-      this.performSetTags(null, changedTags)
+      this.executeBulkOperation(null, 'modify_tags', {"add_tags": changedTags.itemsToAdd.map(t => t.id), "remove_tags": changedTags.itemsToRemove.map(t => t.id)})
     }
-  }
-
-  private performSetTags(modal, changedTags: ChangedItems) {
-    this.executeBulkOperation('modify_tags', {"add_tags": changedTags.itemsToAdd.map(t => t.id), "remove_tags": changedTags.itemsToRemove.map(t => t.id)}).subscribe(
-      response => {
-        if (modal) {
-          modal.close()
-        }
-      }
-    )
   }
 
   setCorrespondents(changedCorrespondents: ChangedItems) {
@@ -163,21 +164,11 @@ export class BulkEditorComponent {
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked.subscribe(() => {
-        this.performSetCorrespondents(modal, correspondent)
+        this.executeBulkOperation(modal, 'set_correspondent', {"correspondent": correspondent ? correspondent.id : null})
       })
     } else {
-      this.performSetCorrespondents(null, correspondent)
+      this.executeBulkOperation(null, 'set_correspondent', {"correspondent": correspondent ? correspondent.id : null})
     }
-  }
-
-  private performSetCorrespondents(modal, correspondent: MatchingModel) {
-    this.executeBulkOperation('set_correspondent', {"correspondent": correspondent ? correspondent.id : null}).subscribe(
-      response => {
-        if (modal) {
-          modal.close()
-        }
-      }
-    )
   }
 
   setDocumentTypes(changedDocumentTypes: ChangedItems) {
@@ -196,21 +187,11 @@ export class BulkEditorComponent {
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked.subscribe(() => {
-        this.performSetDocumentTypes(modal, documentType)
+        this.executeBulkOperation(modal, 'set_document_type', {"document_type": documentType ? documentType.id : null})
       })
     } else {
-      this.performSetDocumentTypes(null, documentType)
+      this.executeBulkOperation(null, 'set_document_type', {"document_type": documentType ? documentType.id : null})
     }
-  }
-
-  private performSetDocumentTypes(modal, documentType) {
-    this.executeBulkOperation('set_document_type', {"document_type": documentType ? documentType.id : null}).subscribe(
-      response => {
-        if (modal) {
-          modal.close()
-        }
-      }
-    )
   }
 
   applyDelete() {
@@ -222,11 +203,8 @@ export class BulkEditorComponent {
     modal.componentInstance.btnClass = "btn-danger"
     modal.componentInstance.btnCaption = $localize`Delete document(s)`
     modal.componentInstance.confirmClicked.subscribe(() => {
-      this.executeBulkOperation("delete", {}).subscribe(
-        response => {
-          modal.close()
-        }
-      )
+      modal.componentInstance.buttonsEnabled = false
+      this.executeBulkOperation(modal, "delete", {})
     })
   }
 }

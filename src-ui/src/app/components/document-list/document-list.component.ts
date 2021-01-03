@@ -90,6 +90,7 @@ export class DocumentListComponent implements OnInit {
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {backdrop: 'static'})
     modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
     modal.componentInstance.saveClicked.subscribe(formValue => {
+      modal.componentInstance.buttonsEnabled = false
       let savedView = {
         name: formValue.name,
         show_on_dashboard: formValue.showOnDashboard,
@@ -101,6 +102,9 @@ export class DocumentListComponent implements OnInit {
       this.savedViewService.create(savedView).subscribe(() => {
         modal.close()
         this.toastService.showInfo($localize`View "${savedView.name}" created successfully.`)
+      }, error => {
+        modal.componentInstance.error = error.error
+        modal.componentInstance.buttonsEnabled = true
       })
     })
   }
