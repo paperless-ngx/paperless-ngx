@@ -24,8 +24,12 @@ import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 })
 export class DocumentDetailComponent implements OnInit {
 
-  public expandOriginalMetadata = false;
-  public expandArchivedMetadata = false;
+  expandOriginalMetadata = false
+  expandArchivedMetadata = false
+
+  error: any
+
+  networkActive = false
 
   documentId: number
   document: PaperlessDocument
@@ -131,19 +135,33 @@ export class DocumentDetailComponent implements OnInit {
   }
 
   save() {
+    this.networkActive = true
     this.documentsService.update(this.document).subscribe(result => {
       this.close()
+      this.networkActive = false
+      this.error = null
+    }, error => {
+      this.networkActive = false
+      this.error = error.error
     })
   }
 
   saveEditNext() {
+    this.networkActive = true
     this.documentsService.update(this.document).subscribe(result => {
+      this.error = null
       this.documentListViewService.getNext(this.document.id).subscribe(nextDocId => {
+        this.networkActive = false
         if (nextDocId) {
           this.openDocumentService.closeDocument(this.document)
           this.router.navigate(['documents', nextDocId])
         }
+      }, error => {
+        this.networkActive = false
       })
+    }, error => {
+      this.networkActive = false
+      this.error = error.error
     })
   }
 

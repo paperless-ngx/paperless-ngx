@@ -25,10 +25,6 @@ export class CorrespondentEditDialogComponent extends EditDialogComponent<Paperl
     return $localize`Edit correspondent`
   }
 
-  getSaveErrorMessage(error: string) {
-    return $localize`Could not save correspondent: ${error}`
-  }
-
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
