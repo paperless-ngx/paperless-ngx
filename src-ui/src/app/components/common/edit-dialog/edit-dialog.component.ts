@@ -2,6 +2,7 @@ import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
@@ -23,6 +24,10 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
 
   @Output()
   success = new EventEmitter()
+
+  networkActive = false
+
+  error = null
 
   abstract getForm(): FormGroup
 
@@ -77,11 +82,14 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       default:
         break;
     }
+    this.networkActive = true
     serverResponse.subscribe(result => {
       this.activeModal.close()
       this.success.emit(result)
+      this.networkActive = false
     }, error => {
-      this.toastService.showError(this.getSaveErrorMessage(error.error.name))
+      this.error = error.error
+      this.networkActive = false
     })
   }
 

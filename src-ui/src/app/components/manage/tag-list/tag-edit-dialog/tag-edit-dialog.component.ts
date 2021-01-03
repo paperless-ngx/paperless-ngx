@@ -25,10 +25,6 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
     return $localize`Edit tag`
   }
 
-  getSaveErrorMessage(error: string) {
-    return $localize`Could not save tag: ${error}`
-  }
-
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),

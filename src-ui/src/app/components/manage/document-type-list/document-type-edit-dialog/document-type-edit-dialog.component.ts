@@ -25,10 +25,6 @@ export class DocumentTypeEditDialogComponent extends EditDialogComponent<Paperle
     return $localize`Edit document type`
   }
 
-  getSaveErrorMessage(error: string) {
-    return $localize`Could not save document type: ${error}`
-  }
-
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
