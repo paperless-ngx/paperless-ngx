@@ -28,6 +28,9 @@ export class ConfirmDialogComponent implements OnInit {
   @Input()
   btnCaption = $localize`Confirm`
 
+  @Input()
+  buttonsEnabled = true
+  
   confirmButtonEnabled = true
   seconds = 0
 

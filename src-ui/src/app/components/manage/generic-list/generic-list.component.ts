@@ -4,6 +4,7 @@ import { MatchingModel, MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/mat
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
+import { ToastService } from 'src/app/services/toast.service';
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component';
 
 @Directive()
@@ -12,7 +13,8 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   constructor(
     private service: AbstractPaperlessService<T>,
     private modalService: NgbModal,
-    private editDialogComponent: any) {
+    private editDialogComponent: any,
+    private toastService: ToastService) {
     }
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>;
@@ -96,9 +98,13 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
     activeModal.componentInstance.btnClass = "btn-danger"
     activeModal.componentInstance.btnCaption = $localize`Delete`
     activeModal.componentInstance.confirmClicked.subscribe(() => {
+      activeModal.componentInstance.buttonsEnabled = false
       this.service.delete(object).subscribe(_ => {
         activeModal.close()
         this.reloadData()
+      }, error => {
+        activeModal.componentInstance.buttonsEnabled = true
+        this.toastService.showError($localize`Error while deleting element: ${JSON.stringify(error.error)}`)
       })
     }
     )

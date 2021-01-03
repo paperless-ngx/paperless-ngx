@@ -4,6 +4,7 @@ import { FILTER_HAS_TAG } from 'src/app/data/filter-rule-type';
 import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { TagService } from 'src/app/services/rest/tag.service';
+import { ToastService } from 'src/app/services/toast.service';
 import { GenericListComponent } from '../generic-list/generic-list.component';
 import { TagEditDialogComponent } from './tag-edit-dialog/tag-edit-dialog.component';
 
@@ -15,9 +16,10 @@ import { TagEditDialogComponent } from './tag-edit-dialog/tag-edit-dialog.compon
 export class TagListComponent extends GenericListComponent<PaperlessTag> {
 
   constructor(tagService: TagService, modalService: NgbModal,
-    private list: DocumentListViewService
+    private list: DocumentListViewService,
+    toastService: ToastService
   ) {
-    super(tagService, modalService, TagEditDialogComponent)
+    super(tagService, modalService, TagEditDialogComponent, toastService)
   }
 
   getColor(id) {

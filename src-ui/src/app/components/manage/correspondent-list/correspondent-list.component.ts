@@ -4,6 +4,7 @@ import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
+import { ToastService } from 'src/app/services/toast.service';
 import { GenericListComponent } from '../generic-list/generic-list.component';
 import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/correspondent-edit-dialog.component';
 
@@ -15,9 +16,10 @@ import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/co
 export class CorrespondentListComponent extends GenericListComponent<PaperlessCorrespondent> {
 
   constructor(correspondentsService: CorrespondentService, modalService: NgbModal,
-    private list: DocumentListViewService
+    private list: DocumentListViewService,
+    toastService: ToastService
   ) { 
-    super(correspondentsService,modalService,CorrespondentEditDialogComponent)
+    super(correspondentsService,modalService,CorrespondentEditDialogComponent, toastService)
   }
 
   getDeleteMessage(object: PaperlessCorrespondent) {
