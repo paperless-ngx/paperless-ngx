@@ -438,6 +438,19 @@ PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
 
     Defaults to ``/usr/share/fonts/liberation/LiberationSerif-Regular.ttf``.
 
+PAPERLESS_IGNORE_DATES=<string>
+    Paperless parses a documents creation date from filename and file content.
+    You may specify a comma separated list of dates that should be ignored during
+    this process. This is useful for special dates (like date of birth) that appear
+    in documents regularly but are very unlikely to be the documents creation date.
+
+    You may specify dates in a multitude of formats supported by dateparser (see
+    https://dateparser.readthedocs.io/en/latest/#popular-formats) but as the dates
+    need to be comma separated, the options are limited.
+    Example: "2020-12-02,22.04.1999"
+
+    Defaults to an empty string to not ignore any dates.
+
 
 Binaries
 ########
