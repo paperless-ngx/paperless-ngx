@@ -78,6 +78,11 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.documentTypeSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
+    this._titleFilter = null
+    this.dateAddedBefore = null
+    this.dateAddedAfter = null
+    this.dateCreatedBefore = null
+    this.dateCreatedAfter = null
 
     value.forEach(rule => {
       switch (rule.rule_type) {
