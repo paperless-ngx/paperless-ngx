@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
 import { PaperlessDocument } from '../data/paperless-document';
@@ -155,6 +156,14 @@ export class DocumentListViewService {
     sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(this.documentListView))
   }
 
+  quickFilter(filterRules: FilterRule[]) {
+    this.savedView = null
+    this.view.filter_rules = filterRules
+    this.reduceSelectionToFilter()
+    this.saveDocumentListView()
+    this.router.navigate(["documents"])
+  }
+
   getLastPage(): number {
     return Math.ceil(this.collectionSize / this.currentPageSize)
   }
@@ -240,7 +249,7 @@ export class DocumentListViewService {
     }
   }
 
-  constructor(private documentService: DocumentService, private settings: SettingsService) {
+  constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
     let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {

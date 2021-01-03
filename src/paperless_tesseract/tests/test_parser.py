@@ -78,7 +78,7 @@ class TestParser(DirectoriesMixin, TestCase):
         parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
         # dont really know how to test it, just call it and assert that it does not raise anything.
 
-    @mock.patch("paperless_tesseract.parsers.run_convert")
+    @mock.patch("documents.parsers.run_convert")
     def test_thumbnail_fallback(self, m):
 
         def call_convert(input_file, output_file, **kwargs):
