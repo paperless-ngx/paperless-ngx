@@ -252,8 +252,6 @@ class Consumer(LoggingMixin):
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
 
-                self.run_post_consume_script(document)
-
         except Exception as e:
             self.log(
                 "error",
@@ -263,6 +261,8 @@ class Consumer(LoggingMixin):
             raise ConsumerError(e)
         finally:
             document_parser.cleanup()
+
+        self.run_post_consume_script(document)
 
         self.log(
             "info",
