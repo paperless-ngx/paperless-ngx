@@ -16,7 +16,8 @@
 			"i18n": {
 				"sourceLocale": "en-US",
 				"locales": {
-					"de": "src/locale/messages.de.xlf"
+					"de": "src/locale/messages.de.xlf",
+					"nl-NL": "src/locale/messages.nl_NL.xlf"
 				}
 			},
 			"architect": {
