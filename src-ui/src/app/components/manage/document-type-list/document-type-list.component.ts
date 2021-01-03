@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FILTER_DOCUMENT_TYPE } from 'src/app/data/filter-rule-type';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
@@ -16,21 +15,17 @@ import { DocumentTypeEditDialogComponent } from './document-type-edit-dialog/doc
 export class DocumentTypeListComponent extends GenericListComponent<PaperlessDocumentType> {
 
   constructor(service: DocumentTypeService, modalService: NgbModal,
-    private router: Router,
     private list: DocumentListViewService
   ) {
     super(service, modalService, DocumentTypeEditDialogComponent)
   }
 
   getDeleteMessage(object: PaperlessDocumentType) {
-    return $localize`Do you really want to delete the document type ${object.name}?`
+    return $localize`Do you really want to delete the document type "${object.name}"?`
   }
 
 
   filterDocuments(object: PaperlessDocumentType) {
-    this.list.documentListView.filter_rules = [
-      {rule_type: FILTER_DOCUMENT_TYPE, value: object.id.toString()}
-    ]
-    this.router.navigate(["documents"])
+    this.list.quickFilter([{rule_type: FILTER_DOCUMENT_TYPE, value: object.id.toString()}])
   }
 }

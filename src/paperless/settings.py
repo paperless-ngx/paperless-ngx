@@ -6,6 +6,8 @@ import re
 
 from dotenv import load_dotenv
 
+from django.utils.translation import gettext_lazy as _
+
 # Tap paperless.conf if it's available
 if os.path.exists("../paperless.conf"):
     load_dotenv("../paperless.conf")
@@ -87,6 +89,7 @@ INSTALLED_APPS = [
     "documents.apps.DocumentsConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
+    "paperless_tika.apps.PaperlessTikaConfig",
     "paperless_mail.apps.PaperlessMailConfig",
 
     "django.contrib.admin",
@@ -124,6 +127,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -252,6 +256,15 @@ if os.getenv("PAPERLESS_DBHOST"):
 ###############################################################################
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ("en-us", _("English")),
+    ("de", _("German"))
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, "locale")
+]
 
 TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
@@ -431,3 +444,10 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
 PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
 
 THUMBNAIL_FONT_NAME = os.getenv("PAPERLESS_THUMBNAIL_FONT_NAME", "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf")
+
+# Tika settings
+PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
+PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
+    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
+)

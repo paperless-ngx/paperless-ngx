@@ -2,7 +2,7 @@ import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
-import { MATCHING_ALGORITHMS } from 'src/app/data/matching-model';
+import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -59,6 +59,10 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
 
   getMatchingAlgorithms() {
     return MATCHING_ALGORITHMS
+  }
+
+  get patternRequired(): boolean {
+    return this.objectForm?.value.matching_algorithm !== MATCH_AUTO
   }
 
   save() {

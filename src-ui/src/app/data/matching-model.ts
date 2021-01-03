@@ -9,12 +9,12 @@ export const MATCH_FUZZY = 5
 export const MATCH_AUTO = 6
 
 export const MATCHING_ALGORITHMS = [
-    {id: MATCH_ANY, name: $localize`Any`},
-    {id: MATCH_ALL, name: $localize`All`},
-    {id: MATCH_LITERAL, name: $localize`Literal`},
-    {id: MATCH_REGEX, name: $localize`Regular expression`},
-    {id: MATCH_FUZZY, name: $localize`Fuzzy match`},
-    {id: MATCH_AUTO, name: $localize`Auto`},
+    {id: MATCH_ANY, shortName: $localize`Any word`, name: $localize`Any: Document contains any of these words (space separated)`},
+    {id: MATCH_ALL, shortName: $localize`All words`, name: $localize`All: Document contains all of these words (space separated)`},
+    {id: MATCH_LITERAL, shortName: $localize`Exact match`, name: $localize`Exact: Document contains this string`},
+    {id: MATCH_REGEX, shortName: $localize`Regular expression`, name: $localize`Regular expression: Document matches this regular expression`},
+    {id: MATCH_FUZZY, shortName: $localize`Fuzzy word`, name: $localize`Fuzzy: Document contains a word similar to this word`},
+    {id: MATCH_AUTO, shortName: $localize`Automatic`, name: $localize`Auto: Learn matching automatically`},
 ]
 
 export interface MatchingModel extends ObjectWithId {
