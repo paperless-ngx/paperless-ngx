@@ -30,10 +30,6 @@ export class DocumentListComponent implements OnInit {
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
-  get isFiltered() {
-    return this.list.filterRules?.length > 0
-  }
-
   getTitle() {
     return this.list.savedViewTitle || $localize`Documents`
   }
@@ -62,17 +58,15 @@ export class DocumentListComponent implements OnInit {
             this.router.navigate(["404"])
             return
           }
-
           this.list.savedView = view
-          this.list.reload()
         })
       } else {
         this.list.savedView = null
-        this.list.reload()
       }
+
+      this.list.reload()
     })
   }
-
 
   loadViewConfig(view: PaperlessSavedView) {
     this.list.load(view)
@@ -99,6 +93,7 @@ export class DocumentListComponent implements OnInit {
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField
       }
+
       this.savedViewService.create(savedView).subscribe(() => {
         modal.close()
         this.toastService.showInfo($localize`View "${savedView.name}" created successfully.`)
@@ -107,6 +102,40 @@ export class DocumentListComponent implements OnInit {
         modal.componentInstance.buttonsEnabled = true
       })
     })
+  }
+
+  resetFilters(): void {
+    if (this.list.savedViewId) {
+      this.savedViewService.getCached(this.list.savedViewId).subscribe(viewUntouched => {
+        this.list.filterRules = viewUntouched.filter_rules
+      })
+    } else {
+      this.list.filterRules = []
+    }
+    this.list.reload()
+  }
+
+  get filterRulesModified(): boolean {
+    if (this.list.savedView == null) {
+      return this.list.filterRules.length > 0 // documents list is modified if it has any filters
+    } else {
+      // compare savedView current filters vs original
+      let modified = false
+      this.savedViewService.getCached(this.list.savedViewId).subscribe(view => {
+        let filterRulesInitial = view.filter_rules
+
+        if (this.list.filterRules.length !== filterRulesInitial.length) modified = true
+        else {
+          this.list.filterRules.forEach(rule => {
+            if (filterRulesInitial.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined) modified = true
+          })
+          filterRulesInitial.forEach(rule => {
+            if (this.list.filterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined) modified = true
+          })
+        }
+      })
+      return modified
+    }
   }
 
   clickTag(tagID: number) {
