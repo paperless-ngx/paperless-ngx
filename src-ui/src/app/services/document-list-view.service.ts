@@ -111,7 +111,8 @@ export class DocumentListViewService {
           this.isReloading = false
         },
         error => {
-          if (error.error['detail'] == 'Invalid page.') {
+          if (this.currentPage != 1 && error.status == 404) {
+            // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             this.currentPage = 1
             this.reload()
           }
