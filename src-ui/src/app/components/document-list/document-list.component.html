@@ -5,7 +5,7 @@
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
       </svg>&nbsp;<ng-container i18n>Select</ng-container>
-      
+
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
@@ -78,7 +78,7 @@
 </app-page-header>
 
 <div class="w-100 mb-2 mb-sm-4">
-  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" #filterEditor></app-filter-editor>
+  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [rulesModified]="filterRulesModified" (reset)="resetFilters()" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 
