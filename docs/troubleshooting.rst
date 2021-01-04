@@ -34,6 +34,9 @@ directory at startup, but won't find any other files added later, check out
 the configuration file and enable filesystem polling with the setting
 ``PAPERLESS_CONSUMER_POLLING``.
 
+This will disable listening to filesystem changes with inotify and paperless will
+manually check the consumption directory for changes instead.
+
 Operation not permitted
 #######################
 
