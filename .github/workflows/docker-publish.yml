@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04]
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -19,11 +19,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Tests
       run: |
-        env
         sudo apt-get update -qq
         sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
-        echo "Replacing python version with ${matrix.python-version}"
-        sed -i "s/python_version = \"3.6\"/python_version = \"${matrix.python-version}\"/" Pipfile
         pip install --upgrade pipenv
         pipenv install --system --dev
         cd src/
