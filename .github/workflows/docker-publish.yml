@@ -10,37 +10,23 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04]
-        python-version: [3.7]
+        python-version: [3.6, 3.7, 3.8]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Update system, install system requirements
+    - name: Tests
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr
-    - name: Upgrade pip
-      run: |
-        pip install --upgrade pip pipenv
-    - name: Gather pip requirements
-      run: |
-        pipenv lock --dev -r > requirements.txt
-    - name: Install pip requirements
-      run: |
-        pip install -r requirements.txt
-    - name: Execute Tests
-      run: |
+        sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
+        pip install --upgrade pipenv
+        pipenv install --system --dev
         cd src/
-        pytest --cov
-        pycodestyle
-    - name: Run sphinx
-      run: |
-        sphinx-build -b html ../docs ../docs/_build -W    
-    - name: Execute coveralls
-      run: |
-        coveralls
+        pipenv run pytest --cov
+        pipenv run pycodestyle
+        pipenv run coveralls
   # Build and push image to docker hub.
   buildx:
     runs-on: ubuntu-latest
