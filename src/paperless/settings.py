@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import re
 
+import dateparser
 from dotenv import load_dotenv
 
 from django.utils.translation import gettext_lazy as _
@@ -446,3 +447,10 @@ PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost
 PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
 )
+
+# List dates that should be ignored when trying to parse date from document text
+IGNORE_DATES = set()
+for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
+    d = dateparser.parse(s)
+    if d:
+        IGNORE_DATES.add(d.date())
