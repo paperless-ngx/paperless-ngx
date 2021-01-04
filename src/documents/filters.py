@@ -4,7 +4,7 @@ from .models import Correspondent, Document, Tag, DocumentType, Log
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
-INT_KWARGS = ["exact", "gt", "gte", "lt", "lte"]
+INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
 DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
 
 
@@ -37,6 +37,10 @@ class DocumentTypeFilterSet(FilterSet):
 
 class TagsFilter(Filter):
 
+    def __init__(self, exclude=False):
+        super(TagsFilter, self).__init__()
+        self.exclude = exclude
+
     def filter(self, qs, value):
         if not value:
             return qs
@@ -47,7 +51,10 @@ class TagsFilter(Filter):
             return qs
 
         for tag_id in tag_ids:
-            qs = qs.filter(tags__id=tag_id)
+            if self.exclude:
+                qs = qs.exclude(tags__id=tag_id)
+            else:
+                qs = qs.filter(tags__id=tag_id)
 
         return qs
 
@@ -74,6 +81,8 @@ class DocumentFilterSet(FilterSet):
 
     tags__id__all = TagsFilter()
 
+    tags__id__none = TagsFilter(exclude=True)
+
     is_in_inbox = InboxFilter()
 
     class Meta:
@@ -89,12 +98,14 @@ class DocumentFilterSet(FilterSet):
             "added": DATE_KWARGS,
             "modified": DATE_KWARGS,
 
+            "correspondent": ["isnull"],
             "correspondent__id": ID_KWARGS,
             "correspondent__name": CHAR_KWARGS,
 
             "tags__id": ID_KWARGS,
             "tags__name": CHAR_KWARGS,
 
+            "document_type": ["isnull"],
             "document_type__id": ID_KWARGS,
             "document_type__name": CHAR_KWARGS,
 

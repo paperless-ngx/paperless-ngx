@@ -120,6 +120,8 @@ The `bare metal route`_ is more complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
+.. _setup-docker_route:
+
 Docker Route
 ============
 
@@ -177,6 +179,14 @@ Docker Route
 
         You can use any settings from the file ``paperless.conf`` in this file.
         Have a look at :ref:`configuration` to see whats available.
+    
+    .. caution::
+
+        Certain file systems such as NFS network shares don't support file system
+        notifications with ``inotify``. When storing the consumption directory
+        on such a file system, paperless will be unable to pick up new files
+        with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
+        which will disable inotify. See :ref:`here <configuration-polling>`.
 
 4.  Run ``docker-compose up -d``. This will create and start the necessary
     containers. This will also build the image of paperless if you grabbed the
@@ -219,8 +229,9 @@ writing. Windows is not and will never be supported.
     *   ``python3-pip``, optionally ``pipenv`` for package installation
     *   ``python3-dev``
 
+    *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
-    *   ``optipng`` for optimising thumbnails
+    *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
     *   ``libpoppler-cpp-dev`` for PDF to text conversion
     *   ``libmagic-dev`` for mime type detection
@@ -240,8 +251,7 @@ writing. Windows is not and will never be supported.
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
 
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
-    for installing some of the python dependencies. You can remove that
-    again after installation.
+    for installing some of the python dependencies.
 
 2.  Install ``redis`` >= 5.0 and configure it to start automatically.
 
@@ -290,6 +300,9 @@ writing. Windows is not and will never be supported.
         
         # This creates the database schema.
         python3 manage.py migrate
+        
+        # This creates the translation files for paperless.
+        python3 manage.py compilemessages
 
         # This creates your first paperless user
         python3 manage.py createsuperuser
@@ -459,6 +472,15 @@ management commands as below.
     Starting paperless will make sure that this is the case. If your try to
     load data from an old database schema in SQLite into a newer database
     schema in PostgreSQL, you will run into trouble.
+
+.. warning::
+
+    On some database fields, PostgreSQL enforces predefined limits on maximum
+    length, whereas SQLite does not. The fields in question are the title of documents
+    (128 characters), names of document types, tags and correspondents (128 characters),
+    and filenames (1024 characters). If you have data in these fields that surpasses these
+    limits, migration to PostgreSQL is not possible and will fail with an error.
+
 
 1.  Stop paperless, if it is running.
 2.  Tell paperless to use PostgreSQL:

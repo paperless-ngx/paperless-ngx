@@ -1,15 +1,16 @@
 import json
 import os
 import re
-import subprocess
 
 import ocrmypdf
 import pdftotext
+import pikepdf
 from PIL import Image
 from django.conf import settings
 from ocrmypdf import InputFileError, EncryptedPdfError
 
-from documents.parsers import DocumentParser, ParseError, run_convert
+from documents.parsers import DocumentParser, ParseError, \
+    make_thumbnail_from_pdf
 
 
 class RasterisedDocumentParser(DocumentParser):
@@ -18,49 +19,36 @@ class RasterisedDocumentParser(DocumentParser):
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
 
+    def extract_metadata(self, document_path, mime_type):
+        namespace_pattern = re.compile(r"\{(.*)\}(.*)")
+
+        result = []
+        if mime_type == 'application/pdf':
+            pdf = pikepdf.open(document_path)
+            meta = pdf.open_metadata()
+            for key, value in meta.items():
+                if isinstance(value, list):
+                    value = " ".join([str(e) for e in value])
+                value = str(value)
+                try:
+                    m = namespace_pattern.match(key)
+                    result.append({
+                        "namespace": m.group(1),
+                        "prefix": meta.REVERSE_NS[m.group(1)],
+                        "key": m.group(2),
+                        "value": value
+                    })
+                except Exception as e:
+                    self.log(
+                        "warning",
+                        f"Error while reading metadata {key}: {value}. Error: "
+                        f"{e}"
+                    )
+        return result
+
     def get_thumbnail(self, document_path, mime_type):
-        """
-        The thumbnail of a PDF is just a 500px wide image of the first page.
-        """
-
-        out_path = os.path.join(self.tempdir, "convert.png")
-
-        # Run convert to get a decent thumbnail
-        try:
-            run_convert(density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=False,
-                        input_file="{}[0]".format(document_path),
-                        output_file=out_path,
-                        logging_group=self.logging_group)
-        except ParseError:
-            # if convert fails, fall back to extracting
-            # the first PDF page as a PNG using Ghostscript
-            self.log(
-                'warning',
-                "Thumbnail generation with ImageMagick failed, falling back "
-                "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!")
-            gs_out_path = os.path.join(self.tempdir, "gs_out.png")
-            cmd = [settings.GS_BINARY,
-                   "-q",
-                   "-sDEVICE=pngalpha",
-                   "-o", gs_out_path,
-                   document_path]
-            if not subprocess.Popen(cmd).wait() == 0:
-                raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
-            # then run convert on the output from gs
-            run_convert(density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=False,
-                        input_file=gs_out_path,
-                        output_file=out_path,
-                        logging_group=self.logging_group)
-
-        return out_path
+        return make_thumbnail_from_pdf(
+            document_path, self.tempdir, self.logging_group)
 
     def is_image(self, mime_type):
         return mime_type in [
@@ -82,7 +70,25 @@ class RasterisedDocumentParser(DocumentParser):
                 f"Error while getting DPI from image {image}: {e}")
             return None
 
-    def parse(self, document_path, mime_type):
+    def calculate_a4_dpi(self, image):
+        try:
+            with Image.open(image) as im:
+                width, height = im.size
+                # divide image width by A4 width (210mm) in inches.
+                dpi = int(width / (21 / 2.54))
+                self.log(
+                    'debug',
+                    f"Estimated DPI {dpi} based on image width {width}"
+                )
+                return dpi
+
+        except Exception as e:
+            self.log(
+                'warning',
+                f"Error while calculating DPI for image {image}: {e}")
+            return None
+
+    def parse(self, document_path, mime_type, file_name=None):
         mode = settings.OCR_MODE
 
         text_original = get_text_from_pdf(document_path)
@@ -134,6 +140,7 @@ class RasterisedDocumentParser(DocumentParser):
 
         if self.is_image(mime_type):
             dpi = self.get_dpi(document_path)
+            a4_dpi = self.calculate_a4_dpi(document_path)
             if dpi:
                 self.log(
                     "debug",
@@ -142,6 +149,8 @@ class RasterisedDocumentParser(DocumentParser):
                 ocr_args['image_dpi'] = dpi
             elif settings.OCR_IMAGE_DPI:
                 ocr_args['image_dpi'] = settings.OCR_IMAGE_DPI
+            elif a4_dpi:
+                ocr_args['image_dpi'] = a4_dpi
             else:
                 raise ParseError(
                     f"Cannot produce archive PDF for image {document_path}, "
@@ -212,6 +221,9 @@ def strip_excess_whitespace(text):
 
 
 def get_text_from_pdf(pdf_file):
+
+    if not os.path.isfile(pdf_file):
+        return None
 
     with open(pdf_file, "rb") as f:
         try:

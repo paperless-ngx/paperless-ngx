@@ -1,5 +1,5 @@
-import { Component, Directive, forwardRef, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Directive, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 
 @Directive()
@@ -29,6 +29,9 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
 
   @Input()
   disabled = false;
+
+  @Input()
+  error: string
 
   value: T
 

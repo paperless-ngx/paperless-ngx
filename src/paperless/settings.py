@@ -6,6 +6,8 @@ import re
 
 from dotenv import load_dotenv
 
+from django.utils.translation import gettext_lazy as _
+
 # Tap paperless.conf if it's available
 if os.path.exists("../paperless.conf"):
     load_dotenv("../paperless.conf")
@@ -53,6 +55,10 @@ ARCHIVE_DIR = os.path.join(MEDIA_ROOT, "documents", "archive")
 THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
+
+# Lock file for synchronizing changes to the MEDIA directory across multiple
+# threads.
+MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
@@ -64,6 +70,8 @@ SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 ###############################################################################
 # Application Definition                                                      #
 ###############################################################################
+
+env_apps = os.getenv("PAPERLESS_APPS").split(",") if os.getenv("PAPERLESS_APPS") else []
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
@@ -81,6 +89,7 @@ INSTALLED_APPS = [
     "documents.apps.DocumentsConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
+    "paperless_tika.apps.PaperlessTikaConfig",
     "paperless_mail.apps.PaperlessMailConfig",
 
     "django.contrib.admin",
@@ -93,7 +102,7 @@ INSTALLED_APPS = [
 
     "channels",
 
-]
+] + env_apps
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -113,6 +122,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -168,13 +178,6 @@ if AUTO_LOGIN_USERNAME:
     MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
 
 
-if DEBUG:
-    X_FRAME_OPTIONS = ''
-    # this should really be 'allow-from uri' but its not supported in any mayor
-    # browser.
-else:
-    X_FRAME_OPTIONS = 'SAMEORIGIN'
-
 # We allow CORS from localhost:8080
 CORS_ALLOWED_ORIGINS = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","))
 
@@ -218,6 +221,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
+COOKIE_PREFIX = os.getenv("PAPERLESS_COOKIE_PREFIX", "")
+
+CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
+SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
+LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
+
 ###############################################################################
 # Database                                                                    #
 ###############################################################################
@@ -252,6 +261,17 @@ if os.getenv("PAPERLESS_DBHOST"):
 ###############################################################################
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ("en-us", _("English")),
+    ("de", _("German")),
+    ("nl-nl", _("Dutch")),
+    ("fr", _("French"))
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, "locale")
+]
 
 TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
@@ -429,3 +449,12 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
 # TODO: this should not have a prefix.
 # Specify the filename format for out files
 PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+
+THUMBNAIL_FONT_NAME = os.getenv("PAPERLESS_THUMBNAIL_FONT_NAME", "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf")
+
+# Tika settings
+PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
+PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
+    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
+)

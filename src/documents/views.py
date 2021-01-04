@@ -4,8 +4,10 @@ from datetime import datetime
 from time import mktime
 
 from django.conf import settings
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Case, When, IntegerField
+from django.db.models.functions import Lower
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -38,19 +40,47 @@ from .filters import (
     DocumentTypeFilterSet,
     LogFilterSet
 )
-from .models import Correspondent, Document, Log, Tag, DocumentType
+from .models import Correspondent, Document, Log, Tag, DocumentType, SavedView
+from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
     LogSerializer,
     TagSerializer,
     DocumentTypeSerializer,
-    PostDocumentSerializer
+    PostDocumentSerializer,
+    SavedViewSerializer,
+    BulkEditSerializer, SelectionDataSerializer
 )
 
 
 class IndexView(TemplateView):
     template_name = "index.html"
+
+    def get_language(self):
+        # This is here for the following reason:
+        # Django identifies languages in the form "en-us"
+        # However, angular generates locales as "en-US".
+        # this translates between these two forms.
+        lang = get_language()
+        if "-" in lang:
+            first = lang[:lang.index("-")]
+            second = lang[lang.index("-")+1:]
+            return f"{first}-{second.upper()}"
+        else:
+            return lang
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cookie_prefix'] = settings.COOKIE_PREFIX
+        context['username'] = self.request.user.username
+        context['full_name'] = self.request.user.get_full_name()
+        context['styles_css'] = f"frontend/{self.get_language()}/styles.css"
+        context['runtime_js'] = f"frontend/{self.get_language()}/runtime.js"
+        context['polyfills_js'] = f"frontend/{self.get_language()}/polyfills.js"  # NOQA: E501
+        context['main_js'] = f"frontend/{self.get_language()}/main.js"
+        context['manifest'] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
+        return context
 
 
 class CorrespondentViewSet(ModelViewSet):
@@ -58,7 +88,7 @@ class CorrespondentViewSet(ModelViewSet):
 
     queryset = Correspondent.objects.annotate(
         document_count=Count('documents'),
-        last_correspondence=Max('documents__created')).order_by('name')
+        last_correspondence=Max('documents__created')).order_by(Lower('name'))
 
     serializer_class = CorrespondentSerializer
     pagination_class = StandardPagination
@@ -77,7 +107,7 @@ class TagViewSet(ModelViewSet):
     model = Tag
 
     queryset = Tag.objects.annotate(
-        document_count=Count('documents')).order_by('name')
+        document_count=Count('documents')).order_by(Lower('name'))
 
     serializer_class = TagSerializer
     pagination_class = StandardPagination
@@ -91,7 +121,7 @@ class DocumentTypeViewSet(ModelViewSet):
     model = DocumentType
 
     queryset = DocumentType.objects.annotate(
-        document_count=Count('documents')).order_by('name')
+        document_count=Count('documents')).order_by(Lower('name'))
 
     serializer_class = DocumentTypeSerializer
     pagination_class = StandardPagination
@@ -99,6 +129,10 @@ class DocumentTypeViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
+
+
+class BulkEditForm(object):
+    pass
 
 
 class DocumentViewSet(RetrieveModelMixin,
@@ -123,6 +157,17 @@ class DocumentViewSet(RetrieveModelMixin,
         "modified",
         "added",
         "archive_serial_number")
+
+    def get_serializer(self, *args, **kwargs):
+        fields_param = self.request.query_params.get('fields', None)
+        if fields_param:
+            fields = fields_param.split(",")
+        else:
+            fields = None
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        kwargs.setdefault('fields', fields)
+        return serializer_class(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         response = super(DocumentViewSet, self).update(
@@ -160,17 +205,48 @@ class DocumentViewSet(RetrieveModelMixin,
             disposition, filename)
         return response
 
+    def get_metadata(self, file, mime_type):
+        if not os.path.isfile(file):
+            return None
+
+        parser_class = get_parser_class_for_mime_type(mime_type)
+        if parser_class:
+            parser = parser_class(logging_group=None)
+
+            try:
+                return parser.extract_metadata(file, mime_type)
+            except Exception as e:
+                # TODO: cover GPG errors, remove later.
+                return []
+        else:
+            return []
+
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
-            return Response({
-                "paperless__checksum": doc.checksum,
-                "paperless__mime_type": doc.mime_type,
-                "paperless__filename": doc.filename,
-                "paperless__has_archive_version":
-                    os.path.isfile(doc.archive_path)
-            })
+
+            meta = {
+                "original_checksum": doc.checksum,
+                "original_size": os.stat(doc.source_path).st_size,
+                "original_mime_type": doc.mime_type,
+                "media_filename": doc.filename,
+                "has_archive_version": os.path.isfile(doc.archive_path),
+                "original_metadata": self.get_metadata(
+                    doc.source_path, doc.mime_type)
+            }
+
+            if doc.archive_checksum and os.path.isfile(doc.archive_path):
+                meta['archive_checksum'] = doc.archive_checksum
+                meta['archive_size'] = os.stat(doc.archive_path).st_size,
+                meta['archive_metadata'] = self.get_metadata(
+                    doc.archive_path, "application/pdf")
+            else:
+                meta['archive_checksum'] = None
+                meta['archive_size'] = None
+                meta['archive_metadata'] = None
+
+            return Response(meta)
         except Document.DoesNotExist:
             raise Http404()
 
@@ -187,7 +263,12 @@ class DocumentViewSet(RetrieveModelMixin,
     @cache_control(public=False, max_age=315360000)
     def thumb(self, request, pk=None):
         try:
-            return HttpResponse(Document.objects.get(id=pk).thumbnail_file,
+            doc = Document.objects.get(id=pk)
+            if doc.storage_type == Document.STORAGE_TYPE_GPG:
+                handle = GnuPG.decrypted(doc.thumbnail_file)
+            else:
+                handle = doc.thumbnail_file
+            return HttpResponse(handle,
                                 content_type='image/png')
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
@@ -211,6 +292,55 @@ class LogViewSet(ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = LogFilterSet
     ordering_fields = ("created",)
+
+
+class SavedViewViewSet(ModelViewSet):
+    model = SavedView
+
+    queryset = SavedView.objects.all()
+    serializer_class = SavedViewSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return SavedView.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class BulkEditView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkEditSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        method = serializer.validated_data.get("method")
+        parameters = serializer.validated_data.get("parameters")
+        documents = serializer.validated_data.get("documents")
+
+        try:
+            # TODO: parameter validation
+            result = method(documents, **parameters)
+            return Response({"result": result})
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 
 
 class PostDocumentView(APIView):
@@ -262,6 +392,63 @@ class PostDocumentView(APIView):
         return Response("OK")
 
 
+class SelectionDataView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SelectionDataSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ids = serializer.validated_data.get('documents')
+
+        correspondents = Correspondent.objects.annotate(
+            document_count=Count(Case(
+                When(documents__id__in=ids, then=1),
+                output_field=IntegerField()
+            )))
+
+        tags = Tag.objects.annotate(document_count=Count(Case(
+            When(documents__id__in=ids, then=1),
+            output_field=IntegerField()
+        )))
+
+        types = DocumentType.objects.annotate(document_count=Count(Case(
+            When(documents__id__in=ids, then=1),
+            output_field=IntegerField()
+        )))
+
+        r = Response({
+            "selected_correspondents": [{
+                "id": t.id,
+                "document_count": t.document_count
+            } for t in correspondents],
+            "selected_tags": [{
+                "id": t.id,
+                "document_count": t.document_count
+            } for t in tags],
+            "selected_document_types": [{
+                "id": t.id,
+                "document_count": t.document_count
+            } for t in types]
+        })
+
+        return r
+
+
 class SearchView(APIView):
 
     permission_classes = (IsAuthenticated,)
@@ -281,14 +468,27 @@ class SearchView(APIView):
                 }
 
     def get(self, request, format=None):
-        if 'query' not in request.query_params:
+
+        if 'query' in request.query_params:
+            query = request.query_params['query']
+        else:
+            query = None
+
+        if 'more_like' in request.query_params:
+            more_like_id = request.query_params['more_like']
+            more_like_content = Document.objects.get(id=more_like_id).content
+        else:
+            more_like_id = None
+            more_like_content = None
+
+        if not query and not more_like_id:
             return Response({
                 'count': 0,
                 'page': 0,
                 'page_count': 0,
+                'corrected_query': None,
                 'results': []})
 
-        query = request.query_params['query']
         try:
             page = int(request.query_params.get('page', 1))
         except (ValueError, TypeError):
@@ -298,8 +498,7 @@ class SearchView(APIView):
             page = 1
 
         try:
-            with index.query_page(self.ix, query, page) as (result_page,
-                                                            corrected_query):
+            with index.query_page(self.ix, page, query, more_like_id, more_like_content) as (result_page, corrected_query):  # NOQA: E501
                 return Response(
                     {'count': len(result_page),
                      'page': result_page.pagenum,

@@ -4,7 +4,8 @@ from django.utils.safestring import mark_safe
 from whoosh.writing import AsyncWriter
 
 from . import index
-from .models import Correspondent, Document, DocumentType, Log, Tag
+from .models import Correspondent, Document, DocumentType, Log, Tag, \
+    SavedView, SavedViewFilterRule
 
 
 class CorrespondentAdmin(admin.ModelAdmin):
@@ -16,8 +17,6 @@ class CorrespondentAdmin(admin.ModelAdmin):
     )
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
-
-    readonly_fields = ("slug",)
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -31,8 +30,6 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ("colour", "matching_algorithm")
     list_editable = ("colour", "match", "matching_algorithm")
 
-    readonly_fields = ("slug", )
-
 
 class DocumentTypeAdmin(admin.ModelAdmin):
 
@@ -44,13 +41,16 @@ class DocumentTypeAdmin(admin.ModelAdmin):
     list_filter = ("matching_algorithm",)
     list_editable = ("match", "matching_algorithm")
 
-    readonly_fields = ("slug",)
-
 
 class DocumentAdmin(admin.ModelAdmin):
 
     search_fields = ("correspondent__name", "title", "content", "tags__name")
-    readonly_fields = ("added", "mime_type", "storage_type", "filename")
+    readonly_fields = (
+        "added",
+        "modified",
+        "mime_type",
+        "storage_type",
+        "filename")
 
     list_display_links = ("title",)
 
@@ -69,7 +69,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
     filter_horizontal = ("tags",)
 
-    ordering = ["-created", "correspondent"]
+    ordering = ["-created"]
 
     date_hierarchy = "created"
 
@@ -101,7 +101,7 @@ class DocumentAdmin(admin.ModelAdmin):
         for tag in obj.tags.all():
             r += self._html_tag(
                 "span",
-                tag.slug + ", "
+                tag.name + ", "
             )
         return r
 
@@ -132,8 +132,22 @@ class LogAdmin(admin.ModelAdmin):
     list_display_links = ("created", "message")
 
 
+class RuleInline(admin.TabularInline):
+    model = SavedViewFilterRule
+
+
+class SavedViewAdmin(admin.ModelAdmin):
+
+    list_display = ("name", "user")
+
+    inlines = [
+        RuleInline
+    ]
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Log, LogAdmin)
+admin.site.register(SavedView, SavedViewAdmin)

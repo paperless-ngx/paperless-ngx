@@ -25,6 +25,8 @@ that works right for you based on recommendations from other Paperless users.
 +---------+----------------+-----+-----+-----+----------------+
 | Fujitsu | `ix500`_       | yes |     | yes | `eonist`_      |
 +---------+----------------+-----+-----+-----+----------------+
+| Epson   | `WF-7710DWF`_  | yes |     | yes | `Skylinar`_    |
++---------+----------------+-----+-----+-----+----------------+
 | Fujitsu | `S1300i`_      | yes |     | yes | `jonaswinkler`_|
 +---------+----------------+-----+-----+-----+----------------+
 
@@ -32,7 +34,8 @@ that works right for you based on recommendations from other Paperless users.
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
 .. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
-.. _ix500: https://www.fujitsu.com/global/products/computing/peripheral/scanners/scansnap/ix500/
+.. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
+.. _WF-7710DWF: https://www.epson.de/en/products/printers/inkjet-printers/for-home/workforce-wf-7710dwf
 .. _S1300i: https://www.fujitsu.com/global/products/computing/peripheral/scanners/soho/s1300i/
 
 .. _danielquinn: https://github.com/danielquinn
@@ -40,4 +43,5 @@ that works right for you based on recommendations from other Paperless users.
 .. _bmsleight: https://github.com/bmsleight
 .. _eonist: https://github.com/eonist
 .. _REOLDEV: https://github.com/REOLDEV
+.. _Skylinar: https://github.com/Skylinar
 .. _jonaswinkler: https://github.com/jonaswinkler

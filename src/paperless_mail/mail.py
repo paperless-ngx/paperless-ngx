@@ -3,9 +3,9 @@ import tempfile
 from datetime import timedelta, date
 
 import magic
+import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
-from django.utils.text import slugify
 from django_q.tasks import async_task
 from imap_tools import MailBox, MailBoxUnencrypted, AND, MailMessageFlags, \
     MailboxFolderSelectError
@@ -26,7 +26,7 @@ class BaseMailAction:
         return {}
 
     def post_consume(self, M, message_uids, parameter):
-        pass
+        pass  # pragma: nocover
 
 
 class DeleteMailAction(BaseMailAction):
@@ -69,7 +69,7 @@ def get_rule_action(rule):
     elif rule.action == MailRule.ACTION_MARK_READ:
         return MarkReadMailAction()
     else:
-        raise ValueError("Unknown action.")
+        raise NotImplementedError("Unknown action.")  # pragma: nocover
 
 
 def make_criterias(rule):
@@ -95,7 +95,7 @@ def get_mailbox(server, port, security):
     elif security == MailAccount.IMAP_SECURITY_SSL:
         mailbox = MailBox(server, port)
     else:
-        raise ValueError("Unknown IMAP security")
+        raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
     return mailbox
 
 
@@ -103,10 +103,7 @@ class MailAccountHandler(LoggingMixin):
 
     def _correspondent_from_name(self, name):
         try:
-            return Correspondent.objects.get_or_create(
-                name=name, defaults={
-                    "slug": slugify(name)
-                })[0]
+            return Correspondent.objects.get_or_create(name=name)[0]
         except DatabaseError as e:
             self.log(
                 "error",
@@ -122,7 +119,7 @@ class MailAccountHandler(LoggingMixin):
             return os.path.splitext(os.path.basename(att.filename))[0]
 
         else:
-            raise ValueError("Unknown title selector.")
+            raise NotImplementedError("Unknown title selector.")  # pragma: nocover  # NOQA: E501
 
     def get_correspondent(self, message, rule):
         c_from = rule.assign_correspondent_from
@@ -144,7 +141,7 @@ class MailAccountHandler(LoggingMixin):
             return rule.assign_correspondent
 
         else:
-            raise ValueError("Unknwown correspondent selector")
+            raise NotImplementedError("Unknwown correspondent selector")  # pragma: nocover  # NOQA: E501
 
     def handle_mail_account(self, account):
 
@@ -297,7 +294,7 @@ class MailAccountHandler(LoggingMixin):
                 async_task(
                     "documents.tasks.consume_file",
                     path=temp_filename,
-                    override_filename=att.filename,
+                    override_filename=pathvalidate.sanitize_filename(att.filename),  # NOQA: E501
                     override_title=title,
                     override_correspondent_id=correspondent.id if correspondent else None,  # NOQA: E501
                     override_document_type_id=doc_type.id if doc_type else None,  # NOQA: E501

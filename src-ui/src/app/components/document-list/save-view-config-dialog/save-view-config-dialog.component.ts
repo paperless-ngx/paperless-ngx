@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -14,10 +14,28 @@ export class SaveViewConfigDialogComponent implements OnInit {
   @Output()
   public saveClicked = new EventEmitter()
 
+  @Input()
+  error
+
+  @Input()
+  buttonsEnabled = true
+
+  _defaultName = ""
+
+  get defaultName() {
+    return this._defaultName
+  }
+
+  @Input()
+  set defaultName(value: string) {
+    this._defaultName = value
+    this.saveViewConfigForm.patchValue({name: value})
+  }
+  
   saveViewConfigForm = new FormGroup({
-    title: new FormControl(''),
+    name: new FormControl(''),
     showInSideBar: new FormControl(false),
-    showInDashboard: new FormControl(false),
+    showOnDashboard: new FormControl(false),
   })
 
   ngOnInit(): void {
