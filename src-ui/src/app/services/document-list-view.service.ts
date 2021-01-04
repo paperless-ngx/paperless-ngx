@@ -152,6 +152,13 @@ export class DocumentListViewService {
     return this.view.sort_reverse
   }
 
+  setSort(field: string, reverse: boolean) {
+    this.view.sort_field = field
+    this.view.sort_reverse = reverse
+    this.saveDocumentListView()
+    this.reload()
+  }
+
   private saveDocumentListView() {
     sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(this.documentListView))
   }
@@ -259,7 +266,7 @@ export class DocumentListViewService {
         this.documentListView = null
       }
     }
-    if (!this.documentListView || !this.documentListView.filter_rules || !this.documentListView.sort_reverse || !this.documentListView.sort_field) {
+    if (!this.documentListView || this.documentListView.filter_rules == null || this.documentListView.sort_reverse == null || this.documentListView.sort_field == null) {
       this.documentListView = {
         filter_rules: [],
         sort_reverse: true,
