@@ -348,11 +348,14 @@ PAPERLESS_TIME_ZONE=<timezone>
     Defaults to UTC.
 
 
+.. _configuration-polling:
+
 PAPERLESS_CONSUMER_POLLING=<num>
     If paperless won't find documents added to your consume folder, it might
     not be able to automatically detect filesystem changes. In that case,
     specify a polling interval in seconds here, which will then cause paperless
-    to periodically check your consumption directory for changes.
+    to periodically check your consumption directory for changes. This will also
+    disable listening for file system changes with ``inotify``.
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
