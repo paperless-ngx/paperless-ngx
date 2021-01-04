@@ -39,21 +39,8 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   }
 
   onSort(event: SortEvent) {
-
-    if (event.sorted) {
-      this.sortField = event.column
-      this.sortReverse = event.reverse
-    } else {
-      this.sortField = null
-      this.sortReverse = false
-    }
-
-    this.headers.forEach(header => {
-      if (header.sortable !== this.sortField) {
-        header.sorted = false
-      }
-    });
-
+    this.sortField = event.column
+    this.sortReverse = event.reverse
     this.reloadData()
   }
 
