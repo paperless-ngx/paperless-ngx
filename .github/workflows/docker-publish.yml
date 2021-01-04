@@ -19,6 +19,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Tests
       run: |
+        env
         sudo apt-get update -qq
         sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
         echo "Replacing python version with ${matrix.python-version}"
