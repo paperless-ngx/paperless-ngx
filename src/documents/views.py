@@ -211,7 +211,7 @@ class DocumentViewSet(RetrieveModelMixin,
 
         parser_class = get_parser_class_for_mime_type(mime_type)
         if parser_class:
-            parser = parser_class(logging_group=None)
+            parser = parser_class(progress_callback=None, logging_group=None)
 
             try:
                 return parser.extract_metadata(file, mime_type)

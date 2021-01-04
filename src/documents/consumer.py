@@ -216,7 +216,7 @@ class Consumer(LoggingMixin):
             self.log(
                 "error",
                 f"Error while consuming document {self.filename}: {e}")
-            self._fail(e)
+            self._fail(str(e))
 
         # Prepare the document classifier.
 
