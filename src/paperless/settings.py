@@ -115,13 +115,6 @@ if DEBUG:
         'paperless.auth.AngularApiAuthenticationOverride'
     )
 
-ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
-
-if ENABLE_HTTP_REMOTE_USER:
-    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
-        'paperless.auth.HttpRemoteUserAuthentication'
-    )
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -134,6 +127,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
+
+if ENABLE_HTTP_REMOTE_USER:
+    MIDDLEWARE.append(
+        'paperless.auth.HttpRemoteUserMiddleware'
+    )
+    AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.RemoteUserBackend',
+        'django.contrib.auth.backends.ModelBackend'
+    ]
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
+        'rest_framework.authentication.RemoteUserAuthentication'
+    )
 
 ROOT_URLCONF = 'paperless.urls'
 
