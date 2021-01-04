@@ -5,6 +5,40 @@
 Changelog
 *********
 
+paperless-ng 0.9.12
+###################
+
+* Paperless localization
+
+  * Thanks to the combined efforts of many users, Paperless is now available in English, Dutch, French and German.
+
+* Thanks to `Jo Vandeginste`_, Paperless has optional support for Office documents such as .docx, .doc, .odt and more.
+
+  * See the :ref:`configuration<configuration-tika>` on how to enable this feature. This feature requires two additional services
+    (one for parsing Office documents and metadata extraction and another for converting Office documents to PDF), and is therefore
+    not enabled on default installations.
+
+* Dark mode
+
+  * Thanks to `Michael Shamoon`_, paperless now has a dark mode. Configuration is available in the settings.
+
+* Other changes and additions
+
+  * The PDF viewer now uses a local copy of some dependencies instead of fetching them from the internet. Thanks to `slorenz`_.
+  * Revamped search bar styling thanks to `Michael Shamoon`_.
+  * Sorting in the document list by clicking on table headers.
+  * A button was added to the document detail page that assigns a new ASN to a document.
+  * Form field validation: When providing invalid input in a form (such as a duplicate ASN or no name), paperless now has visual
+    indicators and clearer error messages about what's wrong.
+  * Paperless disables buttons with network actions (such as save and delete) when a network action is active. This indicates that
+    something is happening and prevents double clicking.
+
+* Fixes
+
+  * Paperless was unable to save views when "Not assigned" was chosen in one of the filter dropdowns.
+  * Clearer error messages when pre and post consumption scripts do not exist.
+  * The post consumption script is executed later in the consumption process. Before the change, an ID was passed to the script referring to
+    a document that did not yet exist in the database.
 
 paperless-ng 0.9.11
 ###################
@@ -966,6 +1000,8 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _slorenz: https://github.com/sisao
+.. _Jo Vandeginste: https://github.com/jovandeginste
 .. _zjean: https://github.com/zjean
 .. _rYR79435: https://github.com/rYR79435
 .. _Michael Shamoon: https://github.com/shamoon
