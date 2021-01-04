@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
+import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
@@ -28,6 +29,8 @@ export class DocumentListComponent implements OnInit {
   @ViewChild("filterEditor")
   private filterEditor: FilterEditorComponent
 
+  @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>;
+  
   displayMode = 'smallCards' // largeCards, smallCards, details
 
   get isFiltered() {
@@ -40,6 +43,10 @@ export class DocumentListComponent implements OnInit {
 
   getSortFields() {
     return DOCUMENT_SORT_FIELDS
+  }
+
+  onSort(event: SortEvent) {
+    this.list.setSort(event.column, event.reverse)
   }
 
   get isBulkEditing(): boolean {
@@ -72,7 +79,6 @@ export class DocumentListComponent implements OnInit {
       }
     })
   }
-
 
   loadViewConfig(view: PaperlessSavedView) {
     this.list.load(view)
