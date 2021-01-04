@@ -73,10 +73,16 @@ in your browser and paperless has to do much less work to serve the data.
 
 **Q:** *How do I install paperless-ng on Raspberry Pi?*
 
-**A:** There is not docker image for ARM available. If you know how to build
+**A:** There is no docker image for ARM available. If you know how to build
 that automatically, I'm all ears. For now, you have to grab the latest release
 archive from the project page and build the image yourself. The release comes
 with the front end already compiled, so you don't have to do this on the Pi.
+
+**Q:** *How do I run this on unRaid?*
+
+**A:** Head over to `<https://github.com/selfhosters/unRAID-CA-templates>`_,
+`Uli Fahrer <https://github.com/Tooa>`_ created a container template for that.
+I don't exactly know how to use that though, since I don't use unRaid.
 
 **Q:** *How do I run this on my toaster?*
 

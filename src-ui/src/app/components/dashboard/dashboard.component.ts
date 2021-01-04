@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
+import { Meta } from '@angular/platform-browser';
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
+import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 
 
 @Component({
@@ -10,13 +12,36 @@ import { SavedViewConfigService } from 'src/app/services/saved-view-config.servi
 export class DashboardComponent implements OnInit {
 
   constructor(
-    public savedViewConfigService: SavedViewConfigService) { }
+    private savedViewService: SavedViewService,
+    private meta: Meta
+  ) { }
 
+  get displayName() {
+    let tagFullName = this.meta.getTag('name=full_name')
+    let tagUsername = this.meta.getTag('name=username')
+    if (tagFullName && tagFullName.content) {
+      return tagFullName.content
+    } else if (tagUsername && tagUsername.content) {
+      return tagUsername.content
+    } else {
+      return null
+    }
+  }
 
-  savedViews = []
+  get subtitle() {
+    if (this.displayName) {
+      return $localize`Hello ${this.displayName}, welcome to Paperless-ng!`
+    } else {
+      return $localize`Welcome to Paperless-ng!`
+    }
+  }
+
+  savedViews: PaperlessSavedView[] = []
 
   ngOnInit(): void {
-    this.savedViews = this.savedViewConfigService.getDashboardConfigs()
+    this.savedViewService.listAll().subscribe(results => {
+      this.savedViews = results.results.filter(savedView => savedView.show_on_dashboard)
+    })
   }
 
 }

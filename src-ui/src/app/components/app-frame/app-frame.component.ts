@@ -5,10 +5,12 @@ import { from, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
+import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { SearchService } from 'src/app/services/rest/search.service';
-import { SavedViewConfigService } from 'src/app/services/saved-view-config.service';
+import { environment } from 'src/environments/environment';
 import { DocumentDetailComponent } from '../document-detail/document-detail.component';
-  
+import { Meta } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-app-frame',
   templateUrl: './app-frame.component.html',
@@ -21,9 +23,13 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private openDocumentsService: OpenDocumentsService,
     private searchService: SearchService,
-    public viewConfigService: SavedViewConfigService
+    public savedViewService: SavedViewService,
+    private meta: Meta
     ) {
+      
   }
+
+  versionString = `${environment.appTitle} ${environment.version}`
 
   isMenuCollapsed: boolean = true
 
@@ -52,7 +58,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
         term.length < 2 ? from([[]]) : this.searchService.autocomplete(term)
       )
     )
-  
+
   itemSelected(event) {
     event.preventDefault()
     let currentSearch: string = this.searchField.value
@@ -92,6 +98,19 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.openDocumentsSubscription) {
       this.openDocumentsSubscription.unsubscribe()
+    }
+  }
+
+  get displayName() {
+    // TODO: taken from dashboard component, is this the best way to pass around username?
+    let tagFullName = this.meta.getTag('name=full_name')
+    let tagUsername = this.meta.getTag('name=username')
+    if (tagFullName && tagFullName.content) {
+      return tagFullName.content
+    } else if (tagUsername && tagUsername.content) {
+      return tagUsername.content
+    } else {
+      return null
     }
   }
 

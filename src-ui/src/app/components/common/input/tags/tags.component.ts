@@ -1,8 +1,6 @@
-import { ThrowStmt } from '@angular/compiler';
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
 import { TagEditDialogComponent } from 'src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { TagService } from 'src/app/services/rest/tag.service';
@@ -23,7 +21,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
 
   onChange = (newValue: number[]) => {};
-  
+
   onTouched = () => {};
 
   writeValue(newValue: number[]): void {
@@ -68,19 +66,12 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   removeTag(id) {
     let index = this.displayValue.indexOf(id)
     if (index > -1) {
-      this.displayValue.splice(index, 1)
+      let oldValue = this.displayValue
+      oldValue.splice(index, 1)
+      this.displayValue = [...oldValue]
       this.onChange(this.displayValue)
     }
   }
-
-  addTag(id) {
-    let index = this.displayValue.indexOf(id)
-    if (index == -1) {
-      this.displayValue.push(id)
-      this.onChange(this.displayValue)
-    }
-  }
-
 
   createTag() {
     var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
@@ -88,9 +79,15 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     modal.componentInstance.success.subscribe(newTag => {
       this.tagService.listAll().subscribe(tags => {
         this.tags = tags.results
-        this.addTag(newTag.id)
+        this.displayValue = [...this.displayValue, newTag.id]
+        this.onChange(this.displayValue)
       })
     })
+  }
+
+  ngSelectChange() {
+    this.value = this.displayValue
+    this.onChange(this.displayValue)
   }
 
 }

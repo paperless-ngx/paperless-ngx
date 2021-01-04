@@ -1,16 +1,45 @@
 import magic
-from pathvalidate import validate_filename, ValidationError
+from django.utils.text import slugify
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 
-from .models import Correspondent, Tag, Document, Log, DocumentType
+from . import bulk_edit
+from .models import Correspondent, Tag, Document, Log, DocumentType, \
+    SavedView, SavedViewFilterRule
 from .parsers import is_mime_type_supported
 
 
-class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
+# https://www.django-rest-framework.org/api-guide/serializers/#example
+class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+    """
+    A ModelSerializer that takes an additional `fields` argument that
+    controls which fields should be displayed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Don't pass the 'fields' arg up to the superclass
+        fields = kwargs.pop('fields', None)
+
+        # Instantiate the superclass normally
+        super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
+
+        if fields is not None:
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+
+class CorrespondentSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
 
     last_correspondence = serializers.DateTimeField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Correspondent
@@ -26,9 +55,13 @@ class CorrespondentSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
+class DocumentTypeSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = DocumentType
@@ -43,9 +76,13 @@ class DocumentTypeSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj):
+        return slugify(obj.name)
+    slug = SerializerMethodField()
 
     class Meta:
         model = Tag
@@ -77,11 +114,23 @@ class DocumentTypeField(serializers.PrimaryKeyRelatedField):
         return DocumentType.objects.all()
 
 
-class DocumentSerializer(serializers.ModelSerializer):
+class DocumentSerializer(DynamicFieldsModelSerializer):
 
     correspondent = CorrespondentField(allow_null=True)
     tags = TagsField(many=True)
     document_type = DocumentTypeField(allow_null=True)
+
+    original_file_name = SerializerMethodField()
+    archived_file_name = SerializerMethodField()
+
+    def get_original_file_name(self, obj):
+        return obj.get_public_filename()
+
+    def get_archived_file_name(self, obj):
+        if obj.archive_checksum:
+            return obj.get_public_filename(archive=True)
+        else:
+            return None
 
     class Meta:
         model = Document
@@ -96,7 +145,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             "created",
             "modified",
             "added",
-            "archive_serial_number"
+            "archive_serial_number",
+            "original_file_name",
+            "archived_file_name",
         )
 
 
@@ -111,6 +162,177 @@ class LogSerializer(serializers.ModelSerializer):
             "group",
             "level"
         )
+
+
+class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SavedViewFilterRule
+        fields = ["rule_type", "value"]
+
+
+class SavedViewSerializer(serializers.ModelSerializer):
+
+    filter_rules = SavedViewFilterRuleSerializer(many=True)
+
+    class Meta:
+        model = SavedView
+        depth = 1
+        fields = ["id", "name", "show_on_dashboard", "show_in_sidebar",
+                  "sort_field", "sort_reverse", "filter_rules"]
+
+    def update(self, instance, validated_data):
+        if 'filter_rules' in validated_data:
+            rules_data = validated_data.pop('filter_rules')
+        else:
+            rules_data = None
+        super(SavedViewSerializer, self).update(instance, validated_data)
+        if rules_data is not None:
+            SavedViewFilterRule.objects.filter(saved_view=instance).delete()
+            for rule_data in rules_data:
+                SavedViewFilterRule.objects.create(
+                    saved_view=instance, **rule_data)
+        return instance
+
+    def create(self, validated_data):
+        rules_data = validated_data.pop('filter_rules')
+        saved_view = SavedView.objects.create(**validated_data)
+        for rule_data in rules_data:
+            SavedViewFilterRule.objects.create(
+                saved_view=saved_view, **rule_data)
+        return saved_view
+
+
+class BulkEditSerializer(serializers.Serializer):
+
+    documents = serializers.ListField(
+        child=serializers.IntegerField(),
+        label="Documents",
+        write_only=True
+    )
+
+    method = serializers.ChoiceField(
+        choices=[
+            "set_correspondent",
+            "set_document_type",
+            "add_tag",
+            "remove_tag",
+            "modify_tags",
+            "delete"
+        ],
+        label="Method",
+        write_only=True,
+    )
+
+    parameters = serializers.DictField(allow_empty=True)
+
+    def _validate_document_id_list(self, documents, name="documents"):
+        if not type(documents) == list:
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all([type(i) == int for i in documents]):
+            raise serializers.ValidationError(
+                f"{name} must be a list of integers")
+        count = Document.objects.filter(id__in=documents).count()
+        if not count == len(documents):
+            raise serializers.ValidationError(
+                f"Some documents in {name} don't exist or were "
+                f"specified twice.")
+
+    def _validate_tag_id_list(self, tags, name="tags"):
+        if not type(tags) == list:
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all([type(i) == int for i in tags]):
+            raise serializers.ValidationError(
+                f"{name} must be a list of integers")
+        count = Tag.objects.filter(id__in=tags).count()
+        if not count == len(tags):
+            raise serializers.ValidationError(
+                f"Some tags in {name} don't exist or were specified twice.")
+
+    def validate_documents(self, documents):
+        self._validate_document_id_list(documents)
+        return documents
+
+    def validate_method(self, method):
+        if method == "set_correspondent":
+            return bulk_edit.set_correspondent
+        elif method == "set_document_type":
+            return bulk_edit.set_document_type
+        elif method == "add_tag":
+            return bulk_edit.add_tag
+        elif method == "remove_tag":
+            return bulk_edit.remove_tag
+        elif method == "modify_tags":
+            return bulk_edit.modify_tags
+        elif method == "delete":
+            return bulk_edit.delete
+        else:
+            raise serializers.ValidationError("Unsupported method.")
+
+    def _validate_parameters_tags(self, parameters):
+        if 'tag' in parameters:
+            tag_id = parameters['tag']
+            try:
+                Tag.objects.get(id=tag_id)
+            except Tag.DoesNotExist:
+                raise serializers.ValidationError("Tag does not exist")
+        else:
+            raise serializers.ValidationError("tag not specified")
+
+    def _validate_parameters_document_type(self, parameters):
+        if 'document_type' in parameters:
+            document_type_id = parameters['document_type']
+            if document_type_id is None:
+                # None is ok
+                return
+            try:
+                DocumentType.objects.get(id=document_type_id)
+            except DocumentType.DoesNotExist:
+                raise serializers.ValidationError(
+                    "Document type does not exist")
+        else:
+            raise serializers.ValidationError("document_type not specified")
+
+    def _validate_parameters_correspondent(self, parameters):
+        if 'correspondent' in parameters:
+            correspondent_id = parameters['correspondent']
+            if correspondent_id is None:
+                return
+            try:
+                Correspondent.objects.get(id=correspondent_id)
+            except Correspondent.DoesNotExist:
+                raise serializers.ValidationError(
+                    "Correspondent does not exist")
+        else:
+            raise serializers.ValidationError("correspondent not specified")
+
+    def _validate_parameters_modify_tags(self, parameters):
+        if "add_tags" in parameters:
+            self._validate_tag_id_list(parameters['add_tags'], "add_tags")
+        else:
+            raise serializers.ValidationError("add_tags not specified")
+
+        if "remove_tags" in parameters:
+            self._validate_tag_id_list(parameters['remove_tags'],
+                                       "remove_tags")
+        else:
+            raise serializers.ValidationError("remove_tags not specified")
+
+    def validate(self, attrs):
+
+        method = attrs['method']
+        parameters = attrs['parameters']
+
+        if method == bulk_edit.set_correspondent:
+            self._validate_parameters_correspondent(parameters)
+        elif method == bulk_edit.set_document_type:
+            self._validate_parameters_document_type(parameters)
+        elif method == bulk_edit.add_tag or method == bulk_edit.remove_tag:
+            self._validate_parameters_tags(parameters)
+        elif method == bulk_edit.modify_tags:
+            self._validate_parameters_modify_tags(parameters)
+
+        return attrs
 
 
 class PostDocumentSerializer(serializers.Serializer):
@@ -151,12 +373,6 @@ class PostDocumentSerializer(serializers.Serializer):
     )
 
     def validate_document(self, document):
-
-        try:
-            validate_filename(document.name)
-        except ValidationError:
-            raise serializers.ValidationError("Invalid filename.")
-
         document_data = document.file.read()
         mime_type = magic.from_buffer(document_data, mime=True)
 
@@ -190,3 +406,11 @@ class PostDocumentSerializer(serializers.Serializer):
             return [tag.id for tag in tags]
         else:
             return None
+
+
+class SelectionDataSerializer(serializers.Serializer):
+
+    documents = serializers.ListField(
+        required=True,
+        child=serializers.IntegerField()
+    )

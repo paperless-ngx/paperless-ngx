@@ -1,0 +1,27 @@
+@import "/src/theme";
+
+.table-row-selected {
+  background-color: $primaryFaded;
+}
+
+$paperless-card-breakpoints: (
+  0: 2, // xs
+  768px: 3, //md
+  992px: 4, //lg
+  1200px: 5, //xl
+  1400px: 6, // xxl
+  1600px: 7,
+  1800px: 8,
+  2000px: 9
+);
+
+.row-cols-paperless-cards {
+  @each $width, $n_cols in $paperless-card-breakpoints {
+    @media(min-width: $width) {
+      > * {
+        flex: 0 0 auto;
+        width: 100% / $n_cols;
+      }
+    }
+  }
+}

@@ -152,6 +152,16 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 
     Defaults to none, which disables this feature.
 
+
+PAPERLESS_COOKIE_PREFIX=<str>
+    Specify a prefix that is added to the cookies used by paperless to identify
+    the currently logged in user. This is useful for when you're running two
+    instances of paperless on the same host.
+
+    After changing this, you will have to login again.
+
+    Defaults to ``""``, which does not alter the cookie names.
+
 .. _configuration-ocr:
 
 OCR settings
@@ -267,6 +277,35 @@ PAPERLESS_OCR_USER_ARG=<json>
 
         {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}    
     
+.. _configuration-tika:
+
+Tika settings
+#############
+
+Paperless can make use of `Tika <https://tika.apache.org/>`_ and 
+`Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
+converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
+wish to use this, you must provide a Tika server and a Gotenberg server,
+configure their endpoints, and enable the feature.
+
+If you run paperless on docker, you can add those services to the docker-compose
+file (see the examples provided).
+
+PAPERLESS_TIKA_ENABLED=<bool>
+    Enable (or disable) the Tika parser.
+
+    Defaults to false.
+
+PAPERLESS_TIKA_ENDPOINT=<url>
+    Set the endpoint URL were Paperless can reach your Tika server.
+
+    Defaults to "http://localhost:9998".
+
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
+    Set the endpoint URL were Paperless can reach your Gotenberg server.
+
+    Defaults to "http://localhost:3000".
+
     
 Software tweaks
 ###############
@@ -309,11 +348,14 @@ PAPERLESS_TIME_ZONE=<timezone>
     Defaults to UTC.
 
 
+.. _configuration-polling:
+
 PAPERLESS_CONSUMER_POLLING=<num>
     If paperless won't find documents added to your consume folder, it might
     not be able to automatically detect filesystem changes. In that case,
     specify a polling interval in seconds here, which will then cause paperless
-    to periodically check your consumption directory for changes.
+    to periodically check your consumption directory for changes. This will also
+    disable listening for file system changes with ``inotify``.
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
@@ -390,11 +432,15 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
 
     Defaults to none, which disables this feature.
 
-PAPERLESS_FILENAME_PARSE_TRANSFORMS
-    Transforms filenames before they are processed by paperless. See
-    :ref:`advanced-transforming_filenames` for details.
+PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
+    Paperless creates thumbnails for plain text files by rendering the content
+    of the file on an image and uses a predefined font for that. This
+    font can be changed here.
 
-    Defaults to none, which disables this feature.
+    Note that this won't have any effect on already generated thumbnails.
+
+    Defaults to ``/usr/share/fonts/liberation/LiberationSerif-Regular.ttf``.
+
 
 Binaries
 ########

@@ -1,19 +1,19 @@
-<app-widget-frame [title]="savedView.title">
+<app-widget-frame [title]="savedView.name">
 
-  <a header-buttons [routerLink]="" (click)="showAll()">Show all</a>
+  <a header-buttons [routerLink]="" (click)="showAll()" i18n>Show all</a>
 
 
   <table content class="table table-sm table-hover table-borderless">
     <thead>
       <tr>
-        <th>Created</th>
-        <th scope="col">Title</th>
+        <th i18n>Created</th>
+        <th scope="col" i18n>Title</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let doc of documents" routerLink="/documents/{{doc.id}}">
         <td>{{doc.created | date}}</td>
-        <td>{{doc.title}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ml-1"></app-tag>
+        <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ml-1"></app-tag>
       </tr>
     </tbody>
   </table>
