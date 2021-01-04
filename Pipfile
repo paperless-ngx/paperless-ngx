@@ -9,7 +9,7 @@ verify_ssl = true
 name = "piwheels"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
 
 [packages]
 dateparser = "~=0.7.6"
