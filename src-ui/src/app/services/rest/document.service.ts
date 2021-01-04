@@ -13,10 +13,10 @@ import { TagService } from './tag.service';
 import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 
 export const DOCUMENT_SORT_FIELDS = [
-  { field: "correspondent__name", name: $localize`Correspondent` },
-  { field: "document_type__name", name: $localize`Document type` },
-  { field: 'title', name: $localize`Title` },
   { field: 'archive_serial_number', name: $localize`ASN` },
+  { field: "correspondent__name", name: $localize`Correspondent` },
+  { field: 'title', name: $localize`Title` },
+  { field: "document_type__name", name: $localize`Document type` },
   { field: 'created', name: $localize`Created` },
   { field: 'added', name: $localize`Added` },
   { field: 'modified', name: $localize`Modified` }
