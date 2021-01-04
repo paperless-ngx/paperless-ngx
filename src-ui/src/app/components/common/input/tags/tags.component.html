@@ -1,29 +1,42 @@
-<div class="form-group">
-  <label for="exampleFormControlTextarea1">Tags</label>
+<div class="form-group paperless-input-select paperless-input-tags">
+  <label for="tags">Tags</label>
 
-  <div class="input-group">
-    <div class="form-control tags-form-control" id="tags">
-      <app-tag class="mr-2" *ngFor="let id of displayValue" [tag]="getTag(id)" (click)="removeTag(id)"></app-tag>
-    </div>
+  <div class="input-group flex-nowrap">
+    <ng-select name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="displayValue"
+      [multiple]="true"
+      [closeOnSelect]="false"
+      [clearSearchOnAdd]="true"
+      [disabled]="disabled"
+      [hideSelected]="true"
+      (change)="ngSelectChange()">
 
-    <div class="input-group-append" ngbDropdown placement="top-right">
-      <button class="btn btn-outline-secondary" type="button" ngbDropdownToggle></button>
-      <div ngbDropdownMenu class="scrollable-menu">
-        <button type="button" *ngFor="let tag of tags" ngbDropdownItem (click)="addTag(tag.id)">
-          <app-tag [tag]="tag"></app-tag>
-        </button>
-      </div>
-    </div>
+      <ng-template ng-label-tmp let-item="item">
+        <span class="tag-wrap tag-wrap-delete" (click)="removeTag(item.id)">
+          <svg width="1.2em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <use xlink:href="assets/bootstrap-icons.svg#x"/>
+          </svg>
+          <app-tag style="background-color: none;" [tag]="getTag(item.id)"></app-tag>
+        </span>
+      </ng-template>
+      <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
+        <div class="tag-wrap">
+          <div class="selected-icon d-inline-block mr-1">
+            <svg *ngIf="displayValue.includes(item.id)" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <use xlink:href="assets/bootstrap-icons.svg#check"/>
+            </svg>
+          </div>
+          <app-tag class="mr-2" [tag]="getTag(item.id)"></app-tag>
+        </div>
+      </ng-template>
+    </ng-select>
 
     <div class="input-group-append">
-
       <button class="btn btn-outline-secondary" type="button" (click)="createTag()">
         <svg class="buttonicon" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#plus" />
         </svg>
       </button>
     </div>
-
   </div>
   <small class="form-text text-muted" *ngIf="hint">{{hint}}</small>
 

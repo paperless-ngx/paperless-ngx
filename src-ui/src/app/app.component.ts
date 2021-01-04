@@ -1,3 +1,4 @@
+import { SettingsService } from './services/settings.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -13,8 +14,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   successSubscription: Subscription;
   failedSubscription: Subscription;
-  
-  constructor ( private consumerStatusService: ConsumerStatusService, private toastService: ToastService, private router: Router ) {
+
+  constructor (private settings: SettingsService, private consumerStatusService: ConsumerStatusService, private toastService: ToastService, private router: Router) {
+    let anyWindow = (window as any)
+    anyWindow.pdfWorkerSrc = '/assets/js/pdf.worker.min.js';
+    this.settings.updateDarkModeSettings()
   }
 
   ngOnDestroy(): void {
@@ -38,6 +42,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   }
 
-  
+
 
 }

@@ -1,4 +1,4 @@
-<form [formGroup]="objectForm" class="needs-validation" novalidate (ngSubmit)="save()">
+<form [formGroup]="objectForm" (ngSubmit)="save()">
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
       <button type="button" class="close" aria-label="Close" (click)="cancel()">
@@ -6,15 +6,15 @@
       </button>
     </div>
     <div class="modal-body">
-      
-      <app-input-text title="Name" formControlName="name"></app-input-text>
-      <app-input-text title="Match" formControlName="match"></app-input-text>
-      <app-input-select title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-      <app-input-check title="Case insensitive" formControlName="is_insensitive"></app-input-check>
+
+      <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
+      <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
+      <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match"></app-input-text>
+      <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
 
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-dark" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-outline-dark" (click)="cancel()" i18n [disabled]="networkActive">Cancel</button>
+      <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>
     </div>
   </form>

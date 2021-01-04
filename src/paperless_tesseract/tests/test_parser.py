@@ -78,7 +78,7 @@ class TestParser(DirectoriesMixin, TestCase):
         parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
         # dont really know how to test it, just call it and assert that it does not raise anything.
 
-    @mock.patch("paperless_tesseract.parsers.run_convert")
+    @mock.patch("documents.parsers.run_convert")
     def test_thumbnail_fallback(self, m):
 
         def call_convert(input_file, output_file, **kwargs):
@@ -164,8 +164,21 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertRaises(ParseError, f)
 
+    @mock.patch("paperless_tesseract.parsers.ocrmypdf.ocr")
+    def test_image_calc_a4_dpi(self, m):
+        parser = RasterisedDocumentParser(None)
 
-    def test_image_no_dpi_fail(self):
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple-no-dpi.png"), "image/png")
+
+        m.assert_called_once()
+
+        args, kwargs = m.call_args
+
+        self.assertEqual(kwargs['image_dpi'], 62)
+
+    @mock.patch("paperless_tesseract.parsers.RasterisedDocumentParser.calculate_a4_dpi")
+    def test_image_dpi_fail(self, m):
+        m.return_value = None
         parser = RasterisedDocumentParser(None)
 
         def f():

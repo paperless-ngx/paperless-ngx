@@ -1,0 +1,44 @@
+  <div class="btn-group" ngbDropdown role="group">
+  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="dateBefore || dateAfter ? 'btn-primary' : 'btn-outline-primary'">
+    {{title}}
+  </button>
+  <div class="dropdown-menu date-dropdown shadow pt-0" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+    <div class="list-group list-group-flush">
+        <button *ngFor="let qf of quickFilters" class="list-group-item small list-goup list-group-item-action d-flex p-2 pl-3" role="menuitem" (click)="setDateQuickFilter(qf.id)">
+          {{qf.name}}
+        </button>
+        <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+
+          <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
+            <div i18n>After</div>
+            <a *ngIf="dateAfter" class="btn btn-link p-0 m-0" (click)="clearAfter()">
+              <svg width="0.8em" height="0.8em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+              </svg>
+              <small i18n>Clear</small>
+            </a>
+          </div>
+
+          <div class="input-group input-group-sm">
+            <input type="date" class="form-control" id="date_after" [(ngModel)]="dateAfter" (change)="onChangeDebounce()">
+          </div>
+        </div>
+        <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+
+          <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
+            <div i18n>Before</div>
+            <a *ngIf="dateBefore" class="btn btn-link p-0 m-0" (click)="clearBefore()">
+              <svg width="0.8em" height="0.8em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+              </svg>
+              <small i18n>Clear</small>
+            </a>
+          </div>
+
+          <div class="input-group input-group-sm">
+            <input type="date" class="form-control" id="date_before" [(ngModel)]="dateBefore" (change)="onChangeDebounce()">
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

@@ -7,6 +7,8 @@ from django.views.generic import RedirectView
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
+from django.utils.translation import gettext_lazy as _
+
 from paperless.consumers import StatusConsumer
 from documents.views import (
     CorrespondentViewSet,
@@ -18,7 +20,10 @@ from documents.views import (
     IndexView,
     SearchAutoCompleteView,
     StatisticsView,
-    PostDocumentView
+    PostDocumentView,
+    SavedViewViewSet,
+    BulkEditView,
+    SelectionDataView
 )
 from paperless.views import FaviconView
 
@@ -28,6 +33,7 @@ api_router.register(r"document_types", DocumentTypeViewSet)
 api_router.register(r"documents", DocumentViewSet)
 api_router.register(r"logs", LogViewSet)
 api_router.register(r"tags", TagViewSet)
+api_router.register(r"saved_views", SavedViewViewSet)
 
 
 urlpatterns = [
@@ -50,6 +56,12 @@ urlpatterns = [
 
         re_path(r"^documents/post_document/", PostDocumentView.as_view(),
                 name="post_document"),
+
+        re_path(r"^documents/bulk_edit/", BulkEditView.as_view(),
+                name="bulk_edit"),
+
+        re_path(r"^documents/selection_data/", SelectionDataView.as_view(),
+                name="selection_data"),
 
         path('token/', views.obtain_auth_token)
 
@@ -79,7 +91,8 @@ urlpatterns = [
 
     # Frontend assets TODO: this is pretty bad, but it works.
     path('assets/<path:path>',
-         RedirectView.as_view(url='/static/frontend/assets/%(path)s')),
+         RedirectView.as_view(url='/static/frontend/en-US/assets/%(path)s')),
+    # TODO: with localization, this is even worse! :/
 
     # login, logout
     path('accounts/', include('django.contrib.auth.urls')),
@@ -98,4 +111,4 @@ admin.site.site_header = 'Paperless-ng'
 # Text at the end of each page's <title>.
 admin.site.site_title = 'Paperless-ng'
 # Text at the top of the admin index page.
-admin.site.index_title = 'Paperless-ng administration'
+admin.site.index_title = _('Paperless-ng administration')

@@ -119,8 +119,11 @@ Updating paperless without docker
 
 After grabbing the new release and unpacking the contents, do the following:
 
-1.  Update python requirements. Paperless uses
-    `Pipenv`_ for managing dependencies:
+1.  Update dependencies. New paperless version may require additional
+    dependencies. The dependencies required are listed in the section about 
+    :ref:`bare metal installations <setup-bare_metal>`.
+
+2.  Update python requirements. If you use Pipenv, this is done with the following steps.
 
     .. code:: shell-session
 
@@ -132,20 +135,26 @@ After grabbing the new release and unpacking the contents, do the following:
     This creates a new virtual environment (or uses your existing environment)
     and installs all dependencies into it.
 
-2.  Collect static files.
+3.  Collect static files.
 
     .. code:: shell-session
 
         $ cd src
         $ pipenv run python3 manage.py collectstatic --clear
     
-3.  Migrate the database.
+4.  Migrate the database.
 
     .. code:: shell-session
 
         $ cd src
         $ pipenv run python3 manage.py migrate
+    
+5.  Update translation files.
 
+    .. code:: shell-session
+
+        $ cd src
+        $ pipenv run python3 manage.py compilemessages
         
 Management utilities
 ####################
@@ -153,14 +162,14 @@ Management utilities
 Paperless comes with some management commands that perform various maintenance
 tasks on your paperless instance. You can invoke these commands either by
 
-.. code:: bash
+.. code:: shell-session
 
     $ cd /path/to/paperless
     $ docker-compose run --rm webserver <command> <arguments>
 
 or
 
-.. code:: bash
+.. code:: shell-session
 
     $ cd /path/to/paperless/src
     $ pipenv run python manage.py <command> <arguments>
@@ -366,7 +375,7 @@ is specified, the archiver will only process that document.
 .. note::
 
     Some documents will cause errors and cannot be converted into PDF/A documents,
-    such as encrypted PDF documents. The archiver will skip over these Documents
+    such as encrypted PDF documents. The archiver will skip over these documents
     each time it sees them.
 
 .. _utilities-encyption:

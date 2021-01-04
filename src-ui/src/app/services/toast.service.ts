@@ -7,7 +7,7 @@ export interface Toast {
 
   content: string
 
-  delay?: number
+  delay: number
 
   action?: any
 
@@ -26,17 +26,17 @@ export class ToastService {
 
   private toastsSubject: Subject<Toast[]> = new Subject()
 
-  showToast(toast: Toast) {
+  show(toast: Toast) {
     this.toasts.push(toast)
     this.toastsSubject.next(this.toasts)
   }
 
-  showInfo(message: string) {
-    this.showToast({title: "Information", content: message, delay: 5000})
+  showError(content: string, delay: number = 10000) {
+    this.show({title: $localize`Error`, content: content, delay: delay})
   }
 
-  showError(message: string) {
-    this.showToast({title: "Error", content: message, delay: 10000})
+  showInfo(content: string, delay: number = 5000) {
+    this.show({title: $localize`Information`, content: content, delay: delay})
   }
 
   closeToast(toast: Toast) {

@@ -1,6 +1,8 @@
 import logging
 
+import tqdm
 from django.conf import settings
+from django.db.models.signals import post_save
 from whoosh.writing import AsyncWriter
 
 from documents import index, sanity_checker
@@ -23,7 +25,7 @@ def index_reindex():
     ix = index.open_index(recreate=True)
 
     with AsyncWriter(ix) as writer:
-        for document in documents:
+        for document in tqdm.tqdm(documents):
             index.update_document(writer, document)
 
 
@@ -33,9 +35,9 @@ def train_classifier():
     try:
         # load the classifier, since we might not have to train it again.
         classifier.reload()
-    except (FileNotFoundError, IncompatibleClassifierVersionError):
+    except (OSError, EOFError, IncompatibleClassifierVersionError):
         # This is what we're going to fix here.
-        pass
+        classifier = DocumentClassifier()
 
     try:
         if classifier.train():
@@ -86,3 +88,16 @@ def sanity_check():
         raise SanityFailedError(messages)
     else:
         return "No issues detected."
+
+
+def bulk_update_documents(document_ids):
+    documents = Document.objects.filter(id__in=document_ids)
+
+    ix = index.open_index()
+
+    for doc in documents:
+        post_save.send(Document, instance=doc, created=False)
+
+    with AsyncWriter(ix) as writer:
+        for doc in documents:
+            index.update_document(writer, doc)

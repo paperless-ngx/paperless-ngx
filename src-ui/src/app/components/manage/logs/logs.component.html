@@ -1,11 +1,12 @@
-<app-page-header title="Logs">
+<app-page-header title="Logs" i18n-title>
 
   <div ngbDropdown class="btn-group">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#funnel" />
-      </svg>
-      Filter
+      </svg>&nbsp;<ng-container i18n>Filter</ng-container>
+      
+      
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
       <button *ngFor="let f of getLevels()" ngbDropdownItem (click)="setLevel(f.id)"

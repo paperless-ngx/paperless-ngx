@@ -9,6 +9,8 @@ RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
 		curl \
+		file \
+		fonts-liberation \
 		ghostscript \
 		gnupg \
 		icc-profiles-free \
@@ -18,7 +20,9 @@ RUN apt-get update \
 		libmagic-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \
+		libqpdf-dev \
 		libxml2 \
+		libxslt1-dev \
 		optipng \
 		pngquant \
 		qpdf \
@@ -34,7 +38,7 @@ RUN apt-get update \
 		zlib1g \
 	&& pip3 install --upgrade supervisor setuptools \
 	&& pip install --no-cache-dir -r requirements.txt \
-	&& apt-get -y purge build-essential \
+	&& apt-get -y purge build-essential libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
@@ -59,8 +63,11 @@ WORKDIR /usr/src/paperless/src/
 
 RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
 
+RUN sudo -HEu paperless python3 manage.py compilemessages
+
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
+EXPOSE 8000
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"

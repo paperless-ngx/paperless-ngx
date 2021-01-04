@@ -8,6 +8,12 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 
+class defaultdictNoStr(defaultdict):
+
+    def __str__(self):
+        raise ValueError("Don't use {tags} directly.")
+
+
 def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
 
@@ -70,13 +76,35 @@ def many_to_dictionary(field):
     return mydictionary
 
 
-def generate_filename(doc):
+def generate_unique_filename(doc, root):
+    counter = 0
+
+    while True:
+        new_filename = generate_filename(doc, counter)
+        if new_filename == doc.filename:
+            # still the same as before.
+            return new_filename
+
+        if os.path.exists(os.path.join(root, new_filename)):
+            counter += 1
+        else:
+            return new_filename
+
+
+def generate_filename(doc, counter=0):
     path = ""
 
     try:
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdict(lambda: slugify(None),
-                               many_to_dictionary(doc.tags))
+            tags = defaultdictNoStr(lambda: slugify(None),
+                                    many_to_dictionary(doc.tags))
+
+            tag_list = pathvalidate.sanitize_filename(
+                ",".join(sorted(
+                    [tag.name for tag in doc.tags.all()]
+                )),
+                replacement_text="-"
+            )
 
             if doc.correspondent:
                 correspondent = pathvalidate.sanitize_filename(
@@ -99,24 +127,28 @@ def generate_filename(doc):
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=doc.created.month if doc.created else "none",
-                created_day=doc.created.day if doc.created else "none",
+                created_month=f"{doc.created.month:02}" if doc.created else "none",  # NOQA: E501
+                created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
-                added_month=doc.added.month if doc.added else "none",
-                added_day=doc.added.day if doc.added else "none",
+                added_month=f"{doc.added.month:02}" if doc.added else "none",
+                added_day=f"{doc.added.day:02}" if doc.added else "none",
                 tags=tags,
-            )
+                tag_list=tag_list
+            ).strip()
+
+            path = path.strip(os.sep)
+
     except (ValueError, KeyError, IndexError):
         logging.getLogger(__name__).warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
             f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default")
 
-    # Always append the primary key to guarantee uniqueness of filename
+    counter_str = f"_{counter:02}" if counter else ""
     if len(path) > 0:
-        filename = "%s-%07i%s" % (path, doc.pk, doc.file_type)
+        filename = f"{path}{counter_str}{doc.file_type}"
     else:
-        filename = "%07i%s" % (doc.pk, doc.file_type)
+        filename = f"{doc.pk:07}{counter_str}{doc.file_type}"
 
     # Append .gpg for encrypted files
     if doc.storage_type == doc.STORAGE_TYPE_GPG:

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { map } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentService } from 'src/app/services/rest/document.service';
 
 @Component({
@@ -13,6 +13,17 @@ export class DocumentCardSmallComponent implements OnInit {
   constructor(private documentService: DocumentService) { }
 
   @Input()
+  selected = false
+
+  setSelected(value: boolean) {
+    this.selected = value
+    this.selectedChange.emit(value)
+  }
+
+  @Output()
+  selectedChange = new EventEmitter<boolean>()
+
+  @Input()
   document: PaperlessDocument
 
   @Output()
@@ -20,6 +31,8 @@ export class DocumentCardSmallComponent implements OnInit {
 
   @Output()
   clickCorrespondent = new EventEmitter<number>()
+
+  moreTags: number = null
 
   ngOnInit(): void {
   }
@@ -35,4 +48,18 @@ export class DocumentCardSmallComponent implements OnInit {
   getPreviewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
   }
+
+  getTagsLimited$() {
+    return this.document.tags$.pipe(
+      map(tags => {
+        if (tags.length > 7) {
+          this.moreTags = tags.length - 6
+          return tags.slice(0, 6)
+        } else {
+          return tags
+        }
+      })
+    )
+  }
+
 }
