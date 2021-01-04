@@ -21,6 +21,8 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
+        echo "Replacing python version with ${matrix.python-version}"
+        sed -i "s/python_version = \"3.6\"/python_version = \"${matrix.python-version}\"/" Pipfile
         pip install --upgrade pipenv
         pipenv install --system --dev
         cd src/
