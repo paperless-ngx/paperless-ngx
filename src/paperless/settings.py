@@ -253,7 +253,8 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ("en-us", _("English")),
     ("de", _("German")),
-    ("nl-nl", _("Dutch"))
+    ("nl-nl", _("Dutch")),
+    ("fr", _("French"))
 ]
 
 LOCALE_PATHS = [
