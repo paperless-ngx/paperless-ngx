@@ -20,7 +20,7 @@ jobs:
         uses: gabrielfalcao/pyenv-action@v5
         with:
           default: "${{ matrix.python }}"
-          command: pip install -U pip  # upgrade pip after installing python
+          command: pip install -U pip
     - name: Tests
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
