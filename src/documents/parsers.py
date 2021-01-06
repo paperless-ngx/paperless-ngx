@@ -210,6 +210,13 @@ def parse_date(filename, text):
             }
         )
 
+    def __filter(date):
+        if date and date.year > 1900 and \
+                date <= timezone.now() and \
+                date.date() not in settings.IGNORE_DATES:
+            return date
+        return None
+
     date = None
 
     # if filename date parsing is enabled, search there first:
@@ -223,7 +230,8 @@ def parse_date(filename, text):
                 # Skip all matches that do not parse to a proper date
                 continue
 
-            if date and date.year > 1900 and date <= timezone.now():
+            date = __filter(date)
+            if date is not None:
                 return date
 
     # Iterate through all regex matches in text and try to parse the date
@@ -236,10 +244,9 @@ def parse_date(filename, text):
             # Skip all matches that do not parse to a proper date
             continue
 
-        if date and date.year > 1900 and date <= timezone.now():
+        date = __filter(date)
+        if date is not None:
             break
-        else:
-            date = None
 
     return date
 

@@ -162,6 +162,12 @@ PAPERLESS_COOKIE_PREFIX=<str>
 
     Defaults to ``""``, which does not alter the cookie names.
 
+PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>
+    Allows authentication via HTTP_REMOTE_USER which is used by some SSO
+    applications.
+
+    Defaults to `false` which disables this feature.
+
 .. _configuration-ocr:
 
 OCR settings
@@ -210,20 +216,20 @@ PAPERLESS_OCR_MODE=<mode>
         into images and puts the OCRed text on top. This works for all documents,
         however, the resulting document may be significantly larger and text
         won't appear as sharp when zoomed in.
-    
+
     The default is ``skip``, which only performs OCR when necessary and always
     creates archived documents.
 
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
-    
+
     *   ``pdf``: Modify the PDF document as little as possible.
     *   ``pdfa``: Convert PDF documents into PDF/A-2b documents, which is a
         subset of the entire PDF specification and meant for storing
         documents long term.
     *   ``pdfa-1``, ``pdfa-2``, ``pdfa-3`` to specify the exact version of
         PDF/A you wish to use.
-    
+
     If not specified, ``pdfa`` is used. Remember that paperless also keeps
     the original input file as well as the archived version.
 
@@ -275,14 +281,14 @@ PAPERLESS_OCR_USER_ARG=<json>
 
     .. code:: json
 
-        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}    
-    
+        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}
+
 .. _configuration-tika:
 
 Tika settings
 #############
 
-Paperless can make use of `Tika <https://tika.apache.org/>`_ and 
+Paperless can make use of `Tika <https://tika.apache.org/>`_ and
 `Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
 converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
 wish to use this, you must provide a Tika server and a Gotenberg server,
@@ -306,7 +312,7 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
 
     Defaults to "http://localhost:3000".
 
-    
+
 Software tweaks
 ###############
 
@@ -348,11 +354,14 @@ PAPERLESS_TIME_ZONE=<timezone>
     Defaults to UTC.
 
 
+.. _configuration-polling:
+
 PAPERLESS_CONSUMER_POLLING=<num>
     If paperless won't find documents added to your consume folder, it might
     not be able to automatically detect filesystem changes. In that case,
     specify a polling interval in seconds here, which will then cause paperless
-    to periodically check your consumption directory for changes.
+    to periodically check your consumption directory for changes. This will also
+    disable listening for file system changes with ``inotify``.
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
@@ -437,6 +446,19 @@ PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
     Note that this won't have any effect on already generated thumbnails.
 
     Defaults to ``/usr/share/fonts/liberation/LiberationSerif-Regular.ttf``.
+
+PAPERLESS_IGNORE_DATES=<string>
+    Paperless parses a documents creation date from filename and file content.
+    You may specify a comma separated list of dates that should be ignored during
+    this process. This is useful for special dates (like date of birth) that appear
+    in documents regularly but are very unlikely to be the documents creation date.
+
+    You may specify dates in a multitude of formats supported by dateparser (see
+    https://dateparser.readthedocs.io/en/latest/#popular-formats) but as the dates
+    need to be comma separated, the options are limited.
+    Example: "2020-12-02,22.04.1999"
+
+    Defaults to an empty string to not ignore any dates.
 
 
 Binaries

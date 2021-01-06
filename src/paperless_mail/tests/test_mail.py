@@ -273,6 +273,49 @@ class TestMail(TestCase):
         args, kwargs = self.async_task.call_args
         self.assertEqual(kwargs['override_filename'], "f2.pdf")
 
+    def test_handle_inline_files(self):
+        message = create_message()
+        message.attachments = [
+            create_attachment(filename="f1.pdf", content_disposition='inline'),
+            create_attachment(filename="f2.pdf", content_disposition='attachment')
+        ]
+
+        account = MailAccount()
+        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account, attachment_type=MailRule.ATTACHMENT_TYPE_EVERYTHING)
+
+        result = self.mail_account_handler.handle_message(message, rule)
+
+        self.assertEqual(result, 2)
+        self.assertEqual(self.async_task.call_count, 2)
+
+    def test_filename_filter(self):
+        message = create_message()
+        message.attachments = [
+            create_attachment(filename="f1.pdf"),
+            create_attachment(filename="f2.pdf"),
+            create_attachment(filename="f3.pdf"),
+            create_attachment(filename="f2.png"),
+        ]
+
+        tests = [
+            ("*.pdf", ["f1.pdf", "f2.pdf", "f3.pdf"]),
+            ("f1.pdf", ["f1.pdf"]),
+            ("f1", []),
+            ("*", ["f1.pdf", "f2.pdf", "f3.pdf", "f2.png"]),
+            ("*.png", ["f2.png"]),
+        ]
+
+        for (pattern, matches) in tests:
+            self.async_task.reset_mock()
+            account = MailAccount()
+            rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account, filter_attachment_filename=pattern)
+
+            result = self.mail_account_handler.handle_message(message, rule)
+
+            self.assertEqual(result, len(matches))
+            filenames = [a[1]['override_filename'] for a in self.async_task.call_args_list]
+            self.assertCountEqual(filenames, matches)
+
     def test_handle_mail_account_mark_read(self):
 
         account = MailAccount.objects.create(name="test", imap_server="", username="admin", password="secret")
