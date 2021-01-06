@@ -11,6 +11,7 @@ RUN apt-get update \
 		curl \
 		file \
 		fonts-liberation \
+		gettext \
 		ghostscript \
 		gnupg \
 		icc-profiles-free \

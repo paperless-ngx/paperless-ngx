@@ -36,7 +36,7 @@
             <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem" (change)="toggleDarkModeSetting()"></app-input-check>
             <div class="custom-control custom-switch" *ngIf="!settingsForm.value.darkModeUseSystem">
               <input type="checkbox" class="custom-control-input" id="darkModeEnabled" formControlName="darkModeEnabled" [checked]="settingsForm.value.darkModeEnabled">
-              <label class="custom-control-label" for="darkModeEnabled">Enabled</label>
+              <label class="custom-control-label" for="darkModeEnabled" i18n>Enable dark mode</label>
             </div>
           </div>
         </div>
@@ -92,5 +92,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3 shadow"></div>
 
-  <button type="submit" class="btn btn-primary">Save</button>
+  <button type="submit" class="btn btn-primary" i18n>Save</button>
 </form>

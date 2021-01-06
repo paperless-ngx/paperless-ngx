@@ -71,6 +71,11 @@ class Consumer(LoggingMixin):
         if not settings.PRE_CONSUME_SCRIPT:
             return
 
+        if not os.path.isfile(settings.PRE_CONSUME_SCRIPT):
+            raise ConsumerError(
+                f"Configured pre-consume script "
+                f"{settings.PRE_CONSUME_SCRIPT} does not exist.")
+
         try:
             Popen((settings.PRE_CONSUME_SCRIPT, self.path)).wait()
         except Exception as e:
@@ -81,6 +86,11 @@ class Consumer(LoggingMixin):
     def run_post_consume_script(self, document):
         if not settings.POST_CONSUME_SCRIPT:
             return
+
+        if not os.path.isfile(settings.POST_CONSUME_SCRIPT):
+            raise ConsumerError(
+                f"Configured post-consume script "
+                f"{settings.POST_CONSUME_SCRIPT} does not exist.")
 
         try:
             Popen((
@@ -252,8 +262,6 @@ class Consumer(LoggingMixin):
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
 
-                self.run_post_consume_script(document)
-
         except Exception as e:
             self.log(
                 "error",
@@ -263,6 +271,8 @@ class Consumer(LoggingMixin):
             raise ConsumerError(e)
         finally:
             document_parser.cleanup()
+
+        self.run_post_consume_script(document)
 
         self.log(
             "info",

@@ -26,7 +26,7 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   public collectionSize = 0
 
   public sortField: string
-  public sortDirection: string
+  public sortReverse: boolean
 
   getMatching(o: MatchingModel) {
     if (o.matching_algorithm == MATCH_AUTO) {
@@ -39,21 +39,8 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   }
 
   onSort(event: SortEvent) {
-
-    if (event.direction && event.direction.length > 0) {
-      this.sortField = event.column
-      this.sortDirection = event.direction
-    } else {
-      this.sortField = null
-      this.sortDirection = null
-    }
-
-    this.headers.forEach(header => {
-      if (header.sortable !== this.sortField) {
-        header.direction = '';
-      }
-    });
-
+    this.sortField = event.column
+    this.sortReverse = event.reverse
     this.reloadData()
   }
 
@@ -62,8 +49,7 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   }
 
   reloadData() {
-    // TODO: this is a hack
-    this.service.list(this.page, null, this.sortField, this.sortDirection == 'des').subscribe(c => {
+    this.service.list(this.page, null, this.sortField, this.sortReverse).subscribe(c => {
       this.data = c.results
       this.collectionSize = c.count
     });

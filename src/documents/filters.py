@@ -4,7 +4,7 @@ from .models import Correspondent, Document, Tag, DocumentType, Log
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
-INT_KWARGS = ["exact", "gt", "gte", "lt", "lte"]
+INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
 DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
 
 

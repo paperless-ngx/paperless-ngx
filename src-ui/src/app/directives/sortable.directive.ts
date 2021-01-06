@@ -1,17 +1,15 @@
 import { Directive, EventEmitter, Input, Output } from '@angular/core';
 
 export interface SortEvent {
-  column: string;
-  direction: string;
+  column: string
+  reverse: boolean
 }
-
-const rotate: {[key: string]: string} = { 'asc': 'des', 'des': '', '': 'asc' };
 
 @Directive({
   selector: 'th[sortable]',
   host: {
-    '[class.asc]': 'direction === "asc"',
-    '[class.des]': 'direction === "des"',
+    '[class.asc]': 'currentSortField == sortable && !currentSortReverse',
+    '[class.des]': 'currentSortField == sortable && currentSortReverse',
     '(click)': 'rotate()'
   }
 })
@@ -19,12 +17,24 @@ export class SortableDirective {
 
   constructor() { }
 
-  @Input() sortable: string = '';
-  @Input() direction: string = '';
+  @Input()
+  sortable: string = '';
+
+  @Input()
+  currentSortReverse: boolean = false
+
+  @Input()
+  currentSortField: string
+
   @Output() sort = new EventEmitter<SortEvent>();
 
   rotate() {
-    this.direction = rotate[this.direction];
-    this.sort.emit({column: this.sortable, direction: this.direction});
+    if (this.currentSortField != this.sortable) {
+      this.sort.emit({column: this.sortable, reverse: false});
+    } else if (this.currentSortField == this.sortable && !this.currentSortReverse) {
+      this.sort.emit({column: this.currentSortField, reverse: true});
+    } else {
+      this.sort.emit({column: null, reverse: false});
+    }
   }
 }

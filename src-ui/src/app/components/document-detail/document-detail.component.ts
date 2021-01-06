@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -17,6 +17,7 @@ import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/c
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 import { ToastService } from 'src/app/services/toast.service';
+import { TextComponent } from '../common/input/text/text.component';
 
 @Component({
   selector: 'app-document-detail',
@@ -24,6 +25,9 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./document-detail.component.scss']
 })
 export class DocumentDetailComponent implements OnInit {
+
+  @ViewChild("inputTitle")
+  titleInput: TextComponent
 
   expandOriginalMetadata = false
   expandArchivedMetadata = false
@@ -157,6 +161,7 @@ export class DocumentDetailComponent implements OnInit {
         if (nextDocId) {
           this.openDocumentService.closeDocument(this.document)
           this.router.navigate(['documents', nextDocId])
+          this.titleInput.focus()
         }
       }, error => {
         this.networkActive = false
