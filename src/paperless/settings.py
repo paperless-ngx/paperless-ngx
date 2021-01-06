@@ -129,20 +129,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
-
-if ENABLE_HTTP_REMOTE_USER:
-    MIDDLEWARE.append(
-        'paperless.auth.HttpRemoteUserMiddleware'
-    )
-    AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.RemoteUserBackend',
-        'django.contrib.auth.backends.ModelBackend'
-    ]
-    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
-        'rest_framework.authentication.RemoteUserAuthentication'
-    )
-
 ROOT_URLCONF = 'paperless.urls'
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
@@ -180,6 +166,19 @@ if AUTO_LOGIN_USERNAME:
     # regular login in case the provided user does not exist.
     MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
 
+ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
+
+if ENABLE_HTTP_REMOTE_USER:
+    MIDDLEWARE.append(
+        'paperless.auth.HttpRemoteUserMiddleware'
+    )
+    AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.RemoteUserBackend',
+        'django.contrib.auth.backends.ModelBackend'
+    ]
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
+        'rest_framework.authentication.RemoteUserAuthentication'
+    )
 
 # We allow CORS from localhost:8080
 CORS_ALLOWED_ORIGINS = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","))
