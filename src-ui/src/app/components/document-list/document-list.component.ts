@@ -121,7 +121,7 @@ export class DocumentListComponent implements OnInit {
   }
 
   resetFilters(): void {
-    this.filterRulesModified = false;
+    this.filterRulesModified = false
     if (this.list.savedViewId) {
       this.savedViewService.getCached(this.list.savedViewId).subscribe(viewUntouched => {
         this.list.filterRules = viewUntouched.filter_rules
@@ -144,12 +144,16 @@ export class DocumentListComponent implements OnInit {
 
         if (this.list.filterRules.length !== filterRulesInitial.length) modified = true
         else {
-          this.list.filterRules.forEach(rule => {
-            if (filterRulesInitial.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined) modified = true
+          modified = this.list.filterRules.some(rule => {
+            return (filterRulesInitial.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined)
           })
-          filterRulesInitial.forEach(rule => {
-            if (this.list.filterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined) modified = true
-          })
+
+          if (!modified) {
+            // only check other direction if we havent already determined is modified
+            modified = filterRulesInitial.some(rule => {
+              this.list.filterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined
+            })
+          }
         }
       })
     }
