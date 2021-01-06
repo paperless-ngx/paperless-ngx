@@ -108,11 +108,12 @@ export class DocumentListComponent implements OnInit {
     if (this.list.savedViewId) {
       this.savedViewService.getCached(this.list.savedViewId).subscribe(viewUntouched => {
         this.list.filterRules = viewUntouched.filter_rules
+        this.list.reload()
       })
     } else {
       this.list.filterRules = []
+      this.list.reload()
     }
-    this.list.reload()
   }
 
   get filterRulesModified(): boolean {
