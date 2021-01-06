@@ -68,12 +68,12 @@ export class DocumentListComponent implements OnInit {
             return
           }
           this.list.savedView = view
+          this.list.reload()
         })
       } else {
         this.list.savedView = null
+        this.list.reload()
       }
-
-      this.list.reload()
     })
 
     this.rulesChanged()
