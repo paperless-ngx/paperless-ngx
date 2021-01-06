@@ -17,6 +17,7 @@ paperless-ng 0.9.12
   * See the :ref:`configuration<configuration-tika>` on how to enable this feature. This feature requires two additional services
     (one for parsing Office documents and metadata extraction and another for converting Office documents to PDF), and is therefore
     not enabled on default installations.
+  * As with all other documents, paperless converts Office documents to PDF and stores both the original as well as the archived PDF.
 
 * Dark mode
 
@@ -32,6 +33,9 @@ paperless-ng 0.9.12
     indicators and clearer error messages about what's wrong.
   * Paperless disables buttons with network actions (such as save and delete) when a network action is active. This indicates that
     something is happening and prevents double clicking.
+  * When using "Save & next", the title field is focussed automatically to better support keyboard editing.
+  * E-Mail: Added filter rule parameters to allow inline attachments (watch out for mails with inlined images!) and attachment filename filters
+    with wildcards.
 
 * Fixes
 
