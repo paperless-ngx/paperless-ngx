@@ -12,6 +12,7 @@ class MailAccountAdmin(admin.ModelAdmin):
 class MailRuleAdmin(admin.ModelAdmin):
 
     radio_fields = {
+        "attachment_type": admin.VERTICAL,
         "action": admin.VERTICAL,
         "assign_title_from": admin.VERTICAL,
         "assign_correspondent_from": admin.VERTICAL
@@ -29,7 +30,9 @@ class MailRuleAdmin(admin.ModelAdmin):
                 ('filter_from',
                  'filter_subject',
                  'filter_body',
-                 'maximum_age')
+                 'filter_attachment_filename',
+                 'maximum_age',
+                 'attachment_type')
         }),
         (_("Actions"), {
             'description':
