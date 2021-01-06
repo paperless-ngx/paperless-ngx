@@ -60,6 +60,15 @@ class MailRule(models.Model):
         verbose_name = _("mail rule")
         verbose_name_plural = _("mail rules")
 
+    ATTACHMENT_TYPE_ATTACHMENTS_ONLY = 1
+    ATTACHMENT_TYPE_EVERYTHING = 2
+
+    ATTACHMENT_TYPES = (
+        (ATTACHMENT_TYPE_ATTACHMENTS_ONLY, _("Only process attachments.")),
+        (ATTACHMENT_TYPE_EVERYTHING, _("Process all files, including 'inline' "
+                                       "attachments."))
+    )
+
     ACTION_DELETE = 1
     ACTION_MOVE = 2
     ACTION_MARK_READ = 3
@@ -125,10 +134,26 @@ class MailRule(models.Model):
         _("filter body"),
         max_length=256, null=True, blank=True)
 
+    filter_attachment_filename = models.CharField(
+        _("filter attachment filename"),
+        max_length=256, null=True, blank=True,
+        help_text=_("Only consume documents which entirely match this "
+                    "filename if specified. Wildcards such as *.pdf or "
+                    "*invoice* are allowed. Case insensitive.")
+    )
+
     maximum_age = models.PositiveIntegerField(
         _("maximum age"),
         default=30,
         help_text=_("Specified in days."))
+
+    attachment_type = models.PositiveIntegerField(
+        _("attachment type"),
+        choices=ATTACHMENT_TYPES,
+        default=ATTACHMENT_TYPE_ATTACHMENTS_ONLY,
+        help_text=_("Inline attachments include embedded images, so it's best "
+                    "to combine this option with a filename filter.")
+    )
 
     action = models.PositiveIntegerField(
         _("action"),

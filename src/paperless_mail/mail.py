@@ -1,6 +1,7 @@
 import os
 import tempfile
 from datetime import timedelta, date
+from fnmatch import fnmatch
 
 import magic
 import pathvalidate
@@ -263,13 +264,17 @@ class MailAccountHandler(LoggingMixin):
 
         for att in message.attachments:
 
-            if not att.content_disposition == "attachment":
+            if not att.content_disposition == "attachment" and rule.attachment_type == MailRule.ATTACHMENT_TYPE_ATTACHMENTS_ONLY:  # NOQA: E501
                 self.log(
                     'debug',
                     f"Rule {rule}: "
                     f"Skipping attachment {att.filename} "
                     f"with content disposition {att.content_disposition}")
                 continue
+
+            if rule.filter_attachment_filename:
+                if not fnmatch(att.filename, rule.filter_attachment_filename):
+                    continue
 
             title = self.get_title(message, att, rule)
 
