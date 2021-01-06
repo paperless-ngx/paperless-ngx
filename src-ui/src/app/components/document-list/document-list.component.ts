@@ -33,6 +33,8 @@ export class DocumentListComponent implements OnInit {
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
+  filterRulesModified: boolean = false
+
   getTitle() {
     return this.list.savedViewTitle || $localize`Documents`
   }
@@ -126,8 +128,6 @@ export class DocumentListComponent implements OnInit {
       this.list.reload()
     }
   }
-
-  filterRulesModified: boolean = false
 
   rulesChanged() {
     let modified = false
