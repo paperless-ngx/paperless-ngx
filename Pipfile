@@ -40,7 +40,7 @@ whitenoise = "~=5.2.0"
 watchdog = "*"
 whoosh="~=2.7.4"
 inotifyrecursive = "~=0.3.4"
-ocrmypdf = "*"
+ocrmypdf = "~=11.3.4"
 tqdm = "*"
 tika = "*"
 
