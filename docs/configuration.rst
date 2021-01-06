@@ -162,6 +162,12 @@ PAPERLESS_COOKIE_PREFIX=<str>
 
     Defaults to ``""``, which does not alter the cookie names.
 
+PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>
+    Allows authentication via HTTP_REMOTE_USER which is used by some SSO
+    applications.
+
+    Defaults to `false` which disables this feature.
+
 .. _configuration-ocr:
 
 OCR settings
@@ -210,20 +216,20 @@ PAPERLESS_OCR_MODE=<mode>
         into images and puts the OCRed text on top. This works for all documents,
         however, the resulting document may be significantly larger and text
         won't appear as sharp when zoomed in.
-    
+
     The default is ``skip``, which only performs OCR when necessary and always
     creates archived documents.
 
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
-    
+
     *   ``pdf``: Modify the PDF document as little as possible.
     *   ``pdfa``: Convert PDF documents into PDF/A-2b documents, which is a
         subset of the entire PDF specification and meant for storing
         documents long term.
     *   ``pdfa-1``, ``pdfa-2``, ``pdfa-3`` to specify the exact version of
         PDF/A you wish to use.
-    
+
     If not specified, ``pdfa`` is used. Remember that paperless also keeps
     the original input file as well as the archived version.
 
@@ -275,14 +281,14 @@ PAPERLESS_OCR_USER_ARG=<json>
 
     .. code:: json
 
-        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}    
-    
+        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}
+
 .. _configuration-tika:
 
 Tika settings
 #############
 
-Paperless can make use of `Tika <https://tika.apache.org/>`_ and 
+Paperless can make use of `Tika <https://tika.apache.org/>`_ and
 `Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
 converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
 wish to use this, you must provide a Tika server and a Gotenberg server,
@@ -306,7 +312,7 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
 
     Defaults to "http://localhost:3000".
 
-    
+
 Software tweaks
 ###############
 
