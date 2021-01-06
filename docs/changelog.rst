@@ -38,6 +38,7 @@ paperless-ng 0.9.12
     with wildcards.
   * Support for remote user authentication thanks to `Michael Shamoon`_. This is useful for hiding Paperless behind single sign on applications
     such as `authelia <https://www.authelia.com/>`_.
+  * "Clear filters" has been renamed to "Reset filters" and now correctly restores the default filters on saved views. Thanks to `Michael Shamoon`_
 
 * Fixes
 
