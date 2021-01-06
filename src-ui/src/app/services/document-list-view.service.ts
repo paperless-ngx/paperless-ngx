@@ -111,7 +111,8 @@ export class DocumentListViewService {
           this.isReloading = false
         },
         error => {
-          if (error.error['detail'] == 'Invalid page.') {
+          if (this.currentPage != 1 && error.status == 404) {
+            // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             this.currentPage = 1
             this.reload()
           }
@@ -150,6 +151,13 @@ export class DocumentListViewService {
 
   get sortReverse(): boolean {
     return this.view.sort_reverse
+  }
+
+  setSort(field: string, reverse: boolean) {
+    this.view.sort_field = field
+    this.view.sort_reverse = reverse
+    this.saveDocumentListView()
+    this.reload()
   }
 
   private saveDocumentListView() {
@@ -259,7 +267,7 @@ export class DocumentListViewService {
         this.documentListView = null
       }
     }
-    if (!this.documentListView || !this.documentListView.filter_rules || !this.documentListView.sort_reverse || !this.documentListView.sort_field) {
+    if (!this.documentListView || this.documentListView.filter_rules == null || this.documentListView.sort_reverse == null || this.documentListView.sort_field == null) {
       this.documentListView = {
         filter_rules: [],
         sort_reverse: true,

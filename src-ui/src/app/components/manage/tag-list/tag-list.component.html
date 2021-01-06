@@ -10,10 +10,10 @@
 <table class="table table-striped border shadow-sm">
   <thead>
     <tr>
-      <th scope="col" sortable="name" (sort)="onSort($event)" i18n>Name</th>
+      <th scope="col" sortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
       <th scope="col" i18n>Color</th>
-      <th scope="col" sortable="matching_algorithm" (sort)="onSort($event)" i18n>Matching</th>
-      <th scope="col" sortable="document_count" (sort)="onSort($event)" i18n>Document count</th>
+      <th scope="col" sortable="matching_algorithm" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Matching</th>
+      <th scope="col" sortable="document_count" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Document count</th>
       <th scope="col" i18n>Actions</th>
     </tr>
   </thead>

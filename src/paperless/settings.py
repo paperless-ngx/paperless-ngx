@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import re
 
+import dateparser
 from dotenv import load_dotenv
 
 from django.utils.translation import gettext_lazy as _
@@ -127,6 +128,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
+
+if ENABLE_HTTP_REMOTE_USER:
+    MIDDLEWARE.append(
+        'paperless.auth.HttpRemoteUserMiddleware'
+    )
+    AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.RemoteUserBackend',
+        'django.contrib.auth.backends.ModelBackend'
+    ]
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
+        'rest_framework.authentication.RemoteUserAuthentication'
+    )
 
 ROOT_URLCONF = 'paperless.urls'
 
@@ -253,7 +268,8 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ("en-us", _("English")),
     ("de", _("German")),
-    ("nl-nl", _("Dutch"))
+    ("nl-nl", _("Dutch")),
+    ("fr", _("French"))
 ]
 
 LOCALE_PATHS = [
@@ -445,3 +461,10 @@ PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost
 PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
 )
+
+# List dates that should be ignored when trying to parse date from document text
+IGNORE_DATES = set()
+for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
+    d = dateparser.parse(s)
+    if d:
+        IGNORE_DATES.add(d.date())
