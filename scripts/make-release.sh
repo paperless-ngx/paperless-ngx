@@ -81,7 +81,7 @@ cp "$PAPERLESS_ROOT/paperless.conf.example" "$PAPERLESS_DIST_APP/paperless.conf"
 
 # copy python source, templates and static files.
 cd "$PAPERLESS_ROOT"
-find src -wholename '*/locale/*' -o -wholename '*/templates/*' -o -wholename '*/static/*' -o -name '*.py' | cpio -pdm "$PAPERLESS_DIST_APP"
+find src -name '*.po' -o -wholename '*/templates/*' -o -wholename '*/static/*' -o -name '*.py' | cpio -pdm "$PAPERLESS_DIST_APP"
 
 # build the front end.
 
