@@ -30,8 +30,10 @@ export class DocumentListComponent implements OnInit {
   private filterEditor: FilterEditorComponent
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>;
-  
+
   displayMode = 'smallCards' // largeCards, smallCards, details
+
+  filterRulesModified: boolean = false
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
@@ -69,18 +71,20 @@ export class DocumentListComponent implements OnInit {
             this.router.navigate(["404"])
             return
           }
-
           this.list.savedView = view
           this.list.reload()
+          this.rulesChanged()
         })
       } else {
         this.list.savedView = null
         this.list.reload()
+        this.rulesChanged()
       }
     })
   }
 
   loadViewConfig(view: PaperlessSavedView) {
+    this.filterRulesModified = false
     this.list.load(view)
     this.list.reload()
   }
@@ -105,6 +109,7 @@ export class DocumentListComponent implements OnInit {
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField
       }
+
       this.savedViewService.create(savedView).subscribe(() => {
         modal.close()
         this.toastService.showInfo($localize`View "${savedView.name}" created successfully.`)
@@ -113,6 +118,46 @@ export class DocumentListComponent implements OnInit {
         modal.componentInstance.buttonsEnabled = true
       })
     })
+  }
+
+  resetFilters(): void {
+    this.filterRulesModified = false
+    if (this.list.savedViewId) {
+      this.savedViewService.getCached(this.list.savedViewId).subscribe(viewUntouched => {
+        this.list.filterRules = viewUntouched.filter_rules
+        this.list.reload()
+      })
+    } else {
+      this.list.filterRules = []
+      this.list.reload()
+    }
+  }
+
+  rulesChanged() {
+    let modified = false
+    if (this.list.savedView == null) {
+      modified = this.list.filterRules.length > 0 // documents list is modified if it has any filters
+    } else {
+      // compare savedView current filters vs original
+      this.savedViewService.getCached(this.list.savedViewId).subscribe(view => {
+        let filterRulesInitial = view.filter_rules
+
+        if (this.list.filterRules.length !== filterRulesInitial.length) modified = true
+        else {
+          modified = this.list.filterRules.some(rule => {
+            return (filterRulesInitial.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined)
+          })
+
+          if (!modified) {
+            // only check other direction if we havent already determined is modified
+            modified = filterRulesInitial.some(rule => {
+              this.list.filterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined
+            })
+          }
+        }
+      })
+    }
+    this.filterRulesModified = modified
   }
 
   clickTag(tagID: number) {
