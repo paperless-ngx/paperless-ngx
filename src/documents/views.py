@@ -79,7 +79,7 @@ class IndexView(TemplateView):
         context['runtime_js'] = f"frontend/{self.get_language()}/runtime.js"
         context['polyfills_js'] = f"frontend/{self.get_language()}/polyfills.js"  # NOQA: E501
         context['main_js'] = f"frontend/{self.get_language()}/main.js"
-        context['manifest'] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
+        context['webmanifest'] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
         return context
 
 
