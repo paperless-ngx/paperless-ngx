@@ -36,6 +36,8 @@ paperless-ng 0.9.12
   * When using "Save & next", the title field is focussed automatically to better support keyboard editing.
   * E-Mail: Added filter rule parameters to allow inline attachments (watch out for mails with inlined images!) and attachment filename filters
     with wildcards.
+  * Support for remote user authentication thanks to `Michael Shamoon`_. This is useful for hiding Paperless behind single sign on applications
+    such as `authelia <https://www.authelia.com/>`_.
 
 * Fixes
 
