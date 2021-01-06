@@ -73,14 +73,14 @@ export class DocumentListComponent implements OnInit {
           }
           this.list.savedView = view
           this.list.reload()
+          this.rulesChanged()
         })
       } else {
         this.list.savedView = null
         this.list.reload()
+        this.rulesChanged()
       }
     })
-
-    this.rulesChanged()
   }
 
   loadViewConfig(view: PaperlessSavedView) {
