@@ -66,9 +66,12 @@ export class DocumentListComponent implements OnInit {
 
       this.list.reload()
     })
+
+    this.rulesChanged()
   }
 
   loadViewConfig(view: PaperlessSavedView) {
+    this.filterRulesModified = false
     this.list.load(view)
     this.list.reload()
   }
@@ -105,6 +108,7 @@ export class DocumentListComponent implements OnInit {
   }
 
   resetFilters(): void {
+    this.filterRulesModified = false;
     if (this.list.savedViewId) {
       this.savedViewService.getCached(this.list.savedViewId).subscribe(viewUntouched => {
         this.list.filterRules = viewUntouched.filter_rules
@@ -116,12 +120,14 @@ export class DocumentListComponent implements OnInit {
     }
   }
 
-  get filterRulesModified(): boolean {
+  filterRulesModified: boolean = false
+
+  rulesChanged() {
+    let modified = false
     if (this.list.savedView == null) {
-      return this.list.filterRules.length > 0 // documents list is modified if it has any filters
+      modified = this.list.filterRules.length > 0 // documents list is modified if it has any filters
     } else {
       // compare savedView current filters vs original
-      let modified = false
       this.savedViewService.getCached(this.list.savedViewId).subscribe(view => {
         let filterRulesInitial = view.filter_rules
 
@@ -135,8 +141,8 @@ export class DocumentListComponent implements OnInit {
           })
         }
       })
-      return modified
     }
+    this.filterRulesModified = modified
   }
 
   clickTag(tagID: number) {
