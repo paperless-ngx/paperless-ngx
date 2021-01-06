@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import authentication
+from django.contrib.auth.middleware import RemoteUserMiddleware
 
 
 class AutoLoginMiddleware(MiddlewareMixin):
@@ -26,3 +27,11 @@ class AngularApiAuthenticationOverride(authentication.BaseAuthentication):
             return (user, None)
         else:
             return None
+
+
+class HttpRemoteUserMiddleware(RemoteUserMiddleware):
+    """ This class allows authentication via HTTP_REMOTE_USER which is set for
+        example by certain SSO applications.
+    """
+
+    header = 'HTTP_REMOTE_USER'
