@@ -468,6 +468,42 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(dst))
 
 
+class PreConsumeTestCase(TestCase):
+
+    @mock.patch("documents.consumer.Popen")
+    @override_settings(PRE_CONSUME_SCRIPT=None)
+    def test_no_pre_consume_script(self, m):
+        c = Consumer()
+        c.path = "path-to-file"
+        c.run_pre_consume_script()
+        m.assert_not_called()
+
+    @mock.patch("documents.consumer.Popen")
+    @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
+    def test_pre_consume_script_not_found(self, m):
+        c = Consumer()
+        c.path = "path-to-file"
+        self.assertRaises(ConsumerError, c.run_pre_consume_script)
+
+    @mock.patch("documents.consumer.Popen")
+    def test_pre_consume_script(self, m):
+        with tempfile.NamedTemporaryFile() as script:
+            with override_settings(PRE_CONSUME_SCRIPT=script.name):
+                c = Consumer()
+                c.path = "path-to-file"
+                c.run_pre_consume_script()
+
+                m.assert_called_once()
+
+                args, kwargs = m.call_args
+
+                command = args[0]
+
+                self.assertEqual(command[0], script.name)
+                self.assertEqual(command[1], "path-to-file")
+
+
+
 class PostConsumeTestCase(TestCase):
 
     @mock.patch("documents.consumer.Popen")
@@ -483,36 +519,45 @@ class PostConsumeTestCase(TestCase):
 
         m.assert_not_called()
 
-    @mock.patch("documents.consumer.Popen")
-    @override_settings(POST_CONSUME_SCRIPT="script")
-    def test_post_consume_script_simple(self, m):
+
+    @override_settings(POST_CONSUME_SCRIPT="does-not-exist")
+    def test_post_consume_script_not_found(self):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
 
-        Consumer().run_post_consume_script(doc)
-
-        m.assert_called_once()
+        self.assertRaises(ConsumerError, Consumer().run_post_consume_script, doc)
 
     @mock.patch("documents.consumer.Popen")
-    @override_settings(POST_CONSUME_SCRIPT="script")
+    def test_post_consume_script_simple(self, m):
+        with tempfile.NamedTemporaryFile() as script:
+            with override_settings(POST_CONSUME_SCRIPT=script.name):
+                doc = Document.objects.create(title="Test", mime_type="application/pdf")
+
+                Consumer().run_post_consume_script(doc)
+
+                m.assert_called_once()
+
+    @mock.patch("documents.consumer.Popen")
     def test_post_consume_script_with_correspondent(self, m):
-        c = Correspondent.objects.create(name="my_bank")
-        doc = Document.objects.create(title="Test", mime_type="application/pdf", correspondent=c)
-        tag1 = Tag.objects.create(name="a")
-        tag2 = Tag.objects.create(name="b")
-        doc.tags.add(tag1)
-        doc.tags.add(tag2)
+        with tempfile.NamedTemporaryFile() as script:
+            with override_settings(POST_CONSUME_SCRIPT=script.name):
+                c = Correspondent.objects.create(name="my_bank")
+                doc = Document.objects.create(title="Test", mime_type="application/pdf", correspondent=c)
+                tag1 = Tag.objects.create(name="a")
+                tag2 = Tag.objects.create(name="b")
+                doc.tags.add(tag1)
+                doc.tags.add(tag2)
 
-        Consumer().run_post_consume_script(doc)
+                Consumer().run_post_consume_script(doc)
 
-        m.assert_called_once()
+                m.assert_called_once()
 
-        args, kwargs = m.call_args
+                args, kwargs = m.call_args
 
-        command = args[0]
+                command = args[0]
 
-        self.assertEqual(command[0], "script")
-        self.assertEqual(command[1], str(doc.pk))
-        self.assertEqual(command[5], f"/api/documents/{doc.pk}/download/")
-        self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
-        self.assertEqual(command[7], "my_bank")
-        self.assertCountEqual(command[8].split(","), ["a", "b"])
+                self.assertEqual(command[0], script.name)
+                self.assertEqual(command[1], str(doc.pk))
+                self.assertEqual(command[5], f"/api/documents/{doc.pk}/download/")
+                self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
+                self.assertEqual(command[7], "my_bank")
+                self.assertCountEqual(command[8].split(","), ["a", "b"])
