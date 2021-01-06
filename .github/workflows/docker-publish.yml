@@ -12,21 +12,20 @@ jobs:
         os: [ubuntu-20.04]
         python-version: [3.6,3.7,3.8]
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v2
+      - name: Install python version
+        uses: gabrielfalcao/pyenv-action@v5
+        with:
+          default: "${{ matrix.python-version }}"
+          command: pip install -U pip  # upgrade pip after installing python
     - name: Tests
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        MATRIX_PYTHON_VERSION: ${{strategy.matrix.python-version}}
       run: |
         echo "Selected python version from matrix is: ${MATRIX_PYTHON_VERSION}"
         sudo apt-get update -qq
         sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
         pip install --upgrade pipenv
-        pyenv global system ${MATRIX_PYTHON_VERSION}
         pipenv install --system --dev
         cd src/
         pipenv run pytest --cov
