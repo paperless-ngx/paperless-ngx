@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ddc3215bed35e50b796a8a48da053f673e4a9a3be0ae35b4d63f4757c4693aab"
+            "sha256": "c35d84fd7f4f1c7d599039712362935e7c41a226b0ab3d83d8c1c2fb2ad0962a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -380,11 +380,11 @@
         },
         "ocrmypdf": {
             "hashes": [
-                "sha256:91e7394172cedb3be801a229dbd3d308fb5ae80cbc3a77879fa7954beea407b1",
-                "sha256:e550b8e884150accab7ea41f4a576b5844594cb5cbd6ed514fbf1206720343ad"
+                "sha256:416a9c4321bfc844f250694b8c68ebb538f60609bbc8686bd9f84a13c5127d68",
+                "sha256:f45fc7e844e6026d6080a623a2936be120fc077d99aaa599df022acf35fb31e6"
             ],
             "index": "pypi",
-            "version": "==11.3.4"
+            "version": "==11.4.5"
         },
         "pathvalidate": {
             "hashes": [
