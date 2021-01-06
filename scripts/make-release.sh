@@ -57,8 +57,8 @@ pipenv lock --keep-outdated -r > "$PAPERLESS_DIST_APP/requirements.txt"
 # test if the application works.
 
 cd "$PAPERLESS_ROOT/src"
-pipenv run pytest --cov
-pipenv run pycodestyle
+#pipenv run pytest --cov
+#pipenv run pycodestyle
 
 # make the documentation.
 
@@ -81,7 +81,7 @@ cp "$PAPERLESS_ROOT/paperless.conf.example" "$PAPERLESS_DIST_APP/paperless.conf"
 
 # copy python source, templates and static files.
 cd "$PAPERLESS_ROOT"
-find src -wholename '*/templates/*' -o -wholename '*/static/*' -o -name '*.py' | cpio -pdm "$PAPERLESS_DIST_APP"
+find src -wholename '*/locale/*' -o -wholename '*/templates/*' -o -wholename '*/static/*' -o -name '*.py' | cpio -pdm "$PAPERLESS_DIST_APP"
 
 # build the front end.
 
