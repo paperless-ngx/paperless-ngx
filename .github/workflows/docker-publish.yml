@@ -11,9 +11,9 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         python: 
-          - 3.6.8
-          - 3.7.5
-          - 3.8.2
+          - 3.6
+          - 3.7
+          - 3.8
     steps:
     - uses: actions/checkout@v2
     - name: Install python version
@@ -25,7 +25,6 @@ jobs:
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "Selected python version from matrix is: ${MATRIX_PYTHON_VERSION}"
         sudo apt-get update -qq
         sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
         pip install --upgrade pipenv
