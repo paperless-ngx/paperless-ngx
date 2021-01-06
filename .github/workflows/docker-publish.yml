@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install python version
-        uses: gabrielfalcao/pyenv-action@v5
+        uses: gabrielfalcao/pyenv-action@v7
         with:
           default: "${{ matrix.python }}"
           command: "pip install -U pip"
