@@ -15,12 +15,12 @@ jobs:
           - 3.7.5
           - 3.8.2
     steps:
-      - uses: actions/checkout@v2
-      - name: Install python version
-        uses: gabrielfalcao/pyenv-action@v7
-        with:
-          default: "${{ matrix.python }}"
-          command: "pip install -U pip"
+    - uses: actions/checkout@v2
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v7
+      with:
+        default: "${{ matrix.python }}"
+        command: "pip install -U pip"
     - name: Tests
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
