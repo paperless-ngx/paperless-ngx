@@ -25,7 +25,7 @@
         <ng-container *ngIf="document.correspondent">
           <a [routerLink]="" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
-        {{document.title | documentTitle}}
+        {{document.title | documentTitle}} <span *ngIf="document.archive_serial_number">(#{{document.archive_serial_number}})</span>
       </p>
     </div>
     <div class="card-footer">
