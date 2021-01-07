@@ -114,8 +114,6 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         results = response.data['results']
         self.assertEqual(len(results[0]), 0)
 
-
-
     def test_document_actions(self):
 
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
@@ -443,6 +441,23 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
             response = self.client.post("/api/documents/post_document/", {"document": f})
+
+        self.assertEqual(response.status_code, 200)
+
+        m.assert_called_once()
+
+        args, kwargs = m.call_args
+        self.assertEqual(kwargs['override_filename'], "simple.pdf")
+        self.assertIsNone(kwargs['override_title'])
+        self.assertIsNone(kwargs['override_correspondent_id'])
+        self.assertIsNone(kwargs['override_document_type_id'])
+        self.assertIsNone(kwargs['override_tag_ids'])
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_empty_metadata(self, m):
+
+        with open(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), "rb") as f:
+            response = self.client.post("/api/documents/post_document/", {"document": f, "title": "", "correspondent": "", "document_type": ""})
 
         self.assertEqual(response.status_code, 200)
 
