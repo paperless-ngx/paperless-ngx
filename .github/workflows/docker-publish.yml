@@ -54,7 +54,7 @@ jobs:
     - name: dependencies
       run: |
         pip install --upgrade pipenv
-        pipenv install --system --dev --ignore-pipfile
+        pipenv install --system --dev
     - name: make
       run: |
         cd docs/
