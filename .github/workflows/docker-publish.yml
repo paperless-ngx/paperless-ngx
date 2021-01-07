@@ -21,6 +21,15 @@ jobs:
       with:
         default: "${{ matrix.python }}"
         command: "pip install -U pip"
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+    - name: Persistent Github pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip${{ matrix.python }}
     - name: Tests
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
