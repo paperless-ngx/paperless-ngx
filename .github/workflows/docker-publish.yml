@@ -59,13 +59,11 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '15'
-    - name: dependencies
+    - name: build
       run: |
         cd src-ui/
         npm install -g @angular/cli
         npm install
-    - name: build
-      run: |
         ng build --prod
   # Build and push image to docker hub.
   buildx:
