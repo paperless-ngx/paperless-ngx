@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
 import { PaperlessDocument } from '../data/paperless-document';
 import { PaperlessSavedView } from '../data/paperless-saved-view';
-import { DOCUMENT_LIST_SERVICE, GENERAL_SETTINGS } from '../data/storage-keys';
+import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
 import { DocumentService } from './rest/document.service';
+import { SettingsService, SETTINGS_KEYS } from './settings.service';
 
 
 /**
@@ -23,7 +25,7 @@ export class DocumentListViewService {
   isReloading: boolean = false
   documents: PaperlessDocument[] = []
   currentPage = 1
-  currentPageSize: number = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
+  currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
   collectionSize: number
 
   /**
@@ -109,7 +111,8 @@ export class DocumentListViewService {
           this.isReloading = false
         },
         error => {
-          if (error.error['detail'] == 'Invalid page.') {
+          if (this.currentPage != 1 && error.status == 404) {
+            // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             this.currentPage = 1
             this.reload()
           }
@@ -150,8 +153,23 @@ export class DocumentListViewService {
     return this.view.sort_reverse
   }
 
+  setSort(field: string, reverse: boolean) {
+    this.view.sort_field = field
+    this.view.sort_reverse = reverse
+    this.saveDocumentListView()
+    this.reload()
+  }
+
   private saveDocumentListView() {
     sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(this.documentListView))
+  }
+
+  quickFilter(filterRules: FilterRule[]) {
+    this.savedView = null
+    this.view.filter_rules = filterRules
+    this.reduceSelectionToFilter()
+    this.saveDocumentListView()
+    this.router.navigate(["documents"])
   }
 
   getLastPage(): number {
@@ -190,7 +208,7 @@ export class DocumentListViewService {
   }
 
   updatePageSize() {
-    let newPageSize = +localStorage.getItem(GENERAL_SETTINGS.DOCUMENT_LIST_SIZE) || GENERAL_SETTINGS.DOCUMENT_LIST_SIZE_DEFAULT
+    let newPageSize = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
     if (newPageSize != this.currentPageSize) {
       this.currentPageSize = newPageSize
     }
@@ -202,7 +220,7 @@ export class DocumentListViewService {
     this.selected.clear()
   }
 
-  private reduceSelectionToFilter() {
+  reduceSelectionToFilter() {
     if (this.selected.size > 0) {
       this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => {
         let subset = new Set<number>()
@@ -239,7 +257,7 @@ export class DocumentListViewService {
     }
   }
 
-  constructor(private documentService: DocumentService) {
+  constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
     let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {
@@ -249,7 +267,7 @@ export class DocumentListViewService {
         this.documentListView = null
       }
     }
-    if (!this.documentListView || !this.documentListView.filter_rules || !this.documentListView.sort_reverse || !this.documentListView.sort_field) {
+    if (!this.documentListView || this.documentListView.filter_rules == null || this.documentListView.sort_reverse == null || this.documentListView.sort_field == null) {
       this.documentListView = {
         filter_rules: [],
         sort_reverse: true,

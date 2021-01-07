@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
@@ -6,9 +7,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  
-  constructor () {
-  }
 
+  constructor (private settings: SettingsService) {
+    let anyWindow = (window as any)
+    anyWindow.pdfWorkerSrc = '/assets/js/pdf.worker.min.js';
+    this.settings.updateDarkModeSettings()
+  }
 
 }

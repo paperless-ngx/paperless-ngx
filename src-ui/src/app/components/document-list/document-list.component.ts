@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
+import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
@@ -28,7 +29,11 @@ export class DocumentListComponent implements OnInit {
   @ViewChild("filterEditor")
   private filterEditor: FilterEditorComponent
 
+  @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>;
+
   displayMode = 'smallCards' // largeCards, smallCards, details
+
+  filterRulesModified: boolean = false
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
@@ -40,6 +45,10 @@ export class DocumentListComponent implements OnInit {
 
   getSortFields() {
     return DOCUMENT_SORT_FIELDS
+  }
+
+  onSort(event: SortEvent) {
+    this.list.setSort(event.column, event.reverse)
   }
 
   get isBulkEditing(): boolean {
@@ -62,26 +71,27 @@ export class DocumentListComponent implements OnInit {
             this.router.navigate(["404"])
             return
           }
-
           this.list.savedView = view
           this.list.reload()
+          this.rulesChanged()
         })
       } else {
         this.list.savedView = null
         this.list.reload()
+        this.rulesChanged()
       }
     })
   }
 
-
   loadViewConfig(view: PaperlessSavedView) {
     this.list.load(view)
     this.list.reload()
+    this.rulesChanged()
   }
 
   saveViewConfig() {
     this.savedViewService.update(this.list.savedView).subscribe(result => {
-      this.toastService.showToast(Toast.make("Information", $localize`View "${this.list.savedView.name}" saved successfully.`))
+      this.toastService.showInfo($localize`View "${this.list.savedView.name}" saved successfully.`)
     })
 
   }
@@ -90,6 +100,7 @@ export class DocumentListComponent implements OnInit {
     let modal = this.modalService.open(SaveViewConfigDialogComponent, {backdrop: 'static'})
     modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
     modal.componentInstance.saveClicked.subscribe(formValue => {
+      modal.componentInstance.buttonsEnabled = false
       let savedView = {
         name: formValue.name,
         show_on_dashboard: formValue.showOnDashboard,
@@ -98,11 +109,55 @@ export class DocumentListComponent implements OnInit {
         sort_reverse: this.list.sortReverse,
         sort_field: this.list.sortField
       }
+
       this.savedViewService.create(savedView).subscribe(() => {
         modal.close()
-        this.toastService.showToast(Toast.make("Information", $localize`View "${savedView.name}" created successfully.`))
+        this.toastService.showInfo($localize`View "${savedView.name}" created successfully.`)
+      }, error => {
+        modal.componentInstance.error = error.error
+        modal.componentInstance.buttonsEnabled = true
       })
     })
+  }
+
+  resetFilters(): void {
+    this.filterRulesModified = false
+    if (this.list.savedViewId) {
+      this.savedViewService.getCached(this.list.savedViewId).subscribe(viewUntouched => {
+        this.list.filterRules = viewUntouched.filter_rules
+        this.list.reload()
+      })
+    } else {
+      this.list.filterRules = []
+      this.list.reload()
+    }
+  }
+
+  rulesChanged() {
+    let modified = false
+    if (this.list.savedView == null) {
+      modified = this.list.filterRules.length > 0 // documents list is modified if it has any filters
+    } else {
+      // compare savedView current filters vs original
+      this.savedViewService.getCached(this.list.savedViewId).subscribe(view => {
+        let filterRulesInitial = view.filter_rules
+
+        if (this.list.filterRules.length !== filterRulesInitial.length) modified = true
+        else {
+          modified = this.list.filterRules.some(rule => {
+            return (filterRulesInitial.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined)
+          })
+
+          if (!modified) {
+            // only check other direction if we havent already determined is modified
+            modified = filterRulesInitial.some(rule => {
+              this.list.filterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined
+            })
+          }
+        }
+      })
+    }
+    this.filterRulesModified = modified
   }
 
   clickTag(tagID: number) {

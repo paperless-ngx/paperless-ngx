@@ -148,7 +148,13 @@ After grabbing the new release and unpacking the contents, do the following:
 
         $ cd src
         $ pipenv run python3 manage.py migrate
+    
+5.  Update translation files.
 
+    .. code:: shell-session
+
+        $ cd src
+        $ pipenv run python3 manage.py compilemessages
         
 Management utilities
 ####################

@@ -138,3 +138,18 @@ class TestDate(TestCase):
     @override_settings(FILENAME_DATE_ORDER="YMD")
     def test_filename_date_parse_invalid(self, *args):
         self.assertIsNone(parse_date("/tmp/20 408000l 2475 - test.pdf", "No date in here"))
+
+    @override_settings(IGNORE_DATES=(datetime.date(2019, 11, 3), datetime.date(2020, 1, 17)))
+    def test_ignored_dates(self, *args):
+        text = (
+            "lorem ipsum 110319, 20200117 and lorem 13.02.2018 lorem "
+            "ipsum"
+        )
+        date = parse_date("", text)
+        self.assertEqual(
+            date,
+            datetime.datetime(
+                2018, 2, 13, 0, 0,
+                tzinfo=tz.gettz(settings.TIME_ZONE)
+            )
+        )
