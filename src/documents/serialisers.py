@@ -382,13 +382,6 @@ class PostDocumentSerializer(serializers.Serializer):
 
         return document.name, document_data
 
-    def validate_title(self, title):
-        if title:
-            return title
-        else:
-            # do not return empty strings.
-            return None
-
     def validate_correspondent(self, correspondent):
         if correspondent:
             return correspondent.id
