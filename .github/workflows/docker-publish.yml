@@ -45,9 +45,7 @@ jobs:
     - name: dependencies
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
-        pip install --upgrade pipenv
-        pipenv install --system --dev
+        sudo apt-get install -qq python3-sphinx
     - name: make
       run: |
         cd docs/
