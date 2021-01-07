@@ -86,7 +86,6 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
     serverResponse.subscribe(result => {
       this.activeModal.close()
       this.success.emit(result)
-      this.networkActive = false
     }, error => {
       this.error = error.error
       this.networkActive = false
