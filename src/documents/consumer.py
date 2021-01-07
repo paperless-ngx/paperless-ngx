@@ -1,7 +1,7 @@
 import datetime
 import hashlib
-import logging
 import os
+from subprocess import Popen
 
 import magic
 from django.conf import settings
@@ -9,6 +9,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from filelock import FileLock
+from rest_framework.reverse import reverse
 
 from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .file_handling import create_source_path_directory, \
@@ -66,6 +67,49 @@ class Consumer(LoggingMixin):
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
+    def run_pre_consume_script(self):
+        if not settings.PRE_CONSUME_SCRIPT:
+            return
+
+        if not os.path.isfile(settings.PRE_CONSUME_SCRIPT):
+            raise ConsumerError(
+                f"Configured pre-consume script "
+                f"{settings.PRE_CONSUME_SCRIPT} does not exist.")
+
+        try:
+            Popen((settings.PRE_CONSUME_SCRIPT, self.path)).wait()
+        except Exception as e:
+            raise ConsumerError(
+                f"Error while executing pre-consume script: {e}"
+            )
+
+    def run_post_consume_script(self, document):
+        if not settings.POST_CONSUME_SCRIPT:
+            return
+
+        if not os.path.isfile(settings.POST_CONSUME_SCRIPT):
+            raise ConsumerError(
+                f"Configured post-consume script "
+                f"{settings.POST_CONSUME_SCRIPT} does not exist.")
+
+        try:
+            Popen((
+                settings.POST_CONSUME_SCRIPT,
+                str(document.pk),
+                document.get_public_filename(),
+                os.path.normpath(document.source_path),
+                os.path.normpath(document.thumbnail_path),
+                reverse("document-download", kwargs={"pk": document.pk}),
+                reverse("document-thumb", kwargs={"pk": document.pk}),
+                str(document.correspondent),
+                str(",".join(document.tags.all().values_list(
+                    "name", flat=True)))
+            )).wait()
+        except Exception as e:
+            raise ConsumerError(
+                f"Error while executing pre-consume script: {e}"
+            )
+
     def try_consume_file(self,
                          path,
                          override_filename=None,
@@ -119,6 +163,8 @@ class Consumer(LoggingMixin):
             logging_group=self.logging_group
         )
 
+        self.run_pre_consume_script()
+
         # This doesn't parse the document yet, but gives us a parser.
 
         document_parser = parser_class(self.logging_group)
@@ -130,7 +176,7 @@ class Consumer(LoggingMixin):
 
         try:
             self.log("debug", "Parsing {}...".format(self.filename))
-            document_parser.parse(self.path, mime_type)
+            document_parser.parse(self.path, mime_type, self.filename)
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
             thumbnail = document_parser.get_optimised_thumbnail(
@@ -158,7 +204,7 @@ class Consumer(LoggingMixin):
         try:
             classifier = DocumentClassifier()
             classifier.reload()
-        except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
+        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
             self.log(
                 "warning",
                 f"Cannot classify documents: {e}.")
@@ -215,6 +261,7 @@ class Consumer(LoggingMixin):
                 # Delete the file only if it was successfully consumed
                 self.log("debug", "Deleting file {}".format(self.path))
                 os.unlink(self.path)
+
         except Exception as e:
             self.log(
                 "error",
@@ -224,6 +271,8 @@ class Consumer(LoggingMixin):
             raise ConsumerError(e)
         finally:
             document_parser.cleanup()
+
+        self.run_post_consume_script(document)
 
         self.log(
             "info",

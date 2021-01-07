@@ -11,7 +11,6 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
-from rest_framework.reverse import reverse
 
 from .. import index, matching
 from ..file_handling import delete_empty_directories, \
@@ -147,32 +146,6 @@ def set_tags(sender,
     document.tags.add(*relevant_tags)
 
 
-def run_pre_consume_script(sender, filename, **kwargs):
-
-    if not settings.PRE_CONSUME_SCRIPT:
-        return
-
-    Popen((settings.PRE_CONSUME_SCRIPT, filename)).wait()
-
-
-def run_post_consume_script(sender, document, **kwargs):
-
-    if not settings.POST_CONSUME_SCRIPT:
-        return
-
-    Popen((
-        settings.POST_CONSUME_SCRIPT,
-        str(document.pk),
-        document.get_public_filename(),
-        os.path.normpath(document.source_path),
-        os.path.normpath(document.thumbnail_path),
-        reverse("document-download", kwargs={"pk": document.pk}),
-        reverse("document-thumb", kwargs={"pk": document.pk}),
-        str(document.correspondent),
-        str(",".join(document.tags.all().values_list("name", flat=True)))
-    )).wait()
-
-
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
@@ -275,13 +248,6 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             # Don't save() here to prevent infinite recursion.
             Document.objects.filter(pk=instance.pk).update(
                 filename=new_filename)
-
-            logging.getLogger(__name__).debug(
-                f"Moved file {old_source_path} to {new_source_path}.")
-
-            if instance.archive_checksum:
-                logging.getLogger(__name__).debug(
-                    f"Moved file {old_archive_path} to {new_archive_path}.")
 
         except OSError as e:
             instance.filename = old_filename

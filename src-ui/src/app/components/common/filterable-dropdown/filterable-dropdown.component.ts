@@ -18,6 +18,18 @@ export class FilterableDropdownSelectionModel {
 
   items: MatchingModel[] = []
 
+  get itemsSorted(): MatchingModel[] {
+    return this.items.sort((a,b) => {
+      if (this.getNonTemporary(a.id) == ToggleableItemState.NotSelected && this.getNonTemporary(b.id) != ToggleableItemState.NotSelected) {
+        return 1
+      } else if (this.getNonTemporary(a.id) != ToggleableItemState.NotSelected && this.getNonTemporary(b.id) == ToggleableItemState.NotSelected) {
+        return -1
+      } else {
+        return a.name.localeCompare(b.name)
+      }
+    })
+  }
+
   private selectionStates = new Map<number, ToggleableItemState>()
 
   private temporarySelectionStates = new Map<number, ToggleableItemState>()
@@ -67,6 +79,10 @@ export class FilterableDropdownSelectionModel {
       this.changed.next(this)
     }
     
+  }
+
+  private getNonTemporary(id: number) {
+    return this.selectionStates.get(id) || ToggleableItemState.NotSelected
   }
 
   get(id: number) {
@@ -142,7 +158,7 @@ export class FilterableDropdownComponent {
     if (items) {
       this._selectionModel.items = Array.from(items)
       this._selectionModel.items.unshift({
-        name: "None",
+        name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
         id: null
       })
     }
@@ -187,6 +203,9 @@ export class FilterableDropdownComponent {
   title: string
 
   @Input()
+  filterPlaceholder: string = ""
+
+  @Input()
   icon: string
 
   @Input()
@@ -194,6 +213,9 @@ export class FilterableDropdownComponent {
 
   @Input()
   editing = false
+
+  @Input()
+  applyOnClose = false
 
   @Output()
   apply = new EventEmitter<ChangedItems>()
@@ -208,7 +230,9 @@ export class FilterableDropdownComponent {
   applyClicked() {
     if (this.selectionModel.isDirty()) {
       this.dropdown.close()
-      this.apply.emit(this.selectionModel.diff())
+      if (!this.applyOnClose) {
+        this.apply.emit(this.selectionModel.diff())
+      }
     }
   }
 
@@ -223,6 +247,9 @@ export class FilterableDropdownComponent {
       this.open.next()
     } else {
       this.filterText = ''
+      if (this.applyOnClose && this.selectionModel.isDirty()) {
+        this.apply.emit(this.selectionModel.diff())
+      }
     }
   }
 

@@ -73,7 +73,7 @@ class Command(Renderable, BaseCommand):
         classifier = DocumentClassifier()
         try:
             classifier.reload()
-        except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
+        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
             logging.getLogger(__name__).warning(
                 f"Cannot classify documents: {e}.")
             classifier = None

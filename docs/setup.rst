@@ -179,6 +179,14 @@ Docker Route
 
         You can use any settings from the file ``paperless.conf`` in this file.
         Have a look at :ref:`configuration` to see whats available.
+    
+    .. caution::
+
+        Certain file systems such as NFS network shares don't support file system
+        notifications with ``inotify``. When storing the consumption directory
+        on such a file system, paperless will be unable to pick up new files
+        with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
+        which will disable inotify. See :ref:`here <configuration-polling>`.
 
 4.  Run ``docker-compose up -d``. This will create and start the necessary
     containers. This will also build the image of paperless if you grabbed the
@@ -292,6 +300,9 @@ writing. Windows is not and will never be supported.
         
         # This creates the database schema.
         python3 manage.py migrate
+        
+        # This creates the translation files for paperless.
+        python3 manage.py compilemessages
 
         # This creates your first paperless user
         python3 manage.py createsuperuser
