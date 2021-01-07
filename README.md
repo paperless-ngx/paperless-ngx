@@ -103,6 +103,12 @@ Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest
 
 The documentation for Paperless-ng is available on [ReadTheDocs](https://paperless-ng.readthedocs.io/).
 
+# Translation
+
+Paperless is currently available in English, German, Dutch and French. Translation is coordinated at transifex: https://www.transifex.com/paperless/paperless-ng
+
+If you want to see paperless in your own language, request that language at transifex and you can start translating after I approve the language.
+
 # Suggestions? Questions? Something not working?
 
 Please open an issue and start a discussion about it!
