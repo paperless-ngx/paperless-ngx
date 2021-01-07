@@ -56,18 +56,14 @@
                     <a ngbNavLink i18n>Details</a>
                     <ng-template ngbNavContent>
 
-                        <app-input-text i18n-title title="Title" formControlName="title"></app-input-text>
-                        <div class="form-group">
-                            <label for="archive_serial_number" i18n>Archive serial number</label>
-                            <input type="number" class="form-control" id="archive_serial_number"
-                                formControlName='archive_serial_number'>
-                        </div>
+                        <app-input-text #inputTitle i18n-title title="Title" formControlName="title" [error]="error?.title"></app-input-text>
+                        <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
                         <app-input-date-time i18n-titleDate titleDate="Date created" formControlName="created"></app-input-date-time>
                         <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
                             (createNew)="createCorrespondent()"></app-input-select>
                         <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
                             (createNew)="createDocumentType()"></app-input-select>
-                        <app-input-tags formControlName="tags" i18n-title title="Tags"></app-input-tags>
+                        <app-input-tags formControlName="tags"></app-input-tags>
 
                     </ng-template>
                 </li>
@@ -131,9 +127,9 @@
 
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
-            <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n>Discard</button>&nbsp;
-            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n>Save & edit next</button>&nbsp;
-            <button type="submit" class="btn btn-primary" i18n>Save</button>&nbsp;
+            <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive">Discard</button>&nbsp;
+            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive">Save & next</button>&nbsp;
+            <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>&nbsp;
         </form>
     </div>
 

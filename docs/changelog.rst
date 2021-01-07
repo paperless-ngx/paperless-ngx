@@ -5,6 +5,86 @@
 Changelog
 *********
 
+paperless-ng 0.9.12
+###################
+
+* Paperless localization
+
+  * Thanks to the combined efforts of many users, Paperless is now available in English, Dutch, French and German.
+
+* Thanks to `Jo Vandeginste`_, Paperless has optional support for Office documents such as .docx, .doc, .odt and more.
+
+  * See the :ref:`configuration<configuration-tika>` on how to enable this feature. This feature requires two additional services
+    (one for parsing Office documents and metadata extraction and another for converting Office documents to PDF), and is therefore
+    not enabled on default installations.
+  * As with all other documents, paperless converts Office documents to PDF and stores both the original as well as the archived PDF.
+
+* Dark mode
+
+  * Thanks to `Michael Shamoon`_, paperless now has a dark mode. Configuration is available in the settings.
+
+* Other changes and additions
+
+  * The PDF viewer now uses a local copy of some dependencies instead of fetching them from the internet. Thanks to `slorenz`_.
+  * Revamped search bar styling thanks to `Michael Shamoon`_.
+  * Sorting in the document list by clicking on table headers.
+  * A button was added to the document detail page that assigns a new ASN to a document.
+  * Form field validation: When providing invalid input in a form (such as a duplicate ASN or no name), paperless now has visual
+    indicators and clearer error messages about what's wrong.
+  * Paperless disables buttons with network actions (such as save and delete) when a network action is active. This indicates that
+    something is happening and prevents double clicking.
+  * When using "Save & next", the title field is focussed automatically to better support keyboard editing.
+  * E-Mail: Added filter rule parameters to allow inline attachments (watch out for mails with inlined images!) and attachment filename filters
+    with wildcards.
+  * Support for remote user authentication thanks to `Michael Shamoon`_. This is useful for hiding Paperless behind single sign on applications
+    such as `authelia <https://www.authelia.com/>`_.
+  * "Clear filters" has been renamed to "Reset filters" and now correctly restores the default filters on saved views. Thanks to `Michael Shamoon`_
+
+* Fixes
+
+  * Paperless was unable to save views when "Not assigned" was chosen in one of the filter dropdowns.
+  * Clearer error messages when pre and post consumption scripts do not exist.
+  * The post consumption script is executed later in the consumption process. Before the change, an ID was passed to the script referring to
+    a document that did not yet exist in the database.
+
+paperless-ng 0.9.11
+###################
+
+* Fixed an issue with the docker image not starting at all due to a configuration change of the web server.
+
+
+paperless-ng 0.9.10
+###################
+
+* Bulk editing
+
+  * Thanks to `Michael Shamoon`_, we've got a new interface for the bulk editor.
+  * There are some configuration options in the settings to alter the behavior.
+
+* Other changes and additions
+  
+  * Thanks to `zjean`_, paperless now publishes a webmanifest, which is useful for adding the application to home screens on mobile devices.
+  * The Paperless-ng logo now navigates to the dashboard.
+  * Filter for documents that don't have any correspondents, types or tags assigned.
+  * Tags, types and correspondents are now sorted case insensitive.
+  * Lots of preparation work for localization support.
+
+* Fixes
+
+  * Added missing dependencies for Raspberry Pi builds.
+  * Fixed an issue with plain text file consumption: Thumbnail generation failed due to missing fonts.
+  * An issue with the search index reporting missing documents after bulk deletes was fixed.
+  * Issue with the tag selector not clearing input correctly.
+  * The consumer used to stop working when encountering an incomplete classifier model file.
+
+.. note::
+
+  The bulk delete operations did not update the search index. Therefore, documents that you deleted remained in the index and
+  caused the search to return messages about missing documents when searching. Further bulk operations will properly update
+  the index.
+  
+  However, this change is not retroactive: If you used the delete method of the bulk editor, you need to reindex your search index
+  by :ref:`running the management command document_index with the argument reindex <administration-index>`.
 
 paperless-ng 0.9.9
 ##################
@@ -927,6 +1007,9 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _slorenz: https://github.com/sisao
+.. _Jo Vandeginste: https://github.com/jovandeginste
+.. _zjean: https://github.com/zjean
 .. _rYR79435: https://github.com/rYR79435
 .. _Michael Shamoon: https://github.com/shamoon
 .. _jayme-github: http://github.com/jayme-github

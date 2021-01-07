@@ -30,7 +30,9 @@ RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
 		curl \
+		file \
 		fonts-liberation \
+		gettext \
 		ghostscript \
 		gnupg \
 		icc-profiles-free \
@@ -91,6 +93,8 @@ RUN addgroup --gid 1000 paperless \
 WORKDIR /usr/src/paperless/src/
 
 RUN sudo -HEu paperless python3 manage.py collectstatic --clear --no-input
+
+RUN sudo -HEu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]

@@ -14,7 +14,15 @@ import { ToastService } from 'src/app/services/toast.service';
 export class CorrespondentEditDialogComponent extends EditDialogComponent<PaperlessCorrespondent> {
 
   constructor(service: CorrespondentService, activeModal: NgbActiveModal, toastService: ToastService) {
-    super(service, activeModal, toastService, 'correspondent')
+    super(service, activeModal, toastService)
+  }
+
+  getCreateTitle() {
+    return $localize`Create new correspondent`
+  }
+
+  getEditTitle() {
+    return $localize`Edit correspondent`
   }
 
   getForm(): FormGroup {

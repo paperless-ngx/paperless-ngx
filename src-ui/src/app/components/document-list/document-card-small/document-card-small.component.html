@@ -1,7 +1,7 @@
 <div class="col p-2 h-100">
-  <div class="card h-100 shadow-sm" [class.card-selected]="selected">
-    <div class="border-bottom" [class.doc-img-background-selected]="selected">
-      <img class="card-img doc-img" [src]="getThumbUrl()" (click)="setSelected(!selected)">
+  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected">
+    <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected">
+      <img class="card-img doc-img rounded-top" [src]="getThumbUrl()" (click)="setSelected(!selected)">
 
       <div class="border-right border-bottom bg-light p-1 rounded document-card-check">
         <div class="custom-control custom-checkbox">
@@ -25,7 +25,7 @@
         <ng-container *ngIf="document.correspondent">
           <a [routerLink]="" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
-        {{document.title | documentTitle}}
+        {{document.title | documentTitle}} <span *ngIf="document.archive_serial_number">(#{{document.archive_serial_number}})</span>
       </p>
     </div>
     <div class="card-footer">

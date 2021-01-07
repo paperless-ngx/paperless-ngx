@@ -14,6 +14,12 @@ export class SaveViewConfigDialogComponent implements OnInit {
   @Output()
   public saveClicked = new EventEmitter()
 
+  @Input()
+  error
+
+  @Input()
+  buttonsEnabled = true
+
   _defaultName = ""
 
   get defaultName() {
@@ -26,7 +32,6 @@ export class SaveViewConfigDialogComponent implements OnInit {
     this.saveViewConfigForm.patchValue({name: value})
   }
   
-
   saveViewConfigForm = new FormGroup({
     name: new FormControl(''),
     showInSideBar: new FormControl(false),
