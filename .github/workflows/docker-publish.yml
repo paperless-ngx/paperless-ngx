@@ -34,6 +34,7 @@ jobs:
         pipenv run pycodestyle
         pipenv run coveralls
   documentation:
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: dependencies
@@ -47,6 +48,7 @@ jobs:
         cd docs/
         make html
   frontend:
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2
