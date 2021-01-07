@@ -53,7 +53,8 @@ jobs:
         command: "pip install -U pip"
     - name: dependencies
       run: |
-        pip install 'sphinx~=3.3' sphinx_rtd_theme
+        pip install --upgrade pipenv
+        pipenv install --system --dev --ignore-pipfile
     - name: make
       run: |
         cd docs/
