@@ -50,9 +50,20 @@ jobs:
       uses: gabrielfalcao/pyenv-action@v7
       with:
         default: "3.6.8"
-        command: "pip install -U pip"
+        command: "pip install -U pip"    
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+    - name: Persistent Github pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip3.6.8}
     - name: dependencies
       run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
         pip install --upgrade pipenv
         pipenv install --system --dev
     - name: make
