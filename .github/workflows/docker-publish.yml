@@ -44,8 +44,7 @@ jobs:
         command: "pip install -U pip"
     - name: dependencies
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -qq python3-sphinx
+        pip install 'sphinx~=3.3' sphinx_rtd_theme
     - name: make
       run: |
         cd docs/
