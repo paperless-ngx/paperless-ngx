@@ -33,6 +33,33 @@ jobs:
         pipenv run pytest --cov
         pipenv run pycodestyle
         pipenv run coveralls
+    documentation:
+      steps:
+      - uses: actions/checkout@v2
+      - name: dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
+          pip install --upgrade pipenv
+          pipenv install --system --dev
+      - name: make
+        run: |
+          cd docs/
+          make html
+    frontend:
+      steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '15'
+      - name: dependencies
+        run: |
+          cd src-ui/
+          npm install -g @angular/cli
+          npm install
+      - name: build
+        run: |
+          ng build --prod
   # Build and push image to docker hub.
   buildx:
     runs-on: ubuntu-latest
