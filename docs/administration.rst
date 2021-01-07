@@ -53,7 +53,7 @@ Restoring
 
 .. _administration-updating:
 
-Updating paperless
+Updating Paperless
 ##################
 
 If a new release of paperless-ng is available, upgrading depends on how you
@@ -69,50 +69,26 @@ First of all, ensure that paperless is stopped.
 
 After that, :ref:`make a backup <administration-backup>`.
 
-A.  If you used the dockerfiles archive, simply download the files of the new release,
-    adjust the settings in the files (i.e., the path to your consumption directory),
-    and replace your existing docker-compose files. Then start paperless as usual,
-    which will pull the new image, and update your database, if necessary:
+A.  If you pull the image from the docker hub, all you need to do is:
 
     .. code:: shell-session
 
-        $ cd /path/to/paperless
+        $ docker-compose pull
         $ docker-compose up
-
-    If you see everything working, you can start paperless-ng with "-d" to have it
-    run in the background.
-
-    .. hint::
-
-        The released docker-compose files specify exact versions to be pulled from the hub.
-        This is to ensure that if the docker-compose files should change at some point
-        (i.e., services updates/configured differently), you wont run into trouble due to
-        docker pulling the ``latest`` image and running it in an older environment.
+    
+    The docker-compose files refer to the ``latest`` version, which is always the latest
+    stable release.
         
-B.  If you built the image yourself, grab the new archive and replace your current
-    paperless folder with the new contents.
-
-    After that, make the necessary adjustments to the docker-compose.yml (i.e.,
-    adjust your consumption directory).
-
-    Build and start the new image with:
+B.  If you built the image yourself, do the following:
 
     .. code:: shell-session
 
-        $ cd /path/to/paperless
+        $ git pull
         $ docker-compose build
         $ docker-compose up
 
-    If you see everything working, you can start paperless-ng with "-d" to have it
-    run in the background.
-
-.. hint::
-
-    You can usually keep your ``docker-compose.env`` file, since this file will
-    never include mandatory configuration options. However, it is worth checking
-    out the new version of this file, since it might have new recommendations
-    on what to configure.
-
+If you see everything working, you can start paperless-ng with "-d" to have it
+run in the background.
 
 Updating paperless without docker
 =================================
