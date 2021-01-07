@@ -3,35 +3,6 @@
 Setup
 *****
 
-Download
-########
-
-Go to the project page on GitHub and download the
-`latest release <https://github.com/jonaswinkler/paperless-ng/releases>`_.
-There are multiple options available.
-
-*   Download the dockerfiles archive if you want to pull paperless from
-    Docker Hub.
-
-*   Download the dist archive and extract it if you want to build the docker image
-    yourself or want to install paperless without docker.
-
-.. hint::
-
-    In contrast to paperless, the recommended way to get and update paperless-ng
-    is not to pull the entire git repository. Paperless-ng includes artifacts
-    that need to be compiled, and that's already done for you in the release.
-
-.. admonition:: Want to try out paperless-ng before migrating?
-
-    The release contains a file ``.env`` which sets the docker-compose project
-    name to "paperless", which is the same as before and instructs docker-compose
-    to reuse and upgrade your paperless volumes.
-
-    Just rename the project name in that file to anything else and docker-compose
-    will create fresh volumes for you!
-
-
 Overview of Paperless-ng
 ########################
 
@@ -110,22 +81,33 @@ Installation
 
 You can go multiple routes with setting up and running Paperless:
 
-* The `docker route`_
-* The `bare metal route`_
+* :ref:`Pull the image from Docker Hub <setup-docker_hub>`
+* :ref:`Build the Docker image yourself <setup-docker_build>`
+* :ref:`Install Paperless directly on your system (bare metal) <setup-bare_metal>`
 
-The `docker route`_ is quick & easy. This is the recommended route. This configures all the stuff
+The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
 from above automatically so that it just works and uses sensible defaults for all configuration options.
 
-The `bare metal route`_ is more complicated to setup but makes it easier
+The bare metal route is more complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
-.. _setup-docker_route:
+.. _setup-docker_hub:
 
-Docker Route
-============
+Install Paperless from Docker Hub
+=================================
 
-1.  Install `Docker`_ and `docker-compose`_. [#compose]_
+1.  Go to the `project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/hub>`_
+    and download one of the ``docker-compose.*.yml`` files, depending on which database backend you
+    want to use. Download the ``docker-compose.env`` file and the ``.env`` file as well and store them
+    in the same directory.
+
+    .. hint::
+
+        For new installations, it is recommended to use PostgreSQL as the database
+        backend.
+
+2.  Install `Docker`_ and `docker-compose`_.
 
     .. caution::
 
@@ -142,15 +124,8 @@ Docker Route
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
         .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
-2.  Copy either ``docker-compose.sqlite.yml`` or ``docker-compose.postgres.yml`` to
-    ``docker-compose.yml``, depending on which database backend you want to use.
 
-    .. hint::
-
-        For new installations, it is recommended to use PostgreSQL as the database
-        backend.
-
-2.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
+3.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
     to the consumption directory in this file. Find the line that specifies where
     to mount the consumption directory:
 
@@ -167,7 +142,7 @@ Docker Route
     Don't change the part after the colon or paperless wont find your documents.
 
 
-3.  Modify ``docker-compose.env``, following the comments in the file. The
+4.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. This ensures that
     both the docker container and you on the host machine have write access
@@ -177,7 +152,7 @@ Docker Route
 
     .. note::
 
-        You can use any settings from the file ``paperless.conf`` in this file.
+        You can use any settings from the file ``paperless.conf.example`` in this file.
         Have a look at :ref:`configuration` to see whats available.
     
     .. caution::
@@ -188,11 +163,10 @@ Docker Route
         with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
         which will disable inotify. See :ref:`here <configuration-polling>`.
 
-4.  Run ``docker-compose up -d``. This will create and start the necessary
-    containers. This will also build the image of paperless if you grabbed the
-    source archive.
+5.  Run ``docker-compose up -d``. This will create and start the necessary
+    containers.
 
-5.  To be able to login, you will need a super user. To create it, execute the
+6.  To be able to login, you will need a super user. To create it, execute the
     following command:
 
     .. code-block:: shell-session
@@ -202,7 +176,7 @@ Docker Route
     This will prompt you to set a username, an optional e-mail address and
     finally a password.
 
-6.  The default ``docker-compose.yml`` exports the webserver on your local port
+7.  The default ``docker-compose.yml`` exports the webserver on your local port
     8000. If you haven't adapted this, you should now be able to visit your
     Paperless instance at ``http://127.0.0.1:8000``. You can login with the
     user and password you just created.
@@ -210,11 +184,33 @@ Docker Route
 .. _Docker: https://www.docker.com/
 .. _docker-compose: https://docs.docker.com/compose/install/
 
-.. [#compose] You of course don't have to use docker-compose, but it
-   simplifies deployment immensely. If you know your way around Docker, feel
-   free to tinker around without using compose!
+.. _setup-docker_build:
 
-.. _`setup-bare_metal`:
+Build the docker image yourself
+===============================
+
+1.  Clone the entire repository of paperless:
+
+    .. code:: shell-session
+
+        git clone https://github.com/jonaswinkler/paperless-ng
+    
+    The master branch always reflects the latest stable version.
+
+2.  Copy one of the ``docker-compose.*.yml`` to ``docker-compose.yml``,
+    depending on which database backend you want to use. Copy
+    ``docker-compose.env.example`` to ``docker-compose.env``.
+
+3.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
+    ``docker-compose up -d`` to start the containers, do
+    
+    .. code:: shell-session
+
+        $ docker-compose build
+    
+    before that to build the image.
+
+.. _setup-bare_metal:
 
 Bare Metal Route
 ================
@@ -229,6 +225,7 @@ writing. Windows is not and will never be supported.
     *   ``python3-pip``, optionally ``pipenv`` for package installation
     *   ``python3-dev``
 
+    *   ``gettext`` for localization
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
     *   ``optipng`` for optimizing thumbnails
@@ -258,8 +255,9 @@ writing. Windows is not and will never be supported.
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
     to use PostgreSQL, SQLite is avialable as well.
 
-4.  Get the release archive. If you pull the git repo as it is, you also have to compile the front end by yourself.
-    Extract the frontend to a place from where you wish to execute it, such as ``/opt/paperless``.
+4.  Get the release archive from `<https://github.com/jonaswinkler/paperless-ng/releases>`_.
+    If you clone the git repo as it is, you also have to compile the front end by yourself.
+    Extract the archive to a place from where you wish to execute it, such as ``/opt/paperless``.
 
 5.  Configure paperless. See :ref:`configuration` for details. Edit the included ``paperless.conf`` and adjust the
     settings to your needs. Required settings for getting paperless running are:
@@ -372,6 +370,11 @@ writing. Windows is not and will never be supported.
     .. code::
 
         <policy domain="coder" rights="read|write" pattern="PDF" />
+    
+13. Optional: Install the `jbig2enc <https://ocrmypdf.readthedocs.io/en/latest/jbig2.html>`_
+    encoder. This will reduce the size of generated PDF documents. You'll most likely need
+    to compile this by yourself, because this software has been patented until around 2017 and
+    binary packages are not available for most distributions.
 
 Migration to paperless-ng
 #########################
@@ -406,13 +409,14 @@ Migration to paperless-ng is then performed in a few simple steps:
     paperless.
 
 3.  Download the latest release of paperless-ng. You can either go with the
-    docker-compose files or use the archive to build the image yourself.
+    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/hub>`_
+    or clone the repository to build the image yourself.
     You can either replace your current paperless folder or put paperless-ng
     in a different location.
 
     .. caution::
 
-        The release include a ``.env`` file. This will set the
+        Paperless includes a ``.env`` file. This will set the
         project name for docker compose to ``paperless`` so that paperless-ng will
         automatically reuse your existing paperless volumes. When you start it, it
         will migrate your existing data. After that, your old paperless installation
@@ -422,9 +426,8 @@ Migration to paperless-ng is then performed in a few simple steps:
     If you want to switch to PostgreSQL, do that after you migrated your existing
     SQLite database.
 
-5.  Adjust ``docker-compose.yml`` and
-    ``docker-compose.env`` to your needs.
-    See `docker route`_ for details on which edits are advised.
+5.  Adjust ``docker-compose.yml`` and ``docker-compose.env`` to your needs.
+    See :ref:`setup-docker_hub` for details on which edits are advised.
 
 6.  Since ``docker-compose`` would just use the the old paperless image, we need to
     manually build a new image:
@@ -452,7 +455,7 @@ Migration to paperless-ng is then performed in a few simple steps:
     This will run paperless in the background and automatically start it on system boot.
 
 9.  Paperless installed a permanent redirect to ``admin/`` in your browser. This
-    redirect is still in place and prevents access to the new UI. Clear
+    redirect is still in place and prevents access to the new UI. Clear your
     browsing cache in order to fix this.
 
 10.  Optionally, follow the instructions below to migrate your existing data to PostgreSQL.
@@ -603,7 +606,5 @@ For details, refer to :ref:`configuration`.
 
     The actual matching of the algorithm is fast and works on Raspberry Pi as 
     well as on any other device.
-
-
 
 .. _redis: https://redis.io/
