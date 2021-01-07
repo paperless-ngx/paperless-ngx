@@ -65,7 +65,7 @@ jobs:
   # Build and push image to docker hub.
   buildx:
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [tests, documentation, frontend]
     steps:
       - uses: actions/checkout@v2
 
