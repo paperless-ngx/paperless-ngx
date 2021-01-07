@@ -84,9 +84,9 @@ export class DocumentListComponent implements OnInit {
   }
 
   loadViewConfig(view: PaperlessSavedView) {
-    this.filterRulesModified = false
     this.list.load(view)
     this.list.reload()
+    this.rulesChanged()
   }
 
   saveViewConfig() {
