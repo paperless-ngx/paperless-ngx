@@ -1,4 +1,4 @@
-name: backend-tests
+name: documentation
 
 # always run documentation workflow to ensure the documentation can still be built
 on: push
