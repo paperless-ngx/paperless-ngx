@@ -56,6 +56,9 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 - Make the front end nice (except mobile).
 - Fix whatever bugs I and you find.
+- Start using CI to build the app.
+- Simplify updates.
+- Make the documentation nice.
 
 ## Roadmap for versions beyond 1.0
 
@@ -64,12 +67,10 @@ These are things that I want to add to paperless eventually. They are sorted by 
 - **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
   - Group and limit search results by correspondent, show “more from this” links in the results.
 - **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
-- **Localization.** I won't translate paperless into any other languages except English and German, however, I'll add the necessary means so that anyone can translate paperless into their favorite language.
 - **An interactive consumer** that shows its progress for documents it processes on the web page.
 	- With live updates and websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particularly happy about.
 	- Notifications when a document was added with buttons to open the new document right away.
 - **Arbitrary tag colors**. Allow the selection of any color with a color picker.
-- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc and .docx documents.
 
 Apart from that, paperless is pretty much feature complete.
 
@@ -101,6 +102,12 @@ Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest
 # Documentation
 
 The documentation for Paperless-ng is available on [ReadTheDocs](https://paperless-ng.readthedocs.io/).
+
+# Translation
+
+Paperless is currently available in English, German, Dutch and French. Translation is coordinated at transifex: https://www.transifex.com/paperless/paperless-ng
+
+If you want to see paperless in your own language, request that language at transifex and you can start translating after I approve the language.
 
 # Suggestions? Questions? Something not working?
 
