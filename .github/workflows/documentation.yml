@@ -1,0 +1,32 @@
+name: backend-tests
+
+# always run documentation workflow to ensure the documentation can still be built
+on: push
+
+# possibly add a publish job for automatic read-the-docs publishing
+jobs:
+  documentation:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v7
+      with:
+        default: "3.6.8"
+        command: "pip install -U pip"    
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+    - name: Persistent Github pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip3.6.8}
+    - name: dependencies
+      run: |
+        pip install 'sphinx~=3.3' sphinx_rtd_theme
+    - name: make
+      run: |
+        cd docs/
+        make html
