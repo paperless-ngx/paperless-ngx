@@ -90,7 +90,6 @@ INSTALLED_APPS = [
     "documents.apps.DocumentsConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
-    "paperless_tika.apps.PaperlessTikaConfig",
     "paperless_mail.apps.PaperlessMailConfig",
 
     "django.contrib.admin",
@@ -460,6 +459,9 @@ PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost
 PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
 )
+
+if PAPERLESS_TIKA_ENABLED:
+    INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
 # List dates that should be ignored when trying to parse date from document text
 IGNORE_DATES = set()
