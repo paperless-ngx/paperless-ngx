@@ -1,4 +1,7 @@
+name: frontend
 
+# always run frontend workflow
+on: push
 
 jobs:
   frontend:
