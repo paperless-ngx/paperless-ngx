@@ -24,6 +24,7 @@ jobs:
         path: ${{ steps.pip-cache.outputs.dir }}
         key: ${{ runner.os }}-pip3.6.8}
     - name: dependencies
+      # instead of directly installing the dependency in the workflow file, can this be done using the pipfile instead?
       run: |
         pip install 'sphinx~=3.3' sphinx_rtd_theme
     - name: make
