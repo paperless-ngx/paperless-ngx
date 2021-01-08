@@ -8,8 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
-        python: 
+        os: ubuntu-20.04]
+        python: # pyenv-action requires the exact version
           - 3.6.8
           - 3.7.9
           - 3.8.6

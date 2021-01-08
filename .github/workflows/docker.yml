@@ -1,32 +1,34 @@
-name: Docker
+name: docker
 
 on:
   push:
-    branches: travis-multiarch-builds
+    branches:
+    - master
+    - dev
+    tags:
+    - 'ng-*'
 
 jobs:
-  # Build and push image to docker hub.
+  # build and push image to docker hub.
   buildx:
     runs-on: ubuntu-latest
-    needs: [tests, documentation, frontend]
-    if: github.ref == 'refs/heads/github-action-test'
     steps:
       - uses: actions/checkout@v2
-
       - name: Prepare
         id: prepare
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
         run: |
-          DOCKER_IMAGE=moztr/paperless-ng
           DOCKER_PLATFORMS=linux/amd64,linux/arm/v7,linux/arm64/v8
           VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/v}
+            VERSION=${GITHUB_REF#refs/tags/}
           fi
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            VERSION=nightly
+          if [[ $GITHUB_REF == refs/heads/* ]]; then
+            VERSION=${GITHUB_REF#refs/heads/}
           fi
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
-          if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+          if [[ $VERSION == "master" ]]; then
             TAGS="$TAGS --tag ${DOCKER_IMAGE}:latest"
           fi
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
