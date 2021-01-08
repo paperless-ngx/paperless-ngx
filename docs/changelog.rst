@@ -5,6 +5,12 @@
 Changelog
 *********
 
+paperless-ng 0.9.13
+###################
+
+* Fixed an issue with Paperless not starting due to the new Tika integration when ``USERMAP_UID`` and ``USERMAP_GID`` was used
+  in the ``docker-compose.env`` file.
+
 paperless-ng 0.9.12
 ###################
 
