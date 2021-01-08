@@ -1,7 +1,8 @@
 table {
   overflow-wrap: anywhere;
+  table-layout: fixed;
 }
 
 th:first-child {
-  min-width: 5rem;
+  width: 25%;
 }
