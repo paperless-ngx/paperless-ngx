@@ -113,7 +113,7 @@
     background-color: rgba(0, 0, 0, 0.15);
     padding-left: 1.8rem;
     border-color: rgba(255, 255, 255, 0.2);
-    transition: flex 0.3s ease;
+    transition: all .3s ease, padding-left 0s ease, background-color 0s ease; // Safari requires all
     max-width: 600px;
     min-width: 300px; // 1/2 max
 
