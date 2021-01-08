@@ -297,7 +297,8 @@ $border-color-dark-mode: #47494f;
     }
   }
 
-  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover {
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
     background-color: $bg-light-dark-mode;
   }
 
