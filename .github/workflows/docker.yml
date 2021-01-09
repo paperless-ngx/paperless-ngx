@@ -34,9 +34,8 @@ jobs:
         id: prepare
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
-        # ,linux/arm/v7,linux/arm64/v8
         run: |
-          DOCKER_PLATFORMS=linux/amd64
+          DOCKER_PLATFORMS=linux/amd64,linux/arm/v7
           DOCKER_VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             DOCKER_VERSION=${GITHUB_REF#refs/tags/}
