@@ -63,7 +63,7 @@ RUN apt-get update \
   && pipenv install --system --deploy --ignore-pipfile \
   && pipenv --clear \
   && pip3 uninstall -y pipenv \
-	&& apt-get -y purge build-essential libqpdf-dev libxslt1-dev \
+	&& apt-get -y purge build-essential libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
