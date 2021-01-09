@@ -294,9 +294,6 @@ converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
 wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
 
-If you run paperless on docker, you can add those services to the docker-compose
-file (see the examples provided).
-
 PAPERLESS_TIKA_ENABLED=<bool>
     Enable (or disable) the Tika parser.
 
@@ -312,6 +309,40 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
 
     Defaults to "http://localhost:3000".
 
+If you run paperless on docker, you can add those services to the docker-compose
+file (see the provided ``docker-compose.tika.yml`` file for reference). The changes
+requires are as follows:
+
+.. code:: yaml
+
+    services:
+        # ...
+
+        webserver:
+            # ...
+
+            environment:
+                # ...
+
+                PAPERLESS_TIKA_ENABLED: 1
+                PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+                PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+        
+        # ...
+
+        gotenberg:
+            image: thecodingmachine/gotenberg
+            restart: unless-stopped
+            environment:
+                DISABLE_GOOGLE_CHROME: 1
+
+        tika:
+            image: apache/tika
+            restart: unless-stopped
+
+Add the configuration variables to the environment of the webserver (alternatively
+put the configuration in the ``docker-compose.env`` file) and add the additional
+services below the webserver service. Watch out for indentation.
 
 Software tweaks
 ###############

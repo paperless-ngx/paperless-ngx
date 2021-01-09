@@ -46,7 +46,7 @@ def _consume(filepath):
         return
 
     if not is_file_ext_supported(os.path.splitext(filepath)[1]):
-        logger.debug(
+        logger.warning(
             f"Not consuming file {filepath}: Unknown file extension.")
         return
 
