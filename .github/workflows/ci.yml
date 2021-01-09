@@ -7,11 +7,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - name: Install python version
-        uses: gabrielfalcao/pyenv-action@v7
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          default: "3.6.8"
-          command: "pip install -U pip"
+          python-version: 3.8
       - name: Get pip cache dir
         id: pip-cache
         run: |
@@ -21,11 +20,9 @@ jobs:
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip3.6.8}
-      - name: dependencies
-        # instead of directly installing the dependency in the workflow file, can this be done using the pipfile instead?
-        run: |
-          pip install 'sphinx~=3.3' sphinx_rtd_theme
-      - name: make
+      - name: Install dependencies
+        run: pipenv install --system --dev --ignore-pipfile
+      - name: Make documentation
         run: |
           cd docs/
           make html
