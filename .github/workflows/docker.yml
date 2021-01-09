@@ -41,7 +41,7 @@ jobs:
         uses: docker/setup-qemu-action@v1
       -
         name: Cache Docker layers
-        uses: pat-s/always-upload-cache@v2
+        uses: pat-s/always-upload-cache@v2.1.3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
