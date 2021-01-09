@@ -84,7 +84,7 @@ jobs:
 
   # build and push image to docker hub.
   build-docker-image:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev' || github.ref == 'refs/tags/ng-*')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/travis-multiarch-builds' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev' || github.ref == 'refs/tags/ng-*')
     runs-on: ubuntu-latest
     needs: tests
     steps:
