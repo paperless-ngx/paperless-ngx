@@ -14,51 +14,80 @@ jobs:
   buildx:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Prepare
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v3.1.0
+      -
+        name: Cache Docker layers
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      -
+        name: Prepare
         id: prepare
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
         # ,linux/arm/v7,linux/arm64/v8
         run: |
           DOCKER_PLATFORMS=linux/amd64
-          VERSION=edge
+          DOCKER_VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/}
+            DOCKER_VERSION=${GITHUB_REF#refs/tags/}
           fi
           if [[ $GITHUB_REF == refs/heads/* ]]; then
-            VERSION=${GITHUB_REF#refs/heads/}
+            DOCKER_VERSION=${GITHUB_REF#refs/heads/}
           fi
-          TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
-          if [[ $VERSION == "master" ]]; then
-            TAGS="$TAGS --tag ${DOCKER_IMAGE}:latest"
+          DOCKER_TAG="${DOCKER_IMAGE}:${DOCKER_VERSION}"
+          if [[ $DOCKER_VERSION == "master" ]]; then
+            DOCKER_TAG="${DOCKER_IMAGE}:latest"
           fi
-          echo ::set-output name=docker_image::${DOCKER_IMAGE}
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
-            --build-arg VERSION=${VERSION} \
+          echo ::set-output name=version::${DOCKER_VERSION}
+          echo ::set-output name=platforms::${DOCKER_PLATFORMS}
+          echo ::set-output name=tag::${DOCKER_TAG}
+      -
+        name: Docker buildx (build)
+        run: |
+          docker buildx build \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --cache-to "type=local,dest=/tmp/.buildx-cache" \
+            --platform ${{steps.prepare.outputs.platforms}} \
+            --output "type=image,push=false" \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
-            ${TAGS} --file ./Dockerfile .
-      - name: install buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v3.1.0
-      - name: Docker Login
-        if: success() && github.event_name != 'pull_request'
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+            --platform ${{steps.prepare.outputs.platforms}} \
+            --tag ${{steps.prepare.outputs.tag}} ./
+
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      -
+        name: Docker Buildx (push)
         run: |
-          echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-      - name: Docker Buildx (push)
-        if: success() && github.event_name != 'pull_request'
-        run: |
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
+          docker buildx build \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --platform ${{steps.prepare.outputs.platforms}} \
+            --output "type=image,push=true" \
+            --tag ${{steps.prepare.outputs.tag}} ./
+
       - name: Docker Check Manifest
-        if: always() && github.event_name != 'pull_request'
         run: |
-          docker run --rm mplatform/mquery ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+          docker run --rm mplatform/mquery ${{steps.prepare.outputs.tag}}
+      -
+        name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{steps.prepare.outputs.tag}}
+
       - name: Clear
-        if: always() && github.event_name != 'pull_request'
         run: |
           rm -f ${HOME}/.docker/config.json
