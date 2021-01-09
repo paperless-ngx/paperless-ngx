@@ -1,0 +1,19 @@
+name: frontend
+
+# always run frontend workflow to see if it builds and tests run fine
+on: [push, pull_request]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15'
+    - name: build
+      run: |
+        cd src-ui/
+        npm install -g @angular/cli
+        npm install
+        ng build --prod
