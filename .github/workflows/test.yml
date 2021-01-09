@@ -1,7 +1,7 @@
 name: backend-tests
 
 # always run tests workflow
-on: push
+on: [push, pull_request]
 
 jobs:
   tests:
