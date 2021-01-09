@@ -1,7 +1,7 @@
 name: documentation
 
 # always run documentation workflow to ensure the documentation can still be built
-on: push
+on: [push, pull_request]
 
 # possibly add a publish job for automatic read-the-docs publishing
 jobs:
