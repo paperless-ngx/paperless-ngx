@@ -21,7 +21,9 @@ jobs:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip3.6.8}
       - name: Install dependencies
-        run: pipenv install --system --dev --ignore-pipfile
+        run: |
+          pip install --upgrade pipenv
+          pipenv install --system --dev --ignore-pipfile
       - name: Make documentation
         run: |
           cd docs/
