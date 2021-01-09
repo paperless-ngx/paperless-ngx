@@ -11,6 +11,8 @@
       # paperless-ng
       - python3-dev
       - python3-pip
+      - gettext
+      - fonts-liberation
       - imagemagick
       - unpaper
       - ghostscript
@@ -166,51 +168,65 @@
 - name: configure paperless-ng
   lineinfile:
     path: "{{ paperlessng_directory }}/paperless.conf.template"
-    regexp: "{{ item.regexp }}"
+    regexp: "^#?{{ item.regexp }}="
     line: "{{ item.line }}"
   with_items:
-    - regexp: "^#?PAPERLESS_REDIS="
+    - regexp: PAPERLESS_REDIS
       line: "PAPERLESS_REDIS=redis://{{ paperlessng_redis_host }}:{{ paperlessng_redis_port }}"
-    - regexp: "^#?PAPERLESS_CONSUMPTION_DIR="
+    - regexp: PAPERLESS_CONSUMPTION_DIR
       line: "PAPERLESS_CONSUMPTION_DIR={{ paperlessng_consumption_dir }}"
-    - regexp: "^#?PAPERLESS_DATA_DIR="
+    - regexp: PAPERLESS_DATA_DIR
       line: "PAPERLESS_DATA_DIR={{ paperlessng_data_dir }}"
-    - regexp: "^#?PAPERLESS_MEDIA_ROOT="
+    - regexp: PAPERLESS_MEDIA_ROOT
       line: "PAPERLESS_MEDIA_ROOT={{ paperlessng_media_root }}"
-    - regexp: "^#?PAPERLESS_STATICDIR="
+    - regexp: PAPERLESS_STATICDIR
       line: "PAPERLESS_STATICDIR={{ paperlessng_static_dir }}"
-    - regexp: "^#?PAPERLESS_FILENAME_FORMAT="
+    - regexp: PAPERLESS_FILENAME_FORMAT
       line: "PAPERLESS_FILENAME_FORMAT={{ paperlessng_filename_format }}"
-    - regexp: "^#?PAPERLESS_OCR_LANGUAGE="
+    - regexp: PAPERLESS_OCR_LANGUAGE
       line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
-    - regexp: "^#PAPERLESS_OCR_USER_ARGS="
+    - regexp: PAPERLESS_OCR_USER_ARGS
       line: "PAPERLESS_OCR_USER_ARGS={{ paperlessng_ocrmypdf_args | combine({'jbig2_lossy': true} if paperlessng_big2enc_lossy else {}) | to_json }}"
-    - regexp: "^#?PAPERLESS_TIME_ZONE="
+    - regexp: PAPERLESS_TIME_ZONE
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
+    - regexp: PAPERLESS_TIKA_ENABLED
+      line: "PAPERLESS_TIKA_ENABLED={{ paperlessng_tika_enabled }}"
   no_log: yes
+
+- name: configure paperless-ng [tika]
+  lineinfile:
+    path: "{{ paperlessng_directory }}/paperless.conf.template"
+    regexp: "^#?{{ item.regexp }}="
+    line: "'{{ item.line }}' if paperlessng_tika_enabled else '#{{ item.line }}'"
+  with_items:
+    - regexp: PAPERLESS_TIKA_ENDPOINT
+      line: "PAPERLESS_TIKA_ENDPOINT={{ paperlessng_tika_endpoint }}"
+    - regexp: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+      line: "PAPERLESS_TIKA_GOTENBERG_ENDPOINT={{ paperlessng_tika_endpoint }}"
 
 - name: configure paperless-ng database [sqlite]
   lineinfile:
     path: "{{ paperlessng_directory }}/paperless.conf.template"
-    regexp: "^#?PAPERLESS_DBHOST="
-    state: absent
+    regexp: "^#?PAPERLESS_DBHOST=(.*)$"
+    line: '#PAPERLESS_DBHOST=\1'
+    backrefs: yes
   when: paperlessng_db_type == 'sqlite'
 
 - name: configure paperless-ng database [postgresql]
   lineinfile:
     path: "{{ paperlessng_directory }}/paperless.conf.template"
-    regexp: "{{ item.regexp }}"
+    regexp: "^#?{{ item.regexp }}="
     line: "{{ item.line }}"
   with_items:
-    - regexp: "^#?PAPERLESS_DBHOST="
+    - regexp: PAPERLESS_DBHOST
       line: "PAPERLESS_DBHOST={{ paperlessng_db_host }}"
-    - regexp: "^#?PAPERLESS_DBPORT="
+    - regexp: PAPERLESS_DBPORT
       line: "PAPERLESS_DBPORT={{ paperlessng_db_port }}"
-    - regexp: "^#?PAPERLESS_DBNAME="
+    - regexp: PAPERLESS_DBNAME
       line: "PAPERLESS_DBNAME={{ paperlessng_db_name }}"
-    - regexp: "^#?PAPERLESS_DBUSER="
+    - regexp: PAPERLESS_DBUSER
       line: "PAPERLESS_DBUSER={{ paperlessng_db_user }}"
-    - regexp: "^#?PAPERLESS_DBPASS="
+    - regexp: PAPERLESS_DBPASS
       line: "PAPERLESS_DBPASS={{ paperlessng_db_pass }}"
   when: paperlessng_db_type == 'postgresql'
   no_log: yes
@@ -248,7 +264,7 @@
   command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py collectstatic --no-input"
   when: paperlessng_current_version.stdout != paperlessng_version | string
   register: static_files
-  changed_when: "'188 unmodified' not in static_files.stdout"
+  changed_when: static_files.stdout is not match("0 static files copied .*")
 
 - name: create database schema
   become: yes
@@ -257,6 +273,12 @@
   when: paperlessng_current_version.stdout != paperlessng_version | string
   register: database_schema
   changed_when: '"No migrations to apply." not in database_schema.stdout'
+
+- name: compile translations
+  become: yes
+  become_user: "{{ paperlessng_system_user }}"
+  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py compilemessages"
+  when: paperlessng_current_version.stdout != paperlessng_version | string
 
 - name: configure paperless superuser
   become: yes

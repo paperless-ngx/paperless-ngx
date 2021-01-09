@@ -1,5 +1,5 @@
 ---
-paperlessng_version: 0.9.11
+paperlessng_version: 0.9.13
 paperlessng_directory: /opt/paperless-ng
 paperlessng_consumption_dir: "{{ paperlessng_directory }}/consumption"
 paperlessng_data_dir: "{{ paperlessng_directory }}/data"
@@ -13,10 +13,13 @@ paperlessng_ocr_languages:
 paperlessng_time_zone: Europe/Berlin
 # see https://ocrmypdf.readthedocs.io/en/latest/api.html#ocrmypdf.ocr
 paperlessng_ocrmypdf_args:
-  #- "deskew": true
+  #- "deskew": true  # https://github.com/jonaswinkler/paperless-ng/issues/231
   - "optimize": 1
 paperlessng_use_jbig2enc: true
 paperlessng_big2enc_lossy: false
+paperlessng_tika_enabled: false
+paperlessng_tika_endpoint: http://localhost:9998
+paperlessng_tika_gotenberg_endpoint: http://localhost:3000
 
 paperlessng_superuser_name: paperlessng
 paperlessng_superuser_email: paperlessng@example.com
