@@ -1,0 +1,133 @@
+---
+# https://github.com/jonaswinkler/paperless-ng/blob/dev/.github/workflows/ci.yml
+- name: install dev dependencies
+  apt:
+    pkg:
+      - git
+      - npm
+      - libqpdf-dev
+
+- name: create temporary git directory
+  tempfile:
+    state: directory
+  register: gitdir
+
+- name: pull paperless-ng
+  git:
+    repo: https://github.com/jonaswinkler/paperless-ng.git
+    dest: "{{ gitdir.path }}"
+    version: "{{ paperlessng_version }}"
+    refspec: "+refs/pull/*:refs/pull/*"
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: compile frontend
+  command:
+    cmd: "{{ item }}"
+  args:
+    chdir: "{{ gitdir.path }}/src-ui"
+  failed_when: false
+  with_items:
+    - npm install -g @angular/cli
+    - npm install
+    - ./node_modules/.bin/ng build --prod
+
+- name: install pipenv
+  pip:
+    name:
+      - pipenv
+      - pybind11  # building pikepdf for <0.9.14
+    extra_args: --upgrade
+
+- name: allow building with any Python 3 release
+  lineinfile:
+    path: "{{ gitdir.path }}/Pipfile"
+    regexp: '^python_version = ".+"$'
+    line: python_version = "3"
+
+# TODO run dev in separate virtualenv
+- name: install Pipfile dependencies
+  command:
+    cmd: pipenv install --dev
+  args:
+    chdir: "{{ gitdir.path }}"
+
+- name: clean output directory
+  file:
+    path: "{{ gitdir.path }}/dist"
+    state: absent
+
+- name: create output directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ gitdir.path }}/dist"
+    - "{{ gitdir.path }}/dist/paperless-ng"
+    - "{{ gitdir.path }}/dist/paperless-ng/scripts"
+
+- name: copy application into place
+  copy:
+    src: "{{ gitdir.path }}/{{ item.src }}"
+    remote_src: yes
+    dest: "{{ gitdir.path }}/dist/paperless-ng/{{ item.dest | default('') }}"
+  with_items:
+    - src: CONTRIBUTING.md
+    - src: LICENSE
+    - src: Pipfile
+    - src: Pipfile.lock
+    - src: README.md
+    - src: paperless.conf.example
+      dest: "paperless.conf"
+
+# TODO can be copied for >=0.9.14
+- name: generate requirements.txt
+  command:
+    cmd: pipenv lock --keep-outdated -r
+  args:
+    chdir: "{{ gitdir.path }}"
+  register: requirements
+
+- name: write requirements.txt
+  copy:
+    content: "{{ requirements.stdout }}"
+    dest: "{{ gitdir.path }}/dist/paperless-ng/requirements.txt"
+
+- name: glob all scripts
+  find:
+    paths: "{{ gitdir.path }}/scripts/"
+    patterns:
+    - "*.service"
+    - "*.sh"
+  register: glob
+
+- name: copy scripts
+  copy:
+    src: "{{ item.path }}"
+    remote_src: yes
+    dest: "{{ gitdir.path }}/dist/paperless-ng/scripts/"
+  with_items:
+    - "{{ glob.files }}"
+
+- name: copy sources
+  command:
+    cmd: "cp -r src/ dist/paperless-ng/src"
+  args:
+    chdir: "{{ gitdir.path }}"
+
+- name: package app
+  archive:
+    path: "{{ gitdir.path }}/dist/"
+    dest: "{{ gitdir.path }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
+    format: xz
+
+- name: extract paperless-ng
+  unarchive:
+    src: "{{ gitdir.path }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
+    remote_src: yes
+    dest: "{{ tempdir.path }}"
+  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+
+- name: remove temporary git directory
+  file:
+    path: "{{ gitdir.path }}"
+    state: absent
