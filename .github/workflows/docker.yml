@@ -19,6 +19,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
+        name: Prepare
+        id: prepare
+        run: |
+          VERSION=edge
+          if [[ $GITHUB_REF == refs/tags/ng-* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/ng-}
+          fi
+          if [[ $GITHUB_REF == refs/heads/* ]]; then
+            VERSION=${GITHUB_REF#refs/heads/}
+          fi
+          echo ::set-output name=version::${VERSION}
+      -
         name: Checkout
         uses: actions/checkout@v2
       -
@@ -49,10 +61,10 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm/v7
           push: true
-          tags: jonaswinkler/paperless-ng:edge
+          tags: jonaswinkler/paperless-ng:${{ steps.prepare.outputs.version }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect jonaswinkler/paperless-ng:edge
+          docker buildx imagetools inspect jonaswinkler/paperless-ng:${{ steps.prepare.outputs.version }}
