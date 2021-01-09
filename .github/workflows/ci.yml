@@ -31,17 +31,16 @@ jobs:
           make html
 
   tests:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
         python-version: ['3.6', '3.7', '3.8']
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          default: "${{ matrix.python-version }}"
+          python-version: "${{ matrix.python-version }}"
       - name: Get pip cache dir
         id: pip-cache
         run: |
