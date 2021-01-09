@@ -1,0 +1,43 @@
+name: backend-tests
+
+# always run tests workflow
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        python: # pyenv-action requires the exact version
+          - 3.6.8
+          - 3.7.9
+          - 3.8.6
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v7
+      with:
+        default: "${{ matrix.python }}"
+        command: "pip install -U pip"
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+    - name: Persistent Github pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip${{ matrix.python }}
+    - name: Tests
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
+        pip install --upgrade pipenv
+        pipenv install --system --dev
+        cd src/
+        pipenv run pytest --cov
+        pipenv run pycodestyle
+        pipenv run coveralls
