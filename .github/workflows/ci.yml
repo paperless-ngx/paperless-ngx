@@ -1,0 +1,140 @@
+name: docker
+
+on: [push, pull_request]
+
+jobs:
+  documentation:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install python version
+        uses: gabrielfalcao/pyenv-action@v7
+        with:
+          default: "3.6.8"
+          command: "pip install -U pip"
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+      - name: Persistent Github pip cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip3.6.8}
+      - name: dependencies
+        # instead of directly installing the dependency in the workflow file, can this be done using the pipfile instead?
+        run: |
+          pip install 'sphinx~=3.3' sphinx_rtd_theme
+      - name: make
+        run: |
+          cd docs/
+          make html
+
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        python: # pyenv-action requires the exact version
+          - 3.6.8
+          - 3.7.9
+          - 3.8.6
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install python version
+        uses: gabrielfalcao/pyenv-action@v7
+        with:
+          default: "${{ matrix.python }}"
+          command: "pip install -U pip"
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+      - name: Persistent Github pip cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip${{ matrix.python }}
+      - name: Tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
+          pip install --upgrade pipenv
+          pipenv install --system --dev
+          cd src/
+          pipenv run pytest --cov
+          pipenv run pycodestyle
+          pipenv run coveralls
+
+  frontend:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15'
+    - name: build
+      run: |
+        cd src-ui/
+        npm install -g @angular/cli
+        npm install
+        ng build --prod
+
+  # build and push image to docker hub.
+  build-docker-image:
+    if: github.event_name == push && (github.ref == refs/heads/master || github.ref == refs/heads/dev || github.ref == refs/tags/ng-*)
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          VERSION=edge
+          if [[ $GITHUB_REF == refs/tags/ng-* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/ng-}
+          fi
+          if [[ $GITHUB_REF == refs/heads/* ]]; then
+            VERSION=${GITHUB_REF#refs/heads/}
+          fi
+          echo ::set-output name=version::${VERSION}
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Cache Docker layers
+        uses: pat-s/always-upload-cache@v2.1.3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm/v7
+          push: true
+          tags: jonaswinkler/paperless-ng:${{ steps.prepare.outputs.version }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+      -
+        name: Inspect image
+        run: |
+          docker buildx imagetools inspect jonaswinkler/paperless-ng:${{ steps.prepare.outputs.version }}
