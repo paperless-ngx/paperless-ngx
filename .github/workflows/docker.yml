@@ -60,7 +60,7 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
             --platform ${{steps.prepare.outputs.platforms}} \
-            --tag ${{steps.prepare.outputs.tag}} ./
+            --tag jonaswinkler/paperless-ng:edge ./
 
       -
         name: Login to DockerHub
@@ -75,8 +75,8 @@ jobs:
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --platform ${{steps.prepare.outputs.platforms}} \
             --output "type=image,push=true" \
-            --tag ${{steps.prepare.outputs.tag}} ./
-      - 
+            --tag jonaswinkler/paperless-ng:edge ./
+      -
         name: Docker Check Manifest
         run: |
           docker run --rm mplatform/mquery ${{steps.prepare.outputs.tag}}
