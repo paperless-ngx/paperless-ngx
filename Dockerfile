@@ -45,6 +45,7 @@ RUN apt-get update \
 		libqpdf-dev \
 		libxml2 \
 		libxslt1-dev \
+		mime-support \
 		optipng \
 		pngquant \
 		qpdf \
