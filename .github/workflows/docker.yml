@@ -5,6 +5,7 @@ on:
     branches:
     - master
     - dev
+    - travis-multiarch-builds
     tags:
     - 'ng-*'
 
@@ -18,8 +19,9 @@ jobs:
         id: prepare
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
+        # ,linux/arm/v7,linux/arm64/v8
         run: |
-          DOCKER_PLATFORMS=linux/amd64,linux/arm/v7,linux/arm64/v8
+          DOCKER_PLATFORMS=linux/amd64
           VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/}
