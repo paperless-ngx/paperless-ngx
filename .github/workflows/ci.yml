@@ -57,11 +57,11 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
           pip install --upgrade pipenv
-          pipenv install --system --dev
+          pipenv install --system --dev --ignore-pipfile
           cd src/
-          pipenv run pytest --cov
-          pipenv run pycodestyle
-          pipenv run coveralls
+          pytest
+          pycodestyle
+          coveralls
 
   frontend:
     runs-on: ubuntu-20.04
