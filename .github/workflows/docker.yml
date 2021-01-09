@@ -71,6 +71,8 @@ jobs:
 
       -
         name: Docker Buildx (push)
+
+        if: false
         run: |
           docker buildx build \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
@@ -79,10 +81,12 @@ jobs:
             --tag ${{steps.prepare.outputs.tag}} ./
 
       - name: Docker Check Manifest
+        if: false
         run: |
           docker run --rm mplatform/mquery ${{steps.prepare.outputs.tag}}
       -
         name: Inspect image
+        if: false
         run: |
           docker buildx imagetools inspect ${{steps.prepare.outputs.tag}}
 
