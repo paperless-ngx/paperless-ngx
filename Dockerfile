@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS jbig2
+FROM ubuntu:20.04 AS jbig2enc
 
 WORKDIR /usr/src/jbig2enc
 
@@ -19,7 +19,7 @@ RUN npm install
 COPY src-ui .
 RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false
 
-FROM python:3.7-slim
+FROM ubuntu:20.04
 
 WORKDIR /usr/src/paperless/
 
@@ -27,7 +27,7 @@ COPY Pipfile* ./
 
 #Dependencies
 RUN apt-get update \
-  && apt-get -y --no-install-recommends install \
+  && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install \
 		build-essential \
 		curl \
 		file \
@@ -48,6 +48,9 @@ RUN apt-get update \
 		mime-support \
 		optipng \
 		pngquant \
+		python3 \
+		python3-pip \
+		python3-dev \
 		qpdf \
 		sudo \
 		tesseract-ocr \
@@ -59,11 +62,12 @@ RUN apt-get update \
 		tzdata \
 		unpaper \
 		zlib1g \
-	&& pip3 install --upgrade supervisor pipenv \
+
+	&& pip3 install --upgrade supervisor pipenv setuptools \
   && pipenv install --system --deploy --ignore-pipfile \
   && pipenv --clear \
   && pip3 uninstall -y pipenv \
-	&& apt-get -y purge build-essential libqpdf-dev \
+	&& apt-get -y purge build-essential libqpdf-dev python3-dev python3-pip \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
@@ -75,10 +79,10 @@ COPY docker/gunicorn.conf.py ./
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/docker-entrypoint.sh /sbin/docker-entrypoint.sh
 
-# copy jbic
-COPY --from=jbig2 /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
-COPY --from=jbig2 /usr/src/jbig2enc/src/jbig2 /usr/local/bin/
-COPY --from=jbig2 /usr/src/jbig2enc/src/*.h /usr/local/include/
+# copy jbig2enc
+COPY --from=jbig2enc /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
+COPY --from=jbig2enc /usr/src/jbig2enc/src/jbig2 /usr/local/bin/
+COPY --from=jbig2enc /usr/src/jbig2enc/src/*.h /usr/local/include/
 
 
 # copy app
