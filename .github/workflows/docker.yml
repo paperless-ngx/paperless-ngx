@@ -71,8 +71,6 @@ jobs:
 
       -
         name: Docker Buildx (push)
-
-        if: false
         run: |
           docker buildx build \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
