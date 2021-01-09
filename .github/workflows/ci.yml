@@ -35,17 +35,13 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
-        python: # pyenv-action requires the exact version
-          - 3.6.8
-          - 3.7.9
-          - 3.8.6
+        python-version: ['3.6', '3.7', '3.8']
     steps:
       - uses: actions/checkout@v2
-      - name: Install python version
-        uses: gabrielfalcao/pyenv-action@v7
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          default: "${{ matrix.python }}"
-          command: "pip install -U pip"
+          default: "${{ matrix.python-version }}"
       - name: Get pip cache dir
         id: pip-cache
         run: |
