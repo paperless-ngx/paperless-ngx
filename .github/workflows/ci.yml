@@ -154,14 +154,19 @@ jobs:
           name: release
           path: paperless-ng.tar.xz
       -
+        id: get_branch_name
+        run: |
+          branch_name=$(echo ${{ GITHUB_REF }} | cut -d/ -f3)
+          echo "::set-output name=branch_name::$branch_name"
+      -
         name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: $GITHUB_REF#refs/heads/
-          release_name: Paperless-ng $GITHUB_REF#refs/heads/
+          tag_name: ${{ steps.get_branch_name.outputs.branch_name }}
+          release_name: Paperless-ng ${{ steps.get_branch_name.outputs.branch_name }}
           draft: true
           prerelease: true
       -
@@ -173,7 +178,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./paperless-ng.tar.xz
-          asset_name: paperless-ng-$GITHUB_REF#refs/heads/.tar.xz
+          asset_name: paperless-ng-${{ steps.get_branch_name.outputs.branch_name }}.tar.xz
           asset_content_type: application/x-xz
 
   # build and push image to docker hub.
