@@ -58,6 +58,7 @@
 									"with": "src/environments/environment.prod.ts"
 								}
 							],
+							"outputPath": "../src/documents/static/frontend/",
 							"optimization": true,
 							"outputHashing": "none",
 							"sourceMap": false,
