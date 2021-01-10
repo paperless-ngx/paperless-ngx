@@ -156,7 +156,7 @@ jobs:
       -
         id: get_branch_name
         run: |
-          branch_name=$(echo ${{ GITHUB_REF }} | cut -d/ -f3)
+          branch_name=$(echo ${{ github.ref }} | cut -d/ -f3)
           echo "::set-output name=branch_name::$branch_name"
       -
         name: Create Release
