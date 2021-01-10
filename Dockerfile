@@ -19,15 +19,15 @@ RUN npm install
 COPY src-ui .
 RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false
 
-FROM ubuntu:20.04
+FROM python:3.7-slim
 
 WORKDIR /usr/src/paperless/
 
-COPY Pipfile* ./
+COPY requirements.txt ./
 
 #Dependencies
 RUN apt-get update \
-  && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install \
+  && apt-get -y --no-install-recommends install \
 		build-essential \
 		curl \
 		file \
@@ -38,21 +38,16 @@ RUN apt-get update \
 		icc-profiles-free \
 		imagemagick \
 		libatlas-base-dev \
-		libffi-dev \
 		liblept5 \
 		libmagic-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \
 		libqpdf-dev \
-		libssl-dev \
 		libxml2 \
 		libxslt1-dev \
 		mime-support \
 		optipng \
 		pngquant \
-		python3 \
-		python3-pip \
-		python3-dev \
 		qpdf \
 		sudo \
 		tesseract-ocr \
@@ -64,13 +59,9 @@ RUN apt-get update \
 		tzdata \
 		unpaper \
 		zlib1g \
-
-  && pip3 install --upgrade supervisor pipenv setuptools \
-  && pipenv lock -r > requirements.txt \
-  && pip3 install -r requirements.txt \
-  && pipenv --clear \
-  && pip3 uninstall -y pipenv \
-	&& apt-get -y purge build-essential libqpdf-dev python3-dev python3-pip \
+	&& pip3 install --upgrade supervisor \
+  && python3 -m pip install -r requirements.txt \
+	&& apt-get -y purge build-essential libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
