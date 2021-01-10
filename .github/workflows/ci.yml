@@ -72,7 +72,7 @@ jobs:
       with:
         node-version: '15'
     - name: build
-      run: ./build-frontend.sh
+      run: ./compile-frontend.sh
     - uses: actions/upload-artifact@v2
       with:
         name: frontend-compiled
