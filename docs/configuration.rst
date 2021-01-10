@@ -423,6 +423,9 @@ PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>
     E.g. <CONSUMPTION_DIR>/foo/bar/file.pdf will add the tags "foo" and "bar" to
     the consumed file. Paperless will create any tags that don't exist yet.
 
+    This is useful for sorting documents with certain tags such as ``car`` or
+    ``todo`` prior to consumption. These folders won't be deleted.
+
     PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
 
     Defaults to false.
