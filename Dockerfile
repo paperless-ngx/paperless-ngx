@@ -25,6 +25,7 @@ RUN apt-get update \
 		gnupg \
 		icc-profiles-free \
 		imagemagick \
+		liblept5 \
 		libxslt1-dev \
 		mime-support \
 		optipng \
@@ -47,7 +48,6 @@ RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
 		libatlas-base-dev \
-		liblept5 \
 		libmagic-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \

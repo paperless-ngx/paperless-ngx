@@ -97,7 +97,7 @@ jobs:
         name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev gettext
+          sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev gettext liblept5
           pip3 install -r requirements.txt
       -
         uses: actions/download-artifact@v2
