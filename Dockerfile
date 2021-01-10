@@ -38,6 +38,7 @@ RUN apt-get update \
 		icc-profiles-free \
 		imagemagick \
 		libatlas-base-dev \
+		libffi-dev \
 		liblept5 \
 		libmagic-dev \
 		libpoppler-cpp-dev \
