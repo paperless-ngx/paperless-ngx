@@ -146,6 +146,7 @@ jobs:
   publish-release:
     runs-on: ubuntu-latest
     needs: build-release
+    if: contains(github.ref, 'refs/tags/ng-')
     steps:
       -
         name: Download Release Artifact
@@ -156,7 +157,7 @@ jobs:
       -
         id: get_branch_name
         run: |
-          branch_name=$(echo ${{ github.ref }} | cut -d/ -f3)
+          branch_name=$(echo ${{ github.ref }} | cut -d- -f2)
           echo "::set-output name=branch_name::$branch_name"
       -
         name: Create Release
@@ -167,8 +168,10 @@ jobs:
         with:
           tag_name: ${{ steps.get_branch_name.outputs.branch_name }}
           release_name: Paperless-ng ${{ steps.get_branch_name.outputs.branch_name }}
-          draft: true
+          draft: false
           prerelease: true
+          body: |
+            TODO: Insert changelog here (it's also in the documentation)
       -
         name: Upload Release Archive
         id: upload-release-asset
@@ -233,7 +236,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64 # ,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
           tags: jonaswinkler/paperless-ng:${{ steps.prepare.outputs.version }}
           cache-from: type=local,src=/tmp/.buildx-cache
