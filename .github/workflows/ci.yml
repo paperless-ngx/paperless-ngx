@@ -86,7 +86,19 @@ jobs:
     needs: [frontend, documentation] # tests
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      -
+        uses: actions/checkout@v2
+      -
+        name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      -
+        name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev gettext
+          pip3 install -r requirements.txt
       -
         uses: actions/download-artifact@v2
         with:
@@ -96,20 +108,34 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: documentation
-          path: src/documents/static/frontend/
+          path: docs/_build/html/
       -
+        name: Move files
         run: |
           mkdir dist
           mkdir dist/paperless-ng
           mkdir dist/paperless-ng/docker
           mkdir dist/paperless-ng/scripts
           cp .dockerignore .env docker-compose.* Dockerfile paperless.conf.example Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
-          cp docker/* dist/paperless-ng/docker/
-          cp scripts/* dist/paperless-ng/scripts/
-          cp src/ dist/paperless-ng/src -R
-          cd dist
-          tar -cJf paperless-ng.tar.xz paperless-ng/
-      - uses: actions/upload-artifact@v2
+          cp docker/*.* dist/paperless-ng/docker/
+          cp scripts/*.service scripts/*.sh dist/paperless-ng/scripts/
+          cp src/ dist/paperless-ng/src -r
+          cp docs/_build/html/ dist/paperless-ng/docs -r
+      -
+        name: Compile messages
+        run: |
+          cd dist/paperless-ng/src
+          python3 manage.py compilemessages
+      -
+        name: Collect static files
+        run: |
+          cd dist/paperless-ng/src
+          python3 manage.py collectstatic --no-input
+      -
+        name: Make release package
+        run: tar -cJf paperless-ng.tar.xz paperless-ng/
+      -
+        uses: actions/upload-artifact@v2
         with:
           name: release
           path: dist/paperless-ng/paperless-ng.tar.xz
