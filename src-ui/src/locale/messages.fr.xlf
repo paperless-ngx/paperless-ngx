@@ -11,7 +11,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="2155249406916744630">
         <source>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; saved successfully.</source>
-        <target>Vue &amp;quot;<x equiv-text="this.list.savedView.name" id="PH"/>&amp;quot; enregistrée avec succès.</target>
+        <target>Vue &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; enregistrée avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">94</context>
@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="6837554170707123455">
         <source>View &quot;<x equiv-text="savedView.name" id="PH"/>&quot; created successfully.</source>
-        <target>Vue &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; créée avec succès.</target>
+        <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; créée avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">115</context>
@@ -83,7 +83,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="72e7d343f9165602cce1ca7faffbc565fd31ef92">
         <source>Save &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
-        <target>Enregistrer &amp;quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&amp;quot;</target>
+        <target>Enregistrer &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
@@ -171,7 +171,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="5382975254277698192">
         <source>Do you really want to delete document &quot;<x equiv-text="this.document.title" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer le document &amp;quot;<x equiv-text="this.document.title" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer le document &quot;<x equiv-text="this.document.title" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">187</context>
@@ -427,7 +427,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="93754014749412887">
         <source>Do you really want to delete the tag &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer l'étiquette &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer l'étiquette &quot;<x equiv-text="object.name" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">30</context>
@@ -507,7 +507,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="4990731724078522539">
         <source>Do you really want to delete the document type &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer le type de document &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer le type de document &quot;<x equiv-text="object.name" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">26</context>
@@ -539,7 +539,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="5610279464668232148">
         <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; deleted.</source>
-        <target>Vue &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; supprimée.</target>
+        <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; supprimée.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">54</context>
@@ -587,7 +587,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13">
         <source>Appearance</source>
-        <target>Apparition</target>
+        <target>Affichage</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">13</context>
@@ -699,7 +699,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7427874343955308724">
         <source>Do you really want to delete the correspondent &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer le correspondant &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer le correspondant &quot;<x equiv-text="object.name" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">26</context>
@@ -867,7 +867,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="afa760e48c97d64d19c1455d18b7834a2256e23f">
         <source>Did you mean &quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&quot;?</source>
-        <target>Vouliez-vous dire &amp;quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&amp;quot; ?</target>
+        <target>Vouliez-vous dire &quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
           <context context-type="linenumber">13</context>
@@ -1189,7 +1189,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="8639884465898458690">
         <source>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; and &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</source>
-        <target>&amp;quot;<x equiv-text="items[0].name" id="PH"/>&amp;quot; et &amp;quot;<x equiv-text="items[1].name" id="PH_1"/>&amp;quot;</target>
+        <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; et &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">114</context>
@@ -1198,7 +1198,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7894972847287473517">
         <source>&quot;<x equiv-text="i.name" id="PH"/>&quot;</source>
-        <target>&amp;quot;<x equiv-text="i.name" id="PH"/>&amp;quot;</target>
+        <target>&quot;<x equiv-text="i.name" id="PH"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">116</context>
@@ -1215,7 +1215,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="1822679894391095557">
         <source><x equiv-text="list" id="PH"/> and &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</source>
-        <target><x equiv-text="list" id="PH"/> et &amp;quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&amp;quot;</target>
+        <target><x equiv-text="list" id="PH"/> et &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">117</context>
@@ -1232,7 +1232,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="6619516195038467207">
         <source>This operation will add the tag &quot;<x equiv-text="tag.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action affectera l'étiquette &amp;quot;<x equiv-text="tag.name" id="PH"/>&amp;quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
+        <target>Cette action affectera l'étiquette &quot;<x equiv-text="tag.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">129</context>
@@ -1248,7 +1248,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7181166515756808573">
         <source>This operation will remove the tag &quot;<x equiv-text="tag.name" id="PH"/>&quot; from <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action supprimera l'étiquette &amp;quot;<x equiv-text="tag.name" id="PH"/>&amp;quot; de(s) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
+        <target>Cette action supprimera l'étiquette &quot;<x equiv-text="tag.name" id="PH"/>&quot; de(s) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">134</context>
@@ -1280,7 +1280,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="6900893559485781849">
         <source>This operation will assign the correspondent &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action affectera le correspondant &amp;quot;<x equiv-text="correspondent.name" id="PH"/>&amp;quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/>document(s) sélectionné(s).</target>
+        <target>Cette action affectera le correspondant &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/>document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">160</context>
@@ -1304,7 +1304,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="332180123895325027">
         <source>This operation will assign the document type &quot;<x equiv-text="documentType.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action affectera le type de document &amp;quot;<x equiv-text="documentType.name" id="PH"/>&amp;quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
+        <target>Cette action affectera le type de document &quot;<x equiv-text="documentType.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">183</context>
@@ -1824,7 +1824,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7517655726614958140">
         <source>Any: Document contains any of these words (space separated)</source>
-        <target>Un des mots : le document contient l'un de ces mots (séparés par des espaces)</target>
+        <target>Un des mots : contient l'un de ces mots (séparés par des espaces)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
@@ -1840,7 +1840,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="111914402588955480">
         <source>All: Document contains all of these words (space separated)</source>
-        <target>Tous les mots : le document contient tous ces mots (séparés par des espaces)</target>
+        <target>Tous les mots : contient tous ces mots (séparés par des espaces)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
@@ -1856,7 +1856,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7109184332944610787">
         <source>Exact: Document contains this string</source>
-        <target>Concordance exacte : le document contient cette chaîne de caractères</target>
+        <target>Concordance exacte : contient cette chaîne de caractères</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
@@ -1872,7 +1872,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7548151332424148033">
         <source>Regular expression: Document matches this regular expression</source>
-        <target>Expression régulière : le document correspond à cette expression régulière</target>
+        <target>Expression régulière : correspond à cette expression régulière</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
@@ -1888,7 +1888,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="8419167206585286450">
         <source>Fuzzy: Document contains a word similar to this word</source>
-        <target>Mot approximatif : le document contient un mot similaire à ce mot</target>
+        <target>Mot approximatif : contient un mot similaire à ce mot</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>

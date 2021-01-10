@@ -93,11 +93,11 @@ msgstr ""
 
 #: documents/models.py:114
 msgid "tag"
-msgstr "tag"
+msgstr "etiket"
 
 #: documents/models.py:115 documents/models.py:171
 msgid "tags"
-msgstr "tags"
+msgstr "etiketten"
 
 #: documents/models.py:121 documents/models.py:153
 msgid "document type"
@@ -285,11 +285,11 @@ msgstr "zit in \"Postvak in\""
 
 #: documents/models.py:380
 msgid "has tag"
-msgstr "heeft tag"
+msgstr "heeft etiket"
 
 #: documents/models.py:381
 msgid "has any tag"
-msgstr "heeft elke tag"
+msgstr "heeft één van de etiketten"
 
 #: documents/models.py:382
 msgid "created before"
@@ -329,7 +329,7 @@ msgstr "gewijzigd na"
 
 #: documents/models.py:391
 msgid "does not have tag"
-msgstr "heeft geen tag"
+msgstr "heeft geen etiket"
 
 #: documents/models.py:402
 msgid "rule type"

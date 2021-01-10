@@ -5,8 +5,8 @@
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#funnel" />
       </svg>&nbsp;<ng-container i18n>Filter</ng-container>
-      
-      
+
+
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
       <button *ngFor="let f of getLevels()" ngbDropdownItem (click)="setLevel(f.id)"
@@ -16,9 +16,9 @@
 
 </app-page-header>
 
-<div class="bg-dark p-3 mb-3" infiniteScroll (scrolled)="onScroll()">
+<div class="bg-dark p-3 mb-3 text-light text-monospace" infiniteScroll (scrolled)="onScroll()">
   <p
-    class="text-light text-monospace m-0 p-0 log-entry-{{log.level}}"
+    class="m-0 p-0 log-entry-{{log.level}}"
     *ngFor="let log of logs">
       {{log.created | date:'short'}}
       {{getLevelText(log.level)}}
