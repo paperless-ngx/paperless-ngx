@@ -1,6 +1,7 @@
 <!doctype html>
 
 {% load static %}
+{% load i18n %}
 
 <html lang="en">
   <head>
@@ -9,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.1.1">
-    <title>Paperless Sign In</title>
+    <title>{% translate "Paperless-ng sign in" %}</title>
 
     <!-- Bootstrap core CSS -->
 		<link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
@@ -38,17 +39,19 @@
     <form class="form-signin" method="post">
 			{% csrf_token %}
 			<img class="mb-4" src="{% static 'frontend/en-US/assets/logo.svg' %}" alt="" width="300">
-			<p>Please sign in.</p>
+			<p>{% translate "Please sign in." %}</p>
 			{% if form.errors %}
 				<div class="alert alert-danger" role="alert">
-					Your username and password didn't match. Please try again.
+					{% translate "Your username and password didn't match. Please try again." %}
 				</div>
 			{% endif %}
-			<label for="inputUsername" class="sr-only">Username</label>
-			<input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
-			<label for="inputPassword" class="sr-only">Password</label>
-			<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
-			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+			{% translate "Username" as i18n_username %}
+			{% translate "Password" as i18n_password %}
+			<label for="inputUsername" class="sr-only">{{ i18n_username }}</label>
+			<input type="text" name="username" id="inputUsername" class="form-control" placeholder="{{ i18n_username }}" required autofocus>
+			<label for="inputPassword" class="sr-only">{{ i18n_password }}</label>
+			<input type="password" name="password" id="inputPassword" class="form-control" placeholder="{{ i18n_password }}" required>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">{% translate "Sign in" %}</button>
 		</form>
 	</body>
 </html>
