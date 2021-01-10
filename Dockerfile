@@ -65,8 +65,9 @@ RUN apt-get update \
 		unpaper \
 		zlib1g \
 
-	&& pip3 install --upgrade supervisor pipenv setuptools \
-  && pipenv install --system --deploy --ignore-pipfile \
+  && pip3 install --upgrade supervisor pipenv setuptools \
+  && pipenv lock -r > requirements.txt \
+  && pip3 install -r requirements.txt \
   && pipenv --clear \
   && pip3 uninstall -y pipenv \
 	&& apt-get -y purge build-essential libqpdf-dev python3-dev python3-pip \
