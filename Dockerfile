@@ -44,6 +44,7 @@ RUN apt-get update \
 		libpoppler-cpp-dev \
 		libpq-dev \
 		libqpdf-dev \
+		libssl-dev \
 		libxml2 \
 		libxslt1-dev \
 		mime-support \
