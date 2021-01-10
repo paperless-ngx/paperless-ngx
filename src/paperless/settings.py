@@ -253,6 +253,7 @@ if os.getenv("PAPERLESS_DBHOST"):
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
         "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
+        'OPTIONS': {'sslmode': os.getenv("PAPERLESS_DBSSLMODE", "prefer")},
     }
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
