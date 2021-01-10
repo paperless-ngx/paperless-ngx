@@ -140,7 +140,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: release
-          path: dist/paperless-ng/paperless-ng.tar.xz
+          path: dist/paperless-ng.tar.xz
 
 
   # build and push image to docker hub.
