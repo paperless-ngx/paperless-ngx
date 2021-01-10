@@ -30,6 +30,10 @@ jobs:
         run: |
           cd docs/
           make html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: documentation
+          path: docs/_build/html/
 
   tests:
     runs-on: ubuntu-20.04
@@ -77,6 +81,39 @@ jobs:
       with:
         name: frontend-compiled
         path: src/documents/static/frontend/
+
+  release:
+    needs: [frontend, documentation] # tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      -
+        uses: actions/download-artifact@v2
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+      -
+        uses: actions/download-artifact@v2
+        with:
+          name: documentation
+          path: src/documents/static/frontend/
+      -
+        run: |
+          mkdir dist
+          mkdir dist/paperless-ng
+          mkdir dist/paperless-ng/docker
+          mkdir dist/paperless-ng/scripts
+          cp .dockerignore .env docker-compose.* Dockerfile paperless.conf.example Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
+          cp docker/* dist/paperless-ng/docker/
+          cp scripts/* dist/paperless-ng/scripts/
+          cp src/ dist/paperless-ng/src -R
+          cd dist
+          tar -cJf paperless-ng.tar.xz paperless-ng/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: dist/paperless-ng/paperless-ng.tar.xz
+
 
   # build and push image to docker hub.
   build-docker-image:
