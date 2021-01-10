@@ -1,6 +1,7 @@
 <!doctype html>
 
 {% load static %}
+{% load i18n %}
 
 <html lang="en">
 <head>
@@ -16,7 +17,7 @@
 	<link rel="stylesheet" href="{% static styles_css %}">
 </head>
 <body>
-  <app-root>Loading...</app-root>
+  <app-root>{% translate "Paperless-ng is loading..." %}</app-root>
 	<script src="{% static runtime_js %}" defer></script>
 	<script src="{% static polyfills_js %}" defer></script>
 	<script src="{% static main_js %}" defer></script>
