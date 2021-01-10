@@ -133,7 +133,9 @@ jobs:
           python3 manage.py collectstatic --no-input
       -
         name: Make release package
-        run: tar -cJf paperless-ng.tar.xz paperless-ng/
+        run: |
+          cd dist
+          tar -cJf paperless-ng.tar.xz paperless-ng/
       -
         uses: actions/upload-artifact@v2
         with:
