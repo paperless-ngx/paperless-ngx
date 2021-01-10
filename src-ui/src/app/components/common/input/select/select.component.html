@@ -6,9 +6,11 @@
       [style.color]="textColor"
       [style.background]="backgroundColor"
       [clearable]="allowNull"
+      [items]="items"
+      bindLabel="name"
+      bindValue="id"
       (change)="onChange(value)"
       (blur)="onTouched()">
-      <ng-option *ngFor="let i of items" [value]="i.id">{{i.name}}</ng-option>
     </ng-select>
 
     <div *ngIf="showPlusButton()" class="input-group-append">

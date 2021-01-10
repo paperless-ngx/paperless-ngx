@@ -53,6 +53,12 @@ PAPERLESS_DBPASS=<password>
 
     Defaults to "paperless".
 
+PAPERLESS_DBSSLMODE=<mode>
+    SSL mode to use when connecting to PostgreSQL.
+
+    See `the official documentation about sslmode <https://www.postgresql.org/docs/current/libpq-ssl.html>`_.
+
+    Default is ``prefer``.
 
 Paths and folders
 #################

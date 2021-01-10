@@ -13,6 +13,7 @@
 #PAPERLESS_DBNAME=paperless
 #PAPERLESS_DBUSER=paperless
 #PAPERLESS_DBPASS=paperless
+#PAPERLESS_DBSSLMODE=prefer
 
 # Paths and folders
 
