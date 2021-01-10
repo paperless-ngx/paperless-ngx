@@ -17,28 +17,31 @@ COPY requirements.txt ./
 # Binary dependencies
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
+  	# Basic dependencies
 		curl \
 		file \
 		fonts-liberation \
 		gettext \
-		ghostscript \
 		gnupg \
-		icc-profiles-free \
 		imagemagick \
-		liblept5 \
 		libxslt1-dev \
 		mime-support \
 		optipng \
+		sudo \
+		tzdata \
+  	# OCRmyPDF dependencies
+		ghostscript \
+		icc-profiles-free \
+		liblept5 \
+		libxml2 \
 		pngquant \
 		qpdf \
-		sudo \
 		tesseract-ocr \
 		tesseract-ocr-eng \
 		tesseract-ocr-deu \
 		tesseract-ocr-fra \
 		tesseract-ocr-ita \
 		tesseract-ocr-spa \
-		tzdata \
 		unpaper \
 		zlib1g \
 		&& rm -rf /var/lib/apt/lists/*
@@ -52,7 +55,6 @@ RUN apt-get update \
 		libpoppler-cpp-dev \
 		libpq-dev \
 		libqpdf-dev \
-		libxml2 \
 	&& python3 -m pip install --upgrade --no-cache-dir supervisor \
   && python3 -m pip install --no-cache-dir -r requirements.txt \
 	&& apt-get -y purge build-essential libqpdf-dev \
