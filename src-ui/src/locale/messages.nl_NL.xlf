@@ -427,7 +427,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="93754014749412887">
         <source>Do you really want to delete the tag &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Wil je de tag echt verwijderen &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot;?</target>
+        <target>Wil je het etiket echt verwijderen &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot;?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">30</context>
@@ -435,7 +435,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="cafc87479686947e2590b9f588a88040aeaf660b">
         <source>Tags</source>
-        <target>Tags</target>
+        <target>Etiketten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">1</context>
@@ -1808,7 +1808,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="5467489005440577210">
         <source>Error while deleting element: <x equiv-text="JSON.stringify(error.error)" id="PH"/></source>
-        <target>Fout bij het verwijderen van een element: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
+        <target>Fout bij het verwijderen van het element: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">93</context>
