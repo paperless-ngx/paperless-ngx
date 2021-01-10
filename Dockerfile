@@ -8,27 +8,15 @@ RUN git clone https://github.com/agl/jbig2enc .
 RUN ./autogen.sh
 RUN ./configure && make
 
-
-FROM node:15 AS frontend
-
-WORKDIR /usr/src/paperless/src-ui/
-
-COPY src-ui/package* ./
-RUN npm install
-
-COPY src-ui .
-RUN node_modules/.bin/ng build --prod --output-hashing none --sourceMap=false
-
 FROM python:3.7-slim
 
 WORKDIR /usr/src/paperless/
 
 COPY requirements.txt ./
 
-#Dependencies
+# Binary dependencies
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
-		build-essential \
 		curl \
 		file \
 		fonts-liberation \
@@ -37,13 +25,6 @@ RUN apt-get update \
 		gnupg \
 		icc-profiles-free \
 		imagemagick \
-		libatlas-base-dev \
-		liblept5 \
-		libmagic-dev \
-		libpoppler-cpp-dev \
-		libpq-dev \
-		libqpdf-dev \
-		libxml2 \
 		libxslt1-dev \
 		mime-support \
 		optipng \
@@ -59,8 +40,21 @@ RUN apt-get update \
 		tzdata \
 		unpaper \
 		zlib1g \
-	&& pip3 install --upgrade supervisor \
-  && python3 -m pip install -r requirements.txt \
+		&& rm -rf /var/lib/apt/lists/*
+
+# Python dependencies
+RUN apt-get update \
+  && apt-get -y --no-install-recommends install \
+		build-essential \
+		libatlas-base-dev \
+		liblept5 \
+		libmagic-dev \
+		libpoppler-cpp-dev \
+		libpq-dev \
+		libqpdf-dev \
+		libxml2 \
+	&& python3 -m pip install --upgrade --no-cache-dir supervisor \
+  && python3 -m pip install --no-cache-dir -r requirements.txt \
 	&& apt-get -y purge build-essential libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
@@ -81,7 +75,6 @@ COPY --from=jbig2enc /usr/src/jbig2enc/src/*.h /usr/local/include/
 
 # copy app
 COPY src/ ./src/
-COPY --from=frontend /usr/src/paperless/src-ui/dist/paperless-ui/ /usr/src/paperless/src/documents/static/frontend/
 
 # add users, setup scripts
 RUN addgroup --gid 1000 paperless \
