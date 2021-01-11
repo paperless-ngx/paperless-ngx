@@ -15,8 +15,7 @@ WORKDIR /usr/src/paperless/
 COPY requirements.txt ./
 
 # Binary dependencies
-RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
-  && apt-get update \
+RUN apt-get update \
   && apt-get -y --no-install-recommends install \
   	# Basic dependencies
 		curl \
