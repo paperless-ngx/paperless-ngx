@@ -154,7 +154,7 @@ Install Paperless from Docker Hub
 
         You can use any settings from the file ``paperless.conf.example`` in this file.
         Have a look at :ref:`configuration` to see whats available.
-    
+
     .. caution::
 
         Certain file systems such as NFS network shares don't support file system
@@ -194,7 +194,7 @@ Build the docker image yourself
     .. code:: shell-session
 
         git clone https://github.com/jonaswinkler/paperless-ng
-    
+
     The master branch always reflects the latest stable version.
 
 2.  Copy one of the ``docker-compose.*.yml`` to ``docker-compose.yml``,
@@ -203,11 +203,11 @@ Build the docker image yourself
 
 3.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
     ``docker-compose up -d`` to start the containers, do
-    
+
     .. code:: shell-session
 
         $ docker-compose build
-    
+
     before that to build the image.
 
 .. _setup-bare_metal:
@@ -225,7 +225,7 @@ writing. Windows is not and will never be supported.
     *   ``python3-pip``, optionally ``pipenv`` for package installation
     *   ``python3-dev``
 
-    *   ``gettext`` for localization
+    *   ``gettext`` for compiling interface translations
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
     *   ``optipng`` for optimizing thumbnails
@@ -270,7 +270,7 @@ writing. Windows is not and will never be supported.
         paperless stores its data. If you like, you can point both to the same directory.
     *   ``PAPERLESS_SECRET_KEY`` should be a random sequence of characters. It's used for authentication. Failure
         to do so allows third parties to forge authentication credentials.
-    
+
     Many more adjustments can be made to paperless, especially the OCR part. The following options are recommended
     for everyone:
 
@@ -279,7 +279,7 @@ writing. Windows is not and will never be supported.
 
 6.  Setup permissions. Create a system users under which you wish to run paperless. Ensure that these directories exist
     and that the user has write permissions to the following directories
-    
+
     *   ``/opt/paperless/media``
     *   ``/opt/paperless/data``
     *   ``/opt/paperless/consume``
@@ -295,10 +295,10 @@ writing. Windows is not and will never be supported.
 
         # This collects static files from paperless and django.
         python3 manage.py collectstatic --clear --no-input
-        
+
         # This creates the database schema.
         python3 manage.py migrate
-        
+
         # This creates the translation files for paperless.
         python3 manage.py compilemessages
 
@@ -311,7 +311,7 @@ writing. Windows is not and will never be supported.
 
         # This collects static files from paperless and django.
         python3 manage.py runserver
-    
+
     and pointing your browser to http://localhost:8000/.
 
     .. warning::
@@ -364,13 +364,13 @@ writing. Windows is not and will never be supported.
     .. code::
 
         <policy domain="coder" rights="none" pattern="PDF" />
-    
+
     to
 
     .. code::
 
         <policy domain="coder" rights="read|write" pattern="PDF" />
-    
+
 13. Optional: Install the `jbig2enc <https://ocrmypdf.readthedocs.io/en/latest/jbig2.html>`_
     encoder. This will reduce the size of generated PDF documents. You'll most likely need
     to compile this by yourself, because this software has been patented until around 2017 and
@@ -442,7 +442,7 @@ Migration to paperless-ng is then performed in a few simple steps:
     .. code:: shell-session
 
         $ docker-compose run --rm webserver document_index reindex
-    
+
     This will migrate your database and create the search index. After that,
     paperless will take care of maintaining the index by itself.
 
@@ -503,9 +503,9 @@ management commands as below.
 
             $ cd /path/to/paperless
             $ docker-compose run --rm webserver /bin/bash
-        
+
         This will launch the container and initialize the PostgreSQL database.
-    
+
     b)  Without docker, open a shell in your virtual environment, switch to
         the ``src`` directory and create the database schema:
 
@@ -515,7 +515,7 @@ management commands as below.
             $ pipenv shell
             $ cd src
             $ python3 manage.py migrate
-        
+
         This will not copy any data yet.
 
 4.  Dump your data from SQLite:
@@ -523,7 +523,7 @@ management commands as below.
     .. code:: shell-session
 
         $ python3 manage.py dumpdata --database=sqlite --exclude=contenttypes --exclude=auth.Permission > data.json
-    
+
 5.  Load your data into PostgreSQL:
 
     .. code:: shell-session
@@ -574,7 +574,7 @@ as well.
 Considerations for less powerful devices
 ########################################
 
-Paperless runs on Raspberry Pi. However, some things are rather slow on the Pi and 
+Paperless runs on Raspberry Pi. However, some things are rather slow on the Pi and
 configuring some options in paperless can help improve performance immensely:
 
 *   Stick with SQLite to save some resources.
@@ -596,15 +596,15 @@ configuring some options in paperless can help improve performance immensely:
 For details, refer to :ref:`configuration`.
 
 .. note::
-    
+
     Updating the :ref:`automatic matching algorithm <advanced-automatic_matching>`
     takes quite a bit of time. However, the update mechanism checks if your
-    data has changed before doing the heavy lifting. If you experience the 
+    data has changed before doing the heavy lifting. If you experience the
     algorithm taking too much cpu time, consider changing the schedule in the
     admin interface to daily. You can also manually invoke the task
     by changing the date and time of the next run to today/now.
 
-    The actual matching of the algorithm is fast and works on Raspberry Pi as 
+    The actual matching of the algorithm is fast and works on Raspberry Pi as
     well as on any other device.
 
 .. _redis: https://redis.io/
