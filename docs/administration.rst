@@ -48,9 +48,6 @@ Options available to bare-metal and non-docker installations:
 Restoring
 =========
 
-
-
-
 .. _administration-updating:
 
 Updating Paperless
@@ -84,9 +81,11 @@ B.  If you built the image yourself, do the following:
     .. code:: shell-session
 
         $ git pull
+        $ ./compile-frontend.sh
         $ docker-compose build
         $ docker-compose up
 
+Running `docker-compose up` will also apply any new database migrations.
 If you see everything working, you can start paperless-ng with "-d" to have it
 run in the background.
 
