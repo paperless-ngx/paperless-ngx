@@ -65,8 +65,8 @@ target/
 .virtualenv
 virtualenv
 /venv
-docker-compose.env
-docker-compose.yml
+/docker-compose.env
+/docker-compose.yml
 
 # Used for development
 scripts/import-for-development
