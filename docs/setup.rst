@@ -97,9 +97,10 @@ run the above mentioned components yourself.
 Install Paperless from Docker Hub
 =================================
 
-1.  Go to the `project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/hub>`_
+1.  Go to the `/docker/hub directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/hub>`_
     and download one of the ``docker-compose.*.yml`` files, depending on which database backend you
-    want to use. Download the ``docker-compose.env`` file and the ``.env`` file as well and store them
+    want to use. Rename this file to `docker-compose.yml`.
+    Download the ``docker-compose.env`` file and the ``.env`` file as well and store them
     in the same directory.
 
     .. hint::
@@ -123,7 +124,6 @@ Install Paperless from Docker Hub
 
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
         .. _docker-compose installation guide: https://docs.docker.com/compose/install/
-
 
 3.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
     to the consumption directory in this file. Find the line that specifies where
@@ -201,7 +201,9 @@ Build the docker image yourself
     depending on which database backend you want to use. Copy
     ``docker-compose.env.example`` to ``docker-compose.env``.
 
-3.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
+3.  Run the `compile-frontend.sh` script. This requires `node` and `npm`.
+
+4.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
     ``docker-compose up -d`` to start the containers, do
 
     .. code:: shell-session
@@ -422,12 +424,7 @@ Migration to paperless-ng is then performed in a few simple steps:
 5.  Adjust ``docker-compose.yml`` and ``docker-compose.env`` to your needs.
     See :ref:`setup-docker_hub` for details on which edits are advised.
 
-6.  Since ``docker-compose`` would just use the the old paperless image, we need to
-    manually build a new image:
-
-    .. code:: shell-session
-
-        $ docker-compose build
+6.  :ref:`Update paperless. <administration-updating>`
 
 7.  In order to find your existing documents with the new search feature, you need
     to invoke a one-time operation that will create the search index:
