@@ -20,7 +20,7 @@
         </div>
       </div>
       <div *ngIf="selectionModel.items" class="items">
-        <ng-container *ngFor="let item of (editing ? selectionModel.itemsSorted : selectionModel.items) | filter: filterText">
+        <ng-container *ngFor="let item of selectionModel.itemsSorted | filter: filterText">
           <app-toggleable-dropdown-button *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" (toggle)="selectionModel.toggle(item.id)"></app-toggleable-dropdown-button>
         </ng-container>
       </div>
