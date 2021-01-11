@@ -199,7 +199,7 @@ class MailAccountHandler(LoggingMixin):
 
         try:
             messages = M.fetch(criteria=AND(**criterias),
-                               mark_seen=False)
+                               mark_seen=False, charset='UTF-8')
         except Exception:
             raise MailError(
                 f"Rule {rule}: Error while fetching folder {rule.folder}")
