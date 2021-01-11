@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-06 19:50+0000\n"
+"POT-Creation-Date: 2021-01-10 21:41+0000\n"
 "PO-Revision-Date: 2020-12-30 19:27+0000\n"
 "Last-Translator: Jonas Winkler, 2021\n"
 "Language-Team: German (https://www.transifex.com/paperless/teams/115905/de/)\n"
@@ -50,7 +50,7 @@ msgid "Automatic"
 msgstr "Automatisch"
 
 #: documents/models.py:41 documents/models.py:354 paperless_mail/models.py:25
-#: paperless_mail/models.py:111
+#: paperless_mail/models.py:109
 msgid "name"
 msgstr "Name"
 
@@ -346,6 +346,48 @@ msgstr "Filterregel"
 msgid "filter rules"
 msgstr "Filterregeln"
 
+#: documents/templates/index.html:20
+msgid "Paperless-ng is loading..."
+msgstr "Paperless-ng wird geladen..."
+
+#: documents/templates/registration/logged_out.html:13
+msgid "Paperless-ng signed out"
+msgstr "Paperless-ng abgemeldet"
+
+#: documents/templates/registration/logged_out.html:41
+msgid "You have been successfully logged out. Bye!"
+msgstr "Sie wurden erfolgreich abgemeldet. Auf Wiedersehen!"
+
+#: documents/templates/registration/logged_out.html:42
+msgid "Sign in again"
+msgstr "Erneut anmelden"
+
+#: documents/templates/registration/login.html:13
+msgid "Paperless-ng sign in"
+msgstr "Paperless-ng Anmeldung"
+
+#: documents/templates/registration/login.html:42
+msgid "Please sign in."
+msgstr "Bitte melden Sie sich an."
+
+#: documents/templates/registration/login.html:45
+msgid "Your username and password didn't match. Please try again."
+msgstr ""
+"Ihr Benutzername und Passwort stimmen nicht überein. Bitte versuchen Sie es "
+"erneut."
+
+#: documents/templates/registration/login.html:48
+msgid "Username"
+msgstr "Benutzername"
+
+#: documents/templates/registration/login.html:49
+msgid "Password"
+msgstr "Passwort"
+
+#: documents/templates/registration/login.html:54
+msgid "Sign in"
+msgstr "Anmelden"
+
 #: paperless/settings.py:268
 msgid "English"
 msgstr "Englisch"
@@ -456,7 +498,7 @@ msgstr "Benutzername"
 
 #: paperless_mail/models.py:50
 msgid "password"
-msgstr "Password"
+msgstr "Passwort"
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
@@ -470,79 +512,79 @@ msgstr "E-Mail-Regeln"
 msgid "Only process attachments."
 msgstr "Nur Anhänge verarbeiten."
 
-#: paperless_mail/models.py:70
+#: paperless_mail/models.py:68
 msgid "Process all files, including 'inline' attachments."
 msgstr "Alle Dateien verarbeiten, auch 'inline'-Anhänge."
 
-#: paperless_mail/models.py:80
+#: paperless_mail/models.py:78
 msgid "Mark as read, don't process read mails"
 msgstr "Als gelesen markieren, gelesene E-Mails nicht verarbeiten"
 
-#: paperless_mail/models.py:81
+#: paperless_mail/models.py:79
 msgid "Flag the mail, don't process flagged mails"
 msgstr "Als wichtig markieren, markierte E-Mails nicht verarbeiten"
 
-#: paperless_mail/models.py:82
+#: paperless_mail/models.py:80
 msgid "Move to specified folder"
 msgstr "In angegebenen Ordner verschieben"
 
-#: paperless_mail/models.py:83
+#: paperless_mail/models.py:81
 msgid "Delete"
 msgstr "Löschen"
 
-#: paperless_mail/models.py:90
+#: paperless_mail/models.py:88
 msgid "Use subject as title"
 msgstr "Betreff als Titel verwenden"
 
-#: paperless_mail/models.py:91
+#: paperless_mail/models.py:89
 msgid "Use attachment filename as title"
 msgstr "Dateiname des Anhangs als Titel verwenden"
 
-#: paperless_mail/models.py:101
+#: paperless_mail/models.py:99
 msgid "Do not assign a correspondent"
 msgstr "Keinen Korrespondenten zuweisen"
 
-#: paperless_mail/models.py:103
+#: paperless_mail/models.py:101
 msgid "Use mail address"
 msgstr "E-Mail-Adresse benutzen"
 
-#: paperless_mail/models.py:105
+#: paperless_mail/models.py:103
 msgid "Use name (or mail address if not available)"
 msgstr "Absendername benutzen (oder E-Mail-Adressen, wenn nicht verfügbar)"
 
-#: paperless_mail/models.py:107
+#: paperless_mail/models.py:105
 msgid "Use correspondent selected below"
 msgstr "Nachfolgend ausgewählten Korrespondent verwenden"
 
-#: paperless_mail/models.py:115
+#: paperless_mail/models.py:113
 msgid "order"
 msgstr "Reihenfolge"
 
-#: paperless_mail/models.py:122
+#: paperless_mail/models.py:120
 msgid "account"
 msgstr "Konto"
 
-#: paperless_mail/models.py:126
+#: paperless_mail/models.py:124
 msgid "folder"
 msgstr "Ordner"
 
-#: paperless_mail/models.py:130
+#: paperless_mail/models.py:128
 msgid "filter from"
 msgstr "Absender filtern"
 
-#: paperless_mail/models.py:133
+#: paperless_mail/models.py:131
 msgid "filter subject"
 msgstr "Betreff filtern"
 
-#: paperless_mail/models.py:136
+#: paperless_mail/models.py:134
 msgid "filter body"
 msgstr "Nachrichteninhalt filtern"
 
-#: paperless_mail/models.py:140
+#: paperless_mail/models.py:138
 msgid "filter attachment filename"
 msgstr "Anhang-Dateiname filtern"
 
-#: paperless_mail/models.py:142
+#: paperless_mail/models.py:140
 msgid ""
 "Only consume documents which entirely match this filename if specified. "
 "Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -551,19 +593,19 @@ msgstr ""
 "entsprechen. Platzhalter wie *.pdf oder *rechnung* sind erlaubt. Groß- und "
 "Kleinschreibung ist irrelevant."
 
-#: paperless_mail/models.py:148
+#: paperless_mail/models.py:146
 msgid "maximum age"
 msgstr "Maximales Alter"
 
-#: paperless_mail/models.py:150
+#: paperless_mail/models.py:148
 msgid "Specified in days."
 msgstr "Angegeben in Tagen."
 
-#: paperless_mail/models.py:153
+#: paperless_mail/models.py:151
 msgid "attachment type"
 msgstr "Dateianhangstyp"
 
-#: paperless_mail/models.py:156
+#: paperless_mail/models.py:154
 msgid ""
 "Inline attachments include embedded images, so it's best to combine this "
 "option with a filename filter."
@@ -571,15 +613,15 @@ msgstr ""
 "'Inline'-Anhänge schließen eingebettete Bilder mit ein, daher sollte diese "
 "Einstellung mit einem Dateinamenfilter kombiniert werden."
 
-#: paperless_mail/models.py:161
+#: paperless_mail/models.py:159
 msgid "action"
 msgstr "Aktion"
 
-#: paperless_mail/models.py:167
+#: paperless_mail/models.py:165
 msgid "action parameter"
 msgstr "Parameter für Aktion"
 
-#: paperless_mail/models.py:169
+#: paperless_mail/models.py:167
 msgid ""
 "Additional parameter for the action selected above, i.e., the target folder "
 "of the move to folder action."
@@ -587,22 +629,22 @@ msgstr ""
 "Zusätzlicher Parameter für die oben ausgewählte Aktion, zum Beispiel der "
 "Zielordner für die Aktion \"In angegebenen Ordner verschieben\""
 
-#: paperless_mail/models.py:175
+#: paperless_mail/models.py:173
 msgid "assign title from"
 msgstr "Titel zuweisen von"
 
-#: paperless_mail/models.py:185
+#: paperless_mail/models.py:183
 msgid "assign this tag"
 msgstr "Dieses Tag zuweisen"
 
-#: paperless_mail/models.py:193
+#: paperless_mail/models.py:191
 msgid "assign this document type"
 msgstr "Diesen Dokumenttyp zuweisen"
 
-#: paperless_mail/models.py:197
+#: paperless_mail/models.py:195
 msgid "assign correspondent from"
 msgstr "Korrespondent zuweisen von"
 
-#: paperless_mail/models.py:207
+#: paperless_mail/models.py:205
 msgid "assign this correspondent"
 msgstr "Diesen Korrespondent zuweisen"
