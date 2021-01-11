@@ -19,8 +19,13 @@ export class FilterableDropdownSelectionModel {
   items: MatchingModel[] = []
 
   get itemsSorted(): MatchingModel[] {
+    // TODO: this is getting called very often
     return this.items.sort((a,b) => {
-      if (this.getNonTemporary(a.id) == ToggleableItemState.NotSelected && this.getNonTemporary(b.id) != ToggleableItemState.NotSelected) {
+      if (a.id == null && b.id != null) {
+        return -1
+      } else if (a.id != null && b.id == null) {
+        return 1
+      } else if (this.getNonTemporary(a.id) == ToggleableItemState.NotSelected && this.getNonTemporary(b.id) != ToggleableItemState.NotSelected) {
         return 1
       } else if (this.getNonTemporary(a.id) != ToggleableItemState.NotSelected && this.getNonTemporary(b.id) == ToggleableItemState.NotSelected) {
         return -1
