@@ -1,11 +1,10 @@
 <app-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="mr-2">
-    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
+  <div ngbDropdown class="mr-2 flex-fill d-flex">
+    <button class="btn btn-sm btn-outline-primary flex-fill" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>&nbsp;<span class="d-none d-md-inline" i18n>Select</span>
-
+      </svg>&nbsp;<ng-container i18n>Select</ng-container>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
@@ -14,7 +13,7 @@
     </div>
   </div>
 
-  <div class="btn-group btn-group-toggle" ngbRadioGroup [(ngModel)]="displayMode"
+  <div class="btn-group btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="displayMode"
     (ngModelChange)="saveDisplayMode()">
     <label ngbButtonLabel class="btn-outline-primary btn-sm">
       <input ngbButton type="radio" class="btn btn-sm" value="details">
@@ -36,48 +35,42 @@
     </label>
   </div>
 
-  <div class="btn-group ml-2 flex-fill">
-    <div ngbDropdown class="btn-group flex-fill">
-      <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort by</button>
-      <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow">
-        <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="list.sortReverse">
-          <label ngbButtonLabel class="btn-outline-primary btn-sm mx-2 flex-fill">
-            <input ngbButton type="radio" class="btn btn-sm" [value]="false">
-            <svg class="toolbaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
-            </svg>
-          </label>
-          <label ngbButtonLabel class="btn-outline-primary btn-sm mr-2 flex-fill">
-            <input ngbButton type="radio" class="btn btn-sm" [value]="true">
-            <svg class="toolbaricon" fill="currentColor">
-              <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
-            </svg>
-          </label>
-        </div>
-        <div>
-          <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="list.sortField = f.field"
-            [class.active]="list.sortField == f.field">{{f.name}}
-          </button>
-        </div>
+  <div ngbDropdown class="btn-group ml-2 flex-fill">
+    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
+    <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
+      <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="list.sortReverse">
+        <label ngbButtonLabel class="btn-outline-primary btn-sm mx-2 flex-fill">
+          <input ngbButton type="radio" class="btn btn-sm" [value]="false">
+          <svg class="toolbaricon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
+          </svg>
+        </label>
+        <label ngbButtonLabel class="btn-outline-primary btn-sm mr-2 flex-fill">
+          <input ngbButton type="radio" class="btn btn-sm" [value]="true">
+          <svg class="toolbaricon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
+          </svg>
+        </label>
+      </div>
+      <div>
+        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="list.sortField = f.field"
+          [class.active]="list.sortField == f.field">{{f.name}}
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="btn-group ml-2 flex-fill">
+  <div class="btn-group ml-2 flex-fill" ngbDropdown role="group">
+    <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" ngbDropdownToggle i18n>Views</button>
+    <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
+      <ng-container *ngIf="!list.savedViewId">
+        <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
+        <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
+      </ng-container>
 
-    <div class="btn-group flex-fill" ngbDropdown role="group">
-      <button class="btn btn-sm btn-outline-primary dropdown-toggle" ngbDropdownToggle i18n>Views</button>
-      <div class="dropdown-menu shadow" ngbDropdownMenu>
-        <ng-container *ngIf="!list.savedViewId">
-          <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
-          <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
-        </ng-container>
-
-        <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId" i18n>Save "{{list.savedViewTitle}}"</button>
-        <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
-      </div>
+      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId" i18n>Save "{{list.savedViewTitle}}"</button>
+      <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
     </div>
-
   </div>
 
 </app-page-header>
