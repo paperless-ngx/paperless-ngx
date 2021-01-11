@@ -19,7 +19,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip3.6.8}
+          key: ${{ runner.os }}-pip3.8}
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
@@ -75,9 +75,10 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '15'
-    - name: build
+    - name: Build frontend
       run: ./compile-frontend.sh
-    - uses: actions/upload-artifact@v2
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
       with:
         name: frontend-compiled
         path: src/documents/static/frontend/
@@ -100,11 +101,13 @@ jobs:
           sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev gettext liblept5
           pip3 install -r requirements.txt
       -
+        name: Download frontend artifact
         uses: actions/download-artifact@v2
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
       -
+        name: Download documentation artifact
         uses: actions/download-artifact@v2
         with:
           name: documentation
@@ -138,6 +141,7 @@ jobs:
           find . -name __pycache__ | xargs rm -r
           tar -cJf paperless-ng.tar.xz paperless-ng/
       -
+        name: Upload release artifact
         uses: actions/upload-artifact@v2
         with:
           name: release
@@ -149,18 +153,18 @@ jobs:
     if: contains(github.ref, 'refs/tags/ng-')
     steps:
       -
-        name: Download Release Artifact
+        name: Download release artifact
         uses: actions/download-artifact@v2
         with:
           name: release
           path: ./
       -
+        name: Get branch name
         id: get_branch_name
         run: |
-          branch_name=$(echo ${{ github.ref }} | cut -d- -f2)
-          echo "::set-output name=branch_name::$branch_name"
+          echo ::set-output name=branch_name::${GITHUB_REF#refs/tags/ng-}
       -
-        name: Create Release
+        name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -173,7 +177,7 @@ jobs:
           body: |
             TODO: Insert changelog here (it's also in the documentation)
       -
-        name: Upload Release Archive
+        name: Upload release archive
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -206,6 +210,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Download frontend artifact
         uses: actions/download-artifact@v2
         with:
           name: frontend-compiled
