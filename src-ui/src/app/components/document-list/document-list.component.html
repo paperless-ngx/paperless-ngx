@@ -1,10 +1,10 @@
 <app-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="d-inline-block mr-2">
+  <div ngbDropdown class="mr-2">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>&nbsp;<ng-container i18n>Select</ng-container>
+      </svg>&nbsp;<span class="d-none d-md-inline" i18n>Select</span>
 
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
