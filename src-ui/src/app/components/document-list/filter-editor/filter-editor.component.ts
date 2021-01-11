@@ -210,4 +210,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.documentTypeSelectionModel.toggle(documentTypeId)
   }
 
+  onTagsDropdownOpen() {
+    this.tagSelectionModel.apply()
+  }
+
+  onCorrespondentDropdownOpen() {
+    this.correspondentSelectionModel.apply()
+  }
+
+  onDocumentTypeDropdownOpen() {
+    this.documentTypeSelectionModel.apply()
+  }
 }
