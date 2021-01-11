@@ -41,7 +41,7 @@ class BogusMailBox(ContextManager):
 
     folder = BogusFolderManager()
 
-    def fetch(self, criteria, mark_seen):
+    def fetch(self, criteria, mark_seen, charset=""):
         msg = self.messages
 
         criteria = str(criteria).strip('()').split(" ")
