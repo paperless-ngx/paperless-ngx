@@ -225,7 +225,6 @@ writing. Windows is not and will never be supported.
     *   ``python3-pip``, optionally ``pipenv`` for package installation
     *   ``python3-dev``
 
-    *   ``gettext`` for compiling interface translations
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
     *   ``optipng`` for optimizing thumbnails
@@ -293,14 +292,8 @@ writing. Windows is not and will never be supported.
 
     .. code:: bash
 
-        # This collects static files from paperless and django.
-        python3 manage.py collectstatic --clear --no-input
-
         # This creates the database schema.
         python3 manage.py migrate
-
-        # This creates the translation files for paperless.
-        python3 manage.py compilemessages
 
         # This creates your first paperless user
         python3 manage.py createsuperuser

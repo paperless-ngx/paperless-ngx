@@ -110,27 +110,17 @@ After grabbing the new release and unpacking the contents, do the following:
 
     This creates a new virtual environment (or uses your existing environment)
     and installs all dependencies into it.
-
-3.  Collect static files.
-
-    .. code:: shell-session
-
-        $ cd src
-        $ pipenv run python3 manage.py collectstatic --clear
     
-4.  Migrate the database.
+3.  Migrate the database.
 
     .. code:: shell-session
 
         $ cd src
         $ pipenv run python3 manage.py migrate
     
-5.  Update translation files.
-
-    .. code:: shell-session
-
-        $ cd src
-        $ pipenv run python3 manage.py compilemessages
+    This might not actually do anything. Not every new paperless version comes with new
+    database migrations.
+    
         
 Management utilities
 ####################
