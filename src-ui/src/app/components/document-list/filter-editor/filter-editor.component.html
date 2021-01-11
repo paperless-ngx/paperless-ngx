@@ -7,8 +7,8 @@
   </div>
   <div class="w-100 d-xl-none"></div>
     <div class="col col-xl-auto mb-2 mb-xl-0">
-      <div class="d-flex  justify-content-between">
-        <app-filterable-dropdown class="mr-md-3" title="Tags" icon="tag-fill" i18n-title
+      <div class="d-flex justify-content-between">
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Tags" icon="tag-fill" i18n-title
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
           [items]="tags"
           [(selectionModel)]="tagSelectionModel"
@@ -16,26 +16,26 @@
           [multiple]="true"
           (open)="onTagsDropdownOpen()"
           [allowSelectNone]="true"></app-filterable-dropdown>
-        <app-filterable-dropdown class="mr-md-3" title="Correspondent" icon="person-fill" i18n-title
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Correspondent" icon="person-fill" i18n-title
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
           [items]="correspondents"
           [(selectionModel)]="correspondentSelectionModel"
           (selectionModelChange)="updateRules()"
           (open)="onCorrespondentDropdownOpen()"
           [allowSelectNone]="true"></app-filterable-dropdown>
-        <app-filterable-dropdown class="mr-md-3" title="Document type" icon="file-earmark-fill" i18n-title
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
           filterPlaceholder="Filter document types" i18n-filterPlaceholder
           [items]="documentTypes"
           [(selectionModel)]="documentTypeSelectionModel"
           (open)="onDocumentTypeDropdownOpen()"
           (selectionModelChange)="updateRules()"
           [allowSelectNone]="true"></app-filterable-dropdown>
-        <app-date-dropdown class="mr-md-3"
+        <app-date-dropdown class="mr-2 flex-fill"
           title="Created" i18n-title
           (datesSet)="updateRules()"
           [(dateBefore)]="dateCreatedBefore"
           [(dateAfter)]="dateCreatedAfter"></app-date-dropdown>
-        <app-date-dropdown
+        <app-date-dropdown class="flex-fill"
           [(dateBefore)]="dateAddedBefore"
           [(dateAfter)]="dateAddedAfter"
           title="Added" i18n-title
