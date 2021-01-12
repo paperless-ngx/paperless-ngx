@@ -58,7 +58,6 @@ RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.lis
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
-		libatlas-base-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \
 		libqpdf-dev \
