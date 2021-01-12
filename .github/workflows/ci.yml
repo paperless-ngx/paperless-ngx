@@ -1,0 +1,252 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  documentation:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+      - name: Persistent Github pip cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip3.8}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev
+          pip install --upgrade pipenv
+          pipenv install --system --dev --ignore-pipfile
+      - name: Make documentation
+        run: |
+          cd docs/
+          make html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: documentation
+          path: docs/_build/html/
+
+  tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+      - name: Persistent Github pip cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip${{ matrix.python }}
+      - name: Tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
+          pip install --upgrade pipenv
+          pipenv install --system --dev --ignore-pipfile
+          cd src/
+          pytest
+          pycodestyle
+          coveralls
+
+  frontend:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15'
+    - name: Build frontend
+      run: ./compile-frontend.sh
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: frontend-compiled
+        path: src/documents/static/frontend/
+
+  build-release:
+    needs: [frontend, documentation, tests]
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        uses: actions/checkout@v2
+      -
+        name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      -
+        name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev gettext liblept5
+          pip3 install -r requirements.txt
+      -
+        name: Download frontend artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+      -
+        name: Download documentation artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: documentation
+          path: docs/_build/html/
+      -
+        name: Move files
+        run: |
+          mkdir dist
+          mkdir dist/paperless-ng
+          mkdir dist/paperless-ng/docker
+          mkdir dist/paperless-ng/scripts
+          cp .dockerignore .env docker-compose.* Dockerfile paperless.conf.example Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
+          cp docker/*.* dist/paperless-ng/docker/
+          cp scripts/*.service scripts/*.sh dist/paperless-ng/scripts/
+          cp src/ dist/paperless-ng/src -r
+          cp docs/_build/html/ dist/paperless-ng/docs -r
+      -
+        name: Compile messages
+        run: |
+          cd dist/paperless-ng/src
+          python3 manage.py compilemessages
+      -
+        name: Collect static files
+        run: |
+          cd dist/paperless-ng/src
+          python3 manage.py collectstatic --no-input
+      -
+        name: Make release package
+        run: |
+          cd dist
+          find . -name __pycache__ | xargs rm -r
+          tar -cJf paperless-ng.tar.xz paperless-ng/
+      -
+        name: Upload release artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: dist/paperless-ng.tar.xz
+
+  publish-release:
+    runs-on: ubuntu-latest
+    needs: build-release
+    if: contains(github.ref, 'refs/tags/ng-')
+    steps:
+      -
+        name: Download release artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: release
+          path: ./
+      -
+        name: Get branch name
+        id: get_branch_name
+        run: |
+          echo ::set-output name=branch_name::${GITHUB_REF#refs/tags/ng-}
+      -
+        name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_branch_name.outputs.branch_name }}
+          release_name: Paperless-ng ${{ steps.get_branch_name.outputs.branch_name }}
+          draft: false
+          prerelease: true
+          body: |
+            TODO: Insert changelog here (it's also in the documentation)
+      -
+        name: Upload release archive
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./paperless-ng.tar.xz
+          asset_name: paperless-ng-${{ steps.get_branch_name.outputs.branch_name }}.tar.xz
+          asset_content_type: application/x-xz
+
+  # build and push image to docker hub.
+  build-docker-image:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/travis-multiarch-builds' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev' || github.ref == 'refs/tags/ng-*')
+    runs-on: ubuntu-latest
+    needs: [frontend, tests]
+    steps:
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          VERSION=edge
+          if [[ $GITHUB_REF == refs/tags/ng-* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/ng-}
+          fi
+          if [[ $GITHUB_REF == refs/heads/* ]]; then
+            VERSION=${GITHUB_REF#refs/heads/}
+          fi
+          echo ::set-output name=version::${VERSION}
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Download frontend artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          push: true
+          tags: jonaswinkler/paperless-ng:${{ steps.prepare.outputs.version }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+      -
+        name: Inspect image
+        run: |
+          docker buildx imagetools inspect jonaswinkler/paperless-ng:${{ steps.prepare.outputs.version }}

@@ -2,23 +2,12 @@ version: "3.4"
 services:
   broker:
     image: redis:6.0
-    restart: always
-
-  db:
-    image: postgres:13
-    restart: always
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
+    restart: unless-stopped
 
   webserver:
     build: .
-    restart: always
+    restart: unless-stopped
     depends_on:
-      - db
       - broker
     ports:
       - 8000:8000
@@ -35,10 +24,8 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
-      PAPERLESS_DBHOST: db
 
 
 volumes:
   data:
   media:
-  pgdata:

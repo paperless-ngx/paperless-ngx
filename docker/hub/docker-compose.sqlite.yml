@@ -2,11 +2,11 @@ version: "3.4"
 services:
   broker:
     image: redis:6.0
-    restart: always
+    restart: unless-stopped
 
   webserver:
-    image: jonaswinkler/paperless-ng:0.9.14
-    restart: always
+    image: jonaswinkler/paperless-ng:latest
+    restart: unless-stopped
     depends_on:
       - broker
     ports:
