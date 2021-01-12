@@ -29,18 +29,22 @@ update paperless.
   * The release archive is built exactly like before. However, the release now comes with already compiled translation messages and
     collected static files. Therefore, the update steps ``compilemessages`` and ``collectstatic`` are now obsolete.
 
-* Other changes and fixes
+* Other changes
 
   * A new configuration option ``PAPERLESS_IGNORE_DATES`` was added by `jayme-github`_. This can be used to instruct paperless to ignore
     certain dates (such as your date of birth) when guessing the date from the document content. This was actually introduced in 0.9.12,
     I just forgot to mention it in the changelog.
-  * A couple changes to the dark mode and fixes to lots of layout issues.
   * The filter drop downs now display selected entries on top of all other entries.
-  * An issue with the tika parser not picking up files from the consumption directory was fixed.
   * The PostgreSQL client now supports setting an explicit ``sslmode`` to force encryption of the connection to PostgreSQL.
-  * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixes.
   * The docker images now come with ``jbig2enc``, which is a lossless image encoder for PDF documents and decreases the size of certain
     PDF/A documents.
+
+* Fixes
+
+  * An issue with the tika parser not picking up files from the consumption directory was fixed.
+  * A couple changes to the dark mode and fixes to lots of layout issues.
+  * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixes.
+  * Fixed an issue with filenames of downloaded files: Dates where off by one day due to timezone issues.
 
 paperless-ng 0.9.13
 ###################
