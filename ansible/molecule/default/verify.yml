@@ -1,0 +1,14 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: check if webserver is up
+    uri:
+      url: http://localhost:8000
+      status_code: [200, 302]
+      return_content: yes
+    register: landingpage
+    failed_when: "'Sign in</button>' not in landingpage.content"
