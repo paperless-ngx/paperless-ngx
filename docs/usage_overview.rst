@@ -110,6 +110,8 @@ The dashboard has a file drop field to upload documents to paperless. Simply dra
 onto this field or select a file with the file dialog. Multiple files are supported.
 
 
+.. _usage-mobile_upload:
+
 Mobile upload
 =============
 
