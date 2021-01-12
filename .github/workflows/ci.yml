@@ -58,6 +58,7 @@ jobs:
       - name: Tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # https://github.com/coveralls-clients/coveralls-python/issues/251
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends libpoppler-cpp-dev unpaper tesseract-ocr imagemagick ghostscript optipng
@@ -66,7 +67,7 @@ jobs:
           cd src/
           pytest
           pycodestyle
-          coveralls
+          coveralls --service=github
 
   frontend:
     runs-on: ubuntu-20.04
