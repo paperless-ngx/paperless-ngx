@@ -376,8 +376,26 @@ PAPERLESS_THREADS_PER_WORKER=<num>
         use a higher thread per worker count.
 
     The default is a balance between the two, according to your CPU core count,
-    with a slight favor towards threads per worker, and using as much cores as
-    possible.
+    with a slight favor towards threads per worker, and leaving at least one core
+    free for other tasks:
+
+    +----------------+---------+---------+
+    | CPU core count | Workers | Threads |
+    +----------------+---------+---------+
+    |              1 |       1 |       1 |
+    +----------------+---------+---------+
+    |              2 |       1 |       1 |
+    +----------------+---------+---------+
+    |              4 |       1 |       3 |
+    +----------------+---------+---------+
+    |              6 |       2 |       2 |
+    +----------------+---------+---------+
+    |              8 |       2 |       3 |
+    +----------------+---------+---------+
+    |             12 |       3 |       3 |
+    +----------------+---------+---------+
+    |             16 |       3 |       5 |
+    +----------------+---------+---------+
 
     If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
     PAPERLESS_THREADS_PER_WORKER automatically.

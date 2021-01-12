@@ -345,10 +345,13 @@ LOGGING = {
 # Favors threads per worker on smaller systems and never exceeds cpu_count()
 # in total.
 
+
 def default_task_workers():
+    # always leave one core open
+    available_cores = max(multiprocessing.cpu_count() - 1, 1)
     try:
         return max(
-            math.floor(math.sqrt(multiprocessing.cpu_count())),
+            math.floor(math.sqrt(available_cores)),
             1
         )
     except NotImplementedError:
@@ -365,17 +368,19 @@ Q_CLUSTER = {
 }
 
 
-def default_threads_per_worker():
+def default_threads_per_worker(task_workers):
+    # always leave one core open
+    available_cores = max(multiprocessing.cpu_count() - 1, 1)
     try:
         return max(
-            math.floor(multiprocessing.cpu_count() / TASK_WORKERS),
+            math.floor(available_cores / task_workers),
             1
         )
     except NotImplementedError:
         return 1
 
 
-THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker())
+THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker(TASK_WORKERS))
 
 ###############################################################################
 # Paperless Specific Settings                                                 #
