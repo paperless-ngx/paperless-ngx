@@ -5,6 +5,43 @@
 Changelog
 *********
 
+paperless-ng 0.9.14
+###################
+
+Starting with this version, releases are getting built automatically. This release also comes with changes on how to install and
+update paperless.
+
+* Paperless now uses GitHub Actions to make releases and build docker images.
+
+  * Docker images are available for amd64, armhf, and aarch64.
+  * When you pull an image from Docker Hub, Docker will automatically select the correct image for you.
+
+* Changes to docker installations and updates
+
+  * The ``-dockerfiles.tar.xz`` release archive is gone. Instead, simply grab the dockerfiles from ``/docker/hub`` in the repository
+    if you wish to install paperless by pulling from the hub.
+  * The docker compose files in ``/docker/hub`` were changed to always use the ``latest`` version automatically. In order to do further
+    updated, simply do a ``docker-compose pull``. The documentation has been updated.
+  * The docker compose files were changed to restart paperless on system boot only if it was running before shutdown.
+
+* Changes to bare metal installations
+
+  * The release archive is built exactly like before. However, the release now comes with already compiled translation messages and
+    collected static files. Therefore, the update steps ``compilemessages`` and ``collectstatic`` are now obsolete.
+
+* Other changes and fixes
+
+  * A new configuration option ``PAPERLESS_IGNORE_DATES`` was added by `jayme-github`_. This can be used to instruct paperless to ignore
+    certain dates (such as your date of birth) when guessing the date from the document content. This was actually introduced in 0.9.12,
+    I just forgot to mention it in the changelog.
+  * A couple changes to the dark mode and fixes to lots of layout issues.
+  * The filter drop downs now display selected entries on top of all other entries.
+  * An issue with the tika parser not picking up files from the consumption directory was fixed.
+  * The PostgreSQL client now supports setting an explicit ``sslmode`` to force encryption of the connection to PostgreSQL.
+  * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixes.
+  * The docker images now come with ``jbig2enc``, which is a lossless image encoder for PDF documents and decreases the size of certain
+    PDF/A documents.
+
 paperless-ng 0.9.13
 ###################
 
