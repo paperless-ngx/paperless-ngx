@@ -89,7 +89,7 @@ These features will probably never make it into paperless, since paperless is me
 
 # Getting started
 
-The recommended way to deploy paperless is docker-compose. Don't clone the repository, grab the latest release to get started instead. The dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself (i.e. if you want to run on Raspberry Pi).
+The recommended way to deploy paperless is docker-compose. The files in the /docker/hub directory are configured to pull the image from Docker Hub.
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
