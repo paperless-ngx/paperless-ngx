@@ -1,11 +1,9 @@
 <div class="btn-group w-100" ngbDropdown role="group" (openChange)="dropdownOpenChange($event)" #dropdown="ngbDropdown">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="!editing && selectionModel.selectionSize() > 0 ? 'btn-primary' : 'btn-outline-primary'">
-    <div class="d-none d-md-inline">{{title}}</div>
-    <div class="d-inline-block d-md-none">
-      <svg class="toolbaricon" fill="currentColor">
-        <use attr.xlink:href="assets/bootstrap-icons.svg#{{icon}}" />
-      </svg>
-    </div>
+    <svg class="toolbaricon" fill="currentColor">
+      <use attr.xlink:href="assets/bootstrap-icons.svg#{{icon}}" />
+    </svg>
+    <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <ng-container *ngIf="!editing && selectionModel.selectionSize() > 0">
       <div class="badge bg-secondary text-light rounded-pill badge-corner">
         {{selectionModel.selectionSize()}}
