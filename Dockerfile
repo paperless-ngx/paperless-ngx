@@ -46,12 +46,19 @@ RUN apt-get update \
 		zlib1g \
 		&& rm -rf /var/lib/apt/lists/*
 
+# This pulls in updated dependencies from bullseye to fix some issues with file type detection.
+# TODO: Remove this once bullseye releases.
+RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
+  && apt-get update \
+  && apt-get install --no-install-recommends -y file libmagic-dev \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm /etc/apt/sources.list.d/bullseye.list
+
 # Python dependencies
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
 		libatlas-base-dev \
-		libmagic-dev \
 		libpoppler-cpp-dev \
 		libpq-dev \
 		libqpdf-dev \
@@ -62,13 +69,6 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
 
-# This pulls in updated dependencies from bullseye to fix some issues with file type detection.
-# remove this once bullseye releases.
-RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
-  && apt-get update \
-  && apt-get install --no-install-recommends -y file \
-  && rm -rf /var/lib/apt/lists/* \
-  && rm /etc/apt/sources.list.d/bullseye.list
 
 # copy scripts
 # this fixes issues with imagemagick and PDF
