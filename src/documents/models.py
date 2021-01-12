@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.utils.timezone import is_aware
 
 from django.utils.translation import gettext_lazy as _
 
@@ -233,7 +234,10 @@ class Document(models.Model):
         verbose_name_plural = _("documents")
 
     def __str__(self):
-        created = datetime.date.isoformat(self.created)
+        if is_aware(self.created):
+            created = timezone.localdate(self.created).isoformat()
+        else:
+            created = datetime.date.isoformat(self.created)
         if self.correspondent and self.title:
             return f"{created} {self.correspondent} {self.title}"
         else:
