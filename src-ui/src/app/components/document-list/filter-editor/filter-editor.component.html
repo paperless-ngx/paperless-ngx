@@ -1,14 +1,14 @@
 <div class="row">
    <div class="col mb-2 mb-xl-0">
-     <div class="form-inline d-flex">
-         <label class="text-muted mr-2" i18n>Filter by:</label>
-         <input class="form-control form-control-sm flex-grow-1" type="text" [(ngModel)]="titleFilter" placeholder="Title" i18n-placeholder>
+     <div class="form-inline d-flex align-items-center">
+         <label class="text-muted mr-2 mb-0" i18n>Filter by:</label>
+         <input class="form-control form-control-sm flex-fill w-auto" type="text" [(ngModel)]="titleFilter" placeholder="Title" i18n-placeholder>
      </div>
   </div>
   <div class="w-100 d-xl-none"></div>
     <div class="col col-xl-auto mb-2 mb-xl-0">
       <div class="d-flex">
-        <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" i18n-title
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Tags" icon="tag-fill" i18n-title
           filterPlaceholder="Filter tags" i18n-filterPlaceholder
           [items]="tags"
           [(selectionModel)]="tagSelectionModel"
@@ -16,21 +16,21 @@
           [multiple]="true"
           (open)="onTagsDropdownOpen()"
           [allowSelectNone]="true"></app-filterable-dropdown>
-        <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" i18n-title
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Correspondent" icon="person-fill" i18n-title
           filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
           [items]="correspondents"
           [(selectionModel)]="correspondentSelectionModel"
           (selectionModelChange)="updateRules()"
           (open)="onCorrespondentDropdownOpen()"
           [allowSelectNone]="true"></app-filterable-dropdown>
-        <app-filterable-dropdown class="mr-2 mr-md-3" title="Document type" icon="file-earmark-fill" i18n-title
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
           filterPlaceholder="Filter document types" i18n-filterPlaceholder
           [items]="documentTypes"
           [(selectionModel)]="documentTypeSelectionModel"
           (open)="onDocumentTypeDropdownOpen()"
           (selectionModelChange)="updateRules()"
           [allowSelectNone]="true"></app-filterable-dropdown>
-        <app-date-dropdown class="mr-2 mr-md-3"
+        <app-date-dropdown class="mr-2"
           title="Created" i18n-title
           (datesSet)="updateRules()"
           [(dateBefore)]="dateCreatedBefore"
