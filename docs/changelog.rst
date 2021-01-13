@@ -38,6 +38,7 @@ update paperless.
   * The PostgreSQL client now supports setting an explicit ``sslmode`` to force encryption of the connection to PostgreSQL.
   * The docker images now come with ``jbig2enc``, which is a lossless image encoder for PDF documents and decreases the size of certain
     PDF/A documents.
+  * When using any of the manual matching algorithms, paperless now logs messages when and why these matching algorithms matched.
 
 * Fixes
 
@@ -47,6 +48,7 @@ update paperless.
   * Fixed an issue with filenames of downloaded files: Dates where off by one day due to timezone issues.
   * Searching will continue to work even when the index returns non-existing documents. This resulted in "Document does not exist" errors
     before. Instead, a warning is logged, indicating the issue.
+  * An issue with the consumer crashing when invalid regular expression were used was fixed.
 
 paperless-ng 0.9.13
 ###################
