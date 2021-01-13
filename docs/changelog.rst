@@ -45,6 +45,8 @@ update paperless.
   * A couple changes to the dark mode and fixes to lots of layout issues.
   * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixes.
   * Fixed an issue with filenames of downloaded files: Dates where off by one day due to timezone issues.
+  * Searching will continue to work even when the index returns non-existing documents. This resulted in "Document does not exist" errors
+    before. Instead, a warning is logged, indicating the issue.
 
 paperless-ng 0.9.13
 ###################
