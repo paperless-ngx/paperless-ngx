@@ -308,7 +308,7 @@ LOGGING = {
             "class": "documents.loggers.PaperlessHandler",
         },
         "console": {
-            "level": "INFO",
+            "level": "DEBUG" if DEBUG else "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         }
