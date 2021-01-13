@@ -1,3 +1,4 @@
+import logging
 import os
 import tempfile
 from datetime import datetime
@@ -458,12 +459,21 @@ class SearchView(APIView):
         self.ix = index.open_index()
 
     def add_infos_to_hit(self, r):
-        doc = Document.objects.get(id=r['id'])
+        try:
+            doc = Document.objects.get(id=r['id'])
+        except Document.DoesNotExist:
+            logging.getLogger(__name__).warning(
+                f"Search index returned a non-existing document: "
+                f"id: {r['id']}, title: {r['title']}. "
+                f"Search index needs reindex."
+            )
+            doc = None
+
         return {'id': r['id'],
-                'highlights': r.highlights("content", text=doc.content),
+                'highlights': r.highlights("content", text=doc.content) if doc else None,  # NOQA: E501
                 'score': r.score,
                 'rank': r.rank,
-                'document': DocumentSerializer(doc).data,
+                'document': DocumentSerializer(doc).data if doc else None,
                 'title': r['title']
                 }
 

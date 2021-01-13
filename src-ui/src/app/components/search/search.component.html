@@ -16,11 +16,13 @@
 
 <div *ngIf="!errorMessage" [class.result-content-searching]="searching" infiniteScroll (scrolled)="onScroll()">
     <p i18n>{resultCount, plural, =0 {No results} =1 {One result} other {{{resultCount}} results}}</p>
-    <app-document-card-large *ngFor="let result of results"
-        [document]="result.document"
-        [details]="result.highlights"
-        [searchScore]="result.score / maxScore"
-        [moreLikeThis]="true">
+    <ng-container *ngFor="let result of results">
+        <app-document-card-large *ngIf="result.document"
+            [document]="result.document"
+            [details]="result.highlights"
+            [searchScore]="result.score / maxScore"
+            [moreLikeThis]="true">
+        </app-document-card-large>
+    </ng-container>
 
-</app-document-card-large>
 </div>
