@@ -62,6 +62,7 @@ migrations() {
 		# simultaneously. This also ensures that the db is ready when the command
 		# of the current container starts.
 		flock 200
+		echo "Apply database migrations..."
 		sudo -HEu paperless python3 manage.py migrate
 	)  200>/usr/src/paperless/data/migration_lock
 
@@ -85,6 +86,8 @@ initialize() {
 }
 
 install_languages() {
+	echo "Installing languages..."
+
 	local langs="$1"
 	read -ra langs <<<"$langs"
 
@@ -119,6 +122,8 @@ install_languages() {
     done
 }
 
+echo "Paperless-ng docker container starting..."
+
 # Install additional languages if specified
 if [[ ! -z "$PAPERLESS_OCR_LANGUAGES"  ]]; then
 		install_languages "$PAPERLESS_OCR_LANGUAGES"
@@ -127,8 +132,10 @@ fi
 initialize
 
 if [[ "$1" != "/"* ]]; then
+	echo Executing management command "$@"
 	exec sudo -HEu paperless python3 manage.py "$@"
 else
+	echo Executing "$@"
 	exec "$@"
 fi
 
