@@ -20,12 +20,17 @@ RUN apt-get update \
   	# Basic dependencies
 		curl \
 		file \
+		# fonts for text file thumbnail generation
 		fonts-liberation \
+		# for making translations further down
 		gettext \
 		gnupg \
 		imagemagick \
+		# for Numpy
+		libatlas-base-dev \
 		libxslt1-dev \
 		mime-support \
+		# thumbnail size reduction
 		optipng \
 		sudo \
 		tzdata \
