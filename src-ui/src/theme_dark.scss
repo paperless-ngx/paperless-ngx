@@ -348,6 +348,10 @@ $border-color-dark-mode: #47494f;
     background-color: darken($danger-dark-mode, 20%);
     border-color: darken($danger-dark-mode, 20%);
   }
+
+  .bg-dark {
+    background-color: $bg-light-dark-mode !important;
+  }
 }
 
 body.color-scheme-dark {
