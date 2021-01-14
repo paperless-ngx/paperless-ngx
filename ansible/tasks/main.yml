@@ -9,26 +9,26 @@
     update_cache: yes
     pkg:
       # paperless-ng
-      - python3-dev
       - python3-pip
-      - gettext
+      - python3-dev
       - fonts-liberation
       - imagemagick
-      - unpaper
-      - ghostscript
       - optipng
-      - tesseract-ocr
       - gnupg
       - libpoppler-cpp-dev
-      - libmagic-dev
       - libpq-dev
+      - libmagic-dev
+      - mime-support
       # OCRmyPDF
+      - unpaper
+      - ghostscript
       - icc-profiles-free
       - qpdf
       - liblept5
       - libxml2
       - pngquant
       - zlib1g
+      - tesseract-ocr
       # dev
       - sudo
       - build-essential
@@ -154,7 +154,7 @@
     group: "{{ paperlessng_system_group }}"
     mode: "750"
   with_items:
-    - "{{ paperlessng_directory }}"  # ansible `copy:` does not set correct permissions on `dest:` for recursive copies
+    - "{{ paperlessng_directory }}"
     - "{{ paperlessng_consumption_dir }}"
     - "{{ paperlessng_data_dir }}"
     - "{{ paperlessng_media_root }}"
@@ -171,8 +171,10 @@
     regexp: "^#?{{ item.regexp }}="
     line: "{{ item.line }}"
   with_items:
+    # Required services
     - regexp: PAPERLESS_REDIS
       line: "PAPERLESS_REDIS=redis://{{ paperlessng_redis_host }}:{{ paperlessng_redis_port }}"
+    # Paths and folders
     - regexp: PAPERLESS_CONSUMPTION_DIR
       line: "PAPERLESS_CONSUMPTION_DIR={{ paperlessng_consumption_dir }}"
     - regexp: PAPERLESS_DATA_DIR
@@ -183,26 +185,65 @@
       line: "PAPERLESS_STATICDIR={{ paperlessng_static_dir }}"
     - regexp: PAPERLESS_FILENAME_FORMAT
       line: "PAPERLESS_FILENAME_FORMAT={{ paperlessng_filename_format }}"
+    # Hosting & Security
+    - regexp: PAPERLESS_SECRET_KEY
+      line: "PAPERLESS_SECRET_KEY={{ paperless_secret_key }}"
+    - regexp: PAPERLESS_ALLOWED_HOSTS
+      line: "PAPERLESS_ALLOWED_HOSTS={{ paperless_allowed_hosts }}"
+    - regexp: PAPERLESS_CORS_ALLOWED_HOSTS
+      line: "PAPERLESS_CORS_ALLOWED_HOSTS={{ paperless_cors_allowed_hosts }}"
+    - regexp: PAPERLESS_FORCE_SCRIPT_NAME
+      line: "PAPERLESS_FORCE_SCRIPT_NAME={{ paperless_force_script_name }}"
+    - regexp: PAPERLESS_STATIC_URL
+      line: "PAPERLESS_STATIC_URL={{ paperless_static_url }}"
+    - regexp: PAPERLESS_AUTO_LOGIN_USERNAME
+      line: "PAPERLESS_AUTO_LOGIN_USERNAME={{ paperless_auto_login_username }}"
+    - regexp: PAPERLESS_COOKIE_PREFIX
+      line: "PAPERLESS_COOKIE_PREFIX={{ paperless_cookie_prefix }}"
+    - regexp: PAPERLESS_ENABLE_HTTP_REMOTE_USER
+      line: "PAPERLESS_ENABLE_HTTP_REMOTE_USER={{ paperless_enable_http_remote_user }}"
+    # OCR settings
     - regexp: PAPERLESS_OCR_LANGUAGE
       line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
+    - regexp: PAPERLESS_OCR_MODE
+      line: "PAPERLESS_OCR_MODE={{ paperlessng_ocr_mode }}"
+    - regexp: PAPERLESS_OCR_OUTPUT_TYPE
+      line: "PAPERLESS_OCR_OUTPUT_TYPE={{ paperlessng_ocr_output_type }}"
+    - regexp: PAPERLESS_OCR_PAGES
+      line: "PAPERLESS_OCR_PAGES={{ paperlessng_ocr_pages }}"
+    - regexp: PAPERLESS_OCR_IMAGE_DPI
+      line: "PAPERLESS_OCR_IMAGE_DPI={{ paperlessng_ocr_image_dpi }}"
     - regexp: PAPERLESS_OCR_USER_ARGS
-      line: "PAPERLESS_OCR_USER_ARGS={{ paperlessng_ocrmypdf_args | combine({'jbig2_lossy': true} if paperlessng_big2enc_lossy else {}) | to_json }}"
-    - regexp: PAPERLESS_TIME_ZONE
-      line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
+      line: "PAPERLESS_OCR_USER_ARGS={{ paperlessng_ocr_user_args | combine({'jbig2_lossy': true} if paperlessng_big2enc_lossy else {}) | to_json }}"
+    # Tika settings
     - regexp: PAPERLESS_TIKA_ENABLED
       line: "PAPERLESS_TIKA_ENABLED={{ paperlessng_tika_enabled }}"
-  no_log: yes
-
-- name: configure paperless-ng [tika]
-  lineinfile:
-    path: "{{ paperlessng_directory }}/paperless.conf.template"
-    regexp: "^#?{{ item.regexp }}="
-    line: "'{{ item.line }}' if paperlessng_tika_enabled else '#{{ item.line }}'"
-  with_items:
     - regexp: PAPERLESS_TIKA_ENDPOINT
       line: "PAPERLESS_TIKA_ENDPOINT={{ paperlessng_tika_endpoint }}"
     - regexp: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
       line: "PAPERLESS_TIKA_GOTENBERG_ENDPOINT={{ paperlessng_tika_endpoint }}"
+    # Software tweaks
+    - regexp: PAPERLESS_TIME_ZONE
+      line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
+    - regexp: PAPERLESS_CONSUMER_POLLING
+      line: "PAPERLESS_CONSUMER_POLLING={{ paperlessng_consumer_polling }}"
+    - regexp: PAPERLESS_CONSUMER_DELETE_DUPLICATES
+      line: "PAPERLESS_CONSUMER_DELETE_DUPLICATES={{ paperlessng_consumer_delete_duplicates }}"
+    - regexp: PAPERLESS_CONSUMER_RECURSIVE
+      line: "PAPERLESS_CONSUMER_RECURSIVE={{ paperlessng_consumer_recursive }}"
+    - regexp: PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS
+      line: "PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS={{ paperlessng_consumer_subdirs_as_tags }}"
+    - regexp: PAPERLESS_OPTIMIZE_THUMBNAILS
+      line: "PAPERLESS_OPTIMIZE_THUMBNAILS={{ paperlessng_optimize_thumbnails }}"
+    - regexp: PAPERLESS_POST_CONSUME_SCRIPT
+      line: "PAPERLESS_POST_CONSUME_SCRIPT={{ paperlessng_post_consume_script }}"
+    - regexp: PAPERLESS_FILENAME_DATE_ORDER
+      line: "PAPERLESS_FILENAME_DATE_ORDER={{ paperlessng_filename_date_order }}"
+    - regexp: PAPERLESS_THUMBNAIL_FONT_NAME
+      line: "PAPERLESS_THUMBNAIL_FONT_NAME={{ paperlessng_thumbnail_font_name }}"
+    - regexp: PAPERLESS_IGNORE_DATES
+      line: "PAPERLESS_IGNORE_DATES={{ paperlessng_ignore_dates }}"
+  no_log: yes
 
 - name: configure paperless-ng database [sqlite]
   lineinfile:
@@ -228,6 +269,8 @@
       line: "PAPERLESS_DBUSER={{ paperlessng_db_user }}"
     - regexp: PAPERLESS_DBPASS
       line: "PAPERLESS_DBPASS={{ paperlessng_db_pass }}"
+    - regexp: PAPERLESS_DBSSLMODE
+      line: "PAPERLESS_DBSSLMODE={{ paperlessng_db_sslmode }}"
   when: paperlessng_db_type == 'postgresql'
   no_log: yes
 
@@ -258,27 +301,13 @@
     extra_args: --upgrade
   when: paperlessng_current_version.stdout != paperlessng_version | string
 
-- name: collect static files
-  become: yes
-  become_user: "{{ paperlessng_system_user }}"
-  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py collectstatic --no-input"
-  when: paperlessng_current_version.stdout != paperlessng_version | string
-  register: static_files
-  changed_when: static_files.stdout is not match("0 static files copied .*")
-
-- name: create database schema
+- name: migrate database schema
   become: yes
   become_user: "{{ paperlessng_system_user }}"
   command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py migrate"
   when: paperlessng_current_version.stdout != paperlessng_version | string
   register: database_schema
   changed_when: '"No migrations to apply." not in database_schema.stdout'
-
-- name: compile translations
-  become: yes
-  become_user: "{{ paperlessng_system_user }}"
-  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py compilemessages"
-  when: paperlessng_current_version.stdout != paperlessng_version | string
 
 - name: configure paperless superuser
   become: yes
