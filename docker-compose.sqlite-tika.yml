@@ -5,10 +5,12 @@ services:
     restart: unless-stopped
 
   webserver:
-    image: jonaswinkler/paperless-ng:latest
+    build: .
     restart: unless-stopped
     depends_on:
       - broker
+      - gotenberg
+      - tika
     ports:
       - 8000:8000
     healthcheck:
