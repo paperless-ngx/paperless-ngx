@@ -24,7 +24,7 @@ update paperless.
     updated, simply do a ``docker-compose pull``. The documentation has been updated.
   * The docker compose files were changed to restart paperless on system boot only if it was running before shutdown.
 
-* Changes to bare metal installations
+* Changes to bare metal installations and updates
 
   * The release archive is built exactly like before. However, the release now comes with already compiled translation messages and
     collected static files. Therefore, the update steps ``compilemessages`` and ``collectstatic`` are now obsolete.
@@ -38,13 +38,14 @@ update paperless.
   * The PostgreSQL client now supports setting an explicit ``sslmode`` to force encryption of the connection to PostgreSQL.
   * The docker images now come with ``jbig2enc``, which is a lossless image encoder for PDF documents and decreases the size of certain
     PDF/A documents.
-  * When using any of the manual matching algorithms, paperless now logs messages when and why these matching algorithms matched.
+  * When using any of the manual matching algorithms, paperless now logs messages about when and why these matching algorithms matched.
+  * The default settings for parallelization in paperless were adjusted to always leave one CPU core free.
 
 * Fixes
 
   * An issue with the tika parser not picking up files from the consumption directory was fixed.
-  * A couple changes to the dark mode and fixes to lots of layout issues.
-  * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixes.
+  * A couple changes to the dark mode and fixes to several other layout issues.
+  * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixed.
   * Fixed an issue with filenames of downloaded files: Dates where off by one day due to timezone issues.
   * Searching will continue to work even when the index returns non-existing documents. This resulted in "Document does not exist" errors
     before. Instead, a warning is logged, indicating the issue.
