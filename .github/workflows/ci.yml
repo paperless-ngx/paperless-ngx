@@ -152,11 +152,10 @@ jobs:
         run: |
           mkdir dist
           mkdir dist/paperless-ng
-          mkdir dist/paperless-ng/docker
           mkdir dist/paperless-ng/scripts
-          cp .dockerignore .env docker-compose.* Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
+          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
           cp paperless.conf.example dist/paperless-ng/paperless.conf
-          cp docker/*.* dist/paperless-ng/docker/
+          cp docker/ dist/paperless-ng/docker -r
           cp scripts/*.service scripts/*.sh dist/paperless-ng/scripts/
           cp src/ dist/paperless-ng/src -r
           cp docs/_build/html/ dist/paperless-ng/docs -r
