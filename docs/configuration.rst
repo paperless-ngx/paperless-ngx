@@ -267,7 +267,7 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
     present in an image.
 
 
-PAPERLESS_OCR_USER_ARG=<json>
+PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
     additional arguments you wish to pass to OCRmyPDF. Since Paperless uses
     the API of OCRmyPDF, you have to specify these in a format that can be
