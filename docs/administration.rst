@@ -54,7 +54,7 @@ Updating Paperless
 ##################
 
 If a new release of paperless-ng is available, upgrading depends on how you
-installed paperless-ng in the first place. The releases are available at
+installed paperless-ng in the first place. The releases are available at the
 `release page <https://github.com/jonaswinkler/paperless-ng/releases>`_.
 
 First of all, ensure that paperless is stopped.
@@ -86,8 +86,8 @@ B.  If you built the image yourself, do the following:
         $ docker-compose up
 
 Running `docker-compose up` will also apply any new database migrations.
-If you see everything working, you can start paperless-ng with "-d" to have it
-run in the background.
+If you see everything working, press CTRL+C once to gracefully stop paperless.
+Then you can start paperless-ng with ``-d`` to have it run in the background.
 
 Updating paperless without docker
 =================================
@@ -109,6 +109,9 @@ After grabbing the new release and unpacking the contents, do the following:
 
     This creates a new virtual environment (or uses your existing environment)
     and installs all dependencies into it.
+
+    You can also use the included ``requirements.txt`` file instead and create the virtual
+    environment yourself. This file includes exactly the same dependencies.
     
 3.  Migrate the database.
 
