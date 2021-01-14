@@ -18,11 +18,12 @@ update paperless.
 
 * Changes to docker installations and updates
 
-  * The ``-dockerfiles.tar.xz`` release archive is gone. Instead, simply grab the dockerfiles from ``/docker/hub`` in the repository
+  * The ``-dockerfiles.tar.xz`` release archive is gone. Instead, simply grab the docker files from ``/docker/compose`` in the repository
     if you wish to install paperless by pulling from the hub.
-  * The docker compose files in ``/docker/hub`` were changed to always use the ``latest`` version automatically. In order to do further
-    updated, simply do a ``docker-compose pull``. The documentation has been updated.
+  * The docker compose files in ``/docker/compose`` were changed to always use the ``latest`` version automatically. In order to do further
+    updates, simply do a ``docker-compose pull``. The documentation has been updated.
   * The docker compose files were changed to restart paperless on system boot only if it was running before shutdown.
+  * Documentation of the docker-compose files about what they do.
 
 * Changes to bare metal installations and updates
 

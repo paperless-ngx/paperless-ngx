@@ -97,9 +97,10 @@ run the above mentioned components yourself.
 Install Paperless from Docker Hub
 =================================
 
-1.  Go to the `/docker/hub directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/hub>`_
+1.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
     and download one of the ``docker-compose.*.yml`` files, depending on which database backend you
     want to use. Rename this file to `docker-compose.yml`.
+    If you want to enable optional support for Office documents, download a file with ``-tika`` in its name.
     Download the ``docker-compose.env`` file and the ``.env`` file as well and store them
     in the same directory.
 
@@ -197,13 +198,27 @@ Build the docker image yourself
 
     The master branch always reflects the latest stable version.
 
-2.  Copy one of the ``docker-compose.*.yml`` to ``docker-compose.yml``,
+2.  Copy one of the ``docker/compose/docker-compose.*.yml`` to ``docker-compose.yml`` in the root folder,
     depending on which database backend you want to use. Copy
-    ``docker-compose.env.example`` to ``docker-compose.env``.
+    ``docker-compose.env`` into the project root as well.
 
-3.  Run the `compile-frontend.sh` script. This requires `node` and `npm`.
+3.  In the ``docker-compose.yml`` file, find the line that instructs docker-compose to pull the paperless image from Docker Hub:
 
-4.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
+    .. code:: yaml
+
+        webserver:
+            image: jonaswinkler/paperless-ng:latest
+    
+    and replace it with a line that instructs docker-compose to build the image from the current working directory instead:
+
+    .. code:: yaml
+
+        webserver:
+            build: .
+
+4.  Run the ``compile-frontend.sh`` script. This requires ``node`` and ``npm >= v15``.
+
+5.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
     ``docker-compose up -d`` to start the containers, do
 
     .. code:: shell-session
@@ -252,6 +267,7 @@ writing. Windows is not and will never be supported.
     On Raspberry Pi, these libraries are required as well:
 
     *   ``libatlas-base-dev``
+    *   ``libxslt1-dev``
 
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
     for installing some of the python dependencies.
@@ -409,8 +425,8 @@ Migration to paperless-ng is then performed in a few simple steps:
     paperless.
 
 3.  Download the latest release of paperless-ng. You can either go with the
-    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/hub>`_
-    or clone the repository to build the image yourself.
+    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+    or clone the repository to build the image yourself (see :ref:`above <setup-docker_build>`).
     You can either replace your current paperless folder or put paperless-ng
     in a different location.
 
@@ -422,7 +438,7 @@ Migration to paperless-ng is then performed in a few simple steps:
         will migrate your existing data. After that, your old paperless installation
         will be incompatible with the migrated volumes.
 
-4.  Copy the ``docker-compose.sqlite.yml`` file to ``docker-compose.yml``.
+4.  Download the ``docker-compose.sqlite.yml`` file to ``docker-compose.yml``.
     If you want to switch to PostgreSQL, do that after you migrated your existing
     SQLite database.
 
