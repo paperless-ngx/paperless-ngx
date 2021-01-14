@@ -52,6 +52,8 @@ out of that folder to use them elsewhere. Here are a couple notes about that.
 *   PDF documents, PNG images, JPEG images, TIFF images and GIF images are processed with OCR and converted into PDF documents.
 *   Plain text documents are supported as well and are added verbatim
     to paperless.
+*   With the optional Tika integration enabled (see :ref:`Configuration <configuration-tika>`), Paperless also supports various
+    Office documents (.docx, .doc, odt, .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
 Paperless determines the type of a file by inspecting its content. The
 file extensions do not matter.
@@ -73,10 +75,8 @@ in your browser and paperless has to do much less work to serve the data.
 
 **Q:** *How do I install paperless-ng on Raspberry Pi?*
 
-**A:** There is no docker image for ARM available. If you know how to build
-that automatically, I'm all ears. For now, you have to grab the latest release
-archive from the project page and build the image yourself. The release comes
-with the front end already compiled, so you don't have to do this on the Pi.
+**A:** Docker images are available for arm and arm64 hardware, so just follow
+the docker-compose instructions, or go the bare metal route.
 
 **Q:** *How do I run this on unRaid?*
 
