@@ -179,6 +179,12 @@ if ENABLE_HTTP_REMOTE_USER:
         'rest_framework.authentication.RemoteUserAuthentication'
     )
 
+# X-Frame options for embedded PDF display:
+if DEBUG:
+    X_FRAME_OPTIONS = 'ANY'
+else:
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 # We allow CORS from localhost:8080
 CORS_ALLOWED_ORIGINS = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","))
 
