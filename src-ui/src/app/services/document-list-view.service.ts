@@ -27,6 +27,7 @@ export class DocumentListViewService {
   currentPage = 1
   currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
   collectionSize: number
+  lastSelectedDocumentIndex: number
 
   /**
    * This is the current config for the document list. The service will always remember the last settings used for the document list.
@@ -108,6 +109,7 @@ export class DocumentListViewService {
           if (onFinish) {
             onFinish()
           }
+          this.lastSelectedDocumentIndex = null
           this.isReloading = false
         },
         error => {
@@ -218,6 +220,7 @@ export class DocumentListViewService {
 
   selectNone() {
     this.selected.clear()
+    this.lastSelectedDocumentIndex = null
   }
 
   reduceSelectionToFilter() {
@@ -249,15 +252,25 @@ export class DocumentListViewService {
     return this.selected.has(d.id)
   }
 
-  setSelected(d: PaperlessDocument, value: boolean) {
-    if (value) {
-      this.selected.add(d.id)
-    } else if (!value) {
-      this.selected.delete(d.id)
-    }
-  toggleSelected(d: PaperlessDocument): void {
-    if (this.selected.has(d.id)) this.selected.delete(d.id)
+  toggleSelected(d: PaperlessDocument, includeRange: boolean): void {
+    if (this.selected.has(d.id) && !includeRange) this.selected.delete(d.id)
     else this.selected.add(d.id)
+
+    if (includeRange && this.lastSelectedDocumentIndex !== null) {
+      const toIndex = this.documentIndexInCurrentView(d.id)
+      console.log('select from', this.lastSelectedDocumentIndex, 'to', toIndex);
+      this.documents.slice(Math.min(this.lastSelectedDocumentIndex, toIndex), Math.max(this.lastSelectedDocumentIndex, toIndex)).forEach(d => {
+        this.selected.add(d.id)
+      })
+    }
+
+    if (!includeRange || (includeRange && this.lastSelectedDocumentIndex == null)) {
+      this.lastSelectedDocumentIndex = this.documentIndexInCurrentView(d.id)
+    }
+  }
+
+  documentIndexInCurrentView(documentID: number): number {
+    return this.documents.map(d => d.id).indexOf(documentID)
   }
 
   constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
