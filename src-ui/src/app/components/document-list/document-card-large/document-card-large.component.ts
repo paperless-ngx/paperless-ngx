@@ -15,16 +15,11 @@ export class DocumentCardLargeComponent implements OnInit {
   @Input()
   selected = false
 
-  setSelected(value: boolean) {
-    this.selected = value
-    this.selectedChange.emit(value)
-  }
-
   @Output()
-  selectedChange = new EventEmitter<boolean>()
+  toggleSelected = new EventEmitter()
 
   get selectable() {
-    return this.selectedChange.observers.length > 0
+    return this.toggleSelected.observers.length > 0
   }
 
   @Input()

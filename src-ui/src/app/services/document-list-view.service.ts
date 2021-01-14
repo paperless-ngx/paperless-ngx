@@ -255,6 +255,9 @@ export class DocumentListViewService {
     } else if (!value) {
       this.selected.delete(d.id)
     }
+  toggleSelected(d: PaperlessDocument): void {
+    if (this.selected.has(d.id)) this.selected.delete(d.id)
+    else this.selected.add(d.id)
   }
 
   constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {

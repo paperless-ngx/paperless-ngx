@@ -14,14 +14,9 @@ export class DocumentCardSmallComponent implements OnInit {
 
   @Input()
   selected = false
-
-  setSelected(value: boolean) {
-    this.selected = value
-    this.selectedChange.emit(value)
-  }
-
+  
   @Output()
-  selectedChange = new EventEmitter<boolean>()
+  toggleSelected = new EventEmitter()
 
   @Input()
   document: PaperlessDocument
