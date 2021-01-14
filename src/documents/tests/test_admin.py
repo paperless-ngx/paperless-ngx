@@ -5,12 +5,14 @@ from django.test import TestCase
 from django.utils import timezone
 
 from documents.admin import DocumentAdmin
-from documents.models import Document, Tag
+from documents.models import Document
+from documents.tests.utils import DirectoriesMixin
 
 
-class TestDocumentAdmin(TestCase):
+class TestDocumentAdmin(DirectoriesMixin, TestCase):
 
     def setUp(self) -> None:
+        super(TestDocumentAdmin, self).setUp()
         self.doc_admin = DocumentAdmin(model=Document, admin_site=AdminSite())
 
     @mock.patch("documents.admin.index.add_or_update_document")
