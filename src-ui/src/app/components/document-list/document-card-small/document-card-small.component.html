@@ -1,11 +1,11 @@
 <div class="col p-2 h-100">
   <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected">
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected">
-      <img class="card-img doc-img rounded-top" [src]="getThumbUrl()" (click)="setSelected(!selected)">
+      <img class="card-img doc-img rounded-top" [src]="getThumbUrl()" (click)="toggleSelected.emit($event)">
 
       <div class="border-right border-bottom bg-light p-1 rounded document-card-check">
         <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (change)="setSelected($event.target.checked)">
+          <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (click)="toggleSelected.emit($event)">
           <label class="custom-control-label" for="smallCardCheck{{document.id}}"></label>
         </div>
       </div>
