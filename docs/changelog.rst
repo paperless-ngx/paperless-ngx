@@ -41,6 +41,7 @@ update paperless.
     PDF/A documents.
   * When using any of the manual matching algorithms, paperless now logs messages about when and why these matching algorithms matched.
   * The default settings for parallelization in paperless were adjusted to always leave one CPU core free.
+  * Added an option to the frontend to choose which method to use for displaying PDF documents.
 
 * Fixes
 
