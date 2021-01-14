@@ -56,8 +56,6 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 - Make the front end nice (except mobile).
 - Fix whatever bugs I and you find.
-- Start using CI to build the app.
-- Simplify updates.
 - Make the documentation nice.
 
 ## Roadmap for versions beyond 1.0
