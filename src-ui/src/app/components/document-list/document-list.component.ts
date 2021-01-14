@@ -160,6 +160,10 @@ export class DocumentListComponent implements OnInit {
     this.filterRulesModified = modified
   }
 
+  toggleSelected(document: PaperlessDocument, event: Event): void {
+    this.list.toggleSelected(document)
+  }
+
   clickTag(tagID: number) {
     this.list.selectNone()
     setTimeout(() => {
