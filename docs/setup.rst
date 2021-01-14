@@ -232,8 +232,9 @@ writing. Windows is not and will never be supported.
     *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
     *   ``libpoppler-cpp-dev`` for PDF to text conversion
-    *   ``libmagic-dev`` for mime type detection
     *   ``libpq-dev`` for PostgreSQL
+    *   ``libmagic-dev`` for mime type detection
+    *   ``mime-support`` for mime type detection
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -247,6 +248,10 @@ writing. Windows is not and will never be supported.
     *   ``zlib1g``
     *   ``tesseract-ocr`` >= 4.0.0 for OCR
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
+
+    On Raspberry Pi, these libraries are required as well:
+
+    *   ``libatlas-base-dev``
 
     You will also need ``build-essential``, ``python3-setuptools`` and ``python3-wheel``
     for installing some of the python dependencies.
