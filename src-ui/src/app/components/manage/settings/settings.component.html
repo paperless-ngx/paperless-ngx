@@ -30,14 +30,22 @@
 
         <div class="form-row form-group">
           <div class="col-md-3 col-form-label">
+            <span i18n>Document editor</span>
+          </div>
+          <div class="col">
+
+            <app-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></app-input-check>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
             <span i18n>Dark mode</span>
           </div>
           <div class="col">
-            <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem" (change)="toggleDarkModeSetting()"></app-input-check>
-            <div class="custom-control custom-switch" *ngIf="!settingsForm.value.darkModeUseSystem">
-              <input type="checkbox" class="custom-control-input" id="darkModeEnabled" formControlName="darkModeEnabled" [checked]="settingsForm.value.darkModeEnabled">
-              <label class="custom-control-label" for="darkModeEnabled" i18n>Enable dark mode</label>
-            </div>
+            <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem"></app-input-check>
+            <app-input-check [hidden]="settingsForm.value.darkModeUseSystem" i18n-title title="Enable dark mode" formControlName="darkModeEnabled"></app-input-check>
           </div>
         </div>
 

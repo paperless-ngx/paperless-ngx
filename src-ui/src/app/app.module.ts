@@ -58,6 +58,7 @@ import { MetadataCollapseComponent } from './components/document-detail/metadata
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NumberComponent } from './components/common/input/number/number.component';
+import { SafePipe } from './pipes/safe.pipe';
 
 @NgModule({
   declarations: [
@@ -106,7 +107,8 @@ import { NumberComponent } from './components/common/input/number/number.compone
     DocumentTitlePipe,
     MetadataCollapseComponent,
     SelectDialogComponent,
-    NumberComponent
+    NumberComponent,
+    SafePipe
   ],
   imports: [
     BrowserModule,
