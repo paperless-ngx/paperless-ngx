@@ -160,8 +160,8 @@ export class DocumentListComponent implements OnInit {
     this.filterRulesModified = modified
   }
 
-  toggleSelected(document: PaperlessDocument, event: Event): void {
-    this.list.toggleSelected(document)
+  toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
+    this.list.toggleSelected(document, event.shiftKey)
   }
 
   clickTag(tagID: number) {
