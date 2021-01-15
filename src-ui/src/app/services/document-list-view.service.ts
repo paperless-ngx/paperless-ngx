@@ -27,8 +27,8 @@ export class DocumentListViewService {
   currentPage = 1
   currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
   collectionSize: number
-  lastSelectedDocumentIndex: number
-  lastSelectedDocumentToIndex: number
+  rangeSelectionAnchorIndex: number
+  lastRangeSelectionToIndex: number
 
   /**
    * This is the current config for the document list. The service will always remember the last settings used for the document list.
@@ -110,7 +110,7 @@ export class DocumentListViewService {
           if (onFinish) {
             onFinish()
           }
-          this.lastSelectedDocumentIndex = this.lastSelectedDocumentToIndex = null
+          this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
           this.isReloading = false
         },
         error => {
@@ -221,7 +221,7 @@ export class DocumentListViewService {
 
   selectNone() {
     this.selected.clear()
-    this.lastSelectedDocumentIndex = this.lastSelectedDocumentToIndex = null
+    this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
   }
 
   reduceSelectionToFilter() {
@@ -256,22 +256,22 @@ export class DocumentListViewService {
   toggleSelected(d: PaperlessDocument): void {
     if (this.selected.has(d.id)) this.selected.delete(d.id)
     else this.selected.add(d.id)
-    this.lastSelectedDocumentIndex = this.documentIndexInCurrentView(d.id)
-    this.lastSelectedDocumentToIndex = null
+    this.rangeSelectionAnchorIndex = this.documentIndexInCurrentView(d.id)
+    this.lastRangeSelectionToIndex = null
   }
 
   selectRangeTo(d: PaperlessDocument) {
-    if (this.lastSelectedDocumentIndex !== null) {
+    if (this.rangeSelectionAnchorIndex !== null) {
       const documentToIndex = this.documentIndexInCurrentView(d.id)
-      const fromIndex = Math.min(this.lastSelectedDocumentIndex, documentToIndex)
-      const toIndex = Math.max(this.lastSelectedDocumentIndex, documentToIndex)
+      const fromIndex = Math.min(this.rangeSelectionAnchorIndex, documentToIndex)
+      const toIndex = Math.max(this.rangeSelectionAnchorIndex, documentToIndex)
 
-      if (this.lastSelectedDocumentToIndex !== null &&
-          ((this.lastSelectedDocumentToIndex > this.lastSelectedDocumentIndex && documentToIndex <= this.lastSelectedDocumentIndex) ||
-          (this.lastSelectedDocumentToIndex < this.lastSelectedDocumentIndex && documentToIndex >= this.lastSelectedDocumentIndex))) {
+      if (this.lastRangeSelectionToIndex !== null &&
+          ((this.lastRangeSelectionToIndex > this.rangeSelectionAnchorIndex && documentToIndex <= this.rangeSelectionAnchorIndex) ||
+          (this.lastRangeSelectionToIndex < this.rangeSelectionAnchorIndex && documentToIndex >= this.rangeSelectionAnchorIndex))) {
 
         // new click is "opposite side" of anchor so we invert the old selection
-        this.documents.slice(Math.min(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex), Math.max(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex) + 1).forEach(d => {
+        this.documents.slice(Math.min(this.rangeSelectionAnchorIndex, this.lastRangeSelectionToIndex), Math.max(this.rangeSelectionAnchorIndex, this.lastRangeSelectionToIndex) + 1).forEach(d => {
           this.selected.delete(d.id)
         })
       }
@@ -279,7 +279,7 @@ export class DocumentListViewService {
       this.documents.slice(fromIndex, toIndex + 1).forEach(d => {
         this.selected.add(d.id)
       })
-      this.lastSelectedDocumentToIndex = documentToIndex
+      this.lastRangeSelectionToIndex = documentToIndex
     } else { // e.g. shift key but was first click
       this.toggleSelected(d)
     }
