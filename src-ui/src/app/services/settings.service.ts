@@ -1,5 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
+import { CookieService } from 'ngx-cookie-service';
 
 export interface PaperlessSettings {
   key: string
@@ -34,7 +36,9 @@ export class SettingsService {
 
   constructor(
     private rendererFactory: RendererFactory2,
-    @Inject(DOCUMENT) private document
+    @Inject(DOCUMENT) private document,
+    private cookieService: CookieService,
+    private meta: Meta
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
 
@@ -53,6 +57,36 @@ export class SettingsService {
       darkModeEnabled ? this.renderer.addClass(this.document.body, 'color-scheme-dark') : this.renderer.removeClass(this.document.body, 'color-scheme-dark')
     }
 
+  }
+
+  getLanguageOptions() {
+    return [
+      {code: "", name: $localize`Use system language`},
+      {code: "en-us", name: `${$localize`English`} (English)`},
+      {code: "de", name: `${$localize`German`} (German)`},
+      {code: "nl", name: `${$localize`Dutch`} (Dutch)`},
+      {code: "fr", name: `${$localize`French`} (French)`}
+    ]
+  }
+
+  private getLanguageCookieName() {
+    let prefix = ""
+    if (this.meta.getTag('name=cookie_prefix')) {
+      prefix = this.meta.getTag('name=cookie_prefix').content
+    }
+    return `${prefix || ''}django_language`
+  }
+
+  getLanguage(): string {
+    return this.cookieService.get(this.getLanguageCookieName())
+  }
+
+  setLanguage(language: string) {
+    if (language) {
+      this.cookieService.set(this.getLanguageCookieName(), language)
+    } else {
+      this.cookieService.delete(this.getLanguageCookieName())
+    }
   }
 
   get(key: string): any {
