@@ -266,10 +266,8 @@ export class DocumentListViewService {
       const fromIndex = Math.min(this.rangeSelectionAnchorIndex, documentToIndex)
       const toIndex = Math.max(this.rangeSelectionAnchorIndex, documentToIndex)
 
-      if (this.lastRangeSelectionToIndex !== null &&
-          ((this.lastRangeSelectionToIndex > this.rangeSelectionAnchorIndex && documentToIndex <= this.rangeSelectionAnchorIndex) ||
-          (this.lastRangeSelectionToIndex < this.rangeSelectionAnchorIndex && documentToIndex >= this.rangeSelectionAnchorIndex))) {
-        // new click is "opposite side" of anchor so we invert the old selection
+      if (this.lastRangeSelectionToIndex !== null) {
+        // revert the old selection
         this.documents.slice(Math.min(this.rangeSelectionAnchorIndex, this.lastRangeSelectionToIndex), Math.max(this.rangeSelectionAnchorIndex, this.lastRangeSelectionToIndex) + 1).forEach(d => {
           this.selected.delete(d.id)
         })
