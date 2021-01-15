@@ -28,6 +28,7 @@ export class DocumentListViewService {
   currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
   collectionSize: number
   lastSelectedDocumentIndex: number
+  lastSelectedDocumentToIndex: number
 
   /**
    * This is the current config for the document list. The service will always remember the last settings used for the document list.
@@ -109,7 +110,7 @@ export class DocumentListViewService {
           if (onFinish) {
             onFinish()
           }
-          this.lastSelectedDocumentIndex = null
+          this.lastSelectedDocumentIndex = this.lastSelectedDocumentToIndex = null
           this.isReloading = false
         },
         error => {
@@ -220,7 +221,7 @@ export class DocumentListViewService {
 
   selectNone() {
     this.selected.clear()
-    this.lastSelectedDocumentIndex = null
+    this.lastSelectedDocumentIndex = this.lastSelectedDocumentToIndex = null
   }
 
   reduceSelectionToFilter() {
@@ -253,17 +254,30 @@ export class DocumentListViewService {
   }
 
   toggleSelected(d: PaperlessDocument, includeRange: boolean): void {
-    if (this.selected.has(d.id) && !includeRange) this.selected.delete(d.id)
-    else this.selected.add(d.id)
+    if (!includeRange) {
+      // regular i.e. no shift key toggle
+      if (this.selected.has(d.id)) this.selected.delete(d.id)
+      else this.selected.add(d.id)
+    } else if (includeRange && this.lastSelectedDocumentIndex !== null) {
+      const documentToIndex = this.documentIndexInCurrentView(d.id)
+      const fromIndex = Math.min(this.lastSelectedDocumentIndex, documentToIndex)
+      const toIndex = Math.max(this.lastSelectedDocumentIndex, documentToIndex)
 
-    if (includeRange && this.lastSelectedDocumentIndex !== null) {
-      const toIndex = this.documentIndexInCurrentView(d.id)
-      this.documents.slice(Math.min(this.lastSelectedDocumentIndex, toIndex), Math.max(this.lastSelectedDocumentIndex, toIndex)).forEach(d => {
+      if ((this.lastSelectedDocumentToIndex > this.lastSelectedDocumentIndex && documentToIndex < this.lastSelectedDocumentIndex) ||
+          (this.lastSelectedDocumentToIndex < this.lastSelectedDocumentIndex && documentToIndex > this.lastSelectedDocumentIndex)) {
+          // invert last selected
+          this.documents.slice(Math.min(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex), Math.max(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex) + 1).forEach(d => {
+            this.selected.delete(d.id)
+          })
+      }
+
+      this.documents.slice(fromIndex, toIndex + 1).forEach(d => {
         this.selected.add(d.id)
       })
+      this.lastSelectedDocumentToIndex = documentToIndex
     }
 
-    if (!includeRange || (includeRange && this.lastSelectedDocumentIndex == null)) {
+    if (!includeRange || (includeRange && this.lastSelectedDocumentIndex == null)) { // e.g. shift key but first click
       this.lastSelectedDocumentIndex = this.documentIndexInCurrentView(d.id)
     }
   }
