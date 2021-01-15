@@ -161,7 +161,8 @@ export class DocumentListComponent implements OnInit {
   }
 
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
-    this.list.toggleSelected(document, event.shiftKey)
+    if (!event.shiftKey) this.list.toggleSelected(document)
+    else this.list.selectRangeTo(document)
   }
 
   clickTag(tagID: number) {

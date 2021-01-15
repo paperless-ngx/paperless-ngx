@@ -253,19 +253,21 @@ export class DocumentListViewService {
     return this.selected.has(d.id)
   }
 
-  toggleSelected(d: PaperlessDocument, includeRange: boolean): void {
-    if (!includeRange) {
-      // regular i.e. no shift key toggle
-      if (this.selected.has(d.id)) this.selected.delete(d.id)
-      else this.selected.add(d.id)
-    } else if (includeRange && this.lastSelectedDocumentIndex !== null) {
+  toggleSelected(d: PaperlessDocument): void {
+    if (this.selected.has(d.id)) this.selected.delete(d.id)
+    else this.selected.add(d.id)
+    this.lastSelectedDocumentIndex = this.documentIndexInCurrentView(d.id)
+  }
+
+  selectRangeTo(d: PaperlessDocument) {
+    if (this.lastSelectedDocumentIndex !== null) {
       const documentToIndex = this.documentIndexInCurrentView(d.id)
       const fromIndex = Math.min(this.lastSelectedDocumentIndex, documentToIndex)
       const toIndex = Math.max(this.lastSelectedDocumentIndex, documentToIndex)
 
       if ((this.lastSelectedDocumentToIndex > this.lastSelectedDocumentIndex && documentToIndex < this.lastSelectedDocumentIndex) ||
           (this.lastSelectedDocumentToIndex < this.lastSelectedDocumentIndex && documentToIndex > this.lastSelectedDocumentIndex)) {
-          // invert last selected
+          // new click is "opposite side" of anchor so we invert the old selection
           this.documents.slice(Math.min(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex), Math.max(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex) + 1).forEach(d => {
             this.selected.delete(d.id)
           })
@@ -275,9 +277,7 @@ export class DocumentListViewService {
         this.selected.add(d.id)
       })
       this.lastSelectedDocumentToIndex = documentToIndex
-    }
-
-    if (!includeRange || (includeRange && this.lastSelectedDocumentIndex == null)) { // e.g. shift key but first click
+    } else { // e.g. shift key but was first click
       this.lastSelectedDocumentIndex = this.documentIndexInCurrentView(d.id)
     }
   }
