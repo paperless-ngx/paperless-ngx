@@ -267,9 +267,8 @@ export class DocumentListViewService {
       const toIndex = Math.max(this.lastSelectedDocumentIndex, documentToIndex)
 
       if (this.lastSelectedDocumentToIndex !== null &&
-          ((this.lastSelectedDocumentToIndex > this.lastSelectedDocumentIndex && documentToIndex < this.lastSelectedDocumentIndex) ||
-          (this.lastSelectedDocumentToIndex < this.lastSelectedDocumentIndex && documentToIndex > this.lastSelectedDocumentIndex))) {
-        console.log('invert');
+          ((this.lastSelectedDocumentToIndex > this.lastSelectedDocumentIndex && documentToIndex <= this.lastSelectedDocumentIndex) ||
+          (this.lastSelectedDocumentToIndex < this.lastSelectedDocumentIndex && documentToIndex >= this.lastSelectedDocumentIndex))) {
 
         // new click is "opposite side" of anchor so we invert the old selection
         this.documents.slice(Math.min(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex), Math.max(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex) + 1).forEach(d => {
@@ -282,7 +281,7 @@ export class DocumentListViewService {
       })
       this.lastSelectedDocumentToIndex = documentToIndex
     } else { // e.g. shift key but was first click
-      this.lastSelectedDocumentIndex = this.documentIndexInCurrentView(d.id)
+      this.toggleSelected(d)
     }
   }
 
