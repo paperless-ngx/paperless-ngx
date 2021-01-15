@@ -38,7 +38,7 @@
         <target>Sélectionner aucun</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2ed8a0c2ce4968f8614151eefed20a0aa3daeeb9">
@@ -46,7 +46,7 @@
         <target>Sélectionner la page</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="b463541a7e303aa4d0b1102eaff8afbaf34e7a74">
@@ -54,15 +54,15 @@
         <target>Sélectionner tout</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="ec97f67072a83aaa972536b18d83179f6e4bbec9">
-        <source>Sort by</source>
-        <target>Trier par</target>
+      <trans-unit datatype="html" id="5d43539fc358c3a548b9d487be821db73e2702ff">
+        <source>Sort</source>
+        <target>Trier</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="b7641aed03492978b4ec6843b1e53f30464294d9">
@@ -94,7 +94,7 @@
         <target>{VAR_PLURAL, plural, =1 {<x id="INTERPOLATION"/> document sélectionné sur 1} other {<x id="INTERPOLATION"/> documents sélectionnés sur <x id="INTERPOLATION_1"/>}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bb773fdeaad5e7fb8e6cd77e1cc558e1b194a0c9">
@@ -102,7 +102,7 @@
         <target>{VAR_PLURAL, plural, =1 {Un document} other {<x id="INTERPOLATION"/> documents}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bb91083b44e3f77dd68de773ceab467ca3d57507">
@@ -110,7 +110,7 @@
         <target>(filtré)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ca0b795795658155d44ddca02e95f1feeeb4a88f">
@@ -118,7 +118,7 @@
         <target>NSA</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7b5c6286aaded63fb279d6deb8aa8c704e085ced">
@@ -126,7 +126,7 @@
         <target>Correspondant</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="fdf7cbdc140d0aab0f0b6c06065a0fd448ed6a2e">
@@ -134,7 +134,7 @@
         <target>Titre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2bd5919e8098513664a89d5b7b52d61e3063950f">
@@ -142,7 +142,7 @@
         <target>Type de document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1b051734b0ee9021991c91b3ed4e81c244322462">
@@ -150,7 +150,7 @@
         <target>Date de création</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="80e3b490720757978c99a7b5af3885faf202b955">
@@ -158,7 +158,7 @@
         <target>Date d'ajout</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9021887951960049161">
@@ -166,7 +166,7 @@
         <target>Confirmer la suppression</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">192</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5382975254277698192">
@@ -174,7 +174,7 @@
         <target>Voulez-vous vraiment supprimer le document &quot;<x equiv-text="this.document.title" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6691075929777935948">
@@ -182,7 +182,7 @@
         <target>Les fichiers liés à ce document seront supprimés définitivement. Cette action est irréversible.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">194</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="719892092227206532">
@@ -190,7 +190,7 @@
         <target>Supprimer le document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">196</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1844801255494293730">
@@ -198,7 +198,7 @@
         <target>Une erreur s'est produite lors de la suppression du document : <x equiv-text="JSON.stringify(error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="826b25211922a1b46436589233cb6f1a163d89b7">
@@ -542,7 +542,7 @@
         <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; supprimée.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5647210819299459618">
@@ -550,7 +550,7 @@
         <target>Paramètres enregistrés avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">70</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -582,7 +582,7 @@
         <target>Vues enregistrées</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">79</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13">
@@ -593,12 +593,52 @@
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="75f8908d266f7cc9b9e68e0be906fd080a223606">
+        <source>Display language</source>
+        <target>Langue d'affichage</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1284a077dc18a2d1ff1b744f16f1797eea28ae37">
+        <source>You need to reload the page after applying a new language.</source>
+        <target>Vous devez recharger la page après avoir sélectionné une nouvelle langue.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="2045151788cbdda7512752e408da59a6b54a8ef0">
         <source>Items per page</source>
         <target>Éléments par page</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="c4435e56bf0289e78fedc462f1d21fb30b9de55d">
+        <source>Document editor</source>
+        <target>Éditeur de documents</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4903e521c9bfd11ce88e7a5575106ef638912e0d">
+        <source>Use PDF viewer provided by the browser</source>
+        <target>Utiliser la visionneuse PDF fournie par le navigateur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="d7db07023e53f8396d18d375c2b78c25fc81c197">
+        <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
+        <target>Cette option est généralement plus rapide pour l'affichage de grands documents PDF, mais elle peut ne pas fonctionner sur certains navigateurs.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">52</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ee5d1cbfd6ee168dae37aaba2b59b50bcabb2ff">
@@ -606,7 +646,7 @@
         <target>Mode sombre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">59</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="f8cb5506e70fd71fddc9bb71cee18bfff7b29637">
@@ -614,39 +654,7 @@
         <target>Utiliser les paramètres du système</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">36</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
-        <source>Bulk editing</source>
-        <target>Edition en masse</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">44</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
-        <source>Show confirmation dialogs</source>
-        <target>Afficher les messages de confirmation</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">48</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
-        <source>Deleting documents will always ask for confirmation.</source>
-        <target>La suppression de documents requiert toujours une confirmation.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">48</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
-        <source>Apply on close</source>
-        <target>Appliquer lors de la fermeture</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8ee474504043fa89821d626e4f3413240fa91b53">
@@ -654,7 +662,39 @@
         <target>Activer le mode sombre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
+        <source>Bulk editing</source>
+        <target>Edition en masse</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
+        <source>Show confirmation dialogs</source>
+        <target>Afficher les messages de confirmation</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
+        <source>Deleting documents will always ask for confirmation.</source>
+        <target>La suppression de documents requiert toujours une confirmation.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
+        <source>Apply on close</source>
+        <target>Appliquer lors de la fermeture</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cb90334f5dfd7fc67205085f59381e2a334ccfc">
@@ -662,7 +702,7 @@
         <target>Apparaît sur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6717cf1acf04728fc2b7c39f6d3297f8ff15fde5">
@@ -670,7 +710,7 @@
         <target>Montrer sur le tableau de bord</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="541bfc5b123b3f8867fd681eaceefb663a811973">
@@ -678,7 +718,7 @@
         <target>Montrer dans la barre latérale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="abba764a7a595d04dc8c3b26e04b3780d4fdb540">
@@ -686,7 +726,7 @@
         <target>Aucune vue sauvegardée n'est définie.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">108</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ef60a738a565f498b858e903e42bc5ffc3cc1299">
@@ -1039,7 +1079,7 @@
         <target>Filtrer les correspondants</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="0ad509732aaf702b7ea8c771c7809fa84bc85908">
@@ -1047,7 +1087,7 @@
         <target>Filtrer les types de documents</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2d9d55f1b70142ff4597ba32179d16888fd9c6b2">
@@ -1055,7 +1095,7 @@
         <target>Réinitialiser les filtres</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7593728289020204896">
@@ -1063,7 +1103,7 @@
         <target>Non affecté</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <note from="description" priority="1">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
       </trans-unit>
@@ -1072,7 +1112,7 @@
         <target>Appliquer</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4873149362496451858">
@@ -1144,7 +1184,7 @@
         <target>Créé le : <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="cd6f3fd48957e1fea6545c2b2defc7b2435ebfa8">
@@ -1168,7 +1208,7 @@
         <target>Score :</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2840db547019ce8c76b2cdbe3a1653c5b68b06af">
@@ -1355,7 +1395,7 @@
         <target>Sélectionner :</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="dfc3c34e182ea73c5d784ff7c8135f087992dac1">
@@ -1363,7 +1403,7 @@
         <target>Tout</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="907df6a2b68daecc3c399cf40a764b358bd9fd84">
@@ -1371,7 +1411,7 @@
         <target>Éditer :</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="27d158b47717ff9305d19866960418c603f19d55">
@@ -1572,6 +1612,46 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="6839066544204061364">
+        <source>Use system language</source>
+        <target>Utiliser la langue du système</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="5866254605255506989">
+        <source>English</source>
+        <target>Anglais</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1858110241312746425">
+        <source>German</source>
+        <target>Allemand</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3071065188816255493">
+        <source>Dutch</source>
+        <target>Néerlandais</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7633754075223722162">
+        <source>French</source>
+        <target>Français</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1519954996184640001">
