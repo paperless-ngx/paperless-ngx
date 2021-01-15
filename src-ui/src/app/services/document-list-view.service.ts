@@ -258,7 +258,6 @@ export class DocumentListViewService {
 
     if (includeRange && this.lastSelectedDocumentIndex !== null) {
       const toIndex = this.documentIndexInCurrentView(d.id)
-      console.log('select from', this.lastSelectedDocumentIndex, 'to', toIndex);
       this.documents.slice(Math.min(this.lastSelectedDocumentIndex, toIndex), Math.max(this.lastSelectedDocumentIndex, toIndex)).forEach(d => {
         this.selected.add(d.id)
       })
