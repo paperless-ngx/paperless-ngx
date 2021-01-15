@@ -14,6 +14,21 @@
 
         <div class="form-row form-group">
           <div class="col-md-3 col-form-label">
+            <span i18n>Display language</span>
+          </div>
+          <div class="col">
+
+            <select class="form-control" formControlName="displayLanguage">
+              <option *ngFor="let lang of languages" [ngValue]="lang.code">{{lang.name}}</option>
+            </select>
+
+            <small class="form-text text-muted" i18n>You need to reload the page after applying a new language.</small>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
             <span i18n>Items per page</span>
           </div>
           <div class="col">
