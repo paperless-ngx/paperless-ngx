@@ -135,7 +135,7 @@
       i18n>Added</th>
   </thead>
   <tbody>
-    <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
+    <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" (click)="toggleSelected(d, $event)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
       <td>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (click)="toggleSelected(d, $event)">
@@ -147,7 +147,7 @@
       </td>
       <td class="d-none d-md-table-cell">
         <ng-container *ngIf="d.correspondent">
-          <a [routerLink]="" (click)="clickCorrespondent(d.correspondent)" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+          <a [routerLink]="" (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
@@ -156,7 +156,7 @@
       </td>
       <td class="d-none d-xl-table-cell">
         <ng-container *ngIf="d.document_type">
-          <a [routerLink]="" (click)="clickDocumentType(d.document_type)" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+          <a [routerLink]="" (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
         </ng-container>
       </td>
       <td>
