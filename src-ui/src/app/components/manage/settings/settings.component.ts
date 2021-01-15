@@ -22,7 +22,8 @@ export class SettingsComponent implements OnInit {
     'darkModeUseSystem': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)),
     'darkModeEnabled': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED)),
     'useNativePdfViewer': new FormControl(this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)),
-    'savedViews': this.savedViewGroup
+    'savedViews': this.savedViewGroup,
+    'displayLanguage': new FormControl(this.settings.getLanguage())
   })
 
   savedViews: PaperlessSavedView[]
@@ -63,9 +64,14 @@ export class SettingsComponent implements OnInit {
     this.settings.set(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
     this.settings.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, this.settingsForm.value.useNativePdfViewer)
+    this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.documentListViewService.updatePageSize()
     this.settings.updateDarkModeSettings()
     this.toastService.showInfo($localize`Settings saved successfully.`)
+  }
+
+  get languages() {
+    return this.settings.getLanguageOptions()
   }
 
   saveSettings() {
