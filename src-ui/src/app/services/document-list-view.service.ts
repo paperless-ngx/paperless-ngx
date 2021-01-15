@@ -257,6 +257,7 @@ export class DocumentListViewService {
     if (this.selected.has(d.id)) this.selected.delete(d.id)
     else this.selected.add(d.id)
     this.lastSelectedDocumentIndex = this.documentIndexInCurrentView(d.id)
+    this.lastSelectedDocumentToIndex = null
   }
 
   selectRangeTo(d: PaperlessDocument) {
@@ -265,12 +266,15 @@ export class DocumentListViewService {
       const fromIndex = Math.min(this.lastSelectedDocumentIndex, documentToIndex)
       const toIndex = Math.max(this.lastSelectedDocumentIndex, documentToIndex)
 
-      if ((this.lastSelectedDocumentToIndex > this.lastSelectedDocumentIndex && documentToIndex < this.lastSelectedDocumentIndex) ||
-          (this.lastSelectedDocumentToIndex < this.lastSelectedDocumentIndex && documentToIndex > this.lastSelectedDocumentIndex)) {
-          // new click is "opposite side" of anchor so we invert the old selection
-          this.documents.slice(Math.min(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex), Math.max(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex) + 1).forEach(d => {
-            this.selected.delete(d.id)
-          })
+      if (this.lastSelectedDocumentToIndex !== null &&
+          ((this.lastSelectedDocumentToIndex > this.lastSelectedDocumentIndex && documentToIndex < this.lastSelectedDocumentIndex) ||
+          (this.lastSelectedDocumentToIndex < this.lastSelectedDocumentIndex && documentToIndex > this.lastSelectedDocumentIndex))) {
+        console.log('invert');
+
+        // new click is "opposite side" of anchor so we invert the old selection
+        this.documents.slice(Math.min(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex), Math.max(this.lastSelectedDocumentIndex, this.lastSelectedDocumentToIndex) + 1).forEach(d => {
+          this.selected.delete(d.id)
+        })
       }
 
       this.documents.slice(fromIndex, toIndex + 1).forEach(d => {
