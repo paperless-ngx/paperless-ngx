@@ -1,5 +1,9 @@
 @import "/src/theme";
 
+tr {
+  user-select: none;
+}
+
 .table-row-selected {
   background-color: $primaryFaded;
 }
