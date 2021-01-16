@@ -19,10 +19,45 @@
           <div class="col">
 
             <select class="form-control" formControlName="displayLanguage">
-              <option *ngFor="let lang of languages" [ngValue]="lang.code">{{lang.name}}</option>
+              <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> ({{lang.englishName}})</span></option>
             </select>
 
             <small class="form-text text-muted" i18n>You need to reload the page after applying a new language.</small>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Date display</span>
+          </div>
+          <div class="col">
+
+            <select class="form-control" formControlName="dateLocale">
+              <option *ngFor="let lang of dateLocaleOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> ({{today | date:'shortDate':null:lang.code}})</span></option>
+            </select>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Date format</span>
+          </div>
+          <div class="col">
+
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatShort" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="shortDate">
+              <label class="custom-control-label" for="dateFormatShort" i18n>Short: {{today | customDate:'shortDate'}}</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatMedium" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="mediumDate">
+              <label class="custom-control-label" for="dateFormatMedium" i18n>Medium: {{today | customDate:'mediumDate'}}</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatLong" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="longDate">
+              <label class="custom-control-label" for="dateFormatLong" i18n>Long: {{today | customDate:'longDate'}}</label>
+            </div>
 
           </div>
         </div>
