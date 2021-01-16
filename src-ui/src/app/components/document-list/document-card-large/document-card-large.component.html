@@ -64,7 +64,7 @@
             <ngb-progressbar [type]="searchScoreClass" [value]="searchScore" class="search-score-bar mx-2" [max]="1"></ngb-progressbar>
           </div>
 
-          <small class="text-muted" [class.ml-auto]="!searchScore" i18n>Created: {{document.created | date}}</small>
+          <small class="text-muted" [class.ml-auto]="!searchScore" i18n>Created: {{document.created | customDate}}</small>
         </div>
 
       </div>
