@@ -79,7 +79,7 @@ export class SettingsComponent implements OnInit {
   }
 
   get dateLocaleOptions(): LanguageOption[] {
-    return [{code: "", name: $localize`Use same as display language`}].concat(this.settings.getLanguageOptions())
+    return [{code: "", name: $localize`Use date format of display language`}].concat(this.settings.getLanguageOptions())
   }
 
   get today() {
