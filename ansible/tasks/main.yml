@@ -155,7 +155,7 @@
 
 - name: move paperless-ng
   command:
-    cmd: "cp -a {{ tempdir.path }}/paperless-ng/ {{ paperlessng_directory }}"
+    cmd: "cp -a {{ tempdir.path }}/paperless-ng/. {{ paperlessng_directory }}"
   when: not reconfigure_only
 
 - name: remove temporary directory
@@ -367,7 +367,7 @@
     owner: "{{ paperlessng_system_user }}"
     group: "{{ paperlessng_system_group }}"
     mode: g-w,o-rwx
-  when: venv.changed or not not reconfigure_only
+  when: venv.changed or not reconfigure_only
 
 - name: configure ghostscript for PDF
   lineinfile:
