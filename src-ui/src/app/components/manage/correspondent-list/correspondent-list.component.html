@@ -21,7 +21,7 @@
       <td scope="row">{{ correspondent.name }}</td>
       <td scope="row">{{ getMatching(correspondent) }}</td>
       <td scope="row">{{ correspondent.document_count }}</td>
-      <td scope="row">{{ correspondent.last_correspondence | date }}</td>
+      <td scope="row">{{ correspondent.last_correspondence | customDate }}</td>
         <td scope="row">
           <div class="btn-group">
             <button class="btn btn-sm btn-outline-secondary" (click)="filterDocuments(correspondent)">

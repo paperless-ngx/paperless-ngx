@@ -16,7 +16,7 @@ export class SavedViewWidgetComponent implements OnInit {
     private documentService: DocumentService,
     private router: Router,
     private list: DocumentListViewService) { }
-  
+
   @Input()
   savedView: PaperlessSavedView
 
@@ -34,7 +34,7 @@ export class SavedViewWidgetComponent implements OnInit {
     } else {
       this.list.load(this.savedView)
       this.router.navigate(["documents"])
-      }
+    }
   }
 
 }

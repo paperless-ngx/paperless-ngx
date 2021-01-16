@@ -12,7 +12,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let doc of documents" routerLink="/documents/{{doc.id}}">
-        <td>{{doc.created | date}}</td>
+        <td>{{doc.created | customDate}}</td>
         <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ml-1"></app-tag>
       </tr>
     </tbody>
