@@ -41,7 +41,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
   })
 
   ngOnInit(): void {
-    // wait to enable close button so it doesnt steal focus form input
+    // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
       this.closeEnabled = true
     });

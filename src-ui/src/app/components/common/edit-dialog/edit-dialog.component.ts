@@ -40,7 +40,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       this.objectForm.patchValue(this.object)
     }
 
-    // we wait to enable the close button so it doesnt pull browser focus since its the first clickable element in the DOM
+    // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
       this.closeEnabled = true
     });
