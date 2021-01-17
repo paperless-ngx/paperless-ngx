@@ -48,15 +48,15 @@
 
             <div class="custom-control custom-radio">
               <input type="radio" id="dateFormatShort" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="shortDate">
-              <label class="custom-control-label" for="dateFormatShort" i18n>Short: {{today | customDate:'shortDate'}}</label>
+              <label class="custom-control-label" for="dateFormatShort" i18n>Short: {{today | customDate:'shortDate':null:comptuedDateLocale}}</label>
             </div>
             <div class="custom-control custom-radio">
               <input type="radio" id="dateFormatMedium" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="mediumDate">
-              <label class="custom-control-label" for="dateFormatMedium" i18n>Medium: {{today | customDate:'mediumDate'}}</label>
+              <label class="custom-control-label" for="dateFormatMedium" i18n>Medium: {{today | customDate:'mediumDate':null:comptuedDateLocale}}</label>
             </div>
             <div class="custom-control custom-radio">
               <input type="radio" id="dateFormatLong" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="longDate">
-              <label class="custom-control-label" for="dateFormatLong" i18n>Long: {{today | customDate:'longDate'}}</label>
+              <label class="custom-control-label" for="dateFormatLong" i18n>Long: {{today | customDate:'longDate':null:comptuedDateLocale}}</label>
             </div>
 
           </div>
