@@ -33,7 +33,7 @@ const SETTINGS: PaperlessSettings[] = [
   {key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, type: "boolean", default: true},
   {key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: "boolean", default: false},
   {key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: "boolean", default: false},
-  {key: SETTINGS_KEYS.DATE_LOCALE, type: "string", default: "de"},
+  {key: SETTINGS_KEYS.DATE_LOCALE, type: "string", default: ""},
   {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"}
 ]
 
