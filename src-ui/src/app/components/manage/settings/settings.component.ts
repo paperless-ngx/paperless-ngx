@@ -30,6 +30,10 @@ export class SettingsComponent implements OnInit {
 
   savedViews: PaperlessSavedView[]
 
+  get comptuedDateLocale(): string {
+    return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage
+  }
+
   constructor(
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
