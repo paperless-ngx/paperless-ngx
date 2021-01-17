@@ -1,7 +1,7 @@
   <form [formGroup]="objectForm" (ngSubmit)="save()">
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">{{getTitle()}}</h4>
-      <button type="button" class="close" aria-label="Close" (click)="cancel()">
+      <button type="button" [disabled]="!closeEnabled" class="close" aria-label="Close" (click)="cancel()">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
