@@ -11,7 +11,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="2155249406916744630">
         <source>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; saved successfully.</source>
-        <target>View &amp;quot;<x equiv-text="this.list.savedView.name" id="PH"/>&amp;quot; met succes opgeslagen.</target>
+        <target>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; met succes opgeslagen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">94</context>
@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="6837554170707123455">
         <source>View &quot;<x equiv-text="savedView.name" id="PH"/>&quot; created successfully.</source>
-        <target>View &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; met succes gemaakt.</target>
+        <target>View &quot;<x equiv-text="savedView.name" id="PH"/>&quot; met succes gemaakt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">115</context>
@@ -38,7 +38,7 @@
         <target>Niets selecteren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2ed8a0c2ce4968f8614151eefed20a0aa3daeeb9">
@@ -46,7 +46,7 @@
         <target>Selecteer pagina</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="b463541a7e303aa4d0b1102eaff8afbaf34e7a74">
@@ -54,15 +54,15 @@
         <target>Alles selecteren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="ec97f67072a83aaa972536b18d83179f6e4bbec9">
-        <source>Sort by</source>
-        <target>Sorteer op</target>
+      <trans-unit datatype="html" id="5d43539fc358c3a548b9d487be821db73e2702ff">
+        <source>Sort</source>
+        <target>Sorteren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="b7641aed03492978b4ec6843b1e53f30464294d9">
@@ -83,7 +83,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="72e7d343f9165602cce1ca7faffbc565fd31ef92">
         <source>Save &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
-        <target>Opslaan &amp;quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&amp;quot;</target>
+        <target>Opslaan &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
@@ -94,7 +94,7 @@
         <target>{VAR_PLURAL, plural, =1 {<x id="INTERPOLATION"/> van één document geselecteerd} other {<x id="INTERPOLATION"/> van <x id="INTERPOLATION_1"/> documenten geselecteerd}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bb773fdeaad5e7fb8e6cd77e1cc558e1b194a0c9">
@@ -102,7 +102,7 @@
         <target>{VAR_PLURAL, plural, =1 {Eén document} other {<x id="INTERPOLATION"/> documenten}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bb91083b44e3f77dd68de773ceab467ca3d57507">
@@ -110,7 +110,7 @@
         <target>(gefilterd)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ca0b795795658155d44ddca02e95f1feeeb4a88f">
@@ -118,7 +118,7 @@
         <target>ASN</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7b5c6286aaded63fb279d6deb8aa8c704e085ced">
@@ -126,7 +126,7 @@
         <target>Correspondent</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="fdf7cbdc140d0aab0f0b6c06065a0fd448ed6a2e">
@@ -134,7 +134,7 @@
         <target>Titel</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2bd5919e8098513664a89d5b7b52d61e3063950f">
@@ -142,7 +142,7 @@
         <target>Documenttype</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1b051734b0ee9021991c91b3ed4e81c244322462">
@@ -150,7 +150,7 @@
         <target>Aangemaakt</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="80e3b490720757978c99a7b5af3885faf202b955">
@@ -158,7 +158,7 @@
         <target>Toegevoegd</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9021887951960049161">
@@ -166,15 +166,15 @@
         <target>Bevestig het verwijderen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">192</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5382975254277698192">
         <source>Do you really want to delete document &quot;<x equiv-text="this.document.title" id="PH"/>&quot;?</source>
-        <target>Wilt u het document echt verwijderen &amp;quot;<x equiv-text="this.document.title" id="PH"/>&amp;quot;?</target>
+        <target>Wilt u het document echt verwijderen &quot;<x equiv-text="this.document.title" id="PH"/>&quot;?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">187</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6691075929777935948">
@@ -182,7 +182,7 @@
         <target>De bestanden voor dit document worden definitief verwijderd. Deze bewerking kan niet ongedaan worden gemaakt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">188</context>
+          <context context-type="linenumber">194</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="719892092227206532">
@@ -190,7 +190,7 @@
         <target>Verwijder document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">196</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1844801255494293730">
@@ -198,7 +198,7 @@
         <target>Fout bij het verwijderen van het document: <x equiv-text="JSON.stringify(error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">197</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="826b25211922a1b46436589233cb6f1a163d89b7">
@@ -427,7 +427,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="93754014749412887">
         <source>Do you really want to delete the tag &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Wil je het etiket echt verwijderen &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot;?</target>
+        <target>Wil je het etiket echt verwijderen &quot;<x equiv-text="object.name" id="PH"/>&quot;?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">30</context>
@@ -507,7 +507,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="4990731724078522539">
         <source>Do you really want to delete the document type &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Wilt u het documenttype echt verwijderen &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot;?</target>
+        <target>Wilt u het documenttype echt verwijderen &quot;<x equiv-text="object.name" id="PH"/>&quot;?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">26</context>
@@ -539,10 +539,10 @@
       </trans-unit>
       <trans-unit datatype="html" id="5610279464668232148">
         <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; deleted.</source>
-        <target>Opgeslagen view &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; verwijderd.</target>
+        <target>Opgeslagen view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; verwijderd.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5647210819299459618">
@@ -553,12 +553,28 @@
           <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="6839066544204061364">
+        <source>Use system language</source>
+        <target>Gebruik de systeemtaal</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7729897675462249787">
+        <source>Use date format of display language</source>
+        <target>Datumopmaak van weergavetaal gebruiken</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
         <source>Error while storing settings on server: <x equiv-text="JSON.stringify(error.error)" id="PH"/></source>
         <target>Fout bij het opslaan van de instellingen: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -582,7 +598,7 @@
         <target>Opgeslagen views</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13">
@@ -593,12 +609,92 @@
           <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="75f8908d266f7cc9b9e68e0be906fd080a223606">
+        <source>Display language</source>
+        <target>Taal</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1284a077dc18a2d1ff1b744f16f1797eea28ae37">
+        <source>You need to reload the page after applying a new language.</source>
+        <target>De pagina moet herladen worden nadat een andere taal werd gekozen.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="0cd55822928764cc82a62ee3e6f3adbc1c630479">
+        <source>Date display</source>
+        <target>Datumweergave</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7df4de0d0704a06a302d853e31f2580eba98f127">
+        <source>Date format</source>
+        <target>Datumopmaak</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="0f0c311d9a4e0cf399cc0ebbe233cacb4bdfca1f">
+        <source>Short: <x equiv-text="{{today | customDate:'shortDate'}}" id="INTERPOLATION"/></source>
+        <target>Kort: <x equiv-text="{{today | customDate:'shortDate'}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="579f2c7581cfe52e7e5db4985d036db18f640606">
+        <source>Medium: <x equiv-text="{{today | customDate:'mediumDate'}}" id="INTERPOLATION"/></source>
+        <target>Medium: <x equiv-text="{{today | customDate:'mediumDate'}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4eb0123bd8786494de05ba50cc4a0bfc2655c5df">
+        <source>Long: <x equiv-text="{{today | customDate:'longDate'}}" id="INTERPOLATION"/></source>
+        <target>Lang: <x equiv-text="{{today | customDate:'longDate'}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="2045151788cbdda7512752e408da59a6b54a8ef0">
         <source>Items per page</source>
         <target>Resultaten per pagina</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="c4435e56bf0289e78fedc462f1d21fb30b9de55d">
+        <source>Document editor</source>
+        <target>Documentbewerker</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4903e521c9bfd11ce88e7a5575106ef638912e0d">
+        <source>Use PDF viewer provided by the browser</source>
+        <target>Gebruik de PDF lezer ingebouwd in uw browser</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="d7db07023e53f8396d18d375c2b78c25fc81c197">
+        <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
+        <target>Dit is gewoonlijk sneller om grote PDF's te tonen, maar werkt niet bij elke browser.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ee5d1cbfd6ee168dae37aaba2b59b50bcabb2ff">
@@ -606,7 +702,7 @@
         <target>Nachtmodus</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="f8cb5506e70fd71fddc9bb71cee18bfff7b29637">
@@ -614,39 +710,7 @@
         <target>Gebruik systeeminstellingen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">36</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
-        <source>Bulk editing</source>
-        <target>Massabewerking</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">44</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
-        <source>Show confirmation dialogs</source>
-        <target>Toon dialoogvenster ter bevestiging</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">48</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
-        <source>Deleting documents will always ask for confirmation.</source>
-        <target>Er zal altijd om bevestiging gevraagd worden voor het verwijderen van documenten.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">48</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
-        <source>Apply on close</source>
-        <target>Toepassen bij het sluiten</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8ee474504043fa89821d626e4f3413240fa91b53">
@@ -654,7 +718,39 @@
         <target>Gebruik nachtmodus</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
+        <source>Bulk editing</source>
+        <target>Massabewerking</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
+        <source>Show confirmation dialogs</source>
+        <target>Toon dialoogvenster ter bevestiging</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
+        <source>Deleting documents will always ask for confirmation.</source>
+        <target>Er zal altijd om bevestiging gevraagd worden voor het verwijderen van documenten.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
+        <source>Apply on close</source>
+        <target>Toepassen bij het sluiten</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cb90334f5dfd7fc67205085f59381e2a334ccfc">
@@ -662,7 +758,7 @@
         <target>Komt voor bij</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6717cf1acf04728fc2b7c39f6d3297f8ff15fde5">
@@ -670,7 +766,7 @@
         <target>Toon op het dashboard</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="541bfc5b123b3f8867fd681eaceefb663a811973">
@@ -678,7 +774,7 @@
         <target>Toon in de zijbalk</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="abba764a7a595d04dc8c3b26e04b3780d4fdb540">
@@ -686,7 +782,7 @@
         <target>Geen opgeslagen views gedefinieerd.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ef60a738a565f498b858e903e42bc5ffc3cc1299">
@@ -699,7 +795,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7427874343955308724">
         <source>Do you really want to delete the correspondent &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Bent u zeker dat u correspondent &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot; wilt verwijderen?</target>
+        <target>Bent u zeker dat u correspondent &quot;<x equiv-text="object.name" id="PH"/>&quot; wilt verwijderen?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">26</context>
@@ -867,7 +963,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="afa760e48c97d64d19c1455d18b7834a2256e23f">
         <source>Did you mean &quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&quot;?</source>
-        <target>Bedoelde u &amp;quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&amp;quot;?</target>
+        <target>Bedoelde u &quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&quot;?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
           <context context-type="linenumber">13</context>
@@ -1039,7 +1135,7 @@
         <target>Correspondenten filteren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="0ad509732aaf702b7ea8c771c7809fa84bc85908">
@@ -1047,7 +1143,7 @@
         <target>Documenttypes filteren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2d9d55f1b70142ff4597ba32179d16888fd9c6b2">
@@ -1055,7 +1151,7 @@
         <target>Filters terug zetten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7593728289020204896">
@@ -1063,7 +1159,7 @@
         <target>Niet toegekend</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <note from="description" priority="1">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
       </trans-unit>
@@ -1072,7 +1168,7 @@
         <target>Toepassen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4873149362496451858">
@@ -1139,12 +1235,12 @@
           <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="1b29a8153575e5ad26cc7dd8bd75c4f45f6bfe7e">
-        <source>Created: <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></source>
-        <target>Aangemaakt op: <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="849b42384616374df49bd8b3711ec159cb10b845">
+        <source>Created: <x equiv-text="{{document.created | customDate}}" id="INTERPOLATION"/></source>
+        <target>Aangemaakt op: <x equiv-text="{{document.created | customDate}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="cd6f3fd48957e1fea6545c2b2defc7b2435ebfa8">
@@ -1168,7 +1264,7 @@
         <target>Score:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2840db547019ce8c76b2cdbe3a1653c5b68b06af">
@@ -1189,7 +1285,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="8639884465898458690">
         <source>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; and &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</source>
-        <target>&amp;quot;<x equiv-text="items[0].name" id="PH"/>&amp;quot; en &amp;quot;<x equiv-text="items[1].name" id="PH_1"/>&amp;quot;</target>
+        <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; en &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">114</context>
@@ -1198,7 +1294,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7894972847287473517">
         <source>&quot;<x equiv-text="i.name" id="PH"/>&quot;</source>
-        <target>&amp;quot;<x equiv-text="i.name" id="PH"/>&amp;quot;</target>
+        <target>&quot;<x equiv-text="i.name" id="PH"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">116</context>
@@ -1215,7 +1311,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="1822679894391095557">
         <source><x equiv-text="list" id="PH"/> and &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</source>
-        <target><x equiv-text="list" id="PH"/> en &amp;quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&amp;quot;</target>
+        <target><x equiv-text="list" id="PH"/> en &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">117</context>
@@ -1232,7 +1328,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="6619516195038467207">
         <source>This operation will add the tag &quot;<x equiv-text="tag.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Het etiket &amp;quot;<x equiv-text="tag.name" id="PH"/>&amp;quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
+        <target>Het etiket &quot;<x equiv-text="tag.name" id="PH"/>&quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">129</context>
@@ -1248,7 +1344,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7181166515756808573">
         <source>This operation will remove the tag &quot;<x equiv-text="tag.name" id="PH"/>&quot; from <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Het etiket &amp;quot;<x equiv-text="tag.name" id="PH"/>&amp;quot; zal verwijderd worden van <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en).</target>
+        <target>Het etiket &quot;<x equiv-text="tag.name" id="PH"/>&quot; zal verwijderd worden van <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">134</context>
@@ -1280,7 +1376,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="6900893559485781849">
         <source>This operation will assign the correspondent &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>De correspondent &amp;quot;<x equiv-text="correspondent.name" id="PH"/>&amp;quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
+        <target>De correspondent &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">160</context>
@@ -1304,7 +1400,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="332180123895325027">
         <source>This operation will assign the document type &quot;<x equiv-text="documentType.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Het documenttype &amp;quot;<x equiv-text="documentType.name" id="PH"/>&amp;quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
+        <target>Het documenttype &quot;<x equiv-text="documentType.name" id="PH"/>&quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">183</context>
@@ -1355,7 +1451,7 @@
         <target>Selecteer:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="dfc3c34e182ea73c5d784ff7c8135f087992dac1">
@@ -1363,7 +1459,7 @@
         <target>Alles</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="907df6a2b68daecc3c399cf40a764b358bd9fd84">
@@ -1371,7 +1467,7 @@
         <target>Bewerk:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="27d158b47717ff9305d19866960418c603f19d55">
@@ -1572,6 +1668,38 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="5866254605255506989">
+        <source>English</source>
+        <target>Engels</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1858110241312746425">
+        <source>German</source>
+        <target>Duits</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3071065188816255493">
+        <source>Dutch</source>
+        <target>Nederlands</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7633754075223722162">
+        <source>French</source>
+        <target>Frans</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1519954996184640001">
