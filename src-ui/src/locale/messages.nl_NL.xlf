@@ -542,7 +542,7 @@
         <target>Opgeslagen view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; verwijderd.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5647210819299459618">
@@ -550,7 +550,7 @@
         <target>Instellingen succesvol opgeslagen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">78</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6839066544204061364">
@@ -558,7 +558,7 @@
         <target>Gebruik de systeemtaal</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7729897675462249787">
@@ -566,7 +566,7 @@
         <target>Datumopmaak van weergavetaal gebruiken</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -574,7 +574,7 @@
         <target>Fout bij het opslaan van de instellingen: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -641,25 +641,25 @@
           <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="0f0c311d9a4e0cf399cc0ebbe233cacb4bdfca1f">
-        <source>Short: <x equiv-text="{{today | customDate:'shortDate'}}" id="INTERPOLATION"/></source>
-        <target>Kort: <x equiv-text="{{today | customDate:'shortDate'}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="69852399a18b8ca4fca8c5bfddd3f00a6d137593">
+        <source>Short: <x equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Kort: <x equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="579f2c7581cfe52e7e5db4985d036db18f640606">
-        <source>Medium: <x equiv-text="{{today | customDate:'mediumDate'}}" id="INTERPOLATION"/></source>
-        <target>Medium: <x equiv-text="{{today | customDate:'mediumDate'}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="d01a59285e711252b98c4f193394e4b854615c78">
+        <source>Medium: <x equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Medium: <x equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="4eb0123bd8786494de05ba50cc4a0bfc2655c5df">
-        <source>Long: <x equiv-text="{{today | customDate:'longDate'}}" id="INTERPOLATION"/></source>
-        <target>Lang: <x equiv-text="{{today | customDate:'longDate'}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="00481629776699b1caebd12b3b1176e2e23740a8">
+        <source>Long: <x equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Lang: <x equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">59</context>
@@ -862,7 +862,7 @@
         <target>Algoritme voor het bepalen van de overeenkomst</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="eab7fc7cf2d663e54de934b779fce4275a303f0f">
@@ -870,7 +870,7 @@
         <target>Patroon voor overeenkomst</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="632e529f49cf3d367dfbd15bd055e9b53aef30fb">
@@ -878,7 +878,7 @@
         <target>Niet hoofdlettergevoelig</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9153094873118985366">
@@ -1883,7 +1883,7 @@
         <target>Maak nieuw item</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5324147361912094446">
@@ -1891,7 +1891,7 @@
         <target>Item bewerken</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1699589597032579396">
@@ -1899,7 +1899,7 @@
         <target>Kon het element niet opslaan: <x equiv-text="error" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="810888510148304696">
