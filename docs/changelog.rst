@@ -11,11 +11,20 @@ paperless-ng 1.0.0
 
 Nothing special about this release, but since there are relatively few bug reports coming in, I think that this is reasonably stable.
 
-* Changes and additions
+* Document export
+
+  * The document exporter has been rewritten to support updating an already existing export in place.
+  * The document exporter supports naming exported files according to ``PAPERLESS_FILENAME_FORMAT``.
+  * The document exporter locks the media directory and the database during execution to ensure that
+    the resulting export is consistent.
+  * See the :ref:`updated documentation <utilities-exporter>` for more details.
+
+* Other changes and additions
 
   * Added a language selector to the settings.
   * Added date format options to the settings.
   * Range selection with shift clicking is now possible in the document list.
+
 
 
 paperless-ng 0.9.14
