@@ -542,7 +542,7 @@
         <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; supprimée.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5647210819299459618">
@@ -550,7 +550,23 @@
         <target>Paramètres enregistrés avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="6839066544204061364">
+        <source>Use system language</source>
+        <target>Utiliser la langue du système</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7729897675462249787">
+        <source>Use date format of display language</source>
+        <target>Utiliser le format de date de la langue d'affichage</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -558,7 +574,7 @@
         <target>Une erreur s'est produite lors de l'enregistrement des paramètres sur le serveur : <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -582,7 +598,7 @@
         <target>Vues enregistrées</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13">
@@ -609,20 +625,60 @@
           <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="2045151788cbdda7512752e408da59a6b54a8ef0">
-        <source>Items per page</source>
-        <target>Éléments par page</target>
+      <trans-unit datatype="html" id="0cd55822928764cc82a62ee3e6f3adbc1c630479">
+        <source>Date display</source>
+        <target>Affichage de la date</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="c4435e56bf0289e78fedc462f1d21fb30b9de55d">
-        <source>Document editor</source>
-        <target>Éditeur de documents</target>
+      <trans-unit datatype="html" id="7df4de0d0704a06a302d853e31f2580eba98f127">
+        <source>Date format</source>
+        <target>Format de date</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="69852399a18b8ca4fca8c5bfddd3f00a6d137593">
+        <source>Short: <x equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Court : <x equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="d01a59285e711252b98c4f193394e4b854615c78">
+        <source>Medium: <x equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Moyen : <x equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="00481629776699b1caebd12b3b1176e2e23740a8">
+        <source>Long: <x equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Long : <x equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="2045151788cbdda7512752e408da59a6b54a8ef0">
+        <source>Items per page</source>
+        <target>Éléments par page</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="c4435e56bf0289e78fedc462f1d21fb30b9de55d">
+        <source>Document editor</source>
+        <target>Visionneuse de documents</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4903e521c9bfd11ce88e7a5575106ef638912e0d">
@@ -630,7 +686,7 @@
         <target>Utiliser la visionneuse PDF fournie par le navigateur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="d7db07023e53f8396d18d375c2b78c25fc81c197">
@@ -638,7 +694,7 @@
         <target>Cette option est généralement plus rapide pour l'affichage de grands documents PDF, mais elle peut ne pas fonctionner sur certains navigateurs.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ee5d1cbfd6ee168dae37aaba2b59b50bcabb2ff">
@@ -646,7 +702,7 @@
         <target>Mode sombre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="f8cb5506e70fd71fddc9bb71cee18bfff7b29637">
@@ -654,7 +710,7 @@
         <target>Utiliser les paramètres du système</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8ee474504043fa89821d626e4f3413240fa91b53">
@@ -662,7 +718,7 @@
         <target>Activer le mode sombre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
@@ -670,7 +726,7 @@
         <target>Edition en masse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
@@ -678,7 +734,7 @@
         <target>Afficher les messages de confirmation</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
@@ -686,7 +742,7 @@
         <target>La suppression de documents requiert toujours une confirmation.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
@@ -694,7 +750,7 @@
         <target>Appliquer lors de la fermeture</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cb90334f5dfd7fc67205085f59381e2a334ccfc">
@@ -702,7 +758,7 @@
         <target>Apparaît sur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6717cf1acf04728fc2b7c39f6d3297f8ff15fde5">
@@ -710,7 +766,7 @@
         <target>Montrer sur le tableau de bord</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="541bfc5b123b3f8867fd681eaceefb663a811973">
@@ -718,7 +774,7 @@
         <target>Montrer dans la barre latérale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="abba764a7a595d04dc8c3b26e04b3780d4fdb540">
@@ -726,7 +782,7 @@
         <target>Aucune vue sauvegardée n'est définie.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ef60a738a565f498b858e903e42bc5ffc3cc1299">
@@ -806,7 +862,7 @@
         <target>Algorithme de rapprochement</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="eab7fc7cf2d663e54de934b779fce4275a303f0f">
@@ -814,7 +870,7 @@
         <target>Modèle de rapprochement</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="632e529f49cf3d367dfbd15bd055e9b53aef30fb">
@@ -822,7 +878,7 @@
         <target>Insensible à la casse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9153094873118985366">
@@ -1179,9 +1235,9 @@
           <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="1b29a8153575e5ad26cc7dd8bd75c4f45f6bfe7e">
-        <source>Created: <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></source>
-        <target>Créé le : <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="849b42384616374df49bd8b3711ec159cb10b845">
+        <source>Created: <x equiv-text="{{document.created | customDate}}" id="INTERPOLATION"/></source>
+        <target>Créé le : <x equiv-text="{{document.created | customDate}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">67</context>
@@ -1614,20 +1670,12 @@
           <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="6839066544204061364">
-        <source>Use system language</source>
-        <target>Utiliser la langue du système</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">64</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="5866254605255506989">
         <source>English</source>
         <target>Anglais</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1858110241312746425">
@@ -1635,7 +1683,7 @@
         <target>Allemand</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">75</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3071065188816255493">
@@ -1643,7 +1691,7 @@
         <target>Néerlandais</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7633754075223722162">
@@ -1651,7 +1699,7 @@
         <target>Français</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1519954996184640001">
@@ -1835,7 +1883,7 @@
         <target>Créer un nouvel élément</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5324147361912094446">
@@ -1843,7 +1891,7 @@
         <target>Éditer l'élément</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1699589597032579396">
@@ -1851,7 +1899,7 @@
         <target>Impossible d'enregistrer l'élément : <x equiv-text="error" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="810888510148304696">
