@@ -24,6 +24,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.d1 = Document.objects.create(content="Content", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", title="wow1", filename="0000001.pdf", mime_type="application/pdf")
         self.d2 = Document.objects.create(content="Content", checksum="9c9691e51741c1f4f41a20896af31770", title="wow2", filename="0000002.pdf", mime_type="application/pdf")
         self.d3 = Document.objects.create(content="Content", checksum="d38d7ed02e988e072caf924e0f3fcb76", title="wow2", filename="0000003.pdf", mime_type="application/pdf")
+        self.d4 = Document.objects.create(content="Content", checksum="82186aaa94f0b98697d704b90fd1c072", title="wow_dec", filename="0000004.pdf.gpg", mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
+
         self.t1 = Tag.objects.create(name="t")
         self.dt1 = DocumentType.objects.create(name="dt")
         self.c1 = Correspondent.objects.create(name="c")
@@ -34,6 +36,9 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.d1.save()
         super(TestExportImport, self).setUp()
 
+    @override_settings(
+        PASSPHRASE="test"
+    )
     def _do_export(self, use_filename_format=False, compare_checksums=False):
         args = ['document_exporter', self.target]
         if use_filename_format:
@@ -54,8 +59,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 6)
-        self.assertEqual(len(list(filter(lambda e: e['model'] == 'documents.document', manifest))), 3)
+        self.assertEqual(len(manifest), 7)
+        self.assertEqual(len(list(filter(lambda e: e['model'] == 'documents.document', manifest))), 4)
 
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
 
@@ -69,6 +74,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
                     checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(checksum, element['fields']['checksum'])
 
+                self.assertEqual(element['fields']['storage_type'], Document.STORAGE_TYPE_UNENCRYPTED)
+
                 if document_exporter.EXPORTER_ARCHIVE_NAME in element:
                     fname = os.path.join(self.target, element[document_exporter.EXPORTER_ARCHIVE_NAME])
                     self.assertTrue(os.path.exists(fname))
@@ -78,7 +85,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
                     self.assertEqual(checksum, element['fields']['archive_checksum'])
 
         with paperless_environment() as dirs:
-            self.assertEqual(Document.objects.count(), 3)
+            self.assertEqual(Document.objects.count(), 4)
             Document.objects.all().delete()
             Correspondent.objects.all().delete()
             DocumentType.objects.all().delete()
@@ -86,13 +93,14 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(Document.objects.count(), 0)
 
             call_command('document_importer', self.target)
-            self.assertEqual(Document.objects.count(), 3)
+            self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(Tag.objects.count(), 1)
             self.assertEqual(Correspondent.objects.count(), 1)
             self.assertEqual(DocumentType.objects.count(), 1)
             self.assertEqual(Document.objects.get(id=self.d1.id).title, "wow1")
             self.assertEqual(Document.objects.get(id=self.d2.id).title, "wow2")
             self.assertEqual(Document.objects.get(id=self.d3.id).title, "wow2")
+            self.assertEqual(Document.objects.get(id=self.d4.id).title, "wow_dec")
             messages = check_sanity()
             # everything is alright after the test
             self.assertEqual(len(messages), 0, str([str(m) for m in messages]))

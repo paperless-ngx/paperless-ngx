@@ -91,7 +91,7 @@ def generate_unique_filename(doc, root):
             return new_filename
 
 
-def generate_filename(doc, counter=0):
+def generate_filename(doc, counter=0, append_gpg=True):
     path = ""
 
     try:
@@ -151,7 +151,7 @@ def generate_filename(doc, counter=0):
         filename = f"{doc.pk:07}{counter_str}{doc.file_type}"
 
     # Append .gpg for encrypted files
-    if doc.storage_type == doc.STORAGE_TYPE_GPG:
+    if append_gpg and doc.storage_type == doc.STORAGE_TYPE_GPG:
         filename += ".gpg"
 
     return filename
