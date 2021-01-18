@@ -47,12 +47,14 @@ class TestExportImport(DirectoriesMixin, TestCase):
     @override_settings(
         PASSPHRASE="test"
     )
-    def _do_export(self, use_filename_format=False, compare_checksums=False):
+    def _do_export(self, use_filename_format=False, compare_checksums=False, delete=False):
         args = ['document_exporter', self.target]
         if use_filename_format:
             args += ["--use-filename-format"]
         if compare_checksums:
             args += ["--compare-checksums"]
+        if delete:
+            args += ["--delete"]
 
         call_command(*args)
 
@@ -182,8 +184,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])))
         self.d3.delete()
 
-        manifest2 = self._do_export()
+        manifest = self._do_export()
         self.assertRaises(ValueError, self._get_document_from_manifest, manifest, self.d3.id)
+        self.assertTrue(os.path.isfile(os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])))
+
+        manifest = self._do_export(delete=True)
         self.assertFalse(os.path.isfile(os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])))
 
         self.assertTrue(len(manifest), 6)
@@ -200,11 +205,13 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self.d1.title = "new_title"
         self.d1.save()
-        self._do_export(use_filename_format=True)
+        self._do_export(use_filename_format=True, delete=True)
         self.assertFalse(os.path.isfile(os.path.join(self.target, "wow1", "c.pdf")))
         self.assertFalse(os.path.isdir(os.path.join(self.target, "wow1")))
         self.assertTrue(os.path.isfile(os.path.join(self.target, "new_title", "c.pdf")))
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        self.assertTrue(os.path.isfile(os.path.join(self.target, "wow2", "none.pdf")))
+        self.assertTrue(os.path.isfile(os.path.join(self.target, "wow2", "none_01.pdf")))
 
     def test_export_missing_files(self):
 

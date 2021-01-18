@@ -31,7 +31,7 @@ class Command(Renderable, BaseCommand):
         parser.add_argument("target")
 
         parser.add_argument(
-            "--compare-checksums",
+            "-c", "--compare-checksums",
             default=False,
             action="store_true",
             help="Compare file checksums when determining whether to export "
@@ -40,11 +40,20 @@ class Command(Renderable, BaseCommand):
         )
 
         parser.add_argument(
-            "--use-filename-format",
+            "-f", "--use-filename-format",
             default=False,
             action="store_true",
             help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
                  "export directory, if configured."
+        )
+
+        parser.add_argument(
+            "-d", "--delete",
+            default=False,
+            action="store_true",
+            help="After exporting, delete files in the export directory that "
+                 "do not belong to the current export, such as files from "
+                 "deleted documents."
         )
 
     def __init__(self, *args, **kwargs):
@@ -54,12 +63,14 @@ class Command(Renderable, BaseCommand):
         self.exported_files = []
         self.compare_checksums = False
         self.use_filename_format = False
+        self.delete = False
 
     def handle(self, *args, **options):
 
         self.target = options["target"]
         self.compare_checksums = options['compare_checksums']
         self.use_filename_format = options['use_filename_format']
+        self.delete = options['delete']
 
         if not os.path.exists(self.target):
             raise CommandError("That path doesn't exist")
@@ -176,15 +187,17 @@ class Command(Renderable, BaseCommand):
         with open(manifest_path, "w") as f:
             json.dump(manifest, f, indent=2)
 
-        if manifest_path in self.files_in_export_dir:
-            self.files_in_export_dir.remove(manifest_path)
+        if self.delete:
+            # 5. Remove files which we did not explicitly export in this run
 
-        # 5. Remove files which we did not explicitly export in this run
-        for f in self.files_in_export_dir:
-            os.remove(f)
+            if manifest_path in self.files_in_export_dir:
+                self.files_in_export_dir.remove(manifest_path)
 
-            delete_empty_directories(os.path.abspath(os.path.dirname(f)),
-                                     os.path.abspath(self.target))
+            for f in self.files_in_export_dir:
+                os.remove(f)
+
+                delete_empty_directories(os.path.abspath(os.path.dirname(f)),
+                                         os.path.abspath(self.target))
 
     def check_and_copy(self, source, source_checksum, target):
         if os.path.abspath(target) in self.files_in_export_dir:
