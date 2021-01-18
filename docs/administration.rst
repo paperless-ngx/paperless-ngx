@@ -53,6 +53,9 @@ Restoring
 Updating Paperless
 ##################
 
+Docker Route
+============
+
 If a new release of paperless-ng is available, upgrading depends on how you
 installed paperless-ng in the first place. The releases are available at the
 `release page <https://github.com/jonaswinkler/paperless-ng/releases>`_.
@@ -72,10 +75,10 @@ A.  If you pull the image from the docker hub, all you need to do is:
 
         $ docker-compose pull
         $ docker-compose up
-    
+
     The docker-compose files refer to the ``latest`` version, which is always the latest
     stable release.
-        
+
 B.  If you built the image yourself, do the following:
 
     .. code:: shell-session
@@ -89,13 +92,13 @@ Running `docker-compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop paperless.
 Then you can start paperless-ng with ``-d`` to have it run in the background.
 
-Updating paperless without docker
-=================================
+Bare Metal Route
+================
 
 After grabbing the new release and unpacking the contents, do the following:
 
 1.  Update dependencies. New paperless version may require additional
-    dependencies. The dependencies required are listed in the section about 
+    dependencies. The dependencies required are listed in the section about
     :ref:`bare metal installations <setup-bare_metal>`.
 
 2.  Update python requirements. If you use Pipenv, this is done with the following steps.
@@ -112,18 +115,50 @@ After grabbing the new release and unpacking the contents, do the following:
 
     You can also use the included ``requirements.txt`` file instead and create the virtual
     environment yourself. This file includes exactly the same dependencies.
-    
+
 3.  Migrate the database.
 
     .. code:: shell-session
 
         $ cd src
         $ pipenv run python3 manage.py migrate
-    
+
     This might not actually do anything. Not every new paperless version comes with new
     database migrations.
-    
-        
+
+Ansible Route
+=============
+
+Most of the update process is automated when using the ansible role.
+
+1.  Backup your defined role variables file outside the paperless source-tree:
+
+    .. code:: shell-session
+
+        $ cp ansible/vars.yml ~/vars.yml.old
+
+2.  Pull the release tag you want to update to:
+
+    .. code:: shell-session
+
+        $ git fetch --all
+        $ git checkout ng-0.9.14
+
+3.  Update the role variable definitions ``ansible/vars.yml`` (where appropriate).
+
+4.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
+
+    .. note::
+
+        When ansible detects that an update run is in progress, it backs up the entire ``paperlessng_directory`` to ``paperlessng_directory-TIMESTAMP``.
+        Updates can be rolled back by simply moving the timestamped folder back to the original location.
+        If the update succeeds and you want to continue using the new release, please don't forget to delete the backup folder.
+
+    .. code:: shell-session
+
+        $ ansible-playbook playbook.yml
+
+
 Management utilities
 ####################
 
@@ -361,7 +396,7 @@ Documents can be stored in Paperless using GnuPG encryption.
     Furthermore, the entire text content of the documents is stored plain in the
     database, even if your documents are encrypted. Filenames are not encrypted as
     well.
-    
+
     Also, the web server provides transparent access to your encrypted documents.
 
     Consider running paperless on an encrypted filesystem instead, which will then
