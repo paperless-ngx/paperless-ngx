@@ -12,6 +12,7 @@ from django.test import TestCase, override_settings
 from documents.management.commands import document_exporter
 from documents.models import Document, Tag, DocumentType, Correspondent
 from documents.sanity_checker import check_sanity
+from documents.settings import EXPORTER_FILE_NAME
 from documents.tests.utils import DirectoriesMixin, paperless_environment
 
 
@@ -35,6 +36,13 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.d1.document_type = self.dt1
         self.d1.save()
         super(TestExportImport, self).setUp()
+
+    def _get_document_from_manifest(self, manifest, id):
+        f = list(filter(lambda d: d['model'] == "documents.document" and d['pk'] == id, manifest))
+        if len(f) == 1:
+            return f[0]
+        else:
+            raise ValueError(f"document with id {id} does not exist in manifest")
 
     @override_settings(
         PASSPHRASE="test"
@@ -119,11 +127,14 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self._do_export()
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
 
+        st_mtime_1 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
+
         with mock.patch("documents.management.commands.document_exporter.shutil.copy2") as m:
             self._do_export()
             m.assert_not_called()
 
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+        st_mtime_2 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
         Path(self.d1.source_path).touch()
 
@@ -131,7 +142,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self._do_export()
             self.assertEqual(m.call_count, 1)
 
+        st_mtime_3 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+
+        self.assertNotEqual(st_mtime_1, st_mtime_2)
+        self.assertNotEqual(st_mtime_2, st_mtime_3)
 
     def test_update_export_changed_checksum(self):
         shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
@@ -155,6 +170,23 @@ class TestExportImport(DirectoriesMixin, TestCase):
             self.assertEqual(m.call_count, 1)
 
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
+
+    def test_update_export_deleted_document(self):
+        shutil.rmtree(os.path.join(self.dirs.media_dir, "documents"))
+        shutil.copytree(os.path.join(os.path.dirname(__file__), "samples", "documents"), os.path.join(self.dirs.media_dir, "documents"))
+
+        manifest = self._do_export()
+
+        self.assertTrue(len(manifest), 7)
+        doc_from_manifest = self._get_document_from_manifest(manifest, self.d3.id)
+        self.assertTrue(os.path.isfile(os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])))
+        self.d3.delete()
+
+        manifest2 = self._do_export()
+        self.assertRaises(ValueError, self._get_document_from_manifest, manifest, self.d3.id)
+        self.assertFalse(os.path.isfile(os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])))
+
+        self.assertTrue(len(manifest), 6)
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{title}/{correspondent}")
     def test_update_export_changed_location(self):
