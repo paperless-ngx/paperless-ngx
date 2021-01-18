@@ -108,7 +108,8 @@ class Command(Renderable, BaseCommand):
             while True:
                 if self.use_filename_format:
                     base_name = generate_filename(
-                        document, counter=filename_counter)
+                        document, counter=filename_counter,
+                        append_gpg=False)
                 else:
                     base_name = document.get_public_filename(
                         counter=filename_counter)
@@ -139,15 +140,18 @@ class Command(Renderable, BaseCommand):
             t = int(time.mktime(document.created.timetuple()))
             if document.storage_type == Document.STORAGE_TYPE_GPG:
 
+                os.makedirs(os.path.dirname(original_target), exist_ok=True)
                 with open(original_target, "wb") as f:
                     f.write(GnuPG.decrypted(document.source_file))
                     os.utime(original_target, times=(t, t))
 
+                os.makedirs(os.path.dirname(thumbnail_target), exist_ok=True)
                 with open(thumbnail_target, "wb") as f:
                     f.write(GnuPG.decrypted(document.thumbnail_file))
                     os.utime(thumbnail_target, times=(t, t))
 
                 if archive_target:
+                    os.makedirs(os.path.dirname(archive_target), exist_ok=True)
                     with open(archive_target, "wb") as f:
                         f.write(GnuPG.decrypted(document.archive_path))
                         os.utime(archive_target, times=(t, t))
