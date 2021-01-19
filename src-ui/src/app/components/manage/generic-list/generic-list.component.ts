@@ -1,17 +1,19 @@
-import { Directive, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Directive, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatchingModel, MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
-import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
+import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service';
 import { ToastService } from 'src/app/services/toast.service';
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component';
 
 @Directive()
-export abstract class GenericListComponent<T extends ObjectWithId> implements OnInit {
+export abstract class GenericListComponent<T extends ObjectWithId> implements OnInit, OnDestroy {
 
   constructor(
-    private service: AbstractPaperlessService<T>,
+    private service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
     private editDialogComponent: any,
     private toastService: ToastService) {
@@ -27,6 +29,10 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
 
   public sortField: string
   public sortReverse: boolean
+
+  private nameFilterDebounce: Subject<string>
+  private subscription: Subscription
+  private _nameFilter: string
 
   getMatching(o: MatchingModel) {
     if (o.matching_algorithm == MATCH_AUTO) {
@@ -44,12 +50,27 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
     this.reloadData()
   }
 
+
   ngOnInit(): void {
     this.reloadData()
+
+    this.nameFilterDebounce = new Subject<string>()
+
+    this.subscription = this.nameFilterDebounce.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(title => {
+      this._nameFilter = title
+      this.reloadData()
+    })
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe()
   }
 
   reloadData() {
-    this.service.list(this.page, null, this.sortField, this.sortReverse).subscribe(c => {
+    this.service.listFiltered(this.page, null, this.sortField, this.sortReverse, this._nameFilter).subscribe(c => {
       this.data = c.results
       this.collectionSize = c.count
     });
@@ -94,5 +115,13 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
       })
     }
     )
+  }
+
+  get nameFilter() {
+    return this._nameFilter
+  }
+
+  set nameFilter(nameFilter: string) {
+    this.nameFilterDebounce.next(nameFilter)
   }
 }
