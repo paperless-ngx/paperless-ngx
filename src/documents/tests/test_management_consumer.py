@@ -7,8 +7,9 @@ from unittest import mock
 
 from django.conf import settings
 from django.core.management import call_command, CommandError
-from django.test import override_settings, TransactionTestCase
+from django.test import override_settings, TransactionTestCase, TestCase
 
+from documents.management.commands.document_consumer import _test_inotify
 from documents.models import Tag
 from documents.consumer import ConsumerError
 from documents.management.commands import document_consumer
@@ -260,3 +261,27 @@ class TestConsumerTags(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
     @override_settings(CONSUMER_POLLING=1)
     def test_consume_file_with_path_tags_polling(self):
         self.test_consume_file_with_path_tags()
+
+
+class TestInotify(DirectoriesMixin, TestCase):
+
+    def test_inotify(self):
+        self.assertTrue(_test_inotify(self.dirs.consumption_dir))
+
+    @mock.patch("documents.management.commands.document_consumer.Path.touch")
+    def test_inotify_error(self, m):
+        m.side_effect = OSError("Permission error")
+        self.assertFalse(_test_inotify(self.dirs.consumption_dir))
+
+    @mock.patch("documents.management.commands.document_consumer.Command.handle_polling")
+    @mock.patch("documents.management.commands.document_consumer.Command.handle_inotify")
+    @mock.patch("documents.management.commands.document_consumer._test_inotify")
+    def test_polling_fallback(self, test_inotify, handle_inotify, handle_polling):
+        test_inotify.return_value = False
+
+        cmd = document_consumer.Command()
+        cmd.handle(directory=settings.CONSUMPTION_DIR, oneshot=False)
+
+        test_inotify.assert_called_once()
+        handle_polling.assert_called_once()
+        handle_inotify.assert_not_called()
