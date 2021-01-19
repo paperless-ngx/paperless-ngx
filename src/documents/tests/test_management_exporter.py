@@ -74,6 +74,11 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
 
+        self.assertEqual(self._get_document_from_manifest(manifest, self.d1.id)['fields']['title'], "wow1")
+        self.assertEqual(self._get_document_from_manifest(manifest, self.d2.id)['fields']['title'], "wow2")
+        self.assertEqual(self._get_document_from_manifest(manifest, self.d3.id)['fields']['title'], "wow2")
+        self.assertEqual(self._get_document_from_manifest(manifest, self.d4.id)['fields']['title'], "wow_dec")
+
         for element in manifest:
             if element['model'] == 'documents.document':
                 fname = os.path.join(self.target, element[document_exporter.EXPORTER_FILE_NAME])
