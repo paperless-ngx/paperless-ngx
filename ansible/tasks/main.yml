@@ -105,46 +105,64 @@
   ignore_errors: yes
   register: paperlessng_current_version
 
+- name: register current state
+  set_fact:
+    fresh_installation: '{{ "No such file or directory" in paperlessng_current_version.stderr }}'
+    update_installation: '{{ "No such file or directory" not in paperlessng_current_version.stderr and paperlessng_current_version.stdout != paperlessng_version | string }}'
+    reconfigure_only: '{{ paperlessng_current_version.stdout == paperlessng_version | string }}'
+
 - name: backup current paperless-ng installation
   copy:
     src: "{{ paperlessng_directory }}"
     remote_src: yes
     dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
-  when: '"No such file or directory" not in paperlessng_current_version.stderr and paperlessng_current_version.stdout != paperlessng_version | string'
+  when: update_installation
+
+- name: remove current paperless sources
+  file:
+    path: "{{ paperlessng_directory }}/{{ item }}"
+    state: absent
+  with_items:
+    - docker
+    - docs
+    - scripts
+    - src
+    - static
+  when: update_installation
 
 - name: create temporary directory
   tempfile:
     state: directory
   register: tempdir
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+  when: not reconfigure_only
 
 - name: extract paperless-ng
   unarchive:
     src: "https://github.com/jonaswinkler/paperless-ng/releases/download/ng-{{ paperlessng_version }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
     remote_src: yes
     dest: "{{ tempdir.path }}"
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+  when: not reconfigure_only
 
 - name: change owner and permissions of paperless-ng
   command:
     cmd: "{{ item }}"
     warn: false
   with_items:
-  - "chown -R {{ paperlessng_system_user }}:{{ paperlessng_system_group }} {{ tempdir.path }}"
-  - "find {{ tempdir.path }} -type d -exec chmod 0750 {} ;"
-  - "find {{ tempdir.path }} -type f -exec chmod 0640 {} ;"
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+    - "chown -R {{ paperlessng_system_user }}:{{ paperlessng_system_group }} {{ tempdir.path }}"
+    - "find {{ tempdir.path }} -type d -exec chmod 0750 {} ;"
+    - "find {{ tempdir.path }} -type f -exec chmod 0640 {} ;"
+  when: not reconfigure_only
 
 - name: move paperless-ng
   command:
-    cmd: "cp -a {{ tempdir.path }}/paperless-ng/ {{ paperlessng_directory }}"
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+    cmd: "cp -a {{ tempdir.path }}/paperless-ng/. {{ paperlessng_directory }}"
+  when: not reconfigure_only
 
 - name: remove temporary directory
   file:
     path: "{{ tempdir.path }}"
     state: absent
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+  when: not reconfigure_only
 
 - name: create paperless-ng directories and set permissions
   file:
@@ -281,7 +299,7 @@
     dest: /etc/paperless.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   register: configuration
 
 - name: create paperlessng venv
@@ -299,15 +317,15 @@
     requirements: "{{ paperlessng_directory }}/requirements.txt"
     executable: "{{ paperlessng_virtualenv }}/bin/pip3"
     extra_args: --upgrade
-  when: paperlessng_current_version.stdout != paperlessng_version | string
+  when: not reconfigure_only
 
 - name: migrate database schema
   become: yes
   become_user: "{{ paperlessng_system_user }}"
   command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py migrate"
-  when: paperlessng_current_version.stdout != paperlessng_version | string
   register: database_schema
   changed_when: '"No migrations to apply." not in database_schema.stdout'
+  when: not reconfigure_only
 
 - name: configure paperless superuser
   become: yes
@@ -336,7 +354,7 @@
       else:
           User.objects.create_superuser('{{ paperlessng_superuser_name }}', '{{ paperlessng_superuser_email }}', '{{ paperlessng_superuser_password }}')
           print('changed')
-  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py shell -c \"{{ creation_script }}\""
+  command: '{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py shell -c "{{ creation_script }}"'
   register: superuser
   changed_when: superuser.stdout == 'changed'
   no_log: yes
@@ -349,7 +367,7 @@
     owner: "{{ paperlessng_system_user }}"
     group: "{{ paperlessng_system_group }}"
     mode: g-w,o-rwx
-  when: venv.changed or paperlessng_current_version.stdout != paperlessng_version | string
+  when: venv.changed or not reconfigure_only
 
 - name: configure ghostscript for PDF
   lineinfile:
@@ -372,34 +390,13 @@
       ]
     - [
         # https://www.freedesktop.org/software/systemd/man/systemd.exec.html
-        {
-          option: "User",
-          value: "{{ paperlessng_system_user }}",
-        },
-        {
-          option: "Group",
-          value: "{{ paperlessng_system_group }}",
-        },
-        {
-          option: "WorkingDirectory",
-          value: "{{ paperlessng_directory }}/src",
-        },
-        {
-          option: "ProtectSystem",
-          value: "full",
-        },
-        {
-          option: "NoNewPrivileges",
-          value: "true",
-        },
-        {
-          option: "PrivateUsers",
-          value: "true",
-        },
-        {
-          option: "PrivateDevices",
-          value: "true",
-        }
+        { option: "User", value: "{{ paperlessng_system_user }}" },
+        { option: "Group", value: "{{ paperlessng_system_group }}" },
+        { option: "WorkingDirectory", value: "{{ paperlessng_directory }}/src", },
+        { option: "ProtectSystem", value: "full" },
+        { option: "NoNewPrivileges", value: "true" },
+        { option: "PrivateUsers", value: "true" },
+        { option: "PrivateDevices", value: "true" },
       ]
 
 - name: configure paperless-consumer service
