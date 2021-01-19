@@ -10,8 +10,6 @@
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
 
-This project is still in development and some things may not work as expected.
-
 # How it Works
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces.
@@ -48,7 +46,7 @@ Here's what you get:
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 * A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
 
-If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
+If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html). However, some parts of the UI have changed since I took these.
 
 For a complete list of changes from paperless, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
 
@@ -57,20 +55,6 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 - Make the front end nice (except mobile).
 - Fix whatever bugs I and you find.
 - Make the documentation nice.
-
-## Roadmap for versions beyond 1.0
-
-These are things that I want to add to paperless eventually. They are sorted by priority.
-
-- **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
-  - Group and limit search results by correspondent, show “more from this” links in the results.
-- **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
-- **An interactive consumer** that shows its progress for documents it processes on the web page.
-	- With live updates and websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particularly happy about.
-	- Notifications when a document was added with buttons to open the new document right away.
-- **Arbitrary tag colors**. Allow the selection of any color with a color picker.
-
-Apart from that, paperless is pretty much feature complete.
 
 ## On the chopping block.
 
