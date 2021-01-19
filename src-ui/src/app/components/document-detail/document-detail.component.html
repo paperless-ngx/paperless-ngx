@@ -141,6 +141,10 @@
             <ng-template #nativePdfViewer>
                 <object [data]="previewUrl | safe" type="application/pdf" class="preview-sticky" width="100%"></object>
             </ng-template>
-        </ng-container>     
+        </ng-container>
+        <ng-container *ngIf="getContentType() == 'text/plain'">
+            <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky" width="100%"></object>
+        </ng-container>
+          
     </div>
 </div>
