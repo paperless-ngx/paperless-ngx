@@ -26,10 +26,15 @@ jobs:
           docker --version
           molecule --version
           python --version
-      - name: Test with molecule
+      - name: Test fresh installation with molecule
         run: |
           cd ansible
-          molecule test
+          molecule test -s fresh
+        working-directory: "${{ github.repository }}"
+      - name: Test release update with molecule
+        run: |
+          cd ansible
+          molecule test -s update
         working-directory: "${{ github.repository }}"
   # # https://galaxy.ansible.com/docs/contributing/importing.html
   # release:

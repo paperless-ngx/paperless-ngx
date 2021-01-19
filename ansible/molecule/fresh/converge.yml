@@ -1,0 +1,7 @@
+---
+- name: fresh installation
+  hosts: all
+  tasks:
+    - name: install paperless-ng with default parameters
+      include_role:
+        name: ansible
