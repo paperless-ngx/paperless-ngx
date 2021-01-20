@@ -15,6 +15,7 @@ export class FilterableDropdownSelectionModel {
   changed = new Subject<FilterableDropdownSelectionModel>()
 
   multiple = false
+  logicalOperator = 'and'
 
   items: MatchingModel[] = []
 
@@ -83,7 +84,7 @@ export class FilterableDropdownSelectionModel {
     if (fireEvent) {
       this.changed.next(this)
     }
-    
+
   }
 
   private getNonTemporary(id: number) {
