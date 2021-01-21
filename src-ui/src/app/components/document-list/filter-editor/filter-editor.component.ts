@@ -204,15 +204,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   toggleTag(tagId: number) {
-    this.tagSelectionModel.toggle(tagId)
+    this.tagSelectionModel.set(tagId, ToggleableItemState.Selected)
   }
 
   toggleCorrespondent(correspondentId: number) {
-    this.correspondentSelectionModel.toggle(correspondentId)
+    this.correspondentSelectionModel.set(correspondentId, ToggleableItemState.Selected)
   }
 
   toggleDocumentType(documentTypeId: number) {
-    this.documentTypeSelectionModel.toggle(documentTypeId)
+    this.documentTypeSelectionModel.set(documentTypeId, ToggleableItemState.Selected)
   }
 
   onTagsDropdownOpen() {
