@@ -12,3 +12,15 @@
     overflow-y: scroll;
   }
 }
+
+small > svg {
+  margin-top: -2px;
+}
+
+.list-group-item-note {
+  line-height: 1;
+
+  small {
+    font-size: 70%;
+  }
+}
