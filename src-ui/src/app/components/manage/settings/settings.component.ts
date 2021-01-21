@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2  } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit, Renderer2  } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
@@ -38,7 +38,8 @@ export class SettingsComponent implements OnInit {
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
     private toastService: ToastService,
-    private settings: SettingsService
+    private settings: SettingsService,
+    @Inject(LOCALE_ID) public currentLocale: string
   ) { }
 
   ngOnInit() {
