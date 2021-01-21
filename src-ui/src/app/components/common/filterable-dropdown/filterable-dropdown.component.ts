@@ -114,6 +114,7 @@ export class FilterableDropdownSelectionModel {
 
   clear(fireEvent = true) {
     this.temporarySelectionStates.clear()
+    this.temporaryLogicalOperator = this._logicalOperator = 'and'
     if (fireEvent) {
       this.changed.next(this)
     }
