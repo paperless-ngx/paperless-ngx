@@ -8,7 +8,7 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAGS_ALL, FILTER_HAS_TAGS_ANY, FILTER_TITLE } from 'src/app/data/filter-rule-type';
+import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAGS_ALL, FILTER_HAS_TAGS_ANY, FILTER_DOES_NOT_HAVE_TAG, FILTER_TITLE } from 'src/app/data/filter-rule-type';
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
 
@@ -111,6 +111,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_HAS_ANY_TAG:
           this.tagSelectionModel.set(null, ToggleableItemState.Selected, false)
           break
+        case FILTER_DOES_NOT_HAVE_TAG:
+          this.tagSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Excluded, false)
+          break
         case FILTER_CORRESPONDENT:
           this.correspondentSelectionModel.set(rule.value ? +rule.value : null, ToggleableItemState.Selected, false)
           break
@@ -132,6 +135,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       const tagFilterType = this.tagSelectionModel.logicalOperator == 'and' ? FILTER_HAS_TAGS_ALL : FILTER_HAS_TAGS_ANY
       this.tagSelectionModel.getSelectedItems().filter(tag => tag.id).forEach(tag => {
         filterRules.push({rule_type: tagFilterType, value: tag.id?.toString()})
+      })
+      this.tagSelectionModel.getExcludedItems().filter(tag => tag.id).forEach(tag => {
+        filterRules.push({rule_type: FILTER_DOES_NOT_HAVE_TAG, value: tag.id?.toString()})
       })
     }
     this.correspondentSelectionModel.getSelectedItems().forEach(correspondent => {

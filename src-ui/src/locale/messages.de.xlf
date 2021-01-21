@@ -449,12 +449,20 @@
           <context context-type="linenumber">2</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="ddb40946e790522301687ecddb9ce1cb8ad40dd1">
+        <source>Filter by:</source>
+        <target>Filtern nach:</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="cff1428d10d59d14e45edec3c735a27b5482db59">
         <source>Name</source>
         <target>Name</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">9</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8fa4d523f7b91df4390120b85ed0406138273e1a">
@@ -462,7 +470,7 @@
         <target>Farbe</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="d0c4488f742efeba0915e90e285a022da813deff">
@@ -470,7 +478,7 @@
         <target>Zuweisung</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9bcf8d20d23c111eca1431abd2d2ce0de324499c">
@@ -478,7 +486,7 @@
         <target>Anzahl Dokumente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="030b4423b92167200e39519599f9b863b4f7c62c">
@@ -486,7 +494,7 @@
         <target>Aktionen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9d51b3c90afda70700229d1b8a55371c13cb3bce">
@@ -494,7 +502,7 @@
         <target>Dokumente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="28f86ffd419b869711aa13f5e5ff54be6d70731c">
@@ -502,7 +510,7 @@
         <target>Bearbeiten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4990731724078522539">
@@ -814,7 +822,7 @@
         <target>Letzter Kontakt</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1234709746630139322">
@@ -1112,14 +1120,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">46</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="ddb40946e790522301687ecddb9ce1cb8ad40dd1">
-        <source>Filter by:</source>
-        <target>Filtern nach:</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">4</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="02d184c288f567825a1fcbf83bcd3099a10853d5">
@@ -1907,7 +1907,7 @@
         <target>Automatisch</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5044611416737085530">
@@ -1915,7 +1915,7 @@
         <target>Möchten Sie dieses Element wirklich löschen?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8371896857609524947">
@@ -1923,7 +1923,7 @@
         <target>Assoziierte Dokumente werden nicht gelöscht.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7022070615528435141">
@@ -1931,7 +1931,7 @@
         <target>Löschen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5467489005440577210">
@@ -1939,7 +1939,7 @@
         <target>Fehler beim Löschen des Elements: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5851669019930456395">

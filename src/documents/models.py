@@ -63,12 +63,6 @@ class MatchingModel(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-
-        self.match = self.match.lower()
-
-        models.Model.save(self, *args, **kwargs)
-
 
 class Correspondent(MatchingModel):
 
