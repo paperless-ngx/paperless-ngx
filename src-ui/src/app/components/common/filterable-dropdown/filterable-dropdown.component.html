@@ -13,7 +13,7 @@
   <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
       <div *ngIf="!editing && multiple" class="list-group-item d-flex">
-        <div class="btn-group btn-group-xs btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="selectionModel.logicalOperator">
+        <div class="btn-group btn-group-xs btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="selectionModel.logicalOperator" (change)="selectionModel.toggleOperator()">
           <label ngbButtonLabel class="btn btn-outline-primary">
             <input ngbButton type="radio" name="logicalOperator" value="and"> All
           </label>
