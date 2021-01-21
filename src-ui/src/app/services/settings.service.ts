@@ -1,10 +1,18 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
+import { CookieService } from 'ngx-cookie-service';
 
 export interface PaperlessSettings {
   key: string
   type: string
   default: any
+}
+
+export interface LanguageOption {
+  code: string,
+  name: string,
+  englishName?: string
 }
 
 export const SETTINGS_KEYS = {
@@ -13,7 +21,9 @@ export const SETTINGS_KEYS = {
   DOCUMENT_LIST_SIZE: 'general-settings:documentListSize',
   DARK_MODE_USE_SYSTEM: 'general-settings:dark-mode:use-system',
   DARK_MODE_ENABLED: 'general-settings:dark-mode:enabled',
-  USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer'
+  USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer',
+  DATE_LOCALE: 'general-settings:date-display:date-locale',
+  DATE_FORMAT: 'general-settings:date-display:date-format'
 }
 
 const SETTINGS: PaperlessSettings[] = [
@@ -22,7 +32,9 @@ const SETTINGS: PaperlessSettings[] = [
   {key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE, type: "number", default: 50},
   {key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, type: "boolean", default: true},
   {key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: "boolean", default: false},
-  {key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: "boolean", default: false}
+  {key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: "boolean", default: false},
+  {key: SETTINGS_KEYS.DATE_LOCALE, type: "string", default: ""},
+  {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"}
 ]
 
 @Injectable({
@@ -34,7 +46,9 @@ export class SettingsService {
 
   constructor(
     private rendererFactory: RendererFactory2,
-    @Inject(DOCUMENT) private document
+    @Inject(DOCUMENT) private document,
+    private cookieService: CookieService,
+    private meta: Meta
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
 
@@ -53,6 +67,35 @@ export class SettingsService {
       darkModeEnabled ? this.renderer.addClass(this.document.body, 'color-scheme-dark') : this.renderer.removeClass(this.document.body, 'color-scheme-dark')
     }
 
+  }
+
+  getLanguageOptions(): LanguageOption[] {
+    return [
+      {code: "en-US", name: $localize`English (US)`, englishName: "English (US)"},
+      {code: "de", name: $localize`German`, englishName: "German"},
+      {code: "nl", name: $localize`Dutch`, englishName: "Dutch"},
+      {code: "fr", name: $localize`French`, englishName: "French"}
+    ]
+  }
+
+  private getLanguageCookieName() {
+    let prefix = ""
+    if (this.meta.getTag('name=cookie_prefix')) {
+      prefix = this.meta.getTag('name=cookie_prefix').content
+    }
+    return `${prefix || ''}django_language`
+  }
+
+  getLanguage(): string {
+    return this.cookieService.get(this.getLanguageCookieName())
+  }
+
+  setLanguage(language: string) {
+    if (language) {
+      this.cookieService.set(this.getLanguageCookieName(), language)
+    } else {
+      this.cookieService.delete(this.getLanguageCookieName())
+    }
   }
 
   get(key: string): any {

@@ -159,6 +159,9 @@ class DocumentViewSet(RetrieveModelMixin,
         "added",
         "archive_serial_number")
 
+    def get_queryset(self):
+        return Document.objects.distinct()
+
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get('fields', None)
         if fields_param:

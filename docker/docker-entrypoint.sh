@@ -79,7 +79,11 @@ initialize() {
 		fi
 	done
 
+	echo "creating directory /tmp/paperless"
+	mkdir -p /tmp/paperless
+
 	chown -R paperless:paperless ../
+	chown -R paperless:paperless /tmp/paperless
 
 	migrations
 
