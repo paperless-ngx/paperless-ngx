@@ -208,7 +208,7 @@ jobs:
           tag_name: ng-${{ steps.get_version.outputs.version }}
           release_name: Paperless-ng ${{ steps.get_version.outputs.version }}
           draft: false
-          prerelease: true
+          prerelease: false
           body: |
             For a complete list of changes, see the changelog at https://paperless-ng.readthedocs.io/en/latest/changelog.html.
       -

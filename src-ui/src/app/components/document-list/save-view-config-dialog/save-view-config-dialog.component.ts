@@ -20,6 +20,8 @@ export class SaveViewConfigDialogComponent implements OnInit {
   @Input()
   buttonsEnabled = true
 
+  closeEnabled = false
+
   _defaultName = ""
 
   get defaultName() {
@@ -31,7 +33,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
     this._defaultName = value
     this.saveViewConfigForm.patchValue({name: value})
   }
-  
+
   saveViewConfigForm = new FormGroup({
     name: new FormControl(''),
     showInSideBar: new FormControl(false),
@@ -39,6 +41,10 @@ export class SaveViewConfigDialogComponent implements OnInit {
   })
 
   ngOnInit(): void {
+    // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
+    setTimeout(() => {
+      this.closeEnabled = true
+    });
   }
 
   save() {

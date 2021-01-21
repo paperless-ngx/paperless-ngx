@@ -5,7 +5,6 @@ from time import sleep
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.text import slugify
 from django_q.tasks import async_task
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
