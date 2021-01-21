@@ -228,6 +228,12 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]['id'], results[1]['id']], [doc1.id, doc3.id])
 
+        response = self.client.get("/api/documents/?tags__id__in={},{}".format(tag_2.id, tag_3.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 2)
+        self.assertCountEqual([results[0]['id'], results[1]['id']], [doc2.id, doc3.id])
+
         response = self.client.get("/api/documents/?tags__id__all={},{}".format(tag_2.id, tag_3.id))
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
