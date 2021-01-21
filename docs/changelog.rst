@@ -5,6 +5,29 @@
 Changelog
 *********
 
+paperless-ng 1.0.0
+##################
+
+Nothing special about this release, but since there are relatively few bug reports coming in, I think that this is reasonably stable.
+
+* Document export
+
+  * The document exporter has been rewritten to support updating an already existing export in place.
+    This enables incremental backups with ``rsync``.
+  * The document exporter supports naming exported files according to ``PAPERLESS_FILENAME_FORMAT``.
+  * The document exporter locks the media directory and the database during execution to ensure that
+    the resulting export is consistent.
+  * See the :ref:`updated documentation <utilities-exporter>` for more details.
+
+* Other changes and additions
+
+  * Added a language selector to the settings.
+  * Added date format options to the settings.
+  * Range selection with shift clicking is now possible in the document list.
+  * Filtering correspondent, type and tag management pages by name.
+  * Focus "Name" field in dialogs by default.
+
+
 paperless-ng 0.9.14
 ###################
 
@@ -116,7 +139,7 @@ paperless-ng 0.9.10
   * There are some configuration options in the settings to alter the behavior.
 
 * Other changes and additions
-  
+
   * Thanks to `zjean`_, paperless now publishes a webmanifest, which is useful for adding the application to home screens on mobile devices.
   * The Paperless-ng logo now navigates to the dashboard.
   * Filter for documents that don't have any correspondents, types or tags assigned.
@@ -136,7 +159,7 @@ paperless-ng 0.9.10
   The bulk delete operations did not update the search index. Therefore, documents that you deleted remained in the index and
   caused the search to return messages about missing documents when searching. Further bulk operations will properly update
   the index.
-  
+
   However, this change is not retroactive: If you used the delete method of the bulk editor, you need to reindex your search index
   by :ref:`running the management command document_index with the argument reindex <administration-index>`.
 
@@ -191,12 +214,12 @@ paperless-ng 0.9.7
 
   * Thanks to the hard work of `Michael Shamoon`_, paperless now comes with a much more streamlined UI for
     filtering documents.
-  
+
   * `Michael Shamoon`_ replaced the document preview with another component. This should fix compatibility with Safari browsers.
 
   * Added buttons to the management pages to quickly show all documents with one specific tag, correspondent, or title.
-  
-  * Paperless now stores your saved views on the server and associates them with your user account. 
+
+  * Paperless now stores your saved views on the server and associates them with your user account.
     This means that you can access your views on multiple devices and have separate views for different users.
     You will have to recreate your views.
 
@@ -214,7 +237,7 @@ paperless-ng 0.9.7
     This option enables you to be logged in into multiple instances by specifying different cookie names for each instance.
 
 * Fixes
-  
+
   * Sometimes paperless would assign dates in the future to newly consumed documents.
   * The filename format fields ``{created_month}`` and ``{created_day}`` now use a leading zero for single digit values.
   * The filename format field ``{tags}`` can no longer be used without arguments.

@@ -98,7 +98,7 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
 
         doc2 = Document.objects.create(checksum="B", file_type="pdf", storage_type=STORAGE_TYPE_GPG)
         self.doc2_id = doc2.id
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000002.pdf.gpg"), source_path_before(doc2))
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000004.pdf.gpg"), source_path_before(doc2))
 
     def testMimeTypesMigrated(self):
         Document = self.apps.get_model('documents', 'Document')
