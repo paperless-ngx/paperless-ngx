@@ -15,7 +15,8 @@ export class FilterableDropdownSelectionModel {
   changed = new Subject<FilterableDropdownSelectionModel>()
 
   multiple = false
-  logicalOperator = 'and'
+  private _logicalOperator = 'and'
+  temporaryLogicalOperator = this._logicalOperator
 
   items: MatchingModel[] = []
 
@@ -91,6 +92,18 @@ export class FilterableDropdownSelectionModel {
     return this.selectionStates.get(id) || ToggleableItemState.NotSelected
   }
 
+  get logicalOperator(): string {
+    return this.temporaryLogicalOperator
+  }
+
+  set logicalOperator(operator: string) {
+    this.temporaryLogicalOperator = operator
+  }
+
+  toggleOperator() {
+    this.changed.next(this)
+  }
+
   get(id: number) {
     return this.temporarySelectionStates.get(id) || ToggleableItemState.NotSelected
   }
@@ -111,6 +124,8 @@ export class FilterableDropdownSelectionModel {
       return true
     } else if (!Array.from(this.selectionStates.keys()).every(id => this.selectionStates.get(id) == this.temporarySelectionStates.get(id))) {
       return true
+    } else if (this.temporaryLogicalOperator !== this._logicalOperator) {
+      return true
     } else {
       return false
     }
@@ -130,6 +145,7 @@ export class FilterableDropdownSelectionModel {
     this.temporarySelectionStates.forEach((value, key) => {
       this.selectionStates.set(key, value)
     })
+    this._logicalOperator = this.temporaryLogicalOperator
   }
 
   reset() {
