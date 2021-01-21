@@ -43,6 +43,10 @@ export class FilterableDropdownSelectionModel {
     return this.items.filter(i => this.temporarySelectionStates.get(i.id) == ToggleableItemState.Selected)
   }
 
+  getExcludedItems() {
+    return this.items.filter(i => this.temporarySelectionStates.get(i.id) == ToggleableItemState.Excluded)
+  }
+
   set(id: number, state: ToggleableItemState, fireEvent = true) {
     if (state == ToggleableItemState.NotSelected) {
       this.temporarySelectionStates.delete(id)
@@ -56,9 +60,9 @@ export class FilterableDropdownSelectionModel {
 
   toggle(id: number, fireEvent = true) {
     let state = this.temporarySelectionStates.get(id)
-    if (state == null || state != ToggleableItemState.Selected) {
+    if (state == null || (state != ToggleableItemState.Selected && state != ToggleableItemState.Excluded)) {
       this.temporarySelectionStates.set(id, ToggleableItemState.Selected)
-    } else if (state == ToggleableItemState.Selected) {
+    } else if (state == ToggleableItemState.Selected || state == ToggleableItemState.Excluded) {
       this.temporarySelectionStates.delete(id)
     }
 
@@ -83,7 +87,30 @@ export class FilterableDropdownSelectionModel {
     if (fireEvent) {
       this.changed.next(this)
     }
-    
+
+  }
+
+  exclude(id: number, fireEvent:boolean = true) {
+    console.log('exclude', id, fireEvent);
+
+    let state = this.temporarySelectionStates.get(id)
+    if (state == null || state != ToggleableItemState.Excluded) {
+      this.temporarySelectionStates.set(id, ToggleableItemState.Excluded)
+    } else if (state == ToggleableItemState.Excluded) {
+      this.temporarySelectionStates.delete(id)
+    }
+
+    if (!this.multiple) {
+      for (let key of this.temporarySelectionStates.keys()) {
+        if (key != id) {
+          this.temporarySelectionStates.delete(key)
+        }
+      }
+    }
+
+    if (fireEvent) {
+      this.changed.next(this)
+    }
   }
 
   private getNonTemporary(id: number) {
