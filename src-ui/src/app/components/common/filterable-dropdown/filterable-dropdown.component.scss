@@ -31,3 +31,7 @@
     border-bottom-right-radius: 0;
   }
 }
+
+.btn-group > label.disabled {
+  filter: brightness(0.5);
+}
