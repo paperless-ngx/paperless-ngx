@@ -91,8 +91,6 @@ export class FilterableDropdownSelectionModel {
   }
 
   exclude(id: number, fireEvent:boolean = true) {
-    console.log('exclude', id, fireEvent);
-
     let state = this.temporarySelectionStates.get(id)
     if (state == null || state != ToggleableItemState.Excluded) {
       this.temporarySelectionStates.set(id, ToggleableItemState.Excluded)
@@ -294,6 +292,14 @@ export class FilterableDropdownComponent {
       } else {
         this.dropdown.close()
       }
+    }
+  }
+
+  excludeClicked(itemID: number) {
+    if (this.editing) {
+      this.selectionModel.toggle(itemID)
+    } else {
+      this.selectionModel.exclude(itemID)
     }
   }
 }
