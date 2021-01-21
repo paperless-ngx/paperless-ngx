@@ -17,7 +17,7 @@
     </ng-container>
   </div>
   <div class="mr-1">
-    <app-tag *ngIf="isTag; else displayName" [tag]="item" [clickable]="true" linkTitle="Filter by tag"></app-tag>
+    <app-tag *ngIf="isTag; else displayName" [tag]="item" [clickable]="false"></app-tag>
     <ng-template #displayName><small>{{item.name}}</small></ng-template>
   </div>
   <div class="badge badge-light rounded-pill ml-auto mr-1">{{item.document_count}}</div>
