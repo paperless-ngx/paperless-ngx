@@ -90,10 +90,28 @@ B.  If you built the image yourself, do the following:
         $ docker-compose build
         $ docker-compose up
 
-Running `docker-compose up` will also apply any new database migrations.
+Running ``docker-compose up`` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop paperless.
 Then you can start paperless-ng with ``-d`` to have it run in the background.
 
+    .. note::
+
+        In version 0.9.14, the update process was changed. In 0.9.13 and earlier, the
+        docker-compose files specified exact versions and pull won't automatically
+        update to newer versions. In order to enable updates as described above, either
+        get the new ``docker-compose.yml`` file from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+        or edit the ``docker-compose.yml`` file, find the line that says
+        
+            .. code::
+
+                image: jonaswinkler/paperless-ng:0.9.x
+        
+        and replace the version with ``latest``:
+
+            .. code::
+
+                image: jonaswinkler/paperless-ng:latest
+        
 Bare Metal Route
 ================
 
