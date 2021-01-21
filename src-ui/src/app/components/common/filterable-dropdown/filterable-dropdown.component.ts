@@ -95,6 +95,7 @@ export class FilterableDropdownSelectionModel {
     let state = this.temporarySelectionStates.get(id)
     if (state == null || state != ToggleableItemState.Excluded) {
       this.temporarySelectionStates.set(id, ToggleableItemState.Excluded)
+      this.temporaryLogicalOperator = this._logicalOperator = 'and'
     } else if (state == ToggleableItemState.Excluded) {
       this.temporarySelectionStates.delete(id)
     }
@@ -269,6 +270,10 @@ export class FilterableDropdownComponent {
 
   @Output()
   open = new EventEmitter()
+
+  get operatorToggleEnabled(): boolean {
+    return this.selectionModel.selectionSize() > 1 && this.selectionModel.getExcludedItems().length == 0
+  }
 
   constructor(private filterPipe: FilterPipe) {
     this.selectionModel = new FilterableDropdownSelectionModel()
