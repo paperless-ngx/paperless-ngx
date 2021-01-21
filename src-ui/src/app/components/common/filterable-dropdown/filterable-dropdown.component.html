@@ -23,11 +23,18 @@
         </ng-container>
       </div>
       <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!selectionModel.isDirty()">
-        <small class="ml-1" [ngClass]="{'font-weight-bold': selectionModel.isDirty()}" i18n>Apply</small>
+        <small class="ml-2" [ngClass]="{'font-weight-bold': selectionModel.isDirty()}" i18n>Apply</small>
         <svg width="1.5em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
         </svg>
       </button>
+      <div *ngIf="!editing" class="list-group-item list-group-item-note pt-1 pb-2">
+        <small i18n>Use
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-option" viewBox="0 0 16 16">
+            <use xlink:href="assets/bootstrap-icons.svg#option" />
+          </svg>
+           + click to exclude items.</small>
+      </div>
     </div>
   </div>
 </div>
