@@ -10,6 +10,10 @@
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
 
+# Survey
+
+If you already used Paperless-ng for a bit, would like to give some anonymous feedback, and help me decide on what to focus on next: I've created a survey, [see here](https://github.com/jonaswinkler/paperless-ng/issues/402). Thank you!
+
 # How it Works
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces.
