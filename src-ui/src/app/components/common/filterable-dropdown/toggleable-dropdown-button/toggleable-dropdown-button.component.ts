@@ -1,12 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { MatchingModel } from 'src/app/data/matching-model';
 
-export interface ToggleableItem {
-  item: MatchingModel,
-  state: ToggleableItemState,
-  count: number
-}
-
 export enum ToggleableItemState {
   NotSelected = 0,
   Selected = 1,
