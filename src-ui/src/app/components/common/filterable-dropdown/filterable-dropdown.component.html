@@ -15,10 +15,10 @@
       <div *ngIf="!editing && multiple" class="list-group-item d-flex">
         <div class="btn-group btn-group-xs btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="selectionModel.logicalOperator" (change)="selectionModel.toggleOperator()">
           <label ngbButtonLabel class="btn btn-outline-primary">
-            <input ngbButton type="radio" name="logicalOperator" value="and" [disabled]="selectionModel.selectionSize() < 2"> All
+            <input ngbButton type="radio" name="logicalOperator" value="and" [disabled]="!operatorToggleEnabled"> All
           </label>
           <label ngbButtonLabel class="btn btn-outline-primary">
-            <input ngbButton type="radio" name="logicalOperator" value="or" [disabled]="selectionModel.selectionSize() < 2"> Any
+            <input ngbButton type="radio" name="logicalOperator" value="or" [disabled]="!operatorToggleEnabled"> Any
           </label>
         </div>
       </div>
