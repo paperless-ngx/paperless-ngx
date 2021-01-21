@@ -10,7 +10,8 @@ export interface ToggleableItem {
 export enum ToggleableItemState {
   NotSelected = 0,
   Selected = 1,
-  PartiallySelected = 2
+  PartiallySelected = 2,
+  Excluded = 3
 }
 
 @Component({
@@ -32,12 +33,19 @@ export class ToggleableDropdownButtonComponent {
   @Output()
   toggle = new EventEmitter()
 
+  @Output()
+  exclude = new EventEmitter()
+
   get isTag(): boolean {
     return 'is_inbox_tag' in this.item
   }
 
-  toggleItem(): void {
-    this.toggle.emit()
+  toggleItem(event: MouseEvent): void {
+    if (event.altKey) {
+      this.exclude.emit()
+    } else {
+      this.toggle.emit()
+    }
   }
 
   isChecked() {
@@ -48,4 +56,7 @@ export class ToggleableDropdownButtonComponent {
     return this.state == ToggleableItemState.PartiallySelected
   }
 
+  isExcluded() {
+    return this.state == ToggleableItemState.Excluded
+  }
 }
