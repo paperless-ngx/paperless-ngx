@@ -153,7 +153,7 @@ class Command(BaseCommand):
         if options["oneshot"]:
             return
 
-        if settings.CONSUMER_POLLING == 0:
+        if settings.CONSUMER_POLLING == 0 and INotify:
             self.handle_inotify(directory, recursive)
         else:
             self.handle_polling(directory, recursive)
