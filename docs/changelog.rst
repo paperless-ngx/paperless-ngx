@@ -5,7 +5,6 @@
 Changelog
 *********
 
-
 paperless-ng 1.0.0
 ##################
 
@@ -25,7 +24,8 @@ Nothing special about this release, but since there are relatively few bug repor
   * Added a language selector to the settings.
   * Added date format options to the settings.
   * Range selection with shift clicking is now possible in the document list.
-
+  * Filtering correspondent, type and tag management pages by name.
+  * Focus "Name" field in dialogs by default.
 
 
 paperless-ng 0.9.14

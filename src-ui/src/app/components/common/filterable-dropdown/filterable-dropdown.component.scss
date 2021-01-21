@@ -35,3 +35,15 @@
 .btn-group > label.disabled {
   filter: brightness(0.5);
 }
+
+small > svg {
+  margin-top: -2px;
+}
+
+.list-group-item-note {
+  line-height: 1;
+
+  small {
+    font-size: 70%;
+  }
+}
