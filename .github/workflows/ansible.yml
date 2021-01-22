@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install molecule[ansible,docker]
+          python3 -m pip install molecule[ansible,docker] jmespath
           ansible --version
           docker --version
           molecule --version
@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install molecule[ansible,docker]
+          python3 -m pip install molecule[ansible,docker] jmespath
           ansible --version
           docker --version
           molecule --version

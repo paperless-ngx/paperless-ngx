@@ -116,12 +116,12 @@
 - name: package app
   archive:
     path: "{{ gitdir.path }}/dist/"
-    dest: "{{ gitdir.path }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
+    dest: "{{ gitdir.path }}/paperless-ng-{{ paperlessng_commit }}.tar.xz"
     format: xz
 
 - name: extract paperless-ng
   unarchive:
-    src: "{{ gitdir.path }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
+    src: "{{ gitdir.path }}/paperless-ng-{{ paperlessng_commit }}.tar.xz"
     remote_src: yes
     dest: "{{ tempdir.path }}"
 
