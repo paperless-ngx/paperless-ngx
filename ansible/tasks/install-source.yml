@@ -18,7 +18,6 @@
     dest: "{{ gitdir.path }}"
     version: "{{ paperlessng_version }}"
     refspec: "+refs/pull/*:refs/pull/*"
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
 
 - name: compile frontend
   command:
@@ -31,6 +30,7 @@
     - npm install
     - ./node_modules/.bin/ng build --prod
 
+# TODO run dev in separate virtualenv
 - name: install pipenv
   pip:
     name:
@@ -44,7 +44,6 @@
     regexp: '^python_version = ".+"$'
     line: python_version = "3"
 
-# TODO run dev in separate virtualenv
 - name: install Pipfile dependencies
   command:
     cmd: pipenv install --dev
@@ -125,7 +124,6 @@
     src: "{{ gitdir.path }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
     remote_src: yes
     dest: "{{ tempdir.path }}"
-  when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
 
 - name: remove temporary git directory
   file:
