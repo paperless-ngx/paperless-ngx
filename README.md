@@ -54,25 +54,6 @@ If you want to see some screenshots of paperless-ng in action, [some are availab
 
 For a complete list of changes from paperless, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
 
-# Roadmap for 1.0
-
-- Make the front end nice (except mobile).
-- Fix whatever bugs I and you find.
-- Make the documentation nice.
-
-## On the chopping block.
-
-- **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
-
-## Wont-do list.
-
-These features will probably never make it into paperless, since paperless is meant to be an easy to use set-and-forget solution.
-
-- **Document versions.** I might consider adding the ability to update a document with a newer version, but that's about it. The kind of documents that get added to paperless usually don't change at all.
-- **Workflows.** I don't see a use case for these, yet.
-- **Folders.** Tags are superior in just about every way.
-- **Apps / extension support.** Again, paperless is meant to be simple.
-
 # Getting started
 
 The recommended way to deploy paperless is docker-compose. The files in the /docker/hub directory are configured to pull the image from Docker Hub.
