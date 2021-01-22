@@ -2,6 +2,12 @@
 - name: fresh installation
   hosts: all
   tasks:
+    - name: set github ref as version when available
+      set_fact:
+        paperlessng_version: "{{ lookup('env', 'GITHUB_REF') | default('latest', True) }}"
+    - name: debug
+      debug:
+        var: paperlessng_version
     - name: install paperless-ng with default parameters
       include_role:
         name: ansible

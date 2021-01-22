@@ -3,7 +3,7 @@
   tasks:
     - name: set previous version as installation target
       set_fact:
-        paperlessng_version: 0.9.13
+        paperlessng_version: 1.0.0
 
     - name: install previous paperless-ng release
       include_role:
