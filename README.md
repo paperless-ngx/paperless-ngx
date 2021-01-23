@@ -33,6 +33,8 @@ Here's what you get:
 # Features
 
 * Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
+* Supports PDF documents, images, plain text files, and Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents).
+	* Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ng.readthedocs.io/en/latest/configuration.html#tika-settings))
 * Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and can be configured freely.
 * Single page application front end. Should be pretty snappy. Will be mobile friendly in the future.
 	* Includes a dashboard that shows basic statistics and has document upload.
