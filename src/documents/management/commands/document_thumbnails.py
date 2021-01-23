@@ -13,8 +13,14 @@ from ...parsers import get_parser_class_for_mime_type
 
 def _process_document(doc_in):
     document = Document.objects.get(id=doc_in)
-    parser = get_parser_class_for_mime_type(document.mime_type)(
-        logging_group=None)
+    parser_class = get_parser_class_for_mime_type(document.mime_type)
+
+    if parser_class:
+        parser = parser_class(logging_group=None)
+    else:
+        print(f"{document} No parser for mime type {document.mime_type}")
+        return
+
     try:
         thumb = parser.get_optimised_thumbnail(
             document.source_path, document.mime_type)

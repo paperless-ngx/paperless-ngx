@@ -14,6 +14,56 @@
 
         <div class="form-row form-group">
           <div class="col-md-3 col-form-label">
+            <span i18n>Display language</span>
+          </div>
+          <div class="col">
+
+            <select class="form-control" formControlName="displayLanguage">
+              <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code && currentLocale != 'en-US'"> - {{lang.englishName}}</span></option>
+            </select>
+
+            <small class="form-text text-muted" i18n>You need to reload the page after applying a new language.</small>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Date display</span>
+          </div>
+          <div class="col">
+
+            <select class="form-control" formControlName="dateLocale">
+              <option *ngFor="let lang of dateLocaleOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> - {{today | date:'shortDate':null:lang.code}}</span></option>
+            </select>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Date format</span>
+          </div>
+          <div class="col">
+
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatShort" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="shortDate">
+              <label class="custom-control-label" for="dateFormatShort" i18n>Short: {{today | customDate:'shortDate':null:computedDateLocale}}</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatMedium" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="mediumDate">
+              <label class="custom-control-label" for="dateFormatMedium" i18n>Medium: {{today | customDate:'mediumDate':null:computedDateLocale}}</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatLong" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="longDate">
+              <label class="custom-control-label" for="dateFormatLong" i18n>Long: {{today | customDate:'longDate':null:computedDateLocale}}</label>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
             <span i18n>Items per page</span>
           </div>
           <div class="col">
@@ -30,14 +80,22 @@
 
         <div class="form-row form-group">
           <div class="col-md-3 col-form-label">
+            <span i18n>Document editor</span>
+          </div>
+          <div class="col">
+
+            <app-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></app-input-check>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
             <span i18n>Dark mode</span>
           </div>
           <div class="col">
-            <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem" (change)="toggleDarkModeSetting()"></app-input-check>
-            <div class="custom-control custom-switch" *ngIf="!settingsForm.value.darkModeUseSystem">
-              <input type="checkbox" class="custom-control-input" id="darkModeEnabled" formControlName="darkModeEnabled" [checked]="settingsForm.value.darkModeEnabled">
-              <label class="custom-control-label" for="darkModeEnabled">Enabled</label>
-            </div>
+            <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem"></app-input-check>
+            <app-input-check [hidden]="settingsForm.value.darkModeUseSystem" i18n-title title="Enable dark mode" formControlName="darkModeEnabled"></app-input-check>
           </div>
         </div>
 
@@ -92,5 +150,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3 shadow"></div>
 
-  <button type="submit" class="btn btn-primary">Save</button>
+  <button type="submit" class="btn btn-primary" i18n>Save</button>
 </form>

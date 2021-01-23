@@ -12,10 +12,14 @@
   mix-blend-mode: multiply;
 }
 
+.card-title {
+  word-break: break-word;
+}
+
 .search-score-bar {
   width: 100px;
   height: 5px;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .document-card-check {

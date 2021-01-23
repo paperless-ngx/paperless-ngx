@@ -11,6 +11,7 @@ from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from filelock import FileLock
 from whoosh.writing import AsyncWriter
 
 from documents.models import Document
@@ -47,8 +48,10 @@ def handle_document(document_id):
                     archive_checksum=checksum,
                     content=parser.get_text()
                 )
-                create_source_path_directory(document.archive_path)
-                shutil.move(parser.get_archive_path(), document.archive_path)
+                with FileLock(settings.MEDIA_LOCK):
+                    create_source_path_directory(document.archive_path)
+                    shutil.move(parser.get_archive_path(),
+                                document.archive_path)
 
         with AsyncWriter(index.open_index()) as writer:
             index.update_document(writer, document)

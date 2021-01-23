@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import re
 
+import dateparser
 from dotenv import load_dotenv
 
 from django.utils.translation import gettext_lazy as _
@@ -89,7 +90,6 @@ INSTALLED_APPS = [
     "documents.apps.DocumentsConfig",
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
-    "paperless_tika.apps.PaperlessTikaConfig",
     "paperless_mail.apps.PaperlessMailConfig",
 
     "django.contrib.admin",
@@ -177,6 +177,25 @@ if AUTO_LOGIN_USERNAME:
     # regular login in case the provided user does not exist.
     MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
 
+ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
+
+if ENABLE_HTTP_REMOTE_USER:
+    MIDDLEWARE.append(
+        'paperless.auth.HttpRemoteUserMiddleware'
+    )
+    AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.RemoteUserBackend',
+        'django.contrib.auth.backends.ModelBackend'
+    ]
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
+        'rest_framework.authentication.RemoteUserAuthentication'
+    )
+
+# X-Frame options for embedded PDF display:
+if DEBUG:
+    X_FRAME_OPTIONS = 'ANY'
+else:
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # We allow CORS from localhost:8080
 CORS_ALLOWED_ORIGINS = tuple(os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","))
@@ -252,6 +271,7 @@ if os.getenv("PAPERLESS_DBHOST"):
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
         "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
+        'OPTIONS': {'sslmode': os.getenv("PAPERLESS_DBSSLMODE", "prefer")},
     }
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
@@ -306,7 +326,7 @@ LOGGING = {
             "class": "documents.loggers.PaperlessHandler",
         },
         "console": {
-            "level": "INFO",
+            "level": "DEBUG" if DEBUG else "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         }
@@ -343,10 +363,13 @@ LOGGING = {
 # Favors threads per worker on smaller systems and never exceeds cpu_count()
 # in total.
 
+
 def default_task_workers():
+    # always leave one core open
+    available_cores = max(multiprocessing.cpu_count() - 1, 1)
     try:
         return max(
-            math.floor(math.sqrt(multiprocessing.cpu_count())),
+            math.floor(math.sqrt(available_cores)),
             1
         )
     except NotImplementedError:
@@ -363,17 +386,19 @@ Q_CLUSTER = {
 }
 
 
-def default_threads_per_worker():
+def default_threads_per_worker(task_workers):
+    # always leave one core open
+    available_cores = max(multiprocessing.cpu_count() - 1, 1)
     try:
         return max(
-            math.floor(multiprocessing.cpu_count() / TASK_WORKERS),
+            math.floor(available_cores / task_workers),
             1
         )
     except NotImplementedError:
         return 1
 
 
-THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker())
+THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker(TASK_WORKERS))
 
 ###############################################################################
 # Paperless Specific Settings                                                 #
@@ -458,3 +483,13 @@ PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost
 PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
     "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
 )
+
+if PAPERLESS_TIKA_ENABLED:
+    INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
+
+# List dates that should be ignored when trying to parse date from document text
+IGNORE_DATES = set()
+for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
+    d = dateparser.parse(s)
+    if d:
+        IGNORE_DATES.add(d.date())

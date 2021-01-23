@@ -1,18 +1,18 @@
 <div class="col p-2 h-100">
   <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected">
-    <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected">
-      <img class="card-img doc-img rounded-top" [src]="getThumbUrl()" (click)="setSelected(!selected)">
+    <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
+      <img class="card-img doc-img rounded-top" [src]="getThumbUrl()">
 
       <div class="border-right border-bottom bg-light p-1 rounded document-card-check">
         <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (change)="setSelected($event.target.checked)">
+          <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (click)="this.toggleSelected.emit($event)">
           <label class="custom-control-label" for="smallCardCheck{{document.id}}"></label>
         </div>
       </div>
 
       <div style="top: 0; right: 0; font-size: large" class="text-right position-absolute mr-1">
         <div *ngFor="let t of getTagsLimited$() | async">
-          <app-tag [tag]="t" (click)="clickTag.emit(t.id)" [clickable]="true" linkTitle="Filter by tag" i18n-linkTitle></app-tag>
+          <app-tag [tag]="t" (click)="clickTag.emit(t.id);$event.stopPropagation()" [clickable]="true" linkTitle="Filter by tag" i18n-linkTitle></app-tag>
         </div>
         <div *ngIf="moreTags">
           <span class="badge badge-secondary">+ {{moreTags}}</span>
@@ -23,9 +23,9 @@
     <div class="card-body p-2">
       <p class="card-text">
         <ng-container *ngIf="document.correspondent">
-          <a [routerLink]="" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent)" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
+          <a [routerLink]="" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
-        {{document.title | documentTitle}}
+        {{document.title | documentTitle}} <span *ngIf="document.archive_serial_number">(#{{document.archive_serial_number}})</span>
       </p>
     </div>
     <div class="card-footer">
@@ -43,14 +43,14 @@
               <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
             </svg>
           </a>
-          <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" i18n-title>
+          <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" (click)="$event.stopPropagation()" i18n-title>
             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
               <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
             </svg>
           </a>
         </div>
-        <small class="text-muted pl-1">{{document.created | date}}</small>
+        <small class="text-muted pl-1">{{document.created | customDate:'shortDate'}}</small>
       </div>
 
     </div>

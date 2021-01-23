@@ -5,7 +5,6 @@ from time import sleep
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.text import slugify
 from django_q.tasks import async_task
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
@@ -46,7 +45,7 @@ def _consume(filepath):
         return
 
     if not is_file_ext_supported(os.path.splitext(filepath)[1]):
-        logger.debug(
+        logger.warning(
             f"Not consuming file {filepath}: Unknown file extension.")
         return
 

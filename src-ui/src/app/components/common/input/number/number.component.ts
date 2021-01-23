@@ -29,7 +29,7 @@ export class NumberComponent extends AbstractInputComponent<number> {
         if (results.count > 0) {
           this.value = results.results[0].archive_serial_number + 1
         } else {
-          this.value + 1
+          this.value = 1
         }
         this.onChange(this.value)
       }

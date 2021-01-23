@@ -38,7 +38,7 @@ def set_correspondent(sender,
     if document.correspondent and not replace:
         return
 
-    potential_correspondents = matching.match_correspondents(document.content,
+    potential_correspondents = matching.match_correspondents(document,
                                                              classifier)
 
     potential_count = len(potential_correspondents)
@@ -81,7 +81,7 @@ def set_document_type(sender,
     if document.document_type and not replace:
         return
 
-    potential_document_type = matching.match_document_types(document.content,
+    potential_document_type = matching.match_document_types(document,
                                                             classifier)
 
     potential_count = len(potential_document_type)
@@ -130,7 +130,7 @@ def set_tags(sender,
 
     current_tags = set(document.tags.all())
 
-    matched_tags = matching.match_tags(document.content, classifier)
+    matched_tags = matching.match_tags(document, classifier)
 
     relevant_tags = set(matched_tags) - current_tags
 

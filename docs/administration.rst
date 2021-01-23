@@ -20,6 +20,8 @@ Options available to any installation of paperless:
     metadata to a specific folder. You may import your documents into a
     fresh instance of paperless again or store your documents in another
     DMS with this export.
+*   The document exporter is also able to update an already existing export.
+    Therefore, incremental backups with ``rsync`` are entirely possible.
 
 Options available to docker installations:
 
@@ -48,16 +50,16 @@ Options available to bare-metal and non-docker installations:
 Restoring
 =========
 
-
-
-
 .. _administration-updating:
 
-Updating paperless
+Updating Paperless
 ##################
 
+Docker Route
+============
+
 If a new release of paperless-ng is available, upgrading depends on how you
-installed paperless-ng in the first place. The releases are available at
+installed paperless-ng in the first place. The releases are available at the
 `release page <https://github.com/jonaswinkler/paperless-ng/releases>`_.
 
 First of all, ensure that paperless is stopped.
@@ -69,58 +71,54 @@ First of all, ensure that paperless is stopped.
 
 After that, :ref:`make a backup <administration-backup>`.
 
-A.  If you used the dockerfiles archive, simply download the files of the new release,
-    adjust the settings in the files (i.e., the path to your consumption directory),
-    and replace your existing docker-compose files. Then start paperless as usual,
-    which will pull the new image, and update your database, if necessary:
+A.  If you pull the image from the docker hub, all you need to do is:
 
     .. code:: shell-session
 
-        $ cd /path/to/paperless
+        $ docker-compose pull
         $ docker-compose up
 
-    If you see everything working, you can start paperless-ng with "-d" to have it
-    run in the background.
+    The docker-compose files refer to the ``latest`` version, which is always the latest
+    stable release.
 
-    .. hint::
-
-        The released docker-compose files specify exact versions to be pulled from the hub.
-        This is to ensure that if the docker-compose files should change at some point
-        (i.e., services updates/configured differently), you wont run into trouble due to
-        docker pulling the ``latest`` image and running it in an older environment.
-        
-B.  If you built the image yourself, grab the new archive and replace your current
-    paperless folder with the new contents.
-
-    After that, make the necessary adjustments to the docker-compose.yml (i.e.,
-    adjust your consumption directory).
-
-    Build and start the new image with:
+B.  If you built the image yourself, do the following:
 
     .. code:: shell-session
 
-        $ cd /path/to/paperless
+        $ git pull
+        $ ./compile-frontend.sh
         $ docker-compose build
         $ docker-compose up
 
-    If you see everything working, you can start paperless-ng with "-d" to have it
-    run in the background.
+Running ``docker-compose up`` will also apply any new database migrations.
+If you see everything working, press CTRL+C once to gracefully stop paperless.
+Then you can start paperless-ng with ``-d`` to have it run in the background.
 
-.. hint::
+    .. note::
 
-    You can usually keep your ``docker-compose.env`` file, since this file will
-    never include mandatory configuration options. However, it is worth checking
-    out the new version of this file, since it might have new recommendations
-    on what to configure.
+        In version 0.9.14, the update process was changed. In 0.9.13 and earlier, the
+        docker-compose files specified exact versions and pull won't automatically
+        update to newer versions. In order to enable updates as described above, either
+        get the new ``docker-compose.yml`` file from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+        or edit the ``docker-compose.yml`` file, find the line that says
+        
+            .. code::
 
+                image: jonaswinkler/paperless-ng:0.9.x
+        
+        and replace the version with ``latest``:
 
-Updating paperless without docker
-=================================
+            .. code::
+
+                image: jonaswinkler/paperless-ng:latest
+        
+Bare Metal Route
+================
 
 After grabbing the new release and unpacking the contents, do the following:
 
 1.  Update dependencies. New paperless version may require additional
-    dependencies. The dependencies required are listed in the section about 
+    dependencies. The dependencies required are listed in the section about
     :ref:`bare metal installations <setup-bare_metal>`.
 
 2.  Update python requirements. If you use Pipenv, this is done with the following steps.
@@ -135,27 +133,52 @@ After grabbing the new release and unpacking the contents, do the following:
     This creates a new virtual environment (or uses your existing environment)
     and installs all dependencies into it.
 
-3.  Collect static files.
+    You can also use the included ``requirements.txt`` file instead and create the virtual
+    environment yourself. This file includes exactly the same dependencies.
 
-    .. code:: shell-session
-
-        $ cd src
-        $ pipenv run python3 manage.py collectstatic --clear
-    
-4.  Migrate the database.
+3.  Migrate the database.
 
     .. code:: shell-session
 
         $ cd src
         $ pipenv run python3 manage.py migrate
-    
-5.  Update translation files.
+
+    This might not actually do anything. Not every new paperless version comes with new
+    database migrations.
+
+Ansible Route
+=============
+
+Most of the update process is automated when using the ansible role.
+
+1.  Backup your defined role variables file outside the paperless source-tree:
 
     .. code:: shell-session
 
-        $ cd src
-        $ pipenv run python3 manage.py compilemessages
-        
+        $ cp ansible/vars.yml ~/vars.yml.old
+
+2.  Pull the release tag you want to update to:
+
+    .. code:: shell-session
+
+        $ git fetch --all
+        $ git checkout ng-0.9.14
+
+3.  Update the role variable definitions ``ansible/vars.yml`` (where appropriate).
+
+4.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
+
+    .. note::
+
+        When ansible detects that an update run is in progress, it backs up the entire ``paperlessng_directory`` to ``paperlessng_directory-TIMESTAMP``.
+        Updates can be rolled back by simply moving the timestamped folder back to the original location.
+        If the update succeeds and you want to continue using the new release, please don't forget to delete the backup folder.
+
+    .. code:: shell-session
+
+        $ ansible-playbook playbook.yml
+
+
 Management utilities
 ####################
 
@@ -189,8 +212,13 @@ backup or migration to another DMS.
 
 .. code::
 
-    document_exporter target
+    document_exporter target [-c] [-f] [-d]
 
+    optional arguments:
+    -c, --compare-checksums
+    -f, --use-filename-format
+    -d, --delete
+    
 ``target`` is a folder to which the data gets written. This includes documents,
 thumbnails and a ``manifest.json`` file. The manifest contains all metadata from
 the database (correspondents, tags, etc).
@@ -198,6 +226,24 @@ the database (correspondents, tags, etc).
 When you use the provided docker compose script, specify ``../export`` as the
 target. This path inside the container is automatically mounted on your host on
 the folder ``export``.
+
+If the target directory already exists and contains files, paperless will assume
+that the contents of the export directory are a previous export and will attempt
+to update the previous export. Paperless will only export changed and added files.
+Paperless determines whether a file has changed by inspecting the file attributes
+"date/time modified" and "size". If that does not work out for you, specify
+``--compare-checksums`` and paperless will attempt to compare file checksums instead.
+This is slower.
+
+Paperless will not remove any existing files in the export directory. If you want
+paperless to also remove files that do not belong to the current export such as files
+from deleted documents, specify ``--delete``. Be careful when pointing paperless to
+a directory that already contains other files.
+
+The filenames generated by this command follow the format
+``[date created] [correspondent] [title].[extension]``.
+If you want paperless to use ``PAPERLESS_FILENAME_FORMAT`` for exported filenames
+instead, specify ``--use-filename-format``.
 
 
 .. _utilities-importer:
@@ -393,7 +439,7 @@ Documents can be stored in Paperless using GnuPG encryption.
     Furthermore, the entire text content of the documents is stored plain in the
     database, even if your documents are encrypted. Filenames are not encrypted as
     well.
-    
+
     Also, the web server provides transparent access to your encrypted documents.
 
     Consider running paperless on an encrypted filesystem instead, which will then

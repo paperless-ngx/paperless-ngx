@@ -1,3 +1,4 @@
+import logging
 import os
 import tempfile
 from datetime import datetime
@@ -79,7 +80,7 @@ class IndexView(TemplateView):
         context['runtime_js'] = f"frontend/{self.get_language()}/runtime.js"
         context['polyfills_js'] = f"frontend/{self.get_language()}/polyfills.js"  # NOQA: E501
         context['main_js'] = f"frontend/{self.get_language()}/main.js"
-        context['manifest'] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
+        context['webmanifest'] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
         return context
 
 
@@ -157,6 +158,9 @@ class DocumentViewSet(RetrieveModelMixin,
         "modified",
         "added",
         "archive_serial_number")
+
+    def get_queryset(self):
+        return Document.objects.distinct()
 
     def get_serializer(self, *args, **kwargs):
         fields_param = self.request.query_params.get('fields', None)
@@ -458,12 +462,21 @@ class SearchView(APIView):
         self.ix = index.open_index()
 
     def add_infos_to_hit(self, r):
-        doc = Document.objects.get(id=r['id'])
+        try:
+            doc = Document.objects.get(id=r['id'])
+        except Document.DoesNotExist:
+            logging.getLogger(__name__).warning(
+                f"Search index returned a non-existing document: "
+                f"id: {r['id']}, title: {r['title']}. "
+                f"Search index needs reindex."
+            )
+            doc = None
+
         return {'id': r['id'],
-                'highlights': r.highlights("content", text=doc.content),
+                'highlights': r.highlights("content", text=doc.content) if doc else None,  # NOQA: E501
                 'score': r.score,
                 'rank': r.rank,
-                'document': DocumentSerializer(doc).data,
+                'document': DocumentSerializer(doc).data if doc else None,
                 'title': r['title']
                 }
 

@@ -110,6 +110,8 @@ The dashboard has a file drop field to upload documents to paperless. Simply dra
 onto this field or select a file with the file dialog. Multiple files are supported.
 
 
+.. _usage-mobile_upload:
+
 Mobile upload
 =============
 
@@ -118,7 +120,7 @@ to share any documents with paperless. This can be combined with any of the mobi
 scanning apps out there, such as Office Lens.
 
 Furthermore, there is the  `Paperless App <https://github.com/bauerj/paperless_app>`_ as well,
-which no only has document upload, but also document editing and browsing.
+which not only has document upload, but also document browsing and download features.
 
 .. _usage-email:
 

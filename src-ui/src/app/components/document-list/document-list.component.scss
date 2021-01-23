@@ -1,5 +1,9 @@
 @import "/src/theme";
 
+tr {
+  user-select: none;
+}
+
 .table-row-selected {
   background-color: $primaryFaded;
 }
@@ -24,4 +28,9 @@ $paperless-card-breakpoints: (
       }
     }
   }
+}
+
+.dropdown-menu-right {
+  right: 0 !important;
+  left: auto !important;
 }

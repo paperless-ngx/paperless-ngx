@@ -28,7 +28,11 @@ export class SearchService {
     }
     return this.http.get<SearchResult>(`${environment.apiBaseUrl}search/`, {params: httpParams}).pipe(
       map(result => {
-        result.results.forEach(hit => this.documentService.addObservablesToDocument(hit.document))
+        result.results.forEach(hit => {
+          if (hit.document) {
+            this.documentService.addObservablesToDocument(hit.document)
+          }
+        })
         return result
       })
     )
