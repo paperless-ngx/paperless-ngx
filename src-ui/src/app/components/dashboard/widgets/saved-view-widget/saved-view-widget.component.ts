@@ -50,7 +50,7 @@ export class SavedViewWidgetComponent implements OnInit {
     } else {
       this.list.load(this.savedView)
       this.router.navigate(["documents"])
-      }
+    }
   }
 
 }

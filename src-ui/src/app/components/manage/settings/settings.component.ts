@@ -1,9 +1,9 @@
-import { Component, OnInit, Renderer2  } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit, Renderer2  } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
-import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { LanguageOption, SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -21,16 +21,25 @@ export class SettingsComponent implements OnInit {
     'documentListItemPerPage': new FormControl(this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)),
     'darkModeUseSystem': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)),
     'darkModeEnabled': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED)),
-    'savedViews': this.savedViewGroup
+    'useNativePdfViewer': new FormControl(this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)),
+    'savedViews': this.savedViewGroup,
+    'displayLanguage': new FormControl(this.settings.getLanguage()),
+    'dateLocale': new FormControl(this.settings.get(SETTINGS_KEYS.DATE_LOCALE)),
+    'dateFormat': new FormControl(this.settings.get(SETTINGS_KEYS.DATE_FORMAT)),
   })
 
   savedViews: PaperlessSavedView[]
+
+  get computedDateLocale(): string {
+    return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage
+  }
 
   constructor(
     public savedViewService: SavedViewService,
     private documentListViewService: DocumentListViewService,
     private toastService: ToastService,
-    private settings: SettingsService
+    private settings: SettingsService,
+    @Inject(LOCALE_ID) public currentLocale: string
   ) { }
 
   ngOnInit() {
@@ -55,23 +64,31 @@ export class SettingsComponent implements OnInit {
     })
   }
 
-  toggleDarkModeSetting() {
-    if (this.settingsForm.value.darkModeUseSystem) {
-      (this.settingsForm.controls.darkModeEnabled as FormControl).disable()
-    } else {
-      (this.settingsForm.controls.darkModeEnabled as FormControl).enable()
-    }
-  }
-
   private saveLocalSettings() {
     this.settings.set(SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE, this.settingsForm.value.bulkEditApplyOnClose)
     this.settings.set(SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS, this.settingsForm.value.bulkEditConfirmationDialogs)
     this.settings.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
+    this.settings.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, this.settingsForm.value.useNativePdfViewer)
+    this.settings.set(SETTINGS_KEYS.DATE_LOCALE, this.settingsForm.value.dateLocale)
+    this.settings.set(SETTINGS_KEYS.DATE_FORMAT, this.settingsForm.value.dateFormat)
+    this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.documentListViewService.updatePageSize()
     this.settings.updateDarkModeSettings()
     this.toastService.showInfo($localize`Settings saved successfully.`)
+  }
+
+  get displayLanguageOptions(): LanguageOption[] {
+    return [{code: "", name: $localize`Use system language`}].concat(this.settings.getLanguageOptions())
+  }
+
+  get dateLocaleOptions(): LanguageOption[] {
+    return [{code: "", name: $localize`Use date format of display language`}].concat(this.settings.getLanguageOptions())
+  }
+
+  get today() {
+    return new Date()
   }
 
   saveSettings() {

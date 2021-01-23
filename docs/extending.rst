@@ -25,8 +25,9 @@ This section describes the steps you need to take to start development on paperl
 
     *   Python 3.6.
     *   All dependencies listed in the :ref:`Bare metal route <setup-bare_metal>`
-    *   redis. You can either install redis or use the included scritps/start-redis.sh
-        to use docker to fire up a redis instance.
+    *   redis. You can either install redis or use the included scritps/start-services.sh
+        to use docker to fire up a redis instance (and some other services such as tika,
+        gotenberg and a postgresql server).
 
 Back end development
 ====================
@@ -38,7 +39,7 @@ Install the python dependencies by performing ``pipenv install --dev`` in the sr
 This will also create a virtual environment, which you can enter with ``pipenv shell`` or
 execute one-shot commands in with ``pipenv run``.
 
-In ``src/paperless.conf``, enable debug mode.
+Copy ``paperless.conf.example`` to ``paperless.conf`` and enable debug mode.
 
 Configure the IDE to use the src/ folder as the base source folder. Configure the following
 launch configurations in your IDE:
@@ -102,17 +103,10 @@ In order to build the front end and serve it as part of django, execute
 
 .. code:: shell-session
 
-    $ ng build --prod --output-path ../src/documents/static/frontend/
+    $ ng build --prod
 
 This will build the front end and put it in a location from which the Django server will serve
 it as static content. This way, you can verify that authentication is working.
-
-Making a release
-================
-
-Execute the ``make-release.sh <ver>`` script.
-
-This will test and assemble everything and also build and tag a docker image.
 
 
 Extending Paperless

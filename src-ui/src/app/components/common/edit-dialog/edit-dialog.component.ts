@@ -27,6 +27,8 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
 
   networkActive = false
 
+  closeEnabled = false
+
   error = null
 
   abstract getForm(): FormGroup
@@ -37,6 +39,11 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
     if (this.object != null) {
       this.objectForm.patchValue(this.object)
     }
+
+    // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
+    setTimeout(() => {
+      this.closeEnabled = true
+    });
   }
 
   getCreateTitle() {
@@ -86,7 +93,6 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
     serverResponse.subscribe(result => {
       this.activeModal.close()
       this.success.emit(result)
-      this.networkActive = false
     }, error => {
       this.error = error.error
       this.networkActive = false

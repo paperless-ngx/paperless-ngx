@@ -6,23 +6,23 @@
         <target>Documents</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2155249406916744630">
         <source>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; saved successfully.</source>
-        <target>Vue &amp;quot;<x equiv-text="this.list.savedView.name" id="PH"/>&amp;quot; enregistrée avec succès.</target>
+        <target>Vue &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; enregistrée avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6837554170707123455">
         <source>View &quot;<x equiv-text="savedView.name" id="PH"/>&quot; created successfully.</source>
-        <target>Vue &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; créée avec succès.</target>
+        <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; créée avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ca82952a6bc860b5391d5975322d8af8ceddfa4">
@@ -38,7 +38,7 @@
         <target>Sélectionner aucun</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2ed8a0c2ce4968f8614151eefed20a0aa3daeeb9">
@@ -46,7 +46,7 @@
         <target>Sélectionner la page</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="b463541a7e303aa4d0b1102eaff8afbaf34e7a74">
@@ -54,15 +54,15 @@
         <target>Sélectionner tout</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="ec97f67072a83aaa972536b18d83179f6e4bbec9">
-        <source>Sort by</source>
-        <target>Trier par</target>
+      <trans-unit datatype="html" id="5d43539fc358c3a548b9d487be821db73e2702ff">
+        <source>Sort</source>
+        <target>Trier</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="b7641aed03492978b4ec6843b1e53f30464294d9">
@@ -83,7 +83,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="72e7d343f9165602cce1ca7faffbc565fd31ef92">
         <source>Save &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
-        <target>Enregistrer &amp;quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&amp;quot;</target>
+        <target>Enregistrer &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
@@ -91,10 +91,10 @@
       </trans-unit>
       <trans-unit datatype="html" id="439e7cc3c1ecefded167ed4d37f7d22dad6a9159">
         <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
-        <target>{VAR_PLURAL, plural, =1 {<x id="INTERPOLATION"/> document sélectionné sur 1} other {<x id="INTERPOLATION"/> document(s) sélectionné(s) sur <x id="INTERPOLATION_1"/>}}</target>
+        <target>{VAR_PLURAL, plural, =1 {<x id="INTERPOLATION"/> document sélectionné sur 1} other {<x id="INTERPOLATION"/> documents sélectionnés sur <x id="INTERPOLATION_1"/>}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bb773fdeaad5e7fb8e6cd77e1cc558e1b194a0c9">
@@ -102,7 +102,15 @@
         <target>{VAR_PLURAL, plural, =1 {Un document} other {<x id="INTERPOLATION"/> documents}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="bb91083b44e3f77dd68de773ceab467ca3d57507">
+        <source>(filtered)</source>
+        <target>(filtré)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ca0b795795658155d44ddca02e95f1feeeb4a88f">
@@ -110,7 +118,7 @@
         <target>NSA</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7b5c6286aaded63fb279d6deb8aa8c704e085ced">
@@ -118,7 +126,7 @@
         <target>Correspondant</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">101</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="fdf7cbdc140d0aab0f0b6c06065a0fd448ed6a2e">
@@ -126,7 +134,7 @@
         <target>Titre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2bd5919e8098513664a89d5b7b52d61e3063950f">
@@ -134,7 +142,7 @@
         <target>Type de document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1b051734b0ee9021991c91b3ed4e81c244322462">
@@ -142,7 +150,7 @@
         <target>Date de création</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="80e3b490720757978c99a7b5af3885faf202b955">
@@ -150,7 +158,7 @@
         <target>Date d'ajout</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9021887951960049161">
@@ -158,15 +166,15 @@
         <target>Confirmer la suppression</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">192</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5382975254277698192">
         <source>Do you really want to delete document &quot;<x equiv-text="this.document.title" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer le document &amp;quot;<x equiv-text="this.document.title" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer le document &quot;<x equiv-text="this.document.title" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6691075929777935948">
@@ -174,7 +182,7 @@
         <target>Les fichiers liés à ce document seront supprimés définitivement. Cette action est irréversible.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">194</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="719892092227206532">
@@ -182,7 +190,15 @@
         <target>Supprimer le document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">196</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1844801255494293730">
+        <source>Error deleting document: <x equiv-text="JSON.stringify(error)" id="PH"/></source>
+        <target>Une erreur s'est produite lors de la suppression du document : <x equiv-text="JSON.stringify(error)" id="PH"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="826b25211922a1b46436589233cb6f1a163d89b7">
@@ -230,7 +246,7 @@
         <target>Contenu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="f721a500a68c357e8f2a01e60510f6a01e4ba529">
@@ -238,7 +254,7 @@
         <target>Métadonnées</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">81</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3f5a652a1f473f4e243e3c6805ef1b383e270bb7">
@@ -246,7 +262,7 @@
         <target>Abandonner</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="52c9a103b812f258bcddc3d90a6e3f46871d25fe">
@@ -254,7 +270,7 @@
         <target>Enregistrer</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8380d9eff8613c0bc58edc7cebc2aa72e17b11e3">
@@ -286,7 +302,7 @@
         <target>Numéro de série de l'archive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="30eebc2dd656dbcb259d8d5286d244ee397d63bd">
@@ -294,15 +310,7 @@
         <target>Date de création</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">65</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="cafc87479686947e2590b9f588a88040aeaf660b">
-        <source>Tags</source>
-        <target>Étiquettes</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6e58f1baf7acb6a0cfe3636b9c2a61b4d1183720">
@@ -310,7 +318,7 @@
         <target>Modifié le</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="c1ae0f9ac4efb2dcd43cd947ddba09d6c4328269">
@@ -318,7 +326,7 @@
         <target>Date d'ajout</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="c7ea641c3a61a12a3599ce5a75c6d0dbba409ad3">
@@ -326,7 +334,7 @@
         <target>Nom de fichier du média</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="74a894d2a8ae24a1eed4bc56e9afdc27dc2c31c8">
@@ -334,7 +342,7 @@
         <target>Somme de contrôle MD5 de l'original</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="e92ca184ea785769fb26138fc25ee9fa06fff6e5">
@@ -342,7 +350,7 @@
         <target>Taille de fichier de l'original</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="b5e93f30cc3411f20bd62025a6cc7394568f1bfd">
@@ -350,7 +358,7 @@
         <target>Type mime de l'original</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="edbf54e4117606b5dd87aaea3c14b21ebf398020">
@@ -358,7 +366,7 @@
         <target>Somme de contrôle MD5 de l'archive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="e6bf12eadecbfd80016eca15fa78651c6ca90c64">
@@ -366,7 +374,7 @@
         <target>Taille de fichier de l'archive</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="203c7adb5bd74ae18e84e1e3b66ddfe76bc0023f">
@@ -374,7 +382,7 @@
         <target>Métadonnées du document original</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7174dcea4a3d0b743e7e4a78747e902230727f67">
@@ -382,7 +390,7 @@
         <target>Métadonnées du document archivé</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">122</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3fb9f1a31c3798173b2fea72638732c783b152fe">
@@ -390,7 +398,7 @@
         <target>Enregistrer &amp; suivant</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8765497970646365998">
@@ -419,10 +427,18 @@
       </trans-unit>
       <trans-unit datatype="html" id="93754014749412887">
         <source>Do you really want to delete the tag &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer l'étiquette &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer l'étiquette &quot;<x equiv-text="object.name" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="cafc87479686947e2590b9f588a88040aeaf660b">
+        <source>Tags</source>
+        <target>Étiquettes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="70a67e04629f6d412db0a12d51820b480788d795">
@@ -433,12 +449,20 @@
           <context context-type="linenumber">2</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="ddb40946e790522301687ecddb9ce1cb8ad40dd1">
+        <source>Filter by:</source>
+        <target>Filtrer par : </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="cff1428d10d59d14e45edec3c735a27b5482db59">
         <source>Name</source>
         <target>Nom</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">9</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8fa4d523f7b91df4390120b85ed0406138273e1a">
@@ -446,7 +470,7 @@
         <target>Couleur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="d0c4488f742efeba0915e90e285a022da813deff">
@@ -454,7 +478,7 @@
         <target>Rapprochement</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9bcf8d20d23c111eca1431abd2d2ce0de324499c">
@@ -462,7 +486,7 @@
         <target>Nombre de documents</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="030b4423b92167200e39519599f9b863b4f7c62c">
@@ -470,7 +494,7 @@
         <target>Actions</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9d51b3c90afda70700229d1b8a55371c13cb3bce">
@@ -478,7 +502,7 @@
         <target>Documents</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="28f86ffd419b869711aa13f5e5ff54be6d70731c">
@@ -486,15 +510,15 @@
         <target>Éditer</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4990731724078522539">
         <source>Do you really want to delete the document type &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer le type de document &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer le type de document &quot;<x equiv-text="object.name" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bc000b39af12c0925c424f4cb85f0c31c0f8eca8">
@@ -523,10 +547,10 @@
       </trans-unit>
       <trans-unit datatype="html" id="5610279464668232148">
         <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; deleted.</source>
-        <target>Vue &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; supprimée.</target>
+        <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; supprimée.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5647210819299459618">
@@ -534,7 +558,23 @@
         <target>Paramètres enregistrés avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="6839066544204061364">
+        <source>Use system language</source>
+        <target>Utiliser la langue du système</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7729897675462249787">
+        <source>Use date format of display language</source>
+        <target>Utiliser le format de date de la langue d'affichage</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -542,7 +582,7 @@
         <target>Une erreur s'est produite lors de l'enregistrement des paramètres sur le serveur : <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -566,15 +606,71 @@
         <target>Vues enregistrées</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13">
         <source>Appearance</source>
-        <target>Apparition</target>
+        <target>Affichage</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="75f8908d266f7cc9b9e68e0be906fd080a223606">
+        <source>Display language</source>
+        <target>Langue d'affichage</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1284a077dc18a2d1ff1b744f16f1797eea28ae37">
+        <source>You need to reload the page after applying a new language.</source>
+        <target>Vous devez recharger la page après avoir sélectionné une nouvelle langue.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="0cd55822928764cc82a62ee3e6f3adbc1c630479">
+        <source>Date display</source>
+        <target>Affichage de la date</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7df4de0d0704a06a302d853e31f2580eba98f127">
+        <source>Date format</source>
+        <target>Format de date</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="69852399a18b8ca4fca8c5bfddd3f00a6d137593">
+        <source>Short: <x equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Court : <x equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="d01a59285e711252b98c4f193394e4b854615c78">
+        <source>Medium: <x equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Moyen : <x equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="00481629776699b1caebd12b3b1176e2e23740a8">
+        <source>Long: <x equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}" id="INTERPOLATION"/></source>
+        <target>Long : <x equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">59</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2045151788cbdda7512752e408da59a6b54a8ef0">
@@ -582,7 +678,31 @@
         <target>Éléments par page</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="c4435e56bf0289e78fedc462f1d21fb30b9de55d">
+        <source>Document editor</source>
+        <target>Visionneuse de documents</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4903e521c9bfd11ce88e7a5575106ef638912e0d">
+        <source>Use PDF viewer provided by the browser</source>
+        <target>Utiliser la visionneuse PDF fournie par le navigateur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="d7db07023e53f8396d18d375c2b78c25fc81c197">
+        <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
+        <target>Cette option est généralement plus rapide pour l'affichage de grands documents PDF, mais elle peut ne pas fonctionner sur certains navigateurs.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ee5d1cbfd6ee168dae37aaba2b59b50bcabb2ff">
@@ -590,7 +710,7 @@
         <target>Mode sombre</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="f8cb5506e70fd71fddc9bb71cee18bfff7b29637">
@@ -598,7 +718,15 @@
         <target>Utiliser les paramètres du système</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="8ee474504043fa89821d626e4f3413240fa91b53">
+        <source>Enable dark mode</source>
+        <target>Activer le mode sombre</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
@@ -606,7 +734,7 @@
         <target>Edition en masse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
@@ -614,7 +742,7 @@
         <target>Afficher les messages de confirmation</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
@@ -622,7 +750,7 @@
         <target>La suppression de documents requiert toujours une confirmation.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
@@ -630,7 +758,7 @@
         <target>Appliquer lors de la fermeture</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cb90334f5dfd7fc67205085f59381e2a334ccfc">
@@ -638,7 +766,7 @@
         <target>Apparaît sur</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6717cf1acf04728fc2b7c39f6d3297f8ff15fde5">
@@ -646,7 +774,7 @@
         <target>Montrer sur le tableau de bord</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="541bfc5b123b3f8867fd681eaceefb663a811973">
@@ -654,7 +782,7 @@
         <target>Montrer dans la barre latérale</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="abba764a7a595d04dc8c3b26e04b3780d4fdb540">
@@ -662,7 +790,7 @@
         <target>Aucune vue sauvegardée n'est définie.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ef60a738a565f498b858e903e42bc5ffc3cc1299">
@@ -675,10 +803,10 @@
       </trans-unit>
       <trans-unit datatype="html" id="7427874343955308724">
         <source>Do you really want to delete the correspondent &quot;<x equiv-text="object.name" id="PH"/>&quot;?</source>
-        <target>Voulez-vous vraiment supprimer le correspondant &amp;quot;<x equiv-text="object.name" id="PH"/>&amp;quot; ?</target>
+        <target>Voulez-vous vraiment supprimer le correspondant &quot;<x equiv-text="object.name" id="PH"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="c3f3334de899327bf3ec8999236e10798ff76e72">
@@ -694,7 +822,7 @@
         <target>Dernière correspondance</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1234709746630139322">
@@ -713,6 +841,14 @@
           <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="d7b35c384aecd25a516200d6921836374613dfe7">
+        <source>Cancel</source>
+        <target>Annuler</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="6457471243969293847">
         <source>Create new correspondent</source>
         <target>Créer un nouveau correspondant</target>
@@ -729,20 +865,12 @@
           <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="3025930461519142465">
-        <source>Could not save correspondent: <x equiv-text="error" id="PH"/></source>
-        <target>Impossible d'enregistrer le correspondant : <x equiv-text="error" id="PH"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
-          <context context-type="linenumber">29</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="3d5caa52b0a51bfd2757215f7614183554d740f0">
         <source>Matching algorithm</source>
         <target>Algorithme de rapprochement</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="eab7fc7cf2d663e54de934b779fce4275a303f0f">
@@ -750,15 +878,7 @@
         <target>Modèle de rapprochement</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">12</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="a1923dd970db4f74b4417b80b4a14e250fd116ff">
-        <source>Auto matching does not require you to fill in this field.</source>
-        <target>Le rapprochement automatique ne nécessite pas que vous remplissiez ce champ.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="632e529f49cf3d367dfbd15bd055e9b53aef30fb">
@@ -766,23 +886,7 @@
         <target>Insensible à la casse</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="85e19678590a8b3ac1dff9d69c7a7610d1742e5a">
-        <source>Auto matching ignores this option.</source>
-        <target>Le rapprochement automatique ne tient pas compte de cette option.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="d7b35c384aecd25a516200d6921836374613dfe7">
-        <source>Cancel</source>
-        <target>Annuler</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9153094873118985366">
@@ -799,14 +903,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="2861521377141790537">
-        <source>Could not save tag: <x equiv-text="error" id="PH"/></source>
-        <target>Impossible d'enregistrer l'étiquette : <x equiv-text="error" id="PH"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
-          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="f2a30b4e1a89a8a0db0bd147b54d6626b9a9bc42">
@@ -839,14 +935,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="5647767513381010218">
-        <source>Could not save document type: <x equiv-text="error" id="PH"/></source>
-        <target>Impossible d'enregistrer le type de document : <x equiv-text="error" id="PH"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
-          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="49c9ede51100b454f7841b24cd02355c6622bf44">
@@ -883,7 +971,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="afa760e48c97d64d19c1455d18b7834a2256e23f">
         <source>Did you mean &quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&quot;?</source>
-        <target>Vouliez-vous dire &amp;quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&amp;quot; ?</target>
+        <target>Vouliez-vous dire &quot;<x equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}" id="START_LINK"/><x equiv-text="{{correctedQuery}}&lt;/a&gt;" id="INTERPOLATION"/><x equiv-text="&lt;/a&gt;" id="CLOSE_LINK"/>&quot; ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
           <context context-type="linenumber">13</context>
@@ -935,7 +1023,7 @@
         <target>Administration</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">154</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="46aa32e581922d6d2c3d7bc4c87209ad5808b029">
@@ -943,7 +1031,7 @@
         <target>Divers</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">153</context>
+          <context context-type="linenumber">160</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="fcfd4675b4c90f08d18d3abede9a9a4dff4cfdc7">
@@ -951,7 +1039,7 @@
         <target>Documentation</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">167</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="355a222236bc01b9a8cd3cb9ecf76891125aed69">
@@ -959,7 +1047,7 @@
         <target>GitHub</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">174</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="af665f8de8fabe306aaf27443957e69bcbbce63c">
@@ -1034,14 +1122,6 @@
           <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="ddb40946e790522301687ecddb9ce1cb8ad40dd1">
-        <source>Filter by:</source>
-        <target>Filtrer par : </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">4</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="02d184c288f567825a1fcbf83bcd3099a10853d5">
         <source>Filter tags</source>
         <target>Filtrer les étiquettes</target>
@@ -1055,7 +1135,7 @@
         <target>Filtrer les correspondants</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="0ad509732aaf702b7ea8c771c7809fa84bc85908">
@@ -1063,15 +1143,15 @@
         <target>Filtrer les types de documents</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="2f33515a935c36763660e8420940b8a7e11fb1f4">
-        <source>Clear all filters</source>
-        <target>Réinitialiser tous les filtres</target>
+      <trans-unit datatype="html" id="2d9d55f1b70142ff4597ba32179d16888fd9c6b2">
+        <source>Reset filters</source>
+        <target>Réinitialiser les filtres</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7593728289020204896">
@@ -1079,7 +1159,7 @@
         <target>Non affecté</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">166</context>
         </context-group>
         <note from="description" priority="1">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
       </trans-unit>
@@ -1088,7 +1168,7 @@
         <target>Appliquer</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4873149362496451858">
@@ -1155,12 +1235,12 @@
           <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="1b29a8153575e5ad26cc7dd8bd75c4f45f6bfe7e">
-        <source>Created: <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></source>
-        <target>Créé le : <x equiv-text="{{document.created | date}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="849b42384616374df49bd8b3711ec159cb10b845">
+        <source>Created: <x equiv-text="{{document.created | customDate}}" id="INTERPOLATION"/></source>
+        <target>Créé le : <x equiv-text="{{document.created | customDate}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="cd6f3fd48957e1fea6545c2b2defc7b2435ebfa8">
@@ -1184,7 +1264,7 @@
         <target>Score :</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2840db547019ce8c76b2cdbe3a1653c5b68b06af">
@@ -1195,21 +1275,29 @@
           <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="8639884465898458690">
-        <source>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; and &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</source>
-        <target>&amp;quot;<x equiv-text="items[0].name" id="PH"/>&amp;quot; et &amp;quot;<x equiv-text="items[1].name" id="PH_1"/>&amp;quot;</target>
+      <trans-unit datatype="html" id="7985804062689412812">
+        <source>Error executing bulk operation: <x equiv-text="JSON.stringify(error.error)" id="PH"/></source>
+        <target>Une erreur s'est produite lors de l'exécution de l'opération de masse : <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="8639884465898458690">
+        <source>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; and &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</source>
+        <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; et &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">114</context>
         </context-group>
         <note from="description" priority="1">This is for messages like 'modify &quot;tag1&quot; and &quot;tag2&quot;'</note>
       </trans-unit>
       <trans-unit datatype="html" id="7894972847287473517">
         <source>&quot;<x equiv-text="i.name" id="PH"/>&quot;</source>
-        <target>&amp;quot;<x equiv-text="i.name" id="PH"/>&amp;quot;</target>
+        <target>&quot;<x equiv-text="i.name" id="PH"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="760986369763309193">
@@ -1217,16 +1305,16 @@
         <target>, </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">116</context>
         </context-group>
         <note from="description" priority="1">this is used to separate enumerations and should probably be a comma and a whitespace in most languages</note>
       </trans-unit>
       <trans-unit datatype="html" id="1822679894391095557">
         <source><x equiv-text="list" id="PH"/> and &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</source>
-        <target><x equiv-text="list" id="PH"/> et &amp;quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&amp;quot;</target>
+        <target><x equiv-text="list" id="PH"/> et &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <note from="description" priority="1">this is for messages like 'modify &quot;tag1&quot;, &quot;tag2&quot; and &quot;tag3&quot;'</note>
       </trans-unit>
@@ -1235,15 +1323,15 @@
         <target>Confirmer l'affectation des étiquettes</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6619516195038467207">
         <source>This operation will add the tag &quot;<x equiv-text="tag.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action affectera l'étiquette &amp;quot;<x equiv-text="tag.name" id="PH"/>&amp;quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
+        <target>Cette action affectera l'étiquette &quot;<x equiv-text="tag.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1894412783609570695">
@@ -1251,15 +1339,15 @@
         <target>Cette action affectera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToAdd)" id="PH"/> au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7181166515756808573">
         <source>This operation will remove the tag &quot;<x equiv-text="tag.name" id="PH"/>&quot; from <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action supprimera l'étiquette &amp;quot;<x equiv-text="tag.name" id="PH"/>&amp;quot; de(s) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
+        <target>Cette action supprimera l'étiquette &quot;<x equiv-text="tag.name" id="PH"/>&quot; de(s) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">134</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3819792277998068944">
@@ -1267,7 +1355,7 @@
         <target>Cette action supprimera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToRemove)" id="PH"/> de(s) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2739066218579571288">
@@ -1275,7 +1363,7 @@
         <target>Cette action affectera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToAdd)" id="PH"/> et supprimera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToRemove)" id="PH_1"/> de(s) <x equiv-text="this.list.selected.size" id="PH_2"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">138</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2996713129519325161">
@@ -1283,15 +1371,15 @@
         <target>Confirmer l'affectation du correspondant</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">158</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6900893559485781849">
         <source>This operation will assign the correspondent &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action affectera le correspondant &amp;quot;<x equiv-text="correspondent.name" id="PH"/>&amp;quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/>document(s) sélectionné(s).</target>
+        <target>Cette action affectera le correspondant &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/>document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">160</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1257522660364398440">
@@ -1299,7 +1387,7 @@
         <target>Cette action supprimera le correspondant de(s) <x equiv-text="this.list.selected.size" id="PH"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">161</context>
+          <context context-type="linenumber">162</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5393409374423140648">
@@ -1307,15 +1395,15 @@
         <target>Confirmer l'affectation du type de document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">181</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="332180123895325027">
         <source>This operation will assign the document type &quot;<x equiv-text="documentType.name" id="PH"/>&quot; to <x equiv-text="this.list.selected.size" id="PH_1"/> selected document(s).</source>
-        <target>Cette action affectera le type de document &amp;quot;<x equiv-text="documentType.name" id="PH"/>&amp;quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
+        <target>Cette action affectera le type de document &quot;<x equiv-text="documentType.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">183</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2236642492594872779">
@@ -1323,7 +1411,7 @@
         <target>Cette action supprimera le type de document de(s) <x equiv-text="this.list.selected.size" id="PH"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">185</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="749430623564850405">
@@ -1331,7 +1419,7 @@
         <target>Confirmer la suppression</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">219</context>
+          <context context-type="linenumber">200</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4303174930844518780">
@@ -1339,7 +1427,7 @@
         <target>Cette action supprimera définitivement <x equiv-text="this.list.selected.size" id="PH"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">220</context>
+          <context context-type="linenumber">201</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5641451190833696892">
@@ -1347,7 +1435,7 @@
         <target>Cette action est irréversible.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">221</context>
+          <context context-type="linenumber">202</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6734339521247847366">
@@ -1355,7 +1443,7 @@
         <target>Supprimer le(s) document(s)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">223</context>
+          <context context-type="linenumber">204</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8b0609df23817024b3bed12beb9b64fc1009f588">
@@ -1363,7 +1451,7 @@
         <target>Sélectionner :</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="dfc3c34e182ea73c5d784ff7c8135f087992dac1">
@@ -1371,7 +1459,7 @@
         <target>Tout</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="907df6a2b68daecc3c399cf40a764b358bd9fd84">
@@ -1379,7 +1467,7 @@
         <target>Éditer :</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="27d158b47717ff9305d19866960418c603f19d55">
@@ -1582,6 +1670,38 @@
           <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="1206520795340730278">
+        <source>English (US)</source>
+        <target>Anglais (US)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1858110241312746425">
+        <source>German</source>
+        <target>Allemand</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3071065188816255493">
+        <source>Dutch</source>
+        <target>Néerlandais</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7633754075223722162">
+        <source>French</source>
+        <target>Français</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="1519954996184640001">
         <source>Error</source>
         <target>Erreur</target>
@@ -1598,17 +1718,17 @@
           <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="2691296884221415710">
-        <source>Correspondent</source>
-        <target>Correspondant</target>
+      <trans-unit datatype="html" id="7517688192215738656">
+        <source>ASN</source>
+        <target>NSA</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="5066119607229701477">
-        <source>Document type</source>
-        <target>Type de document</target>
+      <trans-unit datatype="html" id="2691296884221415710">
+        <source>Correspondent</source>
+        <target>Correspondant</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">17</context>
@@ -1622,9 +1742,9 @@
           <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="7517688192215738656">
-        <source>ASN</source>
-        <target>NSA</target>
+      <trans-unit datatype="html" id="5066119607229701477">
+        <source>Document type</source>
+        <target>Type de document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">19</context>
@@ -1763,7 +1883,7 @@
         <target>Créer un nouvel élément</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5324147361912094446">
@@ -1771,7 +1891,7 @@
         <target>Éditer l'élément</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1699589597032579396">
@@ -1779,7 +1899,7 @@
         <target>Impossible d'enregistrer l'élément : <x equiv-text="error" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="810888510148304696">
@@ -1787,7 +1907,7 @@
         <target>Automatique</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5044611416737085530">
@@ -1795,7 +1915,7 @@
         <target>Voulez-vous vraiment supprimer cet élément ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8371896857609524947">
@@ -1803,7 +1923,7 @@
         <target>Les documents associés ne seront pas supprimés.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7022070615528435141">
@@ -1811,7 +1931,15 @@
         <target>Supprimer</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="5467489005440577210">
+        <source>Error while deleting element: <x equiv-text="JSON.stringify(error.error)" id="PH"/></source>
+        <target>Une erreur s'est produite lors de la suppression de l'élément : <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5851669019930456395">
@@ -1824,7 +1952,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7517655726614958140">
         <source>Any: Document contains any of these words (space separated)</source>
-        <target>Un des mots : le document contient l'un de ces mots (séparés par des espaces)</target>
+        <target>Un des mots : contient l'un de ces mots (séparés par des espaces)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
@@ -1840,7 +1968,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="111914402588955480">
         <source>All: Document contains all of these words (space separated)</source>
-        <target>Tous les mots : le document contient tous ces mots (séparés par des espaces)</target>
+        <target>Tous les mots : contient tous ces mots (séparés par des espaces)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
@@ -1856,7 +1984,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7109184332944610787">
         <source>Exact: Document contains this string</source>
-        <target>Concordance exacte : le document contient cette chaîne de caractères</target>
+        <target>Concordance exacte : contient cette chaîne de caractères</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
@@ -1872,7 +2000,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7548151332424148033">
         <source>Regular expression: Document matches this regular expression</source>
-        <target>Expression régulière : le document correspond à cette expression régulière</target>
+        <target>Expression régulière : correspond à cette expression régulière</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
@@ -1888,7 +2016,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="8419167206585286450">
         <source>Fuzzy: Document contains a word similar to this word</source>
-        <target>Mot approximatif : le document contient un mot similaire à ce mot</target>
+        <target>Mot approximatif : contient un mot similaire à ce mot</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>

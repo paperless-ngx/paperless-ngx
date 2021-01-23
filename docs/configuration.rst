@@ -53,6 +53,12 @@ PAPERLESS_DBPASS=<password>
 
     Defaults to "paperless".
 
+PAPERLESS_DBSSLMODE=<mode>
+    SSL mode to use when connecting to PostgreSQL.
+
+    See `the official documentation about sslmode <https://www.postgresql.org/docs/current/libpq-ssl.html>`_.
+
+    Default is ``prefer``.
 
 Paths and folders
 #################
@@ -162,6 +168,12 @@ PAPERLESS_COOKIE_PREFIX=<str>
 
     Defaults to ``""``, which does not alter the cookie names.
 
+PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>
+    Allows authentication via HTTP_REMOTE_USER which is used by some SSO
+    applications.
+
+    Defaults to `false` which disables this feature.
+
 .. _configuration-ocr:
 
 OCR settings
@@ -210,20 +222,20 @@ PAPERLESS_OCR_MODE=<mode>
         into images and puts the OCRed text on top. This works for all documents,
         however, the resulting document may be significantly larger and text
         won't appear as sharp when zoomed in.
-    
+
     The default is ``skip``, which only performs OCR when necessary and always
     creates archived documents.
 
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
-    
+
     *   ``pdf``: Modify the PDF document as little as possible.
     *   ``pdfa``: Convert PDF documents into PDF/A-2b documents, which is a
         subset of the entire PDF specification and meant for storing
         documents long term.
     *   ``pdfa-1``, ``pdfa-2``, ``pdfa-3`` to specify the exact version of
         PDF/A you wish to use.
-    
+
     If not specified, ``pdfa`` is used. Remember that paperless also keeps
     the original input file as well as the archived version.
 
@@ -255,7 +267,7 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
     present in an image.
 
 
-PAPERLESS_OCR_USER_ARG=<json>
+PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
     additional arguments you wish to pass to OCRmyPDF. Since Paperless uses
     the API of OCRmyPDF, you have to specify these in a format that can be
@@ -275,21 +287,18 @@ PAPERLESS_OCR_USER_ARG=<json>
 
     .. code:: json
 
-        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}    
-    
+        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}
+
 .. _configuration-tika:
 
 Tika settings
 #############
 
-Paperless can make use of `Tika <https://tika.apache.org/>`_ and 
+Paperless can make use of `Tika <https://tika.apache.org/>`_ and
 `Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
 converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
 wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
-
-If you run paperless on docker, you can add those services to the docker-compose
-file (see the examples provided).
 
 PAPERLESS_TIKA_ENABLED=<bool>
     Enable (or disable) the Tika parser.
@@ -306,7 +315,41 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
 
     Defaults to "http://localhost:3000".
 
-    
+If you run paperless on docker, you can add those services to the docker-compose
+file (see the provided ``docker-compose.tika.yml`` file for reference). The changes
+requires are as follows:
+
+.. code:: yaml
+
+    services:
+        # ...
+
+        webserver:
+            # ...
+
+            environment:
+                # ...
+
+                PAPERLESS_TIKA_ENABLED: 1
+                PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+                PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+        
+        # ...
+
+        gotenberg:
+            image: thecodingmachine/gotenberg
+            restart: unless-stopped
+            environment:
+                DISABLE_GOOGLE_CHROME: 1
+
+        tika:
+            image: apache/tika
+            restart: unless-stopped
+
+Add the configuration variables to the environment of the webserver (alternatively
+put the configuration in the ``docker-compose.env`` file) and add the additional
+services below the webserver service. Watch out for indentation.
+
 Software tweaks
 ###############
 
@@ -333,8 +376,26 @@ PAPERLESS_THREADS_PER_WORKER=<num>
         use a higher thread per worker count.
 
     The default is a balance between the two, according to your CPU core count,
-    with a slight favor towards threads per worker, and using as much cores as
-    possible.
+    with a slight favor towards threads per worker, and leaving at least one core
+    free for other tasks:
+
+    +----------------+---------+---------+
+    | CPU core count | Workers | Threads |
+    +----------------+---------+---------+
+    |              1 |       1 |       1 |
+    +----------------+---------+---------+
+    |              2 |       1 |       1 |
+    +----------------+---------+---------+
+    |              4 |       1 |       3 |
+    +----------------+---------+---------+
+    |              6 |       2 |       2 |
+    +----------------+---------+---------+
+    |              8 |       2 |       3 |
+    +----------------+---------+---------+
+    |             12 |       3 |       3 |
+    +----------------+---------+---------+
+    |             16 |       3 |       5 |
+    +----------------+---------+---------+
 
     If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
     PAPERLESS_THREADS_PER_WORKER automatically.
@@ -379,6 +440,9 @@ PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>
     Set the names of subdirectories as tags for consumed files.
     E.g. <CONSUMPTION_DIR>/foo/bar/file.pdf will add the tags "foo" and "bar" to
     the consumed file. Paperless will create any tags that don't exist yet.
+
+    This is useful for sorting documents with certain tags such as ``car`` or
+    ``todo`` prior to consumption. These folders won't be deleted.
 
     PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
 
@@ -440,6 +504,19 @@ PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
     Note that this won't have any effect on already generated thumbnails.
 
     Defaults to ``/usr/share/fonts/liberation/LiberationSerif-Regular.ttf``.
+
+PAPERLESS_IGNORE_DATES=<string>
+    Paperless parses a documents creation date from filename and file content.
+    You may specify a comma separated list of dates that should be ignored during
+    this process. This is useful for special dates (like date of birth) that appear
+    in documents regularly but are very unlikely to be the documents creation date.
+
+    You may specify dates in a multitude of formats supported by dateparser (see
+    https://dateparser.readthedocs.io/en/latest/#popular-formats) but as the dates
+    need to be comma separated, the options are limited.
+    Example: "2020-12-02,22.04.1999"
+
+    Defaults to an empty string to not ignore any dates.
 
 
 Binaries
