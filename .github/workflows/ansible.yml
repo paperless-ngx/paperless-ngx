@@ -5,7 +5,7 @@ on: [push, pull_request]
 
 jobs:
   # https://molecule.readthedocs.io/en/latest/ci.html#github-actions
-  test-fresh:
+  test:
     runs-on: ubuntu-latest
     # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#github-context
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && contains(github.ref, 'refs/heads/'))
@@ -26,36 +26,15 @@ jobs:
           docker --version
           molecule --version
           python --version
-      - name: Test fresh installation with molecule
+      - name: Test installation/build/upgrade with molecule
         run: |
           cd ansible
-          molecule test -s fresh
-        working-directory: "${{ github.repository }}"
-  test-update:
-    runs-on: ubuntu-latest
-    # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#github-context
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && contains(github.ref, 'refs/heads/'))
-    steps:
-      - name: Check out the codebase
-        uses: actions/checkout@v2
-        with:
-          path: "${{ github.repository }}"
-      - name: Set up Python
-        uses: actions/setup-python@v2
-      - name: Set up Docker
-        uses: docker-practice/actions-setup-docker@master
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install molecule[ansible,docker] jmespath
-          ansible --version
-          docker --version
-          molecule --version
-          python --version
-      - name: Test release update with molecule
-        run: |
-          cd ansible
-          molecule test -s update
+          molecule create
+          molecule verify
+          molecule converge
+          molecule idempotence
+          molecule verify
+          molecule destroy
         working-directory: "${{ github.repository }}"
   # # https://galaxy.ansible.com/docs/contributing/importing.html
   # release:
