@@ -106,7 +106,7 @@ Install Paperless from Docker Hub
 
 1.  Login with your user and create a folder in your home-directory `mkdir -v ~/paperless-ng` to have a place for your configuration files and consumption directory.
 
-1.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+2.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
     and download one of the `docker-compose.*.yml` files, depending on which database backend you
     want to use. Rename this file to `docker-compose.yml`.
     If you want to enable optional support for Office documents, download a file with `-tika` in the file name.
@@ -118,7 +118,7 @@ Install Paperless from Docker Hub
         For new installations, it is recommended to use PostgreSQL as the database
         backend.
 
-2.  Install `Docker`_ and `docker-compose`_.
+3.  Install `Docker`_ and `docker-compose`_.
 
     .. caution::
 
@@ -136,24 +136,24 @@ Install Paperless from Docker Hub
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
         .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
-3.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
+4.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
     to the consumption directory. Find the line that specifies where
     to mount the consumption directory:
 
     .. code::
 
-        - ./**consume**:/usr/src/paperless/consume
+        - ./consume:/usr/src/paperless/consume
 
     Replace the part BEFORE the colon with a local directory of your choice:
 
     .. code::
 
-        - /**home/jonaswinkler/paperless-inbox**:/usr/src/paperless/consume
+        - /home/jonaswinkler/paperless-inbox:/usr/src/paperless/consume
 
     Don't change the part after the colon or paperless wont find your documents.
 
 
-4.  Modify ``docker-compose.env``, following the comments in the file. The
+5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. This ensures that
     both the docker container and you on the host machine have write access
@@ -174,14 +174,14 @@ Install Paperless from Docker Hub
         with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
         which will disable inotify. See :ref:`here <configuration-polling>`.
         
-5.  Now head over to: https://hub.docker.com/r/jonaswinkler/paperless-ng and choose your preferred
+6.  Now head over to: https://hub.docker.com/r/jonaswinkler/paperless-ng and choose your preferred
     image and copy the link. To download this image do a `docker pull` followed by the link. Do this within the directory with the .yml files.
     Depending on your network connection and CPU this will take a while. You have time to get a beverage.
 
-5.  Run ``docker-compose up -d``. This will create and start the necessary
+7.  Run ``docker-compose up -d``. This will create and start the necessary
     containers, but your are not done yet!
 
-6.  To be able to login, you will need a super user. To create it, execute the
+8.  To be able to login, you will need a super user. To create it, execute the
     following command:
 
     .. code-block:: shell-session
@@ -191,7 +191,7 @@ Install Paperless from Docker Hub
     This will prompt you to set a username, an optional e-mail address and
     finally a password (at least 8 characters).
 
-7.  The default ``docker-compose.yml`` exports the webserver on your local port
+9.  The default ``docker-compose.yml`` exports the webserver on your local port
     8000. If you haven't adapted this, you should now be able to visit your
     Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000. 
     Use the login credentials you have created with the previous step.
