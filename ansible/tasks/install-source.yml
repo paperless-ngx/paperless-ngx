@@ -5,7 +5,7 @@
     pkg:
       - git
       - npm
-      - libqpdf-dev
+      - gettext
 
 - name: create temporary git directory
   tempfile:
@@ -29,26 +29,6 @@
     - npm install -g @angular/cli
     - npm install
     - ./node_modules/.bin/ng build --prod
-
-# TODO run dev in separate virtualenv
-- name: install pipenv
-  pip:
-    name:
-      - pipenv
-      - pybind11  # building pikepdf for <0.9.14
-    extra_args: --upgrade
-
-- name: allow building with any Python 3 release
-  lineinfile:
-    path: "{{ gitdir.path }}/Pipfile"
-    regexp: '^python_version = ".+"$'
-    line: python_version = "3"
-
-- name: install Pipfile dependencies
-  command:
-    cmd: pipenv install --dev
-  args:
-    chdir: "{{ gitdir.path }}"
 
 - name: clean output directory
   file:
@@ -75,28 +55,16 @@
     - src: Pipfile
     - src: Pipfile.lock
     - src: README.md
+    - src: requirements.txt
     - src: paperless.conf.example
       dest: "paperless.conf"
 
-# TODO can be copied for >=0.9.14
-- name: generate requirements.txt
-  command:
-    cmd: pipenv lock --keep-outdated -r
-  args:
-    chdir: "{{ gitdir.path }}"
-  register: requirements
-
-- name: write requirements.txt
-  copy:
-    content: "{{ requirements.stdout }}"
-    dest: "{{ gitdir.path }}/dist/paperless-ng/requirements.txt"
-
 - name: glob all scripts
   find:
-    paths: "{{ gitdir.path }}/scripts/"
+    paths: ["{{ gitdir.path }}/scripts/"]
     patterns:
-    - "*.service"
-    - "*.sh"
+      - "*.service"
+      - "*.sh"
   register: glob
 
 - name: copy scripts
@@ -112,6 +80,27 @@
     cmd: "cp -r src/ dist/paperless-ng/src"
   args:
     chdir: "{{ gitdir.path }}"
+
+- name: install paperlessng requirements
+  pip:
+    requirements: "{{ gitdir.path }}/requirements.txt"
+    virtualenv: "{{ gitdir.path }}/.venv/"
+    extra_args: --upgrade
+
+- name: compile messages
+  command: "{{ gitdir.path }}/.venv/bin/python3 manage.py compilemessages"
+  args:
+    chdir: "{{ gitdir.path }}/dist/paperless-ng/src/"
+
+- name: collect static files
+  command: "{{ gitdir.path }}/.venv/bin/python3 manage.py collectstatic --no-input"
+  args:
+    chdir: "{{ gitdir.path }}/dist/paperless-ng/src/"
+
+- name: remove pycache directories
+  shell: find . -name __pycache__ | xargs rm -r
+  args:
+    chdir: "{{ gitdir.path }}/dist/"
 
 - name: package app
   archive:
