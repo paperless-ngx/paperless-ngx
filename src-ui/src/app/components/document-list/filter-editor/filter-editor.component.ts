@@ -40,7 +40,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
         case FILTER_HAS_TAG:
           return $localize`Tag: ${this.tags.find(t => t.id == +rule.value)?.name}`
-        
+
         case FILTER_HAS_ANY_TAG:
           if (rule.value == "false") {
             return $localize`Without any tag`
@@ -127,7 +127,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     } else {
       this.tagSelectionModel.getSelectedItems().filter(tag => tag.id).forEach(tag => {
         filterRules.push({rule_type: FILTER_HAS_TAG, value: tag.id?.toString()})
-      })  
+      })
     }
     this.correspondentSelectionModel.getSelectedItems().forEach(correspondent => {
       filterRules.push({rule_type: FILTER_CORRESPONDENT, value: correspondent.id?.toString()})
@@ -153,14 +153,14 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
+  @Output()
+  reset = new EventEmitter()
+
+  @Input()
+  rulesModified: boolean = false
+
   updateRules() {
     this.filterRulesChange.next(this.filterRules)
-  }
-
-  hasFilters() {
-    return this._titleFilter || 
-      this.dateAddedAfter || this.dateAddedBefore || this.dateCreatedAfter || this.dateCreatedBefore ||
-      this.tagSelectionModel.selectionSize() || this.correspondentSelectionModel.selectionSize() || this.documentTypeSelectionModel.selectionSize()
   }
 
   get titleFilter() {
@@ -194,16 +194,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.titleFilterDebounce.complete()
   }
 
-  clearSelected() {
-    this._titleFilter = ""
-    this.tagSelectionModel.clear(false)
-    this.documentTypeSelectionModel.clear(false)
-    this.correspondentSelectionModel.clear(false)
-    this.dateAddedBefore = null
-    this.dateAddedAfter = null
-    this.dateCreatedBefore = null
-    this.dateCreatedAfter = null
-    this.updateRules()
+  resetSelected() {
+    this.reset.next()
   }
 
   toggleTag(tagId: number) {
@@ -218,4 +210,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.documentTypeSelectionModel.toggle(documentTypeId)
   }
 
+  onTagsDropdownOpen() {
+    this.tagSelectionModel.apply()
+  }
+
+  onCorrespondentDropdownOpen() {
+    this.correspondentSelectionModel.apply()
+  }
+
+  onDocumentTypeDropdownOpen() {
+    this.documentTypeSelectionModel.apply()
+  }
 }

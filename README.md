@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/jonaswinkler/paperless-ng.svg?branch=master)](https://travis-ci.com/jonaswinkler/paperless-ng)
+![ci](https://github.com/jonaswinkler/paperless-ng/workflows/ci/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/paperless-ng/community.svg)](https://gitter.im/paperless-ng/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
@@ -9,8 +9,6 @@
 [Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
-
-This project is still in development and some things may not work as expected.
 
 # How it Works
 
@@ -48,7 +46,7 @@ Here's what you get:
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 * A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
 
-If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
+If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html). However, some parts of the UI have changed since I took these.
 
 For a complete list of changes from paperless, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
 
@@ -56,22 +54,7 @@ For a complete list of changes from paperless, check out the [changelog](https:/
 
 - Make the front end nice (except mobile).
 - Fix whatever bugs I and you find.
-
-## Roadmap for versions beyond 1.0
-
-These are things that I want to add to paperless eventually. They are sorted by priority.
-
-- **More search.** The search backend is incredibly versatile and customizable. Searching is the most important feature of this project and thus, I want to implement things like:
-  - Group and limit search results by correspondent, show “more from this” links in the results.
-- **Nested tags**. Organize tags in a hierarchical structure. This will combine the benefits of folders and tags in one coherent system.
-- **Localization.** I won't translate paperless into any other languages except English and German, however, I'll add the necessary means so that anyone can translate paperless into their favorite language.
-- **An interactive consumer** that shows its progress for documents it processes on the web page.
-	- With live updates and websockets. This already works on a dev branch, but requires a lot of new dependencies, which I'm not particularly happy about.
-	- Notifications when a document was added with buttons to open the new document right away.
-- **Arbitrary tag colors**. Allow the selection of any color with a color picker.
-- **More file types**. Possibly allow more file types to be processed by paperless, such as office .odt, .doc and .docx documents.
-
-Apart from that, paperless is pretty much feature complete.
+- Make the documentation nice.
 
 ## On the chopping block.
 
@@ -88,7 +71,7 @@ These features will probably never make it into paperless, since paperless is me
 
 # Getting started
 
-The recommended way to deploy paperless is docker-compose. Don't clone the repository, grab the latest release to get started instead. The dockerfiles archive contains just the docker files which will pull the image from docker hub. The source archive contains everything you need to build the docker image yourself (i.e. if you want to run on Raspberry Pi).
+The recommended way to deploy paperless is docker-compose. The files in the /docker/hub directory are configured to pull the image from Docker Hub.
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
@@ -101,6 +84,12 @@ Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest
 # Documentation
 
 The documentation for Paperless-ng is available on [ReadTheDocs](https://paperless-ng.readthedocs.io/).
+
+# Translation
+
+Paperless is currently available in English, German, Dutch and French. Translation is coordinated at transifex: https://www.transifex.com/paperless/paperless-ng
+
+If you want to see paperless in your own language, request that language at transifex and you can start translating after I approve the language.
 
 # Suggestions? Questions? Something not working?
 

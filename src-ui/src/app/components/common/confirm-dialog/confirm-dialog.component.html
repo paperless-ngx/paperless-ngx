@@ -9,7 +9,7 @@
       <p *ngIf="message">{{message}}</p>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-dark" (click)="cancelClicked()" [disabled]="!buttonsEnabled">Cancel</button>
+      <button type="button" class="btn btn-outline-dark" (click)="cancelClicked()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
       <button type="button" class="btn" [class]="btnClass" (click)="confirmClicked.emit()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
         {{btnCaption}}
         <span *ngIf="!confirmButtonEnabled"> ({{seconds}})</span>

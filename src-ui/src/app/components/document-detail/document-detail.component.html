@@ -1,5 +1,5 @@
 <app-page-header [(title)]="title">
-    <div class="input-group input-group-sm mr-5" *ngIf="getContentType() == 'application/pdf'">
+    <div class="input-group input-group-sm mr-5 d-none d-md-flex" *ngIf="getContentType() == 'application/pdf' && !useNativePdfViewer">
       <div class="input-group-prepend">
         <div class="input-group-text" i18n>Page</div>
       </div>
@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger mr-2" (click)="delete()">
+    <button type="button" class="btn btn-sm btn-outline-danger mr-2 ml-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Delete</span>
@@ -56,14 +56,14 @@
                     <a ngbNavLink i18n>Details</a>
                     <ng-template ngbNavContent>
 
-                        <app-input-text i18n-title title="Title" formControlName="title" [error]="error?.title"></app-input-text>
+                        <app-input-text #inputTitle i18n-title title="Title" formControlName="title" [error]="error?.title"></app-input-text>
                         <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
                         <app-input-date-time i18n-titleDate titleDate="Date created" formControlName="created"></app-input-date-time>
                         <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
                             (createNew)="createCorrespondent()"></app-input-select>
                         <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
                             (createNew)="createDocumentType()"></app-input-select>
-                        <app-input-tags formControlName="tags" i18n-title title="Tags"></app-input-tags>
+                        <app-input-tags formControlName="tags"></app-input-tags>
 
                     </ng-template>
                 </li>
@@ -85,11 +85,11 @@
                             <tbody>
                                 <tr>
                                     <td i18n>Date modified</td>
-                                    <td>{{document.modified | date:'medium'}}</td>
+                                    <td>{{document.modified | customDate}}</td>
                                 </tr>
                                 <tr>
                                     <td i18n>Date added</td>
-                                    <td>{{document.added | date:'medium'}}</td>
+                                    <td>{{document.added | customDate}}</td>
                                 </tr>
                                 <tr>
                                     <td i18n>Media filename</td>
@@ -134,8 +134,17 @@
     </div>
 
     <div class="col-md-6 col-xl-8 mb-3">
-      <div class="pdf-viewer-container" *ngIf="getContentType() == 'application/pdf'">
-        <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
-      </div>
+        <ng-container *ngIf="getContentType() == 'application/pdf'">
+            <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
+                <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
+            </div>
+            <ng-template #nativePdfViewer>
+                <object [data]="previewUrl | safe" type="application/pdf" class="preview-sticky" width="100%"></object>
+            </ng-template>
+        </ng-container>
+        <ng-container *ngIf="getContentType() == 'text/plain'">
+            <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky" width="100%"></object>
+        </ng-container>
+          
     </div>
 </div>

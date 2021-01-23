@@ -13,7 +13,7 @@ import { DocumentTypeListComponent } from './components/manage/document-type-lis
 import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, registerLocaleData } from '@angular/common';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component';
 import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component';
@@ -58,7 +58,17 @@ import { MetadataCollapseComponent } from './components/document-detail/metadata
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NumberComponent } from './components/common/input/number/number.component';
+import { SafePipe } from './pipes/safe.pipe';
+import { CustomDatePipe } from './pipes/custom-date.pipe';
 import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/consumer-status-widget/consumer-status-widget.component';
+
+import localeFr from '@angular/common/locales/fr';
+import localeNl from '@angular/common/locales/nl';
+import localeDe from '@angular/common/locales/de';
+
+registerLocaleData(localeFr)
+registerLocaleData(localeNl)
+registerLocaleData(localeDe)
 
 @NgModule({
   declarations: [
@@ -108,6 +118,8 @@ import { ConsumerStatusWidgetComponent } from './components/dashboard/widgets/co
     MetadataCollapseComponent,
     SelectDialogComponent,
     NumberComponent,
+    SafePipe,
+    CustomDatePipe,
     ConsumerStatusWidgetComponent
   ],
   imports: [

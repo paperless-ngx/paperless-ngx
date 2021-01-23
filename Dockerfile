@@ -1,47 +1,78 @@
+FROM ubuntu:20.04 AS jbig2enc
+
+WORKDIR /usr/src/jbig2enc
+
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential automake libtool libleptonica-dev zlib1g-dev git ca-certificates
+
+RUN git clone https://github.com/agl/jbig2enc .
+RUN ./autogen.sh
+RUN ./configure && make
+
 FROM python:3.7-slim
 
 WORKDIR /usr/src/paperless/
 
 COPY requirements.txt ./
 
-#Dependencies
+# Binary dependencies
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
-		build-essential \
+  	# Basic dependencies
 		curl \
 		file \
+		# fonts for text file thumbnail generation
 		fonts-liberation \
-		ghostscript \
+		# for making translations further down
+		gettext \
 		gnupg \
-		icc-profiles-free \
 		imagemagick \
+		# for Numpy
 		libatlas-base-dev \
-		liblept5 \
-		libmagic-dev \
-		libpoppler-cpp-dev \
-		libpq-dev \
-		libqpdf-dev \
-		libxml2 \
 		libxslt1-dev \
+		mime-support \
+		# thumbnail size reduction
 		optipng \
+		sudo \
+		tzdata \
+  	# OCRmyPDF dependencies
+		ghostscript \
+		icc-profiles-free \
+		liblept5 \
+		libxml2 \
 		pngquant \
 		qpdf \
-		sudo \
 		tesseract-ocr \
 		tesseract-ocr-eng \
 		tesseract-ocr-deu \
 		tesseract-ocr-fra \
 		tesseract-ocr-ita \
 		tesseract-ocr-spa \
-		tzdata \
 		unpaper \
 		zlib1g \
-	&& pip3 install --upgrade supervisor setuptools \
-	&& pip install --no-cache-dir -r requirements.txt \
+		&& rm -rf /var/lib/apt/lists/*
+
+# This pulls in updated dependencies from bullseye to fix some issues with file type detection.
+# TODO: Remove this once bullseye releases.
+RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
+  && apt-get update \
+  && apt-get install --no-install-recommends -y file libmagic-dev \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm /etc/apt/sources.list.d/bullseye.list
+
+# Python dependencies
+RUN apt-get update \
+  && apt-get -y --no-install-recommends install \
+		build-essential \
+		libpoppler-cpp-dev \
+		libpq-dev \
+		libqpdf-dev \
+	&& python3 -m pip install --upgrade --no-cache-dir supervisor \
+  && python3 -m pip install --no-cache-dir -r requirements.txt \
 	&& apt-get -y purge build-essential libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir /var/log/supervisord /var/run/supervisord
+
 
 # copy scripts
 # this fixes issues with imagemagick and PDF
@@ -49,6 +80,12 @@ COPY docker/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 COPY docker/gunicorn.conf.py ./
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/docker-entrypoint.sh /sbin/docker-entrypoint.sh
+
+# copy jbig2enc
+COPY --from=jbig2enc /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
+COPY --from=jbig2enc /usr/src/jbig2enc/src/jbig2 /usr/local/bin/
+COPY --from=jbig2enc /usr/src/jbig2enc/src/*.h /usr/local/include/
+
 
 # copy app
 COPY src/ ./src/

@@ -5,6 +5,83 @@
 Changelog
 *********
 
+paperless-ng 1.0.0
+##################
+
+Nothing special about this release, but since there are relatively few bug reports coming in, I think that this is reasonably stable.
+
+* Document export
+
+  * The document exporter has been rewritten to support updating an already existing export in place.
+    This enables incremental backups with ``rsync``.
+  * The document exporter supports naming exported files according to ``PAPERLESS_FILENAME_FORMAT``.
+  * The document exporter locks the media directory and the database during execution to ensure that
+    the resulting export is consistent.
+  * See the :ref:`updated documentation <utilities-exporter>` for more details.
+
+* Other changes and additions
+
+  * Added a language selector to the settings.
+  * Added date format options to the settings.
+  * Range selection with shift clicking is now possible in the document list.
+  * Filtering correspondent, type and tag management pages by name.
+  * Focus "Name" field in dialogs by default.
+
+
+paperless-ng 0.9.14
+###################
+
+Starting with this version, releases are getting built automatically. This release also comes with changes on how to install and
+update paperless.
+
+* Paperless now uses GitHub Actions to make releases and build docker images.
+
+  * Docker images are available for amd64, armhf, and aarch64.
+  * When you pull an image from Docker Hub, Docker will automatically select the correct image for you.
+
+* Changes to docker installations and updates
+
+  * The ``-dockerfiles.tar.xz`` release archive is gone. Instead, simply grab the docker files from ``/docker/compose`` in the repository
+    if you wish to install paperless by pulling from the hub.
+  * The docker compose files in ``/docker/compose`` were changed to always use the ``latest`` version automatically. In order to do further
+    updates, simply do a ``docker-compose pull``. The documentation has been updated.
+  * The docker compose files were changed to restart paperless on system boot only if it was running before shutdown.
+  * Documentation of the docker-compose files about what they do.
+
+* Changes to bare metal installations and updates
+
+  * The release archive is built exactly like before. However, the release now comes with already compiled translation messages and
+    collected static files. Therefore, the update steps ``compilemessages`` and ``collectstatic`` are now obsolete.
+
+* Other changes
+
+  * A new configuration option ``PAPERLESS_IGNORE_DATES`` was added by `jayme-github`_. This can be used to instruct paperless to ignore
+    certain dates (such as your date of birth) when guessing the date from the document content. This was actually introduced in 0.9.12,
+    I just forgot to mention it in the changelog.
+  * The filter drop downs now display selected entries on top of all other entries.
+  * The PostgreSQL client now supports setting an explicit ``sslmode`` to force encryption of the connection to PostgreSQL.
+  * The docker images now come with ``jbig2enc``, which is a lossless image encoder for PDF documents and decreases the size of certain
+    PDF/A documents.
+  * When using any of the manual matching algorithms, paperless now logs messages about when and why these matching algorithms matched.
+  * The default settings for parallelization in paperless were adjusted to always leave one CPU core free.
+  * Added an option to the frontend to choose which method to use for displaying PDF documents.
+
+* Fixes
+
+  * An issue with the tika parser not picking up files from the consumption directory was fixed.
+  * A couple changes to the dark mode and fixes to several other layout issues.
+  * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixed.
+  * Fixed an issue with filenames of downloaded files: Dates where off by one day due to timezone issues.
+  * Searching will continue to work even when the index returns non-existing documents. This resulted in "Document does not exist" errors
+    before. Instead, a warning is logged, indicating the issue.
+  * An issue with the consumer crashing when invalid regular expression were used was fixed.
+
+paperless-ng 0.9.13
+###################
+
+* Fixed an issue with Paperless not starting due to the new Tika integration when ``USERMAP_UID`` and ``USERMAP_GID`` was used
+  in the ``docker-compose.env`` file.
+
 paperless-ng 0.9.12
 ###################
 
@@ -17,6 +94,7 @@ paperless-ng 0.9.12
   * See the :ref:`configuration<configuration-tika>` on how to enable this feature. This feature requires two additional services
     (one for parsing Office documents and metadata extraction and another for converting Office documents to PDF), and is therefore
     not enabled on default installations.
+  * As with all other documents, paperless converts Office documents to PDF and stores both the original as well as the archived PDF.
 
 * Dark mode
 
@@ -32,6 +110,12 @@ paperless-ng 0.9.12
     indicators and clearer error messages about what's wrong.
   * Paperless disables buttons with network actions (such as save and delete) when a network action is active. This indicates that
     something is happening and prevents double clicking.
+  * When using "Save & next", the title field is focussed automatically to better support keyboard editing.
+  * E-Mail: Added filter rule parameters to allow inline attachments (watch out for mails with inlined images!) and attachment filename filters
+    with wildcards.
+  * Support for remote user authentication thanks to `Michael Shamoon`_. This is useful for hiding Paperless behind single sign on applications
+    such as `authelia <https://www.authelia.com/>`_.
+  * "Clear filters" has been renamed to "Reset filters" and now correctly restores the default filters on saved views. Thanks to `Michael Shamoon`_
 
 * Fixes
 
@@ -55,7 +139,7 @@ paperless-ng 0.9.10
   * There are some configuration options in the settings to alter the behavior.
 
 * Other changes and additions
-  
+
   * Thanks to `zjean`_, paperless now publishes a webmanifest, which is useful for adding the application to home screens on mobile devices.
   * The Paperless-ng logo now navigates to the dashboard.
   * Filter for documents that don't have any correspondents, types or tags assigned.
@@ -75,7 +159,7 @@ paperless-ng 0.9.10
   The bulk delete operations did not update the search index. Therefore, documents that you deleted remained in the index and
   caused the search to return messages about missing documents when searching. Further bulk operations will properly update
   the index.
-  
+
   However, this change is not retroactive: If you used the delete method of the bulk editor, you need to reindex your search index
   by :ref:`running the management command document_index with the argument reindex <administration-index>`.
 
@@ -130,12 +214,12 @@ paperless-ng 0.9.7
 
   * Thanks to the hard work of `Michael Shamoon`_, paperless now comes with a much more streamlined UI for
     filtering documents.
-  
+
   * `Michael Shamoon`_ replaced the document preview with another component. This should fix compatibility with Safari browsers.
 
   * Added buttons to the management pages to quickly show all documents with one specific tag, correspondent, or title.
-  
-  * Paperless now stores your saved views on the server and associates them with your user account. 
+
+  * Paperless now stores your saved views on the server and associates them with your user account.
     This means that you can access your views on multiple devices and have separate views for different users.
     You will have to recreate your views.
 
@@ -153,7 +237,7 @@ paperless-ng 0.9.7
     This option enables you to be logged in into multiple instances by specifying different cookie names for each instance.
 
 * Fixes
-  
+
   * Sometimes paperless would assign dates in the future to newly consumed documents.
   * The filename format fields ``{created_month}`` and ``{created_day}`` now use a leading zero for single digit values.
   * The filename format field ``{tags}`` can no longer be used without arguments.

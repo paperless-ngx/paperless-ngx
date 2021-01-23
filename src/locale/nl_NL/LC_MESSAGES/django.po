@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Ben Zweekhorst <bzweekhorst@gmail.com>, 2021
-# J V <bugs.github@dwarfy.be>, 2021
+# Ben <bzweekhorst@gmail.com>, 2021
+# Jo Vandeginste <jo.vandeginste@gmail.com>, 2021
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-02 00:26+0000\n"
+"POT-Creation-Date: 2021-01-10 21:41+0000\n"
 "PO-Revision-Date: 2020-12-30 19:27+0000\n"
-"Last-Translator: J V <bugs.github@dwarfy.be>, 2021\n"
+"Last-Translator: Jo Vandeginste <jo.vandeginste@gmail.com>, 2021\n"
 "Language-Team: Dutch (Netherlands) (https://www.transifex.com/paperless/teams/115905/nl_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,14 +44,14 @@ msgstr "Reguliere expressie"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr "Vaag woord"
+msgstr "Gelijkaardig woord"
 
 #: documents/models.py:37
 msgid "Automatic"
 msgstr "Automatisch"
 
 #: documents/models.py:41 documents/models.py:354 paperless_mail/models.py:25
-#: paperless_mail/models.py:100
+#: paperless_mail/models.py:109
 msgid "name"
 msgstr "naam"
 
@@ -93,11 +93,11 @@ msgstr ""
 
 #: documents/models.py:114
 msgid "tag"
-msgstr "tag"
+msgstr "etiket"
 
 #: documents/models.py:115 documents/models.py:171
 msgid "tags"
-msgstr "tags"
+msgstr "etiketten"
 
 #: documents/models.py:121 documents/models.py:153
 msgid "document type"
@@ -285,11 +285,11 @@ msgstr "zit in \"Postvak in\""
 
 #: documents/models.py:380
 msgid "has tag"
-msgstr "heeft tag"
+msgstr "heeft etiket"
 
 #: documents/models.py:381
 msgid "has any tag"
-msgstr "heeft elke tag"
+msgstr "heeft één van de etiketten"
 
 #: documents/models.py:382
 msgid "created before"
@@ -329,7 +329,7 @@ msgstr "gewijzigd na"
 
 #: documents/models.py:391
 msgid "does not have tag"
-msgstr "heeft geen tag"
+msgstr "heeft geen etiket"
 
 #: documents/models.py:402
 msgid "rule type"
@@ -347,33 +347,81 @@ msgstr "filterregel"
 msgid "filter rules"
 msgstr "filterregels"
 
-#: paperless/settings.py:254
+#: documents/templates/index.html:20
+msgid "Paperless-ng is loading..."
+msgstr "Paperless-ng is aan het laden..."
+
+#: documents/templates/registration/logged_out.html:13
+msgid "Paperless-ng signed out"
+msgstr "Paperless-ng - afmelden"
+
+#: documents/templates/registration/logged_out.html:41
+msgid "You have been successfully logged out. Bye!"
+msgstr "Je bent nu afgemeld. Tot later!"
+
+#: documents/templates/registration/logged_out.html:42
+msgid "Sign in again"
+msgstr "Meld je opnieuw aan"
+
+#: documents/templates/registration/login.html:13
+msgid "Paperless-ng sign in"
+msgstr "Paperless-ng - aanmelden"
+
+#: documents/templates/registration/login.html:42
+msgid "Please sign in."
+msgstr "Gelieve aan te melden."
+
+#: documents/templates/registration/login.html:45
+msgid "Your username and password didn't match. Please try again."
+msgstr "Je gebruikersnaam en wachtwoord komen niet overeen. Probeer opnieuw."
+
+#: documents/templates/registration/login.html:48
+msgid "Username"
+msgstr "Gebruikersnaam"
+
+#: documents/templates/registration/login.html:49
+msgid "Password"
+msgstr "Wachtwoord"
+
+#: documents/templates/registration/login.html:54
+msgid "Sign in"
+msgstr "Aanmelden"
+
+#: paperless/settings.py:268
 msgid "English"
 msgstr "Engels"
 
-#: paperless/settings.py:255
+#: paperless/settings.py:269
 msgid "German"
 msgstr "Duits"
+
+#: paperless/settings.py:270
+msgid "Dutch"
+msgstr "Nederlands"
+
+#: paperless/settings.py:271
+msgid "French"
+msgstr "Frans"
 
 #: paperless/urls.py:108
 msgid "Paperless-ng administration"
 msgstr "Paperless-ng administratie"
 
-#: paperless_mail/admin.py:24
+#: paperless_mail/admin.py:25
 msgid "Filter"
 msgstr "Filter"
 
-#: paperless_mail/admin.py:26
+#: paperless_mail/admin.py:27
 msgid ""
 "Paperless will only process mails that match ALL of the filters given below."
 msgstr ""
 "Paperless verwerkt alleen e-mails die voldoen aan ALLE onderstaande filters."
 
-#: paperless_mail/admin.py:34
+#: paperless_mail/admin.py:37
 msgid "Actions"
 msgstr "Acties"
 
-#: paperless_mail/admin.py:36
+#: paperless_mail/admin.py:39
 msgid ""
 "The action applied to the mail. This action is only performed when documents"
 " were consumed from the mail. Mails without attachments will remain entirely"
@@ -383,11 +431,11 @@ msgstr ""
 "wanneer documenten verwerkt werden uit de mail. Mails zonder bijlage blijven"
 " onaangeroerd."
 
-#: paperless_mail/admin.py:43
+#: paperless_mail/admin.py:46
 msgid "Metadata"
 msgstr "Metadata"
 
-#: paperless_mail/admin.py:45
+#: paperless_mail/admin.py:48
 msgid ""
 "Assign metadata to documents consumed from this rule automatically. If you "
 "do not assign tags, types or correspondents here, paperless will still "
@@ -457,87 +505,120 @@ msgstr "email-regel"
 msgid "mail rules"
 msgstr "email-regels"
 
-#: paperless_mail/models.py:69
+#: paperless_mail/models.py:67
+msgid "Only process attachments."
+msgstr "Alleen bijlagen verwerken"
+
+#: paperless_mail/models.py:68
+msgid "Process all files, including 'inline' attachments."
+msgstr "Verwerk alle bestanden, inclusief 'inline' bijlagen."
+
+#: paperless_mail/models.py:78
 msgid "Mark as read, don't process read mails"
 msgstr "Markeer als gelezen, verwerk geen gelezen mails"
 
-#: paperless_mail/models.py:70
+#: paperless_mail/models.py:79
 msgid "Flag the mail, don't process flagged mails"
 msgstr "Markeer de mail, verwerk geen mails met markering"
 
-#: paperless_mail/models.py:71
+#: paperless_mail/models.py:80
 msgid "Move to specified folder"
 msgstr "Verplaats naar gegeven map"
 
-#: paperless_mail/models.py:72
+#: paperless_mail/models.py:81
 msgid "Delete"
 msgstr "Verwijder"
 
-#: paperless_mail/models.py:79
+#: paperless_mail/models.py:88
 msgid "Use subject as title"
 msgstr "Gebruik onderwerp als titel"
 
-#: paperless_mail/models.py:80
+#: paperless_mail/models.py:89
 msgid "Use attachment filename as title"
 msgstr "Gebruik naam van bijlage als titel"
 
-#: paperless_mail/models.py:90
+#: paperless_mail/models.py:99
 msgid "Do not assign a correspondent"
 msgstr "Wijs geen correspondent toe"
 
-#: paperless_mail/models.py:92
+#: paperless_mail/models.py:101
 msgid "Use mail address"
 msgstr "Gebruik het email-adres"
 
-#: paperless_mail/models.py:94
+#: paperless_mail/models.py:103
 msgid "Use name (or mail address if not available)"
 msgstr "Gebruik de naam, en anders het email-adres"
 
-#: paperless_mail/models.py:96
+#: paperless_mail/models.py:105
 msgid "Use correspondent selected below"
 msgstr "Gebruik de hieronder aangeduide correspondent"
 
-#: paperless_mail/models.py:104
+#: paperless_mail/models.py:113
 msgid "order"
 msgstr "volgorde"
 
-#: paperless_mail/models.py:111
+#: paperless_mail/models.py:120
 msgid "account"
 msgstr "account"
 
-#: paperless_mail/models.py:115
+#: paperless_mail/models.py:124
 msgid "folder"
 msgstr "map"
 
-#: paperless_mail/models.py:119
+#: paperless_mail/models.py:128
 msgid "filter from"
 msgstr "filter afzender"
 
-#: paperless_mail/models.py:122
+#: paperless_mail/models.py:131
 msgid "filter subject"
 msgstr "filter onderwerp"
 
-#: paperless_mail/models.py:125
+#: paperless_mail/models.py:134
 msgid "filter body"
 msgstr "filter inhoud"
 
-#: paperless_mail/models.py:129
+#: paperless_mail/models.py:138
+msgid "filter attachment filename"
+msgstr "Filter bestandsnaam van bijlage"
+
+#: paperless_mail/models.py:140
+msgid ""
+"Only consume documents which entirely match this filename if specified. "
+"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+"Alleen documenten verwerken die volledig overeenkomen, indien aangegeven. Je"
+" kunt jokertekens gebruiken, zoals *.pdf of *factuur*. Dit is niet "
+"hoofdlettergevoelig."
+
+#: paperless_mail/models.py:146
 msgid "maximum age"
 msgstr "Maximale leeftijd"
 
-#: paperless_mail/models.py:131
+#: paperless_mail/models.py:148
 msgid "Specified in days."
 msgstr "Aangegeven in dagen"
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:151
+msgid "attachment type"
+msgstr "Type bijlage"
+
+#: paperless_mail/models.py:154
+msgid ""
+"Inline attachments include embedded images, so it's best to combine this "
+"option with a filename filter."
+msgstr ""
+"\"Inline\" bijlagen bevatten vaak ook afbeeldingen. In dit geval valt het "
+"aan te raden om ook een filter voor de bestandsnaam op te geven."
+
+#: paperless_mail/models.py:159
 msgid "action"
 msgstr "actie"
 
-#: paperless_mail/models.py:140
+#: paperless_mail/models.py:165
 msgid "action parameter"
 msgstr "actie parameters"
 
-#: paperless_mail/models.py:142
+#: paperless_mail/models.py:167
 msgid ""
 "Additional parameter for the action selected above, i.e., the target folder "
 "of the move to folder action."
@@ -545,22 +626,22 @@ msgstr ""
 "Extra parameters voor de hierboven gekozen actie, met andere woorden: de "
 "bestemmingsmap voor de verplaats-actie."
 
-#: paperless_mail/models.py:148
+#: paperless_mail/models.py:173
 msgid "assign title from"
 msgstr "wijs titel toe van"
 
-#: paperless_mail/models.py:158
+#: paperless_mail/models.py:183
 msgid "assign this tag"
 msgstr "wijs dit etiket toe"
 
-#: paperless_mail/models.py:166
+#: paperless_mail/models.py:191
 msgid "assign this document type"
 msgstr "wijs dit documenttype toe"
 
-#: paperless_mail/models.py:170
+#: paperless_mail/models.py:195
 msgid "assign correspondent from"
 msgstr "wijs correspondent toe van"
 
-#: paperless_mail/models.py:180
+#: paperless_mail/models.py:205
 msgid "assign this correspondent"
 msgstr "wijs deze correspondent toe"

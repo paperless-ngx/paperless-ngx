@@ -148,10 +148,10 @@ class Command(Renderable, BaseCommand):
 
                 create_source_path_directory(document.source_path)
 
-                shutil.copy(document_path, document.source_path)
-                shutil.copy(thumbnail_path, document.thumbnail_path)
+                shutil.copy2(document_path, document.source_path)
+                shutil.copy2(thumbnail_path, document.thumbnail_path)
                 if archive_path:
                     create_source_path_directory(document.archive_path)
-                    shutil.copy(archive_path, document.archive_path)
+                    shutil.copy2(archive_path, document.archive_path)
 
             document.save()

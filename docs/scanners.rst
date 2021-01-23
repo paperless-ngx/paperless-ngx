@@ -10,6 +10,9 @@ scanner you use, but sometimes finding a scanner that will write to an FTP,
 NFS, or SMB server can be difficult.  This page is here to help you find one
 that works right for you based on recommendations from other Paperless users.
 
+Physical scanners
+=================
+
 +---------+----------------+-----+-----+-----+----------------+
 | Brand   | Model          | Supports        | Recommended By |
 +---------+----------------+-----+-----+-----+----------------+
@@ -45,3 +48,25 @@ that works right for you based on recommendations from other Paperless users.
 .. _REOLDEV: https://github.com/REOLDEV
 .. _Skylinar: https://github.com/Skylinar
 .. _jonaswinkler: https://github.com/jonaswinkler
+
+Mobile phone software
+=====================
+
+You can use your phone to "scan" documents. The regular camera app will work, but may have too low contrast for OCR to work well. Apps specifically for scanning are recommended.
+
++-------------------+----------------+-----+-----+-----+-------+--------+----------------+
+| Name              | OS             | Supports                         | Recommended By |
++-------------------+----------------+-----+-----+-----+-------+--------+----------------+
+|                   |                | FTP | NFS | SMB | Email | WebDav |                |
++===================+================+=====+=====+=====+=======+========+================+
+| `Office Lens`_    | Android        | ?   | ?   | ?   | ?     | ?      | `jonaswinkler`_|
++-------------------+----------------+-----+-----+-----+-------+--------+----------------+
+| `Genius Scan`_    | Android        | yes | no  | yes | yes   | yes    | `hannahswain`_ |
++-------------------+----------------+-----+-----+-----+-------+--------+----------------+
+
+On Android, you can use these applications in combination with one of the :ref:`Paperless-ng compatible apps <usage-mobile_upload>` to "Share" the documents produced by these scanner apps with paperless.
+
+.. _Office Lens: https://play.google.com/store/apps/details?id=com.microsoft.office.officelens
+.. _Genius Scan: https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free
+
+.. _hannahswain: https://github.com/hannahswain
