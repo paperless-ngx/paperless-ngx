@@ -95,9 +95,8 @@ should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
 The ansible route combines benefits of both options:
-the setup process is fully automated, reproducible and independent,
-it includes the same sensible defaults,
-and it simultaneously provides the flexibility of a bare metal installation.
+the setup process is fully automated, reproducible and `idempotent <https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency>`,
+it includes the same sensible defaults, and it simultaneously provides the flexibility of a bare metal installation.
 
 .. _setup-docker_hub:
 
