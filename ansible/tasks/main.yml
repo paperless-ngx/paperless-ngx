@@ -190,9 +190,19 @@
   when: update_installation
 
 - block:
+    - name: create paperless-ng directory and set permissions
+      file:
+        path: "{{ paperlessng_directory }}"
+        state: directory
+        owner: "{{ paperlessng_system_user }}"
+        group: "{{ paperlessng_system_group }}"
+        mode: "750"
     - name: create temporary directory
+      become: yes
+      become_user: "{{ paperlessng_system_user }}"
       tempfile:
         state: directory
+        path: "{{ paperlessng_directory }}"
       register: tempdir
     - name: check if version is available as release archive
       uri:
@@ -238,7 +248,6 @@
     group: "{{ paperlessng_system_group }}"
     mode: "750"
   with_items:
-    - "{{ paperlessng_directory }}"
     - "{{ paperlessng_consumption_dir }}"
     - "{{ paperlessng_data_dir }}"
     - "{{ paperlessng_media_root }}"
