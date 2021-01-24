@@ -45,7 +45,10 @@
       register: logs
       failed_when: "('Consuming ' + filename + '.txt') not in logs.content"
 
-    # assumes txt consumption finished by now, might have to sleep a bit
+    - name: sleep 5 seconds
+      pause:
+        seconds: 5
+
     - name: verify uploaded document has been consumed
       uri:
         url: "http://{{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}/api/logs/"
