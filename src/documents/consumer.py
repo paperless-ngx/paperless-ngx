@@ -35,6 +35,7 @@ class Consumer(LoggingMixin):
                        message, document_id=None):
         payload = {
             'filename': os.path.basename(filename),
+            'task_id': self.task_id,
             'current_progress': current_progress,
             'max_progress': max_progress,
             'status': status,
@@ -58,6 +59,7 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = None
         self.override_tag_ids = None
         self.override_document_type_id = None
+        self.task_id = None
 
         self.channel_layer = get_channel_layer()
 
@@ -136,7 +138,8 @@ class Consumer(LoggingMixin):
                          override_title=None,
                          override_correspondent_id=None,
                          override_document_type_id=None,
-                         override_tag_ids=None):
+                         override_tag_ids=None,
+                         task_id=None):
         """
         Return the document object if it was successfully created.
         """
@@ -147,6 +150,7 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
+        self.task_id = task_id
 
         self._send_progress(self.filename, 0, 100, 'WORKING',
                             'Received new file.')

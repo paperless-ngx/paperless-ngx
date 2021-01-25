@@ -1,6 +1,7 @@
 import logging
 import os
 import tempfile
+import uuid
 from datetime import datetime
 from time import mktime
 
@@ -385,6 +386,8 @@ class PostDocumentView(APIView):
             f.write(doc_data)
             os.utime(f.name, times=(t, t))
 
+            task_id = str(uuid.uuid4())
+
             async_task("documents.tasks.consume_file",
                        f.name,
                        override_filename=doc_name,
@@ -392,8 +395,9 @@ class PostDocumentView(APIView):
                        override_correspondent_id=correspondent_id,
                        override_document_type_id=document_type_id,
                        override_tag_ids=tag_ids,
+                       task_id=task_id,
                        task_name=os.path.basename(doc_name)[:100])
-        return Response("OK")
+        return Response({"task_id": task_id})
 
 
 class SelectionDataView(APIView):
