@@ -32,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.successSubscription = this.consumerStatusService.onDocumentConsumptionFinished().subscribe(status => {
       this.toastService.show({title: "Document added", delay: 10000, content: `Document ${status.filename} was added to paperless.`, actionName: "Open document", action: () => {
-        this.router.navigate(['documents', status.document_id])
+        this.router.navigate(['documents', status.documentId])
       }})
     })
 
@@ -41,7 +41,5 @@ export class AppComponent implements OnInit, OnDestroy {
     })
 
   }
-
-
 
 }
