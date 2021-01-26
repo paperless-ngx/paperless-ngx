@@ -37,6 +37,15 @@ enable filesystem polling with the configuration option
 This will disable listening to filesystem changes with inotify and paperless will
 manually check the consumption directory for changes instead.
 
+
+Paperless always redirects to /admin
+####################################
+
+You probably had the old paperless installed at some point. Paperless installed
+a permanent redirect to /admin in your browser, and you need to clear your
+browsing data / cache to fix that.
+
+
 Operation not permitted
 #######################
 
