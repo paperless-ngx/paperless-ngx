@@ -4,6 +4,7 @@ import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
 import { ConsumerStatusService, FileStatus, FileStatusPhase } from 'src/app/services/consumer-status.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
 
+const MAX_ALERTS = 5
 
 @Component({
   selector: 'app-upload-file-widget',
@@ -11,6 +12,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
   styleUrls: ['./upload-file-widget.component.scss']
 })
 export class UploadFileWidgetComponent implements OnInit {
+  alertsExpanded = false
 
   constructor(
     private documentService: DocumentService,
@@ -18,7 +20,12 @@ export class UploadFileWidgetComponent implements OnInit {
   ) { }
 
   getStatus() {
-    return this.consumerStatusService.getConsumerStatus()
+    return this.consumerStatusService.getConsumerStatus().slice(0, MAX_ALERTS)
+  }
+
+  getStatusesHidden() {
+    if (this.consumerStatusService.getConsumerStatus().length < MAX_ALERTS) return []
+    else return this.consumerStatusService.getConsumerStatus().slice(MAX_ALERTS)
   }
 
   getStatusUploading() {
@@ -41,7 +48,7 @@ export class UploadFileWidgetComponent implements OnInit {
     return status.phase == FileStatusPhase.FAILED || status.phase == FileStatusPhase.SUCCESS
   }
 
-  getType(status: FileStatus) {
+  getStatusColor(status: FileStatus) {
     switch (status.phase) {
       case FileStatusPhase.PROCESSING:
       case FileStatusPhase.UPLOADING:
@@ -56,7 +63,11 @@ export class UploadFileWidgetComponent implements OnInit {
   dismiss(status: FileStatus) {
     this.consumerStatusService.dismiss(status)
   }
-  
+
+  dismissAll() {
+    this.consumerStatusService.dismissAll()
+  }
+
   ngOnInit(): void {
   }
 
@@ -75,7 +86,7 @@ export class UploadFileWidgetComponent implements OnInit {
           let formData = new FormData()
           formData.append('document', file, file.name)
           let status = this.consumerStatusService.newFileUpload(file.name)
-          
+
           status.message = "Connecting..."
 
           this.documentService.uploadDocument(formData).subscribe(event => {
