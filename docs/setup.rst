@@ -98,9 +98,10 @@ The ansible route combines benefits of both options:
 the setup process is fully automated, reproducible and `idempotent <https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency>`_,
 it includes the same sensible defaults, and it simultaneously provides the flexibility of a bare metal installation.
 
-.. _setup-docker_hub:
 .. _CLI Basics: https://sehn.tech/post/devops-with-docker/
 .. _idempotent: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency
+
+.. _setup-docker_hub:
 
 Install Paperless from Docker Hub
 =================================
@@ -131,7 +132,7 @@ Install Paperless from Docker Hub
         See the `Docker installation guide`_ on how to install the current
         version of Docker for your operating system or Linux distribution of
         choice. To get the latest version of docker-compose, follow the
-        `docker-compose installation guide`_if your package repository doesn't
+        `docker-compose installation guide`_ if your package repository doesn't
         include it.
 
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
@@ -348,7 +349,8 @@ writing. Windows is not and will never be supported.
     .. warning::
 
         This is a development server which should not be used in
-        production.
+        production. It is not audited for security and performance
+        is inferior to production ready web servers.
 
     .. hint::
 
@@ -362,6 +364,11 @@ writing. Windows is not and will never be supported.
     Paperless needs the ``webserver`` script to run the webserver, the
     ``consumer`` script to watch the input folder, and the ``scheduler``
     script to run tasks such as email checking and document consumption.
+
+    You may need to adjust the path to the ``gunicorn`` executable. This
+    will be installed as part of the python dependencies, and is either located
+    in the ``bin`` folder of your virtual environment, or in ``~/.local/bin/`` if
+    no virtual environment is used.
 
     These services rely on redis and optionally the database server, but
     don't need to be started in any particular order. The example files
