@@ -17,7 +17,7 @@ export class DirtyFormGuard extends DirtyCheckGuard {
     modal.componentInstance.messageBold = $localize`You have unsaved changes.`
     modal.componentInstance.message = $localize`Are you sure you want to leave?`
     modal.componentInstance.btnClass = "btn-warning"
-    modal.componentInstance.btnCaption = $localize`Ok`
+    modal.componentInstance.btnCaption = $localize`Leave page`
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
       modal.close()
