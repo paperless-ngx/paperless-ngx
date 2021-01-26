@@ -120,3 +120,4 @@ class TestParserAvailability(TestCase):
 
         self.assertTrue(is_file_ext_supported('.pdf'))
         self.assertFalse(is_file_ext_supported('.hsdfh'))
+        self.assertFalse(is_file_ext_supported(''))

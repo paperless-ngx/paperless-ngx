@@ -19,7 +19,7 @@
           <div class="col">
 
             <select class="form-control" formControlName="displayLanguage">
-              <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> ({{lang.englishName}})</span></option>
+              <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code && currentLocale != 'en-US'"> - {{lang.englishName}}</span></option>
             </select>
 
             <small class="form-text text-muted" i18n>You need to reload the page after applying a new language.</small>
@@ -34,7 +34,7 @@
           <div class="col">
 
             <select class="form-control" formControlName="dateLocale">
-              <option *ngFor="let lang of dateLocaleOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> ({{today | date:'shortDate':null:lang.code}})</span></option>
+              <option *ngFor="let lang of dateLocaleOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> - {{today | date:'shortDate':null:lang.code}}</span></option>
             </select>
 
           </div>

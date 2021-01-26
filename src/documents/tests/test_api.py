@@ -228,6 +228,12 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]['id'], results[1]['id']], [doc1.id, doc3.id])
 
+        response = self.client.get("/api/documents/?tags__id__in={},{}".format(tag_2.id, tag_3.id))
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 2)
+        self.assertCountEqual([results[0]['id'], results[1]['id']], [doc2.id, doc3.id])
+
         response = self.client.get("/api/documents/?tags__id__all={},{}".format(tag_2.id, tag_3.id))
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
@@ -923,6 +929,14 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         doc2 = Document.objects.get(id=self.doc2.id)
         self.assertEqual(doc2.correspondent, self.c1)
 
+    def test_api_no_correspondent(self):
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "set_correspondent",
+            "parameters": {}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
     def test_api_invalid_document_type(self):
         self.assertEqual(self.doc2.document_type, self.dt1)
         response = self.client.post("/api/documents/bulk_edit/", json.dumps({
@@ -935,6 +949,14 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         doc2 = Document.objects.get(id=self.doc2.id)
         self.assertEqual(doc2.document_type, self.dt1)
 
+    def test_api_no_document_type(self):
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "set_document_type",
+            "parameters": {}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
     def test_api_add_invalid_tag(self):
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
         response = self.client.post("/api/documents/bulk_edit/", json.dumps({
@@ -945,6 +967,14 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
 
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
+
+    def test_api_add_tag_no_tag(self):
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "add_tag",
+            "parameters": {}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
 
     def test_api_delete_invalid_tag(self):
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
@@ -957,12 +987,35 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
 
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
 
+    def test_api_delete_tag_no_tag(self):
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "remove_tag",
+            "parameters": {}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
     def test_api_modify_invalid_tags(self):
         self.assertEqual(list(self.doc2.tags.all()), [self.t1])
         response = self.client.post("/api/documents/bulk_edit/", json.dumps({
             "documents": [self.doc2.id],
             "method": "modify_tags",
             "parameters": {'add_tags': [self.t2.id, 1657], "remove_tags": [1123123]}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_api_modify_tags_no_tags(self):
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "modify_tags",
+            "parameters": {"remove_tags": [1123123]}
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post("/api/documents/bulk_edit/", json.dumps({
+            "documents": [self.doc2.id],
+            "method": "modify_tags",
+            "parameters": {'add_tags': [self.t2.id, 1657]}
         }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
