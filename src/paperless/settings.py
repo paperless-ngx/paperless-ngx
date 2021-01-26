@@ -354,8 +354,10 @@ LOGGING = {
 
 def default_task_workers():
     # always leave one core open
-    available_cores = max(multiprocessing.cpu_count() - 1, 1)
+    available_cores = max(multiprocessing.cpu_count(), 1)
     try:
+        if available_cores < 4:
+            return available_cores
         return max(
             math.floor(math.sqrt(available_cores)),
             1
@@ -376,7 +378,7 @@ Q_CLUSTER = {
 
 def default_threads_per_worker(task_workers):
     # always leave one core open
-    available_cores = max(multiprocessing.cpu_count() - 1, 1)
+    available_cores = max(multiprocessing.cpu_count(), 1)
     try:
         return max(
             math.floor(available_cores / task_workers),
