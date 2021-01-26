@@ -20,7 +20,7 @@ const routes: Routes = [
     {path: 'documents', component: DocumentListComponent },
     {path: 'view/:id', component: DocumentListComponent },
     {path: 'search', component: SearchComponent },
-    {path: 'documents/:id', component: DocumentDetailComponent },
+    {path: 'documents/:id', component: DocumentDetailComponent, canDeactivate: [FormDirtyGuard] },
 
     {path: 'tags', component: TagListComponent },
     {path: 'documenttypes', component: DocumentTypeListComponent },
