@@ -9,6 +9,7 @@
 
       </ngx-file-drop>
     </form>
+    <p>Uploading {{getStatusUploading().length}} files...</p>
     <div *ngFor="let status of getStatus()">
       <p>{{status.filename}}: {{status.message}}</p>
       <ngb-progressbar [value]="status.getProgress()" [max]="1" [striped]="true" [animated]="!isFinished(status)" [type]="getType(status)">

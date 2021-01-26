@@ -18,7 +18,23 @@ export class UploadFileWidgetComponent implements OnInit {
   ) { }
 
   getStatus() {
-    return this.consumerStatusService.consumerStatus
+    return this.consumerStatusService.getConsumerStatus()
+  }
+
+  getStatusUploading() {
+    return this.consumerStatusService.getConsumerStatus(FileStatusPhase.UPLOADING)
+  }
+
+  getTotalUploadProgress() {
+    let current = 0
+    let max = 0
+
+    this.getStatusUploading().forEach(status => {
+      current += status.currentPhaseProgress
+      max += status.currentPhaseMaxProgress
+    })
+
+    return current / Math.max(max, 1)
   }
 
   isFinished(status: FileStatus) {
@@ -58,14 +74,17 @@ export class UploadFileWidgetComponent implements OnInit {
         fileEntry.file((file: File) => {
           let formData = new FormData()
           formData.append('document', file, file.name)
-          let status = this.consumerStatusService.newFileUpload()
-          status.filename = file.name
+          let status = this.consumerStatusService.newFileUpload(file.name)
+          
+          status.message = "Connecting..."
 
           this.documentService.uploadDocument(formData).subscribe(event => {
             if (event.type == HttpEventType.UploadProgress) {
               status.updateProgress(FileStatusPhase.UPLOADING, event.loaded, event.total)
+              status.message = "Uploading..."
             } else if (event.type == HttpEventType.Response) {
               status.taskId = event.body["task_id"]
+              status.message = "Upload complete."
             }
 
           }, error => {
