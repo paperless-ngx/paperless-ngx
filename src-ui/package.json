@@ -22,6 +22,7 @@
     "@angular/router": "~10.1.5",
     "@ng-bootstrap/ng-bootstrap": "^8.0.0",
     "@ng-select/ng-select": "^5.0.9",
+    "@ngneat/dirty-check-forms": "^1.0.1",
     "bootstrap": "^4.5.0",
     "ng-bootstrap": "^1.6.3",
     "ng2-pdf-viewer": "^6.3.2",
