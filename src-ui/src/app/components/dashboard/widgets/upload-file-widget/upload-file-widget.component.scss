@@ -8,17 +8,17 @@ form {
   position: relative;
 }
 
-.alert {
-  transition: all 0.2s ease;
-}
-
 .alert-heading {
   font-size: 80%;
   font-weight: bold;
 }
 
-.btn-sm {
+.btn-open {
   line-height: 1;
+
+  svg {
+    margin-top: -1px;
+  }
 }
 
 .dismiss-all {
