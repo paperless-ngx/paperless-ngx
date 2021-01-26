@@ -11,7 +11,7 @@ import { SettingsComponent } from './components/manage/settings/settings.compone
 import { TagListComponent } from './components/manage/tag-list/tag-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { SearchComponent } from './components/search/search.component';
-import { FormDirtyGuard } from './guards/dirty-form.guard';
+import { DirtyFormGuard } from './guards/dirty-form.guard';
 
 const routes: Routes = [
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
@@ -20,13 +20,13 @@ const routes: Routes = [
     {path: 'documents', component: DocumentListComponent },
     {path: 'view/:id', component: DocumentListComponent },
     {path: 'search', component: SearchComponent },
-    {path: 'documents/:id', component: DocumentDetailComponent, canDeactivate: [FormDirtyGuard] },
+    {path: 'documents/:id', component: DocumentDetailComponent, canDeactivate: [DirtyFormGuard] },
 
     {path: 'tags', component: TagListComponent },
     {path: 'documenttypes', component: DocumentTypeListComponent },
     {path: 'correspondents', component: CorrespondentListComponent },
     {path: 'logs', component: LogsComponent },
-    {path: 'settings', component: SettingsComponent, canDeactivate: [FormDirtyGuard] },
+    {path: 'settings', component: SettingsComponent, canDeactivate: [DirtyFormGuard] },
   ]},
 
   {path: '404', component: NotFoundComponent},

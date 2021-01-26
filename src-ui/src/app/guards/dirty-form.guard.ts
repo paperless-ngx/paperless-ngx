@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component';
 
 @Injectable({ providedIn: 'root' })
-export class FormDirtyGuard extends DirtyCheckGuard {
+export class DirtyFormGuard extends DirtyCheckGuard {
   constructor(private modalService: NgbModal) {
     super();
   }
