@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -7,8 +8,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent implements OnInit {
-
-  constructor(public activeModal: NgbActiveModal) { }
 
   @Output()
   public confirmClicked = new EventEmitter()
@@ -30,9 +29,15 @@ export class ConfirmDialogComponent implements OnInit {
 
   @Input()
   buttonsEnabled = true
-  
+
   confirmButtonEnabled = true
   seconds = 0
+
+  subject: Subject<boolean>
+
+  constructor(public activeModal: NgbActiveModal) {
+    this.confirmClicked.asObservable()
+  }
 
   delayConfirm(seconds: number) {
     this.confirmButtonEnabled = false
@@ -49,7 +54,15 @@ export class ConfirmDialogComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  cancelClicked() {
+  cancel() {
+    this.subject?.next(false)
+    this.subject?.complete()
     this.activeModal.close()
+  }
+
+  confirm() {
+    this.subject?.next(true)
+    this.subject?.complete()
+    this.confirmClicked.emit()
   }
 }

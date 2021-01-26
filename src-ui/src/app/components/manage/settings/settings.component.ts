@@ -32,9 +32,9 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
 
   savedViews: PaperlessSavedView[]
 
-  store: BehaviorSubject<any>;
-  storeSub: Subscription;
-  isDirty$: Observable<boolean>;
+  store: BehaviorSubject<any>
+  storeSub: Subscription
+  isDirty$: Observable<boolean>
 
   get computedDateLocale(): string {
     return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage
@@ -82,10 +82,10 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
 
       this.storeSub = this.store.asObservable().subscribe(state => {
         this.settingsForm.patchValue(state, { emitEvent: false })
-      });
+      })
 
       // Initialize dirtyCheck
-      this.isDirty$ = dirtyCheck(this.settingsForm, this.store.asObservable());
+      this.isDirty$ = dirtyCheck(this.settingsForm, this.store.asObservable())
     })
   }
 
