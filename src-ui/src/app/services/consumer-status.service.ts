@@ -16,7 +16,7 @@ export class FileStatus {
 
   taskId: string
 
-  phase: FileStatusPhase = FileStatusPhase.STARTED  
+  phase: FileStatusPhase = FileStatusPhase.STARTED
 
   currentPhaseProgress: number
 
@@ -33,7 +33,8 @@ export class FileStatus {
       case FileStatusPhase.UPLOADING:
         return this.currentPhaseProgress / this.currentPhaseMaxProgress * 0.2
       case FileStatusPhase.PROCESSING:
-        return this.currentPhaseProgress / this.currentPhaseMaxProgress * 0.8 + 0.2
+        if (this.currentPhaseProgress > 100) this.currentPhaseProgress = 0
+        return (this.currentPhaseProgress / this.currentPhaseMaxProgress * 0.8) + 0.2
       case FileStatusPhase.SUCCESS:
       case FileStatusPhase.FAILED:
         return 1.0

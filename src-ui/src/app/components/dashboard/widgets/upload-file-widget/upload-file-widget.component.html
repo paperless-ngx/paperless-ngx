@@ -6,20 +6,22 @@
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
         multiple="true" contentClassName="justify-content-center d-flex align-items-center p-5" [showBrowseBtn]=true
         browseBtnClassName="btn btn-sm btn-outline-primary ml-2" i18n-dropZoneLabel i18n-browseBtnLabel>
-
       </ngx-file-drop>
     </form>
-    <p>Uploading {{getStatusUploading().length}} files...</p>
     <div *ngFor="let status of getStatus()">
-      <p>{{status.filename}}: {{status.message}}</p>
-      <ngb-progressbar [value]="status.getProgress()" [max]="1" [striped]="true" [animated]="!isFinished(status)" [type]="getType(status)">
-      </ngb-progressbar>
-
-      <div *ngIf="isFinished(status)" class="mb-2">
-        <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary mr-2" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">Open document</button>
-        <button class="btn btn-sm btn-outline-secondary" (click)="dismiss(status)">Dismiss</button>
-      </div>
-    
+      <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
+        <h6 class="alert-heading">{{status.filename}}</h6>
+        <p class="mb-0" *ngIf="!isFinished(status) || (isFinished(status) && !status.documentId)">{{status.message}}</p>
+        <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
+        <div *ngIf="isFinished(status)">
+          <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary mr-2" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
+            <small>Open document</small>
+            <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+            </svg>
+          </button>
+        </div>
+      </ngb-alert>
     </div>
   </div>
 </app-widget-frame>

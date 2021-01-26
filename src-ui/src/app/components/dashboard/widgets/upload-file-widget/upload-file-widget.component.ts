@@ -41,7 +41,7 @@ export class UploadFileWidgetComponent implements OnInit {
     return status.phase == FileStatusPhase.FAILED || status.phase == FileStatusPhase.SUCCESS
   }
 
-  getType(status: FileStatus) {
+  getStatusColor(status: FileStatus) {
     switch (status.phase) {
       case FileStatusPhase.PROCESSING:
       case FileStatusPhase.UPLOADING:
@@ -56,7 +56,7 @@ export class UploadFileWidgetComponent implements OnInit {
   dismiss(status: FileStatus) {
     this.consumerStatusService.dismiss(status)
   }
-  
+
   ngOnInit(): void {
   }
 
@@ -75,7 +75,7 @@ export class UploadFileWidgetComponent implements OnInit {
           let formData = new FormData()
           formData.append('document', file, file.name)
           let status = this.consumerStatusService.newFileUpload(file.name)
-          
+
           status.message = "Connecting..."
 
           this.documentService.uploadDocument(formData).subscribe(event => {
