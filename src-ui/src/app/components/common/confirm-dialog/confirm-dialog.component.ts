@@ -9,6 +9,8 @@ import { Subject } from 'rxjs';
 })
 export class ConfirmDialogComponent implements OnInit {
 
+  constructor(public activeModal: NgbActiveModal) { }
+
   @Output()
   public confirmClicked = new EventEmitter()
 
@@ -35,10 +37,6 @@ export class ConfirmDialogComponent implements OnInit {
 
   subject: Subject<boolean>
 
-  constructor(public activeModal: NgbActiveModal) {
-    this.confirmClicked.asObservable()
-  }
-
   delayConfirm(seconds: number) {
     this.confirmButtonEnabled = false
     this.seconds = seconds
@@ -61,8 +59,8 @@ export class ConfirmDialogComponent implements OnInit {
   }
 
   confirm() {
+    this.confirmClicked.emit()
     this.subject?.next(true)
     this.subject?.complete()
-    this.confirmClicked.emit()
   }
 }
