@@ -13,7 +13,7 @@ export class FormDirtyGuard extends DirtyCheckGuard {
 
   confirmChanges(): Observable<boolean> {
     let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-    modal.componentInstance.title = $localize`Confirm`
+    modal.componentInstance.title = $localize`Unsaved Changes`
     modal.componentInstance.messageBold = $localize`You have unsaved changes.`
     modal.componentInstance.message = $localize`Are you sure you want to leave?`
     modal.componentInstance.btnClass = "btn-warning"
