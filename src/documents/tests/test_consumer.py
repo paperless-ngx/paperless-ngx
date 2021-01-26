@@ -228,7 +228,11 @@ class TestConsumer(DirectoriesMixin, TestCase):
             "mime_types": {"application/pdf": ".pdf"},
             "weight": 0
         })]
+        self.addCleanup(patcher.stop)
 
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        patcher.start()
         self.addCleanup(patcher.stop)
 
         self.consumer = Consumer()
@@ -479,8 +483,9 @@ class PreConsumeTestCase(TestCase):
         m.assert_not_called()
 
     @mock.patch("documents.consumer.Popen")
+    @mock.patch("documents.consumer.Consumer._send_progress")
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
-    def test_pre_consume_script_not_found(self, m):
+    def test_pre_consume_script_not_found(self, m, m2):
         c = Consumer()
         c.filename = "somefile.pdf"
         c.path = "path-to-file"
@@ -504,7 +509,6 @@ class PreConsumeTestCase(TestCase):
                 self.assertEqual(command[1], "path-to-file")
 
 
-
 class PostConsumeTestCase(TestCase):
 
     @mock.patch("documents.consumer.Popen")
@@ -520,9 +524,9 @@ class PostConsumeTestCase(TestCase):
 
         m.assert_not_called()
 
-
     @override_settings(POST_CONSUME_SCRIPT="does-not-exist")
-    def test_post_consume_script_not_found(self):
+    @mock.patch("documents.consumer.Consumer._send_progress")
+    def test_post_consume_script_not_found(self, m):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
         c = Consumer()
         c.filename = "somefile.pdf"
