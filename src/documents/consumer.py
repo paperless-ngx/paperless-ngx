@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+import uuid
 from subprocess import Popen
 
 import magic
@@ -150,7 +151,7 @@ class Consumer(LoggingMixin):
         self.override_correspondent_id = override_correspondent_id
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
-        self.task_id = task_id
+        self.task_id = task_id or str(uuid.uuid4())
 
         self._send_progress(self.filename, 0, 100, 'WORKING',
                             'Received new file.')
