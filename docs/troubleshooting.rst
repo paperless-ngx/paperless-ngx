@@ -30,9 +30,9 @@ Consumer fails to pickup any new files
 ######################################
 
 If you notice that the consumer will only pickup files in the consumption
-directory at startup, but won't find any other files added later, check out
-the configuration file and enable filesystem polling with the setting
-``PAPERLESS_CONSUMER_POLLING``.
+directory at startup, but won't find any other files added later, you will need to
+enable filesystem polling with the configuration option
+``PAPERLESS_CONSUMER_POLLING``, see :ref:`here <configuration-polling>`.
 
 This will disable listening to filesystem changes with inotify and paperless will
 manually check the consumption directory for changes instead.
@@ -63,6 +63,22 @@ This may have two reasons:
 *   You are using the Auto matching algorithm: The classifier explicitly excludes documents
     with Inbox tags. Verify that there are documents in your archive without inbox tags.
     The algorithm will only learn from documents not in your inbox.
+
+UserWarning in sklearn on every single document
+###############################################
+
+You may encounter warnings like this:
+
+.. code::
+    
+    /usr/local/lib/python3.7/site-packages/sklearn/base.py:315:
+    UserWarning: Trying to unpickle estimator CountVectorizer from version 0.23.2 when using version 0.24.0.
+    This might lead to breaking code or invalid results. Use at your own risk.
+
+This happens when certain dependencies of paperless that are responsible for the auto matching algorithm are
+updated. After updating these, your current training data *might* not be compatible anymore. This can be ignored
+in most cases. If you want to get rid of the warning or actually experience issues with automatic matching, delete
+the file ``classification_model.pickle`` in the data directory and let paperless recreate it.
 
 Permission denied errors in the consumption directory
 #####################################################
