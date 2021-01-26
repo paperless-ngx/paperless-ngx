@@ -133,6 +133,10 @@ export class ConsumerStatusService {
     }
   }
 
+  dismissAll() {
+    this.consumerStatus = []
+  }
+
   onDocumentConsumptionFinished() {
     return this.documentConsumptionFinishedSubject
   }
