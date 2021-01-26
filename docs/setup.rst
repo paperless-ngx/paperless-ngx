@@ -20,7 +20,7 @@ Paperless consists of the following components:
     .. code:: shell-session
 
         $ cd /path/to/paperless/src/
-        $ pipenv run gunicorn -c /usr/src/paperless/gunicorn.conf.py -b 0.0.0.0:8000 paperless.wsgi
+        $ gunicorn -c ../gunicorn.conf.py -b 0.0.0.0:8000 paperless.wsgi
 
     or by any other means such as Apache ``mod_wsgi``.
 
@@ -35,7 +35,7 @@ Paperless consists of the following components:
     .. code:: shell-session
 
         $ cd /path/to/paperless/src/
-        $ pipenv run python3 manage.py document_consumer
+        $ python3 manage.py document_consumer
 
     .. _setup-task_processor:
 
@@ -67,7 +67,7 @@ Paperless consists of the following components:
     .. code:: shell-session
 
         $ cd /path/to/paperless/src/
-        $ pipenv run python3 manage.py qcluster
+        $ python3 manage.py qcluster
 
 *   A `redis <https://redis.io/>`_ message broker: This is a really lightweight service that is responsible
     for getting the tasks from the webserver and the consumer to the task scheduler. These run in a different
@@ -255,7 +255,7 @@ writing. Windows is not and will never be supported.
 1.  Install dependencies. Paperless requires the following packages.
 
     *   ``python3`` 3.6, 3.7, 3.8 (3.9 is untested).
-    *   ``python3-pip``, optionally ``pipenv`` for package installation
+    *   ``python3-pip``
     *   ``python3-dev``
 
     *   ``fonts-liberation`` for generating thumbnails for plain text files
@@ -324,8 +324,13 @@ writing. Windows is not and will never be supported.
 
     Adjust as necessary if you configured different folders.
 
-7.  Install python requirements. Paperless comes with both Pipfiles for ``pipenv`` as well as with a ``requirements.txt``.
-    Both will install exactly the same requirements. It is up to you if you wish to use a virtual environment or not.
+7.  Install python requirements from the ``requirements.txt`` file.
+    It is up to you if you wish to use a virtual environment or not.
+
+    .. code:: shell-session
+
+        pip3 install -r requirements.txt
+
 
 8.  Go to ``/opt/paperless/src``, and execute the following commands:
 
@@ -654,14 +659,12 @@ management commands as below.
 
         This will launch the container and initialize the PostgreSQL database.
 
-    b)  Without docker, open a shell in your virtual environment, switch to
+    b)  Without docker, remember to activate any virtual environment, switch to
         the ``src`` directory and create the database schema:
 
         .. code:: shell-session
 
-            $ cd /path/to/paperless
-            $ pipenv shell
-            $ cd src
+            $ cd /path/to/paperless/src
             $ python3 manage.py migrate
 
         This will not copy any data yet.
@@ -678,7 +681,7 @@ management commands as below.
 
         $ python3 manage.py loaddata data.json
 
-6.  Exit the shell.
+6.  If operating inside Docker, you may exit the shell now.
 
     .. code:: shell-session
 
