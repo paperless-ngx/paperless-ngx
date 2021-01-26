@@ -25,10 +25,10 @@ Paperless consists of the following components:
     or by any other means such as Apache ``mod_wsgi``.
 
 *   **The consumer:** This is what watches your consumption folder for documents.
-    However, the consumer itself does not consume really consume your documents anymore.
-    It rather notifies a task processor that a new file is ready for consumption.
+    However, the consumer itself does not really consume your documents.
+    Now it notifies a task processor that a new file is ready for consumption.
     I suppose it should be named differently.
-    This also used to check your emails, but that's now gone elsewhere as well.
+    This was also used to check your emails, but that's now done elsewhere as well.
 
     Start the consumer with the management command ``document_consumer``:
 
@@ -40,25 +40,25 @@ Paperless consists of the following components:
     .. _setup-task_processor:
 
 *   **The task processor:** Paperless relies on `Django Q <https://django-q.readthedocs.io/en/latest/>`_
-    for doing much of the heavy lifting. This is a task queue that accepts tasks from
-    multiple sources and processes tasks in parallel. It also comes with a scheduler that executes
+    for doing most of the heavy lifting. This is a task queue that accepts tasks from
+    multiple sources and processes these in parallel. It also comes with a scheduler that executes
     certain commands periodically.
 
     This task processor is responsible for:
 
     *   Consuming documents. When the consumer finds new documents, it notifies the task processor to
         start a consumption task.
-    *   Consuming emails. It periodically checks your configured accounts for new mails and
-        produces consumption tasks for any documents it finds.
     *   The task processor also performs the consumption of any documents you upload through
         the web interface.
-    *   Maintain the search index and the automatic matching algorithm. These are things that paperless
+    *   Consuming emails. It periodically checks your configured accounts for new emails and
+        notifies the task processor to consume the attachment of an email.
+    *   Maintaining the search index and the automatic matching algorithm. These are things that paperless
         needs to do from time to time in order to operate properly.
 
     This allows paperless to process multiple documents from your consumption folder in parallel! On
-    a modern multi core system, consumption with full ocr is blazing fast.
+    a modern multi core system, this makes the consumption process with full OCR blazingly fast.
 
-    The task processor comes with a built-in admin interface that you can use to see whenever any of the
+    The task processor comes with a built-in admin interface that you can use to check whenever any of the
     tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
     file, etc).
 
@@ -70,8 +70,8 @@ Paperless consists of the following components:
         $ pipenv run python3 manage.py qcluster
 
 *   A `redis <https://redis.io/>`_ message broker: This is a really lightweight service that is responsible
-    for getting the tasks from the webserver and consumer to the task scheduler. These run in different
-    processes (maybe even on different machines!), and therefore, this is necessary.
+    for getting the tasks from the webserver and the consumer to the task scheduler. These run in a different
+    process (maybe even on different machines!), and therefore, this is necessary.
 
 *   Optional: A database server. Paperless supports both PostgreSQL and SQLite for storing its data.
 
@@ -79,7 +79,7 @@ Paperless consists of the following components:
 Installation
 ############
 
-You can go multiple routes with setting up and running Paperless:
+You can go multiple routes to setup and run Paperless:
 
 * :ref:`Pull the image from Docker Hub <setup-docker_hub>`
 * :ref:`Build the Docker image yourself <setup-docker_build>`
@@ -87,26 +87,30 @@ You can go multiple routes with setting up and running Paperless:
 * :ref:`Use ansible to install Paperless on your system automatically (bare metal) <setup-ansible>`
 
 The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
-from above automatically so that it just works and uses sensible defaults for all configuration options.
+from the above automatically so that it just works and uses sensible defaults for all configuration options.
+Here you find a cheat-sheet for docker beginners: `CLI Basics <https://sehn.tech/post/devops-with-docker/>`_ 
 
-The bare metal route is more complicated to setup but makes it easier
+The bare metal route is complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
-The ansible route cobines benefits from both options:
-the setup process is fully automated, reproducible and idempotent,
-it includes the same sensible defaults,
-and it simultaneously provides the flexibility of a bare metal installation.
+The ansible route combines benefits of both options:
+the setup process is fully automated, reproducible and `idempotent <https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency>`_,
+it includes the same sensible defaults, and it simultaneously provides the flexibility of a bare metal installation.
 
 .. _setup-docker_hub:
+.. _CLI Basics: https://sehn.tech/post/devops-with-docker/
+.. _idempotent: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency
 
 Install Paperless from Docker Hub
 =================================
 
-1.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
-    and download one of the ``docker-compose.*.yml`` files, depending on which database backend you
+1.  Login with your user and create a folder in your home-directory `mkdir -v ~/paperless-ng` to have a place for your configuration files and consumption directory.
+
+2.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+    and download one of the `docker-compose.*.yml` files, depending on which database backend you
     want to use. Rename this file to `docker-compose.yml`.
-    If you want to enable optional support for Office documents, download a file with ``-tika`` in its name.
+    If you want to enable optional support for Office documents, download a file with `-tika` in the file name.
     Download the ``docker-compose.env`` file and the ``.env`` file as well and store them
     in the same directory.
 
@@ -115,25 +119,26 @@ Install Paperless from Docker Hub
         For new installations, it is recommended to use PostgreSQL as the database
         backend.
 
-2.  Install `Docker`_ and `docker-compose`_.
+3.  Install `Docker`_ and `docker-compose`_.
 
     .. caution::
 
         If you want to use the included ``docker-compose.*.yml`` file, you
         need to have at least Docker version **17.09.0** and docker-compose
-        version **1.17.0**.
+        version **1.17.0**.  
+        To check do: `docker-compose -v` or `docker -v`
 
         See the `Docker installation guide`_ on how to install the current
         version of Docker for your operating system or Linux distribution of
-        choice. To get an up-to-date version of docker-compose, follow the
-        `docker-compose installation guide`_ if your package repository doesn't
+        choice. To get the latest version of docker-compose, follow the
+        `docker-compose installation guide`_if your package repository doesn't
         include it.
 
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
         .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
-3.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
-    to the consumption directory in this file. Find the line that specifies where
+4.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
+    to the consumption directory. Find the line that specifies where
     to mount the consumption directory:
 
     .. code::
@@ -149,31 +154,35 @@ Install Paperless from Docker Hub
     Don't change the part after the colon or paperless wont find your documents.
 
 
-4.  Modify ``docker-compose.env``, following the comments in the file. The
+5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. This ensures that
     both the docker container and you on the host machine have write access
     to the consumption directory. If your UID and GID on the host system is
     1000 (the default for the first normal user on most systems), it will
-    work out of the box without any modifications.
+    work out of the box without any modifications. `id "username"` to check.
 
     .. note::
 
-        You can use any settings from the file ``paperless.conf.example`` in this file.
-        Have a look at :ref:`configuration` to see whats available.
+        You can copy any setting from the file ``paperless.conf.example`` and paste it here.
+        Have a look at :ref:`configuration` to see what's available.
 
     .. caution::
 
-        Certain file systems such as NFS network shares don't support file system
+        Some file systems such as NFS network shares don't support file system
         notifications with ``inotify``. When storing the consumption directory
-        on such a file system, paperless will be unable to pick up new files
+        on such a file system, paperless will not pick up new files
         with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
         which will disable inotify. See :ref:`here <configuration-polling>`.
+        
+6.  Now head over to: https://hub.docker.com/r/jonaswinkler/paperless-ng and choose your preferred
+    image and copy the link. To download this image do a `docker pull` followed by the link. Do this within the directory with the .yml files.
+    Depending on your network connection and CPU this will take a while. You have time to get a beverage.
 
-5.  Run ``docker-compose up -d``. This will create and start the necessary
-    containers.
+7.  Run ``docker-compose up -d``. This will create and start the necessary
+    containers, but your are not done yet!
 
-6.  To be able to login, you will need a super user. To create it, execute the
+8.  To be able to login, you will need a super user. To create it, execute the
     following command:
 
     .. code-block:: shell-session
@@ -181,12 +190,12 @@ Install Paperless from Docker Hub
         $ docker-compose run --rm webserver createsuperuser
 
     This will prompt you to set a username, an optional e-mail address and
-    finally a password.
+    finally a password (at least 8 characters).
 
-7.  The default ``docker-compose.yml`` exports the webserver on your local port
+9.  The default ``docker-compose.yml`` exports the webserver on your local port
     8000. If you haven't adapted this, you should now be able to visit your
-    Paperless instance at ``http://127.0.0.1:8000``. You can login with the
-    user and password you just created.
+    Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000. 
+    Use the login credentials you have created with the previous step.
 
 .. _Docker: https://www.docker.com/
 .. _docker-compose: https://docs.docker.com/compose/install/
