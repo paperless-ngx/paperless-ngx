@@ -3,3 +3,31 @@
 ::ng-deep .ngx-file-drop__drop-zone--over {
   background-color: $primaryFaded !important;
 }
+
+form {
+  position: relative;
+}
+
+.alert {
+  transition: all 0.2s ease;
+}
+
+.alert-heading {
+  font-size: 80%;
+  font-weight: bold;
+}
+
+.btn-sm {
+  line-height: 1;
+}
+
+::ng-deep .progress {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: auto;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
