@@ -128,8 +128,8 @@
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
             <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive">Discard</button>&nbsp;
-            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive">Save & next</button>&nbsp;
-            <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>&nbsp;
+            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive || !(isDirty$ | async)">Save & next</button>&nbsp;
+            <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive || !(isDirty$ | async)">Save</button>&nbsp;
         </form>
     </div>
 
@@ -145,6 +145,6 @@
         <ng-container *ngIf="getContentType() == 'text/plain'">
             <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky" width="100%"></object>
         </ng-container>
-          
+
     </div>
 </div>

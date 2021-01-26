@@ -19,13 +19,15 @@ import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 import { ToastService } from 'src/app/services/toast.service';
 import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms';
+import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-document-detail',
   templateUrl: './document-detail.component.html',
   styleUrls: ['./document-detail.component.scss']
 })
-export class DocumentDetailComponent implements OnInit {
+export class DocumentDetailComponent implements OnInit, DirtyComponent {
 
   @ViewChild("inputTitle")
   titleInput: TextComponent
@@ -60,6 +62,10 @@ export class DocumentDetailComponent implements OnInit {
 
   previewCurrentPage: number = 1
   previewNumPages: number = 1
+
+  store: BehaviorSubject<any>
+  storeSub: Subscription
+  isDirty$: Observable<boolean>
 
   constructor(
     private documentsService: DocumentService,
@@ -113,7 +119,23 @@ export class DocumentDetailComponent implements OnInit {
       this.metadata = result
     })
     this.title = this.documentTitlePipe.transform(doc.title)
-    this.documentForm.patchValue(doc)
+
+    this.store = new BehaviorSubject({
+      title: doc.title,
+      content: doc.content,
+      created: doc.created,
+      correspondent: doc.correspondent,
+      document_type: doc.document_type,
+      archive_serial_number: doc.archive_serial_number,
+      tags: doc.tags
+    })
+
+    this.storeSub = this.store.asObservable().subscribe(state => {
+      this.documentForm.patchValue(state, { emitEvent: false })
+    })
+
+    // Initialize dirtyCheck
+    this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
   }
 
   createDocumentType() {
