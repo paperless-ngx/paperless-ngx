@@ -33,7 +33,6 @@ export class FileStatus {
       case FileStatusPhase.UPLOADING:
         return this.currentPhaseProgress / this.currentPhaseMaxProgress * 0.2
       case FileStatusPhase.PROCESSING:
-        if (this.currentPhaseProgress > 100) this.currentPhaseProgress = 0
         return (this.currentPhaseProgress / this.currentPhaseMaxProgress * 0.8) + 0.2
       case FileStatusPhase.SUCCESS:
       case FileStatusPhase.FAILED:
@@ -44,7 +43,7 @@ export class FileStatus {
   updateProgress(status: FileStatusPhase, currentProgress?: number, maxProgress?: number) {
     if (status >= this.phase) {
       this.phase = status
-      if (currentProgress) {
+      if (currentProgress != undefined) {
         this.currentPhaseProgress = currentProgress
       }
       if (maxProgress) {
