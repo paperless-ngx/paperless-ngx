@@ -63,7 +63,9 @@ export class ConsumerStatusService {
 
   private statusWebSocked: WebSocket
 
-  consumerStatus: FileStatus[] = []
+  private consumerStatus: FileStatus[] = []
+
+
   private documentConsumptionFinishedSubject = new Subject<FileStatus>()
   private documentConsumptionFailedSubject = new Subject<FileStatus>()
 
@@ -78,10 +80,19 @@ export class ConsumerStatusService {
     return status
   }
 
-  newFileUpload(): FileStatus {
+  newFileUpload(filename: string): FileStatus {
     let status = new FileStatus()
+    status.filename = filename
     this.consumerStatus.push(status)
     return status
+  }
+
+  getConsumerStatus(phase?: FileStatusPhase) {
+    if (phase) {
+      return this.consumerStatus.filter(s => s.phase == phase)
+    } else {
+      return this.consumerStatus
+    }
   }
 
   connect() {
