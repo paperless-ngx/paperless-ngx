@@ -8,10 +8,10 @@ from django.core.asgi import get_asgi_application
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "paperless.settings")
 django_asgi_app = get_asgi_application()
 
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack  # NOQA: E402
+from channels.routing import ProtocolTypeRouter, URLRouter  # NOQA: E402
 
-from paperless.urls import websocket_urlpatterns
+from paperless.urls import websocket_urlpatterns  # NOQA: E402
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
