@@ -57,6 +57,10 @@ export class UploadFileWidgetComponent implements OnInit {
     this.consumerStatusService.dismiss(status)
   }
 
+  dismissAll() {
+    this.consumerStatusService.dismissAll()
+  }
+
   ngOnInit(): void {
   }
 
