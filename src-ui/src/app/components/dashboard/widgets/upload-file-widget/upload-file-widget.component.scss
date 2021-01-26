@@ -9,6 +9,12 @@ form {
   font-weight: bold;
 }
 
+.alerts-hidden {
+  .btn {
+    line-height: 1;
+  }
+}
+
 .btn-open {
   line-height: 1;
 
