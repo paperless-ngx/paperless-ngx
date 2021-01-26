@@ -170,6 +170,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
 
   save() {
     this.networkActive = true
+    this.store.next(this.documentForm.value)
     this.documentsService.update(this.document).subscribe(result => {
       this.close()
       this.networkActive = false
@@ -182,6 +183,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
 
   saveEditNext() {
     this.networkActive = true
+    this.store.next(this.documentForm.value)
     this.documentsService.update(this.document).subscribe(result => {
       this.error = null
       this.documentListViewService.getNext(this.document.id).subscribe(nextDocId => {

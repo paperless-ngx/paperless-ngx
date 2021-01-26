@@ -111,6 +111,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.set(SETTINGS_KEYS.DATE_LOCALE, this.settingsForm.value.dateLocale)
     this.settings.set(SETTINGS_KEYS.DATE_FORMAT, this.settingsForm.value.dateFormat)
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
+    this.store.next(this.settingsForm.value)
     this.documentListViewService.updatePageSize()
     this.settings.updateDarkModeSettings()
     this.toastService.showInfo($localize`Settings saved successfully.`)
