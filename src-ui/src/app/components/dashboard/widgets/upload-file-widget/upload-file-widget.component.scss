@@ -1,9 +1,5 @@
 @import "/src/theme";
 
-::ng-deep .ngx-file-drop__drop-zone--over {
-  background-color: $primaryFaded !important;
-}
-
 form {
   position: relative;
 }
