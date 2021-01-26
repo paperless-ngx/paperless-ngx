@@ -94,3 +94,47 @@ Ensure that ``USERMAP_UID`` and ``USERMAP_GID`` are set to the user id and group
 different from ``1000``. See :ref:`setup-docker_hub`.
 
 Also ensure that you are able to read and write to the consumption directory on the host.
+
+Web-UI stuck at "Loading..."
+############################
+
+This might have multiple reasons.
+
+
+1.  If you built the docker image yourself or deployed using the bare metal route,
+    make sure that there are files in ``<paperless-root>/static/frontend/<lang-code>/``.
+    If there are no files, make sure that you executed ``collectstatic`` successfully, either
+    manually or as part of the docker image build.
+
+    If the front end is still missing, make sure that the front end is compiled (files present in
+    ``src/documents/static/frontend``). If it is not, you need to compile the front end yourself
+    or download the release archive instead of cloning the repository.
+
+2.  Check the output of the web server. You might see errors like this:
+
+
+    .. code::
+
+        [2021-01-25 10:08:04 +0000] [40] [ERROR] Socket error processing request.
+        Traceback (most recent call last):
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 134, in handle
+            self.handle_request(listener, req, client, addr)
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 190, in handle_request
+            util.reraise(*sys.exc_info())
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/util.py", line 625, in reraise
+            raise value
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 178, in handle_request
+            resp.write_file(respiter)
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/http/wsgi.py", line 396, in write_file
+            if not self.sendfile(respiter):
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/http/wsgi.py", line 386, in sendfile
+            sent += os.sendfile(sockno, fileno, offset + sent, count)
+        OSError: [Errno 22] Invalid argument
+    
+    To fix this issue, add
+
+    .. code::
+
+        SENDFILE=0
+    
+    to your `docker-compose.env` file.
