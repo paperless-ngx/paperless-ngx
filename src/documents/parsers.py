@@ -261,7 +261,7 @@ class DocumentParser(LoggingMixin):
     `paperless_tesseract.parsers` for inspiration.
     """
 
-    def __init__(self, logging_group, progress_callback):
+    def __init__(self, logging_group, progress_callback=None):
         super().__init__()
         self.logging_group = logging_group
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)

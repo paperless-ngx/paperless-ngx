@@ -170,7 +170,7 @@ class DummyParser(DocumentParser):
         raise NotImplementedError()
 
     def __init__(self, logging_group, scratch_dir, archive_path):
-        super(DummyParser, self).__init__(logging_group)
+        super(DummyParser, self).__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
         self.archive_path = archive_path
 
@@ -212,10 +212,10 @@ def fake_magic_from_file(file, mime=False):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumer(DirectoriesMixin, TestCase):
 
-    def make_dummy_parser(self, logging_group):
+    def make_dummy_parser(self, logging_group, progress_callback=None):
         return DummyParser(logging_group, self.dirs.scratch_dir, self.get_test_archive_file())
 
-    def make_faulty_parser(self, logging_group):
+    def make_faulty_parser(self, logging_group, progress_callback=None):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
@@ -312,7 +312,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         try:
             self.consumer.try_consume_file("non-existing-file")
         except ConsumerError as e:
-            self.assertTrue(str(e).endswith('It is not a file'))
+            self.assertTrue(str(e).endswith('File not found.'))
             return
 
         self.fail("Should throw exception")
@@ -350,7 +350,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         try:
             self.consumer.try_consume_file(self.get_test_file())
         except ConsumerError as e:
-            self.assertEqual("Unsupported mime type application/pdf of file sample.pdf", str(e))
+            self.assertEqual(str(e), "sample.pdf: Unsupported mime type application/pdf")
             return
 
         self.fail("Should throw exception")
@@ -366,7 +366,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         try:
             self.consumer.try_consume_file(self.get_test_file())
         except ConsumerError as e:
-            self.assertEqual(str(e), "Does not compute.")
+            self.assertEqual(str(e), "sample.pdf: Error while consuming document sample.pdf: Does not compute.")
             return
 
         self.fail("Should throw exception.")
@@ -378,7 +378,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         try:
             self.consumer.try_consume_file(filename)
         except ConsumerError as e:
-            self.assertEqual(str(e), "NO.")
+            self.assertEqual(str(e), "sample.pdf: The following error occured while consuming sample.pdf: NO.")
         else:
             self.fail("Should raise exception")
 
@@ -482,6 +482,7 @@ class PreConsumeTestCase(TestCase):
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
     def test_pre_consume_script_not_found(self, m):
         c = Consumer()
+        c.filename = "somefile.pdf"
         c.path = "path-to-file"
         self.assertRaises(ConsumerError, c.run_pre_consume_script)
 
@@ -523,8 +524,9 @@ class PostConsumeTestCase(TestCase):
     @override_settings(POST_CONSUME_SCRIPT="does-not-exist")
     def test_post_consume_script_not_found(self):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
-
-        self.assertRaises(ConsumerError, Consumer().run_post_consume_script, doc)
+        c = Consumer()
+        c.filename = "somefile.pdf"
+        self.assertRaises(ConsumerError, c.run_post_consume_script, doc)
 
     @mock.patch("documents.consumer.Popen")
     def test_post_consume_script_simple(self, m):
