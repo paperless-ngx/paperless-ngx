@@ -1,4 +1,4 @@
-import { Component, Inject, LOCALE_ID, OnInit, OnDestroy, Renderer2  } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit, OnDestroy, Renderer2 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
