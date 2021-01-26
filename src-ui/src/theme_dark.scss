@@ -362,6 +362,10 @@ $border-color-dark-mode: #47494f;
     border-color: darken($bg-light-dark-mode, 10%);
     color: $text-color-dark-mode-accent;
   }
+
+  .progress-bar.bg-primary {
+    background-color: darken($primary-dark-mode, 5%) !important;
+  }
 }
 
 body.color-scheme-dark {
