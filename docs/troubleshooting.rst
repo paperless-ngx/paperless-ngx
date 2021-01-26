@@ -88,7 +88,7 @@ This happens when certain dependencies of paperless that are responsible for the
 updated. After updating these, your current training data *might* not be compatible anymore. This can be ignored
 in most cases. This warning will disappear automatically when paperless updates the training data.
 
- f you want to get rid of the warning or actually experience issues with automatic matching, delete
+If you want to get rid of the warning or actually experience issues with automatic matching, delete
 the file ``classification_model.pickle`` in the data directory and let paperless recreate it.
 
 Permission denied errors in the consumption directory
