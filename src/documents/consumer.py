@@ -37,7 +37,7 @@ class Consumer(LoggingMixin):
     def _send_progress(self, current_progress, max_progress, status,
                        message, document_id=None):
         payload = {
-            'filename': os.path.basename(self.filename),
+            'filename': os.path.basename(self.filename) if self.filename else None,  # NOQA: E501
             'task_id': self.task_id,
             'current_progress': current_progress,
             'max_progress': max_progress,
@@ -70,7 +70,7 @@ class Consumer(LoggingMixin):
         if not os.path.isfile(self.path):
             self._fail(
                 _("File not found"),
-                f"Cannot consume {self.path}: It is not a file."
+                f"Cannot consume {self.path}: File not found."
             )
 
     def pre_check_duplicate(self):
@@ -80,7 +80,7 @@ class Consumer(LoggingMixin):
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             self._fail(
-                _("Document is a duplicate"),
+                _("Document already exists"),
                 f"Not consuming {self.filename}: It is a duplicate."
             )
 
