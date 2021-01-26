@@ -25,6 +25,8 @@ from .signals import (
     document_consumption_started
 )
 
+from django.utils.translation import gettext as _
+
 
 class ConsumerError(Exception):
     pass
@@ -32,10 +34,10 @@ class ConsumerError(Exception):
 
 class Consumer(LoggingMixin):
 
-    def _send_progress(self, filename, current_progress, max_progress, status,
+    def _send_progress(self, current_progress, max_progress, status,
                        message, document_id=None):
         payload = {
-            'filename': os.path.basename(filename),
+            'filename': os.path.basename(self.filename),
             'task_id': self.task_id,
             'current_progress': current_progress,
             'max_progress': max_progress,
@@ -47,10 +49,10 @@ class Consumer(LoggingMixin):
                                                      {'type': 'status_update',
                                                       'data': payload})
 
-    def _fail(self, message):
-        self._send_progress(self.filename, 100, 100, 'FAILED',
-                            message)
-        raise ConsumerError(f"{self.filename}: {message}")
+    def _fail(self, message, log_message=None):
+        self._send_progress(100, 100, 'FAILED', message)
+        self.log("error", log_message or message)
+        raise ConsumerError(f"{self.filename}: {log_message or message}")
 
     def __init__(self):
         super().__init__()
@@ -66,11 +68,10 @@ class Consumer(LoggingMixin):
 
     def pre_check_file_exists(self):
         if not os.path.isfile(self.path):
-            self.log(
-                "error",
-                "Cannot consume {}: It is not a file.".format(self.path)
+            self._fail(
+                _("File not found"),
+                f"Cannot consume {self.path}: It is not a file."
             )
-            self._fail("File not found")
 
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
@@ -78,11 +79,10 @@ class Consumer(LoggingMixin):
         if Document.objects.filter(Q(checksum=checksum) | Q(archive_checksum=checksum)).exists():  # NOQA: E501
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
-            self.log(
-                "error",
-                "Not consuming {}: It is a duplicate.".format(self.filename)
+            self._fail(
+                _("Document is a duplicate"),
+                f"Not consuming {self.filename}: It is a duplicate."
             )
-            self._fail("Document is a duplicate")
 
     def pre_check_directories(self):
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
@@ -95,14 +95,16 @@ class Consumer(LoggingMixin):
             return
 
         if not os.path.isfile(settings.PRE_CONSUME_SCRIPT):
-            raise ConsumerError(
+            self._fail(
+                _("Pre-consume script does not exist."),
                 f"Configured pre-consume script "
                 f"{settings.PRE_CONSUME_SCRIPT} does not exist.")
 
         try:
             Popen((settings.PRE_CONSUME_SCRIPT, self.path)).wait()
         except Exception as e:
-            raise ConsumerError(
+            self._fail(
+                _("Error while executing pre-consume script"),
                 f"Error while executing pre-consume script: {e}"
             )
 
@@ -111,9 +113,11 @@ class Consumer(LoggingMixin):
             return
 
         if not os.path.isfile(settings.POST_CONSUME_SCRIPT):
-            raise ConsumerError(
+            self._fail(
+                _("Post-consume script does not exist."),
                 f"Configured post-consume script "
-                f"{settings.POST_CONSUME_SCRIPT} does not exist.")
+                f"{settings.POST_CONSUME_SCRIPT} does not exist."
+            )
 
         try:
             Popen((
@@ -129,8 +133,9 @@ class Consumer(LoggingMixin):
                     "name", flat=True)))
             )).wait()
         except Exception as e:
-            raise ConsumerError(
-                f"Error while executing pre-consume script: {e}"
+            self._fail(
+                _("Error while executing post-consume script"),
+                f"Error while executing post-consume script: {e}"
             )
 
     def try_consume_file(self,
@@ -153,8 +158,7 @@ class Consumer(LoggingMixin):
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
 
-        self._send_progress(self.filename, 0, 100, 'WORKING',
-                            'Received new file.')
+        self._send_progress(0, 100, 'WORKING', _('Received new file'))
 
         # this is for grouping logging entries for this particular file
         # together.
@@ -177,10 +181,13 @@ class Consumer(LoggingMixin):
 
         parser_class = get_parser_class_for_mime_type(mime_type)
         if not parser_class:
-            self._fail(f"Unsupported mime type {mime_type}")
+            self._fail(
+                _("File type %(type)s not supported") %
+                {'type': mime_type},
+                f"Unsupported mime type {mime_type}"
+            )
         else:
-            self.log("debug",
-                     f"Parser: {parser_class.__name__}")
+            self.log("debug", f"Parser: {parser_class.__name__}")
 
         # Notify all listeners that we're going to do some work.
 
@@ -195,7 +202,7 @@ class Consumer(LoggingMixin):
         def progress_callback(current_progress, max_progress, message):
             # recalculate progress to be within 20 and 80
             p = int((current_progress / max_progress) * 50 + 20)
-            self._send_progress(self.filename, p, 100, "WORKING", message)
+            self._send_progress(p, 100, "WORKING", message)
 
         # This doesn't parse the document yet, but gives us a parser.
 
@@ -206,32 +213,36 @@ class Consumer(LoggingMixin):
 
         # Parse the document. This may take some time.
 
+        text = None
+        date = None
+        thumbnail = None
+        archive_path = None
+
         try:
-            self._send_progress(self.filename, 20, 100, 'WORKING',
-                                'Parsing document...')
+            self._send_progress(20, 100, 'WORKING', _('Parsing document...'))
             self.log("debug", "Parsing {}...".format(self.filename))
             document_parser.parse(self.path, mime_type, self.filename)
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
-            self._send_progress(self.filename, 70, 100, 'WORKING',
-                                'Generating thumbnail...')
+            self._send_progress(70, 100, 'WORKING',
+                                _('Generating thumbnail...'))
             thumbnail = document_parser.get_optimised_thumbnail(
                 self.path, mime_type)
 
             text = document_parser.get_text()
             date = document_parser.get_date()
             if not date:
-                self._send_progress(self.filename, 90, 100, 'WORKING',
-                                    'Getting date from document...')
+                self._send_progress(90, 100, 'WORKING',
+                                    _('Getting date from document...'))
                 date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
 
         except ParseError as e:
             document_parser.cleanup()
-            self.log(
-                "error",
-                f"Error while consuming document {self.filename}: {e}")
-            self._fail(str(e))
+            self._fail(
+                str(e),
+                f"Error while consuming document {self.filename}: {e}"
+            )
 
         # Prepare the document classifier.
 
@@ -247,8 +258,7 @@ class Consumer(LoggingMixin):
                 "warning",
                 f"Cannot classify documents: {e}.")
             classifier = None
-        self._send_progress(self.filename, 95, 100, 'WORKING',
-                            'Storing the document...')
+        self._send_progress(95, 100, 'WORKING', _('Saving document...'))
         # now that everything is done, we can start to store the document
         # in the system. This will be a transaction and reasonably fast.
         try:
@@ -302,12 +312,11 @@ class Consumer(LoggingMixin):
                 os.unlink(self.path)
 
         except Exception as e:
-            self.log(
-                "error",
+            self._fail(
+                str(e),
                 f"The following error occured while consuming "
                 f"{self.filename}: {e}"
             )
-            self._fail(str(e))
         finally:
             document_parser.cleanup()
 
@@ -318,8 +327,7 @@ class Consumer(LoggingMixin):
             "Document {} consumption finished".format(document)
         )
 
-        self._send_progress(self.filename, 100, 100, 'SUCCESS',
-                            'Finished.', document.id)
+        self._send_progress(100, 100, 'SUCCESS', _('Finished.'), document.id)
 
         return document
 
