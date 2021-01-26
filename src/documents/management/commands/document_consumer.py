@@ -70,31 +70,6 @@ def _consume(filepath):
             "Error while consuming document: {}".format(e))
 
 
-def _test_inotify(directory):
-    if not INotify:
-        return False
-
-    test_file = os.path.join(directory, "__inotify_test_file__")
-    inotify = INotify()
-    descriptor = None
-    try:
-        inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO
-        descriptor = inotify.add_watch(directory, inotify_flags)
-        Path(test_file).touch()
-        events = inotify.read(timeout=1000)
-        return len(events) == 1
-    except Exception as e:
-        logger.warning(
-            f"Error while checking inotify availability: {str(e)}")
-        return False
-    finally:
-        if descriptor:
-            inotify.rm_watch(descriptor)
-        inotify.close()
-        if os.path.isfile(test_file):
-            os.unlink(test_file)
-
-
 def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
     mtime = -1
     current_try = 0
@@ -178,25 +153,17 @@ class Command(BaseCommand):
         if options["oneshot"]:
             return
 
-        if settings.CONSUMER_POLLING == 0:
-            if _test_inotify(directory):
-                self.handle_inotify(directory, recursive)
-            else:
-                logger.warning(
-                    f"Inotify notifications are not available on {directory}, "
-                    f"falling back to polling every 10 seconds")
-                self.handle_polling(
-                    directory, recursive, 10)
+        if settings.CONSUMER_POLLING == 0 and INotify:
+            self.handle_inotify(directory, recursive)
         else:
-            self.handle_polling(
-                directory, recursive, settings.CONSUMER_POLLING)
+            self.handle_polling(directory, recursive)
 
         logger.debug("Consumer exiting.")
 
-    def handle_polling(self, directory, recursive, timeout):
+    def handle_polling(self, directory, recursive):
         logging.getLogger(__name__).info(
             f"Polling directory for changes: {directory}")
-        self.observer = PollingObserver(timeout=timeout)
+        self.observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
         self.observer.schedule(Handler(), directory, recursive=recursive)
         self.observer.start()
         try:
