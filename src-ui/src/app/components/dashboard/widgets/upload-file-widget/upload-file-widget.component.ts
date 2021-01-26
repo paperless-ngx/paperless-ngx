@@ -4,6 +4,7 @@ import { FileSystemFileEntry, NgxFileDropEntry } from 'ngx-file-drop';
 import { ConsumerStatusService, FileStatus, FileStatusPhase } from 'src/app/services/consumer-status.service';
 import { DocumentService } from 'src/app/services/rest/document.service';
 
+const MAX_ALERTS = 5
 
 @Component({
   selector: 'app-upload-file-widget',
@@ -11,6 +12,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
   styleUrls: ['./upload-file-widget.component.scss']
 })
 export class UploadFileWidgetComponent implements OnInit {
+  alertsExpanded = false
 
   constructor(
     private documentService: DocumentService,
@@ -18,7 +20,12 @@ export class UploadFileWidgetComponent implements OnInit {
   ) { }
 
   getStatus() {
-    return this.consumerStatusService.getConsumerStatus()
+    return this.consumerStatusService.getConsumerStatus().slice(0, MAX_ALERTS)
+  }
+
+  getStatusesHidden() {
+    if (this.consumerStatusService.getConsumerStatus().length < MAX_ALERTS) return []
+    else return this.consumerStatusService.getConsumerStatus().slice(MAX_ALERTS)
   }
 
   getStatusUploading() {
