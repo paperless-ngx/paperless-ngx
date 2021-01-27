@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-26 14:59+0100\n"
+"POT-Creation-Date: 2021-01-27 17:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,8 +26,8 @@ msgid "File not found"
 msgstr "Datei nicht gefunden"
 
 #: documents/consumer.py:83
-msgid "Document is a duplicate"
-msgstr "Dokument existiert bereits"
+msgid "Document already exists"
+msgstr ""
 
 #: documents/consumer.py:99
 msgid "Pre-consume script does not exist."
@@ -674,3 +674,6 @@ msgstr ""
 #: paperless_mail/models.py:205
 msgid "assign this correspondent"
 msgstr ""
+
+#~ msgid "Document is a duplicate"
+#~ msgstr "Dokument existiert bereits"
