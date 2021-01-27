@@ -202,6 +202,26 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
     })
   }
 
+  maybeClose() {
+    this.isDirty$.subscribe(dirty => {
+      if (dirty) {
+        let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+        modal.componentInstance.title = $localize`Unsaved Changes`
+        modal.componentInstance.messageBold = $localize`You have unsaved changes.`
+        modal.componentInstance.message = $localize`Are you sure you want to leave?`
+        modal.componentInstance.btnClass = "btn-warning"
+        modal.componentInstance.btnCaption = $localize`Leave page`
+        modal.componentInstance.confirmClicked.subscribe(() => {
+          modal.componentInstance.buttonsEnabled = false
+          modal.close()
+          this.close()
+        })
+      } else {
+        this.close()
+      }
+    })
+  }
+
   close() {
     this.openDocumentService.closeDocument(this.document)
     if (this.documentListViewService.savedViewId) {
