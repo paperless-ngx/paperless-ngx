@@ -1,7 +1,7 @@
 bind = '0.0.0.0:8000'
 backlog = 2048
 workers = 3
-worker_class = 'sync'
+worker_class = 'uvicorn.workers.UvicornWorker'
 worker_connections = 1000
 timeout = 20
 keepalive = 2

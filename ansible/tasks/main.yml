@@ -418,7 +418,7 @@
     path: "{{ paperlessng_directory }}/scripts/paperless-webserver.service"
     section: "Service"
     option: "ExecStart"
-    value: "{{ paperlessng_virtualenv }}/bin/gunicorn paperless.wsgi -w 2 -b {{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}"
+    value: "{{ paperlessng_virtualenv }}/bin/gunicorn paperless.asgi:application -w 2 -k uvicorn.workers.UvicornWorker -b {{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}"
 
 - name: copy systemd services
   copy:

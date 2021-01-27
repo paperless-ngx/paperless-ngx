@@ -44,7 +44,7 @@ tqdm = "*"
 tika = "*"
 channels = "~=3.0"
 channels-redis = "*"
-daphne = "~=3.0"
+uvicorn = {extras = ["standard"], version = "*"}
 
 [dev-packages]
 coveralls = "*"
