@@ -21,7 +21,6 @@ const routes: Routes = [
     {path: 'view/:id', component: DocumentListComponent },
     {path: 'search', component: SearchComponent },
     {path: 'documents/:id', component: DocumentDetailComponent },
-
     {path: 'tags', component: TagListComponent },
     {path: 'documenttypes', component: DocumentTypeListComponent },
     {path: 'correspondents', component: CorrespondentListComponent },
