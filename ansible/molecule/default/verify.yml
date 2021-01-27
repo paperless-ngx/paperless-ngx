@@ -29,9 +29,9 @@
           document:
             content: "{{ content }}"
             filename: "{{ filename }}.txt"
-            mime_type: text/plain
         headers:
           Authorization: 'Basic {{ (paperlessng_superuser_name + ":" + paperlessng_superuser_password) | b64encode }}'
+          Content-Type: text/plain
         return_content: yes
       register: post_document
       failed_when: "'OK' not in post_document.content"
@@ -44,10 +44,6 @@
         return_content: yes
       register: logs
       failed_when: "('Consuming ' + filename + '.txt') not in logs.content"
-
-    - name: sleep 5 seconds
-      pause:
-        seconds: 5
 
     - name: verify uploaded document has been consumed
       uri:

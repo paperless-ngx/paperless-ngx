@@ -383,6 +383,7 @@ class PostDocumentView(APIView):
                                          dir=settings.SCRATCH_DIR,
                                          delete=False) as f:
             f.write(doc_data)
+            f.flush()
             os.utime(f.name, times=(t, t))
 
             async_task("documents.tasks.consume_file",
