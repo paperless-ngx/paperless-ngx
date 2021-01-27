@@ -26,6 +26,10 @@ export class SettingsComponent implements OnInit {
     'displayLanguage': new FormControl(this.settings.getLanguage()),
     'dateLocale': new FormControl(this.settings.get(SETTINGS_KEYS.DATE_LOCALE)),
     'dateFormat': new FormControl(this.settings.get(SETTINGS_KEYS.DATE_FORMAT)),
+    'notificationsConsumerNewDocument': new FormControl(this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT)),
+    'notificationsConsumerSuccess': new FormControl(this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)),
+    'notificationsConsumerFailed': new FormControl(this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED)),
+    'notificationsConsumerSuppressOnDashboard': new FormControl(this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD)),
   })
 
   savedViews: PaperlessSavedView[]
@@ -73,6 +77,10 @@ export class SettingsComponent implements OnInit {
     this.settings.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, this.settingsForm.value.useNativePdfViewer)
     this.settings.set(SETTINGS_KEYS.DATE_LOCALE, this.settingsForm.value.dateLocale)
     this.settings.set(SETTINGS_KEYS.DATE_FORMAT, this.settingsForm.value.dateFormat)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT, this.settingsForm.value.notificationsConsumerNewDocument)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS, this.settingsForm.value.notificationsConsumerSuccess)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED, this.settingsForm.value.notificationsConsumerFailed)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD, this.settingsForm.value.notificationsConsumerSuppressOnDashboard)
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.documentListViewService.updatePageSize()
     this.settings.updateDarkModeSettings()

@@ -65,19 +65,21 @@ export class ConsumerStatusService {
 
   private consumerStatus: FileStatus[] = []
 
-
+  private documentDetectedSubject = new Subject<FileStatus>()
   private documentConsumptionFinishedSubject = new Subject<FileStatus>()
   private documentConsumptionFailedSubject = new Subject<FileStatus>()
 
   private get(taskId: string, filename?: string) {
     let status = this.consumerStatus.find(e => e.taskId == taskId) || this.consumerStatus.find(e => e.filename == filename && e.taskId == null)
+    let created = false
     if (!status) {
       status = new FileStatus()
       this.consumerStatus.push(status)
+      created = true
     }
     status.taskId = taskId
     status.filename = filename
-    return status
+    return {'status': status, 'created': created}
   }
 
   newFileUpload(filename: string): FileStatus {
@@ -101,11 +103,17 @@ export class ConsumerStatusService {
     this.statusWebSocked.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
 
-      let status = this.get(statusMessage.task_id, statusMessage.filename)
+      let statusMessageGet = this.get(statusMessage.task_id, statusMessage.filename)
+      let status = statusMessageGet.status
+      let created = statusMessageGet.created
+
       status.updateProgress(FileStatusPhase.PROCESSING, statusMessage.current_progress, statusMessage.max_progress)
       status.message = statusMessage.message
       status.documentId = statusMessage.document_id
 
+      if (created && statusMessage.status == 'STARTING') {
+        this.documentDetectedSubject.next(status)
+      }
       if (statusMessage.status == "SUCCESS") {
         status.phase = FileStatusPhase.SUCCESS
         this.documentConsumptionFinishedSubject.next(status)
@@ -148,6 +156,10 @@ export class ConsumerStatusService {
 
   onDocumentConsumptionFailed() {
     return this.documentConsumptionFailedSubject
+  }
+
+  onDocumentDetected() {
+    return this.documentDetectedSubject
   }
 
 }

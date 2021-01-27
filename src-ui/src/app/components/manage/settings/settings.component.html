@@ -99,6 +99,20 @@
           </div>
         </div>
 
+        <h4 class="mt-4" i18n>Notifications</h4>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Consumer status</span>
+          </div>
+          <div class="col">
+            <app-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></app-input-check>
+            <app-input-check i18n-title title="Show notifications when document consumption completes successfully" formControlName="notificationsConsumerSuccess"></app-input-check>
+            <app-input-check i18n-title title="Show notifications when document consumption fails" formControlName="notificationsConsumerFailed"></app-input-check>
+            <app-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all consumer related status messages on the dashboard."></app-input-check>
+          </div>
+        </div>
+
         <h4 class="mt-4" i18n>Bulk editing</h4>
 
         <div class="form-row form-group">
