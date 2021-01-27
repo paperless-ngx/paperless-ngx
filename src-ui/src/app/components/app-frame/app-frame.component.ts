@@ -25,9 +25,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     public savedViewService: SavedViewService,
     private meta: Meta
-    ) {
-      
-  }
+    ) { }
 
   versionString = `${environment.appTitle} ${environment.version}`
 
@@ -78,17 +76,21 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   closeAll() {
-    this.closeMenu()
-    this.openDocumentsService.closeAll()
+    // user may need to confirm losing unsaved changes
+    this.openDocumentsService.closeAll().subscribe(confirmed => {
+      if (confirmed) {
+        this.closeMenu()
 
-    // TODO: is there a better way to do this?
-    let route = this.activatedRoute
-    while (route.firstChild) {
-      route = route.firstChild
-    }
-    if (route.component == DocumentDetailComponent) {
-      this.router.navigate([""])
-    }
+        // TODO: is there a better way to do this?
+        let route = this.activatedRoute
+        while (route.firstChild) {
+          route = route.firstChild
+        }
+        if (route.component == DocumentDetailComponent) {
+          this.router.navigate([""])
+        }
+      }
+    })
   }
 
   ngOnInit() {
