@@ -97,6 +97,10 @@ export class ConsumerStatusService {
     }
   }
 
+  getConsumerStatusCompleted() {
+    return this.consumerStatus.filter(s => s.phase == FileStatusPhase.FAILED || s.phase == FileStatusPhase.SUCCESS)
+  }
+
   connect() {
     this.disconnect()
     this.statusWebSocked = new WebSocket("ws://localhost:8000/ws/status/");

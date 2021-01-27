@@ -32,6 +32,9 @@ export class UploadFileWidgetComponent implements OnInit {
     return this.consumerStatusService.getConsumerStatus(FileStatusPhase.UPLOADING)
   }
 
+  getStatusCompleted() {
+    return this.consumerStatusService.getConsumerStatusCompleted()
+  }
   getTotalUploadProgress() {
     let current = 0
     let max = 0

@@ -23,15 +23,6 @@ form {
   }
 }
 
-.dismiss-all {
-  transition: opacity 0.2s ease;
-  opacity: 0;
-}
-
-.has-multiple-status .dismiss-all {
-  opacity: 1;
-}
-
 ::ng-deep .progress {
   position: absolute;
   top: 0;
