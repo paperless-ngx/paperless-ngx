@@ -87,15 +87,15 @@ export class UploadFileWidgetComponent implements OnInit {
           formData.append('document', file, file.name)
           let status = this.consumerStatusService.newFileUpload(file.name)
 
-          status.message = "Connecting..."
+          status.message = $localize`Connecting...`
 
           this.documentService.uploadDocument(formData).subscribe(event => {
             if (event.type == HttpEventType.UploadProgress) {
               status.updateProgress(FileStatusPhase.UPLOADING, event.loaded, event.total)
-              status.message = "Uploading..."
+              status.message = $localize`Uploading...`
             } else if (event.type == HttpEventType.Response) {
               status.taskId = event.body["task_id"]
-              status.message = "Upload complete."
+              status.message = $localize`Waiting for consumer...`
             }
 
           }, error => {
@@ -106,7 +106,7 @@ export class UploadFileWidgetComponent implements OnInit {
                 break;
               }
               default: {
-                status.message = $localize`An error has occurred while uploading the document. Sorry!`
+                status.message = `${error.status} ${error.statusText}`
                 break;
               }
             }
