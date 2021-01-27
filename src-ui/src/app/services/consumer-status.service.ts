@@ -43,10 +43,10 @@ export class FileStatus {
   updateProgress(status: FileStatusPhase, currentProgress?: number, maxProgress?: number) {
     if (status >= this.phase) {
       this.phase = status
-      if (currentProgress != undefined) {
+      if (currentProgress != null) {
         this.currentPhaseProgress = currentProgress
       }
-      if (maxProgress) {
+      if (maxProgress != null) {
         this.currentPhaseMaxProgress = maxProgress
       }
     }
@@ -70,7 +70,7 @@ export class ConsumerStatusService {
   private documentConsumptionFailedSubject = new Subject<FileStatus>()
 
   private get(taskId: string, filename?: string) {
-    let status = this.consumerStatus.find(e => e.taskId == taskId) || this.consumerStatus.find(e => e.filename == filename)
+    let status = this.consumerStatus.find(e => e.taskId == taskId) || this.consumerStatus.find(e => e.filename == filename && e.taskId == null)
     if (!status) {
       status = new FileStatus()
       this.consumerStatus.push(status)
