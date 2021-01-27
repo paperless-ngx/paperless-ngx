@@ -20,7 +20,7 @@
       <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
     </div>
     <div *ngIf="getStatusesHidden().length" class="alerts-hidden">
-      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center">{{getStatusesHidden().length}} more hidden <button class="btn btn-sm btn-link py-0" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded">Show all</button></p>
+      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center"><span i18n>{{getStatusesHidden().length}} more hidden</span> <button class="btn btn-sm btn-link py-0" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</button></p>
       <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
         <div *ngFor="let status of getStatusesHidden()">
           <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
