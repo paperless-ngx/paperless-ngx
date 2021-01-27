@@ -99,14 +99,13 @@ export class UploadFileWidgetComponent implements OnInit {
             }
 
           }, error => {
-            status.updateProgress(FileStatusPhase.FAILED)
             switch (error.status) {
               case 400: {
-                status.message = error.error.document
+                this.consumerStatusService.fail(status, error.error.document)
                 break;
               }
               default: {
-                status.message = `${error.status} ${error.statusText}`
+                this.consumerStatusService.fail(status, `${error.status} ${error.statusText}`)
                 break;
               }
             }
