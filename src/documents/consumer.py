@@ -158,7 +158,7 @@ class Consumer(LoggingMixin):
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
 
-        self._send_progress(0, 100, 'WORKING', _('Received new file'))
+        self._send_progress(0, 100, 'STARTING', _('Received new file'))
 
         # this is for grouping logging entries for this particular file
         # together.
