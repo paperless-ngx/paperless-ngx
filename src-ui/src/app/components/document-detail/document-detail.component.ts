@@ -136,6 +136,9 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
 
     // Initialize dirtyCheck
     this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
+    this.isDirty$.subscribe(dirty => {
+      this.openDocumentService.setDirty(this.document.id, dirty)
+    })
   }
 
   createDocumentType() {
