@@ -117,6 +117,12 @@ export class ConsumerStatusService {
     }
   }
 
+  fail(status: FileStatus, message: string) {
+    status.message = message
+    status.phase = FileStatusPhase.FAILED
+    this.documentConsumptionFailedSubject.next(status)
+  }
+
   disconnect() {
     if (this.statusWebSocked) {
       this.statusWebSocked.close()
@@ -133,7 +139,7 @@ export class ConsumerStatusService {
   }
 
   dismissAll() {
-    this.consumerStatus = []
+    this.consumerStatus = this.consumerStatus.filter(status => status.phase < FileStatusPhase.SUCCESS)
   }
 
   onDocumentConsumptionFinished() {
