@@ -539,7 +539,10 @@ Migration to paperless-ng
 
 At its core, paperless-ng is still paperless and fully compatible. However, some
 things have changed under the hood, so you need to adapt your setup depending on
-how you installed paperless. The important things to keep in mind are as follows.
+how you installed paperless.
+
+This setup describes how to update an existing paperless Docker installation.
+The important things to keep in mind are as follows:
 
 * Read the :ref:`changelog <paperless_changelog>` and take note of breaking changes.
 * You should decide if you want to stick with SQLite or want to migrate your database
@@ -574,11 +577,18 @@ Migration to paperless-ng is then performed in a few simple steps:
 
     .. caution::
 
-        Paperless includes a ``.env`` file. This will set the
-        project name for docker compose to ``paperless`` so that paperless-ng will
-        automatically reuse your existing paperless volumes. When you start it, it
-        will migrate your existing data. After that, your old paperless installation
-        will be incompatible with the migrated volumes.
+        Paperless-ng includes a ``.env`` file. This will set the
+        project name for docker compose to ``paperless``, which will also define the name
+        of the volumes by paperless-ng. However, if you experience that paperless-ng
+        is not using your old paperless volumes, verify the names of your volumes with
+
+        .. code:: shell-session
+
+            $ docker volume ls | grep _data
+        
+        and adjust the project name in the ``.env`` file so that it matches the name
+        of the volumes before the ``_data`` part.
+
 
 4.  Download the ``docker-compose.sqlite.yml`` file to ``docker-compose.yml``.
     If you want to switch to PostgreSQL, do that after you migrated your existing
