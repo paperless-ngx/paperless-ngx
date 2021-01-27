@@ -103,12 +103,29 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
       this.downloadOriginalUrl = this.documentsService.getDownloadUrl(this.documentId, true)
       if (this.openDocumentService.getOpenDocument(this.documentId)) {
         this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
-      } else {
-        this.documentsService.get(this.documentId).subscribe(doc => {
+      }
+      this.documentsService.get(this.documentId).subscribe(doc => {
+        // Initialize dirtyCheck
+        this.store = new BehaviorSubject({
+          title: doc.title,
+          content: doc.content,
+          created: doc.created,
+          correspondent: doc.correspondent,
+          document_type: doc.document_type,
+          archive_serial_number: doc.archive_serial_number,
+          tags: doc.tags
+        })
+
+        this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
+        this.isDirty$.subscribe(dirty => {
+          this.openDocumentService.setDirty(this.document.id, dirty)
+        })
+        
+        if (!this.openDocumentService.getOpenDocument(this.documentId)) {
           this.openDocumentService.openDocument(doc)
           this.updateComponent(doc)
-        }, error => {this.router.navigate(['404'])})
-      }
+        }
+      }, error => {this.router.navigate(['404'])})
     })
 
   }
@@ -119,26 +136,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
       this.metadata = result
     })
     this.title = this.documentTitlePipe.transform(doc.title)
-
-    this.store = new BehaviorSubject({
-      title: doc.title,
-      content: doc.content,
-      created: doc.created,
-      correspondent: doc.correspondent,
-      document_type: doc.document_type,
-      archive_serial_number: doc.archive_serial_number,
-      tags: doc.tags
-    })
-
-    this.storeSub = this.store.asObservable().subscribe(state => {
-      this.documentForm.patchValue(state, { emitEvent: false })
-    })
-
-    // Initialize dirtyCheck
-    this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
-    this.isDirty$.subscribe(dirty => {
-      this.openDocumentService.setDirty(this.document.id, dirty)
-    })
+    this.documentForm.patchValue(doc)
   }
 
   createDocumentType() {
