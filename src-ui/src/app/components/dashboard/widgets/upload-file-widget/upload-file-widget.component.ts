@@ -23,13 +23,38 @@ export class UploadFileWidgetComponent implements OnInit {
     return this.consumerStatusService.getConsumerStatus().slice(0, MAX_ALERTS)
   }
 
-  getStatusesHidden() {
+  getStatusSummary() {
+    let strings = []
+    let countUploadingAndProcessing =  this.consumerStatusService.getConsumerStatusNotCompleted().length
+    let countFailed = this.getStatusFailed().length
+    let countSuccess = this.getStatusSuccess().length
+    if (countUploadingAndProcessing > 0) {
+      strings.push($localize`Processing: ${countUploadingAndProcessing}`)
+    }
+    if (countFailed > 0) {
+      strings.push($localize`Failed: ${countFailed}`)
+    }
+    if (countSuccess > 0) {
+      strings.push($localize`Added: ${countSuccess}`)
+    }
+    return strings.join($localize`:this string is used to separate processing, failed and added on the file upload widget:, `)
+  }
+
+  getStatusHidden() {
     if (this.consumerStatusService.getConsumerStatus().length < MAX_ALERTS) return []
     else return this.consumerStatusService.getConsumerStatus().slice(MAX_ALERTS)
   }
 
   getStatusUploading() {
     return this.consumerStatusService.getConsumerStatus(FileStatusPhase.UPLOADING)
+  }
+
+  getStatusFailed() {
+    return this.consumerStatusService.getConsumerStatus(FileStatusPhase.FAILED)
+  }
+
+  getStatusSuccess() {
+    return this.consumerStatusService.getConsumerStatus(FileStatusPhase.SUCCESS)
   }
 
   getStatusCompleted() {
