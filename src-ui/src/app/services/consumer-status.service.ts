@@ -90,11 +90,15 @@ export class ConsumerStatusService {
   }
 
   getConsumerStatus(phase?: FileStatusPhase) {
-    if (phase) {
+    if (phase != null) {
       return this.consumerStatus.filter(s => s.phase == phase)
     } else {
       return this.consumerStatus
     }
+  }
+
+  getConsumerStatusNotCompleted() {
+    return this.consumerStatus.filter(s => s.phase < FileStatusPhase.SUCCESS)
   }
 
   getConsumerStatusCompleted() {

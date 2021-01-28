@@ -12,17 +12,18 @@
     <form>
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
-        multiple="true" contentClassName="justify-content-center d-flex align-items-center p-5" [showBrowseBtn]=true
+        multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
         browseBtnClassName="btn btn-sm btn-outline-primary ml-2" i18n-dropZoneLabel i18n-browseBtnLabel>
       </ngx-file-drop>
     </form>
+    <p class="mt-3" *ngIf="getStatus().length > 0">{{getStatusSummary()}}</p>
     <div *ngFor="let status of getStatus()">
       <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
     </div>
-    <div *ngIf="getStatusesHidden().length" class="alerts-hidden">
-      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center"><span i18n>{{getStatusesHidden().length}} more hidden</span> <button class="btn btn-sm btn-link py-0" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</button></p>
+    <div *ngIf="getStatusHidden().length" class="alerts-hidden">
+      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center"><span i18n>{{getStatusHidden().length}} more hidden</span> <button class="btn btn-sm btn-link py-0" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</button></p>
       <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
-        <div *ngFor="let status of getStatusesHidden()">
+        <div *ngFor="let status of getStatusHidden()">
           <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
         </div>
       </div>
