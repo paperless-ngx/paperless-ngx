@@ -109,7 +109,7 @@ export class BulkEditorComponent {
     if (items.length == 0) {
       return ""
     } else if (items.length == 1) {
-      return items[0].name
+      return $localize`"${items[0].name}"`
     } else if (items.length == 2) {
       return $localize`:This is for messages like 'modify "tag1" and "tag2"':"${items[0].name}" and "${items[1].name}"`
     } else {
