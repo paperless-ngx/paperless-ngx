@@ -42,7 +42,7 @@ httptools==0.1.1
 humanfriendly==9.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 hyperlink==21.0.0
 idna==2.10; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-imap-tools==0.36.0
+imap-tools==0.37.0
 img2pdf==0.4.0
 importlib-metadata==3.4.0; python_version < '3.8'
 incremental==17.5.0
