@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-27 17:57+0100\n"
+"POT-Creation-Date: 2021-01-28 22:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,60 +19,6 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
-
-#: documents/consumer.py:72
-msgid "File not found"
-msgstr "Datei nicht gefunden"
-
-#: documents/consumer.py:83
-msgid "Document already exists"
-msgstr ""
-
-#: documents/consumer.py:99
-msgid "Pre-consume script does not exist."
-msgstr ""
-
-#: documents/consumer.py:107
-msgid "Error while executing pre-consume script"
-msgstr ""
-
-#: documents/consumer.py:117
-msgid "Post-consume script does not exist."
-msgstr ""
-
-#: documents/consumer.py:137
-msgid "Error while executing post-consume script"
-msgstr ""
-
-#: documents/consumer.py:161
-msgid "Received new file"
-msgstr ""
-
-#: documents/consumer.py:185 documents/serialisers.py:383
-#, fuzzy, python-format
-#| msgid "File type {type} not supported."
-msgid "File type %(type)s not supported"
-msgstr "Dateityp {type} wird nicht unterstützt"
-
-#: documents/consumer.py:222
-msgid "Parsing document..."
-msgstr ""
-
-#: documents/consumer.py:228
-msgid "Generating thumbnail..."
-msgstr ""
-
-#: documents/consumer.py:236
-msgid "Getting date from document..."
-msgstr ""
-
-#: documents/consumer.py:261
-msgid "Saving document..."
-msgstr ""
-
-#: documents/consumer.py:330
-msgid "Finished."
 msgstr ""
 
 #: documents/models.py:33
@@ -392,6 +338,11 @@ msgstr ""
 msgid "filter rules"
 msgstr ""
 
+#: documents/serialisers.py:383
+#, python-format
+msgid "File type %(type)s not supported"
+msgstr ""
+
 #: documents/templates/index.html:20
 msgid "Paperless-ng is loading..."
 msgstr ""
@@ -674,6 +625,3 @@ msgstr ""
 #: paperless_mail/models.py:205
 msgid "assign this correspondent"
 msgstr ""
-
-#~ msgid "Document is a duplicate"
-#~ msgstr "Dokument existiert bereits"
