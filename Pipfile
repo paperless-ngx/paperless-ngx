@@ -44,6 +44,8 @@ inotifyrecursive = "~=0.3.4"
 ocrmypdf = "~=11.4.5"
 tqdm = "*"
 tika = "*"
+# TODO: This will sadly also install daphne+dependencies,
+#  which an ASGI server we don't need. Adds about 15MB image size.
 channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
