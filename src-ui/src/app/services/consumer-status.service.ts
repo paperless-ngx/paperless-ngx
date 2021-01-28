@@ -10,6 +10,22 @@ export enum FileStatusPhase {
   FAILED = 4
 }
 
+export const FILE_STATUS_MESSAGES = {
+  "document_already_exists": $localize`Document already exists.`,
+  "file_not_found": $localize`File not found.`,
+  "pre_consume_script_not_found": $localize`Pre-consume script does not exist.`,
+  "pre_consume_script_error": $localize`Error while executing pre-consume script.`,
+  "post_consume_script_not_found": $localize`Post-consume script does not exist.`,
+  "post_consume_script_error": $localize`Error while executing post-consume script.`,
+  "new_file": $localize`Received new file.`,
+  "unsupported_type": $localize`File type not supported.`,
+  "parsing_document": $localize`Processing document...`,
+  "generating_thumbnail": $localize`Generating thumbnail...`,
+  "parse_date": $localize`Retrieving date from document...`,
+  "save_document": $localize`Saving document...`,
+  "finished": $localize`Finished.`
+}
+
 export class FileStatus {
 
   filename: string
@@ -116,7 +132,11 @@ export class ConsumerStatusService {
       let created = statusMessageGet.created
 
       status.updateProgress(FileStatusPhase.PROCESSING, statusMessage.current_progress, statusMessage.max_progress)
-      status.message = statusMessage.message
+      if (statusMessage.message && statusMessage.message in FILE_STATUS_MESSAGES) {
+        status.message = FILE_STATUS_MESSAGES[statusMessage.message]
+      } else if (statusMessage.message) {
+        status.message = statusMessage.message
+      }
       status.documentId = statusMessage.document_id
 
       if (created && statusMessage.status == 'STARTING') {
