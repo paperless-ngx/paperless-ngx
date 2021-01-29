@@ -132,10 +132,6 @@ class DocumentTypeViewSet(ModelViewSet):
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
 
 
-class BulkEditForm(object):
-    pass
-
-
 class DocumentViewSet(RetrieveModelMixin,
                       UpdateModelMixin,
                       DestroyModelMixin,
