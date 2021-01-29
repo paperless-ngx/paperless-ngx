@@ -19,6 +19,7 @@ import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 import { ToastService } from 'src/app/services/toast.service';
 import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
 
 @Component({
   selector: 'app-document-detail',
@@ -40,6 +41,8 @@ export class DocumentDetailComponent implements OnInit {
   documentId: number
   document: PaperlessDocument
   metadata: PaperlessDocumentMetadata
+  suggestions: PaperlessDocumentSuggestions
+
   title: string
   previewUrl: string
   downloadUrl: string
@@ -95,6 +98,7 @@ export class DocumentDetailComponent implements OnInit {
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
       this.downloadOriginalUrl = this.documentsService.getDownloadUrl(this.documentId, true)
+      this.suggestions = null
       if (this.openDocumentService.getOpenDocument(this.documentId)) {
         this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
       } else {
@@ -111,6 +115,9 @@ export class DocumentDetailComponent implements OnInit {
     this.document = doc
     this.documentsService.getMetadata(doc.id).subscribe(result => {
       this.metadata = result
+    })
+    this.documentsService.getSuggestions(doc.id).subscribe(result => {
+      this.suggestions = result
     })
     this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)

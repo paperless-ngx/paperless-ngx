@@ -30,11 +30,22 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   allowNull: boolean = false
 
+  @Input()
+  suggestions: number[]
+
   @Output()
   createNew = new EventEmitter()
-  
+
   showPlusButton(): boolean {
     return this.createNew.observers.length > 0
+  }
+
+  getSuggestions() {
+    if (this.suggestions && this.items) {
+      return this.suggestions.filter(id => id != this.value).map(id => this.items.find(item => item.id == id))
+    } else {
+      return []
+    }
   }
 
 }
