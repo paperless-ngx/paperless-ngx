@@ -1288,8 +1288,8 @@
           <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="993900b5f9b0d14c7dbf3afd308afcfc1be5c356" datatype="html">
-        <source>Suggested:</source>
+      <trans-unit id="a1e6c11f20d4bf6e8e6b43e3c6d2561b2080645e" datatype="html">
+        <source>Suggestions:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
           <context context-type="linenumber">26</context>

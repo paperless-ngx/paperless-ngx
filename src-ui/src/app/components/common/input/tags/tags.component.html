@@ -35,7 +35,7 @@
   </div>
   <small class="form-text text-muted" *ngIf="hint">{{hint}}</small>
   <small *ngIf="getSuggestions().length > 0">
-    <span i18n>Suggested:</span>&nbsp;
+    <span i18n>Suggestions:</span>&nbsp;
     <ng-container *ngFor="let tag of getSuggestions()">
       <a (click)="addTag(tag.id)" [routerLink]="">{{tag.name}}</a>&nbsp;
     </ng-container>
