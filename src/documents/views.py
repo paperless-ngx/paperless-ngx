@@ -34,6 +34,7 @@ from rest_framework.viewsets import (
 import documents.index as index
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
+from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
 from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
@@ -41,6 +42,7 @@ from .filters import (
     DocumentTypeFilterSet,
     LogFilterSet
 )
+from .matching import match_correspondents, match_tags, match_document_types
 from .models import Correspondent, Document, Log, Tag, DocumentType, SavedView
 from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
@@ -225,30 +227,57 @@ class DocumentViewSet(RetrieveModelMixin,
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
-
-            meta = {
-                "original_checksum": doc.checksum,
-                "original_size": os.stat(doc.source_path).st_size,
-                "original_mime_type": doc.mime_type,
-                "media_filename": doc.filename,
-                "has_archive_version": os.path.isfile(doc.archive_path),
-                "original_metadata": self.get_metadata(
-                    doc.source_path, doc.mime_type)
-            }
-
-            if doc.archive_checksum and os.path.isfile(doc.archive_path):
-                meta['archive_checksum'] = doc.archive_checksum
-                meta['archive_size'] = os.stat(doc.archive_path).st_size,
-                meta['archive_metadata'] = self.get_metadata(
-                    doc.archive_path, "application/pdf")
-            else:
-                meta['archive_checksum'] = None
-                meta['archive_size'] = None
-                meta['archive_metadata'] = None
-
-            return Response(meta)
         except Document.DoesNotExist:
             raise Http404()
+
+        meta = {
+            "original_checksum": doc.checksum,
+            "original_size": os.stat(doc.source_path).st_size,
+            "original_mime_type": doc.mime_type,
+            "media_filename": doc.filename,
+            "has_archive_version": os.path.isfile(doc.archive_path),
+            "original_metadata": self.get_metadata(
+                doc.source_path, doc.mime_type)
+        }
+
+        if doc.archive_checksum and os.path.isfile(doc.archive_path):
+            meta['archive_checksum'] = doc.archive_checksum
+            meta['archive_size'] = os.stat(doc.archive_path).st_size,
+            meta['archive_metadata'] = self.get_metadata(
+                doc.archive_path, "application/pdf")
+        else:
+            meta['archive_checksum'] = None
+            meta['archive_size'] = None
+            meta['archive_metadata'] = None
+
+        return Response(meta)
+
+    @action(methods=['get'], detail=True)
+    def suggestions(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404()
+
+        try:
+            classifier = DocumentClassifier()
+            classifier.reload()
+        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
+            logging.getLogger(__name__).warning(
+                "Cannot load classifier: Not providing auto matching "
+                "suggestions"
+            )
+            classifier = None
+
+        return Response({
+            "correspondents": [
+                c.id for c in match_correspondents(doc, classifier)
+            ],
+            "tags": [t.id for t in match_tags(doc, classifier)],
+            "document_types": [
+                dt.id for dt in match_document_types(doc, classifier)
+            ]
+        })
 
     @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
