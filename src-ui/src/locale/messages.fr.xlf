@@ -1283,6 +1283,14 @@
           <context context-type="linenumber">73</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="7894972847287473517">
+        <source>&quot;<x equiv-text="items[0].name" id="PH"/>&quot;</source>
+        <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot;</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="8639884465898458690">
         <source>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; and &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</source>
         <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; et &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</target>
@@ -1291,14 +1299,6 @@
           <context context-type="linenumber">114</context>
         </context-group>
         <note from="description" priority="1">This is for messages like 'modify &quot;tag1&quot; and &quot;tag2&quot;'</note>
-      </trans-unit>
-      <trans-unit datatype="html" id="7894972847287473517">
-        <source>&quot;<x equiv-text="i.name" id="PH"/>&quot;</source>
-        <target>&quot;<x equiv-text="i.name" id="PH"/>&quot;</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">116</context>
-        </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="760986369763309193">
         <source>, </source>
