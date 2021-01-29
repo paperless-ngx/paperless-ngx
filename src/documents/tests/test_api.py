@@ -590,6 +590,10 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(len(meta['original_metadata']), 0)
         self.assertGreater(len(meta['archive_metadata']), 0)
 
+    def test_get_metadata_invalid_doc(self):
+        response = self.client.get(f"/api/documents/34576/metadata/")
+        self.assertEqual(response.status_code, 404)
+
     def test_get_metadata_no_archive(self):
         doc = Document.objects.create(title="test", filename="file.pdf", mime_type="application/pdf")
 
@@ -604,6 +608,30 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertFalse(meta['has_archive_version'])
         self.assertGreater(len(meta['original_metadata']), 0)
         self.assertIsNone(meta['archive_metadata'])
+
+    def test_get_empty_suggestions(self):
+        doc = Document.objects.create(title="test", mime_type="application/pdf")
+
+        response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'correspondents': [], 'tags': [], 'document_types': []})
+
+    def test_get_suggestions_invalid_doc(self):
+        response = self.client.get(f"/api/documents/34676/suggestions/")
+        self.assertEqual(response.status_code, 404)
+
+    @mock.patch("documents.views.match_correspondents")
+    @mock.patch("documents.views.match_tags")
+    @mock.patch("documents.views.match_document_types")
+    def test_get_suggestions(self, match_document_types, match_tags, match_correspondents):
+        doc = Document.objects.create(title="test", mime_type="application/pdf", content="this is an invoice!")
+        match_tags.return_value = [Tag(id=56), Tag(id=123)]
+        match_document_types.return_value = [DocumentType(id=23)]
+        match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
+
+        response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
+        self.assertEqual(response.data, {'correspondents': [88,2], 'tags': [56,123], 'document_types': [23]})
 
     def test_saved_views(self):
         u1 = User.objects.create_user("user1")
