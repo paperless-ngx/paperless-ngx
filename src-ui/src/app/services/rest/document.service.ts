@@ -11,6 +11,7 @@ import { CorrespondentService } from './correspondent.service';
 import { DocumentTypeService } from './document-type.service';
 import { TagService } from './tag.service';
 import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -127,6 +128,10 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   getSelectionData(ids: number[]): Observable<SelectionData> {
     return this.http.post<SelectionData>(this.getResourceUrl(null, 'selection_data'), {"documents": ids})
+  }
+
+  getSuggestions(id: number): Observable<PaperlessDocumentSuggestions> {
+    return this.http.get<PaperlessDocumentSuggestions>(this.getResourceUrl(id, 'suggestions'))
   }
 
 }
