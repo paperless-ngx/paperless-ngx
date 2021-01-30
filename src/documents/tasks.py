@@ -6,10 +6,9 @@ from django.db.models.signals import post_save
 from whoosh.writing import AsyncWriter
 
 from documents import index, sanity_checker
-from documents.classifier import DocumentClassifier, \
-    IncompatibleClassifierVersionError
+from documents.classifier import DocumentClassifier, load_classifier
 from documents.consumer import Consumer, ConsumerError
-from documents.models import Document
+from documents.models import Document, Tag, DocumentType, Correspondent
 from documents.sanity_checker import SanityFailedError
 
 
@@ -30,13 +29,18 @@ def index_reindex():
 
 
 def train_classifier():
-    classifier = DocumentClassifier()
+    if (not Tag.objects.filter(
+                matching_algorithm=Tag.MATCH_AUTO).exists() and
+        not DocumentType.objects.filter(
+            matching_algorithm=Tag.MATCH_AUTO).exists() and
+        not Correspondent.objects.filter(
+            matching_algorithm=Tag.MATCH_AUTO).exists()):
 
-    try:
-        # load the classifier, since we might not have to train it again.
-        classifier.reload()
-    except (OSError, EOFError, IncompatibleClassifierVersionError):
-        # This is what we're going to fix here.
+        return
+
+    classifier = load_classifier()
+
+    if not classifier:
         classifier = DocumentClassifier()
 
     try:
@@ -52,7 +56,7 @@ def train_classifier():
             )
 
     except Exception as e:
-        logging.getLogger(__name__).error(
+        logging.getLogger(__name__).warning(
             "Classifier error: " + str(e)
         )
 

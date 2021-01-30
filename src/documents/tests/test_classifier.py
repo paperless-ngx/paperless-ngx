@@ -1,10 +1,13 @@
+import os
 import tempfile
+from pathlib import Path
 from time import sleep
 from unittest import mock
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 
-from documents.classifier import DocumentClassifier, IncompatibleClassifierVersionError
+from documents.classifier import DocumentClassifier, IncompatibleClassifierVersionError, load_classifier
 from documents.models import Correspondent, Document, Tag, DocumentType
 from documents.tests.utils import DirectoriesMixin
 
@@ -235,3 +238,30 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertListEqual(self.classifier.predict_tags(doc1.content), [t1.pk])
         self.assertListEqual(self.classifier.predict_tags(doc2.content), [])
+
+    def test_load_classifier_not_exists(self):
+        self.assertFalse(os.path.exists(settings.MODEL_FILE))
+        self.assertIsNone(load_classifier())
+
+    @mock.patch("documents.classifier.DocumentClassifier.reload")
+    def test_load_classifier(self, reload):
+        Path(settings.MODEL_FILE).touch()
+        self.assertIsNotNone(load_classifier())
+
+    @mock.patch("documents.classifier.DocumentClassifier.reload")
+    def test_load_classifier_incompatible_version(self, reload):
+        Path(settings.MODEL_FILE).touch()
+        self.assertTrue(os.path.exists(settings.MODEL_FILE))
+
+        reload.side_effect = IncompatibleClassifierVersionError()
+        self.assertIsNone(load_classifier())
+        self.assertFalse(os.path.exists(settings.MODEL_FILE))
+
+    @mock.patch("documents.classifier.DocumentClassifier.reload")
+    def test_load_classifier_os_error(self, reload):
+        Path(settings.MODEL_FILE).touch()
+        self.assertTrue(os.path.exists(settings.MODEL_FILE))
+
+        reload.side_effect = OSError()
+        self.assertIsNone(load_classifier())
+        self.assertTrue(os.path.exists(settings.MODEL_FILE))
