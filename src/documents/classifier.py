@@ -40,8 +40,8 @@ def load_classifier():
     except (EOFError, IncompatibleClassifierVersionError) as e:
         # there's something wrong with the model file.
         logger.error(
-            f"Unrecoverable error while loading document classification model: "
-            f"{str(e)}, deleting model file."
+            f"Unrecoverable error while loading document "
+            f"classification model: {str(e)}, deleting model file."
         )
         os.unlink(settings.MODEL_FILE)
         classifier = None
