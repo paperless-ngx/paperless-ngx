@@ -420,7 +420,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIsNotNone(os.path.isfile(document.title))
         self.assertTrue(os.path.isfile(document.source_path))
 
-    @mock.patch("documents.consumer.DocumentClassifier")
+    @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m):
         correspondent = Correspondent.objects.create(name="test")
         dtype = DocumentType.objects.create(name="test")

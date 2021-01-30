@@ -26,6 +26,34 @@ def preprocess_content(content):
     return content
 
 
+def load_classifier():
+    if not os.path.isfile(settings.MODEL_FILE):
+        logger.debug(
+            f"Document classification model does not exist (yet), not "
+            f"performing automatic matching."
+        )
+        return None
+
+    try:
+        classifier = DocumentClassifier()
+        classifier.reload()
+    except (EOFError, IncompatibleClassifierVersionError) as e:
+        # there's something wrong with the model file.
+        logger.error(
+            f"Unrecoverable error while loading document classification model: "
+            f"{str(e)}, deleting model file."
+        )
+        os.unlink(settings.MODEL_FILE)
+        classifier = None
+    except OSError as e:
+        logger.error(
+            f"Error while loading document classification model: {str(e)}"
+        )
+        classifier = None
+
+    return classifier
+
+
 class DocumentClassifier(object):
 
     FORMAT_VERSION = 6
