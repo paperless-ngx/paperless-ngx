@@ -20,7 +20,7 @@ class TestSettings(TestCase):
         self.assertEqual(default_threads, 1)
 
     def test_workers_threads(self):
-        for i in range(2, 64):
+        for i in range(1, 64):
             with mock.patch("paperless.settings.multiprocessing.cpu_count") as cpu_count:
                 cpu_count.return_value = i
 
@@ -31,4 +31,4 @@ class TestSettings(TestCase):
                 self.assertTrue(default_workers >= 1)
                 self.assertTrue(default_threads >= 1)
 
-                self.assertTrue(default_workers * default_threads < i, f"{i}")
+                self.assertTrue(default_workers * default_threads <= i, f"{i}")

@@ -1,4 +1,4 @@
-![ci](https://github.com/jonaswinkler/paperless-ng/workflows/ci/badge.svg)
+[![ci](https://github.com/jonaswinkler/paperless-ng/workflows/ci/badge.svg)](https://github.com/jonaswinkler/paperless-ng/actions)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/paperless-ng/community.svg)](https://gitter.im/paperless-ng/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
@@ -8,7 +8,11 @@
 
 [Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
-Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the changelog in the documentation.
+Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation.
+
+# Survey
+
+If you already used Paperless-ng for a bit, would like to give some anonymous feedback, and help me decide on what to focus on next: I've created a survey, [see here](https://github.com/jonaswinkler/paperless-ng/issues/402). Thank you!
 
 # How it Works
 
@@ -29,6 +33,8 @@ Here's what you get:
 # Features
 
 * Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
+* Supports PDF documents, images, plain text files, and Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents).
+	* Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ng.readthedocs.io/en/latest/configuration.html#tika-settings))
 * Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and can be configured freely.
 * Single page application front end. Should be pretty snappy. Will be mobile friendly in the future.
 	* Includes a dashboard that shows basic statistics and has document upload.
@@ -49,25 +55,6 @@ Here's what you get:
 If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html). However, some parts of the UI have changed since I took these.
 
 For a complete list of changes from paperless, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
-
-# Roadmap for 1.0
-
-- Make the front end nice (except mobile).
-- Fix whatever bugs I and you find.
-- Make the documentation nice.
-
-## On the chopping block.
-
-- **GnuPG encrypion.** [Here's a note about encryption in paperless](https://paperless-ng.readthedocs.io/en/latest/administration.html#managing-encryption). The gist of it is that I don't see which attacks this implementation protects against. It gives a false sense of security to users who don't care about how it works.
-
-## Wont-do list.
-
-These features will probably never make it into paperless, since paperless is meant to be an easy to use set-and-forget solution.
-
-- **Document versions.** I might consider adding the ability to update a document with a newer version, but that's about it. The kind of documents that get added to paperless usually don't change at all.
-- **Workflows.** I don't see a use case for these, yet.
-- **Folders.** Tags are superior in just about every way.
-- **Apps / extension support.** Again, paperless is meant to be simple.
 
 # Getting started
 

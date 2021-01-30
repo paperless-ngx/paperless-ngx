@@ -22,7 +22,7 @@ def path_check(var, directory):
                 exists_hint.format(directory)
             ))
         elif not os.access(directory, os.W_OK | os.X_OK):
-            messages.append(Error(
+            messages.append(Warning(
                 writeable_message.format(var),
                 writeable_hint.format(directory)
             ))

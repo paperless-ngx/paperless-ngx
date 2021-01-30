@@ -22,4 +22,12 @@
     </div>
   </div>
   <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+  <small *ngIf="getSuggestions().length > 0">
+    <span i18n>Suggestions:</span>&nbsp;
+    <ng-container *ngFor="let s of getSuggestions()">
+      <a (click)="value = s.id; onChange(value)" [routerLink]="">{{s.name}}</a>&nbsp;
+    </ng-container>
+    
+    
+  </small>
 </div>

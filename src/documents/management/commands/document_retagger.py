@@ -2,8 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from documents.classifier import DocumentClassifier, \
-    IncompatibleClassifierVersionError
+from documents.classifier import load_classifier
 from documents.models import Document
 from ...mixins import Renderable
 from ...signals.handlers import set_correspondent, set_document_type, set_tags
@@ -70,13 +69,7 @@ class Command(Renderable, BaseCommand):
             queryset = Document.objects.all()
         documents = queryset.distinct()
 
-        classifier = DocumentClassifier()
-        try:
-            classifier.reload()
-        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
-            logging.getLogger(__name__).warning(
-                f"Cannot classify documents: {e}.")
-            classifier = None
+        classifier = load_classifier()
 
         for document in documents:
             logging.getLogger(__name__).info(
