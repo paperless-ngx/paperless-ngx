@@ -1,5 +1,5 @@
 ---
-paperlessng_version: 0.9.14
+paperlessng_version: latest  # 'latest', release number, or github branch/tag/commit/ref
 
 # Required services
 paperlessng_redis_host: localhost

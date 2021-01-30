@@ -121,27 +121,19 @@ After grabbing the new release and unpacking the contents, do the following:
     dependencies. The dependencies required are listed in the section about
     :ref:`bare metal installations <setup-bare_metal>`.
 
-2.  Update python requirements. If you use Pipenv, this is done with the following steps.
+2.  Update python requirements. Keep in mind to activate your virtual environment
+    before that, if you use one.
 
     .. code:: shell-session
 
-        $ pip install --upgrade pipenv
-        $ cd /path/to/paperless
-        $ pipenv clean
-        $ pipenv install
-
-    This creates a new virtual environment (or uses your existing environment)
-    and installs all dependencies into it.
-
-    You can also use the included ``requirements.txt`` file instead and create the virtual
-    environment yourself. This file includes exactly the same dependencies.
+        $ pip install -r requirements.txt
 
 3.  Migrate the database.
 
     .. code:: shell-session
 
         $ cd src
-        $ pipenv run python3 manage.py migrate
+        $ python3 manage.py migrate
 
     This might not actually do anything. Not every new paperless version comes with new
     database migrations.
@@ -195,7 +187,7 @@ or
 .. code:: shell-session
 
     $ cd /path/to/paperless/src
-    $ pipenv run python manage.py <command> <arguments>
+    $ python3 manage.py <command> <arguments>
 
 depending on whether you use docker or not.
 
@@ -462,6 +454,3 @@ Basic usage to disable encryption of your document store:
 .. code::
 
     decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
-
-
-.. _Pipenv: https://pipenv.pypa.io/en/latest/
