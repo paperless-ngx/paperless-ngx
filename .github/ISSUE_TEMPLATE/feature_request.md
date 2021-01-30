@@ -9,6 +9,9 @@ assignees: ''
 
 <!--
 => We already have lots of feature requests open. Please search the existing requests first and look for feature requests similar to yours.
+
+=> Don't remove the [Feature Request] prefix from the title.
+
 -->
 
 **Is your feature request related to a problem? Please describe.**
