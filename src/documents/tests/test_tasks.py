@@ -83,7 +83,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         self.assertRaises(SanityFailedError, tasks.sanity_check)
         m.assert_called_once()
 
-    def test_culk_update_documents(self):
+    def test_bulk_update_documents(self):
         doc1 = Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(),
                                 created=timezone.now(), modified=timezone.now())
 
