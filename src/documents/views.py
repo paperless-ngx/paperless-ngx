@@ -398,6 +398,7 @@ class PostDocumentView(APIView):
 
         with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
                                          dir=settings.SCRATCH_DIR,
+                                         buffering=0,
                                          delete=False) as f:
             f.write(doc_data)
             os.utime(f.name, times=(t, t))
