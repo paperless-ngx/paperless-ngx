@@ -21,20 +21,20 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install molecule[ansible,docker]
+          python3 -m pip install molecule[ansible,docker] jmespath
           ansible --version
           docker --version
           molecule --version
           python --version
-      - name: Test fresh installation with molecule
+      - name: Test installation/build/upgrade with molecule
         run: |
           cd ansible
-          molecule test -s fresh
-        working-directory: "${{ github.repository }}"
-      - name: Test release update with molecule
-        run: |
-          cd ansible
-          molecule test -s update
+          molecule create
+          molecule verify
+          molecule converge
+          molecule idempotence
+          molecule verify
+          molecule destroy
         working-directory: "${{ github.repository }}"
   # # https://galaxy.ansible.com/docs/contributing/importing.html
   # release:
