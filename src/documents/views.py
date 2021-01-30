@@ -35,6 +35,7 @@ from rest_framework.viewsets import (
 import documents.index as index
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
+from .classifier import load_classifier
 from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
@@ -42,6 +43,7 @@ from .filters import (
     DocumentTypeFilterSet,
     LogFilterSet
 )
+from .matching import match_correspondents, match_tags, match_document_types
 from .models import Correspondent, Document, Log, Tag, DocumentType, SavedView
 from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
@@ -131,10 +133,6 @@ class DocumentTypeViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filterset_class = DocumentTypeFilterSet
     ordering_fields = ("name", "matching_algorithm", "match", "document_count")
-
-
-class BulkEditForm(object):
-    pass
 
 
 class DocumentViewSet(RetrieveModelMixin,
@@ -230,30 +228,49 @@ class DocumentViewSet(RetrieveModelMixin,
     def metadata(self, request, pk=None):
         try:
             doc = Document.objects.get(pk=pk)
-
-            meta = {
-                "original_checksum": doc.checksum,
-                "original_size": os.stat(doc.source_path).st_size,
-                "original_mime_type": doc.mime_type,
-                "media_filename": doc.filename,
-                "has_archive_version": os.path.isfile(doc.archive_path),
-                "original_metadata": self.get_metadata(
-                    doc.source_path, doc.mime_type)
-            }
-
-            if doc.archive_checksum and os.path.isfile(doc.archive_path):
-                meta['archive_checksum'] = doc.archive_checksum
-                meta['archive_size'] = os.stat(doc.archive_path).st_size,
-                meta['archive_metadata'] = self.get_metadata(
-                    doc.archive_path, "application/pdf")
-            else:
-                meta['archive_checksum'] = None
-                meta['archive_size'] = None
-                meta['archive_metadata'] = None
-
-            return Response(meta)
         except Document.DoesNotExist:
             raise Http404()
+
+        meta = {
+            "original_checksum": doc.checksum,
+            "original_size": os.stat(doc.source_path).st_size,
+            "original_mime_type": doc.mime_type,
+            "media_filename": doc.filename,
+            "has_archive_version": os.path.isfile(doc.archive_path),
+            "original_metadata": self.get_metadata(
+                doc.source_path, doc.mime_type)
+        }
+
+        if doc.archive_checksum and os.path.isfile(doc.archive_path):
+            meta['archive_checksum'] = doc.archive_checksum
+            meta['archive_size'] = os.stat(doc.archive_path).st_size,
+            meta['archive_metadata'] = self.get_metadata(
+                doc.archive_path, "application/pdf")
+        else:
+            meta['archive_checksum'] = None
+            meta['archive_size'] = None
+            meta['archive_metadata'] = None
+
+        return Response(meta)
+
+    @action(methods=['get'], detail=True)
+    def suggestions(self, request, pk=None):
+        try:
+            doc = Document.objects.get(pk=pk)
+        except Document.DoesNotExist:
+            raise Http404()
+
+        classifier = load_classifier()
+
+        return Response({
+            "correspondents": [
+                c.id for c in match_correspondents(doc, classifier)
+            ],
+            "tags": [t.id for t in match_tags(doc, classifier)],
+            "document_types": [
+                dt.id for dt in match_document_types(doc, classifier)
+            ]
+        })
 
     @action(methods=['get'], detail=True)
     def preview(self, request, pk=None):
@@ -382,6 +399,7 @@ class PostDocumentView(APIView):
 
         with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
                                          dir=settings.SCRATCH_DIR,
+                                         buffering=0,
                                          delete=False) as f:
             f.write(doc_data)
             os.utime(f.name, times=(t, t))

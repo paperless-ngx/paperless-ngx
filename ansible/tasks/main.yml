@@ -34,7 +34,13 @@
       - build-essential
       - python3-setuptools
       - python3-wheel
-      - python3-virtualenv
+
+# upstream virtualenv in Ubuntu 20.04 is broken
+# https://github.com/pypa/virtualenv/issues/1873
+- name: install python virtualenv
+  pip:
+    name: virtualenv
+    extra_args: --upgrade
 
 - name: install ocr languages
   apt:
@@ -97,71 +103,141 @@
     # GNUPG_HOME required due to paperless db.py
     create_home: yes
 
+- block:
+    - name: get latest release version
+      uri:
+        url: https://api.github.com/repos/jonaswinkler/paperless-ng/releases/latest
+        method: GET
+      register: latest_release
+    - name: parse latest release version
+      set_fact:
+        paperlessng_version: "{{ latest_release.json['tag_name'] }}"
+  when: paperlessng_version == "latest"
+
+- block:
+    - name: sanitize version string
+      set_fact:
+        paperlessng_version: "{{ paperlessng_version | regex_replace('^ng-(\\d+\\.\\d+\\.\\d+)$', '\\1') }}"
+    - name: get tag data
+      uri:
+        url: https://api.github.com/repos/jonaswinkler/paperless-ng/tags
+        method: GET
+      register: tags
+    - name: get commit for target tag
+      set_fact:
+        paperlessng_commit: "{{ tags.json | json_query('[?name==`ng-' + paperlessng_version +'`] | [0].commit.sha') }}"
+  when: paperlessng_version | regex_search("^(ng-)?(\d+\.\d+\.\d+)$")
+
+- block:
+    - name: check if version is branch
+      uri:
+        url: "https://api.github.com/repos/jonaswinkler/paperless-ng/branches/{{ paperlessng_version }}"
+        method: GET
+        status_code: [200, 404]
+      register: branch
+    - name: get commit for target branch
+      set_fact:
+        paperlessng_commit: "{{ branch.json | json_query('commit.sha') }}"
+      when: branch.status == 200
+    - block:
+        - name: check if version is commit-or-ref
+          uri:
+            url: "https://api.github.com/repos/jonaswinkler/paperless-ng/commits/{{ paperlessng_version }}"
+            method: GET
+            status_code: [200, 404, 422]
+          register: commit
+        - name: get commit for target commit-or-ref
+          set_fact:
+            paperlessng_commit: "{{ commit.json | json_query('sha') }}"
+          when: commit.status == 200
+        - name: fail
+          fail:
+            msg: "Can not determine commit from `paperlessng_version=={{ paperlessng_version }}`!"
+          when: commit.status != 200
+      when: branch.status == 404
+  when: not(paperlessng_version | regex_search("^(ng-)?(\d+\.\d+\.\d+)$"))
+
 - name: check for paperless-ng installation
   command:
-    cmd: 'grep -Po "(?<=Paperless-ng )\d+\.\d+\.\d+" {{ paperlessng_directory }}/docs/changelog.html'
-  changed_when: '"No such file or directory" in paperlessng_current_version.stderr or paperlessng_current_version.stdout != paperlessng_version | string'
+    cmd: "cat {{ paperlessng_directory }}/.installed_version"
+  changed_when: '"No such file or directory" in paperlessng_current_commit.stderr or paperlessng_current_commit.stdout != paperlessng_commit | string'
   failed_when: false
   ignore_errors: yes
-  register: paperlessng_current_version
+  register: paperlessng_current_commit
 
 - name: register current state
   set_fact:
-    fresh_installation: '{{ "No such file or directory" in paperlessng_current_version.stderr }}'
-    update_installation: '{{ "No such file or directory" not in paperlessng_current_version.stderr and paperlessng_current_version.stdout != paperlessng_version | string }}'
-    reconfigure_only: '{{ paperlessng_current_version.stdout == paperlessng_version | string }}'
+    fresh_installation: '{{ "No such file or directory" in paperlessng_current_commit.stderr }}'
+    update_installation: '{{ "No such file or directory" not in paperlessng_current_commit.stderr and paperlessng_current_commit.stdout != paperlessng_commit | string }}'
+    reconfigure_only: "{{ paperlessng_current_commit.stdout == paperlessng_commit | string }}"
 
-- name: backup current paperless-ng installation
-  copy:
-    src: "{{ paperlessng_directory }}"
-    remote_src: yes
-    dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
+- block:
+    - name: backup current paperless-ng installation
+      copy:
+        src: "{{ paperlessng_directory }}"
+        remote_src: yes
+        dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
+    - name: remove current paperless sources
+      file:
+        path: "{{ paperlessng_directory }}/{{ item }}"
+        state: absent
+      with_items:
+        - docker
+        - docs
+        - scripts
+        - src
+        - static
   when: update_installation
 
-- name: remove current paperless sources
-  file:
-    path: "{{ paperlessng_directory }}/{{ item }}"
-    state: absent
-  with_items:
-    - docker
-    - docs
-    - scripts
-    - src
-    - static
-  when: update_installation
-
-- name: create temporary directory
-  tempfile:
-    state: directory
-  register: tempdir
-  when: not reconfigure_only
-
-- name: extract paperless-ng
-  unarchive:
-    src: "https://github.com/jonaswinkler/paperless-ng/releases/download/ng-{{ paperlessng_version }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
-    remote_src: yes
-    dest: "{{ tempdir.path }}"
-  when: not reconfigure_only
-
-- name: change owner and permissions of paperless-ng
-  command:
-    cmd: "{{ item }}"
-    warn: false
-  with_items:
-    - "chown -R {{ paperlessng_system_user }}:{{ paperlessng_system_group }} {{ tempdir.path }}"
-    - "find {{ tempdir.path }} -type d -exec chmod 0750 {} ;"
-    - "find {{ tempdir.path }} -type f -exec chmod 0640 {} ;"
-  when: not reconfigure_only
-
-- name: move paperless-ng
-  command:
-    cmd: "cp -a {{ tempdir.path }}/paperless-ng/. {{ paperlessng_directory }}"
-  when: not reconfigure_only
-
-- name: remove temporary directory
-  file:
-    path: "{{ tempdir.path }}"
-    state: absent
+- block:
+    - name: create paperless-ng directory and set permissions
+      file:
+        path: "{{ paperlessng_directory }}"
+        state: directory
+        owner: "{{ paperlessng_system_user }}"
+        group: "{{ paperlessng_system_group }}"
+        mode: "750"
+    - name: create temporary directory
+      become: yes
+      become_user: "{{ paperlessng_system_user }}"
+      tempfile:
+        state: directory
+        path: "{{ paperlessng_directory }}"
+      register: tempdir
+    - name: check if version is available as release archive
+      uri:
+        url: "https://github.com/jonaswinkler/paperless-ng/releases/download/ng-{{ paperlessng_version }}/paperless-ng-{{ paperlessng_version }}.tar.xz"
+        method: GET
+        status_code: [200, 404]
+      register: release_archive
+    - name: install paperless-ng from source
+      include_tasks: install-source.yml
+      when: release_archive.status == 404
+    - name: install paperless-ng from release archive
+      include_tasks: install-release.yml
+      when: release_archive.status == 200
+    - name: change owner and permissions of paperless-ng
+      command:
+        cmd: "{{ item }}"
+        warn: false
+      with_items:
+        - "chown -R {{ paperlessng_system_user }}:{{ paperlessng_system_group }} {{ tempdir.path }}"
+        - "find {{ tempdir.path }} -type d -exec chmod 0750 {} ;"
+        - "find {{ tempdir.path }} -type f -exec chmod 0640 {} ;"
+    - name: move paperless-ng
+      command:
+        cmd: "cp -a {{ tempdir.path }}/paperless-ng/. {{ paperlessng_directory }}"
+    - name: store commit hash of installed version
+      copy:
+        content: "{{ paperlessng_commit }}"
+        dest: "{{ paperlessng_directory }}/.installed_version"
+        owner: "{{ paperlessng_system_user }}"
+        group: "{{ paperlessng_system_group }}"
+        mode: "0440"
+    - name: remove temporary directory
+      file:
+        path: "{{ tempdir.path }}"
+        state: absent
   when: not reconfigure_only
 
 - name: create paperless-ng directories and set permissions
@@ -172,7 +248,6 @@
     group: "{{ paperlessng_system_group }}"
     mode: "750"
   with_items:
-    - "{{ paperlessng_directory }}"
     - "{{ paperlessng_consumption_dir }}"
     - "{{ paperlessng_data_dir }}"
     - "{{ paperlessng_media_root }}"
@@ -180,7 +255,7 @@
 
 - name: rename initial config
   command:
-    cmd: "mv {{ paperlessng_directory }}/paperless.conf {{ paperlessng_directory }}/paperless.conf.template"
+    cmd: "mv -f {{ paperlessng_directory }}/paperless.conf {{ paperlessng_directory }}/paperless.conf.template"
     removes: "{{ paperlessng_directory }}/paperless.conf"
 
 - name: configure paperless-ng
@@ -310,21 +385,20 @@
     creates: "{{ paperlessng_virtualenv }}"
   register: venv
 
-- name: install paperlessng requirements
-  become: yes
-  become_user: "{{ paperlessng_system_user }}"
-  pip:
-    requirements: "{{ paperlessng_directory }}/requirements.txt"
-    executable: "{{ paperlessng_virtualenv }}/bin/pip3"
-    extra_args: --upgrade
-  when: not reconfigure_only
-
-- name: migrate database schema
-  become: yes
-  become_user: "{{ paperlessng_system_user }}"
-  command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py migrate"
-  register: database_schema
-  changed_when: '"No migrations to apply." not in database_schema.stdout'
+- block:
+    - name: install paperlessng requirements
+      become: yes
+      become_user: "{{ paperlessng_system_user }}"
+      pip:
+        requirements: "{{ paperlessng_directory }}/requirements.txt"
+        executable: "{{ paperlessng_virtualenv }}/bin/pip3"
+        extra_args: --upgrade
+    - name: migrate database schema
+      become: yes
+      become_user: "{{ paperlessng_system_user }}"
+      command: "{{ paperlessng_virtualenv }}/bin/python3 {{ paperlessng_directory }}/src/manage.py migrate"
+      register: database_schema
+      changed_when: '"No migrations to apply." not in database_schema.stdout'
   when: not reconfigure_only
 
 - name: configure paperless superuser
@@ -392,7 +466,7 @@
         # https://www.freedesktop.org/software/systemd/man/systemd.exec.html
         { option: "User", value: "{{ paperlessng_system_user }}" },
         { option: "Group", value: "{{ paperlessng_system_group }}" },
-        { option: "WorkingDirectory", value: "{{ paperlessng_directory }}/src", },
+        { option: "WorkingDirectory", value: "{{ paperlessng_directory }}/src" },
         { option: "ProtectSystem", value: "full" },
         { option: "NoNewPrivileges", value: "true" },
         { option: "PrivateUsers", value: "true" },

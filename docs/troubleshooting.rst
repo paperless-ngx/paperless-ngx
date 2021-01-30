@@ -30,12 +30,21 @@ Consumer fails to pickup any new files
 ######################################
 
 If you notice that the consumer will only pickup files in the consumption
-directory at startup, but won't find any other files added later, check out
-the configuration file and enable filesystem polling with the setting
-``PAPERLESS_CONSUMER_POLLING``.
+directory at startup, but won't find any other files added later, you will need to
+enable filesystem polling with the configuration option
+``PAPERLESS_CONSUMER_POLLING``, see :ref:`here <configuration-polling>`.
 
 This will disable listening to filesystem changes with inotify and paperless will
 manually check the consumption directory for changes instead.
+
+
+Paperless always redirects to /admin
+####################################
+
+You probably had the old paperless installed at some point. Paperless installed
+a permanent redirect to /admin in your browser, and you need to clear your
+browsing data / cache to fix that.
+
 
 Operation not permitted
 #######################
@@ -64,6 +73,24 @@ This may have two reasons:
     with Inbox tags. Verify that there are documents in your archive without inbox tags.
     The algorithm will only learn from documents not in your inbox.
 
+UserWarning in sklearn on every single document
+###############################################
+
+You may encounter warnings like this:
+
+.. code::
+    
+    /usr/local/lib/python3.7/site-packages/sklearn/base.py:315:
+    UserWarning: Trying to unpickle estimator CountVectorizer from version 0.23.2 when using version 0.24.0.
+    This might lead to breaking code or invalid results. Use at your own risk.
+
+This happens when certain dependencies of paperless that are responsible for the auto matching algorithm are
+updated. After updating these, your current training data *might* not be compatible anymore. This can be ignored
+in most cases. This warning will disappear automatically when paperless updates the training data.
+
+If you want to get rid of the warning or actually experience issues with automatic matching, delete
+the file ``classification_model.pickle`` in the data directory and let paperless recreate it.
+
 Permission denied errors in the consumption directory
 #####################################################
 
@@ -78,3 +105,47 @@ Ensure that ``USERMAP_UID`` and ``USERMAP_GID`` are set to the user id and group
 different from ``1000``. See :ref:`setup-docker_hub`.
 
 Also ensure that you are able to read and write to the consumption directory on the host.
+
+Web-UI stuck at "Loading..."
+############################
+
+This might have multiple reasons.
+
+
+1.  If you built the docker image yourself or deployed using the bare metal route,
+    make sure that there are files in ``<paperless-root>/static/frontend/<lang-code>/``.
+    If there are no files, make sure that you executed ``collectstatic`` successfully, either
+    manually or as part of the docker image build.
+
+    If the front end is still missing, make sure that the front end is compiled (files present in
+    ``src/documents/static/frontend``). If it is not, you need to compile the front end yourself
+    or download the release archive instead of cloning the repository.
+
+2.  Check the output of the web server. You might see errors like this:
+
+
+    .. code::
+
+        [2021-01-25 10:08:04 +0000] [40] [ERROR] Socket error processing request.
+        Traceback (most recent call last):
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 134, in handle
+            self.handle_request(listener, req, client, addr)
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 190, in handle_request
+            util.reraise(*sys.exc_info())
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/util.py", line 625, in reraise
+            raise value
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 178, in handle_request
+            resp.write_file(respiter)
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/http/wsgi.py", line 396, in write_file
+            if not self.sendfile(respiter):
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/http/wsgi.py", line 386, in sendfile
+            sent += os.sendfile(sockno, fileno, offset + sent, count)
+        OSError: [Errno 22] Invalid argument
+    
+    To fix this issue, add
+
+    .. code::
+
+        SENDFILE=0
+    
+    to your `docker-compose.env` file.

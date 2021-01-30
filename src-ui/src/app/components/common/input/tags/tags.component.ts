@@ -26,9 +26,6 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   writeValue(newValue: number[]): void {
     this.value = newValue
-    if (this.tags) {
-      this.displayValue = newValue
-    }
   }
   registerOnChange(fn: any): void {
     this.onChange = fn;
@@ -43,7 +40,6 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     this.tagService.listAll().subscribe(result => {
       this.tags = result.results
-      this.displayValue = this.value
     })
   }
 
@@ -53,23 +49,28 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   @Input()
   hint
 
-  value: number[]
+  @Input()
+  suggestions: number[]
 
-  displayValue: number[] = []
+  value: number[]
 
   tags: PaperlessTag[]
 
   getTag(id) {
-    return this.tags.find(tag => tag.id == id)
+    if (this.tags) {
+      return this.tags.find(tag => tag.id == id)
+    } else {
+      return null
+    }
   }
 
   removeTag(id) {
-    let index = this.displayValue.indexOf(id)
+    let index = this.value.indexOf(id)
     if (index > -1) {
-      let oldValue = this.displayValue
+      let oldValue = this.value
       oldValue.splice(index, 1)
-      this.displayValue = [...oldValue]
-      this.onChange(this.displayValue)
+      this.value = [...oldValue]
+      this.onChange(this.value)
     }
   }
 
@@ -79,15 +80,23 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     modal.componentInstance.success.subscribe(newTag => {
       this.tagService.listAll().subscribe(tags => {
         this.tags = tags.results
-        this.displayValue = [...this.displayValue, newTag.id]
-        this.onChange(this.displayValue)
+        this.value = [...this.value, newTag.id]
+        this.onChange(this.value)
       })
     })
   }
 
-  ngSelectChange() {
-    this.value = this.displayValue
-    this.onChange(this.displayValue)
+  getSuggestions() {
+    if (this.suggestions && this.tags) {
+      return this.suggestions.filter(id => !this.value.includes(id)).map(id => this.tags.find(tag => tag.id == id))
+    } else {
+      return []
+    }
+  }
+
+  addTag(id) {
+    this.value = [...this.value, id]
+    this.onChange(this.value)
   }
 
 }
