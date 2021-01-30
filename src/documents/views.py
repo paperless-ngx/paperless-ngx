@@ -34,7 +34,7 @@ from rest_framework.viewsets import (
 import documents.index as index
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
-from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
+from .classifier import load_classifier
 from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
@@ -259,15 +259,7 @@ class DocumentViewSet(RetrieveModelMixin,
         except Document.DoesNotExist:
             raise Http404()
 
-        try:
-            classifier = DocumentClassifier()
-            classifier.reload()
-        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
-            logging.getLogger(__name__).warning(
-                "Cannot load classifier: Not providing auto matching "
-                "suggestions"
-            )
-            classifier = None
+        classifier = load_classifier()
 
         return Response({
             "correspondents": [

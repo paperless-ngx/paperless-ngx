@@ -11,7 +11,7 @@ from django.utils import timezone
 from filelock import FileLock
 from rest_framework.reverse import reverse
 
-from .classifier import DocumentClassifier, IncompatibleClassifierVersionError
+from .classifier import load_classifier
 from .file_handling import create_source_path_directory, \
     generate_unique_filename
 from .loggers import LoggingMixin
@@ -201,14 +201,7 @@ class Consumer(LoggingMixin):
         #   reloading the classifier multiple times, since there are multiple
         #   post-consume hooks that all require the classifier.
 
-        try:
-            classifier = DocumentClassifier()
-            classifier.reload()
-        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
-            self.log(
-                "warning",
-                f"Cannot classify documents: {e}.")
-            classifier = None
+        classifier = load_classifier()
 
         # now that everything is done, we can start to store the document
         # in the system. This will be a transaction and reasonably fast.
