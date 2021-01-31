@@ -155,6 +155,7 @@ jobs:
           mkdir dist/paperless-ng/scripts
           cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
           cp paperless.conf.example dist/paperless-ng/paperless.conf
+          cp gunicorn.conf.py dist/paperless-ng/gunicorn.conf.py
           cp docker/ dist/paperless-ng/docker -r
           cp scripts/*.service scripts/*.sh dist/paperless-ng/scripts/
           cp src/ dist/paperless-ng/src -r

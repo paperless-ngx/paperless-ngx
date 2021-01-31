@@ -20,7 +20,7 @@ Paperless consists of the following components:
     .. code:: shell-session
 
         $ cd /path/to/paperless/src/
-        $ gunicorn -c ../gunicorn.conf.py -b 0.0.0.0:8000 paperless.wsgi
+        $ gunicorn -c ../gunicorn.conf.py paperless.wsgi
 
     or by any other means such as Apache ``mod_wsgi``.
 
@@ -88,7 +88,7 @@ You can go multiple routes to setup and run Paperless:
 
 The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
 from the above automatically so that it just works and uses sensible defaults for all configuration options.
-Here you find a cheat-sheet for docker beginners: `CLI Basics <https://sehn.tech/post/devops-with-docker/>`_ 
+Here you find a cheat-sheet for docker beginners: `CLI Basics <https://sehn.tech/post/devops-with-docker/>`_
 
 The bare metal route is complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
@@ -126,7 +126,7 @@ Install Paperless from Docker Hub
 
         If you want to use the included ``docker-compose.*.yml`` file, you
         need to have at least Docker version **17.09.0** and docker-compose
-        version **1.17.0**.  
+        version **1.17.0**.
         To check do: `docker-compose -v` or `docker -v`
 
         See the `Docker installation guide`_ on how to install the current
@@ -175,7 +175,7 @@ Install Paperless from Docker Hub
         on such a file system, paperless will not pick up new files
         with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
         which will disable inotify. See :ref:`here <configuration-polling>`.
-        
+
 6.  Now head over to: https://hub.docker.com/r/jonaswinkler/paperless-ng and choose your preferred
     image and copy the link. To download this image do a `docker pull` followed by the link. Do this within the directory with the .yml files.
     Depending on your network connection and CPU this will take a while. You have time to get a beverage.
@@ -195,7 +195,7 @@ Install Paperless from Docker Hub
 
 9.  The default ``docker-compose.yml`` exports the webserver on your local port
     8000. If you haven't adapted this, you should now be able to visit your
-    Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000. 
+    Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000.
     Use the login credentials you have created with the previous step.
 
 .. _Docker: https://www.docker.com/
@@ -224,7 +224,7 @@ Build the docker image yourself
 
         webserver:
             image: jonaswinkler/paperless-ng:latest
-    
+
     and replace it with a line that instructs docker-compose to build the image from the current working directory instead:
 
     .. code:: yaml
@@ -427,7 +427,7 @@ Install Paperless using ansible
 
         This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
 
-1.  Install ansible 2.7+ on the management node. 
+1.  Install ansible 2.7+ on the management node.
     This may be the target host paperless-ng is being installed on or any remote host which can access the target host.
     For further details, check the ansible `inventory <https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html>`_ documentation.
 
@@ -585,7 +585,7 @@ Migration to paperless-ng is then performed in a few simple steps:
         .. code:: shell-session
 
             $ docker volume ls | grep _data
-        
+
         and adjust the project name in the ``.env`` file so that it matches the name
         of the volumes before the ``_data`` part.
 
