@@ -1,9 +1,11 @@
-import { AfterViewInit, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
+import { ConsumerStatusService } from 'src/app/services/consumer-status.service';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
@@ -16,7 +18,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss']
 })
-export class DocumentListComponent implements OnInit {
+export class DocumentListComponent implements OnInit, OnDestroy {
 
   constructor(
     public list: DocumentListViewService,
@@ -24,7 +26,9 @@ export class DocumentListComponent implements OnInit {
     public route: ActivatedRoute,
     private router: Router,
     private toastService: ToastService,
-    private modalService: NgbModal) { }
+    private modalService: NgbModal,
+    private consumerStatusService: ConsumerStatusService
+  ) { }
 
   @ViewChild("filterEditor")
   private filterEditor: FilterEditorComponent
@@ -34,6 +38,8 @@ export class DocumentListComponent implements OnInit {
   displayMode = 'smallCards' // largeCards, smallCards, details
 
   filterRulesModified: boolean = false
+
+  private consumptionFinishedSubscription: Subscription
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
@@ -63,6 +69,9 @@ export class DocumentListComponent implements OnInit {
     if (localStorage.getItem('document-list:displayMode') != null) {
       this.displayMode = localStorage.getItem('document-list:displayMode')
     }
+    this.consumptionFinishedSubscription = this.consumerStatusService.onDocumentConsumptionFinished().subscribe(() => {
+      this.list.reload()
+    })
     this.route.paramMap.subscribe(params => {
       this.list.clear()
       if (params.has('id')) {
@@ -81,6 +90,12 @@ export class DocumentListComponent implements OnInit {
         this.rulesChanged()
       }
     })
+  }
+
+  ngOnDestroy() {
+    if (this.consumptionFinishedSubscription) {
+      this.consumptionFinishedSubscription.unsubscribe()
+    }
   }
 
   loadViewConfig(view: PaperlessSavedView) {

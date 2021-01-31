@@ -352,6 +352,20 @@ $border-color-dark-mode: #47494f;
   .bg-dark {
     background-color: $bg-light-dark-mode !important;
   }
+
+  .ngx-file-drop__drop-zone--over {
+    background-color: darken($primary-dark-mode, 35%) !important;
+  }
+
+  .alert-secondary {
+    background-color: $bg-light-dark-mode;
+    border-color: darken($bg-light-dark-mode, 10%);
+    color: $text-color-dark-mode-accent;
+  }
+
+  .progress-bar.bg-primary {
+    background-color: darken($primary-dark-mode, 5%) !important;
+  }
 }
 
 body.color-scheme-dark {

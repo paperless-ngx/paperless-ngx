@@ -23,7 +23,7 @@ export class StatisticsWidgetComponent implements OnInit {
   getStatistics(): Observable<Statistics> {
     return this.http.get(`${environment.apiBaseUrl}statistics/`)
   }
-  
+
   ngOnInit(): void {
     this.getStatistics().subscribe(statistics => {
       this.statistics = statistics

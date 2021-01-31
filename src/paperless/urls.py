@@ -9,6 +9,7 @@ from rest_framework.routers import DefaultRouter
 
 from django.utils.translation import gettext_lazy as _
 
+from paperless.consumers import StatusConsumer
 from documents.views import (
     CorrespondentViewSet,
     DocumentViewSet,
@@ -98,6 +99,11 @@ urlpatterns = [
 
     # Root of the Frontent
     re_path(r".*", login_required(IndexView.as_view())),
+]
+
+
+websocket_urlpatterns = [
+    re_path(r'ws/status/$', StatusConsumer.as_asgi()),
 ]
 
 # Text in each page's <h1> (and above login form).

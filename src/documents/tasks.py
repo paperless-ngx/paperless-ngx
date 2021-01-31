@@ -66,7 +66,8 @@ def consume_file(path,
                  override_title=None,
                  override_correspondent_id=None,
                  override_document_type_id=None,
-                 override_tag_ids=None):
+                 override_tag_ids=None,
+                 task_id=None):
 
     document = Consumer().try_consume_file(
         path,
@@ -74,7 +75,9 @@ def consume_file(path,
         override_title=override_title,
         override_correspondent_id=override_correspondent_id,
         override_document_type_id=override_document_type_id,
-        override_tag_ids=override_tag_ids)
+        override_tag_ids=override_tag_ids,
+        task_id=task_id
+    )
 
     if document:
         return "Success. New document id {} created".format(

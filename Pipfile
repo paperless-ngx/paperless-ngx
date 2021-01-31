@@ -33,7 +33,10 @@ python-Levenshtein = "*"
 python-magic = "*"
 psycopg2-binary = "*"
 redis = "*"
-scikit-learn="~=0.24.0"
+# Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
+scikit-learn="==0.24.0"
+# Prevent scipy updates because 1.6 is incompatible with python 3.6
+scipy="~=1.5.4"
 whitenoise = "~=5.2.0"
 watchdog = "*"
 whoosh="~=2.7.4"
@@ -41,6 +44,11 @@ inotifyrecursive = "~=0.3.4"
 ocrmypdf = "~=11.4.5"
 tqdm = "*"
 tika = "*"
+# TODO: This will sadly also install daphne+dependencies,
+#  which an ASGI server we don't need. Adds about 15MB image size.
+channels = "~=3.0"
+channels-redis = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 
 [dev-packages]
 coveralls = "*"
