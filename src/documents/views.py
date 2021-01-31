@@ -398,19 +398,20 @@ class PostDocumentView(APIView):
 
         with tempfile.NamedTemporaryFile(prefix="paperless-upload-",
                                          dir=settings.SCRATCH_DIR,
-                                         buffering=0,
                                          delete=False) as f:
             f.write(doc_data)
             os.utime(f.name, times=(t, t))
+            temp_filename = f.name
 
-            async_task("documents.tasks.consume_file",
-                       f.name,
-                       override_filename=doc_name,
-                       override_title=title,
-                       override_correspondent_id=correspondent_id,
-                       override_document_type_id=document_type_id,
-                       override_tag_ids=tag_ids,
-                       task_name=os.path.basename(doc_name)[:100])
+        async_task("documents.tasks.consume_file",
+                   temp_filename,
+                   override_filename=doc_name,
+                   override_title=title,
+                   override_correspondent_id=correspondent_id,
+                   override_document_type_id=document_type_id,
+                   override_tag_ids=tag_ids,
+                   task_name=os.path.basename(doc_name)[:100])
+
         return Response("OK")
 
 
