@@ -100,6 +100,8 @@ INSTALLED_APPS = [
 
     "django_q",
 
+    "channels",
+
 ] + env_apps
 
 REST_FRAMEWORK = {
@@ -133,6 +135,7 @@ ROOT_URLCONF = 'paperless.urls'
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 
 WSGI_APPLICATION = 'paperless.wsgi.application'
+ASGI_APPLICATION = "paperless.asgi.application"
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 
@@ -152,6 +155,15 @@ TEMPLATES = [
         },
     },
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
+        },
+    },
+}
 
 ###############################################################################
 # Security                                                                    #

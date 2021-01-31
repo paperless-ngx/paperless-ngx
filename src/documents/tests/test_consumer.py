@@ -170,7 +170,7 @@ class DummyParser(DocumentParser):
         raise NotImplementedError()
 
     def __init__(self, logging_group, scratch_dir, archive_path):
-        super(DummyParser, self).__init__(logging_group)
+        super(DummyParser, self).__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
         self.archive_path = archive_path
 
@@ -212,10 +212,24 @@ def fake_magic_from_file(file, mime=False):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumer(DirectoriesMixin, TestCase):
 
-    def make_dummy_parser(self, logging_group):
+    def _assert_first_last_send_progress(self, first_status="STARTING", last_status="SUCCESS", first_progress=0, first_progress_max=100, last_progress=100, last_progress_max=100):
+
+        self._send_progress.assert_called()
+
+        args, kwargs = self._send_progress.call_args_list[0]
+        self.assertEqual(args[0], first_progress)
+        self.assertEqual(args[1], first_progress_max)
+        self.assertEqual(args[2], first_status)
+
+        args, kwargs = self._send_progress.call_args_list[len(self._send_progress.call_args_list) - 1]
+        self.assertEqual(args[0], last_progress)
+        self.assertEqual(args[1], last_progress_max)
+        self.assertEqual(args[2], last_status)
+
+    def make_dummy_parser(self, logging_group, progress_callback=None):
         return DummyParser(logging_group, self.dirs.scratch_dir, self.get_test_archive_file())
 
-    def make_faulty_parser(self, logging_group):
+    def make_faulty_parser(self, logging_group, progress_callback=None):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
@@ -228,7 +242,11 @@ class TestConsumer(DirectoriesMixin, TestCase):
             "mime_types": {"application/pdf": ".pdf"},
             "weight": 0
         })]
+        self.addCleanup(patcher.stop)
 
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        self._send_progress = patcher.start()
         self.addCleanup(patcher.stop)
 
         self.consumer = Consumer()
@@ -274,6 +292,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertFalse(os.path.isfile(filename))
 
+        self._assert_first_last_send_progress()
+
     def testOverrideFilename(self):
         filename = self.get_test_file()
         override_filename = "Statement for November.pdf"
@@ -282,21 +302,26 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.title, "Statement for November")
 
+        self._assert_first_last_send_progress()
+
     def testOverrideTitle(self):
         document = self.consumer.try_consume_file(self.get_test_file(), override_title="Override Title")
         self.assertEqual(document.title, "Override Title")
+        self._assert_first_last_send_progress()
 
     def testOverrideCorrespondent(self):
         c = Correspondent.objects.create(name="test")
 
         document = self.consumer.try_consume_file(self.get_test_file(), override_correspondent_id=c.pk)
         self.assertEqual(document.correspondent.id, c.id)
+        self._assert_first_last_send_progress()
 
     def testOverrideDocumentType(self):
         dt = DocumentType.objects.create(name="test")
 
         document = self.consumer.try_consume_file(self.get_test_file(), override_document_type_id=dt.pk)
         self.assertEqual(document.document_type.id, dt.id)
+        self._assert_first_last_send_progress()
 
     def testOverrideTags(self):
         t1 = Tag.objects.create(name="t1")
@@ -307,37 +332,42 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
         self.assertIn(t3, document.tags.all())
+        self._assert_first_last_send_progress()
 
     def testNotAFile(self):
-        try:
-            self.consumer.try_consume_file("non-existing-file")
-        except ConsumerError as e:
-            self.assertTrue(str(e).endswith('It is not a file'))
-            return
 
-        self.fail("Should throw exception")
+        self.assertRaisesMessage(
+            ConsumerError,
+            "File not found",
+            self.consumer.try_consume_file,
+            "non-existing-file"
+        )
+
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     def testDuplicates1(self):
         self.consumer.try_consume_file(self.get_test_file())
 
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertTrue(str(e).endswith("It is a duplicate."))
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "It is a duplicate",
+            self.consumer.try_consume_file,
+            self.get_test_file()
+        )
 
-        self.fail("Should throw exception")
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     def testDuplicates2(self):
         self.consumer.try_consume_file(self.get_test_file())
 
-        try:
-            self.consumer.try_consume_file(self.get_test_archive_file())
-        except ConsumerError as e:
-            self.assertTrue(str(e).endswith("It is a duplicate."))
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "It is a duplicate",
+            self.consumer.try_consume_file,
+            self.get_test_archive_file()
+        )
 
-        self.fail("Should throw exception")
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     def testDuplicates3(self):
         self.consumer.try_consume_file(self.get_test_archive_file())
@@ -347,13 +377,15 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def testNoParsers(self, m):
         m.return_value = []
 
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual("Unsupported mime type application/pdf of file sample.pdf", str(e))
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: Unsupported mime type application/pdf",
+            self.consumer.try_consume_file,
+            self.get_test_file()
+        )
 
-        self.fail("Should throw exception")
+        self._assert_first_last_send_progress(last_status="FAILED")
+
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testFaultyParser(self, m):
@@ -363,24 +395,28 @@ class TestConsumer(DirectoriesMixin, TestCase):
             "weight": 0
         })]
 
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "Does not compute.")
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: Error while consuming document sample.pdf: Does not compute.",
+            self.consumer.try_consume_file,
+            self.get_test_file()
+        )
 
-        self.fail("Should throw exception.")
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     @mock.patch("documents.consumer.Consumer._write")
     def testPostSaveError(self, m):
         filename = self.get_test_file()
         m.side_effect = OSError("NO.")
-        try:
-            self.consumer.try_consume_file(filename)
-        except ConsumerError as e:
-            self.assertEqual(str(e), "NO.")
-        else:
-            self.fail("Should raise exception")
+
+        self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: The following error occured while consuming sample.pdf: NO.",
+            self.consumer.try_consume_file,
+            filename
+        )
+
+        self._assert_first_last_send_progress(last_status="FAILED")
 
         # file not deleted
         self.assertTrue(os.path.isfile(filename))
@@ -396,6 +432,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.filename, "none/new docs.pdf")
+
+        self._assert_first_last_send_progress()
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
@@ -420,6 +458,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIsNotNone(os.path.isfile(document.title))
         self.assertTrue(os.path.isfile(document.source_path))
 
+        self._assert_first_last_send_progress()
+
     @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m):
         correspondent = Correspondent.objects.create(name="test")
@@ -439,19 +479,26 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
 
+        self._assert_first_last_send_progress()
+
     @override_settings(CONSUMER_DELETE_DUPLICATES=True)
     def test_delete_duplicate(self):
         dst = self.get_test_file()
         self.assertTrue(os.path.isfile(dst))
         doc = self.consumer.try_consume_file(dst)
 
+        self._assert_first_last_send_progress()
+
         self.assertFalse(os.path.isfile(dst))
         self.assertIsNotNone(doc)
+
+        self._send_progress.reset_mock()
 
         dst = self.get_test_file()
         self.assertTrue(os.path.isfile(dst))
         self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
         self.assertFalse(os.path.isfile(dst))
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     @override_settings(CONSUMER_DELETE_DUPLICATES=False)
     def test_no_delete_duplicate(self):
@@ -467,6 +514,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
         self.assertTrue(os.path.isfile(dst))
 
+        self._assert_first_last_send_progress(last_status="FAILED")
+
 
 class PreConsumeTestCase(TestCase):
 
@@ -479,9 +528,11 @@ class PreConsumeTestCase(TestCase):
         m.assert_not_called()
 
     @mock.patch("documents.consumer.Popen")
+    @mock.patch("documents.consumer.Consumer._send_progress")
     @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
-    def test_pre_consume_script_not_found(self, m):
+    def test_pre_consume_script_not_found(self, m, m2):
         c = Consumer()
+        c.filename = "somefile.pdf"
         c.path = "path-to-file"
         self.assertRaises(ConsumerError, c.run_pre_consume_script)
 
@@ -503,7 +554,6 @@ class PreConsumeTestCase(TestCase):
                 self.assertEqual(command[1], "path-to-file")
 
 
-
 class PostConsumeTestCase(TestCase):
 
     @mock.patch("documents.consumer.Popen")
@@ -519,12 +569,13 @@ class PostConsumeTestCase(TestCase):
 
         m.assert_not_called()
 
-
     @override_settings(POST_CONSUME_SCRIPT="does-not-exist")
-    def test_post_consume_script_not_found(self):
+    @mock.patch("documents.consumer.Consumer._send_progress")
+    def test_post_consume_script_not_found(self, m):
         doc = Document.objects.create(title="Test", mime_type="application/pdf")
-
-        self.assertRaises(ConsumerError, Consumer().run_post_consume_script, doc)
+        c = Consumer()
+        c.filename = "somefile.pdf"
+        self.assertRaises(ConsumerError, c.run_post_consume_script, doc)
 
     @mock.patch("documents.consumer.Popen")
     def test_post_consume_script_simple(self, m):
