@@ -1,12 +1,60 @@
 <?xml version="1.0" ?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file datatype="plaintext" original="ng2.template" source-language="en-US" target-language="de">
     <body>
+      <trans-unit datatype="html" id="9103526311244275943">
+        <source>Document added</source>
+        <target>Dokument hinzugefügt</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="9204248378636247318">
+        <source>Document <x equiv-text="status.filename" id="PH"/> was added to paperless.</source>
+        <target>Das Dokument <x equiv-text="status.filename" id="PH"/> wurde zu Paperless hinzugefügt.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1931214133925051574">
+        <source>Open document</source>
+        <target>Dokument öffnen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="8582620835547864448">
+        <source>Could not add <x equiv-text="status.filename" id="PH"/>: <x equiv-text="status.message" id="PH_1"/></source>
+        <target>Konnte <x equiv-text="status.filename" id="PH"/> nicht hinzufügen: <x equiv-text="status.message" id="PH_1"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1710712016675379662">
+        <source>New document detected</source>
+        <target>Neues Dokument erkannt</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="587031278561344416">
+        <source>Document <x equiv-text="status.filename" id="PH"/> is being processed by paperless.</source>
+        <target>Dokument <x equiv-text="status.filename" id="PH"/> wird von Paperless verarbeitet.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="4733307402565258070">
         <source>Documents</source>
         <target>Dokumente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2155249406916744630">
@@ -14,7 +62,7 @@
         <target>Ansicht &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; erfolgreich gespeichert.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6837554170707123455">
@@ -22,7 +70,7 @@
         <target>Ansicht &quot;<x equiv-text="savedView.name" id="PH"/>&quot; erfolgreich erstellt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ca82952a6bc860b5391d5975322d8af8ceddfa4">
@@ -550,7 +598,7 @@
         <target>Gespeicherte Ansicht &quot;<x equiv-text="savedView.name" id="PH"/>&quot; gelöscht.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5647210819299459618">
@@ -558,7 +606,7 @@
         <target>Einstellungen erfolgreich gespeichert.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6839066544204061364">
@@ -566,7 +614,7 @@
         <target>Benutze Systemsprache</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7729897675462249787">
@@ -574,7 +622,7 @@
         <target>Benutze Datumsformat der Anzeigesprache</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -582,7 +630,7 @@
         <target>Fehler beim Speichern der Einstellungen auf dem Server: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -606,7 +654,7 @@
         <target>Gespeicherte Ansichten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">128</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13">
@@ -729,12 +777,68 @@
           <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="8bcabdf6b16cad0313a86c7e940c5e3ad7f9f8ab">
+        <source>Notifications</source>
+        <target>Benachrichtigungen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="69c5a98f8aa92e4db060f10dcd37781c8f40a48f">
+        <source>Consumer status</source>
+        <target>Status Dokumentenverarbeitung</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="2ad4d76b36341c589d94004ad2a213fd4d6f5ca0">
+        <source>Show notifications when new documents are detected</source>
+        <target>Zeige Benachrichtigungen wenn neue Dokumente erkannt werden</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="f2361d3f65b6c77ef0a15fad8af8e858b043ace3">
+        <source>Show notifications when document consumption completes successfully</source>
+        <target>Zeige Benachrichtigungen wenn neue Dokumente erfolgreich hinzugefügt wurden.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="2bcbcbe99e207803e21183580b98d90410dd8718">
+        <source>Show notifications when document consumption fails</source>
+        <target>Zeige Benachrichtigungen wenn Dokumente nicht hinzugefügt werden können</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="af113f7c9f7e13145c3461f61a1aedf12d57bd71">
+        <source>Suppress notifications on dashboard</source>
+        <target>Unterdrücke Benachrichtigungen auf der Startseite.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="59fe5c9233a2aaab3079a2300e4dfa439ddb1890">
+        <source>This will suppress all consumer related status messages on the dashboard.</source>
+        <target>Dadurch werden alle Benachrichtigungen über die Dokumentenverarbeitung auf der Startseite unterdrückt.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">112</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
         <source>Bulk editing</source>
         <target>Massenbearbeitung</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
@@ -742,7 +846,7 @@
         <target>Bestätigungsdialoge anzeigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">120</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
@@ -750,7 +854,7 @@
         <target>Beim Löschen von Dokumenten wird immer nach einer Bestätigung gefragt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">120</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
@@ -758,7 +862,7 @@
         <target>Anwenden beim Schließen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cb90334f5dfd7fc67205085f59381e2a334ccfc">
@@ -766,7 +870,7 @@
         <target>Erscheint auf</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">140</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6717cf1acf04728fc2b7c39f6d3297f8ff15fde5">
@@ -774,7 +878,7 @@
         <target>Auf Startseite zeigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="541bfc5b123b3f8867fd681eaceefb663a811973">
@@ -782,7 +886,7 @@
         <target>In Seitenleiste zeigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">147</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="abba764a7a595d04dc8c3b26e04b3780d4fdb540">
@@ -790,7 +894,7 @@
         <target>Keine gespeicherten Ansichten vorhanden.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">157</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ef60a738a565f498b858e903e42bc5ffc3cc1299">
@@ -1518,28 +1622,52 @@
           <context context-type="linenumber">4</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="8705589528094706681">
-        <source>The document has been uploaded and will be processed by the consumer shortly.</source>
-        <target>Das Dokument wurde hochgeladen und wird in Kürze durch Paperless-ng verarbeitet.</target>
+      <trans-unit datatype="html" id="6443586946875325554">
+        <source>Processing: <x equiv-text="countUploadingAndProcessing" id="PH"/></source>
+        <target>Verarbeite: <x equiv-text="countUploadingAndProcessing" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
-          <context context-type="linenumber">63</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="4956689020592747108">
-        <source>There was an error while uploading the document: <x equiv-text="error.error.document" id="PH"/></source>
-        <target>Konnte Dokument nicht hochladen: <x equiv-text="error.error.document" id="PH"/></target>
+      <trans-unit datatype="html" id="9182918211699394982">
+        <source>Failed: <x equiv-text="countFailed" id="PH"/></source>
+        <target>Fehlgeschlagen: <x equiv-text="countFailed" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="7554858521017940575">
-        <source>An error has occurred while uploading the document. Sorry!</source>
-        <target>Beim Hochladen trat ein Fehler auf. Entschuldigung!</target>
+      <trans-unit datatype="html" id="534116346205124059">
+        <source>Added: <x equiv-text="countSuccess" id="PH"/></source>
+        <target>Hinzugefügt: <x equiv-text="countSuccess" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3852289441366561594">
+        <source>Connecting...</source>
+        <target>Verbinde...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1245343823699368872">
+        <source>Uploading...</source>
+        <target>Hochladen...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3994065460580948013">
+        <source>Waiting for consumer...</source>
+        <target>Warte auf Consumer...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="e022072b3e4dd77e3f09960817ef3359a49963b3">
@@ -1555,7 +1683,7 @@
         <target>Dokumente hier ablegen oder</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="865c511f4a24558ed0e954f9bbbff557bbb8954d">
@@ -1563,15 +1691,31 @@
         <target>Datei auswählen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="33c76d75ce25ce3b05ab22877f1b6b09dcf603ae">
-        <source>{VAR_PLURAL, plural, =1 {Uploading file...} =other {Uploading <x id="INTERPOLATION"/> files...}}</source>
-        <target>{VAR_PLURAL, plural, =1 {Lade Datei hoch...} =other {Lade <x id="INTERPOLATION"/> Dateien hoch...}}</target>
+      <trans-unit datatype="html" id="bd4a8607e4a002d939cffb347ec056664dfb2c73">
+        <source>Dismiss completed</source>
+        <target>Fertiggestellte verbergen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1fc4e0a1e93fdda0ed3c9e590971d283afb68265">
+        <source><x equiv-text="{{getStatusHidden().length}}" id="INTERPOLATION"/> more hidden</source>
+        <target><x equiv-text="{{getStatusHidden().length}}" id="INTERPOLATION"/> weitere versteckt</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="710254a196a2649674438edf8a15b7ab1f48271b">
+        <source>Open document</source>
+        <target>Dokument öffnen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="45854ddec74086b271e62be6a363f4fa5036f7fc">
@@ -1683,7 +1827,7 @@
         <target>Englisch (US)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1858110241312746425">
@@ -1691,7 +1835,7 @@
         <target>Deutsch</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3071065188816255493">
@@ -1699,7 +1843,7 @@
         <target>Niederländisch</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7633754075223722162">
@@ -1707,7 +1851,111 @@
         <target>Französisch</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="2119857572761283468">
+        <source>Document already exists.</source>
+        <target>Dokument existiert bereits.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="148389968432135849">
+        <source>File not found.</source>
+        <target>Datei nicht gefunden.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1520671543092565667">
+        <source>Pre-consume script does not exist.</source>
+        <target>Pre-Consume-Skript existiert nicht.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7742915911032564889">
+        <source>Error while executing pre-consume script.</source>
+        <target>Fehler beim Ausführen des Pre-Consume-Skripts.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="8995193730018060346">
+        <source>Post-consume script does not exist.</source>
+        <target>Post-Consume-Skript existiert nicht.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="256773668518189604">
+        <source>Error while executing post-consume script.</source>
+        <target>Fehler beim Ausführen des Post-Consume-Skripts.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="6252258095055634191">
+        <source>Received new file.</source>
+        <target>Neue Datei erhalten.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7337565919209746135">
+        <source>File type not supported.</source>
+        <target>Dateityp wird nicht unterstützt.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="5002399167376099234">
+        <source>Processing document...</source>
+        <target>Verarbeite Dokument...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1085975194762600381">
+        <source>Generating thumbnail...</source>
+        <target>Erzeuge Miniaturbild...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="3280851677698431426">
+        <source>Retrieving date from document...</source>
+        <target>Ermittle Datum des Dokuments...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="7162102384876037296">
+        <source>Saving document...</source>
+        <target>Speichere Dokument...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4550450765009165976">
+        <source>Finished.</source>
+        <target>Abgeschlossen.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1519954996184640001">
@@ -1715,7 +1963,7 @@
         <target>Fehler</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5037437391296624618">
@@ -1723,7 +1971,7 @@
         <target>Information</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7517688192215738656">
