@@ -54,6 +54,7 @@
         - src: Pipfile.lock
         - src: README.md
         - src: requirements.txt
+        - src: gunicorn.conf.py
         - src: paperless.conf.example
           dest: "paperless.conf"
 
