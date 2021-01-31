@@ -23,7 +23,11 @@ export const SETTINGS_KEYS = {
   DARK_MODE_ENABLED: 'general-settings:dark-mode:enabled',
   USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer',
   DATE_LOCALE: 'general-settings:date-display:date-locale',
-  DATE_FORMAT: 'general-settings:date-display:date-format'
+  DATE_FORMAT: 'general-settings:date-display:date-format',
+  NOTIFICATIONS_CONSUMER_NEW_DOCUMENT: 'general-settings:notifications:consumer-new-documents',
+  NOTIFICATIONS_CONSUMER_SUCCESS: 'general-settings:notifications:consumer-success',
+  NOTIFICATIONS_CONSUMER_FAILED: 'general-settings:notifications:consumer-failed',
+  NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD: 'general-settings:notifications:consumer-suppress-on-dashboard',
 }
 
 const SETTINGS: PaperlessSettings[] = [
@@ -34,7 +38,11 @@ const SETTINGS: PaperlessSettings[] = [
   {key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: "boolean", default: false},
   {key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: "boolean", default: false},
   {key: SETTINGS_KEYS.DATE_LOCALE, type: "string", default: ""},
-  {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"}
+  {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD, type: "boolean", default: true},
 ]
 
 @Injectable({

@@ -261,7 +261,7 @@ class DocumentParser(LoggingMixin):
     `paperless_tesseract.parsers` for inspiration.
     """
 
-    def __init__(self, logging_group):
+    def __init__(self, logging_group, progress_callback=None):
         super().__init__()
         self.logging_group = logging_group
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
@@ -271,6 +271,12 @@ class DocumentParser(LoggingMixin):
         self.archive_path = None
         self.text = None
         self.date = None
+        self.progress_callback = progress_callback
+
+    def progress(self, current, max):
+        print(self.progress_callback)
+        if self.progress_callback:
+            self.progress_callback(current, max)
 
     def extract_metadata(self, document_path, mime_type):
         return []

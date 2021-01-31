@@ -9,6 +9,10 @@ export interface Toast {
 
   delay: number
 
+  action?: any
+
+  actionName?: string
+
 }
 
 @Injectable({

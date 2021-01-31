@@ -8,6 +8,8 @@ from .models import Correspondent, Tag, Document, Log, DocumentType, \
     SavedView, SavedViewFilterRule
 from .parsers import is_mime_type_supported
 
+from django.utils.translation import gettext as _
+
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -378,7 +380,9 @@ class PostDocumentSerializer(serializers.Serializer):
 
         if not is_mime_type_supported(mime_type):
             raise serializers.ValidationError(
-                "This file type is not supported.")
+                _("File type %(type)s not supported") %
+                {'type': mime_type}
+            )
 
         return document.name, document_data
 

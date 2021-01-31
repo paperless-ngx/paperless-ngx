@@ -1,6 +1,7 @@
 import logging
 import os
 import tempfile
+import uuid
 from datetime import datetime
 from time import mktime
 
@@ -213,7 +214,7 @@ class DocumentViewSet(RetrieveModelMixin,
 
         parser_class = get_parser_class_for_mime_type(mime_type)
         if parser_class:
-            parser = parser_class(logging_group=None)
+            parser = parser_class(progress_callback=None, logging_group=None)
 
             try:
                 return parser.extract_metadata(file, mime_type)
@@ -403,6 +404,8 @@ class PostDocumentView(APIView):
             os.utime(f.name, times=(t, t))
             temp_filename = f.name
 
+        task_id = str(uuid.uuid4())
+
         async_task("documents.tasks.consume_file",
                    temp_filename,
                    override_filename=doc_name,
@@ -410,6 +413,7 @@ class PostDocumentView(APIView):
                    override_correspondent_id=correspondent_id,
                    override_document_type_id=document_type_id,
                    override_tag_ids=tag_ids,
+                   task_id=task_id,
                    task_name=os.path.basename(doc_name)[:100])
 
         return Response("OK")
