@@ -114,6 +114,12 @@
         paperlessng_version: "{{ latest_release.json['tag_name'] }}"
   when: paperlessng_version == "latest"
 
+- name: check if version is ref
+  fail:
+    msg: "Specifying `paperlessng_version` as git ref may not work as expected!"
+  ignore_errors: True  # Output failure (as warning), but don't consider play failed
+  when: paperlessng_version.startswith('refs/')
+
 - block:
     - name: sanitize version string
       set_fact:
