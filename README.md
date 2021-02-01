@@ -82,7 +82,7 @@ If you want to see paperless in your own language, request that language at tran
 
 # Feature Requests
 
-Feature requests can be submitted via [GitHub Discussions](https://github.com/jonaswinkler/paperless-ng/discussions/categories/ideas), you can search for existing ideas, add your own and vote for the ones you care about! Note that some older feature requests can also be found under [issues](https://github.com/jonaswinkler/paperless-ng/issues).
+Feature requests can be submitted via [GitHub Discussions](https://github.com/jonaswinkler/paperless-ng/discussions/categories/feature-requests), you can search for existing ideas, add your own and vote for the ones you care about! Note that some older feature requests can also be found under [issues](https://github.com/jonaswinkler/paperless-ng/issues).
 
 # Questions? Something not working?
 
@@ -90,7 +90,7 @@ For bugs please [open an issue](https://github.com/jonaswinkler/paperless-ng/iss
 
 ## Feel like helping out?
 
-There's still lots of things to be done, just have a look at that issue log. If you feel like contributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome. The documentation has some basic information on how to get started.
+There's still lots of things to be done, just have a look at open issues & discussions. If you feel like contributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome. The documentation has some basic information on how to get started.
 
 If you want to implement something big: Please start a discussion about that in the issues! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested. See the roadmap above.
 
