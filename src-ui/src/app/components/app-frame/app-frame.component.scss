@@ -24,6 +24,7 @@
   padding-top: 0.5rem;
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  min-height: min-content;
 }
 @supports ((position: -webkit-sticky) or (position: sticky)) {
   .sidebar-sticky {
