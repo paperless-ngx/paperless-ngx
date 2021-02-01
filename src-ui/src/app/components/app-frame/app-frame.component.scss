@@ -62,8 +62,14 @@
   flex-wrap: nowrap;
 }
 
-.nav-item .small svg {
-  margin-bottom: 2px;
+.nav-item .nav-link-additional {
+  margin-top: 0.2rem;
+  margin-left: 0.25rem;
+  padding-top: 0.5rem;
+
+  svg {
+    margin-bottom: 2px;
+  }
 }
 
 /*
