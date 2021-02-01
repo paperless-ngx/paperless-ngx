@@ -179,8 +179,8 @@ Install Paperless from Docker Hub
         with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
         which will disable inotify. See :ref:`here <configuration-polling>`.
 
-6.  Run ``docker-compose up -d``. This will pull the image, create and start the necessary
-    containers.
+6.  Run ``docker-compose pull``, followed by ``docker-compose up -d``.
+    This will pull the image, create and start the necessary containers.
 
 7.  To be able to login, you will need a super user. To create it, execute the
     following command:
