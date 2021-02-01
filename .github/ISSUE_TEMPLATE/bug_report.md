@@ -12,7 +12,7 @@ assignees: ''
 => Please also make sure that you followed the installation instructions.
 => Please search the issues and look for similar issues before opening a bug report.
 
-=> If you would like to submit a feature request please submit one under https://github.com/jonaswinkler/paperless-ng/discussions/categories/ideas
+=> If you would like to submit a feature request please submit one under https://github.com/jonaswinkler/paperless-ng/discussions/categories/feature-requests
 
 => If you encounter issues while installing of configuring Paperless-ng, please post that in the "Support" section of the discussions. Remember that Paperless successfully runs on a variety of different systems. If paperless does not start, it's probably an issue with your system, and not an issue of paperless.
 
