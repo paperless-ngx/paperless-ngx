@@ -81,6 +81,7 @@ Installation
 
 You can go multiple routes to setup and run Paperless:
 
+* :ref:`Use the easy install docker script <setup-docker_script>`
 * :ref:`Pull the image from Docker Hub <setup-docker_hub>`
 * :ref:`Build the Docker image yourself <setup-docker_build>`
 * :ref:`Install Paperless directly on your system manually (bare metal) <setup-bare_metal>`
@@ -100,6 +101,24 @@ it includes the same sensible defaults, and it simultaneously provides the flexi
 
 .. _CLI Basics: https://sehn.tech/post/devops-with-docker/
 .. _idempotent: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency
+
+.. _setup-docker_script:
+
+Install Paperless from Docker Hub using the installation script
+===============================================================
+
+Paperless provides an interactive installation script. This script will ask you
+for a couple configuration options, download and create the necessary configuration files, pull the docker image, start paperless and create your user account. This script essentially
+performs all the steps described in :ref:`setup-docker_hub` automatically.
+
+1.  Make sure that docker and docker-compose are installed.
+2.  Download and run the installation script:
+
+    .. code:: shell-session
+
+        $ wget https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/install-paperless-ng.sh
+        $ chmod +x install-paperless-ng.sh
+        $ ./install-paperless-ng.sh
 
 .. _setup-docker_hub:
 

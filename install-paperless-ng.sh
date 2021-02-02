@@ -15,13 +15,54 @@ ask() {
 		fi
 		array=$3
 		if [[ -z $3 || " ${array[@]} " =~ " ${result} " ]]; then
-    	ask_result=$result
+			ask_result=$result
 			return
 		else
 			echo "Invalid option: $result"
 		fi
 	done
 }
+
+ask_docker_folder() {
+	while true ; do
+
+		read -p "$1 [$2]: " result
+
+		if [[ -z $result ]]; then
+			ask_result=$2
+			return
+		fi
+
+		if [[ $result == /* || $result == ./* ]]; then
+			ask_result=$result
+			return
+		else
+			echo "Invalid folder: $result"
+		fi
+
+
+	done
+}
+
+if [[ $(id -u) == "0" ]] ; then
+	echo "Do not run this script as root."
+	exit 1
+fi
+
+if [[ -z $(which wget) ]] ; then
+	echo "wget executable not found. Is wget installed?"
+	exit 1
+fi
+
+if [[ -z $(which docker) ]] ; then
+	echo "docker executable not found. Is docker installed?"
+	exit 1
+fi
+
+if [[ -z $(which docker-compose) ]] ; then
+	echo "docker-compose executable not found. Is docker-compose installed?"
+	exit 1
+fi
 
 echo ""
 echo "############################################"
@@ -48,14 +89,13 @@ echo "The consume folder is where paperles will search for new documents."
 echo "Point this to a folder where your scanner is able to put your scanned"
 echo "documents."
 echo ""
-echo "HINT: If paperless is unable to pick up any files from this directory after"
-echo "installation, you might need to configure PAPERLESS_CONSUMER_POLLING."
-echo "See the documentation for details."
-echo ""
-echo "CAUTION: You must specify an absolute path starting with /"
+echo "CAUTION: You must specify an absolute path starting with / or a relative "
+echo "path starting with ./ here. Examples:"
+echo "  /mnt/consume"
+echo "  ./consume"
 echo ""
 
-ask "Consume folder" "$TARGET_FOLDER/consume"
+ask_docker_folder "Consume folder" "$TARGET_FOLDER/consume"
 CONSUME_FOLDER=$ask_result
 
 echo ""
@@ -64,9 +104,10 @@ echo "Leave empty and docker will manage this folder for you."
 echo "Docker usually stores managed folders in /var/lib/docker/volumes."
 echo ""
 echo "CAUTION: If specified, you must specify an absolute path starting with /"
+echo "or a relative path starting with ./ here."
 echo ""
 
-ask "Media folder" ""
+ask_docker_folder "Media folder" ""
 MEDIA_FOLDER=$ask_result
 
 echo ""
@@ -74,8 +115,11 @@ echo "The data folder is where paperless stores other data, such as your"
 echo "SQLite database (if used), the search index and other data."
 echo "As with the media folder, leave empty to have this managed by docker."
 echo ""
+echo "CAUTION: If specified, you must specify an absolute path starting with /"
+echo "or a relative path starting with ./ here."
+echo ""
 
-ask "Data folder" ""
+ask_docker_folder "Data folder" ""
 DATA_FOLDER=$ask_result
 
 echo ""
@@ -166,8 +210,36 @@ done
 ask "Email" "$USERNAME@localhost"
 EMAIL=$ask_result
 
-echo "Done collecting data. Press any key to install."
-read
+echo ""
+echo "Summary"
+echo "======="
+echo ""
+
+echo "Target folder: $TARGET_FOLDER"
+echo "Consume folder: $CONSUME_FOLDER"
+if [[ -z $MEDIA_FOLDER ]] ; then
+	echo "Media folder: Managed by docker"
+else
+	echo "Media folder: $MEDIA_FOLDER"
+fi
+if [[ -z $DATA_FOLDER ]] ; then
+	echo "Data folder: Managed by docker"
+else
+	echo "Data folder: $DATA_FOLDER"
+fi
+echo ""
+echo "Port: $PORT"
+echo "Database: $DATABASE_BACKEND"
+echo "Tika enabled: $TIKA_ENABLED"
+echo "OCR language: $OCR_LANGUAGE"
+echo "User id: $USERMAP_UID"
+echo "Group id: $USERMAP_GID"
+echo ""
+echo "Paperless username: $USERNAME"
+echo "Paperless email: $EMAIL"
+
+echo ""
+read -p "Press any key to install."
 
 echo ""
 echo "Installing paperless..."
@@ -209,7 +281,7 @@ sed -i "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
 sed -i "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/paperless/consume#g" docker-compose.yml
 
 if [[ -n $MEDIA_FOLDER ]] ; then
-	sed -i "s#- data:/usr/src/paperless/media#- $MEDIA_FOLDER:/usr/src/paperless/media#g" docker-compose.yml
+	sed -i "s#- media:/usr/src/paperless/media#- $MEDIA_FOLDER:/usr/src/paperless/media#g" docker-compose.yml
 fi
 
 if [[ -n $DATA_FOLDER ]] ; then
