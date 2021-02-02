@@ -34,7 +34,7 @@ django-q==1.3.4
 django==3.1.6
 djangorestframework==3.12.2
 filelock==3.0.12
-fuzzywuzzy==0.18.0
+fuzzywuzzy[speedup]==0.18.0
 gunicorn==20.0.4
 h11==0.12.0; python_version >= '3.6'
 hiredis==1.1.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
