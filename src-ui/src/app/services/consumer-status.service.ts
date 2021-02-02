@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { WebsocketConsumerStatusMessage } from '../data/websocket-consumer-status-message';
 
 export enum FileStatusPhase {
@@ -77,7 +78,7 @@ export class ConsumerStatusService {
 
   constructor() { }
 
-  private statusWebSocked: WebSocket
+  private statusWebSocket: WebSocket
 
   private consumerStatus: FileStatus[] = []
 
@@ -123,8 +124,9 @@ export class ConsumerStatusService {
 
   connect() {
     this.disconnect()
-    this.statusWebSocked = new WebSocket("ws://localhost:8000/ws/status/");
-    this.statusWebSocked.onmessage = (ev) => {
+
+    this.statusWebSocket = new WebSocket(`${environment.webSocketProtocol}//${environment.webSocketHost}/ws/status/`);
+    this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
 
       let statusMessageGet = this.get(statusMessage.task_id, statusMessage.filename)
@@ -160,9 +162,9 @@ export class ConsumerStatusService {
   }
 
   disconnect() {
-    if (this.statusWebSocked) {
-      this.statusWebSocked.close()
-      this.statusWebSocked = null
+    if (this.statusWebSocket) {
+      this.statusWebSocket.close()
+      this.statusWebSocket = null
     }
   }
 
