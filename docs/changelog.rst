@@ -5,6 +5,57 @@
 Changelog
 *********
 
+paperless-ng 1.1.0
+##################
+
+* Document processing status
+
+  * Paperless now shows the status of processing documents on the dashboard in real time.
+  * Status notifications when
+
+    * New documents are detected in the consumption folder, in mails, uploaded on the front end,
+      or added with one of the mobile apps.
+    * Documents are successfully added to paperless.
+    * Document consumption failed (with error messages)
+  
+  * Configuration options to enable/disable individual notifications.
+
+* Live updates to document lists and saved views when new documents are added.
+
+  .. hint::
+
+    For status notifications and live updates to work, paperless now requires an `ASGI <https://asgi.readthedocs.io/en/latest/>`_-enabled
+    web server. The docker images uses ``gunicorn`` and an ASGI-enabled worker called `uvicorn <http://www.uvicorn.org/>`_,
+    and there is no need to configure anything.
+
+    For bare metal installations, changes are required for the notifications to work. Adapt the service ``paperless-webserver.service``
+    to use the supplied ``gunicorn.conf.py`` configuration file and adapt the reference to the ASGI application as follows:
+
+    .. code::
+
+      ExecStart=/opt/paperless/.local/bin/gunicorn -c /opt/paperless/gunicorn.conf.py paperless.asgi:application
+
+    Paperless will continue to work with WSGI, but you will not get any status notifications.
+
+* Paperless now offers suggestions for tags, correspondents and types on the document detail page.
+
+* Added an interactive easy install script that automatically downloads, configures and starts paperless with docker.
+
+* Official support for Python 3.9.
+
+* Other changes and fixes
+
+  * Adjusted the default parallelization settings to run more than one task in parallel on systems with 4 or less cores.
+    This addresses issues with paperless not consuming any new files when other tasks are running.
+
+  * Fixed a rare race condition that would cause paperless to process incompletely written files when using the upload on the dashboard.
+
+  * The document classifier no longer issues warnings and errors when auto matching is not used at all.
+
+  * Better icon for document previews.
+
+  * Better info section in the side bar.
+
 paperless-ng 1.0.0
 ##################
 
