@@ -1,6 +1,12 @@
 name: ci
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'translations_**'
+  pull_request:
+    branches-ignore:
+      - 'translations_**'
 
 jobs:
   documentation:
