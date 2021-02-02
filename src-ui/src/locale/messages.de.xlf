@@ -1664,7 +1664,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7446520539098045935">
         <source>Upload complete, waiting...</source>
-        <target>Dateo hochgeladen, warte...</target>
+        <target>Datei hochgeladen, warte...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">126</context>
@@ -2038,7 +2038,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="2056433880533904076">
         <source>Light blue</source>
-        <target>Hellblau</target>
+        <target>Blau, hell</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
           <context context-type="linenumber">6</context>
@@ -2054,7 +2054,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="1143414876575720034">
         <source>Light green</source>
-        <target>Hellgrün</target>
+        <target>Grün, hell</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
           <context context-type="linenumber">8</context>
@@ -2070,7 +2070,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="3250646524116252719">
         <source>Light red</source>
-        <target>Hellrot</target>
+        <target>Rot, hell</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
           <context context-type="linenumber">10</context>
@@ -2086,7 +2086,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="5479028842846122610">
         <source>Light orange</source>
-        <target>Hellorange</target>
+        <target>Orange, hell</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
           <context context-type="linenumber">12</context>
@@ -2102,7 +2102,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="1789283185177957430">
         <source>Light violet</source>
-        <target>Hellviolet</target>
+        <target>Violet, hell</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
           <context context-type="linenumber">14</context>
@@ -2134,7 +2134,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="461048771215121187">
         <source>Light grey</source>
-        <target>Hellgrau</target>
+        <target>Grau, hell</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
           <context context-type="linenumber">18</context>
