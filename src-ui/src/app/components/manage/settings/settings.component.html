@@ -99,20 +99,6 @@
           </div>
         </div>
 
-        <h4 class="mt-4" i18n>Notifications</h4>
-
-        <div class="form-row form-group">
-          <div class="col-md-3 col-form-label">
-            <span i18n>Document processing</span>
-          </div>
-          <div class="col">
-            <app-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></app-input-check>
-            <app-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></app-input-check>
-            <app-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></app-input-check>
-            <app-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></app-input-check>
-          </div>
-        </div>
-
         <h4 class="mt-4" i18n>Bulk editing</h4>
 
         <div class="form-row form-group">
@@ -124,7 +110,26 @@
 
       </ng-template>
     </li>
+    
     <li [ngbNavItem]="2">
+      <a ngbNavLink i18n>Notifications</a>
+      <ng-template ngbNavContent>
+        
+        <h4 i18n>Document processing</h4>
+
+        <div class="form-row form-group">
+          <div class="offset-md-3 col">
+            <app-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></app-input-check>
+            <app-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></app-input-check>
+            <app-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></app-input-check>
+            <app-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></app-input-check>
+          </div>
+        </div>
+
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="3">
       <a ngbNavLink i18n>Saved views</a>
       <ng-template ngbNavContent>
 
