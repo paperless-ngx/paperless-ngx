@@ -20,8 +20,12 @@
     <div *ngFor="let status of getStatus()">
       <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
     </div>
-    <div *ngIf="getStatusHidden().length" class="alerts-hidden">
-      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center"><span i18n>{{getStatusHidden().length}} more hidden</span> <button class="btn btn-sm btn-link py-0" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</button></p>
+    <div *ngIf="!getStatusHidden().length" class="alerts-hidden">
+      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center">
+        <span i18n="This is shown as a summary line when there are more than 5 document in the processing pipeline.">{getStatusHidden().length, plural, =1 {One more document} other {{{getStatusHidden().length}} more documents}}</span>
+        &nbsp;&bull;&nbsp;
+        <a [routerLink]="" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
+      </p>
       <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
         <div *ngFor="let status of getStatusHidden()">
           <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
