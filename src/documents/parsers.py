@@ -273,10 +273,9 @@ class DocumentParser(LoggingMixin):
         self.date = None
         self.progress_callback = progress_callback
 
-    def progress(self, current, max):
-        print(self.progress_callback)
+    def progress(self, current_progress, max_progress):
         if self.progress_callback:
-            self.progress_callback(current, max)
+            self.progress_callback(current_progress, max_progress)
 
     def extract_metadata(self, document_path, mime_type):
         return []

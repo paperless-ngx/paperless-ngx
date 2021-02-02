@@ -190,11 +190,11 @@ class RasterisedDocumentParser(DocumentParser):
             # Also, no archived file.
             if not self.text:
                 # However, if we don't have anything, fail:
-                raise ParseError(e.__class__.__name__ + ": " + str(e))
+                raise ParseError(f"{e.__class__.__name__}: {str(e)}")
 
         except Exception as e:
             # Anything else is probably serious.
-            raise ParseError(e.__class__.__name__ + ": " + str(e))
+            raise ParseError(f"{e.__class__.__name__}: {str(e)}")
 
         if not self.text:
             # This may happen for files that don't have any text.
