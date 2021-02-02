@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def _tags_from_path(filepath):
-    """Walk up the directory tree from filepath to CONSUMPTION_DIr
+    """Walk up the directory tree from filepath to CONSUMPTION_DIR
        and get or create Tag IDs for every directory.
     """
     tag_ids = set()
