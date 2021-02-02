@@ -4,10 +4,10 @@ name: Ansible Role
 on:
   push:
     branches-ignore:
-      - 'translations_**'
+      - 'translations**'
   pull_request:
     branches-ignore:
-      - 'translations_**'
+      - 'translations**'
 
 jobs:
   # https://molecule.readthedocs.io/en/latest/ci.html#github-actions

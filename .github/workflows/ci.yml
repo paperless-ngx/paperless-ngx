@@ -3,10 +3,10 @@ name: ci
 on:
   push:
     branches-ignore:
-      - 'translations_**'
+      - 'translations**'
   pull_request:
     branches-ignore:
-      - 'translations_**'
+      - 'translations**'
 
 jobs:
   documentation:
