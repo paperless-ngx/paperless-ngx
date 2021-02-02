@@ -785,9 +785,9 @@
           <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="69c5a98f8aa92e4db060f10dcd37781c8f40a48f">
-        <source>Consumer status</source>
-        <target>Status Dokumentenverarbeitung</target>
+      <trans-unit datatype="html" id="8680abbea249ebe9c2fe35556559c8e1a9eb5841">
+        <source>Document processing</source>
+        <target>Dokumentverarbeitung</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">106</context>
@@ -801,17 +801,17 @@
           <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="f2361d3f65b6c77ef0a15fad8af8e858b043ace3">
-        <source>Show notifications when document consumption completes successfully</source>
-        <target>Zeige Benachrichtigungen wenn neue Dokumente erfolgreich hinzugefügt wurden.</target>
+      <trans-unit datatype="html" id="e775f4f7c40249d31426ae61a21616a0c9d8e84f">
+        <source>Show notifications when document processing completes successfully</source>
+        <target>Zeige Benachrichtigungen wenn neue Dokumente erfolgreich hinzugefügt wurden</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="2bcbcbe99e207803e21183580b98d90410dd8718">
-        <source>Show notifications when document consumption fails</source>
-        <target>Zeige Benachrichtigungen wenn Dokumente nicht hinzugefügt werden können</target>
+      <trans-unit datatype="html" id="e3844dd174d8e817ddb551fae28f14ae80ca36b6">
+        <source>Show notifications when document processing fails</source>
+        <target>Zeige Benachrichtigungen wenn Dokumente nicht hinzugefügt werden konnten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">111</context>
@@ -825,8 +825,8 @@
           <context context-type="linenumber">112</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="59fe5c9233a2aaab3079a2300e4dfa439ddb1890">
-        <source>This will suppress all consumer related status messages on the dashboard.</source>
+      <trans-unit datatype="html" id="e27bd3804d2936a6897e81c2e52e294490e5e5a8">
+        <source>This will suppress all messages about document processing status on the dashboard.</source>
         <target>Dadurch werden alle Benachrichtigungen über die Dokumentenverarbeitung auf der Startseite unterdrückt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
@@ -1662,9 +1662,9 @@
           <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="3994065460580948013">
-        <source>Waiting for consumer...</source>
-        <target>Warte auf Consumer...</target>
+      <trans-unit datatype="html" id="7446520539098045935">
+        <source>Upload complete, waiting...</source>
+        <target>Dateo hochgeladen, warte...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">126</context>
@@ -1701,21 +1701,23 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
+        <note from="description" priority="1">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
       </trans-unit>
-      <trans-unit datatype="html" id="1fc4e0a1e93fdda0ed3c9e590971d283afb68265">
-        <source><x equiv-text="{{getStatusHidden().length}}" id="INTERPOLATION"/> more hidden</source>
-        <target><x equiv-text="{{getStatusHidden().length}}" id="INTERPOLATION"/> weitere versteckt</target>
+      <trans-unit datatype="html" id="90917e1a0a7bb59e9d11bdde9183e9391963e17b">
+        <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
+        <target>{VAR_PLURAL, plural, =1 {Ein weiteres Dokument} other {<x id="INTERPOLATION"/> weitere Dokumente}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
+        <note from="description" priority="1">This is shown as a summary line when there are more than 5 document in the processing pipeline.</note>
       </trans-unit>
       <trans-unit datatype="html" id="710254a196a2649674438edf8a15b7ab1f48271b">
         <source>Open document</source>
         <target>Dokument öffnen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="45854ddec74086b271e62be6a363f4fa5036f7fc">
@@ -1877,6 +1879,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
+        <note from="description" priority="1">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="7742915911032564889">
         <source>Error while executing pre-consume script.</source>
@@ -1885,6 +1888,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
+        <note from="description" priority="1">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="8995193730018060346">
         <source>Post-consume script does not exist.</source>
@@ -1893,6 +1897,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
+        <note from="description" priority="1">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="256773668518189604">
         <source>Error while executing post-consume script.</source>
@@ -1901,6 +1906,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
+        <note from="description" priority="1">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="6252258095055634191">
         <source>Received new file.</source>
