@@ -1,7 +1,7 @@
 <app-widget-frame title="Upload new documents" i18n-title>
   <div header-buttons>
     <a *ngIf="getStatusCompleted().length > 0" (click)="dismissAll()" [routerLink]="" >
-      <span i18n>Dismiss completed</span>&nbsp;
+      <span i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>&nbsp;
       <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
         <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7l-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
         <path d="M5.354 7.146l.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>

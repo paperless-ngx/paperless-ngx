@@ -123,7 +123,7 @@ export class UploadFileWidgetComponent implements OnInit {
               status.message = $localize`Uploading...`
             } else if (event.type == HttpEventType.Response) {
               status.taskId = event.body["task_id"]
-              status.message = $localize`Waiting for consumer...`
+              status.message = $localize`Upload complete, waiting...`
             }
 
           }, error => {
