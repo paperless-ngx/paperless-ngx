@@ -1,14 +1,19 @@
 import json
 
 from asgiref.sync import async_to_sync
+from channels.exceptions import DenyConnection, AcceptConnection
 from channels.generic.websocket import WebsocketConsumer
 
 
 class StatusConsumer(WebsocketConsumer):
+
     def connect(self):
-        self.accept()
-        async_to_sync(self.channel_layer.group_add)(
-            'status_updates', self.channel_name)
+        if not self.scope['user'].is_authenticated:
+            raise DenyConnection()
+        else:
+            async_to_sync(self.channel_layer.group_add)(
+                'status_updates', self.channel_name)
+            raise AcceptConnection()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
