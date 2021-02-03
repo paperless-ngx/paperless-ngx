@@ -133,7 +133,7 @@ export class UploadFileWidgetComponent implements OnInit {
                 break;
               }
               default: {
-                this.consumerStatusService.fail(status, `${error.status} ${error.statusText}`)
+                this.consumerStatusService.fail(status, $localize`HTTP error: ${error.status} ${error.statusText}`)
                 break;
               }
             }
