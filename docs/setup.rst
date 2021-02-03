@@ -588,7 +588,7 @@ Migration to paperless-ng is then performed in a few simple steps:
     paperless.
 
 3.  Download the latest release of paperless-ng. You can either go with the
-    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`__
     or clone the repository to build the image yourself (see :ref:`above <setup-docker_build>`).
     You can either replace your current paperless folder or put paperless-ng
     in a different location.
@@ -787,3 +787,46 @@ For details, refer to :ref:`configuration`.
     well as on any other device.
 
 .. _redis: https://redis.io/
+
+
+.. _setup-nginx:
+
+Using nginx as a reverse proxy
+##############################
+
+If you want to expose paperless to the internet, you should hide it behind a
+reverse proxy with SSL enabled. 
+
+In addition to the usual configuration for SSL,
+the following configuration is required for paperless to operate:
+
+.. code:: nginx
+
+    http {
+
+        # Adjust as required. This is the maximum size for file uploads.
+        # The default value 1M might be a little too small.
+        client_max_body_size 10M;
+
+        server {
+
+            location / {
+
+                # Adjust host and port as required.
+                proxy_pass http://localhost:8000/;
+
+                # These configuration options are required for WebSockets to work.
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+                proxy_redirect off;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+        }
+    }
+
+Also read `this <https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu>`__, towards the end of the section.
