@@ -7,8 +7,11 @@ from channels.generic.websocket import WebsocketConsumer
 
 class StatusConsumer(WebsocketConsumer):
 
+    def _authenticated(self):
+        return 'user' in self.scope and self.scope['user'].is_authenticated
+
     def connect(self):
-        if not self.scope['user'].is_authenticated:
+        if not self._authenticated():
             raise DenyConnection()
         else:
             async_to_sync(self.channel_layer.group_add)(
@@ -20,4 +23,7 @@ class StatusConsumer(WebsocketConsumer):
             'status_updates', self.channel_name)
 
     def status_update(self, event):
-        self.send(json.dumps(event['data']))
+        if not self._authenticated():
+            self.close()
+        else:
+            self.send(json.dumps(event['data']))
