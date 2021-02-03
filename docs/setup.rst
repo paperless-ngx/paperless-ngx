@@ -176,7 +176,10 @@ Install Paperless from Docker Hub
 
 5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
-    to the uid and gid of your user on the host system. This ensures that
+    to the uid and gid of your user on the host system. Use ``id -u`` and
+    ``id -g`` to get these.
+
+    This ensures that
     both the docker container and you on the host machine have write access
     to the consumption directory. If your UID and GID on the host system is
     1000 (the default for the first normal user on most systems), it will
@@ -195,14 +198,10 @@ Install Paperless from Docker Hub
         with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
         which will disable inotify. See :ref:`here <configuration-polling>`.
 
-6.  Now head over to: https://hub.docker.com/r/jonaswinkler/paperless-ng and choose your preferred
-    image and copy the link. To download this image do a `docker pull` followed by the link. Do this within the directory with the .yml files.
-    Depending on your network connection and CPU this will take a while. You have time to get a beverage.
+6.  Run ``docker-compose pull``, followed by ``docker-compose up -d``.
+    This will pull the image, create and start the necessary containers.
 
-7.  Run ``docker-compose up -d``. This will create and start the necessary
-    containers, but your are not done yet!
-
-8.  To be able to login, you will need a super user. To create it, execute the
+7.  To be able to login, you will need a super user. To create it, execute the
     following command:
 
     .. code-block:: shell-session
@@ -212,8 +211,8 @@ Install Paperless from Docker Hub
     This will prompt you to set a username, an optional e-mail address and
     finally a password (at least 8 characters).
 
-9.  The default ``docker-compose.yml`` exports the webserver on your local port
-    8000. If you haven't adapted this, you should now be able to visit your
+8.  The default ``docker-compose.yml`` exports the webserver on your local port
+    8000. If you did not change this, you should now be able to visit your
     Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000.
     Use the login credentials you have created with the previous step.
 
@@ -481,7 +480,7 @@ Install Paperless using ansible
     .. code:: sh
 
         cd paperless-ng
-        git checkout ng-0.9.14
+        git checkout ng-1.0.0
 
 3.  Create an ansible ``playbook.yml`` in the paperless-ng root directory:
 
@@ -531,7 +530,7 @@ Install Paperless using ansible
 
     .. code:: yaml
 
-        paperless_secret_key: PleaseGenerateAStrongKeyForThis
+        paperlessng_secret_key: PleaseGenerateAStrongKeyForThis
 
         paperlessng_superuser_name: YourUserName
         paperlessng_superuser_email: name@domain.tld
