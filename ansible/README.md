@@ -107,7 +107,7 @@ Example Playbook
     paperlessng_db_type: postgresql
     paperlessng_db_pass: PLEASEPROVIDEASTRONGPASSWORDHERE
 
-    paperless_secret_key: AGAINPLEASECHANGETHISNOW
+    paperlessng_secret_key: AGAINPLEASECHANGETHISNOW
 
     paperlessng_ocr_languages:
       - eng

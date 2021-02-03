@@ -286,21 +286,21 @@
       line: "PAPERLESS_FILENAME_FORMAT={{ paperlessng_filename_format }}"
     # Hosting & Security
     - regexp: PAPERLESS_SECRET_KEY
-      line: "PAPERLESS_SECRET_KEY={{ paperless_secret_key }}"
+      line: "PAPERLESS_SECRET_KEY={{ paperlessng_secret_key }}"
     - regexp: PAPERLESS_ALLOWED_HOSTS
-      line: "PAPERLESS_ALLOWED_HOSTS={{ paperless_allowed_hosts }}"
+      line: "PAPERLESS_ALLOWED_HOSTS={{ paperlessng_allowed_hosts }}"
     - regexp: PAPERLESS_CORS_ALLOWED_HOSTS
-      line: "PAPERLESS_CORS_ALLOWED_HOSTS={{ paperless_cors_allowed_hosts }}"
+      line: "PAPERLESS_CORS_ALLOWED_HOSTS={{ paperlessng_cors_allowed_hosts }}"
     - regexp: PAPERLESS_FORCE_SCRIPT_NAME
-      line: "PAPERLESS_FORCE_SCRIPT_NAME={{ paperless_force_script_name }}"
+      line: "PAPERLESS_FORCE_SCRIPT_NAME={{ paperlessng_force_script_name }}"
     - regexp: PAPERLESS_STATIC_URL
-      line: "PAPERLESS_STATIC_URL={{ paperless_static_url }}"
+      line: "PAPERLESS_STATIC_URL={{ paperlessng_static_url }}"
     - regexp: PAPERLESS_AUTO_LOGIN_USERNAME
-      line: "PAPERLESS_AUTO_LOGIN_USERNAME={{ paperless_auto_login_username }}"
+      line: "PAPERLESS_AUTO_LOGIN_USERNAME={{ paperlessng_auto_login_username }}"
     - regexp: PAPERLESS_COOKIE_PREFIX
-      line: "PAPERLESS_COOKIE_PREFIX={{ paperless_cookie_prefix }}"
+      line: "PAPERLESS_COOKIE_PREFIX={{ paperlessng_cookie_prefix }}"
     - regexp: PAPERLESS_ENABLE_HTTP_REMOTE_USER
-      line: "PAPERLESS_ENABLE_HTTP_REMOTE_USER={{ paperless_enable_http_remote_user }}"
+      line: "PAPERLESS_ENABLE_HTTP_REMOTE_USER={{ paperlessng_enable_http_remote_user }}"
     # OCR settings
     - regexp: PAPERLESS_OCR_LANGUAGE
       line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
