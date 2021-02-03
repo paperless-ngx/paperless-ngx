@@ -88,7 +88,7 @@ You can go multiple routes to setup and run Paperless:
 
 The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
 from the above automatically so that it just works and uses sensible defaults for all configuration options.
-Here you find a cheat-sheet for docker beginners: `CLI Basics <https://sehn.tech/post/devops-with-docker/>`_ 
+Here you find a cheat-sheet for docker beginners: `CLI Basics <https://sehn.tech/post/devops-with-docker/>`_
 
 The bare metal route is complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
@@ -126,7 +126,7 @@ Install Paperless from Docker Hub
 
         If you want to use the included ``docker-compose.*.yml`` file, you
         need to have at least Docker version **17.09.0** and docker-compose
-        version **1.17.0**.  
+        version **1.17.0**.
         To check do: `docker-compose -v` or `docker -v`
 
         See the `Docker installation guide`_ on how to install the current
@@ -151,7 +151,7 @@ Install Paperless from Docker Hub
     .. code::
 
         - /home/jonaswinkler/paperless-inbox:/usr/src/paperless/consume
-    
+
     Don't change the part after the colon or paperless wont find your documents.
 
 
@@ -159,7 +159,7 @@ Install Paperless from Docker Hub
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
     to the uid and gid of your user on the host system. Use ``id -u`` and
     ``id -g`` to get these.
-    
+
     This ensures that
     both the docker container and you on the host machine have write access
     to the consumption directory. If your UID and GID on the host system is
@@ -194,7 +194,7 @@ Install Paperless from Docker Hub
 
 8.  The default ``docker-compose.yml`` exports the webserver on your local port
     8000. If you did not change this, you should now be able to visit your
-    Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000. 
+    Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000.
     Use the login credentials you have created with the previous step.
 
 .. _Docker: https://www.docker.com/
@@ -223,7 +223,7 @@ Build the docker image yourself
 
         webserver:
             image: jonaswinkler/paperless-ng:latest
-    
+
     and replace it with a line that instructs docker-compose to build the image from the current working directory instead:
 
     .. code:: yaml
@@ -426,7 +426,7 @@ Install Paperless using ansible
 
         This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
 
-1.  Install ansible 2.7+ on the management node. 
+1.  Install ansible 2.7+ on the management node.
     This may be the target host paperless-ng is being installed on or any remote host which can access the target host.
     For further details, check the ansible `inventory <https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html>`_ documentation.
 
@@ -461,7 +461,7 @@ Install Paperless using ansible
     .. code:: sh
 
         cd paperless-ng
-        git checkout ng-0.9.14
+        git checkout ng-1.0.0
 
 3.  Create an ansible ``playbook.yml`` in the paperless-ng root directory:
 
@@ -511,7 +511,7 @@ Install Paperless using ansible
 
     .. code:: yaml
 
-        paperless_secret_key: PleaseGenerateAStrongKeyForThis
+        paperlessng_secret_key: PleaseGenerateAStrongKeyForThis
 
         paperlessng_superuser_name: YourUserName
         paperlessng_superuser_email: name@domain.tld
@@ -584,7 +584,7 @@ Migration to paperless-ng is then performed in a few simple steps:
         .. code:: shell-session
 
             $ docker volume ls | grep _data
-        
+
         and adjust the project name in the ``.env`` file so that it matches the name
         of the volumes before the ``_data`` part.
 
