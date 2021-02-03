@@ -214,7 +214,7 @@
         <target>Löschen bestätigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5382975254277698192">
@@ -222,7 +222,7 @@
         <target>Möchten Sie das Dokument &quot;<x equiv-text="this.document.title" id="PH"/>&quot; wirklich löschen?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">204</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6691075929777935948">
@@ -230,7 +230,7 @@
         <target>Die Dateien dieses Dokuments werden permanent gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="719892092227206532">
@@ -238,7 +238,7 @@
         <target>Dokument löschen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">207</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1844801255494293730">
@@ -246,7 +246,7 @@
         <target>Fehler beim Löschen des Dokuments: <x equiv-text="JSON.stringify(error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">214</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="826b25211922a1b46436589233cb6f1a163d89b7">
@@ -427,7 +427,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="203c7adb5bd74ae18e84e1e3b66ddfe76bc0023f">
         <source>Original document metadata</source>
-        <target>Original-Metadaten</target>
+        <target>Metadaten Original</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">121</context>
@@ -435,7 +435,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7174dcea4a3d0b743e7e4a78747e902230727f67">
         <source>Archived document metadata</source>
-        <target>Metadaten des archivierten Dokuments</target>
+        <target>Metadaten Archiv</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">122</context>
@@ -451,7 +451,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="8765497970646365998">
         <source>Hello <x equiv-text="this.displayName" id="PH"/>, welcome to Paperless-ng!</source>
-        <target>Hallo <x equiv-text="this.displayName" id="PH"/>, Willkommen zu Paperless-ng</target>
+        <target>Hallo <x equiv-text="this.displayName" id="PH"/>, willkommen zu Paperless-ng!</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
@@ -1678,6 +1678,14 @@
           <context context-type="linenumber">126</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="1405142710727603568">
+        <source>HTTP error: <x equiv-text="error.status" id="PH"/> <x equiv-text="error.statusText" id="PH_1"/></source>
+        <target>HTTP-Fehler: <x equiv-text="error.status" id="PH"/> <x equiv-text="error.statusText" id="PH_1"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="e022072b3e4dd77e3f09960817ef3359a49963b3">
         <source>Upload new documents</source>
         <target>Neue Dokumente hochladen</target>
@@ -1746,7 +1754,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="ea8d9a9486d5639d1c38c012900b8d34d5e4135d">
         <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they'll start showing up in the documents list. After you've added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as 'Recently added', 'Tagged TODO') and they will appear on the dashboard instead of this message.</source>
-        <target>Sie können Ihre Dokumente hochladen, indem Sie sie in die Hochladebox auf der rechten Seite ziehen oder in den konfigurierten Ablageordner kopieren/verschieben. Danach werden sie inder Dokumentliste erscheinen. Nachdem Sie den Dokumenten einige Metadaten zugewiesen haben, können Sie die Filtermechanismen zur Erstellung individueller Ansichten benutzen (zum Beispiel &quot;Kürzlich hinzugefügt&quot; oder &quot;Mit TODO markiert&quot;) und die Ansichten werden auf der Startseite erscheinen und diese Nachricht ersetzen.</target>
+        <target>Sie können Ihre Dokumente hochladen, indem Sie sie in die Hochladebox auf der rechten Seite ziehen oder in den konfigurierten Ablageordner kopieren/verschieben. Danach werden sie in der Dokumentenliste erscheinen. Nachdem Sie den Dokumenten einige Metadaten zugewiesen haben, können Sie die Filtermechanismen zur Erstellung individueller Ansichten benutzen (zum Beispiel &quot;Kürzlich hinzugefügt&quot; oder &quot;Mit TODO markiert&quot;) und die Ansichten werden auf der Startseite anstelle dieser Nachricht erscheinen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
@@ -1762,7 +1770,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="edb41dc36af2e70789d8e3422325d930e783253e">
         <source>Once you've got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</source>
-        <target>Nachdem Sie einige Dokumente hochgeladen und mit Metadatebn haben, kann Paperless diese Metadaten automatisch passenden neuen Dokumenten zuweisen.</target>
+        <target>Nachdem Sie einige Dokumente hochgeladen und diesen Korrespondenten, Tags und Dokumenttypen zugewiesen haben, kann Paperless-ng diese Metadaten automatisch passenden neuen Dokumenten zuweisen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
@@ -1770,7 +1778,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="9dca488928c0b7af46c3866f86a6c2c8548399aa">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
-        <target>Sie können in Paperless Ihre E-Mail-Konten einrichten und Paperless wird automatisch Dokumente aus Dateianhängen erzeugen.</target>
+        <target>Sie können in Paperless Ihre E-Mail-Konten einrichten und Paperless wird automatisch Dokumente aus Dateianhängen hinzufügen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
@@ -1869,7 +1877,7 @@
         <target>Dokument existiert bereits.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="148389968432135849">
@@ -1877,7 +1885,7 @@
         <target>Datei nicht gefunden.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1520671543092565667">
@@ -1885,7 +1893,7 @@
         <target>Pre-Consume-Skript existiert nicht.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <note from="description" priority="1">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -1894,7 +1902,7 @@
         <target>Fehler beim Ausführen des Pre-Consume-Skripts.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <note from="description" priority="1">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -1903,7 +1911,7 @@
         <target>Post-Consume-Skript existiert nicht.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <note from="description" priority="1">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -1912,7 +1920,7 @@
         <target>Fehler beim Ausführen des Post-Consume-Skripts.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <note from="description" priority="1">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -1921,7 +1929,7 @@
         <target>Neue Datei erhalten.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7337565919209746135">
@@ -1929,7 +1937,7 @@
         <target>Dateityp wird nicht unterstützt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5002399167376099234">
@@ -1937,7 +1945,7 @@
         <target>Verarbeite Dokument...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1085975194762600381">
@@ -1945,7 +1953,7 @@
         <target>Erzeuge Miniaturbild...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3280851677698431426">
@@ -1953,7 +1961,7 @@
         <target>Ermittle Datum des Dokuments...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7162102384876037296">
@@ -1961,7 +1969,7 @@
         <target>Speichere Dokument...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4550450765009165976">
@@ -1969,7 +1977,7 @@
         <target>Abgeschlossen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1519954996184640001">
@@ -2222,7 +2230,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7517655726614958140">
         <source>Any: Document contains any of these words (space separated)</source>
-        <target>Irgendein Wort: Dokument enthält eins der folgender Wörter</target>
+        <target>Irgendein Wort: Dokument enthält eins der folgenden Wörter</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
@@ -2270,7 +2278,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="7548151332424148033">
         <source>Regular expression: Document matches this regular expression</source>
-        <target>Regulärer Ausdruck: Dokument passt zum folgenden Audruck</target>
+        <target>Regulärer Ausdruck: Dokument passt zum folgenden Ausdruck</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
@@ -2286,7 +2294,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="8419167206585286450">
         <source>Fuzzy: Document contains a word similar to this word</source>
-        <target>Ungenau: Dokument enthält ein zum folgendem Wort ähnliches Wort</target>
+        <target>Ungenau: Dokument enthält ein zum folgenden Wort ähnliches Wort</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
