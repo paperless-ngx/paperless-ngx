@@ -115,9 +115,13 @@ export class DocumentDetailComponent implements OnInit {
     this.document = doc
     this.documentsService.getMetadata(doc.id).subscribe(result => {
       this.metadata = result
+    }, error => {
+      this.metadata = null
     })
     this.documentsService.getSuggestions(doc.id).subscribe(result => {
       this.suggestions = result
+    }, error => {
+      this.suggestions = null
     })
     this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)
