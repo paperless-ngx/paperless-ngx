@@ -37,6 +37,8 @@ paperless-ng 1.1.0
 
     Paperless will continue to work with WSGI, but you will not get any status notifications.
 
+    Apache ``mod_wsgi`` users, see :ref:`this note <faq-mod_wsgi>`.
+
 * Paperless now offers suggestions for tags, correspondents and types on the document detail page.
 
 * Added an interactive easy install script that automatically downloads, configures and starts paperless with docker.
