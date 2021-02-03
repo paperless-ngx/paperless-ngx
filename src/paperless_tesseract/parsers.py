@@ -200,7 +200,7 @@ class RasterisedDocumentParser(DocumentParser):
             # This may happen for files that don't have any text.
             self.log(
                 'warning',
-                f"Document {document_path} does not have any text."
+                f"Document {document_path} does not have any text. "
                 f"This is probably an error or you tried to add an image "
                 f"without text, or something is wrong with this document.")
             self.text = ""
