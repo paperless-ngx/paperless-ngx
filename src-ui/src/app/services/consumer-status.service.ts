@@ -176,8 +176,8 @@ export class ConsumerStatusService {
     }
   }
 
-  dismissAll() {
-    this.consumerStatus = this.consumerStatus.filter(status => status.phase < FileStatusPhase.SUCCESS)
+  dismissCompleted() {
+    this.consumerStatus = this.consumerStatus.filter(status => status.phase != FileStatusPhase.SUCCESS)
   }
 
   onDocumentConsumptionFinished() {
