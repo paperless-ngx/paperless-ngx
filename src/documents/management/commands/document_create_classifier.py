@@ -1,10 +1,9 @@
 from django.core.management.base import BaseCommand
 
-from ...mixins import Renderable
 from ...tasks import train_classifier
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Trains the classifier on your data and saves the resulting models to a
