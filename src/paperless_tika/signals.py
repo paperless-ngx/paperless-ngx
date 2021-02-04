@@ -1,9 +1,13 @@
-from .parsers import TikaDocumentParser
+
+def get_parser(*args, **kwargs):
+    from .parsers import TikaDocumentParser
+
+    return TikaDocumentParser(*args, **kwargs)
 
 
 def tika_consumer_declaration(sender, **kwargs):
     return {
-        "parser": TikaDocumentParser,
+        "parser": get_parser,
         "weight": 10,
         "mime_types": {
             "application/msword": ".doc",
