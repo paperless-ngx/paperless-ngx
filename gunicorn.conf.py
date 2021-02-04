@@ -1,7 +1,7 @@
 bind = '0.0.0.0:8000'
 workers = 2
 worker_class = 'uvicorn.workers.UvicornWorker'
-timeout = 20
+timeout = 60
 
 def pre_fork(server, worker):
     pass
