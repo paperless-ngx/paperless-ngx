@@ -114,8 +114,8 @@ class TestParserAvailability(TestCase):
         self.assertEqual(get_default_file_extension('application/zip'), ".zip")
         self.assertEqual(get_default_file_extension('aasdasd/dgfgf'), "")
 
-        self.assertEqual(get_parser_class_for_mime_type('application/pdf'), RasterisedDocumentParser)
-        self.assertEqual(get_parser_class_for_mime_type('text/plain'), TextDocumentParser)
+        self.assertIsInstance(get_parser_class_for_mime_type('application/pdf')(logging_group=None), RasterisedDocumentParser)
+        self.assertIsInstance(get_parser_class_for_mime_type('text/plain')(logging_group=None), TextDocumentParser)
         self.assertEqual(get_parser_class_for_mime_type('text/sdgsdf'), None)
 
         self.assertTrue(is_file_ext_supported('.pdf'))
