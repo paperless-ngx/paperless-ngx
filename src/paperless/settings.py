@@ -160,6 +160,8 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
+            "capacity": 2000,  # default 100
+            "expiry": 15,  # default 60
         },
     },
 }
