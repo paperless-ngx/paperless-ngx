@@ -130,6 +130,15 @@ class TestClassifier(DirectoriesMixin, TestCase):
         new_classifier.reload()
         self.assertFalse(new_classifier.train())
 
+    @override_settings(MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"))
+    def test_load_and_classify(self):
+        self.generate_test_data()
+
+        new_classifier = DocumentClassifier()
+        new_classifier.reload()
+
+        self.assertCountEqual(new_classifier.predict_tags(self.doc2.content), [45, 12])
+
     def test_one_correspondent_predict(self):
         c1 = Correspondent.objects.create(name="c1", matching_algorithm=Correspondent.MATCH_AUTO)
         doc1 = Document.objects.create(title="doc1", content="this is a document from c1", correspondent=c1, checksum="A")
