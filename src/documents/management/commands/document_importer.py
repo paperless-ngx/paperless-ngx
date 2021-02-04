@@ -15,7 +15,6 @@ from documents.models import Document
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
 from ...file_handling import create_source_path_directory
-from ...mixins import Renderable
 from ...signals.handlers import update_filename_and_move_files
 
 
@@ -28,7 +27,7 @@ def disable_signal(sig, receiver, sender):
         sig.connect(receiver=receiver, sender=sender)
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Using a manifest.json file, load the data from there, and import the

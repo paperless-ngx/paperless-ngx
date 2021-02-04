@@ -17,7 +17,6 @@ from whoosh.writing import AsyncWriter
 from documents.models import Document
 from ... import index
 from ...file_handling import create_source_path_directory
-from ...mixins import Renderable
 from ...parsers import get_parser_class_for_mime_type
 
 
@@ -62,7 +61,7 @@ def handle_document(document_id):
         parser.cleanup()
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Using the current classification model, assigns correspondents, tags
@@ -70,10 +69,6 @@ class Command(Renderable, BaseCommand):
         back-tag all previously indexed documents with metadata created (or
         modified) after their initial import.
     """.replace("    ", "")
-
-    def __init__(self, *args, **kwargs):
-        self.verbosity = 0
-        BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
         parser.add_argument(

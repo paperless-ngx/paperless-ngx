@@ -16,10 +16,9 @@ from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
 from paperless.db import GnuPG
 from ...file_handling import generate_filename, delete_empty_directories
-from ...mixins import Renderable
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Decrypt and rename all files in our collection into a given target
