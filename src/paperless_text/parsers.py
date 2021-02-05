@@ -11,6 +11,8 @@ class TextDocumentParser(DocumentParser):
     This parser directly parses a text document (.txt, .md, or .csv)
     """
 
+    logging_name = "paperless.parsing.text"
+
     def get_thumbnail(self, document_path, mime_type):
 
         def read_text():

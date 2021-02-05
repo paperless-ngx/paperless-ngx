@@ -7,6 +7,9 @@ from documents.models import Document
 from ...signals.handlers import set_correspondent, set_document_type, set_tags
 
 
+logger = logging.getLogger("paperless.management.retagger")
+
+
 class Command(BaseCommand):
 
     help = """
@@ -65,7 +68,7 @@ class Command(BaseCommand):
         classifier = load_classifier()
 
         for document in documents:
-            logging.getLogger(__name__).info(
+            logger.info(
                 f"Processing document {document.title}")
 
             if options['correspondent']:

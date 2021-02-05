@@ -13,7 +13,7 @@ class IncompatibleClassifierVersionError(Exception):
     pass
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.classifier")
 
 
 def preprocess_content(content):
@@ -115,7 +115,7 @@ class DocumentClassifier(object):
         labels_document_type = list()
 
         # Step 1: Extract and preprocess training data from the database.
-        logging.getLogger(__name__).debug("Gathering data from database...")
+        logger.debug("Gathering data from database...")
         m = hashlib.sha1()
         for doc in Document.objects.order_by('pk').exclude(tags__is_inbox_tag=True):  # NOQA: E501
             preprocessed_content = preprocess_content(doc.content)
@@ -162,7 +162,7 @@ class DocumentClassifier(object):
         num_correspondents = len(set(labels_correspondent) | {-1}) - 1
         num_document_types = len(set(labels_document_type) | {-1}) - 1
 
-        logging.getLogger(__name__).debug(
+        logger.debug(
             "{} documents, {} tag(s), {} correspondent(s), "
             "{} document type(s).".format(
                 len(data),
@@ -173,7 +173,7 @@ class DocumentClassifier(object):
         )
 
         # Step 2: vectorize data
-        logging.getLogger(__name__).debug("Vectorizing data...")
+        logger.debug("Vectorizing data...")
         self.data_vectorizer = CountVectorizer(
             analyzer="word",
             ngram_range=(1, 2),
@@ -183,7 +183,7 @@ class DocumentClassifier(object):
 
         # Step 3: train the classifiers
         if num_tags > 0:
-            logging.getLogger(__name__).debug("Training tags classifier...")
+            logger.debug("Training tags classifier...")
 
             if num_tags == 1:
                 # Special case where only one tag has auto:
@@ -202,12 +202,12 @@ class DocumentClassifier(object):
             self.tags_classifier.fit(data_vectorized, labels_tags_vectorized)
         else:
             self.tags_classifier = None
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "There are no tags. Not training tags classifier."
             )
 
         if num_correspondents > 0:
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "Training correspondent classifier..."
             )
             self.correspondent_classifier = MLPClassifier(tol=0.01)
@@ -217,13 +217,13 @@ class DocumentClassifier(object):
             )
         else:
             self.correspondent_classifier = None
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "There are no correspondents. Not training correspondent "
                 "classifier."
             )
 
         if num_document_types > 0:
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "Training document type classifier..."
             )
             self.document_type_classifier = MLPClassifier(tol=0.01)
@@ -233,7 +233,7 @@ class DocumentClassifier(object):
             )
         else:
             self.document_type_classifier = None
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "There are no document types. Not training document type "
                 "classifier."
             )

@@ -47,6 +47,8 @@ MESSAGE_FINISHED = "finished"
 
 class Consumer(LoggingMixin):
 
+    logging_name = "paperless.consumer"
+
     def _send_progress(self, current_progress, max_progress, status,
                        message=None, document_id=None):
         payload = {
