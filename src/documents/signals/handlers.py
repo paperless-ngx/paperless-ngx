@@ -19,8 +19,7 @@ from ..file_handling import delete_empty_directories, \
 from ..models import Document, Tag
 
 
-def logger(message, group):
-    logging.getLogger(__name__).debug(message, extra={"group": group})
+logger = logging.getLogger("paperless.handlers")
 
 
 def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
@@ -48,23 +47,23 @@ def set_correspondent(sender,
         selected = None
     if potential_count > 1:
         if use_first:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential correspondents, "
                 f"so we've opted for {selected}",
-                logging_group
+                extra={'group': logging_group}
             )
         else:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential correspondents, "
                 f"not assigning any correspondent",
-                logging_group
+                extra={'group': logging_group}
             )
             return
 
     if selected or replace:
-        logger(
+        logger.info(
             f"Assigning correspondent {selected} to {document}",
-            logging_group
+            extra={'group': logging_group}
         )
 
         document.correspondent = selected
@@ -92,23 +91,23 @@ def set_document_type(sender,
 
     if potential_count > 1:
         if use_first:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential document types, "
                 f"so we've opted for {selected}",
-                logging_group
+                extra={'group': logging_group}
             )
         else:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential document types, "
                 f"not assigning any document type",
-                logging_group
+                extra={'group': logging_group}
             )
             return
 
     if selected or replace:
-        logger(
+        logger.info(
             f"Assigning document type {selected} to {document}",
-            logging_group
+            extra={'group': logging_group}
         )
 
         document.document_type = selected
@@ -138,9 +137,9 @@ def set_tags(sender,
         return
 
     message = 'Tagging "{}" with "{}"'
-    logger(
+    logger.info(
         message.format(document, ", ".join([t.name for t in relevant_tags])),
-        logging_group
+        extra={'group': logging_group}
     )
 
     document.tags.add(*relevant_tags)
@@ -155,10 +154,10 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
             if os.path.isfile(f):
                 try:
                     os.unlink(f)
-                    logging.getLogger(__name__).debug(
+                    logger.debug(
                         f"Deleted file {f}.")
                 except OSError as e:
-                    logging.getLogger(__name__).warning(
+                    logger.warning(
                         f"While deleting document {str(instance)}, the file "
                         f"{f} could not be deleted: {e}"
                     )
@@ -177,13 +176,13 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
 def validate_move(instance, old_path, new_path):
     if not os.path.isfile(old_path):
         # Can't do anything if the old file does not exist anymore.
-        logging.getLogger(__name__).fatal(
+        logger.fatal(
             f"Document {str(instance)}: File {old_path} has gone.")
         return False
 
     if os.path.isfile(new_path):
         # Can't do anything if the new file already exists. Skip updating file.
-        logging.getLogger(__name__).warning(
+        logger.warning(
             f"Document {str(instance)}: Cannot rename file "
             f"since target path {new_path} already exists.")
         return False

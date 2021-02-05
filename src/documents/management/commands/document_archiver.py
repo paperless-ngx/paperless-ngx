@@ -20,7 +20,7 @@ from ...file_handling import create_source_path_directory
 from ...parsers import get_parser_class_for_mime_type
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.management.archiver")
 
 
 def handle_document(document_id):

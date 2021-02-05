@@ -36,7 +36,7 @@ DATE_REGEX = re.compile(
 )
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.parsing")
 
 
 def is_mime_type_supported(mime_type):
@@ -261,6 +261,8 @@ class DocumentParser(LoggingMixin):
     `paperless_tesseract.parsers` for inspiration.
     """
 
+    logging_name = "paperless.parsing"
+
     def __init__(self, logging_group, progress_callback=None):
         super().__init__()
         self.logging_group = logging_group
@@ -316,5 +318,5 @@ class DocumentParser(LoggingMixin):
         return self.date
 
     def cleanup(self):
-        self.log("debug", "Deleting directory {}".format(self.tempdir))
+        self.log("debug", f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)

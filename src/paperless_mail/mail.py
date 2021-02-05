@@ -102,6 +102,8 @@ def get_mailbox(server, port, security):
 
 class MailAccountHandler(LoggingMixin):
 
+    logging_name = "paperless.mail"
+
     def _correspondent_from_name(self, name):
         try:
             return Correspondent.objects.get_or_create(name=name)[0]
