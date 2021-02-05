@@ -1,7 +1,6 @@
 import logging
 import re
 
-from fuzzywuzzy import fuzz
 
 from documents.models import MatchingModel, Correspondent, DocumentType, Tag
 
@@ -123,6 +122,8 @@ def matches(matching_model, document):
         return bool(match)
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_FUZZY:
+        from fuzzywuzzy import fuzz
+
         match = re.sub(r'[^\w\s]', '', matching_model.match)
         text = re.sub(r'[^\w\s]', '', document_content)
         if matching_model.is_insensitive:
