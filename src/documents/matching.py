@@ -6,7 +6,7 @@ from fuzzywuzzy import fuzz
 from documents.models import MatchingModel, Correspondent, DocumentType, Tag
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.matching")
 
 
 def log_reason(matching_model, document, reason):

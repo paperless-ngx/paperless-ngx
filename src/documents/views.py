@@ -58,6 +58,9 @@ from .serialisers import (
 )
 
 
+logger = logging.getLogger("paperless.api")
+
+
 class IndexView(TemplateView):
     template_name = "index.html"
 
@@ -488,7 +491,7 @@ class SearchView(APIView):
         try:
             doc = Document.objects.get(id=r['id'])
         except Document.DoesNotExist:
-            logging.getLogger(__name__).warning(
+            logger.warning(
                 f"Search index returned a non-existing document: "
                 f"id: {r['id']}, title: {r['title']}. "
                 f"Search index needs reindex."

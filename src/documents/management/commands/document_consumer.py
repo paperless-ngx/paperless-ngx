@@ -17,7 +17,7 @@ try:
 except ImportError:
     INotify = flags = None
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.management.consumer")
 
 
 def _tags_from_path(filepath):
@@ -108,12 +108,7 @@ class Command(BaseCommand):
     # This is here primarily for the tests and is irrelevant in production.
     stop_flag = False
 
-    def __init__(self, *args, **kwargs):
-
-        self.logger = logging.getLogger(__name__)
-
-        BaseCommand.__init__(self, *args, **kwargs)
-        self.observer = None
+    observer = None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -161,7 +156,7 @@ class Command(BaseCommand):
         logger.debug("Consumer exiting.")
 
     def handle_polling(self, directory, recursive):
-        logging.getLogger(__name__).info(
+        logger.info(
             f"Polling directory for changes: {directory}")
         self.observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
         self.observer.schedule(Handler(), directory, recursive=recursive)
@@ -176,7 +171,7 @@ class Command(BaseCommand):
         self.observer.join()
 
     def handle_inotify(self, directory, recursive):
-        logging.getLogger(__name__).info(
+        logger.info(
             f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()

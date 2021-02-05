@@ -12,6 +12,9 @@ from documents.models import Document, Tag, DocumentType, Correspondent
 from documents.sanity_checker import SanityFailedError
 
 
+logger = logging.getLogger("paperless.tasks")
+
+
 def index_optimize():
     ix = index.open_index()
     writer = AsyncWriter(ix)
@@ -45,18 +48,18 @@ def train_classifier():
 
     try:
         if classifier.train():
-            logging.getLogger(__name__).info(
+            logger.info(
                 "Saving updated classifier model to {}...".format(
                     settings.MODEL_FILE)
             )
             classifier.save_classifier()
         else:
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "Training data unchanged."
             )
 
     except Exception as e:
-        logging.getLogger(__name__).warning(
+        logger.warning(
             "Classifier error: " + str(e)
         )
 

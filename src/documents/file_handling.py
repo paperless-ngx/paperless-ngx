@@ -8,6 +8,9 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 
+logger = logging.getLogger("paperless.filehandling")
+
+
 class defaultdictNoStr(defaultdict):
 
     def __str__(self):
@@ -140,7 +143,7 @@ def generate_filename(doc, counter=0, append_gpg=True):
             path = path.strip(os.sep)
 
     except (ValueError, KeyError, IndexError):
-        logging.getLogger(__name__).warning(
+        logger.warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
             f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default")
 

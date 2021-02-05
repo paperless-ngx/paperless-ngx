@@ -12,7 +12,7 @@ from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.writing import AsyncWriter
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.index")
 
 
 class JsonFormatter(Formatter):

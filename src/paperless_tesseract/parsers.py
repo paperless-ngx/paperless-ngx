@@ -19,6 +19,8 @@ class RasterisedDocumentParser(DocumentParser):
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
 
+    logging_name = "paperless.parsing.tesseract"
+
     def extract_metadata(self, document_path, mime_type):
         namespace_pattern = re.compile(r"\{(.*)\}(.*)")
 
