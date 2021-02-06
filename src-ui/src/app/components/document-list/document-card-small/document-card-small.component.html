@@ -1,5 +1,5 @@
 <div class="col p-2 h-100">
-  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected">
+  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected" [class.popover-hidden]="popoverHidden">
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
       <img class="card-img doc-img rounded-top" [src]="getThumbUrl()">
 
@@ -48,10 +48,10 @@
           <ng-template #previewContent>
             <ng-container *ngIf="getContentType() == 'application/pdf'">
                 <div class="preview pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
-                  <div class="spinner-border spinner-border-sm" role="status">
+                  <div class="spinner-border text-primary spinner-border-sm" role="status">
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="false" [show-all]="true" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
+                  <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="false" [show-all]="true" [render-text-mode]="2"></pdf-viewer>
                 </div>
                 <ng-template #nativePdfViewer>
                     <object [data]="previewUrl | safe" type="application/pdf" class="preview" width="100%"></object>
