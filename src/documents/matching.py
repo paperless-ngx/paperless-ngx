@@ -11,7 +11,7 @@ logger = logging.getLogger("paperless.matching")
 def log_reason(matching_model, document, reason):
     class_name = type(matching_model).__name__
     logger.debug(
-        f"Assigning {class_name} {matching_model.name} to document "
+        f"{class_name} {matching_model.name} matched on document "
         f"{document} because {reason}")
 
 
