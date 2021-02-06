@@ -221,7 +221,7 @@ Install Paperless from Docker Hub
 
 .. _setup-docker_build:
 
-Build the docker image yourself
+Build the Docker image yourself
 ===============================
 
 1.  Clone the entire repository of paperless:
@@ -252,14 +252,14 @@ Build the docker image yourself
 
 4.  Run the ``compile-frontend.sh`` script. This requires ``node`` and ``npm >= v15``.
 
-5.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
-    ``docker-compose up -d`` to start the containers, do
+5.  Follow steps 3 to 8 of :ref:`setup-docker_hub`. When asked to run
+    ``docker-compose pull`` to pull the image, do
 
     .. code:: shell-session
 
         $ docker-compose build
 
-    before that to build the image.
+    instead to build the image.
 
 .. _setup-bare_metal:
 
@@ -309,7 +309,7 @@ writing. Windows is not and will never be supported.
 2.  Install ``redis`` >= 5.0 and configure it to start automatically.
 
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
-    to use PostgreSQL, SQLite is avialable as well.
+    to use PostgreSQL, SQLite is available as well.
 
 4.  Get the release archive from `<https://github.com/jonaswinkler/paperless-ng/releases>`_.
     If you clone the git repo as it is, you also have to compile the front end by yourself.
@@ -333,8 +333,14 @@ writing. Windows is not and will never be supported.
     *   Set ``PAPERLESS_OCR_LANGUAGE`` to the language most of your documents are written in.
     *   Set ``PAPERLESS_TIME_ZONE`` to your local time zone.
 
-6.  Setup permissions. Create a system users under which you wish to run paperless. Ensure that these directories exist
-    and that the user has write permissions to the following directories
+6.  Create a system user under which you wish to run paperless.
+
+    .. code:: shell-session
+
+        adduser paperless --system --home /opt/paperless --group
+
+7.  Ensure that these directories exist
+    and that the paperless user has write permissions to the following directories:
 
     *   ``/opt/paperless/media``
     *   ``/opt/paperless/data``
@@ -342,30 +348,32 @@ writing. Windows is not and will never be supported.
 
     Adjust as necessary if you configured different folders.
 
-7.  Install python requirements from the ``requirements.txt`` file.
+8.  Install python requirements from the ``requirements.txt`` file.
     It is up to you if you wish to use a virtual environment or not.
 
     .. code:: shell-session
 
-        pip3 install -r requirements.txt
+        sudo -Hu paperless pip3 install -r requirements.txt
+    
+    This will install all python dependencies in the home directory of
+    the new paperless user.
 
-
-8.  Go to ``/opt/paperless/src``, and execute the following commands:
+9.  Go to ``/opt/paperless/src``, and execute the following commands:
 
     .. code:: bash
 
         # This creates the database schema.
-        python3 manage.py migrate
+        sudo -Hu paperless python3 manage.py migrate
 
         # This creates your first paperless user
-        python3 manage.py createsuperuser
+        sudo -Hu paperless python3 manage.py createsuperuser
 
-9.  Optional: Test that paperless is working by executing
+10. Optional: Test that paperless is working by executing
 
       .. code:: bash
 
         # This collects static files from paperless and django.
-        python3 manage.py runserver
+        sudo -Hu paperless python3 manage.py runserver
 
     and pointing your browser to http://localhost:8000/.
 
@@ -380,7 +388,7 @@ writing. Windows is not and will never be supported.
         This will not start the consumer. Paperless does this in a
         separate process.
 
-10. Setup systemd services to run paperless automatically. You may
+11. Setup systemd services to run paperless automatically. You may
     use the service definition files included in the ``scripts`` folder
     as a starting point.
 
@@ -396,14 +404,7 @@ writing. Windows is not and will never be supported.
     These services rely on redis and optionally the database server, but
     don't need to be started in any particular order. The example files
     depend on redis being started. If you use a database server, you should
-    add additinal dependencies.
-
-    .. hint::
-
-        You may optionally set up your preferred web server to serve
-        paperless as a wsgi application directly instead of running the
-        ``webserver`` service. The module containing the wsgi application
-        is named ``paperless.wsgi``.
+    add additional dependencies.
 
     .. caution::
 
@@ -412,10 +413,13 @@ writing. Windows is not and will never be supported.
         however, the documentation of GUnicorn states that you should
         use a proxy server in front of gunicorn instead.
 
-11. Optional: Install a samba server and make the consumption folder
+        For instructions on how to use nginx for that,
+        :ref:`see the instructions below <setup-nginx>`.
+
+12. Optional: Install a samba server and make the consumption folder
     available as a network share.
 
-12. Configure ImageMagick to allow processing of PDF documents. Most distributions have
+13. Configure ImageMagick to allow processing of PDF documents. Most distributions have
     this disabled by default, since PDF documents can contain malware. If
     you don't do this, paperless will fall back to ghostscript for certain steps
     such as thumbnail generation.
@@ -432,7 +436,7 @@ writing. Windows is not and will never be supported.
 
         <policy domain="coder" rights="read|write" pattern="PDF" />
 
-13. Optional: Install the `jbig2enc <https://ocrmypdf.readthedocs.io/en/latest/jbig2.html>`_
+14. Optional: Install the `jbig2enc <https://ocrmypdf.readthedocs.io/en/latest/jbig2.html>`_
     encoder. This will reduce the size of generated PDF documents. You'll most likely need
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
@@ -441,9 +445,10 @@ writing. Windows is not and will never be supported.
 
 Install Paperless using ansible
 ===============================
-    .. note::
 
-        This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
+.. note::
+
+    This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
 
 1.  Install ansible 2.7+ on the management node.
     This may be the target host paperless-ng is being installed on or any remote host which can access the target host.
