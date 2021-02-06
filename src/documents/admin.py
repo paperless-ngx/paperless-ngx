@@ -116,22 +116,6 @@ class DocumentAdmin(admin.ModelAdmin):
         return format_html("<{} {}/>", kind, attributes)
 
 
-class LogAdmin(admin.ModelAdmin):
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    list_display = ("created", "message", "level",)
-    list_filter = ("level", "created",)
-
-    ordering = ('-created',)
-
-    list_display_links = ("created", "message")
-
-
 class RuleInline(admin.TabularInline):
     model = SavedViewFilterRule
 
@@ -149,5 +133,4 @@ admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
-admin.site.register(Log, LogAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
