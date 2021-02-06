@@ -32,9 +32,6 @@ export class DocumentCardSmallComponent implements OnInit {
 
   moreTags: number = null
 
-  @Output()
-  showPreview = new EventEmitter<DocumentCardSmallComponent>()
-
   @ViewChild('popover') popover: NgbPopover
 
   mouseOnPreview = false
@@ -91,7 +88,6 @@ export class DocumentCardSmallComponent implements OnInit {
         if (this.mouseOnPreview) {
           // show popover
           this.popoverHidden = false
-          this.showPreview.emit(this)
         } else {
           this.popover.close()
         }
@@ -101,5 +97,9 @@ export class DocumentCardSmallComponent implements OnInit {
 
   mouseLeavePreview() {
     this.mouseOnPreview = false
+  }
+
+  mouseLeaveCard() {
+    this.popover.close()
   }
 }
