@@ -4,7 +4,9 @@ import shutil
 import tempfile
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
@@ -716,6 +718,28 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
+
+    def test_get_logs(self):
+        response = self.client.get("/api/logs/")
+        self.assertEqual(response.status_code, 200)
+        self.assertCountEqual(response.data, ["mail", "paperless"])
+
+    def test_get_invalid_log(self):
+        response = self.client.get("/api/logs/bogus_log/")
+        self.assertEqual(response.status_code, 404)
+
+    @override_settings(LOGGING_DIR="bogus_dir")
+    def test_get_nonexistent_log(self):
+        response = self.client.get("/api/logs/paperless/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_log(self):
+        log_data = "test\ntest2\n"
+        with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/")
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response.data, ["test", "test2"])
 
 
 class TestBulkEdit(DirectoriesMixin, APITestCase):

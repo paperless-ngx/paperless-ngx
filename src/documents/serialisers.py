@@ -153,19 +153,6 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
         )
 
 
-class LogSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Log
-        fields = (
-            "id",
-            "created",
-            "message",
-            "group",
-            "level"
-        )
-
-
 class SavedViewFilterRuleSerializer(serializers.ModelSerializer):
 
     class Meta:

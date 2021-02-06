@@ -29,7 +29,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet,
-    ReadOnlyModelViewSet
+    ViewSet
 )
 
 import documents.index as index
@@ -40,16 +40,14 @@ from .filters import (
     CorrespondentFilterSet,
     DocumentFilterSet,
     TagFilterSet,
-    DocumentTypeFilterSet,
-    LogFilterSet
+    DocumentTypeFilterSet
 )
 from .matching import match_correspondents, match_tags, match_document_types
-from .models import Correspondent, Document, Log, Tag, DocumentType, SavedView
+from .models import Correspondent, Document, Tag, DocumentType, SavedView
 from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
-    LogSerializer,
     TagSerializer,
     DocumentTypeSerializer,
     PostDocumentSerializer,
@@ -307,16 +305,28 @@ class DocumentViewSet(RetrieveModelMixin,
             raise Http404()
 
 
-class LogViewSet(ReadOnlyModelViewSet):
-    model = Log
+class LogViewSet(ViewSet):
 
-    queryset = Log.objects.all()
-    serializer_class = LogSerializer
-    pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filterset_class = LogFilterSet
-    ordering_fields = ("created",)
+
+    log_files = ["paperless", "mail"]
+
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        if not pk in self.log_files:
+            raise Http404()
+
+        filename = os.path.join(settings.LOGGING_DIR, f"{pk}.log")
+
+        if not os.path.isfile(filename):
+            raise Http404()
+
+        with open(filename, "r") as f:
+            lines = [l.rstrip() for l in f.readlines()]
+
+        return Response(lines)
+
+    def list(self, request, *args, **kwargs):
+        return Response(self.log_files)
 
 
 class SavedViewViewSet(ModelViewSet):

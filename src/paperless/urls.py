@@ -31,7 +31,7 @@ api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
 api_router.register(r"document_types", DocumentTypeViewSet)
 api_router.register(r"documents", DocumentViewSet)
-api_router.register(r"logs", LogViewSet)
+api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
 
