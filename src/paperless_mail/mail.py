@@ -102,7 +102,7 @@ def get_mailbox(server, port, security):
 
 class MailAccountHandler(LoggingMixin):
 
-    logging_name = "paperless.mail"
+    logging_name = "paperless_mail"
 
     def _correspondent_from_name(self, name):
         try:
