@@ -169,6 +169,16 @@ CHANNEL_LAYERS = {
     },
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 ###############################################################################
 # Security                                                                    #
 ###############################################################################
@@ -398,7 +408,7 @@ Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
     'workers': TASK_WORKERS,
-    'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
+    'django_redis': 'default'
 }
 
 
