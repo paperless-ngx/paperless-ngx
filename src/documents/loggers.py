@@ -17,7 +17,10 @@ class LoggingMixin:
         if self.logging_name:
             logger = logging.getLogger(self.logging_name)
         else:
-            name = ".".join([self.__class__.__module__, self.__class__.__name__])
+            name = ".".join([
+                self.__class__.__module__,
+                self.__class__.__name__
+            ])
             logger = logging.getLogger(name)
 
         getattr(logger, level)(message, extra={
