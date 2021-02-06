@@ -39,7 +39,8 @@ def load_classifier():
         classifier = DocumentClassifier()
         try:
             classifier.load()
-            cache.set("paperless-classifier", classifier, version=version)
+            cache.set("paperless-classifier", classifier,
+                      version=version, timeout=86400)
         except (EOFError, IncompatibleClassifierVersionError) as e:
             # there's something wrong with the model file.
             logger.error(
