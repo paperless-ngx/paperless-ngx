@@ -1,7 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
+import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { DocumentService } from 'src/app/services/rest/document.service';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-document-card-small',
@@ -10,11 +13,11 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 })
 export class DocumentCardSmallComponent implements OnInit {
 
-  constructor(private documentService: DocumentService) { }
+  constructor(private documentService: DocumentService, private settings: SettingsService) { }
 
   @Input()
   selected = false
-  
+
   @Output()
   toggleSelected = new EventEmitter()
 
@@ -29,7 +32,17 @@ export class DocumentCardSmallComponent implements OnInit {
 
   moreTags: number = null
 
+  @Output()
+  showPreview = new EventEmitter<DocumentCardSmallComponent>()
+
+  @ViewChild('popover') popover: NgbPopover
+
+  metadata: PaperlessDocumentMetadata
+
   ngOnInit(): void {
+    this.documentService.getMetadata(this.document?.id).subscribe(result => {
+      this.metadata = result
+    })
   }
 
   getThumbUrl() {
@@ -40,7 +53,7 @@ export class DocumentCardSmallComponent implements OnInit {
     return this.documentService.getDownloadUrl(this.document.id)
   }
 
-  getPreviewUrl() {
+  get previewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
@@ -57,4 +70,27 @@ export class DocumentCardSmallComponent implements OnInit {
     )
   }
 
+  get useNativePdfViewer(): boolean {
+    return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
+  }
+
+  getContentType() {
+    return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
+  }
+
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          this.showPreview.emit(this)
+          this.popover.open()
+        }
+      }, 600);
+    }
+  }
+
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+  }
 }

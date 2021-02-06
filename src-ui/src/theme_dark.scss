@@ -366,6 +366,18 @@ $border-color-dark-mode: #47494f;
   .progress-bar.bg-primary {
     background-color: darken($primary-dark-mode, 5%) !important;
   }
+
+  .popover {
+    .popover-header,
+    .popover-body {
+      background-color: $bg-light-dark-mode;
+      border-color: $border-color-dark-mode;
+    }
+
+    .arrow::after {
+      border-top-color: $bg-light-dark-mode;
+    }
+  }
 }
 
 body.color-scheme-dark {
