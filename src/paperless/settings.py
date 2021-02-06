@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import re
 
+from concurrent_log_handler.queue import setup_logging_queues
 from dotenv import load_dotenv
 
 from django.utils.translation import gettext_lazy as _
@@ -61,6 +62,8 @@ DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
 MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
+
+LOGGING_DIR = os.getenv('PAPERLESS_LOGGING_DIR', os.path.join(DATA_DIR, "log"))
 
 CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR", os.path.join(BASE_DIR, "..", "consume"))
 
@@ -306,14 +309,19 @@ USE_TZ = True
 # Logging                                                                     #
 ###############################################################################
 
-DISABLE_DBHANDLER = __get_boolean("PAPERLESS_DISABLE_DBHANDLER")
+setup_logging_queues()
+
+os.makedirs(LOGGING_DIR, exist_ok=True)
+
+LOGROTATE_MAX_SIZE = os.getenv("PAPERLESS_LOGROTATE_MAX_SIZE", 1000000)
+LOGROTATE_MAX_BACKUPS = os.getenv("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
+            'format': '[{asctime}] [{levelname}] [{name}] {message}',
             'style': '{',
         },
         'simple': {
@@ -322,34 +330,39 @@ LOGGING = {
         },
     },
     "handlers": {
-        "db": {
-            "level": "DEBUG",
-            "class": "documents.loggers.PaperlessHandler",
-        },
         "console": {
             "level": "DEBUG" if DEBUG else "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
+        },
+        "file_paperless": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "paperless.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS
+        },
+        "file_mail": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "mail.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS
         }
     },
     "root": {
-        "handlers": ["console"],
-        "level": "DEBUG",
+        "handlers": ["console"]
     },
     "loggers": {
-        "documents": {
-            "handlers": ["db"],
-            "propagate": True,
+        "paperless": {
+            "handlers": ["file_paperless"],
+            "level": "DEBUG"
         },
         "paperless_mail": {
-            "handlers": ["db"],
-            "propagate": True,
-        },
-        "paperless_tesseract": {
-            "handlers": ["db"],
-            "propagate": True,
-        },
-    },
+            "handlers": ["file_mail"],
+            "level": "DEBUG"
+        }
+    }
 }
 
 ###############################################################################
