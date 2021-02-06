@@ -373,11 +373,17 @@ $border-color-dark-mode: #47494f;
       background-color: $bg-light-dark-mode;
       border-color: $border-color-dark-mode;
     }
+  }
 
-    .arrow::after {
-      border-top-color: $bg-light-dark-mode;
+  $placements: 'top', 'right', 'bottom', 'left';
+
+  @each $placement in $placements {
+    .bs-popover-#{$placement} > .arrow::after,
+    .bs-popover-auto[x-placement^=#{$placement}] > .arrow::after {
+      border-#{$placement}-color: $bg-light-dark-mode;
     }
   }
+  
 }
 
 body.color-scheme-dark {
