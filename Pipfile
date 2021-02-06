@@ -48,6 +48,7 @@ tika = "*"
 channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+concurrent-log-handler = "*"
 
 [dev-packages]
 coveralls = "*"
