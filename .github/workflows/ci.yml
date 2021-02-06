@@ -2,6 +2,7 @@ name: ci
 
 on:
   push:
+    tags: ng-*
     branches-ignore:
       - 'translations**'
   pull_request:
