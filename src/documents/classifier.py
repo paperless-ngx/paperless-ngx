@@ -5,6 +5,7 @@ import pickle
 import re
 
 from django.conf import settings
+from django.core.cache import cache
 
 from documents.models import Document, MatchingModel
 
@@ -30,22 +31,28 @@ def load_classifier():
         )
         return None
 
-    try:
+    version = os.stat(settings.MODEL_FILE).st_mtime
+
+    classifier = cache.get("paperless-classifier", version=version)
+
+    if not classifier:
         classifier = DocumentClassifier()
-        classifier.reload()
-    except (EOFError, IncompatibleClassifierVersionError) as e:
-        # there's something wrong with the model file.
-        logger.error(
-            f"Unrecoverable error while loading document "
-            f"classification model: {str(e)}, deleting model file."
-        )
-        os.unlink(settings.MODEL_FILE)
-        classifier = None
-    except OSError as e:
-        logger.error(
-            f"Error while loading document classification model: {str(e)}"
-        )
-        classifier = None
+        try:
+            classifier.load()
+            cache.set("paperless-classifier", classifier, version=version)
+        except (EOFError, IncompatibleClassifierVersionError) as e:
+            # there's something wrong with the model file.
+            logger.error(
+                f"Unrecoverable error while loading document "
+                f"classification model: {str(e)}, deleting model file."
+            )
+            os.unlink(settings.MODEL_FILE)
+            classifier = None
+        except OSError as e:
+            logger.error(
+                f"Error while loading document classification model: {str(e)}"
+            )
+            classifier = None
 
     return classifier
 
@@ -55,10 +62,6 @@ class DocumentClassifier(object):
     FORMAT_VERSION = 6
 
     def __init__(self):
-        # mtime of the model file on disk. used to prevent reloading when
-        # nothing has changed.
-        self.classifier_version = 0
-
         # hash of the training data. used to prevent re-training when the
         # training data has not changed.
         self.data_hash = None
@@ -69,30 +72,23 @@ class DocumentClassifier(object):
         self.correspondent_classifier = None
         self.document_type_classifier = None
 
-    def reload(self):
-        if os.path.getmtime(settings.MODEL_FILE) > self.classifier_version:
-            with open(settings.MODEL_FILE, "rb") as f:
-                schema_version = pickle.load(f)
+    def load(self):
+        with open(settings.MODEL_FILE, "rb") as f:
+            schema_version = pickle.load(f)
 
-                if schema_version != self.FORMAT_VERSION:
-                    raise IncompatibleClassifierVersionError(
-                        "Cannor load classifier, incompatible versions.")
-                else:
-                    if self.classifier_version > 0:
-                        # Don't be confused by this check. It's simply here
-                        # so that we wont log anything on initial reload.
-                        logger.info("Classifier updated on disk, "
-                                    "reloading classifier models")
-                    self.data_hash = pickle.load(f)
-                    self.data_vectorizer = pickle.load(f)
-                    self.tags_binarizer = pickle.load(f)
+            if schema_version != self.FORMAT_VERSION:
+                raise IncompatibleClassifierVersionError(
+                    "Cannor load classifier, incompatible versions.")
+            else:
+                self.data_hash = pickle.load(f)
+                self.data_vectorizer = pickle.load(f)
+                self.tags_binarizer = pickle.load(f)
 
-                    self.tags_classifier = pickle.load(f)
-                    self.correspondent_classifier = pickle.load(f)
-                    self.document_type_classifier = pickle.load(f)
-            self.classifier_version = os.path.getmtime(settings.MODEL_FILE)
+                self.tags_classifier = pickle.load(f)
+                self.correspondent_classifier = pickle.load(f)
+                self.document_type_classifier = pickle.load(f)
 
-    def save_classifier(self):
+    def save(self):
         with open(settings.MODEL_FILE, "wb") as f:
             pickle.dump(self.FORMAT_VERSION, f)
             pickle.dump(self.data_hash, f)
