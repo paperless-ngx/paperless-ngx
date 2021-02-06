@@ -72,13 +72,13 @@ PAPERLESS_CONSUMPTION_DIR=<path>
     container. Change the local consumption directory in the docker-compose.yml
     file instead.
 
-    Defaults to "../consume", relative to the "src" directory.
+    Defaults to "../consume/", relative to the "src" directory.
 
 PAPERLESS_DATA_DIR=<path>
     This is where paperless stores all its data (search index, SQLite database,
     classification model, etc).
 
-    Defaults to "../data", relative to the "src" directory.
+    Defaults to "../data/", relative to the "src" directory.
 
 PAPERLESS_MEDIA_ROOT=<path>
     This is where your documents and thumbnails are stored.
@@ -86,7 +86,7 @@ PAPERLESS_MEDIA_ROOT=<path>
     You can set this and PAPERLESS_DATA_DIR to the same folder to have paperless
     store all its data within the same volume.
 
-    Defaults to "../media", relative to the "src" directory.
+    Defaults to "../media/", relative to the "src" directory.
 
 PAPERLESS_STATICDIR=<path>
     Override the default STATIC_ROOT here.  This is where all static files
@@ -94,13 +94,32 @@ PAPERLESS_STATICDIR=<path>
 
     Unless you're doing something fancy, there is no need to override this.
 
-    Defaults to "../static", relative to the "src" directory.
+    Defaults to "../static/", relative to the "src" directory.
 
 PAPERLESS_FILENAME_FORMAT=<format>
     Changes the filenames paperless uses to store documents in the media directory.
     See :ref:`advanced-file_name_handling` for details.
 
     Default is none, which disables this feature.
+
+PAPERLESS_LOGGING_DIR=<path>
+    This is where paperless will store log files.
+
+    Defaults to "``PAPERLESS_DATA_DIR``/log/".
+
+
+Logging
+#######
+
+PAPERLESS_LOGROTATE_MAX_SIZE=<num>
+    Maximum file size for log files before they are rotated, in bytes.
+
+    Defaults to 1 MiB.
+
+PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>
+    Number of rotated log files to keep.
+
+    Defaults to 20.
 
 Hosting & Security
 ##################

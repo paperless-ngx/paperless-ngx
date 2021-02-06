@@ -58,6 +58,13 @@ paperless-ng 1.1.0
 
   * Better info section in the side bar.
 
+  * Paperless no longer logs to the database. Instead, logs are written to rotating log files. This solves many "database is locked"
+    issues on Raspberry Pi, especially when SQLite is used.
+
+  * By default, log files are written to ``PAPERLESS_DATA_DIR/log/``. Logging settings can be adjusted with
+    ``PAPERLESS_LOGGING_DIR``, ``PAPERLESS_LOGROTATE_MAX_SIZE`` and
+    ``PAPERLESS_LOGROTATE_MAX_BACKUPS``.
+
 paperless-ng 1.0.0
 ##################
 
