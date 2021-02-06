@@ -34,3 +34,21 @@
 .doc-img-background-selected {
   background-color: $primaryFaded;
 }
+
+::ng-deep .popover {
+  max-width: 40rem;
+
+  .preview {
+    min-width: 10rem;
+    min-height: 10rem;
+    max-height: 25rem;
+    overflow-y: scroll;
+  }
+
+  .spinner-border {
+    position: absolute;
+    top: 4rem;
+    left: calc(50% - 0.5rem);
+    z-index: 0;
+  }
+}
