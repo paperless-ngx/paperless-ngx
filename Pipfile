@@ -51,6 +51,7 @@ channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
+django-redis = "*"
 
 [dev-packages]
 coveralls = "*"
