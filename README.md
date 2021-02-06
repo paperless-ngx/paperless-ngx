@@ -1,4 +1,5 @@
 [![ci](https://github.com/jonaswinkler/paperless-ng/workflows/ci/badge.svg)](https://github.com/jonaswinkler/paperless-ng/actions)
+![Ansible Role](https://github.com/jonaswinkler/paperless-ng/workflows/Ansible%20Role/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/paperless-ng/community.svg)](https://gitter.im/paperless-ng/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
@@ -9,12 +10,6 @@
 [Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation.
-
-# Survey
-
-If you already used Paperless-ng for a bit, would like to give some anonymous feedback, and help me decide on what to focus on next: I've created a survey, [see here](https://github.com/jonaswinkler/paperless-ng/issues/402). Thank you!
-
-*See also [Feature Requests](#feature-requests)*
 
 # How it Works
 
