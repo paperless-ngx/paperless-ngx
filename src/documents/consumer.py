@@ -200,8 +200,6 @@ class Consumer(LoggingMixin):
                 MESSAGE_UNSUPPORTED_TYPE,
                 f"Unsupported mime type {mime_type}"
             )
-        else:
-            self.log("debug", f"Parser: {parser_class.__name__}")
 
         # Notify all listeners that we're going to do some work.
 
@@ -221,6 +219,8 @@ class Consumer(LoggingMixin):
         # This doesn't parse the document yet, but gives us a parser.
 
         document_parser = parser_class(self.logging_group, progress_callback)
+
+        self.log("debug", f"Parser: {type(document_parser).__name__}")
 
         # However, this already created working directories which we have to
         # clean up.
