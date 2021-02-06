@@ -10,8 +10,6 @@ export class LogsComponent implements OnInit {
 
   constructor(private logService: LogService) { }
 
-  @ViewChild('logContainer') private logContainer: ElementRef
-
   logs: string[] = []
 
   logFiles: string[] = []
@@ -31,6 +29,8 @@ export class LogsComponent implements OnInit {
   reloadLogs() {
     this.logService.get(this.activeLog).subscribe(result => {
       this.logs = result
+    }, error => {
+      this.logs = []
     })
   }
 
