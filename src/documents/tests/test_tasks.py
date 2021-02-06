@@ -2,7 +2,7 @@ import os
 from unittest import mock
 
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from documents import tasks
@@ -52,6 +52,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         load_classifier.assert_called_once()
         self.assertFalse(os.path.isfile(settings.MODEL_FILE))
 
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
     def test_train_classifier(self):
         c = Correspondent.objects.create(matching_algorithm=Tag.MATCH_AUTO, name="test")
         doc = Document.objects.create(correspondent=c, content="test", title="test")

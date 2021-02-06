@@ -52,7 +52,7 @@ def train_classifier():
                 "Saving updated classifier model to {}...".format(
                     settings.MODEL_FILE)
             )
-            classifier.save_classifier()
+            classifier.save()
         else:
             logger.debug(
                 "Training data unchanged."
