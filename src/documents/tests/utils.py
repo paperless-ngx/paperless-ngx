@@ -19,11 +19,14 @@ def setup_directories():
     dirs.originals_dir = os.path.join(dirs.media_dir, "documents", "originals")
     dirs.thumbnail_dir = os.path.join(dirs.media_dir, "documents", "thumbnails")
     dirs.archive_dir = os.path.join(dirs.media_dir, "documents", "archive")
+    dirs.logging_dir = os.path.join(dirs.data_dir, "log")
 
     os.makedirs(dirs.index_dir, exist_ok=True)
     os.makedirs(dirs.originals_dir, exist_ok=True)
     os.makedirs(dirs.thumbnail_dir, exist_ok=True)
     os.makedirs(dirs.archive_dir, exist_ok=True)
+
+    os.makedirs(dirs.logging_dir, exist_ok=True)
 
     dirs.settings_override = override_settings(
         DATA_DIR=dirs.data_dir,
@@ -33,6 +36,7 @@ def setup_directories():
         THUMBNAIL_DIR=dirs.thumbnail_dir,
         ARCHIVE_DIR=dirs.archive_dir,
         CONSUMPTION_DIR=dirs.consumption_dir,
+        LOGGING_DIR=dirs.logging_dir,
         INDEX_DIR=dirs.index_dir,
         MODEL_FILE=os.path.join(dirs.data_dir, "classification_model.pickle"),
         MEDIA_LOCK=os.path.join(dirs.media_dir, "media.lock")
