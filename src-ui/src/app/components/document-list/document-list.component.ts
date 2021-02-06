@@ -12,7 +12,6 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { Toast, ToastService } from 'src/app/services/toast.service';
 import { FilterEditorComponent } from './filter-editor/filter-editor.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
-import { DocumentCardSmallComponent } from './document-card-small/document-card-small.component';
 
 @Component({
   selector: 'app-document-list',
@@ -41,8 +40,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   filterRulesModified: boolean = false
 
   private consumptionFinishedSubscription: Subscription
-
-  @ViewChildren(DocumentCardSmallComponent) smallCards: QueryList<DocumentCardSmallComponent>
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
@@ -206,11 +203,5 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   trackByDocumentId(index, item: PaperlessDocument) {
     return item.id
-  }
-
-  closeAllPopovers(cardOpening: DocumentCardSmallComponent) {
-    this.smallCards.forEach(card => {
-      if (card !== cardOpening) card.popover.close()
-    })
   }
 }
