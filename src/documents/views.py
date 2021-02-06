@@ -312,7 +312,7 @@ class LogViewSet(ViewSet):
     log_files = ["paperless", "mail"]
 
     def retrieve(self, request, pk=None, *args, **kwargs):
-        if not pk in self.log_files:
+        if pk not in self.log_files:
             raise Http404()
 
         filename = os.path.join(settings.LOGGING_DIR, f"{pk}.log")
@@ -321,7 +321,7 @@ class LogViewSet(ViewSet):
             raise Http404()
 
         with open(filename, "r") as f:
-            lines = [l.rstrip() for l in f.readlines()]
+            lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)
 
