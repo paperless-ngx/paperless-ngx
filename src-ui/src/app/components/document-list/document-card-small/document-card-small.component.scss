@@ -52,3 +52,8 @@
     z-index: 0;
   }
 }
+
+.popover-hidden ::ng-deep .popover {
+  opacity: 0;
+  pointer-events: none;
+}

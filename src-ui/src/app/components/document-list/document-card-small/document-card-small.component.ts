@@ -37,6 +37,9 @@ export class DocumentCardSmallComponent implements OnInit {
 
   @ViewChild('popover') popover: NgbPopover
 
+  mouseOnPreview = false
+  popoverHidden = true
+
   metadata: PaperlessDocumentMetadata
 
   ngOnInit(): void {
@@ -81,10 +84,16 @@ export class DocumentCardSmallComponent implements OnInit {
   mouseEnterPreview() {
     this.mouseOnPreview = true
     if (!this.popover.isOpen()) {
+      // we're going to open but hide to pre-load content during hover delay
+      this.popover.open()
+      this.popoverHidden = true
       setTimeout(() => {
         if (this.mouseOnPreview) {
+          // show popover
+          this.popoverHidden = false
           this.showPreview.emit(this)
-          this.popover.open()
+        } else {
+          this.popover.close()
         }
       }, 600);
     }
