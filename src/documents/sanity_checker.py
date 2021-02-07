@@ -56,7 +56,8 @@ def check_sanity():
             messages.append(SanityError(
                 f"Thumbnail of document {doc.pk} does not exist."))
         else:
-            present_files.remove(os.path.normpath(doc.thumbnail_path))
+            if os.path.normpath(doc.thumbnail_path) in present_files:
+                present_files.remove(os.path.normpath(doc.thumbnail_path))
             try:
                 with doc.thumbnail_file as f:
                     f.read()
@@ -71,7 +72,8 @@ def check_sanity():
             messages.append(SanityError(
                 f"Original of document {doc.pk} does not exist."))
         else:
-            present_files.remove(os.path.normpath(doc.source_path))
+            if os.path.normpath(doc.source_path) in present_files:
+                present_files.remove(os.path.normpath(doc.source_path))
             try:
                 with doc.source_file as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
@@ -92,7 +94,8 @@ def check_sanity():
                     f"Archived version of document {doc.pk} does not exist."
                 ))
             else:
-                present_files.remove(os.path.normpath(doc.archive_path))
+                if os.path.normpath(doc.archive_path) in present_files:
+                    present_files.remove(os.path.normpath(doc.archive_path))
                 try:
                     with doc.archive_file as f:
                         checksum = hashlib.md5(f.read()).hexdigest()
@@ -103,7 +106,8 @@ def check_sanity():
                 else:
                     if not checksum == doc.archive_checksum:
                         messages.append(SanityError(
-                            f"Checksum mismatch of archive {doc.pk}. "
+                            f"Checksum mismatch of archived document "
+                            f"{doc.pk}. "
                             f"Stored: {doc.checksum}, actual: {checksum}."
                         ))
 
