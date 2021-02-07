@@ -538,6 +538,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test_similar_filenames(self, m):
         shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
