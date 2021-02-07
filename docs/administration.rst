@@ -180,7 +180,7 @@ tasks on your paperless instance. You can invoke these commands either by
 .. code:: shell-session
 
     $ cd /path/to/paperless
-    $ docker-compose run --rm webserver <command> <arguments>
+    $ docker-compose exec -u paperless webserver python3 manage.py <command> <arguments>
 
 or
 
