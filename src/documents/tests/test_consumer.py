@@ -5,14 +5,12 @@ import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
 
-from django.conf import settings
 from django.test import TestCase, override_settings
 
 from .utils import DirectoriesMixin
 from ..consumer import Consumer, ConsumerError
 from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
 from ..parsers import DocumentParser, ParseError
-from ..tasks import sanity_check
 
 
 class TestAttributes(TestCase):
@@ -183,24 +181,6 @@ class DummyParser(DocumentParser):
         self.text = "The Text"
 
 
-class CopyParser(DocumentParser):
-
-    def get_thumbnail(self, document_path, mime_type):
-        return self.fake_thumb
-
-    def get_optimised_thumbnail(self, document_path, mime_type):
-        return self.fake_thumb
-
-    def __init__(self, logging_group, progress_callback=None):
-        super(CopyParser, self).__init__(logging_group, progress_callback)
-        _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=self.tempdir)
-
-    def parse(self, document_path, mime_type, file_name=None):
-        self.text = "The text"
-        self.archive_path = os.path.join(self.tempdir, "archive.pdf")
-        shutil.copy(document_path, self.archive_path)
-
-
 class FaultyParser(DocumentParser):
 
     def get_thumbnail(self, document_path, mime_type):
@@ -223,8 +203,6 @@ def fake_magic_from_file(file, mime=False):
     if mime:
         if os.path.splitext(file)[1] == ".pdf":
             return "application/pdf"
-        elif os.path.splitext(file)[1] == ".png":
-            return "image/png"
         else:
             return "unknown"
     else:
@@ -538,19 +516,6 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress(last_status="FAILED")
 
-    @mock.patch("documents.parsers.document_consumer_declaration.send")
-    def test_similar_filenames(self, m):
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.png"), os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
-        m.return_value = [(None, {
-            "parser": CopyParser,
-            "mime_types": {"application/pdf": ".pdf", "image/png": ".zip"},
-            "weight": 0
-        })]
-        doc1 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
-        doc2 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
-
-        sanity_check()
 
 class PreConsumeTestCase(TestCase):
 
