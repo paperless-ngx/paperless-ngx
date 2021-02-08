@@ -161,5 +161,8 @@ def generate_filename(doc, counter=0, append_gpg=True):
 
 
 def archive_name_from_filename(filename):
-
-    return os.path.splitext(filename)[0] + ".pdf"
+    name, ext = os.path.splitext(filename)
+    if ext == ".pdf":
+        return filename
+    else:
+        return filename + ".pdf"
