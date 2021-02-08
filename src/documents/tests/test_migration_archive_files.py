@@ -141,6 +141,8 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
 
+        self.assertEqual(Document.objects.filter(archive_checksum__isnull=False).count(), 4)
+
         # this will raise errors when any inconsistencies remain after migration
         sanity_check()
 
