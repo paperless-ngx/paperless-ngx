@@ -112,6 +112,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
         simple_pdf = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
         simple_pdf2 = os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000002.pdf")
         simple_txt = os.path.join(os.path.dirname(__file__), "samples", "simple.txt")
+        simple_png = os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.png")
 
         Document = apps.get_model("documents", "Document")
 
@@ -119,8 +120,10 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
         self.doc_no_archive = make_test_document(Document, "no_archive", "no_archive.txt", "text/plain", simple_txt)
         self.clashA = make_test_document(Document, "clash", "clash.pdf", "application/pdf", simple_pdf, simple_pdf)
         self.clashB = make_test_document(Document, "clash", "clash.jpg", "image/jpeg", simple_jpg, simple_pdf)
+        self.clashC = make_test_document(Document, "clash", "clash.png", "image/png", simple_png, simple_pdf)
 
         self.assertEqual(archive_path_old(self.clashA), archive_path_old(self.clashB))
+        self.assertEqual(archive_path_old(self.clashA), archive_path_old(self.clashC))
         self.assertRaises(SanityFailedError, sanity_check)
 
     def testArchiveFilesMigrated(self):
