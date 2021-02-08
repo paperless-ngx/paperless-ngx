@@ -74,11 +74,17 @@ def move_old_to_new_locations(apps, schema_editor):
     # check for documents that have incorrect archive versions
     for doc in Document.objects.filter(archive_checksum__isnull=False):
         old_path = archive_path_old(doc)
+        new_path = archive_path_new(doc)
 
         if not os.path.isfile(old_path):
             raise ValueError(
                 f"Archived document of {doc.filename} does not exist at: "
                 f"{old_path}")
+
+        if old_path != new_path and os.path.isfile(new_path):
+            raise ValueError(
+                f"Need to move {old_path} to {new_path}, but target file "
+                f"already exists")
 
         if old_path in old_archive_path_to_id:
             affected_document_ids.add(doc.id)
