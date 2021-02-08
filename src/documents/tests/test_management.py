@@ -106,6 +106,7 @@ class TestMakeIndex(TestCase):
 
 class TestRenamer(DirectoriesMixin, TestCase):
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_rename(self):
         doc = Document.objects.create(title="test", mime_type="application/pdf")
         doc.filename = generate_filename(doc)

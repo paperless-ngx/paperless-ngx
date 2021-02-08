@@ -146,6 +146,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_thumbnail)
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_download_with_archive(self):
 
         _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
