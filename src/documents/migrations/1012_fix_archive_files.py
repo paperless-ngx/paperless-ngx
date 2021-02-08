@@ -163,8 +163,9 @@ def move_new_to_old_locations(apps, schema_editor):
     for doc in Document.objects.filter(archive_checksum__isnull=False):
         new_archive_path = archive_path_new(doc)
         old_archive_path = archive_path_old(doc)
-        shutil.move(new_archive_path, old_archive_path)
-        logger.debug(f"Moving {new_archive_path} to {old_archive_path}")
+        if new_archive_path != old_archive_path:
+            logger.debug(f"Moving {new_archive_path} to {old_archive_path}")
+            shutil.move(new_archive_path, old_archive_path)
 
 
 class Migration(migrations.Migration):
