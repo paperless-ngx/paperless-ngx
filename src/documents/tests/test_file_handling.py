@@ -558,6 +558,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(os.path.isfile(doc.archive_path))
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_archive_deleted(self):
         original = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
