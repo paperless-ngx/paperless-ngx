@@ -102,11 +102,17 @@ def move_old_to_new_locations(apps, schema_editor):
         old_path = archive_path_old(doc)
         new_path = archive_path_new(doc)
 
-        if old_path != new_path and not os.path.isfile(new_path):
-            logger.debug(
-                f"Moving {old_path} to {new_path}"
-            )
-            shutil.move(old_path, new_path)
+        if doc.id in affected_document_ids:
+            # remove affected archive versions
+            if os.path.isfile(old_path):
+                os.unlink(old_path)
+        else:
+            # move unaffected archive versions
+            if old_path != new_path and os.path.isfile(old_path) and not os.path.isfile(new_path):
+                logger.debug(
+                    f"Moving {old_path} to {new_path}"
+                )
+                shutil.move(old_path, new_path)
 
     # regenerate archive documents
     for doc_id in affected_document_ids:
