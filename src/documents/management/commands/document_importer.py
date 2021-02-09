@@ -151,6 +151,9 @@ class Command(BaseCommand):
                 shutil.copy2(thumbnail_path, document.thumbnail_path)
                 if archive_path:
                     create_source_path_directory(document.archive_path)
+                    # TODO: this assumes that the export is valid and
+                    #  archive_filename is present on all documents with
+                    #  archived files
                     shutil.copy2(archive_path, document.archive_path)
 
             document.save()
