@@ -22,7 +22,10 @@ def _process_document(doc_in):
 
     try:
         thumb = parser.get_optimised_thumbnail(
-            document.source_path, document.mime_type)
+            document.source_path,
+            document.mime_type,
+            document.get_public_filename()
+        )
 
         shutil.move(thumb, document.thumbnail_path)
     finally:
