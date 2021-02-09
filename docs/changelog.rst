@@ -5,6 +5,22 @@
 Changelog
 *********
 
+paperless-ng 1.1.1
+##################
+
+* Fixed a bug in the sanity checker that would cause it to display "x not in list" errors instead of actual issues.
+
+* Fixed a bug with filename generation for archive filenames that would cause the archive files of two documents to overlap.
+
+  * This happened when ``PAPERLESS_FILENAME_FORMAT`` is used and the filename for two documents is the same, except for the file extension.
+  * Paperless will now store the archive filename in the database as well instead of deriving it from the original filename, and use the
+    same logic for detecting and avoiding filename clashes that's also used for original filenames.
+  * The migrations will repair any missing archive files. If you're using tika, ensure that tika is running while performing the migration. Docker will take care of that.
+
+* Fixed a bug with thumbnail regeneration when TIKA integration was used.
+
+* Added ASN as a placeholder field to the filename format.
+
 paperless-ng 1.1.0
 ##################
 
@@ -17,7 +33,7 @@ paperless-ng 1.1.0
       or added with one of the mobile apps.
     * Documents are successfully added to paperless.
     * Document consumption failed (with error messages)
-  
+
   * Configuration options to enable/disable individual notifications.
 
 * Live updates to document lists and saved views when new documents are added.
