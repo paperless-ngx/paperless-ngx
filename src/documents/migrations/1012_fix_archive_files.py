@@ -192,7 +192,7 @@ def move_old_to_new_locations(apps, schema_editor):
                 os.unlink(old_path)
         else:
             # Set archive path for unaffected files
-            doc.archive_filename = archive_path_old(doc)
+            doc.archive_filename = archive_name_from_filename(doc.filename)
             Document.objects.filter(id=doc.id).update(
                 archive_filename=doc.archive_filename
             )
