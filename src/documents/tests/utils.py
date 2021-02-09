@@ -92,6 +92,7 @@ class TestMigrations(TransactionTestCase):
 
     migrate_from = None
     migrate_to = None
+    auto_migrate = True
 
     def setUp(self):
         super(TestMigrations, self).setUp()
@@ -108,6 +109,12 @@ class TestMigrations(TransactionTestCase):
 
         self.setUpBeforeMigration(old_apps)
 
+        self.apps = old_apps
+
+        if self.auto_migrate:
+            self.performMigration()
+
+    def performMigration(self):
         # Run the migration to test
         executor = MigrationExecutor(connection)
         executor.loader.build_graph()  # reload.
