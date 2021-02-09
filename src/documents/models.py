@@ -279,7 +279,6 @@ class Document(models.Model):
         else:
             return None
 
-
     @property
     def archive_file(self):
         return open(self.archive_path, "rb")
