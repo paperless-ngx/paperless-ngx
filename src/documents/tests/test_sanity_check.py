@@ -86,6 +86,19 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         Path(self.dirs.originals_dir, "orphaned").touch()
         self.assertEqual(len(check_sanity()), 1)
 
-    def test_all(self):
-        Document.objects.create(title="test", checksum="dgfhj", archive_checksum="dfhg", content="", pk=1, filename="0000001.pdf")
+    def test_error_tostring(self):
+        Document.objects.create(title="test", checksum="dgfhj", archive_checksum="dfhg", content="", pk=1, filename="0000001.pdf", archive_filename="0000001.pdf")
         string = str(SanityFailedError(check_sanity()))
+        self.assertIsNotNone(string)
+
+    def test_archive_filename_no_checksum(self):
+        doc = self.make_test_data()
+        doc.archive_checksum = None
+        doc.save()
+        self.assertEqual(len(check_sanity()), 2)
+
+    def test_archive_checksum_no_filename(self):
+        doc = self.make_test_data()
+        doc.archive_filename = None
+        doc.save()
+        self.assertEqual(len(check_sanity()), 2)
