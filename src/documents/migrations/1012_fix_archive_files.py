@@ -163,7 +163,7 @@ def move_old_to_new_locations(apps, schema_editor):
 
         if not os.path.isfile(old_path):
             raise ValueError(
-                f"Archived document of {doc.filename} does not exist at: "
+                f"Archived document ID:{doc.id} does not exist at: "
                 f"{old_path}")
 
         if old_path in old_archive_path_to_id:
@@ -180,7 +180,7 @@ def move_old_to_new_locations(apps, schema_editor):
         parser_class = get_parser_class_for_mime_type(doc.mime_type)
         if not parser_class:
             raise Exception(
-                f"document {doc.filename} has an invalid archived document, "
+                f"Document ID:{doc.id} has an invalid archived document, "
                 f"but no parsers are available. Cannot migrate.")
 
     for doc in Document.objects.filter(archive_checksum__isnull=False):
@@ -205,7 +205,7 @@ def move_old_to_new_locations(apps, schema_editor):
 
         doc = Document.objects.get(id=doc_id)
         logger.info(
-            f"Regenerating archive document for {doc.filename}"
+            f"Regenerating archive document for document ID:{doc.id}"
         )
         parser_class = get_parser_class_for_mime_type(doc.mime_type)
         parser: DocumentParser = parser_class(None, None)
@@ -222,10 +222,16 @@ def move_old_to_new_locations(apps, schema_editor):
                 shutil.copy2(parser.get_archive_path(), archive_path_new(doc))
             else:
                 doc.archive_checksum = None
+                logger.error(
+                    f"Parser did not return an archive document for document "
+                    f"ID:{doc.id}. Removing archive document."
+                )
             doc.save()
         except ParseError:
             logger.exception(
-                f"Unable to regenerate archive document for {doc.filename}"
+                f"Unable to regenerate archive document for ID:{doc.id}. You "
+                f"need to invoke the document_archiver management command "
+                f"manually for that document."
             )
         finally:
             parser.cleanup()
