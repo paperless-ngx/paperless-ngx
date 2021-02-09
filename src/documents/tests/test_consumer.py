@@ -296,6 +296,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIsNone(document.correspondent)
         self.assertIsNone(document.document_type)
         self.assertEqual(document.filename, "0000001.pdf")
+        self.assertEqual(document.archive_filename, "0000001.pdf")
 
         self.assertTrue(os.path.isfile(
             document.source_path
@@ -454,6 +455,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.filename, "none/new docs.pdf")
+        self.assertEqual(document.archive_filename, "none/new docs.pdf")
 
         self._assert_first_last_send_progress()
 
@@ -468,7 +470,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
             filenames.insert(0, f)
             return f
 
-        m.side_effect = lambda f, root: get_filename()
+        m.side_effect = lambda f, archive_filename = False: get_filename()
 
         filename = self.get_test_file()
 
@@ -479,6 +481,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertEqual(document.title, "new docs")
         self.assertIsNotNone(os.path.isfile(document.title))
         self.assertTrue(os.path.isfile(document.source_path))
+        self.assertTrue(os.path.isfile(document.archive_path))
 
         self._assert_first_last_send_progress()
 
@@ -553,7 +556,15 @@ class TestConsumer(DirectoriesMixin, TestCase):
         doc2 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
         doc3 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"))
 
+        self.assertEqual(doc1.filename, "simple.png")
+        self.assertEqual(doc1.archive_filename, "simple.pdf")
+        self.assertEqual(doc2.filename, "simple.pdf")
+        self.assertEqual(doc2.archive_filename, "simple_01.pdf")
+        self.assertEqual(doc3.filename, "simple.png.pdf")
+        self.assertEqual(doc3.archive_filename, "simple.png.pdf")
+
         sanity_check()
+
 
 class PreConsumeTestCase(TestCase):
 
