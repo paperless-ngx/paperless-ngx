@@ -149,18 +149,15 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_download_with_archive(self):
 
-        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
-
         content = b"This is a test"
         content_archive = b"This is the same test but archived"
 
-        with open(filename, "wb") as f:
-            f.write(content)
-
-        filename = os.path.basename(filename)
-
-        doc = Document.objects.create(title="none", filename=filename,
+        doc = Document.objects.create(title="none", filename="my_document.pdf",
+                                      archive_filename="archived.pdf",
                                       mime_type="application/pdf")
+
+        with open(doc.source_path, "wb") as f:
+            f.write(content)
 
         with open(doc.archive_path, "wb") as f:
             f.write(content_archive)
@@ -578,7 +575,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         async_task.assert_not_called()
 
     def test_get_metadata(self):
-        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png", archive_checksum="A")
+        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png", archive_checksum="A", archive_filename="archive.pdf")
 
         shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), doc.source_path)
         shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), doc.archive_path)
@@ -592,6 +589,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertTrue(meta['has_archive_version'])
         self.assertEqual(len(meta['original_metadata']), 0)
         self.assertGreater(len(meta['archive_metadata']), 0)
+        self.assertEqual(meta['media_filename'], "file.pdf")
+        self.assertEqual(meta['archive_media_filename'], "archive.pdf")
 
     def test_get_metadata_invalid_doc(self):
         response = self.client.get(f"/api/documents/34576/metadata/")
@@ -611,6 +610,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertFalse(meta['has_archive_version'])
         self.assertGreater(len(meta['original_metadata']), 0)
         self.assertIsNone(meta['archive_metadata'])
+        self.assertIsNone(meta['archive_media_filename'])
 
     def test_get_empty_suggestions(self):
         doc = Document.objects.create(title="test", mime_type="application/pdf")

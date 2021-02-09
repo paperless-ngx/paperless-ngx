@@ -20,6 +20,7 @@ from documents.tests.utils import DirectoriesMixin
 sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
 
+@override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
 class TestArchiver(DirectoriesMixin, TestCase):
 
     def make_models(self):
@@ -45,6 +46,7 @@ class TestArchiver(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(doc.archive_path))
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
+        self.assertEqual(doc.archive_filename, "none/A.pdf")
 
 
 class TestDecryptDocuments(TestCase):
