@@ -16,7 +16,8 @@ from whoosh.writing import AsyncWriter
 
 from documents.models import Document
 from ... import index
-from ...file_handling import create_source_path_directory
+from ...file_handling import create_source_path_directory, \
+    generate_unique_filename
 from ...parsers import get_parser_class_for_mime_type
 
 
@@ -39,13 +40,16 @@ def handle_document(document_id):
             with transaction.atomic():
                 with open(parser.get_archive_path(), 'rb') as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
-                # i'm going to save first so that in case the file move
+                # I'm going to save first so that in case the file move
                 # fails, the database is rolled back.
-                # we also don't use save() since that triggers the filehandling
+                # We also don't use save() since that triggers the filehandling
                 # logic, and we don't want that yet (file not yet in place)
+                document.archive_filename = generate_unique_filename(
+                    document, archive_filename=True)
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
-                    content=parser.get_text()
+                    content=parser.get_text(),
+                    archive_filename=document.archive_filename
                 )
                 with FileLock(settings.MEDIA_LOCK):
                     create_source_path_directory(document.archive_path)
@@ -101,7 +105,7 @@ class Command(BaseCommand):
         document_ids = list(map(
             lambda doc: doc.id,
             filter(
-                lambda d: overwrite or not d.archive_checksum,
+                lambda d: overwrite or not d.has_archive_version,
                 documents
             )
         ))
