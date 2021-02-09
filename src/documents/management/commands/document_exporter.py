@@ -139,7 +139,7 @@ class Command(BaseCommand):
             thumbnail_target = os.path.join(self.target, thumbnail_name)
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
-            if os.path.exists(document.archive_path):
+            if document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
                 archive_target = os.path.join(self.target, archive_name)
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name

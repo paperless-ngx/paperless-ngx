@@ -14,7 +14,7 @@ from filelock import FileLock
 
 from .. import index, matching
 from ..file_handling import delete_empty_directories, \
-    create_source_path_directory, archive_name_from_filename, \
+    create_source_path_directory, \
     generate_unique_filename
 from ..models import Document, Tag
 
@@ -148,18 +148,18 @@ def set_tags(sender,
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
-        for f in (instance.source_path,
-                  instance.archive_path,
-                  instance.thumbnail_path):
-            if os.path.isfile(f):
+        for filename in (instance.source_path,
+                         instance.archive_path,
+                         instance.thumbnail_path):
+            if filename and os.path.isfile(filename):
                 try:
-                    os.unlink(f)
+                    os.unlink(filename)
                     logger.debug(
-                        f"Deleted file {f}.")
+                        f"Deleted file {filename}.")
                 except OSError as e:
                     logger.warning(
                         f"While deleting document {str(instance)}, the file "
-                        f"{f} could not be deleted: {e}"
+                        f"{filename} could not be deleted: {e}"
                     )
 
         delete_empty_directories(
@@ -167,10 +167,11 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
             root=settings.ORIGINALS_DIR
         )
 
-        delete_empty_directories(
-            os.path.dirname(instance.archive_path),
-            root=settings.ARCHIVE_DIR
-        )
+        if instance.has_archive_version:
+            delete_empty_directories(
+                os.path.dirname(instance.archive_path),
+                root=settings.ARCHIVE_DIR
+            )
 
 
 def validate_move(instance, old_path, new_path):
@@ -207,8 +208,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
 
     with FileLock(settings.MEDIA_LOCK):
         old_filename = instance.filename
-        new_filename = generate_unique_filename(
-            instance, settings.ORIGINALS_DIR)
+        new_filename = generate_unique_filename(instance)
 
         if new_filename == instance.filename:
             # Don't do anything if its the same.
@@ -222,8 +222,11 @@ def update_filename_and_move_files(sender, instance, **kwargs):
 
         # archive files are optional, archive checksum tells us if we have one,
         # since this is None for documents without archived files.
-        if instance.archive_checksum:
-            new_archive_filename = archive_name_from_filename(new_filename)
+        if instance.has_archive_version:
+            old_archive_filename = instance.archive_filename
+            new_archive_filename = generate_unique_filename(
+                instance, archive_filename=True
+            )
             old_archive_path = instance.archive_path
             new_archive_path = os.path.join(settings.ARCHIVE_DIR,
                                             new_archive_filename)
@@ -233,6 +236,8 @@ def update_filename_and_move_files(sender, instance, **kwargs):
 
             create_source_path_directory(new_archive_path)
         else:
+            old_archive_filename = None
+            new_archive_filename = None
             old_archive_path = None
             new_archive_path = None
 
@@ -240,22 +245,28 @@ def update_filename_and_move_files(sender, instance, **kwargs):
 
         try:
             os.rename(old_source_path, new_source_path)
-            if instance.archive_checksum:
-                os.rename(old_archive_path, new_archive_path)
             instance.filename = new_filename
+
+            if instance.has_archive_version:
+                os.rename(old_archive_path, new_archive_path)
+                instance.archive_filename = new_archive_filename
 
             # Don't save() here to prevent infinite recursion.
             Document.objects.filter(pk=instance.pk).update(
-                filename=new_filename)
+                filename=instance.filename,
+                archive_filename=instance.archive_filename,
+            )
 
         except OSError as e:
             instance.filename = old_filename
+            instance.archive_filename = old_archive_filename
             # this happens when we can't move a file. If that's the case for
             # the archive file, we try our best to revert the changes.
             # no need to save the instance, the update() has not happened yet.
             try:
                 os.rename(new_source_path, old_source_path)
-                os.rename(new_archive_path, old_archive_path)
+                if instance.has_archive_version:
+                    os.rename(new_archive_path, old_archive_path)
             except Exception as e:
                 # This is fine, since:
                 # A: if we managed to move source from A to B, we will also
@@ -271,9 +282,10 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             # since moving them once succeeded, it's very likely going to
             # succeed again.
             os.rename(new_source_path, old_source_path)
-            if instance.archive_checksum:
+            if instance.has_archive_version:
                 os.rename(new_archive_path, old_archive_path)
             instance.filename = old_filename
+            instance.archive_filename = old_archive_filename
             # again, no need to save the instance, since the actual update()
             # operation failed.
 
@@ -283,7 +295,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             delete_empty_directories(os.path.dirname(old_source_path),
                                      root=settings.ORIGINALS_DIR)
 
-        if old_archive_path and not os.path.isfile(old_archive_path):
+        if instance.has_archive_version and not os.path.isfile(old_archive_path):  # NOQA: E501
             delete_empty_directories(os.path.dirname(old_archive_path),
                                      root=settings.ARCHIVE_DIR)
 

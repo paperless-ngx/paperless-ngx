@@ -292,8 +292,7 @@ class Consumer(LoggingMixin):
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):
-                    document.filename = generate_unique_filename(
-                        document, settings.ORIGINALS_DIR)
+                    document.filename = generate_unique_filename(document)
                     create_source_path_directory(document.source_path)
 
                     self._write(document.storage_type,
@@ -303,6 +302,10 @@ class Consumer(LoggingMixin):
                                 thumbnail, document.thumbnail_path)
 
                     if archive_path and os.path.isfile(archive_path):
+                        document.archive_filename = generate_unique_filename(
+                            document,
+                            archive_filename=True
+                        )
                         create_source_path_directory(document.archive_path)
                         self._write(document.storage_type,
                                     archive_path, document.archive_path)
