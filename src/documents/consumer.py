@@ -241,7 +241,7 @@ class Consumer(LoggingMixin):
             self._send_progress(70, 100, 'WORKING',
                                 MESSAGE_GENERATING_THUMBNAIL)
             thumbnail = document_parser.get_optimised_thumbnail(
-                self.path, mime_type)
+                self.path, mime_type, self.filename)
 
             text = document_parser.get_text()
             date = document_parser.get_date()
