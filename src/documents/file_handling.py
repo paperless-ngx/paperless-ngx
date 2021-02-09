@@ -131,6 +131,11 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             else:
                 document_type = "none"
 
+            if doc.archive_serial_number:
+                asn = str(doc.archive_serial_number)
+            else:
+                asn = "none"
+
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
                 title=pathvalidate.sanitize_filename(
                     doc.title, replacement_text="-"),
@@ -144,6 +149,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 added_year=doc.added.year if doc.added else "none",
                 added_month=f"{doc.added.month:02}" if doc.added else "none",
                 added_day=f"{doc.added.day:02}" if doc.added else "none",
+                asn=asn,
                 tags=tags,
                 tag_list=tag_list
             ).strip()

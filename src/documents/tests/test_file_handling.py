@@ -201,6 +201,13 @@ class TestFileHandling(DirectoriesMixin, TestCase):
 
         self.assertEqual(generate_filename(d), "my_doc_type - the_doc.pdf")
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{asn} - {title}")
+    def test_asn(self):
+        d1 = Document.objects.create(title="the_doc", mime_type="application/pdf", archive_serial_number=652, checksum="A")
+        d2 = Document.objects.create(title="the_doc", mime_type="application/pdf", archive_serial_number=None, checksum="B")
+        self.assertEqual(generate_filename(d1), "652 - the_doc.pdf")
+        self.assertEqual(generate_filename(d2), "none - the_doc.pdf")
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
         document = Document()
