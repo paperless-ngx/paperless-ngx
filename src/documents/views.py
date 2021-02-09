@@ -291,6 +291,8 @@ class DocumentViewSet(RetrieveModelMixin,
                 handle = GnuPG.decrypted(doc.thumbnail_file)
             else:
                 handle = doc.thumbnail_file
+            # TODO: Send ETag information and use that to send new thumbnails
+            #  if available
             return HttpResponse(handle,
                                 content_type='image/png')
         except (FileNotFoundError, Document.DoesNotExist):
