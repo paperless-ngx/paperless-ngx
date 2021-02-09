@@ -108,15 +108,15 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
     def setUpBeforeMigration(self, apps):
         Document = apps.get_model("documents", "Document")
 
-        doc_no_archive = make_test_document(Document, "no_archive", "text/plain", simple_txt, "no_archive.txt")
-        clash1 = make_test_document(Document, "clash", "application/pdf", simple_pdf, "clash.pdf", simple_pdf)
-        clash2 = make_test_document(Document, "clash", "image/jpeg", simple_jpg, "clash.jpg", simple_pdf)
-        clash3 = make_test_document(Document, "clash", "image/png", simple_png, "clash.png", simple_pdf)
-        clash4 = make_test_document(Document, "clash.png", "application/pdf", simple_pdf2, "clash.png.pdf", simple_pdf2)
+        self.doc_no_archive = make_test_document(Document, "no_archive", "text/plain", simple_txt, "no_archive.txt")
+        self.clash1 = make_test_document(Document, "clash", "application/pdf", simple_pdf, "clash.pdf", simple_pdf)
+        self.clash2 = make_test_document(Document, "clash", "image/jpeg", simple_jpg, "clash.jpg", simple_pdf)
+        self.clash3 = make_test_document(Document, "clash", "image/png", simple_png, "clash.png", simple_pdf)
+        self.clash4 = make_test_document(Document, "clash.png", "application/pdf", simple_pdf2, "clash.png.pdf", simple_pdf2)
 
-        self.assertEqual(archive_path_old(clash1), archive_path_old(clash2))
-        self.assertEqual(archive_path_old(clash1), archive_path_old(clash3))
-        self.assertNotEqual(archive_path_old(clash1), archive_path_old(clash4))
+        self.assertEqual(archive_path_old(self.clash1), archive_path_old(self.clash2))
+        self.assertEqual(archive_path_old(self.clash1), archive_path_old(self.clash3))
+        self.assertNotEqual(archive_path_old(self.clash1), archive_path_old(self.clash4))
 
     def testArchiveFilesMigrated(self):
         Document = self.apps.get_model('documents', 'Document')
@@ -140,10 +140,25 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
 
         self.assertEqual(Document.objects.filter(archive_checksum__isnull=False).count(), 4)
 
+    def test_filenames(self):
+        Document = self.apps.get_model('documents', 'Document')
+        self.assertEqual(Document.objects.get(id=self.doc_no_archive.id).archive_filename, None)
+        self.assertEqual(Document.objects.get(id=self.clash1.id).archive_filename, f"{self.clash1.id:07}.pdf")
+        self.assertEqual(Document.objects.get(id=self.clash2.id).archive_filename, f"{self.clash2.id:07}.pdf")
+        self.assertEqual(Document.objects.get(id=self.clash3.id).archive_filename, f"{self.clash3.id:07}.pdf")
+        self.assertEqual(Document.objects.get(id=self.clash4.id).archive_filename, "clash.png.pdf")
+
 
 @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
 class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
-    pass
+
+    def test_filenames(self):
+        Document = self.apps.get_model('documents', 'Document')
+        self.assertEqual(Document.objects.get(id=self.doc_no_archive.id).archive_filename, None)
+        self.assertEqual(Document.objects.get(id=self.clash1.id).archive_filename, "none/clash.pdf")
+        self.assertEqual(Document.objects.get(id=self.clash2.id).archive_filename, "none/clash_01.pdf")
+        self.assertEqual(Document.objects.get(id=self.clash3.id).archive_filename, "none/clash_02.pdf")
+        self.assertEqual(Document.objects.get(id=self.clash4.id).archive_filename, "clash.png.pdf")
 
 
 @override_settings(PAPERLESS_FILENAME_FORMAT="")
