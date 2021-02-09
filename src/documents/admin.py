@@ -50,7 +50,11 @@ class DocumentAdmin(admin.ModelAdmin):
         "modified",
         "mime_type",
         "storage_type",
-        "filename")
+        "filename",
+        "checksum",
+        "archive_filename",
+        "archive_checksum"
+    )
 
     list_display_links = ("title",)
 
