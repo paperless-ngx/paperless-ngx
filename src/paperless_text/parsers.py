@@ -13,7 +13,7 @@ class TextDocumentParser(DocumentParser):
 
     logging_name = "paperless.parsing.text"
 
-    def get_thumbnail(self, document_path, mime_type):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
 
         def read_text():
             with open(document_path, 'r') as src:

@@ -288,14 +288,17 @@ class DocumentParser(LoggingMixin):
     def get_archive_path(self):
         return self.archive_path
 
-    def get_thumbnail(self, document_path, mime_type):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         """
         Returns the path to a file we can use as a thumbnail for this document.
         """
         raise NotImplementedError()
 
-    def get_optimised_thumbnail(self, document_path, mime_type):
-        thumbnail = self.get_thumbnail(document_path, mime_type)
+    def get_optimised_thumbnail(self,
+                                document_path,
+                                mime_type,
+                                file_name=None):
+        thumbnail = self.get_thumbnail(document_path, mime_type, file_name)
         if settings.OPTIMIZE_THUMBNAILS:
             out_path = os.path.join(self.tempdir, "thumb_optipng.png")
 
