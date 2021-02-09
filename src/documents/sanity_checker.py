@@ -88,7 +88,7 @@ def check_sanity():
                     ))
 
         # Check sanity of the archive file.
-        if doc.archive_checksum:
+        if doc.has_archive_version:
             if not os.path.isfile(doc.archive_path):
                 messages.append(SanityError(
                     f"Archived version of document {doc.pk} does not exist."

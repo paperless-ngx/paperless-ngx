@@ -192,7 +192,7 @@ class DocumentViewSet(RetrieveModelMixin,
 
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
-        if not self.original_requested(request) and os.path.isfile(doc.archive_path):  # NOQA: E501
+        if not self.original_requested(request) and doc.has_archive_version:  # NOQA: E501
             file_handle = doc.archive_file
             filename = doc.get_public_filename(archive=True)
             mime_type = 'application/pdf'
@@ -237,18 +237,18 @@ class DocumentViewSet(RetrieveModelMixin,
             "original_size": os.stat(doc.source_path).st_size,
             "original_mime_type": doc.mime_type,
             "media_filename": doc.filename,
-            "has_archive_version": os.path.isfile(doc.archive_path),
+            "has_archive_version": doc.has_archive_version,
             "original_metadata": self.get_metadata(
-                doc.source_path, doc.mime_type)
+                doc.source_path, doc.mime_type),
+            "archive_checksum": doc.archive_checksum,
+            "archive_media_filename": doc.archive_filename
         }
 
-        if doc.archive_checksum and os.path.isfile(doc.archive_path):
-            meta['archive_checksum'] = doc.archive_checksum
+        if doc.has_archive_version:
             meta['archive_size'] = os.stat(doc.archive_path).st_size,
             meta['archive_metadata'] = self.get_metadata(
                 doc.archive_path, "application/pdf")
         else:
-            meta['archive_checksum'] = None
             meta['archive_size'] = None
             meta['archive_metadata'] = None
 

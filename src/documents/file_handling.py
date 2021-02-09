@@ -79,12 +79,20 @@ def many_to_dictionary(field):
     return mydictionary
 
 
-def generate_unique_filename(doc, root):
+def generate_unique_filename(doc, archive_filename=False):
+    if archive_filename:
+        old_filename = doc.archive_filename
+        root = settings.ARCHIVE_DIR
+    else:
+        old_filename = doc.filename
+        root = settings.ORIGINALS_DIR
+
     counter = 0
 
     while True:
-        new_filename = generate_filename(doc, counter)
-        if new_filename == doc.filename:
+        new_filename = generate_filename(
+            doc, counter, archive_filename=archive_filename)
+        if new_filename == old_filename:
             # still the same as before.
             return new_filename
 
@@ -94,7 +102,7 @@ def generate_unique_filename(doc, root):
             return new_filename
 
 
-def generate_filename(doc, counter=0, append_gpg=True):
+def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     path = ""
 
     try:
@@ -148,21 +156,16 @@ def generate_filename(doc, counter=0, append_gpg=True):
             f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default")
 
     counter_str = f"_{counter:02}" if counter else ""
+
+    filetype_str = ".pdf" if archive_filename else doc.file_type
+
     if len(path) > 0:
-        filename = f"{path}{counter_str}{doc.file_type}"
+        filename = f"{path}{counter_str}{filetype_str}"
     else:
-        filename = f"{doc.pk:07}{counter_str}{doc.file_type}"
+        filename = f"{doc.pk:07}{counter_str}{filetype_str}"
 
     # Append .gpg for encrypted files
     if append_gpg and doc.storage_type == doc.STORAGE_TYPE_GPG:
         filename += ".gpg"
 
     return filename
-
-
-def archive_name_from_filename(filename):
-    name, ext = os.path.splitext(filename)
-    if ext == ".pdf":
-        return filename
-    else:
-        return filename + ".pdf"
