@@ -87,6 +87,18 @@ def check_sanity():
                         f"Stored: {doc.checksum}, actual: {checksum}."
                     ))
 
+        if doc.archive_checksum and not doc.archive_filename:
+            messages.append(SanityError(
+                f"Document {doc.pk} has an archive file checksum, but no "
+                f"archive filename."
+            ))
+
+        if not doc.archive_checksum and doc.archive_filename:
+            messages.append(SanityError(
+                f"Document {doc.pk} has an archive file, but its checksum is "
+                f"missing."
+            ))
+
         # Check sanity of the archive file.
         if doc.has_archive_version:
             if not os.path.isfile(doc.archive_path):
