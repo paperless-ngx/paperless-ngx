@@ -21,7 +21,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
             shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "archive", "0000001.pdf"), os.path.join(self.dirs.archive_dir, "0000001.pdf"))
             shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), os.path.join(self.dirs.thumbnail_dir, "0000001.png"))
 
-        return Document.objects.create(title="test", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", content="test", pk=1, filename="0000001.pdf", mime_type="application/pdf")
+        return Document.objects.create(title="test", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", content="test", pk=1, filename="0000001.pdf", mime_type="application/pdf", archive_filename="0000001.pdf")
 
     def test_no_docs(self):
         self.assertEqual(len(check_sanity()), 0)
