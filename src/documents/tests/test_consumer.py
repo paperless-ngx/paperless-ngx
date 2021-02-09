@@ -543,13 +543,15 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def test_similar_filenames(self, m):
         shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
         shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.png"), os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.png"), os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"))
         m.return_value = [(None, {
             "parser": CopyParser,
-            "mime_types": {"application/pdf": ".pdf", "image/png": ".zip"},
+            "mime_types": {"application/pdf": ".pdf", "image/png": ".png"},
             "weight": 0
         })]
         doc1 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
         doc2 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
+        doc3 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"))
 
         sanity_check()
 
