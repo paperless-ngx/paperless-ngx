@@ -95,8 +95,10 @@ def make_test_document(document_class, title: str, mime_type: str, original: str
 simple_jpg = os.path.join(os.path.dirname(__file__), "samples", "simple.jpg")
 simple_pdf = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 simple_pdf2 = os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000002.pdf")
+simple_pdf3 = os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000003.pdf")
 simple_txt = os.path.join(os.path.dirname(__file__), "samples", "simple.txt")
 simple_png = os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.png")
+simple_png2 = os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
 
 
 @override_settings(PAPERLESS_FILENAME_FORMAT="")
@@ -108,6 +110,8 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
     def setUpBeforeMigration(self, apps):
         Document = apps.get_model("documents", "Document")
 
+        self.unrelated = make_test_document(Document, "unrelated", "application/pdf", simple_pdf3, "unrelated.pdf", simple_pdf)
+        self.no_text = make_test_document(Document, "no-text", "image/png", simple_png2, "no-text.png", simple_pdf)
         self.doc_no_archive = make_test_document(Document, "no_archive", "text/plain", simple_txt, "no_archive.txt")
         self.clash1 = make_test_document(Document, "clash", "application/pdf", simple_pdf, "clash.pdf", simple_pdf)
         self.clash2 = make_test_document(Document, "clash", "image/jpeg", simple_jpg, "clash.jpg", simple_pdf)
@@ -138,10 +142,12 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
                     archive_checksum = hashlib.md5(f.read()).hexdigest()
                 self.assertEqual(archive_checksum, doc.archive_checksum)
 
-        self.assertEqual(Document.objects.filter(archive_checksum__isnull=False).count(), 4)
+        self.assertEqual(Document.objects.filter(archive_checksum__isnull=False).count(), 6)
 
     def test_filenames(self):
         Document = self.apps.get_model('documents', 'Document')
+        self.assertEqual(Document.objects.get(id=self.unrelated.id).archive_filename, "unrelated.pdf")
+        self.assertEqual(Document.objects.get(id=self.no_text.id).archive_filename, "no-text.pdf")
         self.assertEqual(Document.objects.get(id=self.doc_no_archive.id).archive_filename, None)
         self.assertEqual(Document.objects.get(id=self.clash1.id).archive_filename, f"{self.clash1.id:07}.pdf")
         self.assertEqual(Document.objects.get(id=self.clash2.id).archive_filename, f"{self.clash2.id:07}.pdf")
@@ -154,11 +160,30 @@ class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
 
     def test_filenames(self):
         Document = self.apps.get_model('documents', 'Document')
+        self.assertEqual(Document.objects.get(id=self.unrelated.id).archive_filename, "unrelated.pdf")
+        self.assertEqual(Document.objects.get(id=self.no_text.id).archive_filename, "no-text.pdf")
         self.assertEqual(Document.objects.get(id=self.doc_no_archive.id).archive_filename, None)
         self.assertEqual(Document.objects.get(id=self.clash1.id).archive_filename, "none/clash.pdf")
         self.assertEqual(Document.objects.get(id=self.clash2.id).archive_filename, "none/clash_01.pdf")
         self.assertEqual(Document.objects.get(id=self.clash3.id).archive_filename, "none/clash_02.pdf")
         self.assertEqual(Document.objects.get(id=self.clash4.id).archive_filename, "clash.png.pdf")
+
+
+@override_settings(PAPERLESS_FILENAME_FORMAT="")
+class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
+
+    migrate_from = '1011_auto_20210101_2340'
+    migrate_to = '1012_fix_archive_files'
+    auto_migrate = False
+
+    def test_archive_missing(self):
+
+        Document = self.apps.get_model("documents", "Document")
+
+        doc = make_test_document(Document, "clash", "application/pdf", simple_pdf, "clash.pdf", simple_pdf)
+        os.unlink(archive_path_old(doc))
+
+        self.assertRaisesMessage(ValueError, "does not exist at: ", self.performMigration)
 
 
 @override_settings(PAPERLESS_FILENAME_FORMAT="")
