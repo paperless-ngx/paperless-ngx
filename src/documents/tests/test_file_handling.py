@@ -507,6 +507,38 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(existing_archive_file))
         self.assertEqual(doc.archive_filename, "none/my_doc_01.pdf")
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    def test_move_original_only(self):
+        original = os.path.join(settings.ORIGINALS_DIR, "document_01.pdf")
+        archive = os.path.join(settings.ARCHIVE_DIR, "document.pdf")
+        Path(original).touch()
+        Path(archive).touch()
+
+        doc = Document.objects.create(mime_type="application/pdf", title="document", filename="document_01.pdf", checksum="A",
+                                      archive_checksum="B", archive_filename="document.pdf")
+
+        self.assertEqual(doc.filename, "document.pdf")
+        self.assertEqual(doc.archive_filename, "document.pdf")
+
+        self.assertTrue(os.path.isfile(doc.source_path))
+        self.assertTrue(os.path.isfile(doc.archive_path))
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    def test_move_archive_only(self):
+        original = os.path.join(settings.ORIGINALS_DIR, "document.pdf")
+        archive = os.path.join(settings.ARCHIVE_DIR, "document_01.pdf")
+        Path(original).touch()
+        Path(archive).touch()
+
+        doc = Document.objects.create(mime_type="application/pdf", title="document", filename="document.pdf", checksum="A",
+                                      archive_checksum="B", archive_filename="document_01.pdf")
+
+        self.assertEqual(doc.filename, "document.pdf")
+        self.assertEqual(doc.archive_filename, "document.pdf")
+
+        self.assertTrue(os.path.isfile(doc.source_path))
+        self.assertTrue(os.path.isfile(doc.archive_path))
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.os.rename")
     def test_move_archive_error(self, m):
