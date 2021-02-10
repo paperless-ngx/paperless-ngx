@@ -101,17 +101,17 @@ Then you can start paperless-ng with ``-d`` to have it run in the background.
         update to newer versions. In order to enable updates as described above, either
         get the new ``docker-compose.yml`` file from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
         or edit the ``docker-compose.yml`` file, find the line that says
-        
+
             .. code::
 
                 image: jonaswinkler/paperless-ng:0.9.x
-        
+
         and replace the version with ``latest``:
 
             .. code::
 
                 image: jonaswinkler/paperless-ng:latest
-        
+
 Bare Metal Route
 ================
 
@@ -209,7 +209,7 @@ tasks on your paperless instance. You can invoke these commands either by
 .. code:: shell-session
 
     $ cd /path/to/paperless
-    $ docker-compose run --rm webserver <command> <arguments>
+    $ docker-compose exec -u paperless webserver python3 manage.py <command> <arguments>
 
 or
 
@@ -239,7 +239,7 @@ backup or migration to another DMS.
     -c, --compare-checksums
     -f, --use-filename-format
     -d, --delete
-    
+
 ``target`` is a folder to which the data gets written. This includes documents,
 thumbnails and a ``manifest.json`` file. The manifest contains all metadata from
 the database (correspondents, tags, etc).
