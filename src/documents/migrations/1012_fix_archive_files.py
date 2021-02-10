@@ -4,6 +4,7 @@ import hashlib
 import logging
 import os
 import shutil
+from time import sleep
 
 import pathvalidate
 from django.conf import settings
@@ -12,8 +13,12 @@ from django.template.defaultfilters import slugify
 
 from documents.file_handling import defaultdictNoStr, many_to_dictionary
 
+
 logger = logging.getLogger("paperless.migrations")
 
+###############################################################################
+# This is code copied straight paperless before the change.
+###############################################################################
 
 def archive_name_from_filename(filename):
     return os.path.splitext(filename)[0] + ".pdf"
@@ -150,6 +155,65 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     return filename
 
 
+###############################################################################
+# This code performs bidirection archive file transformation.
+###############################################################################
+
+
+def create_archive_version(doc, retry_count=4):
+    from documents.parsers import get_parser_class_for_mime_type, \
+        DocumentParser, \
+        ParseError
+
+    logger.info(
+        f"Regenerating archive document for document ID:{doc.id}"
+    )
+    parser_class = get_parser_class_for_mime_type(doc.mime_type)
+    for try_num in range(retry_count):
+        parser: DocumentParser = parser_class(None, None)
+        try:
+            parser.parse(source_path(doc), doc.mime_type,
+                         os.path.basename(doc.filename))
+            doc.content = parser.get_text()
+
+            if parser.get_archive_path() and os.path.isfile(
+                parser.get_archive_path()):
+                doc.archive_filename = generate_unique_filename(
+                    doc, archive_filename=True)
+                with open(parser.get_archive_path(), "rb") as f:
+                    doc.archive_checksum = hashlib.md5(f.read()).hexdigest()
+                os.makedirs(os.path.dirname(archive_path_new(doc)),
+                            exist_ok=True)
+                shutil.copy2(parser.get_archive_path(), archive_path_new(doc))
+            else:
+                doc.archive_checksum = None
+                logger.error(
+                    f"Parser did not return an archive document for document "
+                    f"ID:{doc.id}. Removing archive document."
+                )
+            doc.save()
+            return
+        except ParseError:
+            if try_num + 1 == retry_count:
+                logger.exception(
+                    f"Unable to regenerate archive document for ID:{doc.id}. You "
+                    f"need to invoke the document_archiver management command "
+                    f"manually for that document."
+                )
+                doc.archive_checksum = None
+                doc.save()
+                return
+            else:
+                # This is mostly here for the tika parser in docker
+                # environemnts. The servers for parsing need to come up first,
+                # and the docker setup doesn't ensure that tika is running
+                # before attempting migrations.
+                logger.error("Parse error, will try again in 5 seconds...")
+                sleep(5)
+        finally:
+            parser.cleanup()
+
+
 def move_old_to_new_locations(apps, schema_editor):
     Document = apps.get_model("documents", "Document")
 
@@ -199,42 +263,10 @@ def move_old_to_new_locations(apps, schema_editor):
 
     # regenerate archive documents
     for doc_id in affected_document_ids:
-        from documents.parsers import get_parser_class_for_mime_type, \
-            DocumentParser, \
-            ParseError
-
         doc = Document.objects.get(id=doc_id)
-        logger.info(
-            f"Regenerating archive document for document ID:{doc.id}"
-        )
-        parser_class = get_parser_class_for_mime_type(doc.mime_type)
-        parser: DocumentParser = parser_class(None, None)
-        try:
-            parser.parse(source_path(doc), doc.mime_type, os.path.basename(doc.filename))
-            doc.content = parser.get_text()
+        create_archive_version(doc)
 
-            if parser.get_archive_path() and os.path.isfile(parser.get_archive_path()):
-                doc.archive_filename = generate_unique_filename(
-                    doc, archive_filename=True)
-                with open(parser.get_archive_path(), "rb") as f:
-                    doc.archive_checksum = hashlib.md5(f.read()).hexdigest()
-                os.makedirs(os.path.dirname(archive_path_new(doc)), exist_ok=True)
-                shutil.copy2(parser.get_archive_path(), archive_path_new(doc))
-            else:
-                doc.archive_checksum = None
-                logger.error(
-                    f"Parser did not return an archive document for document "
-                    f"ID:{doc.id}. Removing archive document."
-                )
-            doc.save()
-        except ParseError:
-            logger.exception(
-                f"Unable to regenerate archive document for ID:{doc.id}. You "
-                f"need to invoke the document_archiver management command "
-                f"manually for that document."
-            )
-        finally:
-            parser.cleanup()
+
 
 
 def move_new_to_old_locations(apps, schema_editor):
