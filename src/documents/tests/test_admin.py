@@ -23,18 +23,6 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         self.assertEqual(Document.objects.get(id=doc.id).title, "new title")
         m.assert_called_once()
 
-    def test_tags(self):
-        doc = Document.objects.create(title="test")
-        doc.tags.create(name="t1")
-        doc.tags.create(name="t2")
-
-        self.assertEqual(self.doc_admin.tags_(doc), "<span >t1, </span><span >t2, </span>")
-
-    def test_tags_empty(self):
-        doc = Document.objects.create(title="test")
-
-        self.assertEqual(self.doc_admin.tags_(doc), "")
-
     @mock.patch("documents.admin.index.remove_document")
     def test_delete_model(self, m):
         doc = Document.objects.create(title="test")
