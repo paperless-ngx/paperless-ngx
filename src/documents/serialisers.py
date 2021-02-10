@@ -129,7 +129,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
         return obj.get_public_filename()
 
     def get_archived_file_name(self, obj):
-        if obj.archive_checksum:
+        if obj.has_archive_version:
             return obj.get_public_filename(archive=True)
         else:
             return None
