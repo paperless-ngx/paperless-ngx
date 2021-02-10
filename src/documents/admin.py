@@ -59,9 +59,7 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display_links = ("title",)
 
     list_display = (
-        "created",
-        "added",
-        "archive_serial_number",
+        "id",
         "title",
         "mime_type",
         "filename",
@@ -76,7 +74,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
     filter_horizontal = ("tags",)
 
-    ordering = ["-created"]
+    ordering = ["-id"]
 
     date_hierarchy = "created"
 
