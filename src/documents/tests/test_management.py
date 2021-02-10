@@ -110,23 +110,25 @@ class TestRenamer(DirectoriesMixin, TestCase):
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_rename(self):
-        doc = Document.objects.create(title="test", mime_type="application/pdf")
+        doc = Document.objects.create(title="test", mime_type="image/jpeg")
         doc.filename = generate_filename(doc)
+        doc.archive_filename = generate_filename(doc, archive_filename=True)
         doc.save()
 
         Path(doc.source_path).touch()
+        Path(doc.archive_path).touch()
 
-        old_source_path = doc.source_path
-
-        with override_settings(PAPERLESS_FILENAME_FORMAT="{title}"):
+        with override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}"):
             call_command("document_renamer")
 
         doc2 = Document.objects.get(id=doc.id)
 
-        self.assertEqual(doc2.filename, "test.pdf")
-        self.assertFalse(os.path.isfile(old_source_path))
+        self.assertEqual(doc2.filename, "none/test.jpg")
+        self.assertEqual(doc2.archive_filename, "none/test.pdf")
         self.assertFalse(os.path.isfile(doc.source_path))
+        self.assertFalse(os.path.isfile(doc.archive_path))
         self.assertTrue(os.path.isfile(doc2.source_path))
+        self.assertTrue(os.path.isfile(doc2.archive_path))
 
 
 class TestCreateClassifier(TestCase):
