@@ -52,6 +52,8 @@ channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 django-redis = "*"
+# uvloop 0.15+ incompatible with python 3.6
+uvloop = "~=0.14.0"
 
 [dev-packages]
 coveralls = "*"
