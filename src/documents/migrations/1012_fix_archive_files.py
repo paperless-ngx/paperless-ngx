@@ -160,7 +160,12 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 ###############################################################################
 
 
-def create_archive_version(doc, retry_count=4):
+def parse_wrapper(parser, path, mime_type, file_name):
+    # this is here so that I can mock this out for testing.
+    parser.parse(path, mime_type, file_name)
+
+
+def create_archive_version(doc, retry_count=3):
     from documents.parsers import get_parser_class_for_mime_type, \
         DocumentParser, \
         ParseError
@@ -172,8 +177,8 @@ def create_archive_version(doc, retry_count=4):
     for try_num in range(retry_count):
         parser: DocumentParser = parser_class(None, None)
         try:
-            parser.parse(source_path(doc), doc.mime_type,
-                         os.path.basename(doc.filename))
+            parse_wrapper(parser, source_path(doc), doc.mime_type,
+                          os.path.basename(doc.filename))
             doc.content = parser.get_text()
 
             if parser.get_archive_path() and os.path.isfile(
@@ -225,25 +230,28 @@ def move_old_to_new_locations(apps, schema_editor):
     for doc in Document.objects.filter(archive_checksum__isnull=False):
         old_path = archive_path_old(doc)
 
-        if not os.path.isfile(old_path):
-            raise ValueError(
-                f"Archived document ID:{doc.id} does not exist at: "
-                f"{old_path}")
-
         if old_path in old_archive_path_to_id:
             affected_document_ids.add(doc.id)
             affected_document_ids.add(old_archive_path_to_id[old_path])
         else:
             old_archive_path_to_id[old_path] = doc.id
 
-    # check that we can regenerate these archive versions
+    # check that archive files of all unaffected documents are in place
+    for doc in Document.objects.filter(archive_checksum__isnull=False):
+        old_path = archive_path_old(doc)
+        if doc.id not in affected_document_ids and not os.path.isfile(old_path):
+            raise ValueError(
+                f"Archived document ID:{doc.id} does not exist at: "
+                f"{old_path}")
+
+    # check that we can regenerate affected archive versions
     for doc_id in affected_document_ids:
         from documents.parsers import get_parser_class_for_mime_type
 
         doc = Document.objects.get(id=doc_id)
         parser_class = get_parser_class_for_mime_type(doc.mime_type)
         if not parser_class:
-            raise Exception(
+            raise ValueError(
                 f"Document ID:{doc.id} has an invalid archived document, "
                 f"but no parsers are available. Cannot migrate.")
 
@@ -253,6 +261,9 @@ def move_old_to_new_locations(apps, schema_editor):
             old_path = archive_path_old(doc)
             # remove affected archive versions
             if os.path.isfile(old_path):
+                logger.debug(
+                    f"Removing {old_path}"
+                )
                 os.unlink(old_path)
         else:
             # Set archive path for unaffected files
@@ -265,8 +276,6 @@ def move_old_to_new_locations(apps, schema_editor):
     for doc_id in affected_document_ids:
         doc = Document.objects.get(id=doc_id)
         create_archive_version(doc)
-
-
 
 
 def move_new_to_old_locations(apps, schema_editor):

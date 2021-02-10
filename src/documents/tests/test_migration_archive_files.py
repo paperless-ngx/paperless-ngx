@@ -2,10 +2,12 @@ import hashlib
 import os
 import shutil
 from pathlib import Path
+from unittest import mock
 
 from django.conf import settings
 from django.test import override_settings
 
+from documents.parsers import ParseError
 from documents.tests.utils import DirectoriesMixin, TestMigrations
 
 
@@ -169,6 +171,11 @@ class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
         self.assertEqual(Document.objects.get(id=self.clash4.id).archive_filename, "clash.png.pdf")
 
 
+def fake_parse_wrapper(parser, path, mime_type, file_name):
+    parser.archive_path = None
+    parser.text = "the text"
+
+
 @override_settings(PAPERLESS_FILENAME_FORMAT="")
 class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
 
@@ -185,6 +192,73 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
 
         self.assertRaisesMessage(ValueError, "does not exist at: ", self.performMigration)
 
+    def test_parser_missing(self):
+        Document = self.apps.get_model("documents", "Document")
+
+        doc1 = make_test_document(Document, "document", "invalid/typesss768", simple_png, "document.png", simple_pdf)
+        doc2 = make_test_document(Document, "document", "invalid/typesss768", simple_jpg, "document.jpg", simple_pdf)
+
+        self.assertRaisesMessage(ValueError, "no parsers are available", self.performMigration)
+
+    @mock.patch("documents.migrations.1012_fix_archive_files.parse_wrapper")
+    def test_parser_error(self, m):
+        m.side_effect = ParseError()
+        Document = self.apps.get_model("documents", "Document")
+
+        doc1 = make_test_document(Document, "document", "image/png", simple_png, "document.png", simple_pdf)
+        doc2 = make_test_document(Document, "document", "application/pdf", simple_jpg, "document.jpg", simple_pdf)
+
+        self.assertIsNotNone(doc1.archive_checksum)
+        self.assertIsNotNone(doc2.archive_checksum)
+
+        with self.assertLogs() as capture:
+            self.performMigration()
+
+        self.assertEqual(m.call_count, 6)
+
+        self.assertEqual(
+            len(list(filter(lambda log: "Parse error, will try again in 5 seconds" in log, capture.output))),
+            4)
+
+        self.assertEqual(
+            len(list(filter(lambda log: "Unable to regenerate archive document for ID:" in log, capture.output))),
+            2)
+
+        Document = self.apps.get_model("documents", "Document")
+
+        doc1 = Document.objects.get(id=doc1.id)
+        doc2 = Document.objects.get(id=doc2.id)
+
+        self.assertIsNone(doc1.archive_checksum)
+        self.assertIsNone(doc2.archive_checksum)
+        self.assertIsNone(doc1.archive_filename)
+        self.assertIsNone(doc2.archive_filename)
+
+    @mock.patch("documents.migrations.1012_fix_archive_files.parse_wrapper")
+    def test_parser_no_archive(self, m):
+        m.side_effect = fake_parse_wrapper
+
+        Document = self.apps.get_model("documents", "Document")
+
+        doc1 = make_test_document(Document, "document", "image/png", simple_png, "document.png", simple_pdf)
+        doc2 = make_test_document(Document, "document", "application/pdf", simple_jpg, "document.jpg", simple_pdf)
+
+        with self.assertLogs() as capture:
+            self.performMigration()
+
+        self.assertEqual(
+            len(list(filter(lambda log: "Parser did not return an archive document for document" in log, capture.output))),
+            2)
+
+        Document = self.apps.get_model("documents", "Document")
+
+        doc1 = Document.objects.get(id=doc1.id)
+        doc2 = Document.objects.get(id=doc2.id)
+
+        self.assertIsNone(doc1.archive_checksum)
+        self.assertIsNone(doc2.archive_checksum)
+        self.assertIsNone(doc1.archive_filename)
+        self.assertIsNone(doc2.archive_filename)
 
 @override_settings(PAPERLESS_FILENAME_FORMAT="")
 class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
