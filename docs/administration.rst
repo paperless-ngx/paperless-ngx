@@ -171,6 +171,35 @@ Most of the update process is automated when using the ansible role.
         $ ansible-playbook playbook.yml
 
 
+Downgrading Paperless
+#####################
+
+Downgrades are possible. However, some updates also contain database migrations (these change the layout of the database and may move data).
+In order to move back from a version that applied database migrations, you'll have to revert the database migration *before* downgrading,
+and then downgrade paperless.
+
+This table lists the most recent database migrations for each versions:
+
++---------+-------------------------+
+| Version | Latest migration number |
++---------+-------------------------+
+| 1.0.0   | 1011                    |
++---------+-------------------------+
+| 1.1.0   | 1011                    |
++---------+-------------------------+
+| 1.1.1   | 1012                    |
++---------+-------------------------+
+
+Execute the following management command to migrate your database:
+
+.. code:: shell-session
+
+    $ python3 manage.py migrate documents <migration number>
+
+.. note::
+
+    Some migrations cannot be undone. The command will issue errors if that happens.
+
 Management utilities
 ####################
 
