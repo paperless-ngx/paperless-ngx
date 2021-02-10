@@ -23,6 +23,12 @@ Options available to any installation of paperless:
 *   The document exporter is also able to update an already existing export.
     Therefore, incremental backups with ``rsync`` are entirely possible.
 
+.. caution::
+
+    You cannot import the export generated with one version of paperless in a
+    different version of paperless. The export contains an exact image of the
+    database, and migrations may change the database layout.
+
 Options available to docker installations:
 
 *   Backup the docker volumes. These usually reside within
