@@ -8,6 +8,8 @@ Changelog
 paperless-ng 1.1.1
 ##################
 
+This release contains new database migrations.
+
 * Fixed a bug in the sanity checker that would cause it to display "x not in list" errors instead of actual issues.
 
 * Fixed a bug with filename generation for archive filenames that would cause the archive files of two documents to overlap.
