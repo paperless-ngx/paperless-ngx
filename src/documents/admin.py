@@ -59,16 +59,19 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display_links = ("title",)
 
     list_display = (
-        "correspondent",
-        "title",
-        "tags_",
         "created",
+        "added",
+        "archive_serial_number",
+        "title",
+        "mime_type",
+        "filename",
+        "archive_filename"
     )
 
     list_filter = (
-        "document_type",
-        "tags",
-        "correspondent"
+        ("mime_type"),
+        ("archive_serial_number", admin.EmptyFieldListFilter),
+        ("archive_filename", admin.EmptyFieldListFilter),
     )
 
     filter_horizontal = ("tags",)
@@ -98,26 +101,6 @@ class DocumentAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         index.add_or_update_document(obj)
         super(DocumentAdmin, self).save_model(request, obj, form, change)
-
-    @mark_safe
-    def tags_(self, obj):
-        r = ""
-        for tag in obj.tags.all():
-            r += self._html_tag(
-                "span",
-                tag.name + ", "
-            )
-        return r
-
-    @staticmethod
-    def _html_tag(kind, inside=None, **kwargs):
-        attributes = format_html_join(' ', '{}="{}"', kwargs.items())
-
-        if inside is not None:
-            return format_html("<{kind} {attributes}>{inside}</{kind}>",
-                               kind=kind, attributes=attributes, inside=inside)
-
-        return format_html("<{} {}/>", kind, attributes)
 
 
 class RuleInline(admin.TabularInline):
