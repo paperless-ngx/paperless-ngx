@@ -54,6 +54,8 @@ concurrent-log-handler = "*"
 django-redis = "*"
 # uvloop 0.15+ incompatible with python 3.6
 uvloop = "~=0.14.0"
+# TODO: keep an eye on piwheel builds and update this once available (https://www.piwheels.org/project/cryptography/)
+cryptography = "~=3.3.2"
 
 [dev-packages]
 coveralls = "*"
