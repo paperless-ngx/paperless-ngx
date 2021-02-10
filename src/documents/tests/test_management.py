@@ -43,11 +43,27 @@ class TestArchiver(DirectoriesMixin, TestCase):
         doc = Document.objects.get(id=doc.id)
 
         self.assertIsNotNone(doc.checksum)
+        self.assertIsNotNone(doc.archive_checksum)
         self.assertTrue(os.path.isfile(doc.archive_path))
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
         self.assertEqual(doc.archive_filename, "none/A.pdf")
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    def test_naming_priorities(self):
+        doc1 = Document.objects.create(checksum="A", title="document", content="first document", mime_type="application/pdf", filename="document.pdf")
+        doc2 = Document.objects.create(checksum="B", title="document", content="second document", mime_type="application/pdf", filename="document_01.pdf")
+        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"document.pdf"))
+        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"document_01.pdf"))
+
+        handle_document(doc2.pk)
+        handle_document(doc1.pk)
+
+        doc1 = Document.objects.get(id=doc1.id)
+        doc2 = Document.objects.get(id=doc2.id)
+
+        self.assertEqual(doc1.archive_filename, "document.pdf")
+        self.assertEqual(doc2.archive_filename, "document_01.pdf")
 
 class TestDecryptDocuments(TestCase):
 
