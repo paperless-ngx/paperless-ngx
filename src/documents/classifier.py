@@ -43,9 +43,9 @@ def load_classifier():
                       version=version, timeout=86400)
         except (EOFError, IncompatibleClassifierVersionError) as e:
             # there's something wrong with the model file.
-            logger.error(
+            logger.exception(
                 f"Unrecoverable error while loading document "
-                f"classification model: {str(e)}, deleting model file."
+                f"classification model, deleting model file."
             )
             os.unlink(settings.MODEL_FILE)
             classifier = None
