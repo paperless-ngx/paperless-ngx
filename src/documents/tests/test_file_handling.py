@@ -446,6 +446,18 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(document2.filename, "qwe.pdf")
 
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    @mock.patch("documents.signals.handlers.Document.objects.filter")
+    def test_no_update_without_change(self, m):
+        doc = Document.objects.create(title="document", filename="document.pdf", archive_filename="document.pdf", checksum="A", archive_checksum="B", mime_type="application/pdf")
+        Path(doc.source_path).touch()
+        Path(doc.archive_path).touch()
+
+        doc.save()
+
+        m.assert_not_called()
+
+
 
 class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
 
@@ -558,6 +570,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         Path(archive).touch()
         doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B", archive_filename="0000001.pdf")
 
+        m.assert_called()
         self.assertTrue(os.path.isfile(original))
         self.assertTrue(os.path.isfile(archive))
         self.assertTrue(os.path.isfile(doc.source_path))
@@ -595,6 +608,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         Path(archive).touch()
         doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", archive_filename="0000001.pdf", checksum="A", archive_checksum="B")
 
+        m.assert_called()
         self.assertTrue(os.path.isfile(original))
         self.assertTrue(os.path.isfile(archive))
         self.assertTrue(os.path.isfile(doc.source_path))
