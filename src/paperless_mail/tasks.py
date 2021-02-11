@@ -13,11 +13,8 @@ def process_mail_accounts():
         try:
             total_new_documents += MailAccountHandler().handle_mail_account(
                 account)
-        except MailError as e:
-            logger.error(
-                f"Error while processing mail account {account}: {e}",
-                exc_info=True
-            )
+        except MailError:
+            logger.exception(f"Error while processing mail account {account}")
 
     if total_new_documents > 0:
         return f"Added {total_new_documents} document(s)."

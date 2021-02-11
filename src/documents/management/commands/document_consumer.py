@@ -54,8 +54,7 @@ def _consume(filepath):
         if settings.CONSUMER_SUBDIRS_AS_TAGS:
             tag_ids = _tags_from_path(filepath)
     except Exception as e:
-        logger.error(
-            "Error creating tags from path: {}".format(e))
+        logger.exception("Error creating tags from path")
 
     try:
         async_task("documents.tasks.consume_file",
@@ -66,8 +65,7 @@ def _consume(filepath):
         # Catch all so that the consumer won't crash.
         # This is also what the test case is listening for to check for
         # errors.
-        logger.error(
-            "Error while consuming document: {}".format(e))
+        logger.exception("Error while consuming document")
 
 
 def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
