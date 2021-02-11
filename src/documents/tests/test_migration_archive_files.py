@@ -260,6 +260,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         self.assertIsNone(doc1.archive_filename)
         self.assertIsNone(doc2.archive_filename)
 
+
 @override_settings(PAPERLESS_FILENAME_FORMAT="")
 class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
 

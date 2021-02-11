@@ -208,21 +208,16 @@ def update_filename_and_move_files(sender, instance, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
         old_filename = instance.filename
         new_filename = generate_unique_filename(instance)
-
-        if new_filename == instance.filename:
-            # Don't do anything if its the same.
-            return
-
+        move_original = old_filename != new_filename
         old_source_path = instance.source_path
         new_source_path = os.path.join(settings.ORIGINALS_DIR, new_filename)
 
-        if not validate_move(instance, old_source_path, new_source_path):
+        if move_original and not validate_move(instance, old_source_path, new_source_path):
             return
 
-        # archive files are optional, archive checksum tells us if we have one,
-        # since this is None for documents without archived files.
+        old_archive_filename = instance.archive_filename
+
         if instance.has_archive_version:
-            old_archive_filename = instance.archive_filename
             new_archive_filename = generate_unique_filename(
                 instance, archive_filename=True
             )
@@ -230,25 +225,26 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             new_archive_path = os.path.join(settings.ARCHIVE_DIR,
                                             new_archive_filename)
 
-            if not validate_move(instance, old_archive_path, new_archive_path):
+            move_archive = old_archive_filename != new_archive_filename
+            if move_archive and not validate_move(instance, old_archive_path, new_archive_path):
                 return
-
-            create_source_path_directory(new_archive_path)
         else:
-            old_archive_filename = None
-            new_archive_filename = None
-            old_archive_path = None
-            new_archive_path = None
+            move_archive = False
 
-        create_source_path_directory(new_source_path)
+        if not move_original and not move_archive:
+            # Don't do anything if filenames did not change.
+            return
 
         try:
-            os.rename(old_source_path, new_source_path)
-            instance.filename = new_filename
+            if move_original:
+                instance.filename = new_filename
+                create_source_path_directory(new_source_path)
+                os.rename(old_source_path, new_source_path)
 
-            if instance.has_archive_version:
-                os.rename(old_archive_path, new_archive_path)
+            if move_archive:
                 instance.archive_filename = new_archive_filename
+                create_source_path_directory(new_archive_path)
+                os.rename(old_archive_path, new_archive_path)
 
             # Don't save() here to prevent infinite recursion.
             Document.objects.filter(pk=instance.pk).update(
@@ -256,16 +252,24 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 archive_filename=instance.archive_filename,
             )
 
-        except OSError as e:
+        except Exception as e:
+            # This happens when either:
+            #  - moving the files failed due to file system errors
+            #  - saving to the database failed due to database errors
+            # In both cases, we need to revert to the original state.
+
+            # restore old values on the instance
             instance.filename = old_filename
             instance.archive_filename = old_archive_filename
-            # this happens when we can't move a file. If that's the case for
-            # the archive file, we try our best to revert the changes.
-            # no need to save the instance, the update() has not happened yet.
+
+            # Try to move files to their original location.
             try:
-                os.rename(new_source_path, old_source_path)
-                if instance.has_archive_version:
+                if move_original and os.path.isfile(new_source_path):
+                    os.rename(new_source_path, old_source_path)
+
+                if move_archive and os.path.isfile(new_archive_path):
                     os.rename(new_archive_path, old_archive_path)
+
             except Exception as e:
                 # This is fine, since:
                 # A: if we managed to move source from A to B, we will also
@@ -276,17 +280,6 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 # B: if moving the orignal file failed, nothing has changed
                 #  anyway.
                 pass
-        except DatabaseError as e:
-            # this happens after moving files, so move them back into place.
-            # since moving them once succeeded, it's very likely going to
-            # succeed again.
-            os.rename(new_source_path, old_source_path)
-            if instance.has_archive_version:
-                os.rename(new_archive_path, old_archive_path)
-            instance.filename = old_filename
-            instance.archive_filename = old_archive_filename
-            # again, no need to save the instance, since the actual update()
-            # operation failed.
 
         # finally, remove any empty sub folders. This will do nothing if
         # something has failed above.
