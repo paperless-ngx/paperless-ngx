@@ -60,7 +60,7 @@ def handle_document(document_id):
             index.update_document(writer, document)
 
     except Exception as e:
-        logger.error(f"Error while parsing document {document}: {str(e)}")
+        logger.exception(f"Error while parsing document {document}")
     finally:
         parser.cleanup()
 

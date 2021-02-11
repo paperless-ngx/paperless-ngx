@@ -78,8 +78,8 @@ def open_index(recreate=False):
     try:
         if exists_in(settings.INDEX_DIR) and not recreate:
             return open_dir(settings.INDEX_DIR, schema=get_schema())
-    except Exception as e:
-        logger.error(f"Error while opening the index: {e}, recreating.")
+    except Exception:
+        logger.exception(f"Error while opening the index, recreating.")
 
     if not os.path.isdir(settings.INDEX_DIR):
         os.makedirs(settings.INDEX_DIR, exist_ok=True)
