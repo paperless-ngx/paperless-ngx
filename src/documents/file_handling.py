@@ -79,13 +79,33 @@ def many_to_dictionary(field):
     return mydictionary
 
 
-def generate_unique_filename(doc, archive_filename=False):
+def generate_unique_filename(doc,
+                             archive_filename=False):
+    """
+    Generates a unique filename for doc in settings.ORIGINALS_DIR.
+
+    The returned filename is guaranteed to be either the current filename
+    of the document if unchanged, or a new filename that does not correspondent
+    to any existing files. The function will append _01, _02, etc to the
+    filename before the extension to avoid conflicts.
+
+    If archive_filename is True, return a unique archive filename instead.
+
+    """
     if archive_filename:
         old_filename = doc.archive_filename
         root = settings.ARCHIVE_DIR
     else:
         old_filename = doc.filename
         root = settings.ORIGINALS_DIR
+
+    # If generating archive filenames, try to make a name that is similar to
+    # the original filename first.
+
+    if archive_filename and doc.filename:
+        new_filename = os.path.splitext(doc.filename)[0] + ".pdf"
+        if new_filename == old_filename or not os.path.exists(os.path.join(root, new_filename)):  # NOQA: E501
+            return new_filename
 
     counter = 0
 
