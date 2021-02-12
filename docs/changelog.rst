@@ -5,6 +5,11 @@
 Changelog
 *********
 
+paperless-ng 1.1.2
+##################
+
+* Always show top left corner of thumbnails, even for extra wide documents.
+
 paperless-ng 1.1.1
 ##################
 
