@@ -14,10 +14,10 @@ This release contains new database migrations.
 
 * Fixed a bug with filename generation for archive filenames that would cause the archive files of two documents to overlap.
 
-  * This happened when ``PAPERLESS_FILENAME_FORMAT`` is used and the filename for two documents is the same, except for the file extension.
+  * This happened when ``PAPERLESS_FILENAME_FORMAT`` is used and the filenames of two or more documents are the same, except for the file extension.
   * Paperless will now store the archive filename in the database as well instead of deriving it from the original filename, and use the
     same logic for detecting and avoiding filename clashes that's also used for original filenames.
-  * The migrations will repair any missing archive files. If you're using tika, ensure that tika is running while performing the migration. Docker will take care of that.
+  * The migrations will repair any missing archive files. If you're using tika, ensure that tika is running while performing the migration. Docker-compose will take care of that.
 
 * Fixed a bug with thumbnail regeneration when TIKA integration was used.
 
