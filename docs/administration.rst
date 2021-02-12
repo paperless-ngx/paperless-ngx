@@ -206,25 +206,33 @@ Execute the following management command to migrate your database:
 
     Some migrations cannot be undone. The command will issue errors if that happens.
 
+.. _utilities-management-commands:
+
 Management utilities
 ####################
 
 Paperless comes with some management commands that perform various maintenance
-tasks on your paperless instance. You can invoke these commands either by
+tasks on your paperless instance. You can invoke these commands in the following way:
+
+With docker-compose, while paperless is running:
 
 .. code:: shell-session
 
     $ cd /path/to/paperless
-    $ docker-compose exec -u paperless webserver python3 manage.py <command> <arguments>
+    $ docker-compose exec webserver <command> <arguments>
 
-or
+With docker, while paperless is running:
+
+.. code:: shell-session
+
+    $ docker exec -it <container-name> <command> <arguments>
+
+Bare metal:
 
 .. code:: shell-session
 
     $ cd /path/to/paperless/src
     $ python3 manage.py <command> <arguments>
-
-depending on whether you use docker or not.
 
 All commands have built-in help, which can be accessed by executing them with
 the argument ``--help``.
