@@ -23,6 +23,9 @@ This release contains new database migrations.
 
 * Added ASN as a placeholder field to the filename format.
 
+* The docker image now comes with built-in shortcuts for most management commands. These are now the recommended way to execute management commands, since these
+  also ensure that they're always executed as the paperless user and you're less likely to run into permission issues. See :ref:`utilities-management-commands`.
+
 paperless-ng 1.1.0
 ##################
 
