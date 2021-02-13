@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from django.conf import settings
 from django.test import TestCase, override_settings
 
@@ -233,7 +234,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertFalse(os.path.exists(settings.MODEL_FILE))
         self.assertIsNone(load_classifier())
 
-    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
     @mock.patch("documents.classifier.DocumentClassifier.load")
     def test_load_classifier(self, load):
         Path(settings.MODEL_FILE).touch()
@@ -242,6 +242,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
     @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}})
     @override_settings(MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"))
+    @pytest.mark.skip(reason="Disabled caching due to high memory usage - need to investigate.")
     def test_load_classifier_cached(self):
         classifier = load_classifier()
         self.assertIsNotNone(classifier)
@@ -250,7 +251,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
             classifier2 = load_classifier()
             load.assert_not_called()
 
-    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
     @mock.patch("documents.classifier.DocumentClassifier.load")
     def test_load_classifier_incompatible_version(self, load):
         Path(settings.MODEL_FILE).touch()
@@ -260,7 +260,6 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertIsNone(load_classifier())
         self.assertFalse(os.path.exists(settings.MODEL_FILE))
 
-    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
     @mock.patch("documents.classifier.DocumentClassifier.load")
     def test_load_classifier_os_error(self, load):
         Path(settings.MODEL_FILE).touch()
