@@ -10,6 +10,8 @@ paperless-ng 1.1.2
 
 * Always show top left corner of thumbnails, even for extra wide documents.
 
+* Added a management command for executing the sanity checker directly. See :ref:`utilities-sanity-checker`.
+
 paperless-ng 1.1.1
 ##################
 
