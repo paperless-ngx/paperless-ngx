@@ -94,6 +94,30 @@ If you want to get rid of the warning or actually experience issues with automat
 the file ``classification_model.pickle`` in the data directory and let paperless recreate it.
 
 
+504 Server Error: Gateway Timeout when adding Office documents
+##############################################################
+
+You may experience these errors when using the optional TIKA integration:
+
+.. code::
+
+    requests.exceptions.HTTPError: 504 Server Error: Gateway Timeout for url: http://gotenberg:3000/convert/office
+
+Gotenberg is a server that converts Office documents into PDF documents and has a default timeout of 10 seconds.
+When conversion takes longer, Gotenberg raises this error.
+
+You can increase the timeout by configuring an environment variable for gotenberg (see also `here <https://thecodingmachine.github.io/gotenberg/#environment_variables.default_wait_timeout>`__).
+If using docker-compose, this is achieved by the following configuration change in the ``docker-compose.yml`` file:
+
+.. code:: yaml
+
+    gotenberg:
+        image: thecodingmachine/gotenberg
+        restart: unless-stopped
+        environment:
+            DISABLE_GOOGLE_CHROME: 1
+            DEFAULT_WAIT_TIMEOUT: 30
+
 Permission denied errors in the consumption directory
 #####################################################
 
