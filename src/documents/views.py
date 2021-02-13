@@ -225,6 +225,12 @@ class DocumentViewSet(RetrieveModelMixin,
         else:
             return []
 
+    def get_filesize(self, filename):
+        if os.path.isfile(filename):
+            return os.stat(filename).st_size
+        else:
+            return None
+
     @action(methods=['get'], detail=True)
     def metadata(self, request, pk=None):
         try:
@@ -234,7 +240,7 @@ class DocumentViewSet(RetrieveModelMixin,
 
         meta = {
             "original_checksum": doc.checksum,
-            "original_size": os.stat(doc.source_path).st_size,
+            "original_size": self.get_filesize(doc.source_path),
             "original_mime_type": doc.mime_type,
             "media_filename": doc.filename,
             "has_archive_version": doc.has_archive_version,
@@ -245,7 +251,7 @@ class DocumentViewSet(RetrieveModelMixin,
         }
 
         if doc.has_archive_version:
-            meta['archive_size'] = os.stat(doc.archive_path).st_size,
+            meta['archive_size'] = self.get_filesize(doc.archive_path)
             meta['archive_metadata'] = self.get_metadata(
                 doc.archive_path, "application/pdf")
         else:
