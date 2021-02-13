@@ -398,7 +398,7 @@ Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
     'workers': TASK_WORKERS,
-    'django_redis': 'default'
+    'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 }
 
 
