@@ -410,6 +410,34 @@ the naming scheme.
 The command takes no arguments and processes all your documents at once.
 
 
+.. _utilities-sanity-checker:
+
+Sanity checker
+==============
+
+Paperless has a built-in sanity checker that inspects your document collection for issues.
+
+The issues detected by the sanity checker are as follows:
+
+* Missing original files.
+* Missing archive files.
+* Inaccessible original files due to improper permissions.
+* Inaccessible archive files due to improper permissions.
+* Corrupted original documents by comparing their checksum against what is stored in the database.
+* Corrupted archive documents by comparing their checksum against what is stored in the database.
+* Missing thumbnails.
+* Inaccessible thumbnails due to improper permissions.
+* Documents without any content (warning).
+* Orphaned files in the media directory (warning). These are files that are not referenced by any document im paperless.
+
+
+.. code::
+
+    document_sanity_checker
+
+The command takes no arguments. Depending on the size of your document archive, this may take some time.
+
+
 Fetching e-mail
 ===============
 
