@@ -2,6 +2,7 @@ import hashlib
 import os
 
 from django.conf import settings
+from tqdm import tqdm
 
 from documents.models import Document
 
@@ -38,7 +39,7 @@ class SanityFailedError(Exception):
             f"{message_string}\n\n===============\n\n")
 
 
-def check_sanity():
+def check_sanity(progress=False):
     messages = []
 
     present_files = []
@@ -50,7 +51,12 @@ def check_sanity():
     if lockfile in present_files:
         present_files.remove(lockfile)
 
-    for doc in Document.objects.all():
+    if progress:
+        docs = tqdm(Document.objects.all())
+    else:
+        docs = Document.objects.all()
+
+    for doc in docs:
         # Check sanity of the thumbnail
         if not os.path.isfile(doc.thumbnail_path):
             messages.append(SanityError(
