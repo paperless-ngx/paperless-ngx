@@ -577,8 +577,11 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
     def test_get_metadata(self):
         doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png", archive_checksum="A", archive_filename="archive.pdf")
 
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), doc.source_path)
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), doc.archive_path)
+        source_file = os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png")
+        archive_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
+
+        shutil.copy(source_file, doc.source_path)
+        shutil.copy(archive_file, doc.archive_path)
 
         response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
         self.assertEqual(response.status_code, 200)
@@ -591,6 +594,8 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertGreater(len(meta['archive_metadata']), 0)
         self.assertEqual(meta['media_filename'], "file.pdf")
         self.assertEqual(meta['archive_media_filename'], "archive.pdf")
+        self.assertEqual(meta['original_size'], os.stat(source_file).st_size)
+        self.assertEqual(meta['archive_size'], os.stat(archive_file).st_size)
 
     def test_get_metadata_invalid_doc(self):
         response = self.client.get(f"/api/documents/34576/metadata/")
@@ -611,6 +616,21 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertGreater(len(meta['original_metadata']), 0)
         self.assertIsNone(meta['archive_metadata'])
         self.assertIsNone(meta['archive_media_filename'])
+
+    def test_get_metadata_missing_files(self):
+        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="application/pdf", archive_filename="file.pdf", archive_checksum="B", checksum="A")
+
+        response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
+        self.assertEqual(response.status_code, 200)
+
+        meta = response.data
+
+        self.assertTrue(meta['has_archive_version'])
+        self.assertIsNone(meta['original_metadata'])
+        self.assertIsNone(meta['original_size'])
+        self.assertIsNone(meta['archive_metadata'])
+        self.assertIsNone(meta['archive_size'])
+
 
     def test_get_empty_suggestions(self):
         doc = Document.objects.create(title="test", mime_type="application/pdf")

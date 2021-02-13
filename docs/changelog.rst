@@ -11,6 +11,8 @@ paperless-ng 1.1.2
 * Always show top left corner of thumbnails, even for extra wide documents.
 
 * Added a management command for executing the sanity checker directly. See :ref:`utilities-sanity-checker`.
+  
+* Fixed an issue with the metadata tab not reporting anything in case of missing files.
 
 paperless-ng 1.1.1
 ##################
