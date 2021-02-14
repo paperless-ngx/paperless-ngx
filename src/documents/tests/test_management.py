@@ -159,33 +159,20 @@ class TestCreateClassifier(TestCase):
 
 class TestSanityChecker(DirectoriesMixin, TestCase):
 
-    def test_no_errors(self):
+    def test_no_issues(self):
         with self.assertLogs() as capture:
             call_command("document_sanity_checker")
 
         self.assertEqual(len(capture.output), 1)
-        self.assertIn("No issues found.", capture.output[0])
+        self.assertIn("Sanity checker detected no issues.", capture.output[0])
 
-    @mock.patch("documents.management.commands.document_sanity_checker.logger.warning")
-    @mock.patch("documents.management.commands.document_sanity_checker.logger.error")
-    def test_warnings(self, error, warning):
-        doc = Document.objects.create(title="test", filename="test.pdf", checksum="d41d8cd98f00b204e9800998ecf8427e")
-        Path(doc.source_path).touch()
-        Path(doc.thumbnail_path).touch()
-
-        call_command("document_sanity_checker")
-
-        error.assert_not_called()
-        warning.assert_called()
-
-    @mock.patch("documents.management.commands.document_sanity_checker.logger.warning")
-    @mock.patch("documents.management.commands.document_sanity_checker.logger.error")
-    def test_errors(self, error, warning):
+    def test_errors(self):
         doc = Document.objects.create(title="test", content="test", filename="test.pdf", checksum="abc")
         Path(doc.source_path).touch()
         Path(doc.thumbnail_path).touch()
 
-        call_command("document_sanity_checker")
+        with self.assertLogs() as capture:
+            call_command("document_sanity_checker")
 
-        warning.assert_not_called()
-        error.assert_called()
+        self.assertEqual(len(capture.output), 1)
+        self.assertIn("Checksum mismatch of document", capture.output[0])
