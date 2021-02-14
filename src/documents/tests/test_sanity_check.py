@@ -73,6 +73,11 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
 
         return Document.objects.create(title="test", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", content="test", pk=1, filename="0000001.pdf", mime_type="application/pdf", archive_filename="0000001.pdf")
 
+    def assertSanityError(self, messageRegex):
+        messages = check_sanity()
+        self.assertTrue(messages.has_error())
+        self.assertRegex(messages[0]['message'], messageRegex)
+
     def test_no_docs(self):
         self.assertEqual(len(check_sanity()), 0)
 
@@ -83,71 +88,47 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
     def test_no_thumbnail(self):
         doc = self.make_test_data()
         os.remove(doc.thumbnail_path)
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Thumbnail of document .* does not exist")
+        self.assertSanityError("Thumbnail of document .* does not exist")
 
     def test_thumbnail_no_access(self):
         doc = self.make_test_data()
         os.chmod(doc.thumbnail_path, 0o000)
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Cannot read thumbnail file of document")
+        self.assertSanityError("Cannot read thumbnail file of document")
         os.chmod(doc.thumbnail_path, 0o777)
 
     def test_no_original(self):
         doc = self.make_test_data()
         os.remove(doc.source_path)
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Original of document .* does not exist.")
+        self.assertSanityError("Original of document .* does not exist.")
 
     def test_original_no_access(self):
         doc = self.make_test_data()
         os.chmod(doc.source_path, 0o000)
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Cannot read original file of document")
+        self.assertSanityError("Cannot read original file of document")
         os.chmod(doc.source_path, 0o777)
 
     def test_original_checksum_mismatch(self):
         doc = self.make_test_data()
         doc.checksum = "WOW"
         doc.save()
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Checksum mismatch of document")
+        self.assertSanityError("Checksum mismatch of document")
 
     def test_no_archive(self):
         doc = self.make_test_data()
         os.remove(doc.archive_path)
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Archived version of document .* does not exist.")
+        self.assertSanityError("Archived version of document .* does not exist.")
 
     def test_archive_no_access(self):
         doc = self.make_test_data()
         os.chmod(doc.archive_path, 0o000)
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Cannot read archive file of document")
+        self.assertSanityError("Cannot read archive file of document")
         os.chmod(doc.archive_path, 0o777)
 
     def test_archive_checksum_mismatch(self):
         doc = self.make_test_data()
         doc.archive_checksum = "WOW"
         doc.save()
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Checksum mismatch of archived document")
+        self.assertSanityError("Checksum mismatch of archived document")
 
     def test_empty_content(self):
         doc = self.make_test_data()
@@ -172,16 +153,10 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         doc = self.make_test_data()
         doc.archive_checksum = None
         doc.save()
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 2)
-        self.assertRegex(messages[0]['message'], "has an archive file, but its checksum is missing.")
+        self.assertSanityError("has an archive file, but its checksum is missing.")
 
     def test_archive_checksum_no_filename(self):
         doc = self.make_test_data()
         doc.archive_filename = None
         doc.save()
-        messages = check_sanity()
-        self.assertTrue(messages.has_error())
-        self.assertEqual(len(messages), 2)
-        self.assertRegex(messages[0]['message'], "has an archive file checksum, but no archive filename.")
+        self.assertSanityError("has an archive file checksum, but no archive filename.")
