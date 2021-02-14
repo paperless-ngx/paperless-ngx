@@ -16,6 +16,8 @@ paperless-ng 1.1.2
 
 * Reverted a change from 1.1.0 that caused huge memory usage due to redis caching.
 
+* Some memory usage optimizations.
+
 paperless-ng 1.1.1
 ##################
 
