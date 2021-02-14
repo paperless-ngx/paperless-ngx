@@ -39,7 +39,7 @@ scikit-learn="==0.24.0"
 # Prevent scipy updates because 1.6 is incompatible with python 3.6
 scipy="~=1.5.4"
 whitenoise = "~=5.2.0"
-watchdog = "*"
+watchdog = "~=1.0.0"
 whoosh="~=2.7.4"
 inotifyrecursive = "~=0.3.4"
 ocrmypdf = "~=11.6"
@@ -51,7 +51,6 @@ channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
-django-redis = "*"
 # uvloop 0.15+ incompatible with python 3.6
 uvloop = "~=0.14.0"
 # TODO: keep an eye on piwheel builds and update this once available (https://www.piwheels.org/project/cryptography/)
