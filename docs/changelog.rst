@@ -12,7 +12,8 @@ paperless-ng 1.1.2
 
 * Added a management command for executing the sanity checker directly.
   See :ref:`utilities-sanity-checker`.
-  The sanity checker will also report errors in the log files.
+
+* The weekly sanity check now reports messages in the log files.
 
 * Fixed an issue with the metadata tab not reporting anything in case of missing files.
 
