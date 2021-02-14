@@ -102,9 +102,10 @@ INSTALLED_APPS = [
 
     "django_q",
 
-    "channels",
-
 ] + env_apps
+
+if DEBUG:
+    INSTALLED_APPS.append("channels")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
