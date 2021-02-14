@@ -2,12 +2,12 @@ import os
 from unittest import mock
 
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils import timezone
 
 from documents import tasks
 from documents.models import Document, Tag, Correspondent, DocumentType
-from documents.sanity_checker import SanityError, SanityFailedError
+from documents.sanity_checker import SanityCheckMessages, SanityCheckFailedException
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -74,13 +74,33 @@ class TestTasks(DirectoriesMixin, TestCase):
         self.assertNotEqual(mtime2, mtime3)
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
-    def test_sanity_check(self, m):
-        m.return_value = []
-        tasks.sanity_check()
+    def test_sanity_check_success(self, m):
+        m.return_value = SanityCheckMessages()
+        self.assertEqual(tasks.sanity_check(), "No issues detected.")
         m.assert_called_once()
-        m.reset_mock()
-        m.return_value = [SanityError("")]
-        self.assertRaises(SanityFailedError, tasks.sanity_check)
+
+    @mock.patch("documents.tasks.sanity_checker.check_sanity")
+    def test_sanity_check_error(self, m):
+        messages = SanityCheckMessages()
+        messages.error("Some error")
+        m.return_value = messages
+        self.assertRaises(SanityCheckFailedException, tasks.sanity_check)
+        m.assert_called_once()
+
+    @mock.patch("documents.tasks.sanity_checker.check_sanity")
+    def test_sanity_check_warning(self, m):
+        messages = SanityCheckMessages()
+        messages.warning("Some warning")
+        m.return_value = messages
+        self.assertEqual(tasks.sanity_check(), "Sanity check exited with warnings. See log.")
+        m.assert_called_once()
+
+    @mock.patch("documents.tasks.sanity_checker.check_sanity")
+    def test_sanity_check_info(self, m):
+        messages = SanityCheckMessages()
+        messages.info("Some info")
+        m.return_value = messages
+        self.assertEqual(tasks.sanity_check(), "Sanity check exited with infos. See log.")
         m.assert_called_once()
 
     def test_bulk_update_documents(self):

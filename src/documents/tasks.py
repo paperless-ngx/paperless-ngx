@@ -9,8 +9,7 @@ from documents import index, sanity_checker
 from documents.classifier import DocumentClassifier, load_classifier
 from documents.consumer import Consumer, ConsumerError
 from documents.models import Document, Tag, DocumentType, Correspondent
-from documents.sanity_checker import SanityFailedError
-
+from documents.sanity_checker import SanityCheckFailedException
 
 logger = logging.getLogger("paperless.tasks")
 
@@ -94,8 +93,15 @@ def consume_file(path,
 def sanity_check():
     messages = sanity_checker.check_sanity()
 
-    if len(messages) > 0:
-        raise SanityFailedError(messages)
+    messages.log_messages()
+
+    if messages.has_error():
+        raise SanityCheckFailedException(
+            "Sanity check failed with errors. See log.")
+    elif messages.has_warning():
+        return "Sanity check exited with warnings. See log."
+    elif len(messages) > 0:
+        return "Sanity check exited with infos. See log."
     else:
         return "No issues detected."
 
