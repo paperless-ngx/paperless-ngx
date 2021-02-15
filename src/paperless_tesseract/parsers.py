@@ -2,12 +2,8 @@ import json
 import os
 import re
 
-import ocrmypdf
-import pdftotext
-import pikepdf
 from PIL import Image
 from django.conf import settings
-from ocrmypdf import InputFileError, EncryptedPdfError
 
 from documents.parsers import DocumentParser, ParseError, \
     make_thumbnail_from_pdf
@@ -22,6 +18,8 @@ class RasterisedDocumentParser(DocumentParser):
     logging_name = "paperless.parsing.tesseract"
 
     def extract_metadata(self, document_path, mime_type):
+        import pikepdf
+
         namespace_pattern = re.compile(r"\{(.*)\}(.*)")
 
         result = []
@@ -91,6 +89,9 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
     def parse(self, document_path, mime_type, file_name=None):
+        import ocrmypdf
+        from ocrmypdf import InputFileError, EncryptedPdfError
+
         mode = settings.OCR_MODE
 
         text_original = get_text_from_pdf(document_path)
@@ -223,6 +224,7 @@ def strip_excess_whitespace(text):
 
 
 def get_text_from_pdf(pdf_file):
+    import pdftotext
 
     if not os.path.isfile(pdf_file):
         return None
