@@ -1,10 +1,8 @@
 from django.contrib import admin
-from django.utils.html import format_html, format_html_join
-from django.utils.safestring import mark_safe
 from whoosh.writing import AsyncWriter
 
 from . import index
-from .models import Correspondent, Document, DocumentType, Log, Tag, \
+from .models import Correspondent, Document, DocumentType, Tag, \
     SavedView, SavedViewFilterRule
 
 
