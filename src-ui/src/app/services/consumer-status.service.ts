@@ -169,7 +169,12 @@ export class ConsumerStatusService {
   }
 
   dismiss(status: FileStatus) {
-    let index = this.consumerStatus.findIndex(s => s.filename == status.filename)
+    let index
+    if (status.taskId != null) {
+      index = this.consumerStatus.findIndex(s => s.taskId == status.taskId)
+    } else {
+      index = this.consumerStatus.findIndex(s => s.filename == status.filename)
+    }
 
     if (index > -1) {
       this.consumerStatus.splice(index, 1)
