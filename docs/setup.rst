@@ -763,7 +763,8 @@ configuring some options in paperless can help improve performance immensely:
 
 *   Stick with SQLite to save some resources.
 *   Consider setting ``PAPERLESS_OCR_PAGES`` to 1, so that paperless will only OCR
-    the first page of your documents.
+    the first page of your documents. In most cases, this page contains enough
+    information to be able to find it.
 *   ``PAPERLESS_TASK_WORKERS`` and ``PAPERLESS_THREADS_PER_WORKER`` are configured
     to use all cores. The Raspberry Pi models 3 and up have 4 cores, meaning that
     paperless will use 2 workers and 2 threads per worker. This may result in
@@ -776,6 +777,8 @@ configuring some options in paperless can help improve performance immensely:
     file generation for already ocr'ed documents entirely.
 *   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
     times. Thumbnails will be about 20% larger.
+*   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
+    1. This will save some memory.
 
 For details, refer to :ref:`configuration`.
 

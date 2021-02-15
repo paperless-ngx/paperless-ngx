@@ -5,6 +5,14 @@
 Changelog
 *********
 
+paperless-ng 1.1.3
+##################
+
+* Added a docker-specific configuration option to adjust the number of
+  worker processes of the web server. See :ref:`configuration-docker`.
+
+* Some more memory usage optimizations.
+
 paperless-ng 1.1.2
 ##################
 

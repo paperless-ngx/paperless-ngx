@@ -555,3 +555,65 @@ PAPERLESS_GS_BINARY=<path>
 
 PAPERLESS_OPTIPNG_BINARY=<path>
     Defaults to "/usr/bin/optipng".
+
+
+.. _configuration-docker:
+
+Docker-specific options
+#######################
+
+These options don't have any effect in ``paperless.conf``. These options adjust
+the behavior of the docker container. Configure these in `docker-compose.env`.
+
+PAPERLESS_WEBSERVER_WORKERS=<num>
+    The number of worker processes the webserver should spawn. More worker processes
+    usually result in the front end to load data much quicker. However, each worker process
+    also loads the entire application into memory separately, so increasing this value
+    will increase RAM usage.
+
+    Consider configuring this to 1 on low power devices with limited amount of RAM.
+
+    Defaults to 2.
+
+USERMAP_UID=<uid>
+    The ID of the paperless user in the container. Set this to your actual user ID on the
+    host system, which you can get by executing
+
+    .. code:: shell-session
+
+        $ id -u
+    
+    Paperless will change ownership on its folders to this user, so you need to get this right
+    in order to be able to write to the consumption directory.
+    
+    Defaults to 1000.
+
+USERMAP_GID=<gid>
+    The ID of the paperless Group in the container. Set this to your actual group ID on the
+    host system, which you can get by executing
+
+    .. code:: shell-session
+
+        $ id -g
+    
+    Paperless will change ownership on its folders to this group, so you need to get this right
+    in order to be able to write to the consumption directory.
+    
+    Defaults to 1000.
+
+PAPERLESS_OCR_LANGUAGES=<list>
+    Additional OCR languages to install. By default, paperless comes with
+    English, German, Italian, Spanish and French. If your language is not in this list, install
+    additional languages with this configuration option:
+
+    .. code:: bash
+
+        PAPERLESS_OCR_LANGUAGES=tur ces
+
+    To actually use these languages, also set the default OCR language of paperless:
+
+    .. code:: bash
+
+        PAPERLESS_OCR_LANGUAGE=tur
+
+    Defaults to none, which does not install any additional languages.
