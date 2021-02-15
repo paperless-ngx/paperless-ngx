@@ -32,7 +32,6 @@ from rest_framework.viewsets import (
     ViewSet
 )
 
-import documents.index as index
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
 from .classifier import load_classifier
@@ -176,10 +175,12 @@ class DocumentViewSet(RetrieveModelMixin,
     def update(self, request, *args, **kwargs):
         response = super(DocumentViewSet, self).update(
             request, *args, **kwargs)
+        from documents import index
         index.add_or_update_document(self.get_object())
         return response
 
     def destroy(self, request, *args, **kwargs):
+        from documents import index
         index.remove_document_from_index(self.get_object())
         return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
 
@@ -501,10 +502,6 @@ class SearchView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def __init__(self, *args, **kwargs):
-        super(SearchView, self).__init__(*args, **kwargs)
-        self.ix = index.open_index()
-
     def add_infos_to_hit(self, r):
         try:
             doc = Document.objects.get(id=r['id'])
@@ -525,6 +522,7 @@ class SearchView(APIView):
                 }
 
     def get(self, request, format=None):
+        from documents import index
 
         if 'query' in request.query_params:
             query = request.query_params['query']
@@ -554,8 +552,10 @@ class SearchView(APIView):
         if page < 1:
             page = 1
 
+        ix = index.open_index()
+
         try:
-            with index.query_page(self.ix, page, query, more_like_id, more_like_content) as (result_page, corrected_query):  # NOQA: E501
+            with index.query_page(ix, page, query, more_like_id, more_like_content) as (result_page, corrected_query):  # NOQA: E501
                 return Response(
                     {'count': len(result_page),
                      'page': result_page.pagenum,
@@ -570,10 +570,6 @@ class SearchAutoCompleteView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def __init__(self, *args, **kwargs):
-        super(SearchAutoCompleteView, self).__init__(*args, **kwargs)
-        self.ix = index.open_index()
-
     def get(self, request, format=None):
         if 'term' in request.query_params:
             term = request.query_params['term']
@@ -587,7 +583,11 @@ class SearchAutoCompleteView(APIView):
         else:
             limit = 10
 
-        return Response(index.autocomplete(self.ix, term, limit))
+        from documents import index
+
+        ix = index.open_index()
+
+        return Response(index.autocomplete(ix, term, limit))
 
 
 class StatisticsView(APIView):
