@@ -13,6 +13,16 @@ paperless-ng 1.1.3
 
 * Some more memory usage optimizations.
 
+.. note::
+
+  Many packages that paperless depends on are slowly dropping Python 3.6
+  support one after another, including the web server.
+  
+  At some point, paperless will drop Python 3.6 support. If using a bare
+  metal installation upgrade to python 3.7 or newer if you're still on 3.6.
+
+  If using docker, this does not affect you.
+
 paperless-ng 1.1.2
 ##################
 
