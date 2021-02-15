@@ -6,7 +6,6 @@ import shutil
 import subprocess
 import tempfile
 
-import dateparser
 import magic
 from django.conf import settings
 from django.utils import timezone
@@ -200,6 +199,8 @@ def parse_date(filename, text):
         """
         Call dateparser.parse with a particular date ordering
         """
+        import dateparser
+
         return dateparser.parse(
             ds,
             settings={
