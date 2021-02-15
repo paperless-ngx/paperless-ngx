@@ -442,6 +442,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data['documents_total'], 3)
         self.assertEqual(response.data['documents_inbox'], 1)
 
+    def test_statistics_no_inbox_tag(self):
+        Document.objects.create(title="none1", checksum="A")
+
+        response = self.client.get("/api/statistics/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['documents_inbox'], None)
+
     @mock.patch("documents.views.async_task")
     def test_upload(self, m):
 
