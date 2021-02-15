@@ -1,7 +1,5 @@
 from django.contrib import admin
-from whoosh.writing import AsyncWriter
 
-from . import index
 from .models import Correspondent, Document, DocumentType, Tag, \
     SavedView, SavedViewFilterRule
 
@@ -84,17 +82,21 @@ class DocumentAdmin(admin.ModelAdmin):
     created_.short_description = "Created"
 
     def delete_queryset(self, request, queryset):
-        ix = index.open_index()
-        with AsyncWriter(ix) as writer:
+        from documents import index
+
+        with index.open_index_writer() as writer:
             for o in queryset:
                 index.remove_document(writer, o)
+
         super(DocumentAdmin, self).delete_queryset(request, queryset)
 
     def delete_model(self, request, obj):
+        from documents import index
         index.remove_document_from_index(obj)
         super(DocumentAdmin, self).delete_model(request, obj)
 
     def save_model(self, request, obj, form, change):
+        from documents import index
         index.add_or_update_document(obj)
         super(DocumentAdmin, self).save_model(request, obj, form, change)
 
