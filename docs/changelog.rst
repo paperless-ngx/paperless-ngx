@@ -13,12 +13,14 @@ paperless-ng 1.1.3
 
 * Some more memory usage optimizations.
 
+* Don't show inbox statistics if no inbox tag is defined.
+
 .. note::
 
   Some packages that paperless depends on are slowly dropping Python 3.6
   support one after another, including the web server. Supporting Python
   3.6 means that I cannot update these packages anymore.
-  
+
   At some point, paperless will drop Python 3.6 support. If using a bare
   metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
 
