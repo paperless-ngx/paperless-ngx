@@ -95,9 +95,6 @@ class DocumentClassifier(object):
             pickle.dump(self.document_type_classifier, f)
 
     def train(self):
-        from sklearn.feature_extraction.text import CountVectorizer
-        from sklearn.neural_network import MLPClassifier
-        from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
 
         data = list()
         labels_tags = list()
@@ -161,6 +158,10 @@ class DocumentClassifier(object):
                 num_document_types
             )
         )
+
+        from sklearn.feature_extraction.text import CountVectorizer
+        from sklearn.neural_network import MLPClassifier
+        from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
 
         # Step 2: vectorize data
         logger.debug("Vectorizing data...")
