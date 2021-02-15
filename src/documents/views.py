@@ -595,8 +595,14 @@ class StatisticsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        return Response({
-            'documents_total': Document.objects.all().count(),
-            'documents_inbox': Document.objects.filter(
+        documents_total = Document.objects.all().count()
+        if Tag.objects.filter(is_inbox_tag=True).exists():
+            documents_inbox = Document.objects.filter(
                 tags__is_inbox_tag=True).distinct().count()
+        else:
+            documents_inbox = None
+
+        return Response({
+            'documents_total': documents_total,
+            'documents_inbox': documents_inbox,
         })
