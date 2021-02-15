@@ -11,7 +11,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from filelock import FileLock
 
-from .. import index, matching
+from .. import matching
 from ..file_handling import delete_empty_directories, \
     create_source_path_directory, \
     generate_unique_filename
@@ -305,4 +305,6 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
 
 
 def add_to_index(sender, document, **kwargs):
+    from documents import index
+
     index.add_or_update_document(document)

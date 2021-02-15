@@ -86,6 +86,22 @@ def open_index(recreate=False):
     return create_in(settings.INDEX_DIR, get_schema())
 
 
+@contextmanager
+def open_index_writer(ix=None, optimize=False):
+    if ix:
+        writer = AsyncWriter(ix)
+    else:
+        writer = AsyncWriter(open_index())
+
+    try:
+        yield writer
+    except Exception as e:
+        logger.exception(str(e))
+        writer.cancel()
+    finally:
+        writer.commit(optimize=optimize)
+
+
 def update_document(writer, doc):
     tags = ",".join([t.name for t in doc.tags.all()])
     writer.update_document(
@@ -110,14 +126,12 @@ def remove_document_by_id(writer, doc_id):
 
 
 def add_or_update_document(document):
-    ix = open_index()
-    with AsyncWriter(ix) as writer:
+    with open_index_writer() as writer:
         update_document(writer, document)
 
 
 def remove_document_from_index(document):
-    ix = open_index()
-    with AsyncWriter(ix) as writer:
+    with open_index_writer() as writer:
         remove_document(writer, document)
 
 
