@@ -18,7 +18,8 @@
 				"locales": {
 					"de": "src/locale/messages.de.xlf",
 					"nl-NL": "src/locale/messages.nl_NL.xlf",
-					"fr": "src/locale/messages.fr.xlf"
+					"fr": "src/locale/messages.fr.xlf",
+					"en-GB": "src/locale/messages.en_GB.xlf"
 				}
 			},
 			"architect": {
