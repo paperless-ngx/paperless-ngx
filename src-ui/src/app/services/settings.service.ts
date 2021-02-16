@@ -80,6 +80,7 @@ export class SettingsService {
   getLanguageOptions(): LanguageOption[] {
     return [
       {code: "en-US", name: $localize`English (US)`, englishName: "English (US)"},
+      {code: "en-GB", name: $localize`English (GB)`, englishName: "English (GB)"},
       {code: "de", name: $localize`German`, englishName: "German"},
       {code: "nl", name: $localize`Dutch`, englishName: "Dutch"},
       {code: "fr", name: $localize`French`, englishName: "French"}

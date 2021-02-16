@@ -288,7 +288,8 @@ if os.getenv("PAPERLESS_DBHOST"):
 LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = [
-    ("en-us", _("English")),
+    ("en-us", _("English (US)")),
+    ("en-gb", _("English (GB)")),
     ("de", _("German")),
     ("nl-nl", _("Dutch")),
     ("fr", _("French"))
