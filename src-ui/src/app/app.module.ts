@@ -64,10 +64,12 @@ import { CustomDatePipe } from './pipes/custom-date.pipe';
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
 import localeDe from '@angular/common/locales/de';
+import localeEnGb from '@angular/common/locales/en-GB';
 
 registerLocaleData(localeFr)
 registerLocaleData(localeNl)
 registerLocaleData(localeDe)
+registerLocaleData(localeEnGb)
 
 @NgModule({
   declarations: [
