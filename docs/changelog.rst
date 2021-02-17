@@ -5,15 +5,12 @@
 Changelog
 *********
 
-paperless-ng 1.1.3
+paperless-ng 1.1.4
 ##################
 
-* Added a docker-specific configuration option to adjust the number of
-  worker processes of the web server. See :ref:`configuration-docker`.
+* Added English (GB) locale.
 
-* Some more memory usage optimizations.
-
-* Don't show inbox statistics if no inbox tag is defined.
+* Added ISO-8601 date display option.
 
 .. note::
 
@@ -25,6 +22,16 @@ paperless-ng 1.1.3
   metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
 
   If using docker, this does not affect you.
+
+paperless-ng 1.1.3
+##################
+
+* Added a docker-specific configuration option to adjust the number of
+  worker processes of the web server. See :ref:`configuration-docker`.
+
+* Some more memory usage optimizations.
+
+* Don't show inbox statistics if no inbox tag is defined.
 
 paperless-ng 1.1.2
 ##################
