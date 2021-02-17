@@ -591,11 +591,11 @@
         },
         "ocrmypdf": {
             "hashes": [
-                "sha256:a54634d017a2f44aa2115b0b6ae5aa41a7cec018f5c53d16ad3abec1e70b3db7",
-                "sha256:d0e2da48d4abd90f48f0937b2cd4ba57503b56c603f5e3aa91e20e3b21a036cd"
+                "sha256:0f624456a50be0b0bc8c0b59704d159f637616c093a1cabe8bb383706561bcf7",
+                "sha256:b829ad640a6160423162012e094ee2f7cd074ec99efadd7f7486954ec9182985"
             ],
             "index": "pypi",
-            "version": "==11.6.0"
+            "version": "==11.6.2"
         },
         "pathvalidate": {
             "hashes": [
@@ -841,11 +841,11 @@
         },
         "python-magic": {
             "hashes": [
-                "sha256:356efa93c8899047d1eb7d3eb91e871ba2f5b1376edbaf4cc305e3c872207355",
-                "sha256:b757db2a5289ea3f1ced9e60f072965243ea43a2221430048fd8cacab17be0ce"
+                "sha256:8551e804c09a3398790bd9e392acb26554ae2609f29c72abb0b9dee9a5571eae",
+                "sha256:ca884349f2c92ce830e3f498c5b7c7051fe2942c3ee4332f65213b8ebff15a62"
             ],
             "index": "pypi",
-            "version": "==0.4.18"
+            "version": "==0.4.22"
         },
         "pytz": {
             "hashes": [
@@ -1837,11 +1837,11 @@
         },
         "tox": {
             "hashes": [
-                "sha256:65d0e90ceb816638a50d64f4b47b11da767b284c0addda2294cb3cd69bd72425",
-                "sha256:cf7fef81a3a2434df4d7af2a6d1bf606d2970220addfbe7dea2615bd4bb2c252"
+                "sha256:89afa9c59c04beb55eda789c7a65feb1a70fde117f85f1bd1c27c66758456e60",
+                "sha256:ed1e650cf6368bcbc4a071eeeba363c480920e0ed8a9ad1793c7caaa5ad33d49"
             ],
             "index": "pypi",
-            "version": "==3.21.4"
+            "version": "==3.22.0"
         },
         "urllib3": {
             "hashes": [
