@@ -137,7 +137,7 @@ export class BulkEditorComponent {
       } else {
         modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} and remove the tags ${this._localizeList(changedTags.itemsToRemove)} on ${this.list.selected.size} selected document(s).`
       }
-      
+
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked.subscribe(() => {
