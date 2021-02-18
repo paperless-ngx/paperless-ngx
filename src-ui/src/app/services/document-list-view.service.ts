@@ -8,6 +8,23 @@ import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
 import { DocumentService } from './rest/document.service';
 import { SettingsService, SETTINGS_KEYS } from './settings.service';
 
+interface ListViewState {
+
+  title?: string
+
+  documents?: PaperlessDocument[]
+
+  currentPage: number
+  collectionSize: number
+
+  sortField: string
+  sortReverse: boolean
+
+  filterRules: FilterRule[]
+
+  selected?: Set<number>
+
+}
 
 /**
  * This service manages the document list which is displayed using the document list view.
@@ -20,156 +37,174 @@ import { SettingsService, SETTINGS_KEYS } from './settings.service';
 })
 export class DocumentListViewService {
 
-  static DEFAULT_SORT_FIELD = 'created'
-
   isReloading: boolean = false
-  documents: PaperlessDocument[] = []
-  currentPage = 1
-  currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
-  collectionSize: number
+
   rangeSelectionAnchorIndex: number
   lastRangeSelectionToIndex: number
 
-  /**
-   * This is the current config for the document list. The service will always remember the last settings used for the document list.
-   */
-  private _documentListViewConfig: PaperlessSavedView
-  /**
-   * Optionally, this is the currently selected saved view, which might be null.
-   */
-  private _savedViewConfig: PaperlessSavedView
+  currentPageSize: number = this.settings.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
 
-  get savedView(): PaperlessSavedView {
-    return this._savedViewConfig
+  private listViewStates: Map<number, ListViewState> = new Map()
+
+  private _activeSavedViewId: number = null
+
+  get activeSavedViewId() {
+    return this._activeSavedViewId
   }
 
-  set savedView(value: PaperlessSavedView) {
-    if (value && !this._savedViewConfig || value && value.id != this._savedViewConfig.id) {
-      //saved view inactive and should be active now, or saved view active, but a different view is requested
-      //this is here so that we don't modify value, which might be the actual instance of the saved view.
-      this.selectNone()
-      this._savedViewConfig = Object.assign({}, value)
-    } else if (this._savedViewConfig && !value) {
-      //saved view active, but document list requested
-      this.selectNone()
-      this._savedViewConfig = null
+  get activeSavedViewTitle() {
+    return this.activeListViewState.title
+  }
+
+  private defaultListViewState(): ListViewState {
+    return {
+      title: null,
+      documents: [],
+      currentPage: 1,
+      collectionSize: null,
+      sortField: "created",
+      sortReverse: true,
+      filterRules: [],
+      selected: new Set<number>()
     }
   }
 
-  get savedViewId() {
-    return this.savedView?.id
+  private get activeListViewState() {
+    if (!this.listViewStates.has(this._activeSavedViewId)) {
+      this.listViewStates.set(this._activeSavedViewId, this.defaultListViewState())
+    }
+    return this.listViewStates.get(this._activeSavedViewId)
   }
 
-  get savedViewTitle() {
-    return this.savedView?.name
-  }
-
-  get documentListView() {
-    return this._documentListViewConfig
-  }
-
-  set documentListView(value) {
-    if (value) {
-      this._documentListViewConfig = Object.assign({}, value)
-      this.saveDocumentListView()
+  activateSavedView(view: PaperlessSavedView) {
+    this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
+    if (view) {
+      this._activeSavedViewId = view.id
+      this.loadSavedView(view)
+    } else {
+      this._activeSavedViewId = null
     }
   }
 
-  /**
-   * This is what switches between the saved views and the document list view. Everything on the document list uses
-   * this property to determine the settings for the currently displayed document list.
-   */
-  get view() {
-    return this.savedView || this.documentListView
-  }
-
-  load(view: PaperlessSavedView) {
-    this.documentListView.filter_rules = cloneFilterRules(view.filter_rules)
-    this.documentListView.sort_reverse = view.sort_reverse
-    this.documentListView.sort_field = view.sort_field
-    this.saveDocumentListView()
-  }
-
-  clear() {
-    this.collectionSize = null
-    this.documents = []
-    this.currentPage = 1
+  loadSavedView(view: PaperlessSavedView, closeCurrentView: boolean = false) {
+    if (closeCurrentView) {
+      this._activeSavedViewId = null
+    }
+    this.activeListViewState.filterRules = cloneFilterRules(view.filter_rules)
+    this.activeListViewState.sortField = view.sort_field
+    this.activeListViewState.sortReverse = view.sort_reverse
+    if (this._activeSavedViewId) {
+      this.activeListViewState.title = view.name
+    }
+    this.reduceSelectionToFilter()
   }
 
   reload(onFinish?) {
     this.isReloading = true
+    let activeListViewState = this.activeListViewState
+
     this.documentService.listFiltered(
-      this.currentPage,
+      activeListViewState.currentPage,
       this.currentPageSize,
-      this.view.sort_field,
-      this.view.sort_reverse,
-      this.view.filter_rules).subscribe(
+      activeListViewState.sortField,
+      activeListViewState.sortReverse,
+      activeListViewState.filterRules).subscribe(
         result => {
-          this.collectionSize = result.count
-          this.documents = result.results
+          this.isReloading = false
+          activeListViewState.collectionSize = result.count
+          activeListViewState.documents = result.results
           if (onFinish) {
             onFinish()
           }
           this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
-          this.isReloading = false
         },
         error => {
-          if (this.currentPage != 1 && error.status == 404) {
+          this.isReloading = false
+          if (activeListViewState.currentPage != 1 && error.status == 404) {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
-            this.currentPage = 1
+            activeListViewState.currentPage = 1
             this.reload()
           }
-          this.isReloading = false
         })
   }
 
   set filterRules(filterRules: FilterRule[]) {
-    //we're going to clone the filterRules object, since we don't
-    //want changes in the filter editor to propagate into here right away.
-    this.view.filter_rules = filterRules
+    this.activeListViewState.filterRules = filterRules
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
   }
 
   get filterRules(): FilterRule[] {
-    return this.view.filter_rules
+    return this.activeListViewState.filterRules
   }
 
   set sortField(field: string) {
-    this.view.sort_field = field
-    this.saveDocumentListView()
+    this.activeListViewState.sortField = field
     this.reload()
+    this.saveDocumentListView()
   }
 
   get sortField(): string {
-    return this.view.sort_field
+    return this.activeListViewState.sortField
   }
 
   set sortReverse(reverse: boolean) {
-    this.view.sort_reverse = reverse
-    this.saveDocumentListView()
+    this.activeListViewState.sortReverse = reverse
     this.reload()
+    this.saveDocumentListView()
   }
 
   get sortReverse(): boolean {
-    return this.view.sort_reverse
+    return this.activeListViewState.sortReverse
+  }
+
+  get collectionSize(): number {
+    return this.activeListViewState.collectionSize
+  }
+
+  get currentPage(): number {
+    return this.activeListViewState.currentPage
+  }
+
+  set currentPage(page: number) {
+    this.activeListViewState.currentPage = page
+    this.reload()
+    this.saveDocumentListView()
+  }
+
+  get documents(): PaperlessDocument[] {
+    return this.activeListViewState.documents
+  }
+
+  get selected(): Set<number> {
+    return this.activeListViewState.selected
   }
 
   setSort(field: string, reverse: boolean) {
-    this.view.sort_field = field
-    this.view.sort_reverse = reverse
-    this.saveDocumentListView()
+    this.activeListViewState.sortField = field
+    this.activeListViewState.sortReverse = reverse
     this.reload()
+    this.saveDocumentListView()
   }
 
   private saveDocumentListView() {
-    sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(this.documentListView))
+    if (this._activeSavedViewId == null) {
+      let savedState: ListViewState = {
+        collectionSize: this.activeListViewState.collectionSize,
+        currentPage: this.activeListViewState.currentPage,
+        filterRules: this.activeListViewState.filterRules,
+        sortField: this.activeListViewState.sortField,
+        sortReverse: this.activeListViewState.sortReverse
+      }
+      sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(savedState))
+    }
   }
 
   quickFilter(filterRules: FilterRule[]) {
-    this.savedView = null
-    this.view.filter_rules = filterRules
+    this._activeSavedViewId = null
+    this.activeListViewState.filterRules = filterRules
+    this.activeListViewState.currentPage = 1
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
     this.router.navigate(["documents"])
@@ -217,8 +252,6 @@ export class DocumentListViewService {
     }
   }
 
-  selected = new Set<number>()
-
   selectNone() {
     this.selected.clear()
     this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
@@ -227,13 +260,11 @@ export class DocumentListViewService {
   reduceSelectionToFilter() {
     if (this.selected.size > 0) {
       this.documentService.listAllFilteredIds(this.filterRules).subscribe(ids => {
-        let subset = new Set<number>()
-        for (let id of ids) {
-          if (this.selected.has(id)) {
-            subset.add(id)
+        for (let id of this.selected) {
+          if (!ids.includes(id)) {
+            this.selected.delete(id)
           }
         }
-        this.selected = subset
       })
     }
   }
@@ -287,20 +318,21 @@ export class DocumentListViewService {
   }
 
   constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
-    let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
+     let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {
-        this.documentListView = JSON.parse(documentListViewConfigJson)
+        let savedState: ListViewState = JSON.parse(documentListViewConfigJson)
+        // Remove null elements from the restored state
+        Object.keys(savedState).forEach(k => {
+          if (savedState[k] == null) {
+            delete savedState[k]
+          }
+        })
+        //only use restored state attributes instead of defaults if they are not null
+        let newState = Object.assign(this.defaultListViewState(), savedState)
+        this.listViewStates.set(null, newState)
       } catch (e) {
         sessionStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
-        this.documentListView = null
-      }
-    }
-    if (!this.documentListView || this.documentListView.filter_rules == null || this.documentListView.sort_reverse == null || this.documentListView.sort_field == null) {
-      this.documentListView = {
-        filter_rules: [],
-        sort_reverse: true,
-        sort_field: 'created'
       }
     }
   }
