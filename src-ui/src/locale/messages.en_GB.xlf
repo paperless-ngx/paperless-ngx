@@ -58,11 +58,11 @@
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2155249406916744630">
-        <source>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; saved successfully.</source>
-        <target>View &amp;quot;<x equiv-text="this.list.savedView.name" id="PH"/>&amp;quot; saved successfully.</target>
+        <source>View &quot;<x equiv-text="this.list.activeSavedViewTitle" id="PH"/>&quot; saved successfully.</source>
+        <target>View &amp;quot;<x equiv-text="this.list.activeSavedViewTitle" id="PH"/>&amp;quot; saved successfully.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6837554170707123455">
@@ -70,7 +70,7 @@
         <target>View &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; created successfully.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ca82952a6bc860b5391d5975322d8af8ceddfa4">
@@ -129,9 +129,9 @@
           <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="72e7d343f9165602cce1ca7faffbc565fd31ef92">
-        <source>Save &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
-        <target>Save &amp;quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&amp;quot;</target>
+      <trans-unit datatype="html" id="5f5ce787c428d917c30c9bd70789a618e09743a7">
+        <source>Save &quot;<x equiv-text="{{list.activeSavedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
+        <target>Save &amp;quot;<x equiv-text="{{list.activeSavedViewTitle}}" id="INTERPOLATION"/>&amp;quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
@@ -585,14 +585,6 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="5ca707824ab93066c7d9b44e1b8bf216725c2c22">
-        <source>Filter</source>
-        <target>Filter</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
-          <context context-type="linenumber">7</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="5610279464668232148">
         <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; deleted.</source>
         <target>Saved view &amp;quot;<x equiv-text="savedView.name" id="PH"/>&amp;quot; deleted.</target>
@@ -622,7 +614,15 @@
         <target>Use date format of display language</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4912706592792948707">
+        <source>ISO 8601</source>
+        <target>ISO 8601</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -630,7 +630,7 @@
         <target>Error while storing settings on server: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -1234,6 +1234,14 @@
           <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="6523384805359286307">
+        <source>Title: <x equiv-text="rule.value" id="PH"/></source>
+        <target>Title: <x equiv-text="rule.value" id="PH"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="02d184c288f567825a1fcbf83bcd3099a10853d5">
         <source>Filter tags</source>
         <target>Filter tags</target>
@@ -1614,20 +1622,20 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="46c8fe557cf52c9389783627d4f85453f4ddb459">
-        <source>Documents in inbox: <x equiv-text="{{statistics.documents_inbox}}" id="INTERPOLATION"/></source>
-        <target>Documents in inbox: <x equiv-text="{{statistics.documents_inbox}}" id="INTERPOLATION"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-          <context context-type="linenumber">3</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="c327c0e67bcac7494dcbaa9afb3b42d5008c6438">
-        <source>Total documents: <x equiv-text="{{statistics.documents_total}}" id="INTERPOLATION"/></source>
-        <target>Total documents: <x equiv-text="{{statistics.documents_total}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="c0d907c2687c09612395aee6ef7c04ca8e5e5e0a">
+        <source>Total documents: <x equiv-text="{{statistics?.documents_total}}" id="INTERPOLATION"/></source>
+        <target>Total documents: <x equiv-text="{{statistics?.documents_total}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="13e8d49dbcad9f9d71e66a9a56d6f328cff430c9">
+        <source>Documents in inbox: <x equiv-text="{{statistics?.documents_inbox}}" id="INTERPOLATION"/></source>
+        <target>Documents in inbox: <x equiv-text="{{statistics?.documents_inbox}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">3</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6443586946875325554">
@@ -1848,12 +1856,20 @@
           <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="6987083569809053351">
+        <source>English (GB)</source>
+        <target>English (GB)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="1858110241312746425">
         <source>German</source>
         <target>German</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3071065188816255493">
@@ -1861,7 +1877,7 @@
         <target>Dutch</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7633754075223722162">
@@ -1869,7 +1885,7 @@
         <target>French</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2119857572761283468">
