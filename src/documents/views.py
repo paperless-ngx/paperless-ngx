@@ -639,7 +639,10 @@ class BulkDownloadView(APIView):
         content = serializer.validated_data.get('content')
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-        temp = tempfile.NamedTemporaryFile(dir=settings.SCRATCH_DIR, suffix="-compressed-archive", delete=False)
+        temp = tempfile.NamedTemporaryFile(
+            dir=settings.SCRATCH_DIR,
+            suffix="-compressed-archive",
+            delete=False)
 
         if content == 'both':
             strategy_class = OriginalAndArchiveStrategy
