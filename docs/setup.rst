@@ -280,7 +280,6 @@ writing. Windows is not and will never be supported.
     *   ``imagemagick`` >= 6 for PDF conversion
     *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
-    *   ``libpoppler-cpp-dev`` for PDF to text conversion
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
     *   ``mime-support`` for mime type detection
@@ -354,7 +353,7 @@ writing. Windows is not and will never be supported.
     .. code:: shell-session
 
         sudo -Hu paperless pip3 install -r requirements.txt
-    
+
     This will install all python dependencies in the home directory of
     the new paperless user.
 
@@ -803,7 +802,7 @@ Using nginx as a reverse proxy
 ##############################
 
 If you want to expose paperless to the internet, you should hide it behind a
-reverse proxy with SSL enabled. 
+reverse proxy with SSL enabled.
 
 In addition to the usual configuration for SSL,
 the following configuration is required for paperless to operate:
