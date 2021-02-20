@@ -202,7 +202,6 @@ Paperless uses `OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/>`_ for
 performing OCR on documents and images. Paperless uses sensible defaults for
 most settings, but all of them can be configured to your needs.
 
-
 PAPERLESS_OCR_LANGUAGE=<lang>
     Customize the language that paperless will attempt to use when
     parsing documents.
@@ -245,6 +244,39 @@ PAPERLESS_OCR_MODE=<mode>
     The default is ``skip``, which only performs OCR when necessary and always
     creates archived documents.
 
+PAPERLESS_OCR_CLEAN=<mode>
+    Tells paperless to use ``unpaper`` to clean any input document before
+    sending it to tesseract. This uses more resources, but generally results
+    in better OCR results. The following modes are available:
+
+    *   ``clean``: Apply unpaper.
+    *   ``clean-final``: Apply unpaper, and use the cleaned images to build the
+        output file instead of the original images.
+    *   ``none``: Do not apply unpaper.
+
+    Defaults to ``clean``.
+
+PAPERLESS_OCR_DESKEW=<bool>
+    Tells paperless to correct skewing (slight rotation of input images Mostly
+    due to improper scanning)
+
+    Defaults to ``false``, which disables this feature.
+
+
+PAPERLESS_OCR_ROTATE_PAGES=<bool>
+    Tells paperless to correct page rotation (90°, 180° and 270° rotation).
+
+    Defaults to ``false``, which disables this feature.
+
+
+PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>
+    Adjust the threshold for automatic page rotation by ``PAPERLESS_OCR_ROTATE_PAGES``.
+    This is an arbitrary value reported by tesseract. "15" is a very conservative value,
+    whereas "2" is a very aggressive option and will often result correctly rotated pages
+    being rotated as well.
+
+    Defaults to "10".
+
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
 
@@ -271,7 +303,6 @@ PAPERLESS_OCR_PAGES=<num>
 
     Defaults to 0, which disables this feature and always uses all pages.
 
-
 PAPERLESS_OCR_IMAGE_DPI=<num>
     Paperless will OCR any images you put into the system and convert them
     into PDF documents. This is useful if your scanner produces images.
@@ -282,8 +313,8 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
 
     Set this to the DPI your scanner produces images at.
 
-    Default is none, which causes paperless to fail if no DPI information is
-    present in an image.
+    Default is none, which will automatically calculate image DPI so that
+    the produced PDF documents are A4 sized.
 
 
 PAPERLESS_OCR_USER_ARGS=<json>
