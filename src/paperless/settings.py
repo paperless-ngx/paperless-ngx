@@ -449,6 +449,14 @@ OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
 
+OCR_CLEAN = os.getenv("PAPERLESS_OCR_CLEAN", "clean")
+
+OCR_DESKEW = __get_boolean("PAPERLESS_OCR_DESKEW")
+
+OCR_ROTATE_PAGES = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES")
+
+OCR_ROTATE_PAGES_THRESHOLD = float(os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 10.0))
+
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
 # GNUPG needs a home directory for some reason
