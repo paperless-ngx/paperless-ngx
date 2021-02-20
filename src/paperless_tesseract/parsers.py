@@ -300,4 +300,3 @@ def strip_excess_whitespace(text):
 
     # TODO: this needs a rework
     return no_trailing_whitespace.strip()
-
