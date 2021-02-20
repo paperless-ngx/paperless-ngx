@@ -56,6 +56,20 @@
     </div>
   </div>
   <div class="col-auto ml-auto mb-2 mb-xl-0 d-flex">
+    <div class="btn-group btn-group-sm mr-2">
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="downloadSelected()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#download" />
+        </svg>&nbsp;<ng-container i18n>Download</ng-container>
+      </button>
+      <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
+        <button class="btn btn-outline-primary btn-sm dropdown-toggle-split" ngbDropdownToggle></button>
+        <div class="dropdown-menu" ngbDropdownMenu>
+          <button ngbDropdownItem i18n (click)="downloadSelected('originals')">Download originals</button>
+        </div>
+      </div>
+    </div>
+
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()">
       <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#trash" />

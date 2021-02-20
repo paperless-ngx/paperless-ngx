@@ -134,4 +134,8 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     return this.http.get<PaperlessDocumentSuggestions>(this.getResourceUrl(id, 'suggestions'))
   }
 
+  bulkDownload(ids: number[], content="both") {
+    return this.http.post(this.getResourceUrl(null, 'bulk_download'), {"documents": ids, "content": content}, { responseType: 'blob' })
+  }
+
 }
