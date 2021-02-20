@@ -2,6 +2,7 @@ import logging
 import os
 import tempfile
 import uuid
+import zipfile
 from datetime import datetime
 from time import mktime
 
@@ -34,6 +35,8 @@ from rest_framework.viewsets import (
 
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
+from .bulk_download import OriginalAndArchiveStrategy, OriginalsOnlyStrategy, \
+    ArchiveOnlyStrategy
 from .classifier import load_classifier
 from .filters import (
     CorrespondentFilterSet,
@@ -51,7 +54,9 @@ from .serialisers import (
     DocumentTypeSerializer,
     PostDocumentSerializer,
     SavedViewSerializer,
-    BulkEditSerializer, SelectionDataSerializer
+    BulkEditSerializer,
+    DocumentListSerializer,
+    BulkDownloadSerializer
 )
 
 
@@ -444,7 +449,7 @@ class PostDocumentView(APIView):
 class SelectionDataView(APIView):
 
     permission_classes = (IsAuthenticated,)
-    serializer_class = SelectionDataSerializer
+    serializer_class = DocumentListSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
 
     def get_serializer_context(self):
@@ -606,3 +611,52 @@ class StatisticsView(APIView):
             'documents_total': documents_total,
             'documents_inbox': documents_inbox,
         })
+
+
+class BulkDownloadView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BulkDownloadSerializer
+    parser_classes = (parsers.JSONParser,)
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ids = serializer.validated_data.get('documents')
+        compression = serializer.validated_data.get('compression')
+        content = serializer.validated_data.get('content')
+
+        os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
+        temp = tempfile.NamedTemporaryFile(dir=settings.SCRATCH_DIR, suffix="-compressed-archive", delete=False)
+
+        if content == 'both':
+            strategy_class = OriginalAndArchiveStrategy
+        elif content == 'originals':
+            strategy_class = OriginalsOnlyStrategy
+        else:
+            strategy_class = ArchiveOnlyStrategy
+
+        with zipfile.ZipFile(temp.name, "w", compression) as zipf:
+            strategy = strategy_class(zipf)
+            for id in ids:
+                doc = Document.objects.get(id=id)
+                strategy.add_document(doc)
+
+        with open(temp.name, "rb") as f:
+            response = HttpResponse(f, content_type="application/zip")
+            response["Content-Disposition"] = '{}; filename="{}"'.format(
+                "attachment", "documents.zip")
+
+            return response
