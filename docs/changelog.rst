@@ -5,6 +5,20 @@
 Changelog
 *********
 
+paperless-ng 1.2.0
+##################
+
+* Changes to the OCRmyPDF integration
+
+  * Added support for deskewing and automatic rotation of incorrectly rotated pages.
+  * Better support for encrypted files.
+  * Better support for various other PDF files: Paperless will now attempt to force OCR with safe options when OCR fails with the configured options.
+  * Added an explicit option to skip cleaning with ``unpaper``.
+
+* Download multiple selected document.
+
+* Paperless no longer depends on ``libpoppler-cpp-dev``.
+
 paperless-ng 1.1.4
 ##################
 
