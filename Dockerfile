@@ -67,7 +67,6 @@ COPY requirements.txt ../
 RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
-		libpoppler-cpp-dev \
 		libpq-dev \
 		libqpdf-dev \
 	&& python3 -m pip install --upgrade --no-cache-dir supervisor \

@@ -15,7 +15,6 @@
       - imagemagick
       - optipng
       - gnupg
-      - libpoppler-cpp-dev
       - libpq-dev
       - libmagic-dev
       - mime-support
