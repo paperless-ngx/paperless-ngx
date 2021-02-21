@@ -155,8 +155,11 @@ class RasterisedDocumentParser(DocumentParser):
 
         if settings.OCR_CLEAN == 'clean':
             ocrmypdf_args['clean'] = True
-        elif settings.OCR_CLEAN == 'clean-final' and not settings.OCR_MODE == 'redo':  # NOQA: E501
-            ocrmypdf_args['clean_final'] = True
+        elif settings.OCR_CLEAN == 'clean-final':
+            if settings.OCR_MODE == 'redo':
+                ocrmypdf_args['clean'] = True
+            else:
+                ocrmypdf_args['clean_final'] = True
 
         if settings.OCR_DESKEW and not settings.OCR_MODE == 'redo':
             ocrmypdf_args['deskew'] = True
