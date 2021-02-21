@@ -244,6 +244,8 @@ PAPERLESS_OCR_MODE=<mode>
     The default is ``skip``, which only performs OCR when necessary and always
     creates archived documents.
 
+    Read more about this in the `OCRmyPDF documentation <https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped>`_.
+
 PAPERLESS_OCR_CLEAN=<mode>
     Tells paperless to use ``unpaper`` to clean any input document before
     sending it to tesseract. This uses more resources, but generally results
@@ -256,12 +258,19 @@ PAPERLESS_OCR_CLEAN=<mode>
 
     Defaults to ``clean``.
 
+    .. note::
+
+        ``clean-final`` is incompatible with ocr mode ``redo``.
+
 PAPERLESS_OCR_DESKEW=<bool>
     Tells paperless to correct skewing (slight rotation of input images mainly
     due to improper scanning)
 
     Defaults to ``false``, which disables this feature.
 
+    .. note::
+
+        Deskewing is incompatible with ocr mode ``redo``.
 
 PAPERLESS_OCR_ROTATE_PAGES=<bool>
     Tells paperless to correct page rotation (90°, 180° and 270° rotation).
