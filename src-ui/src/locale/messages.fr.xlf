@@ -58,11 +58,11 @@
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2155249406916744630">
-        <source>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; saved successfully.</source>
-        <target>Vue &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; enregistrée avec succès.</target>
+        <source>View &quot;<x equiv-text="this.list.activeSavedViewTitle" id="PH"/>&quot; saved successfully.</source>
+        <target>Vue &quot;<x equiv-text="this.list.activeSavedViewTitle" id="PH"/>&quot; enregistrée avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6837554170707123455">
@@ -70,7 +70,7 @@
         <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; créée avec succès.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ca82952a6bc860b5391d5975322d8af8ceddfa4">
@@ -129,9 +129,9 @@
           <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="72e7d343f9165602cce1ca7faffbc565fd31ef92">
-        <source>Save &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
-        <target>Enregistrer &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</target>
+      <trans-unit datatype="html" id="5f5ce787c428d917c30c9bd70789a618e09743a7">
+        <source>Save &quot;<x equiv-text="{{list.activeSavedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
+        <target>Enregistrer &quot;<x equiv-text="{{list.activeSavedViewTitle}}" id="INTERPOLATION"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
@@ -585,14 +585,6 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="5ca707824ab93066c7d9b44e1b8bf216725c2c22">
-        <source>Filter</source>
-        <target>Filtrer</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
-          <context context-type="linenumber">7</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="5610279464668232148">
         <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; deleted.</source>
         <target>Vue &quot;<x equiv-text="savedView.name" id="PH"/>&quot; supprimée.</target>
@@ -622,7 +614,15 @@
         <target>Utiliser le format de date de la langue d'affichage</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4912706592792948707">
+        <source>ISO 8601</source>
+        <target>ISO 8601</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -630,7 +630,7 @@
         <target>Une erreur s'est produite lors de l'enregistrement des paramètres sur le serveur : <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -1234,6 +1234,14 @@
           <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="6523384805359286307">
+        <source>Title: <x equiv-text="rule.value" id="PH"/></source>
+        <target>Titre : <x equiv-text="rule.value" id="PH"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="02d184c288f567825a1fcbf83bcd3099a10853d5">
         <source>Filter tags</source>
         <target>Filtrer les étiquettes</target>
@@ -1392,7 +1400,7 @@
         <target>Une erreur s'est produite lors de l'exécution de l'opération de masse : <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7894972847287473517">
@@ -1400,7 +1408,7 @@
         <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8639884465898458690">
@@ -1408,7 +1416,7 @@
         <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; et &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">115</context>
         </context-group>
         <note from="description" priority="1">This is for messages like 'modify &quot;tag1&quot; and &quot;tag2&quot;'</note>
       </trans-unit>
@@ -1417,7 +1425,7 @@
         <target>, </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <note from="description" priority="1">this is used to separate enumerations and should probably be a comma and a whitespace in most languages</note>
       </trans-unit>
@@ -1426,7 +1434,7 @@
         <target><x equiv-text="list" id="PH"/> et &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <note from="description" priority="1">this is for messages like 'modify &quot;tag1&quot;, &quot;tag2&quot; and &quot;tag3&quot;'</note>
       </trans-unit>
@@ -1435,7 +1443,7 @@
         <target>Confirmer l'affectation des étiquettes</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6619516195038467207">
@@ -1443,7 +1451,7 @@
         <target>Cette action affectera l'étiquette &quot;<x equiv-text="tag.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1894412783609570695">
@@ -1451,7 +1459,7 @@
         <target>Cette action affectera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToAdd)" id="PH"/> au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7181166515756808573">
@@ -1459,7 +1467,7 @@
         <target>Cette action supprimera l'étiquette &quot;<x equiv-text="tag.name" id="PH"/>&quot; de(s) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3819792277998068944">
@@ -1467,7 +1475,7 @@
         <target>Cette action supprimera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToRemove)" id="PH"/> de(s) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2739066218579571288">
@@ -1475,7 +1483,7 @@
         <target>Cette action affectera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToAdd)" id="PH"/> et supprimera les étiquettes <x equiv-text="this._localizeList(changedTags.itemsToRemove)" id="PH_1"/> de(s) <x equiv-text="this.list.selected.size" id="PH_2"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">139</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2996713129519325161">
@@ -1483,7 +1491,7 @@
         <target>Confirmer l'affectation du correspondant</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">159</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6900893559485781849">
@@ -1491,7 +1499,7 @@
         <target>Cette action affectera le correspondant &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/>document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">161</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1257522660364398440">
@@ -1499,7 +1507,7 @@
         <target>Cette action supprimera le correspondant de(s) <x equiv-text="this.list.selected.size" id="PH"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">163</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5393409374423140648">
@@ -1507,7 +1515,7 @@
         <target>Confirmer l'affectation du type de document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">182</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="332180123895325027">
@@ -1515,7 +1523,7 @@
         <target>Cette action affectera le type de document &quot;<x equiv-text="documentType.name" id="PH"/>&quot; au(x) <x equiv-text="this.list.selected.size" id="PH_1"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">184</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2236642492594872779">
@@ -1523,7 +1531,7 @@
         <target>Cette action supprimera le type de document de(s) <x equiv-text="this.list.selected.size" id="PH"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">186</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="749430623564850405">
@@ -1531,7 +1539,7 @@
         <target>Confirmer la suppression</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">201</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4303174930844518780">
@@ -1539,7 +1547,7 @@
         <target>Cette action supprimera définitivement <x equiv-text="this.list.selected.size" id="PH"/> document(s) sélectionné(s).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">202</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5641451190833696892">
@@ -1547,7 +1555,7 @@
         <target>Cette action est irréversible.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6734339521247847366">
@@ -1555,7 +1563,7 @@
         <target>Supprimer le(s) document(s)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8b0609df23817024b3bed12beb9b64fc1009f588">
@@ -1580,6 +1588,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="fc2de37422d7c4af6686842283cc2afd781b6848">
+        <source>Download originals</source>
+        <target>Télécharger les originaux</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="a1e6c11f20d4bf6e8e6b43e3c6d2561b2080645e">
@@ -1614,20 +1630,20 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="46c8fe557cf52c9389783627d4f85453f4ddb459">
-        <source>Documents in inbox: <x equiv-text="{{statistics.documents_inbox}}" id="INTERPOLATION"/></source>
-        <target>Documents dans la boîte de réception : <x equiv-text="{{statistics.documents_inbox}}" id="INTERPOLATION"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-          <context context-type="linenumber">3</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="c327c0e67bcac7494dcbaa9afb3b42d5008c6438">
-        <source>Total documents: <x equiv-text="{{statistics.documents_total}}" id="INTERPOLATION"/></source>
-        <target>Nombre total de documents : <x equiv-text="{{statistics.documents_total}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="c0d907c2687c09612395aee6ef7c04ca8e5e5e0a">
+        <source>Total documents: <x equiv-text="{{statistics?.documents_total}}" id="INTERPOLATION"/></source>
+        <target>Nombre total de documents : <x equiv-text="{{statistics?.documents_total}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="13e8d49dbcad9f9d71e66a9a56d6f328cff430c9">
+        <source>Documents in inbox: <x equiv-text="{{statistics?.documents_inbox}}" id="INTERPOLATION"/></source>
+        <target>Documents dans la boîte de réception : <x equiv-text="{{statistics?.documents_inbox}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">3</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6443586946875325554">
@@ -1848,12 +1864,20 @@
           <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="6987083569809053351">
+        <source>English (GB)</source>
+        <target>Anglais (GB)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="1858110241312746425">
         <source>German</source>
         <target>Allemand</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3071065188816255493">
@@ -1861,7 +1885,7 @@
         <target>Néerlandais</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7633754075223722162">
@@ -1869,7 +1893,7 @@
         <target>Français</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2119857572761283468">
