@@ -39,6 +39,12 @@ def handle_document(document_id):
             mime_type,
             document.get_public_filename())
 
+        thumbnail = parser.get_optimised_thumbnail(
+            document.source_path,
+            mime_type,
+            document.get_public_filename()
+        )
+
         if parser.get_archive_path():
             with transaction.atomic():
                 with open(parser.get_archive_path(), 'rb') as f:
@@ -58,6 +64,7 @@ def handle_document(document_id):
                     create_source_path_directory(document.archive_path)
                     shutil.move(parser.get_archive_path(),
                                 document.archive_path)
+                    shutil.move(thumbnail, document.thumbnail_path)
 
         with AsyncWriter(index.open_index()) as writer:
             index.update_document(writer, document)
