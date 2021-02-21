@@ -1,6 +1,7 @@
 import logging
 import os
 from pathlib import Path
+from threading import Thread
 from time import sleep
 
 from django.conf import settings
@@ -57,6 +58,7 @@ def _consume(filepath):
         logger.exception("Error creating tags from path")
 
     try:
+        logger.info(f"Adding {filepath} to the task queue.")
         async_task("documents.tasks.consume_file",
                    filepath,
                    override_tag_ids=tag_ids if tag_ids else None,
@@ -69,6 +71,7 @@ def _consume(filepath):
 
 
 def _consume_wait_unmodified(file):
+    logger.debug(f"Waiting for file {file} to remain unmodified")
     mtime = -1
     current_try = 0
     while current_try < settings.CONSUMER_POLLING_RETRY_COUNT:
@@ -91,10 +94,14 @@ def _consume_wait_unmodified(file):
 class Handler(FileSystemEventHandler):
 
     def on_created(self, event):
-        _consume_wait_unmodified(event.src_path)
+        Thread(
+            target=_consume_wait_unmodified, args=(event.src_path,)
+        ).start()
 
     def on_moved(self, event):
-        _consume_wait_unmodified(event.dest_path)
+        Thread(
+            target=_consume_wait_unmodified, args=(event.dest_path,)
+        ).start()
 
 
 class Command(BaseCommand):
