@@ -68,10 +68,10 @@ def _consume(filepath):
         logger.exception("Error while consuming document")
 
 
-def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
+def _consume_wait_unmodified(file):
     mtime = -1
     current_try = 0
-    while current_try < num_tries:
+    while current_try < settings.CONSUMER_POLLING_RETRY_COUNT:
         try:
             new_mtime = os.stat(file).st_mtime
         except FileNotFoundError:
@@ -82,7 +82,7 @@ def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
             _consume(file)
             return
         mtime = new_mtime
-        sleep(wait_time)
+        sleep(settings.CONSUMER_POLLING_DELAY)
         current_try += 1
 
     logger.error(f"Timeout while waiting on file {file} to remain unmodified.")
