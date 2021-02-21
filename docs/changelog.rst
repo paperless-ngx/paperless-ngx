@@ -21,14 +21,11 @@ paperless-ng 1.2.0
 
 * Improved responsiveness when switching between saved views and the document list.
 
+* Increased the default wait time when observing files in the consumption folder
+  with polling from 1 to 5 seconds. This will decrease the likelihood of paperless
+  consuming partially written files.
+
 * Paperless no longer depends on ``libpoppler-cpp-dev``.
-
-paperless-ng 1.1.4
-##################
-
-* Added English (GB) locale.
-
-* Added ISO-8601 date display option.
 
 .. note::
 
@@ -40,6 +37,13 @@ paperless-ng 1.1.4
   metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
 
   If using docker, this does not affect you.
+
+paperless-ng 1.1.4
+##################
+
+* Added English (GB) locale.
+
+* Added ISO-8601 date display option.
 
 paperless-ng 1.1.3
 ##################
