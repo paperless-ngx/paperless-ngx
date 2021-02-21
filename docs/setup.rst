@@ -774,6 +774,9 @@ configuring some options in paperless can help improve performance immensely:
     your documents before feeding them into paperless. Some scanners are able to
     do this! You might want to even specify ``skip_noarchive`` to skip archive
     file generation for already ocr'ed documents entirely.
+*   If you want to perform OCR on the the device, consider using ``PAPERLESS_OCR_CLEAN=none``.
+    This will speed up OCR times and use less memory at the expense of slightly worse
+    OCR results.
 *   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
     times. Thumbnails will be about 20% larger.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
