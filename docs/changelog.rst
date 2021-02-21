@@ -17,6 +17,10 @@ paperless-ng 1.2.0
 
 * Download multiple selected document.
 
+* The document list now remembers the current page.
+
+* Improved responsiveness when switching between saved views and the document list.
+
 * Paperless no longer depends on ``libpoppler-cpp-dev``.
 
 paperless-ng 1.1.4
