@@ -53,7 +53,9 @@ class RasterisedDocumentParser(DocumentParser):
 
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return make_thumbnail_from_pdf(
-            document_path, self.tempdir, self.logging_group)
+            self.archive_path or document_path,
+            self.tempdir,
+            self.logging_group)
 
     def is_image(self, mime_type):
         return mime_type in [
