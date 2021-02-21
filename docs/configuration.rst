@@ -260,22 +260,28 @@ PAPERLESS_OCR_CLEAN=<mode>
 
     .. note::
 
-        ``clean-final`` is incompatible with ocr mode ``redo``.
+        ``clean-final`` is incompatible with ocr mode ``redo``. When both
+        ``clean-final`` and the ocr mode ``redo`` is configured, ``clean``
+        is used instead.
 
 PAPERLESS_OCR_DESKEW=<bool>
     Tells paperless to correct skewing (slight rotation of input images mainly
     due to improper scanning)
 
-    Defaults to ``false``, which disables this feature.
+    Defaults to ``true``, which enables this feature.
 
     .. note::
 
-        Deskewing is incompatible with ocr mode ``redo``.
+        Deskewing is incompatible with ocr mode ``redo``. Deskewing will get
+        disabled automatically if ``redo`` is used as the ocr mode.
 
 PAPERLESS_OCR_ROTATE_PAGES=<bool>
     Tells paperless to correct page rotation (90°, 180° and 270° rotation).
 
-    Defaults to ``false``, which disables this feature.
+    If you notice that paperless is not rotating pages incorrectly rotated
+    pages (or vice versa), try adjusting the threshold up or down (see below).
+
+    Defaults to ``true``, which enables this feature.
 
 
 PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>
@@ -284,7 +290,7 @@ PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>
     whereas "2" is a very aggressive option and will often result correctly rotated pages
     being rotated as well.
 
-    Defaults to "10".
+    Defaults to "12".
 
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
@@ -392,7 +398,7 @@ requires are as follows:
                 PAPERLESS_TIKA_ENABLED: 1
                 PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
                 PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-        
+
         # ...
 
         gotenberg:
@@ -622,10 +628,10 @@ USERMAP_UID=<uid>
     .. code:: shell-session
 
         $ id -u
-    
+
     Paperless will change ownership on its folders to this user, so you need to get this right
     in order to be able to write to the consumption directory.
-    
+
     Defaults to 1000.
 
 USERMAP_GID=<gid>
@@ -635,10 +641,10 @@ USERMAP_GID=<gid>
     .. code:: shell-session
 
         $ id -g
-    
+
     Paperless will change ownership on its folders to this group, so you need to get this right
     in order to be able to write to the consumption directory.
-    
+
     Defaults to 1000.
 
 PAPERLESS_OCR_LANGUAGES=<list>
