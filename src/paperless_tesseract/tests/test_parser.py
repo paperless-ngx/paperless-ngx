@@ -300,6 +300,47 @@ class TestParser(DirectoriesMixin, TestCase):
             "If you read this, it’s your own fault. Also check your screen orientation."
         ])
 
+    def test_ocrmypdf_parameters(self):
+        parser = RasterisedDocumentParser(None)
+        params = parser.construct_ocrmypdf_parameters(input_file="input.pdf", output_file="output.pdf",
+                                                      sidecar_file="sidecar.txt", mime_type="application/pdf",
+                                                      safe_fallback=False)
+
+        self.assertEqual(params['input_file'], "input.pdf")
+        self.assertEqual(params['output_file'], "output.pdf")
+        self.assertEqual(params['sidecar'], "sidecar.txt")
+
+        with override_settings(OCR_CLEAN="none"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertNotIn("clean", params)
+            self.assertNotIn("clean_final", params)
+
+        with override_settings(OCR_CLEAN="clean"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['clean'])
+            self.assertNotIn("clean_final", params)
+
+        with override_settings(OCR_CLEAN="clean-final", OCR_MODE="skip"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['clean_final'])
+            self.assertNotIn("clean", params)
+
+        with override_settings(OCR_CLEAN="clean-final", OCR_MODE="redo"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['clean'])
+            self.assertNotIn("clean_final", params)
+
+        with override_settings(OCR_DESKEW=True, OCR_MODE="skip"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['deskew'])
+
+        with override_settings(OCR_DESKEW=True, OCR_MODE="redo"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertNotIn('deskew', params)
+
+        with override_settings(OCR_DESKEW=False, OCR_MODE="skip"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertNotIn('deskew', params)
 
 class TestParserFileTypes(DirectoriesMixin, TestCase):
 
