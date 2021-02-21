@@ -257,7 +257,7 @@ PAPERLESS_OCR_CLEAN=<mode>
     Defaults to ``clean``.
 
 PAPERLESS_OCR_DESKEW=<bool>
-    Tells paperless to correct skewing (slight rotation of input images Mostly
+    Tells paperless to correct skewing (slight rotation of input images mainly
     due to improper scanning)
 
     Defaults to ``false``, which disables this feature.
