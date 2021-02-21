@@ -34,7 +34,10 @@ def handle_document(document_id):
     parser = parser_class(logging_group=uuid.uuid4())
 
     try:
-        parser.parse(document.source_path, mime_type)
+        parser.parse(
+            document.source_path,
+            mime_type,
+            document.get_public_filename())
 
         if parser.get_archive_path():
             with transaction.atomic():
