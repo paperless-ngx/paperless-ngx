@@ -10,12 +10,12 @@ paperless-ng 1.2.0
 
 * Changes to the OCRmyPDF integration
 
-  * Added support for deskewing and automatic rotation of incorrectly rotated pages.
+  * Added support for deskewing and automatic rotation of incorrectly rotated pages. This is disabled by default, see :ref:`configuration-ocr`.
   * Better support for encrypted files.
   * Better support for various other PDF files: Paperless will now attempt to force OCR with safe options when OCR fails with the configured options.
   * Added an explicit option to skip cleaning with ``unpaper``.
 
-* Download multiple selected document.
+* Download multiple selected documents as a zip archive.
 
 * The document list now remembers the current page.
 
