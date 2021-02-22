@@ -25,6 +25,8 @@ paperless-ng 1.2.0
   with polling from 1 to 5 seconds. This will decrease the likelihood of paperless
   consuming partially written files.
 
+* Fixed a crash of the document archiver management command when trying to process documents with unknown mime types.
+
 * Paperless no longer depends on ``libpoppler-cpp-dev``.
 
 .. note::
