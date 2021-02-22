@@ -49,6 +49,21 @@ class TestArchiver(DirectoriesMixin, TestCase):
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
         self.assertEqual(doc.archive_filename, "none/A.pdf")
 
+    def test_unknown_mime_type(self):
+        doc = self.make_models()
+        doc.mime_type = "sdgfh"
+        doc.save()
+        shutil.copy(sample_file, doc.source_path)
+
+        handle_document(doc.pk)
+
+        doc = Document.objects.get(id=doc.id)
+
+        self.assertIsNotNone(doc.checksum)
+        self.assertIsNone(doc.archive_checksum)
+        self.assertIsNone(doc.archive_filename)
+        self.assertTrue(os.path.isfile(doc.source_path))
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
     def test_naming_priorities(self):
         doc1 = Document.objects.create(checksum="A", title="document", content="first document", mime_type="application/pdf", filename="document.pdf")
