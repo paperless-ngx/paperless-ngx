@@ -113,6 +113,13 @@ jobs:
       with:
         node-version: '15'
     -
+      name: Configure version on dev branches
+      if: startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev'
+      run: |
+        git_hash=$(git rev-parse --short "$GITHUB_SHA")
+        git_branch=${GITHUB_REF#refs/heads/}
+        sed -i -E 's/version: "(.*)"/version: "$git_branch $git_hash"/g' src-ui/src/environments/environment.prod.ts
+    -
       name: Build frontend
       run: ./compile-frontend.sh
     -
