@@ -4,9 +4,7 @@ import multiprocessing
 import logging
 import os
 import shutil
-import sys
 import uuid
-from io import TextIOBase
 
 import tqdm
 from django import db
@@ -14,6 +12,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from filelock import FileLock
+from whoosh.writing import AsyncWriter
 
 from documents.models import Document
 from ... import index
@@ -25,27 +24,10 @@ from ...parsers import get_parser_class_for_mime_type
 logger = logging.getLogger("paperless.management.archiver")
 
 
-class LoggerWriter(TextIOBase):
-
-    def __init__(self, doc: Document):
-        self.doc = doc
-
-    def write(self, message):
-        # if statement reduces the amount of newlines that are
-        # printed to the logger
-        if message != '\n':
-            logger.error(
-                f"Document {self.doc} (ID: {self.doc.pk}): {message}"
-            )
-
-
 def handle_document(document_id):
     document = Document.objects.get(id=document_id)
 
     mime_type = document.mime_type
-
-    # redirect errors to the log and associate them with the current document
-    sys.stderr = LoggerWriter(document)
 
     parser_class = get_parser_class_for_mime_type(mime_type)
 
