@@ -278,7 +278,7 @@ PAPERLESS_OCR_DESKEW=<bool>
 PAPERLESS_OCR_ROTATE_PAGES=<bool>
     Tells paperless to correct page rotation (90°, 180° and 270° rotation).
 
-    If you notice that paperless is not rotating pages incorrectly rotated
+    If you notice that paperless is not rotating incorrectly rotated
     pages (or vice versa), try adjusting the threshold up or down (see below).
 
     Defaults to ``true``, which enables this feature.
@@ -287,7 +287,7 @@ PAPERLESS_OCR_ROTATE_PAGES=<bool>
 PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>
     Adjust the threshold for automatic page rotation by ``PAPERLESS_OCR_ROTATE_PAGES``.
     This is an arbitrary value reported by tesseract. "15" is a very conservative value,
-    whereas "2" is a very aggressive option and will often result correctly rotated pages
+    whereas "2" is a very aggressive option and will often result in correctly rotated pages
     being rotated as well.
 
     Defaults to "12".
@@ -338,7 +338,7 @@ PAPERLESS_OCR_USER_ARGS=<json>
     the API of OCRmyPDF, you have to specify these in a format that can be
     passed to the API. See `the API reference of OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/api.html#reference>`_
     for valid parameters. All command line options are supported, but they
-    use underscores instead of dashed.
+    use underscores instead of dashes.
 
     .. caution::
 
