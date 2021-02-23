@@ -72,7 +72,7 @@ jobs:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip${{ matrix.python-version }}
       -
-        name: Prepare tests
+        name: Install dependencies
         run: |
           pip install --upgrade pipenv
           pipenv install --system --dev --ignore-pipfile
@@ -109,7 +109,7 @@ jobs:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip${{ matrix.python-version }}
       -
-        name: Prepare tests
+        name: Install dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng
