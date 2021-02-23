@@ -1,11 +1,13 @@
+import re
+
 import magic
 from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from . import bulk_edit
-from .models import Correspondent, Tag, Document, Log, DocumentType, \
-    SavedView, SavedViewFilterRule
+from .models import Correspondent, Tag, Document, DocumentType, \
+    SavedView, SavedViewFilterRule, MatchingModel
 from .parsers import is_mime_type_supported
 
 from django.utils.translation import gettext as _
@@ -33,15 +35,26 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-class CorrespondentSerializer(serializers.ModelSerializer):
+class MatchingModelSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
-
-    last_correspondence = serializers.DateTimeField(read_only=True)
 
     def get_slug(self, obj):
         return slugify(obj.name)
     slug = SerializerMethodField()
+
+    def validate_match(self, match):
+        if 'matching_algorithm' in self.initial_data and self.initial_data['matching_algorithm'] == MatchingModel.MATCH_REGEX:  # NOQA: E501
+            try:
+                re.compile(match)
+            except Exception as e:
+                raise serializers.ValidationError(_("Invalid regular expresssion: ") + str(e))
+        return match
+
+
+class CorrespondentSerializer(MatchingModelSerializer):
+
+    last_correspondence = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Correspondent
@@ -57,13 +70,7 @@ class CorrespondentSerializer(serializers.ModelSerializer):
         )
 
 
-class DocumentTypeSerializer(serializers.ModelSerializer):
-
-    document_count = serializers.IntegerField(read_only=True)
-
-    def get_slug(self, obj):
-        return slugify(obj.name)
-    slug = SerializerMethodField()
+class DocumentTypeSerializer(MatchingModelSerializer):
 
     class Meta:
         model = DocumentType
@@ -78,13 +85,7 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
         )
 
 
-class TagSerializer(serializers.ModelSerializer):
-
-    document_count = serializers.IntegerField(read_only=True)
-
-    def get_slug(self, obj):
-        return slugify(obj.name)
-    slug = SerializerMethodField()
+class TagSerializer(MatchingModelSerializer):
 
     class Meta:
         model = Tag
