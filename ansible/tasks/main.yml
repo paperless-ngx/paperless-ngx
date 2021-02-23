@@ -256,7 +256,7 @@
     - "{{ paperlessng_consumption_dir }}"
     - "{{ paperlessng_data_dir }}"
     - "{{ paperlessng_media_root }}"
-    - "{{ paperlessng_static_dir }}"
+    - "{{ paperlessng_staticdir }}"
 
 - name: rename initial config
   command:
@@ -280,9 +280,11 @@
     - regexp: PAPERLESS_MEDIA_ROOT
       line: "PAPERLESS_MEDIA_ROOT={{ paperlessng_media_root }}"
     - regexp: PAPERLESS_STATICDIR
-      line: "PAPERLESS_STATICDIR={{ paperlessng_static_dir }}"
+      line: "PAPERLESS_STATICDIR={{ paperlessng_staticdir }}"
     - regexp: PAPERLESS_FILENAME_FORMAT
       line: "PAPERLESS_FILENAME_FORMAT={{ paperlessng_filename_format }}"
+    - regexp: PAPERLESS_LOGGING_DIR
+      line: "PAPERLESS_LOGGING_DIR={{ paperlessng_logging_dir }}"
     # Hosting & Security
     - regexp: PAPERLESS_SECRET_KEY
       line: "PAPERLESS_SECRET_KEY={{ paperlessng_secret_key }}"
@@ -305,6 +307,14 @@
       line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
     - regexp: PAPERLESS_OCR_MODE
       line: "PAPERLESS_OCR_MODE={{ paperlessng_ocr_mode }}"
+    - regexp: PAPERLESS_OCR_CLEAN
+      line: "PAPERLESS_OCR_CLEAN={{ paperlessng_ocr_clean }}"
+    - regexp: PAPERLESS_OCR_DESKEW
+      line: "PAPERLESS_OCR_DESKEW={{ paperlessng_ocr_deskew }}"
+    - regexp: PAPERLESS_OCR_ROTATE_PAGES
+      line: "PAPERLESS_OCR_ROTATE_PAGES={{ paperlessng_ocr_rotate_pages }}"
+    - regexp: PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD
+      line: "PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD={{ paperlessng_ocr_rotate_pages_threshold }}"
     - regexp: PAPERLESS_OCR_OUTPUT_TYPE
       line: "PAPERLESS_OCR_OUTPUT_TYPE={{ paperlessng_ocr_output_type }}"
     - regexp: PAPERLESS_OCR_PAGES
@@ -331,6 +341,10 @@
       line: "PAPERLESS_CONSUMER_RECURSIVE={{ paperlessng_consumer_recursive }}"
     - regexp: PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS
       line: "PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS={{ paperlessng_consumer_subdirs_as_tags }}"
+    - regexp: PAPERLESS_CONVERT_MEMORY_LIMIT
+      line: "PAPERLESS_CONVERT_MEMORY_LIMIT={{ paperlessng_convert_memory_limit }}"
+    - regexp: PAPERLESS_CONVERT_TMPDIR
+      line: "PAPERLESS_CONVERT_TMPDIR={{ paperlessng_convert_tmpdir }}"
     - regexp: PAPERLESS_OPTIMIZE_THUMBNAILS
       line: "PAPERLESS_OPTIMIZE_THUMBNAILS={{ paperlessng_optimize_thumbnails }}"
     - regexp: PAPERLESS_POST_CONSUME_SCRIPT
