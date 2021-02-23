@@ -43,7 +43,7 @@
 
 - name: install ocr languages
   apt:
-    pkg: "{{ paperlessng_ocr_languages | map('regex_replace', '^(.*)$', 'tesseract-ocr-\\1') | list }}"
+    pkg: "{{ paperlessng_ocr_languages | map('regex_replace', '^(.*)$', 'tesseract-ocr-\\1') | map('replace', '_', '-') | list }}"
 
 - name: set up notesalexp repository key (for jbig2enc)
   apt_key:
@@ -304,7 +304,7 @@
       line: "PAPERLESS_ENABLE_HTTP_REMOTE_USER={{ paperlessng_enable_http_remote_user }}"
     # OCR settings
     - regexp: PAPERLESS_OCR_LANGUAGE
-      line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') }}"
+      line: "PAPERLESS_OCR_LANGUAGE={{ paperlessng_ocr_languages | join('+') | replace('-','_') }}"
     - regexp: PAPERLESS_OCR_MODE
       line: "PAPERLESS_OCR_MODE={{ paperlessng_ocr_mode }}"
     - regexp: PAPERLESS_OCR_CLEAN
