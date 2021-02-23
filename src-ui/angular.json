@@ -36,6 +36,7 @@
 						"aot": true,
 						"assets": [
 							"src/favicon.ico",
+							"src/apple-touch-icon.png",
 							"src/assets",
 							"src/manifest.webmanifest", {
 								"glob": "pdf.worker.min.js",
@@ -112,6 +113,7 @@
 						"karmaConfig": "karma.conf.js",
 						"assets": [
 							"src/favicon.ico",
+							"src/apple-touch-icon.png",
 							"src/assets",
 							"src/manifest.webmanifest"
 						],
