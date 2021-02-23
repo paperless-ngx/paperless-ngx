@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 14:52+0100\n"
+"POT-Creation-Date: 2021-02-23 12:30+0100\n"
 "PO-Revision-Date: 2021-02-16 18:37+0000\n"
 "Last-Translator: Jonas Winkler, 2021\n"
 "Language-Team: German (https://www.transifex.com/paperless/teams/115905/de/)\n"
@@ -354,7 +354,11 @@ msgstr "Filterregel"
 msgid "filter rules"
 msgstr "Filterregeln"
 
-#: documents/serialisers.py:370
+#: documents/serialisers.py:52
+msgid "Invalid regular expresssion: "
+msgstr "Ungültiger regulärer Ausdruck:"
+
+#: documents/serialisers.py:376
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Dateityp %(type)s nicht unterstützt"
@@ -421,7 +425,7 @@ msgstr "Niederländisch"
 msgid "French"
 msgstr "Französisch"
 
-#: paperless/urls.py:114
+#: paperless/urls.py:118
 msgid "Paperless-ng administration"
 msgstr "Paperless-ng Administration"
 
