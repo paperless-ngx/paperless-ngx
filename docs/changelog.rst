@@ -5,6 +5,17 @@
 Changelog
 *********
 
+paperless-ng 1.2.1
+##################
+
+* Added translation into Portuguese (Brazil).
+
+* The date input fields now respect the currently selected date format.
+
+* Added a fancy icon when adding paperless to the home screen on iOS devices.
+
+* When using regular expression matching, the regular expression is now validated before saving the tag/correspondent/type.
+
 paperless-ng 1.2.0
 ##################
 
