@@ -25,7 +25,7 @@ def forward(apps, schema_editor):
     for tag in Tag.objects.all():
         colour_old_id = tag.colour_old
         rgb = COLOURS_OLD[colour_old_id]
-        tag.colour = rgb
+        tag.color = rgb
         tag.save()
 
 
@@ -40,7 +40,7 @@ def reverse(apps, schema_editor):
         return 1
 
     for tag in Tag.objects.all():
-        colour_id = _get_colour_id(tag.colour)
+        colour_id = _get_colour_id(tag.color)
         tag.colour_old = colour_id
         tag.save()
 
@@ -48,7 +48,7 @@ def reverse(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1005_checksums'),
+        ('documents', '1012_fix_archive_files'),
     ]
 
     operations = [
@@ -59,8 +59,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='tag',
-            name='colour',
-            field=models.CharField(blank=True, max_length=7),
+            name='color',
+            field=models.CharField(blank=True, max_length=7, verbose_name='color'),
         ),
         migrations.RunPython(forward, reverse),
         migrations.RemoveField(
