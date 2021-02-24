@@ -4,7 +4,6 @@ import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { DocumentService } from 'src/app/services/rest/document.service';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-document-card-small',
@@ -13,7 +12,7 @@ import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.servic
 })
 export class DocumentCardSmallComponent implements OnInit {
 
-  constructor(private documentService: DocumentService, private settings: SettingsService) { }
+  constructor(private documentService: DocumentService) { }
 
   @Input()
   selected = false
