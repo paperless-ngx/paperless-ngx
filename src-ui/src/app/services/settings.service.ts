@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Inject, Injectable, LOCALE_ID, Renderer2, RendererFactory2 } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -10,9 +10,14 @@ export interface PaperlessSettings {
 }
 
 export interface LanguageOption {
-  code: string,
-  name: string,
+  code: string
+  name: string
   englishName?: string
+
+  /**
+   * A date format string for use by the date selectors. MUST contain 'yyyy', 'mm' and 'dd'.
+   */
+  dateInputFormat?: string
 }
 
 export const SETTINGS_KEYS = {
@@ -56,7 +61,8 @@ export class SettingsService {
     private rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
     private cookieService: CookieService,
-    private meta: Meta
+    private meta: Meta,
+    @Inject(LOCALE_ID) private localeId: string
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
 
@@ -79,13 +85,18 @@ export class SettingsService {
 
   getLanguageOptions(): LanguageOption[] {
     return [
-      {code: "en-us", name: $localize`English (US)`, englishName: "English (US)"},
-      {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)"},
-      {code: "de", name: $localize`German`, englishName: "German"},
-      {code: "nl", name: $localize`Dutch`, englishName: "Dutch"},
-      {code: "fr", name: $localize`French`, englishName: "French"},
-      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)"}
+      {code: "en-us", name: $localize`English (US)`, englishName: "English (US)", dateInputFormat: "mm/dd/yyyy"},
+      {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)", dateInputFormat: "dd/mm/yyyy"},
+      {code: "de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
+      {code: "nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
+      {code: "fr", name: $localize`French`, englishName: "French", dateInputFormat: "dd/mm/yyyy"},
+      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"}
     ]
+  }
+
+  getDateLocaleOptions(): LanguageOption[] {
+    let isoOption: LanguageOption = {code: "iso-8601", name: $localize`ISO 8601`, dateInputFormat: "yyyy-mm-dd"}
+    return [isoOption].concat(this.getLanguageOptions())
   }
 
   private getLanguageCookieName() {
@@ -106,6 +117,11 @@ export class SettingsService {
     } else {
       this.cookieService.delete(this.getLanguageCookieName())
     }
+  }
+
+  getLocalizedDateInputFormat(): string {
+    let dateLocale = this.get(SETTINGS_KEYS.DATE_LOCALE) || this.getLanguage() || this.localeId.toLowerCase()
+    return this.getDateLocaleOptions().find(o => o.code == dateLocale)?.dateInputFormat || "yyyy-mm-dd"
   }
 
   get(key: string): any {

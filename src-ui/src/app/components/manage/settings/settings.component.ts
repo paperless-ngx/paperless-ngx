@@ -88,14 +88,15 @@ export class SettingsComponent implements OnInit {
   }
 
   get displayLanguageOptions(): LanguageOption[] {
-    return [{code: "", name: $localize`Use system language`}].concat(this.settings.getLanguageOptions())
+    return [
+      {code: "", name: $localize`Use system language`}
+    ].concat(this.settings.getLanguageOptions())
   }
 
   get dateLocaleOptions(): LanguageOption[] {
     return [
-      {code: "", name: $localize`Use date format of display language`},
-      {code: "iso-8601", name: $localize`ISO 8601`}
-    ].concat(this.settings.getLanguageOptions())
+      {code: "", name: $localize`Use date format of display language`}
+    ].concat(this.settings.getDateLocaleOptions())
   }
 
   get today() {
