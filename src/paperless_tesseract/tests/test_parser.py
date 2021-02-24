@@ -79,6 +79,20 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertContainsStrings(text.strip(), ["This is a test document."])
 
+
+    def test_get_text_rtl_from_pdf(self):
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        text = parser.extract_text(None, os.path.join(self.SAMPLE_FILES, 'simple-rtl-digital.pdf'))
+
+        self.assertContainsStrings(text.strip(), ["מסמך בדיקה 1234 בעברית"])
+
+    @override_settings(OCR_MODE="skip")
+    def test_multi_page_analog_pages_skip(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple-rtl-rasterized.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["מסמך בדיקה", "1234", "בעברית"])
+
     def test_thumbnail(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
         parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
