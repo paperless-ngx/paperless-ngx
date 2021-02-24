@@ -217,6 +217,7 @@ will create a directory structure as follows:
 
 Paperless provides the following placeholders withing filenames:
 
+* ``{asn}``: The archive serial number of the document, or "none".
 * ``{correspondent}``: The name of the correspondent, or "none".
 * ``{document_type}``: The name of the document type, or "none".
 * ``{tag_list}``: A comma separated list of all tags assigned to the document.

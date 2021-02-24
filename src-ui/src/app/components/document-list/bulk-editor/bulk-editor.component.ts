@@ -15,6 +15,7 @@ import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable
 import { MatchingModel } from 'src/app/data/matching-model';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-bulk-editor',
@@ -137,7 +138,7 @@ export class BulkEditorComponent {
       } else {
         modal.componentInstance.message = $localize`This operation will add the tags ${this._localizeList(changedTags.itemsToAdd)} and remove the tags ${this._localizeList(changedTags.itemsToRemove)} on ${this.list.selected.size} selected document(s).`
       }
-      
+
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked.subscribe(() => {
@@ -205,6 +206,12 @@ export class BulkEditorComponent {
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
       this.executeBulkOperation(modal, "delete", {})
+    })
+  }
+
+  downloadSelected(content = "archive") {
+    this.documentService.bulkDownload(Array.from(this.list.selected), content).subscribe((result: any) => {
+      saveAs(result, 'documents.zip');
     })
   }
 }

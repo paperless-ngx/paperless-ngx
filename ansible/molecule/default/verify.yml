@@ -38,7 +38,7 @@
 
     - name: verify uploaded document has been accepted
       uri:
-        url: "http://{{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}/api/logs/"
+        url: "http://{{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}/api/logs/paperless/"
         headers:
           Authorization: 'Basic {{ (paperlessng_superuser_name + ":" + paperlessng_superuser_password) | b64encode }}'
         return_content: yes
@@ -51,7 +51,7 @@
 
     - name: verify uploaded document has been consumed
       uri:
-        url: "http://{{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}/api/logs/"
+        url: "http://{{ paperlessng_listen_address }}:{{ paperlessng_listen_port }}/api/logs/paperless/"
         headers:
           Authorization: 'Basic {{ (paperlessng_superuser_name + ":" + paperlessng_superuser_password) | b64encode }}'
         return_content: yes

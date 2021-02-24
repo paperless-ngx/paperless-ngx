@@ -16,10 +16,9 @@ from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
 from paperless.db import GnuPG
 from ...file_handling import generate_filename, delete_empty_directories
-from ...mixins import Renderable
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Decrypt and rename all files in our collection into a given target
@@ -140,7 +139,7 @@ class Command(Renderable, BaseCommand):
             thumbnail_target = os.path.join(self.target, thumbnail_name)
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
-            if os.path.exists(document.archive_path):
+            if document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
                 archive_target = os.path.join(self.target, archive_name)
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name

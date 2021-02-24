@@ -109,6 +109,30 @@ This will build the front end and put it in a location from which the Django ser
 it as static content. This way, you can verify that authentication is working.
 
 
+Building the documentation
+==========================
+
+The documentation is built using sphinx. I've configured ReadTheDocs to automatically build
+the documentation when changes are pushed. If you want to build the documentation locally,
+this is how you do it:
+
+1.  Install python dependencies.
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless
+        $ pipenv install --dev
+
+2.  Build the documentation
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless/docs
+        $ pipenv run make clean html
+
+This will build the HTML documentation, and put the resulting files in the ``_build/html``
+directory.
+
 Extending Paperless
 ===================
 

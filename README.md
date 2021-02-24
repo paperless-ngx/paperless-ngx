@@ -1,4 +1,5 @@
 [![ci](https://github.com/jonaswinkler/paperless-ng/workflows/ci/badge.svg)](https://github.com/jonaswinkler/paperless-ng/actions)
+![Ansible Role](https://github.com/jonaswinkler/paperless-ng/workflows/Ansible%20Role/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/paperless-ng/community.svg)](https://gitter.im/paperless-ng/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
@@ -6,15 +7,16 @@
 
 # Paperless-ng
 
-[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
+[Paperless (click me)](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
-Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation.
+Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. These key points should help you decide whether Paperless-ng is something you would prefer over Paperless:
 
-# Survey
+* Interface: The new front end is the main interface for paperless-ng, the old interface still exists but most customizations (such as thumbnails for the document list) have been removed.
+* Encryption: Paperless-ng does not support GnuPG anymore, since storing your data on encrypted file systems (that you optionally mount on demand) achieves about the same result.
+* Resource usage: Paperless-ng does use a bit more resources than Paperless. Running the web server requires about 300MB of RAM or more, depending on the configuration. While adding documents, it requires about 300MB additional RAM, depending on the document. It still runs on Pi (many users do that), but it has been generally geared to better use the resources of more powerful systems.
+* API changes: If you rely on the REST API of paperless, some of its functionality has been changed.
 
-If you already used Paperless-ng for a bit, would like to give some anonymous feedback, and help me decide on what to focus on next: I've created a survey, [see here](https://github.com/jonaswinkler/paperless-ng/issues/402). Thank you!
-
-*See also [Feature Requests](#feature-requests)*
+For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation.
 
 # How it Works
 
@@ -37,8 +39,8 @@ Here's what you get:
 * Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
 * Supports PDF documents, images, plain text files, and Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents).
 	* Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ng.readthedocs.io/en/latest/configuration.html#tika-settings))
-* Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and can be configured freely.
-* Single page application front end. Should be pretty snappy. Will be mobile friendly in the future.
+* Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely.
+* Single page application front end.
 	* Includes a dashboard that shows basic statistics and has document upload.
 	* Filtering by tags, correspondents, types, and more.
 	* Customizable views can be saved and displayed on the dashboard.
@@ -49,14 +51,13 @@ Here's what you get:
 	* Searching for similar documents ("More like this")
 * Email processing: Paperless adds documents from your email accounts.
 	* Configure multiple accounts and filters for each account.
-	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them or delete them.
+	* When adding documents from mail, paperless can move these mail to a new folder, mark them as read, flag them as important or delete them.
 * Machine learning powered document matching.
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
-* A task processor that processes documents in parallel and also tells you when something goes wrong. On modern multi core systems, consumption is blazing fast.
+* Optimized for multi core systems: Paperless-ng consumes multiple documents in parallel.
+* The integrated sanity checker makes sure that your document archive is in good health.
 
-If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html). However, some parts of the UI have changed since I took these.
-
-For a complete list of changes from paperless, check out the [changelog](https://paperless-ng.readthedocs.io/en/latest/changelog.html)
+If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
 
 # Getting started
 
@@ -76,9 +77,9 @@ The documentation for Paperless-ng is available on [ReadTheDocs](https://paperle
 
 # Translation
 
-Paperless is currently available in English, German, Dutch and French. Translation is coordinated at transifex: https://www.transifex.com/paperless/paperless-ng
+Paperless is currently available in English, German, Dutch, French, and Portuguese.
 
-If you want to see paperless in your own language, request that language at transifex and you can start translating after I approve the language.
+There's an active translation project at transifex! If you want to help out by translating paperless into your language, please head over to https://github.com/jonaswinkler/paperless-ng/issues/212 for details.
 
 # Feature Requests
 
@@ -108,4 +109,4 @@ These projects also exist, but their status and compatibility with paperless-ng 
 
 # Important Note
 
-Document scanners are typically used to scan sensitive documents.  Things like your social insurance number, tax records, invoices, etc.  Everything is stored in the clear without encryption by default (it needs to be searchable, so if someone has ideas on how to do that on encrypted data, I'm all ears).  This means that Paperless should never be run on an untrusted host.  Instead, I recommend that if you do want to use it, run it locally on a server in your own home.
+Document scanners are typically used to scan sensitive documents.  Things like your social insurance number, tax records, invoices, etc.  Everything is stored in the clear without encryption. This means that Paperless should never be run on an untrusted host.  Instead, I recommend that if you do want to use it, run it locally on a server in your own home.

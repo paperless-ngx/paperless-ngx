@@ -1,52 +1,11 @@
 import os
 import shutil
-from pathlib import Path
 
-from django.apps import apps
 from django.conf import settings
-from django.db import connection
-from django.db.migrations.executor import MigrationExecutor
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import override_settings
 
-from documents.models import Document
 from documents.parsers import get_default_file_extension
-from documents.tests.utils import DirectoriesMixin
-
-
-class TestMigrations(TransactionTestCase):
-
-    @property
-    def app(self):
-        return apps.get_containing_app_config(type(self).__module__).name
-
-    migrate_from = None
-    migrate_to = None
-
-    def setUp(self):
-        super(TestMigrations, self).setUp()
-
-        assert self.migrate_from and self.migrate_to, \
-            "TestCase '{}' must define migrate_from and migrate_to     properties".format(type(self).__name__)
-        self.migrate_from = [(self.app, self.migrate_from)]
-        self.migrate_to = [(self.app, self.migrate_to)]
-        executor = MigrationExecutor(connection)
-        old_apps = executor.loader.project_state(self.migrate_from).apps
-
-        # Reverse to the original migration
-        executor.migrate(self.migrate_from)
-
-        self.setUpBeforeMigration(old_apps)
-
-        # Run the migration to test
-        executor = MigrationExecutor(connection)
-        executor.loader.build_graph()  # reload.
-        executor.migrate(self.migrate_to)
-
-        self.apps = executor.loader.project_state(self.migrate_to).apps
-
-    def setUpBeforeMigration(self, apps):
-        pass
-
+from documents.tests.utils import DirectoriesMixin, TestMigrations
 
 STORAGE_TYPE_UNENCRYPTED = "unencrypted"
 STORAGE_TYPE_GPG = "gpg"

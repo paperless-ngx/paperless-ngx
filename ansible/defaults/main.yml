@@ -23,14 +23,14 @@ paperlessng_filename_format:
 paperlessng_virtualenv: "{{ paperlessng_directory }}/.venv"
 
 # Hosting & Security
-paperless_secret_key: PLEASECHANGETHISFORTHELOVEOFGOD
-paperless_allowed_hosts: "*"
-paperless_cors_allowed_hosts: http://localhost:8000
-paperless_force_script_name:
-paperless_static_url: /static/
-paperless_auto_login_username:
-paperless_cookie_prefix: ""
-paperless_enable_http_remote_user: False
+paperlessng_secret_key: PLEASECHANGETHISFORTHELOVEOFGOD
+paperlessng_allowed_hosts: "*"
+paperlessng_cors_allowed_hosts: http://localhost:8000
+paperlessng_force_script_name:
+paperlessng_static_url: /static/
+paperlessng_auto_login_username:
+paperlessng_cookie_prefix: ""
+paperlessng_enable_http_remote_user: False
 
 # OCR settings
 paperlessng_ocr_languages:

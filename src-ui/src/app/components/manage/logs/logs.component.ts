@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { LOG_LEVELS, LOG_LEVEL_INFO, PaperlessLog } from 'src/app/data/paperless-log';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { LogService } from 'src/app/services/rest/log.service';
 
 @Component({
@@ -11,38 +10,42 @@ export class LogsComponent implements OnInit {
 
   constructor(private logService: LogService) { }
 
-  logs: PaperlessLog[] = []
-  level: number = LOG_LEVEL_INFO
+  logs: string[] = []
+
+  logFiles: string[] = []
+
+  activeLog: string
 
   ngOnInit(): void {
-    this.reload()
-  }
-
-  reload() {
-    this.logService.list(1, 50, 'created', true, {'level__gte': this.level}).subscribe(result => this.logs = result.results)
-  }
-
-  getLevelText(level: number) {
-    return LOG_LEVELS.find(l => l.id == level)?.name
-  }
-
-  onScroll() {
-    let lastCreated = null
-    if (this.logs.length > 0) {
-      lastCreated = new Date(this.logs[this.logs.length-1].created).toISOString()
-    }
-    this.logService.list(1, 25, 'created', true, {'created__lt': lastCreated, 'level__gte': this.level}).subscribe(result => {
-      this.logs.push(...result.results)
+    this.logService.list().subscribe(result => {
+      this.logFiles = result
+      if (this.logFiles.length > 0) {
+        this.activeLog = this.logFiles[0]
+        this.reloadLogs()
+      }
     })
   }
 
-  getLevels() {
-    return LOG_LEVELS
+  reloadLogs() {
+    this.logService.get(this.activeLog).subscribe(result => {
+      this.logs = result
+    }, error => {
+      this.logs = []
+    })
   }
 
-  setLevel(id) {
-    this.level = id
-    this.reload()
+  getLogLevel(log: string) {
+    if (log.indexOf("[DEBUG]") != -1) {
+      return 10
+    } else if (log.indexOf("[WARNING]") != -1) {
+      return 30
+    } else if (log.indexOf("[ERROR]") != -1) {
+      return 40
+    } else if (log.indexOf("[CRITICAL]") != -1) {
+      return 50
+    } else {
+      return 20
+    }
   }
 
 }

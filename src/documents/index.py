@@ -12,7 +12,7 @@ from whoosh.qparser.dateparse import DateParserPlugin
 from whoosh.writing import AsyncWriter
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.index")
 
 
 class JsonFormatter(Formatter):
@@ -78,12 +78,28 @@ def open_index(recreate=False):
     try:
         if exists_in(settings.INDEX_DIR) and not recreate:
             return open_dir(settings.INDEX_DIR, schema=get_schema())
-    except Exception as e:
-        logger.error(f"Error while opening the index: {e}, recreating.")
+    except Exception:
+        logger.exception(f"Error while opening the index, recreating.")
 
     if not os.path.isdir(settings.INDEX_DIR):
         os.makedirs(settings.INDEX_DIR, exist_ok=True)
     return create_in(settings.INDEX_DIR, get_schema())
+
+
+@contextmanager
+def open_index_writer(ix=None, optimize=False):
+    if ix:
+        writer = AsyncWriter(ix)
+    else:
+        writer = AsyncWriter(open_index())
+
+    try:
+        yield writer
+    except Exception as e:
+        logger.exception(str(e))
+        writer.cancel()
+    finally:
+        writer.commit(optimize=optimize)
 
 
 def update_document(writer, doc):
@@ -110,14 +126,12 @@ def remove_document_by_id(writer, doc_id):
 
 
 def add_or_update_document(document):
-    ix = open_index()
-    with AsyncWriter(ix) as writer:
+    with open_index_writer() as writer:
         update_document(writer, document)
 
 
 def remove_document_from_index(document):
-    ix = open_index()
-    with AsyncWriter(ix) as writer:
+    with open_index_writer() as writer:
         remove_document(writer, document)
 
 

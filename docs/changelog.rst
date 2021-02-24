@@ -5,6 +5,106 @@
 Changelog
 *********
 
+paperless-ng 1.2.1
+##################
+
+* `Rodrigo Avelino <https://github.com/rodavelino>`_ translated Paperless into Portuguese (Brazil).
+
+* The date input fields now respect the currently selected date format.
+
+* Added a fancy icon when adding paperless to the home screen on iOS devices. Thanks to `Joel Nordell <https://github.com/joelnordell>`_.
+
+* When using regular expression matching, the regular expression is now validated before saving the tag/correspondent/type.
+
+paperless-ng 1.2.0
+##################
+
+* Changes to the OCRmyPDF integration
+
+  * Added support for deskewing and automatic rotation of incorrectly rotated pages. This is enabled by default, see :ref:`configuration-ocr`.
+  * Better support for encrypted files.
+  * Better support for various other PDF files: Paperless will now attempt to force OCR with safe options when OCR fails with the configured options.
+  * Added an explicit option to skip cleaning with ``unpaper``.
+
+* Download multiple selected documents as a zip archive.
+
+* The document list now remembers the current page.
+
+* Improved responsiveness when switching between saved views and the document list.
+
+* Increased the default wait time when observing files in the consumption folder
+  with polling from 1 to 5 seconds. This will decrease the likelihood of paperless
+  consuming partially written files.
+
+* Fixed a crash of the document archiver management command when trying to process documents with unknown mime types.
+
+* Paperless no longer depends on ``libpoppler-cpp-dev``.
+
+.. note::
+
+  Some packages that paperless depends on are slowly dropping Python 3.6
+  support one after another, including the web server. Supporting Python
+  3.6 means that I cannot update these packages anymore.
+
+  At some point, paperless will drop Python 3.6 support. If using a bare
+  metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
+
+  If using docker, this does not affect you.
+
+paperless-ng 1.1.4
+##################
+
+* Added English (GB) locale.
+
+* Added ISO-8601 date display option.
+
+paperless-ng 1.1.3
+##################
+
+* Added a docker-specific configuration option to adjust the number of
+  worker processes of the web server. See :ref:`configuration-docker`.
+
+* Some more memory usage optimizations.
+
+* Don't show inbox statistics if no inbox tag is defined.
+
+paperless-ng 1.1.2
+##################
+
+* Always show top left corner of thumbnails, even for extra wide documents.
+
+* Added a management command for executing the sanity checker directly.
+  See :ref:`utilities-sanity-checker`.
+
+* The weekly sanity check now reports messages in the log files.
+
+* Fixed an issue with the metadata tab not reporting anything in case of missing files.
+
+* Reverted a change from 1.1.0 that caused huge memory usage due to redis caching.
+
+* Some memory usage optimizations.
+
+paperless-ng 1.1.1
+##################
+
+This release contains new database migrations.
+
+* Fixed a bug in the sanity checker that would cause it to display "x not in list" errors instead of actual issues.
+
+* Fixed a bug with filename generation for archive filenames that would cause the archive files of two documents to overlap.
+
+  * This happened when ``PAPERLESS_FILENAME_FORMAT`` is used and the filenames of two or more documents are the same, except for the file extension.
+  * Paperless will now store the archive filename in the database as well instead of deriving it from the original filename, and use the
+    same logic for detecting and avoiding filename clashes that's also used for original filenames.
+  * The migrations will repair any missing archive files. If you're using tika, ensure that tika is running while performing the migration. Docker-compose will take care of that.
+
+* Fixed a bug with thumbnail regeneration when TIKA integration was used.
+
+* Added ASN as a placeholder field to the filename format.
+
+* The docker image now comes with built-in shortcuts for most management commands. These are now the recommended way to execute management commands, since these
+  also ensure that they're always executed as the paperless user and you're less likely to run into permission issues. See :ref:`utilities-management-commands`.
+
 paperless-ng 1.1.0
 ##################
 
@@ -17,7 +117,7 @@ paperless-ng 1.1.0
       or added with one of the mobile apps.
     * Documents are successfully added to paperless.
     * Document consumption failed (with error messages)
-  
+
   * Configuration options to enable/disable individual notifications.
 
 * Live updates to document lists and saved views when new documents are added.
@@ -37,6 +137,8 @@ paperless-ng 1.1.0
 
     Paperless will continue to work with WSGI, but you will not get any status notifications.
 
+    Apache ``mod_wsgi`` users, see :ref:`this note <faq-mod_wsgi>`.
+
 * Paperless now offers suggestions for tags, correspondents and types on the document detail page.
 
 * Added an interactive easy install script that automatically downloads, configures and starts paperless with docker.
@@ -55,6 +157,13 @@ paperless-ng 1.1.0
   * Better icon for document previews.
 
   * Better info section in the side bar.
+
+  * Paperless no longer logs to the database. Instead, logs are written to rotating log files. This solves many "database is locked"
+    issues on Raspberry Pi, especially when SQLite is used.
+
+  * By default, log files are written to ``PAPERLESS_DATA_DIR/log/``. Logging settings can be adjusted with
+    ``PAPERLESS_LOGGING_DIR``, ``PAPERLESS_LOGROTATE_MAX_SIZE`` and
+    ``PAPERLESS_LOGROTATE_MAX_BACKUPS``.
 
 paperless-ng 1.0.0
 ##################

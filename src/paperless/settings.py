@@ -4,7 +4,7 @@ import multiprocessing
 import os
 import re
 
-import dateparser
+from concurrent_log_handler.queue import setup_logging_queues
 from dotenv import load_dotenv
 
 from django.utils.translation import gettext_lazy as _
@@ -63,6 +63,8 @@ MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
+LOGGING_DIR = os.getenv('PAPERLESS_LOGGING_DIR', os.path.join(DATA_DIR, "log"))
+
 CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR", os.path.join(BASE_DIR, "..", "consume"))
 
 # This will be created if it doesn't exist
@@ -100,9 +102,10 @@ INSTALLED_APPS = [
 
     "django_q",
 
-    "channels",
-
 ] + env_apps
+
+if DEBUG:
+    INSTALLED_APPS.append("channels")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -161,6 +164,8 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
+            "capacity": 2000,  # default 100
+            "expiry": 15,  # default 60
         },
     },
 }
@@ -283,10 +288,12 @@ if os.getenv("PAPERLESS_DBHOST"):
 LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = [
-    ("en-us", _("English")),
+    ("en-us", _("English (US)")),
+    ("en-gb", _("English (GB)")),
     ("de", _("German")),
     ("nl-nl", _("Dutch")),
-    ("fr", _("French"))
+    ("fr", _("French")),
+    ("pt-br", _("Portuguese (Brazil)"))
 ]
 
 LOCALE_PATHS = [
@@ -305,14 +312,19 @@ USE_TZ = True
 # Logging                                                                     #
 ###############################################################################
 
-DISABLE_DBHANDLER = __get_boolean("PAPERLESS_DISABLE_DBHANDLER")
+setup_logging_queues()
+
+os.makedirs(LOGGING_DIR, exist_ok=True)
+
+LOGROTATE_MAX_SIZE = os.getenv("PAPERLESS_LOGROTATE_MAX_SIZE", 1024*1024)
+LOGROTATE_MAX_BACKUPS = os.getenv("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
+            'format': '[{asctime}] [{levelname}] [{name}] {message}',
             'style': '{',
         },
         'simple': {
@@ -321,34 +333,39 @@ LOGGING = {
         },
     },
     "handlers": {
-        "db": {
-            "level": "DEBUG",
-            "class": "documents.loggers.PaperlessHandler",
-        },
         "console": {
             "level": "DEBUG" if DEBUG else "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
+        },
+        "file_paperless": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "paperless.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS
+        },
+        "file_mail": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "mail.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS
         }
     },
     "root": {
-        "handlers": ["console"],
-        "level": "DEBUG",
+        "handlers": ["console"]
     },
     "loggers": {
-        "documents": {
-            "handlers": ["db"],
-            "propagate": True,
+        "paperless": {
+            "handlers": ["file_paperless"],
+            "level": "DEBUG"
         },
         "paperless_mail": {
-            "handlers": ["db"],
-            "propagate": True,
-        },
-        "paperless_tesseract": {
-            "handlers": ["db"],
-            "propagate": True,
-        },
-    },
+            "handlers": ["file_mail"],
+            "level": "DEBUG"
+        }
+    }
 }
 
 ###############################################################################
@@ -383,6 +400,7 @@ TASK_WORKERS = int(os.getenv("PAPERLESS_TASK_WORKERS", default_task_workers()))
 Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
+    'recycle': 1,
     'workers': TASK_WORKERS,
     'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 }
@@ -408,6 +426,12 @@ THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_p
 
 CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
+CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
+
+CONSUMER_POLLING_RETRY_COUNT = int(
+    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5)
+)
+
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
@@ -431,6 +455,14 @@ OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
+
+OCR_CLEAN = os.getenv("PAPERLESS_OCR_CLEAN", "clean")
+
+OCR_DESKEW = __get_boolean("PAPERLESS_OCR_DESKEW", "true")
+
+OCR_ROTATE_PAGES = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES", "true")
+
+OCR_ROTATE_PAGES_THRESHOLD = float(os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0))
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
@@ -491,7 +523,11 @@ if PAPERLESS_TIKA_ENABLED:
 
 # List dates that should be ignored when trying to parse date from document text
 IGNORE_DATES = set()
-for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
-    d = dateparser.parse(s)
-    if d:
-        IGNORE_DATES.add(d.date())
+
+if os.getenv("PAPERLESS_IGNORE_DATES", ""):
+    import dateparser
+
+    for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
+        d = dateparser.parse(s)
+        if d:
+            IGNORE_DATES.add(d.date())
