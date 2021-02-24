@@ -77,9 +77,9 @@ The documentation for Paperless-ng is available on [ReadTheDocs](https://paperle
 
 # Translation
 
-Paperless is currently available in English, German, Dutch, French, and Portuguese. Translation is coordinated at transifex: https://www.transifex.com/paperless/paperless-ng
+Paperless is currently available in English, German, Dutch, French, and Portuguese.
 
-If you want to see paperless in your own language, request that language at transifex and you can start translating after I approve the language.
+There's an active translation project at transifex! If you want to help out by translating paperless into your language, please head over to https://github.com/jonaswinkler/paperless-ng/issues/212 for details.
 
 # Feature Requests
 
