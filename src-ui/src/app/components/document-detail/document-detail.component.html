@@ -1,14 +1,4 @@
 <app-page-header [(title)]="title">
-    <div class="input-group input-group-sm mr-5 d-none d-md-flex" *ngIf="getContentType() == 'application/pdf' && !useNativePdfViewer">
-      <div class="input-group-prepend">
-        <div class="input-group-text" i18n>Page</div>
-      </div>
-      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-      <div class="input-group-append">
-        <div class="input-group-text" i18n>of {{previewNumPages}}</div>
-      </div>
-    </div>
-
     <button type="button" class="btn btn-sm btn-outline-danger mr-2 ml-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
@@ -135,12 +125,7 @@
 
     <div class="col-md-6 col-xl-8 mb-3">
         <ng-container *ngIf="getContentType() == 'application/pdf'">
-            <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
-                <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
-            </div>
-            <ng-template #nativePdfViewer>
-                <object [data]="previewUrl | safe" type="application/pdf" class="preview-sticky" width="100%"></object>
-            </ng-template>
+          <object [data]="previewUrl | safe" class="preview-sticky" width="100%">If error</object>
         </ng-container>
         <ng-container *ngIf="getContentType() == 'text/plain'">
             <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky" width="100%"></object>
