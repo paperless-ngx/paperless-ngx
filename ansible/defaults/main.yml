@@ -18,8 +18,9 @@ paperlessng_directory: /opt/paperless-ng
 paperlessng_consumption_dir: "{{ paperlessng_directory }}/consumption"
 paperlessng_data_dir: "{{ paperlessng_directory }}/data"
 paperlessng_media_root: "{{ paperlessng_directory }}/media"
-paperlessng_static_dir: "{{ paperlessng_directory }}/static"
+paperlessng_staticdir: "{{ paperlessng_directory }}/static"
 paperlessng_filename_format:
+paperlessng_logging_dir: "{{ paperlessng_data_dir }}/log"
 paperlessng_virtualenv: "{{ paperlessng_directory }}/.venv"
 
 # Hosting & Security
@@ -36,12 +37,15 @@ paperlessng_enable_http_remote_user: False
 paperlessng_ocr_languages:
   - eng
 paperlessng_ocr_mode: skip
+paperlessng_ocr_clean: clean
+paperlessng_ocr_deskew: True
+paperlessng_ocr_rotate_pages: True
+paperlessng_ocr_rotate_pages_threshold: 12
 paperlessng_ocr_output_type: pdfa
 paperlessng_ocr_pages: 0
 paperlessng_ocr_image_dpi:
 # see https://ocrmypdf.readthedocs.io/en/latest/api.html#ocrmypdf.ocr
 paperlessng_ocr_user_args:
-  #- "deskew": True  # https://github.com/jonaswinkler/paperless-ng/issues/231
   - "optimize": 1
 paperlessng_use_jbig2enc: True
 paperlessng_big2enc_lossy: False
@@ -57,10 +61,11 @@ paperlessng_consumer_polling: 0
 paperlessng_consumer_delete_duplicates: False
 paperlessng_consumer_recursive: False
 paperlessng_consumer_subdirs_as_tags: False
+paperlessng_convert_memory_limit: 0
+paperlessng_convert_tmpdir:
 paperlessng_optimize_thumbnails: True
 paperlessng_post_consume_script:
 paperlessng_filename_date_order:
-paperlessng_filename_parse_transforms:
 paperlessng_thumbnail_font_name: /usr/share/fonts/liberation/LiberationSerif-Regular.ttf
 paperlessng_ignore_dates: ""
 
