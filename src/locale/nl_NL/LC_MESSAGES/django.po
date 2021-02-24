@@ -1,0 +1,664 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Jonas Winkler, 2021
+# Jo Vandeginste <jo.vandeginste@gmail.com>, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-16 14:52+0100\n"
+"PO-Revision-Date: 2021-02-16 18:37+0000\n"
+"Last-Translator: Jo Vandeginste <jo.vandeginste@gmail.com>, 2021\n"
+"Language-Team: Dutch (Netherlands) (https://www.transifex.com/paperless/teams/115905/nl_NL/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl_NL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: documents/apps.py:10
+msgid "Documents"
+msgstr "Documenten"
+
+#: documents/models.py:32
+msgid "Any word"
+msgstr "Eender welk woord"
+
+#: documents/models.py:33
+msgid "All words"
+msgstr "Alle woorden"
+
+#: documents/models.py:34
+msgid "Exact match"
+msgstr "Exacte overeenkomst"
+
+#: documents/models.py:35
+msgid "Regular expression"
+msgstr "Reguliere expressie"
+
+#: documents/models.py:36
+msgid "Fuzzy word"
+msgstr "Gelijkaardig woord"
+
+#: documents/models.py:37
+msgid "Automatic"
+msgstr "Automatisch"
+
+#: documents/models.py:41 documents/models.py:364 paperless_mail/models.py:25
+#: paperless_mail/models.py:109
+msgid "name"
+msgstr "naam"
+
+#: documents/models.py:45
+msgid "match"
+msgstr "Overeenkomst"
+
+#: documents/models.py:49
+msgid "matching algorithm"
+msgstr "Algoritme voor het bepalen van de overeenkomst"
+
+#: documents/models.py:55
+msgid "is insensitive"
+msgstr "is niet hoofdlettergevoelig"
+
+#: documents/models.py:74 documents/models.py:134
+msgid "correspondent"
+msgstr "correspondent"
+
+#: documents/models.py:75
+msgid "correspondents"
+msgstr "correspondenten"
+
+#: documents/models.py:97
+msgid "color"
+msgstr "Kleur"
+
+#: documents/models.py:101
+msgid "is inbox tag"
+msgstr "is \"Postvak in\"-etiket"
+
+#: documents/models.py:103
+msgid ""
+"Marks this tag as an inbox tag: All newly consumed documents will be tagged "
+"with inbox tags."
+msgstr ""
+"Markeer dit etiket als een \"Postvak in\"-etiket: alle nieuw verwerkte "
+"documenten krijgen de \"Postvak in\"-etiketten."
+
+#: documents/models.py:108
+msgid "tag"
+msgstr "etiket"
+
+#: documents/models.py:109 documents/models.py:165
+msgid "tags"
+msgstr "etiketten"
+
+#: documents/models.py:115 documents/models.py:147
+msgid "document type"
+msgstr "documenttype"
+
+#: documents/models.py:116
+msgid "document types"
+msgstr "documenttypen"
+
+#: documents/models.py:124
+msgid "Unencrypted"
+msgstr "Niet versleuteld"
+
+#: documents/models.py:125
+msgid "Encrypted with GNU Privacy Guard"
+msgstr "Versleuteld met GNU Privacy Guard"
+
+#: documents/models.py:138
+msgid "title"
+msgstr "titel"
+
+#: documents/models.py:151
+msgid "content"
+msgstr "inhoud"
+
+#: documents/models.py:153
+msgid ""
+"The raw, text-only data of the document. This field is primarily used for "
+"searching."
+msgstr ""
+"De onbewerkte gegevens van het document. Dit veld wordt voornamelijk "
+"gebruikt om te zoeken."
+
+#: documents/models.py:158
+msgid "mime type"
+msgstr "mimetype"
+
+#: documents/models.py:169
+msgid "checksum"
+msgstr "checksum"
+
+#: documents/models.py:173
+msgid "The checksum of the original document."
+msgstr "Het controlecijfer van het originele document."
+
+#: documents/models.py:177
+msgid "archive checksum"
+msgstr "archief checksum"
+
+#: documents/models.py:182
+msgid "The checksum of the archived document."
+msgstr "De checksum van het gearchiveerde document."
+
+#: documents/models.py:186 documents/models.py:342
+msgid "created"
+msgstr "aangemaakt"
+
+#: documents/models.py:190
+msgid "modified"
+msgstr "gewijzigd"
+
+#: documents/models.py:194
+msgid "storage type"
+msgstr "type opslag"
+
+#: documents/models.py:202
+msgid "added"
+msgstr "toegevoegd"
+
+#: documents/models.py:206
+msgid "filename"
+msgstr "bestandsnaam"
+
+#: documents/models.py:212
+msgid "Current filename in storage"
+msgstr "Huidige bestandsnaam in opslag"
+
+#: documents/models.py:216
+msgid "archive filename"
+msgstr "Bestandsnaam in archief"
+
+#: documents/models.py:222
+msgid "Current archive filename in storage"
+msgstr "Huidige bestandsnaam in archief"
+
+#: documents/models.py:226
+msgid "archive serial number"
+msgstr "serienummer in archief"
+
+#: documents/models.py:231
+msgid "The position of this document in your physical document archive."
+msgstr "De positie van dit document in je fysieke documentenarchief."
+
+#: documents/models.py:237
+msgid "document"
+msgstr "document"
+
+#: documents/models.py:238
+msgid "documents"
+msgstr "documenten"
+
+#: documents/models.py:325
+msgid "debug"
+msgstr "debug"
+
+#: documents/models.py:326
+msgid "information"
+msgstr "informatie"
+
+#: documents/models.py:327
+msgid "warning"
+msgstr "waarschuwing"
+
+#: documents/models.py:328
+msgid "error"
+msgstr "fout"
+
+#: documents/models.py:329
+msgid "critical"
+msgstr "kritisch"
+
+#: documents/models.py:333
+msgid "group"
+msgstr "groep"
+
+#: documents/models.py:336
+msgid "message"
+msgstr "bericht"
+
+#: documents/models.py:339
+msgid "level"
+msgstr "niveau"
+
+#: documents/models.py:346
+msgid "log"
+msgstr "bericht"
+
+#: documents/models.py:347
+msgid "logs"
+msgstr "berichten"
+
+#: documents/models.py:358 documents/models.py:408
+msgid "saved view"
+msgstr "opgeslagen view"
+
+#: documents/models.py:359
+msgid "saved views"
+msgstr "opgeslagen views"
+
+#: documents/models.py:362
+msgid "user"
+msgstr "gebruiker"
+
+#: documents/models.py:368
+msgid "show on dashboard"
+msgstr "weergeven op dashboard"
+
+#: documents/models.py:371
+msgid "show in sidebar"
+msgstr "weergeven in zijbalk"
+
+#: documents/models.py:375
+msgid "sort field"
+msgstr "sorteerveld"
+
+#: documents/models.py:378
+msgid "sort reverse"
+msgstr "omgekeerd sorteren"
+
+#: documents/models.py:384
+msgid "title contains"
+msgstr "titel bevat"
+
+#: documents/models.py:385
+msgid "content contains"
+msgstr "inhoud bevat"
+
+#: documents/models.py:386
+msgid "ASN is"
+msgstr "ASN is"
+
+#: documents/models.py:387
+msgid "correspondent is"
+msgstr "correspondent is"
+
+#: documents/models.py:388
+msgid "document type is"
+msgstr "documenttype is"
+
+#: documents/models.py:389
+msgid "is in inbox"
+msgstr "zit in \"Postvak in\""
+
+#: documents/models.py:390
+msgid "has tag"
+msgstr "heeft etiket"
+
+#: documents/models.py:391
+msgid "has any tag"
+msgstr "heeft één van de etiketten"
+
+#: documents/models.py:392
+msgid "created before"
+msgstr "aangemaakt voor"
+
+#: documents/models.py:393
+msgid "created after"
+msgstr "aangemaakt na"
+
+#: documents/models.py:394
+msgid "created year is"
+msgstr "aangemaakt jaar is"
+
+#: documents/models.py:395
+msgid "created month is"
+msgstr "aangemaakte maand is"
+
+#: documents/models.py:396
+msgid "created day is"
+msgstr "aangemaakte dag is"
+
+#: documents/models.py:397
+msgid "added before"
+msgstr "toegevoegd voor"
+
+#: documents/models.py:398
+msgid "added after"
+msgstr "toegevoegd na"
+
+#: documents/models.py:399
+msgid "modified before"
+msgstr "gewijzigd voor"
+
+#: documents/models.py:400
+msgid "modified after"
+msgstr "gewijzigd na"
+
+#: documents/models.py:401
+msgid "does not have tag"
+msgstr "heeft geen etiket"
+
+#: documents/models.py:412
+msgid "rule type"
+msgstr "type regel"
+
+#: documents/models.py:416
+msgid "value"
+msgstr "waarde"
+
+#: documents/models.py:422
+msgid "filter rule"
+msgstr "filterregel"
+
+#: documents/models.py:423
+msgid "filter rules"
+msgstr "filterregels"
+
+#: documents/serialisers.py:370
+#, python-format
+msgid "File type %(type)s not supported"
+msgstr "Bestandstype %(type)s niet ondersteund"
+
+#: documents/templates/index.html:20
+msgid "Paperless-ng is loading..."
+msgstr "Paperless-ng is aan het laden..."
+
+#: documents/templates/registration/logged_out.html:13
+msgid "Paperless-ng signed out"
+msgstr "Paperless-ng - afmelden"
+
+#: documents/templates/registration/logged_out.html:41
+msgid "You have been successfully logged out. Bye!"
+msgstr "Je bent nu afgemeld. Tot later!"
+
+#: documents/templates/registration/logged_out.html:42
+msgid "Sign in again"
+msgstr "Meld je opnieuw aan"
+
+#: documents/templates/registration/login.html:13
+msgid "Paperless-ng sign in"
+msgstr "Paperless-ng - aanmelden"
+
+#: documents/templates/registration/login.html:42
+msgid "Please sign in."
+msgstr "Gelieve aan te melden."
+
+#: documents/templates/registration/login.html:45
+msgid "Your username and password didn't match. Please try again."
+msgstr "Je gebruikersnaam en wachtwoord komen niet overeen. Probeer opnieuw."
+
+#: documents/templates/registration/login.html:48
+msgid "Username"
+msgstr "Gebruikersnaam"
+
+#: documents/templates/registration/login.html:49
+msgid "Password"
+msgstr "Wachtwoord"
+
+#: documents/templates/registration/login.html:54
+msgid "Sign in"
+msgstr "Aanmelden"
+
+#: paperless/settings.py:291
+msgid "English (US)"
+msgstr "Engels (US)"
+
+#: paperless/settings.py:292
+msgid "English (GB)"
+msgstr "Engels (Brits)"
+
+#: paperless/settings.py:293
+msgid "German"
+msgstr "Duits"
+
+#: paperless/settings.py:294
+msgid "Dutch"
+msgstr "Nederlands"
+
+#: paperless/settings.py:295
+msgid "French"
+msgstr "Frans"
+
+#: paperless/urls.py:114
+msgid "Paperless-ng administration"
+msgstr "Paperless-ng administratie"
+
+#: paperless_mail/admin.py:25
+msgid "Filter"
+msgstr "Filter"
+
+#: paperless_mail/admin.py:27
+msgid ""
+"Paperless will only process mails that match ALL of the filters given below."
+msgstr ""
+"Paperless verwerkt alleen e-mails die voldoen aan ALLE onderstaande filters."
+
+#: paperless_mail/admin.py:37
+msgid "Actions"
+msgstr "Acties"
+
+#: paperless_mail/admin.py:39
+msgid ""
+"The action applied to the mail. This action is only performed when documents"
+" were consumed from the mail. Mails without attachments will remain entirely"
+" untouched."
+msgstr ""
+"De actie die wordt toegepast op de mail. Deze actie wordt alleen uitgevoerd "
+"wanneer documenten verwerkt werden uit de mail. Mails zonder bijlage blijven"
+" onaangeroerd."
+
+#: paperless_mail/admin.py:46
+msgid "Metadata"
+msgstr "Metadata"
+
+#: paperless_mail/admin.py:48
+msgid ""
+"Assign metadata to documents consumed from this rule automatically. If you "
+"do not assign tags, types or correspondents here, paperless will still "
+"process all matching rules that you have defined."
+msgstr ""
+"Automatisch metadata toewijzen aan documenten vanuit deze regel. Indien je "
+"geen etiketten, documenttypes of correspondenten toewijst, zal Paperless nog"
+" steeds alle regels verwerken die je hebt gedefinieerd."
+
+#: paperless_mail/apps.py:9
+msgid "Paperless mail"
+msgstr "Paperless email"
+
+#: paperless_mail/models.py:11
+msgid "mail account"
+msgstr "email account"
+
+#: paperless_mail/models.py:12
+msgid "mail accounts"
+msgstr "email accounts"
+
+#: paperless_mail/models.py:19
+msgid "No encryption"
+msgstr "Geen versleuteling"
+
+#: paperless_mail/models.py:20
+msgid "Use SSL"
+msgstr "Gebruik SSL"
+
+#: paperless_mail/models.py:21
+msgid "Use STARTTLS"
+msgstr "Gebruik STARTTLS"
+
+#: paperless_mail/models.py:29
+msgid "IMAP server"
+msgstr "IMAP-server"
+
+#: paperless_mail/models.py:33
+msgid "IMAP port"
+msgstr "IMAP-poort"
+
+#: paperless_mail/models.py:36
+msgid ""
+"This is usually 143 for unencrypted and STARTTLS connections, and 993 for "
+"SSL connections."
+msgstr ""
+"Dit is gewoonlijk 143 voor onversleutelde of STARTTLS verbindingen, en 993 "
+"voor SSL verbindingen."
+
+#: paperless_mail/models.py:40
+msgid "IMAP security"
+msgstr "IMAP-beveiliging"
+
+#: paperless_mail/models.py:46
+msgid "username"
+msgstr "gebruikersnaam"
+
+#: paperless_mail/models.py:50
+msgid "password"
+msgstr "wachtwoord"
+
+#: paperless_mail/models.py:60
+msgid "mail rule"
+msgstr "email-regel"
+
+#: paperless_mail/models.py:61
+msgid "mail rules"
+msgstr "email-regels"
+
+#: paperless_mail/models.py:67
+msgid "Only process attachments."
+msgstr "Alleen bijlagen verwerken"
+
+#: paperless_mail/models.py:68
+msgid "Process all files, including 'inline' attachments."
+msgstr "Verwerk alle bestanden, inclusief 'inline' bijlagen."
+
+#: paperless_mail/models.py:78
+msgid "Mark as read, don't process read mails"
+msgstr "Markeer als gelezen, verwerk geen gelezen mails"
+
+#: paperless_mail/models.py:79
+msgid "Flag the mail, don't process flagged mails"
+msgstr "Markeer de mail, verwerk geen mails met markering"
+
+#: paperless_mail/models.py:80
+msgid "Move to specified folder"
+msgstr "Verplaats naar gegeven map"
+
+#: paperless_mail/models.py:81
+msgid "Delete"
+msgstr "Verwijder"
+
+#: paperless_mail/models.py:88
+msgid "Use subject as title"
+msgstr "Gebruik onderwerp als titel"
+
+#: paperless_mail/models.py:89
+msgid "Use attachment filename as title"
+msgstr "Gebruik naam van bijlage als titel"
+
+#: paperless_mail/models.py:99
+msgid "Do not assign a correspondent"
+msgstr "Wijs geen correspondent toe"
+
+#: paperless_mail/models.py:101
+msgid "Use mail address"
+msgstr "Gebruik het email-adres"
+
+#: paperless_mail/models.py:103
+msgid "Use name (or mail address if not available)"
+msgstr "Gebruik de naam, en anders het email-adres"
+
+#: paperless_mail/models.py:105
+msgid "Use correspondent selected below"
+msgstr "Gebruik de hieronder aangeduide correspondent"
+
+#: paperless_mail/models.py:113
+msgid "order"
+msgstr "volgorde"
+
+#: paperless_mail/models.py:120
+msgid "account"
+msgstr "account"
+
+#: paperless_mail/models.py:124
+msgid "folder"
+msgstr "map"
+
+#: paperless_mail/models.py:128
+msgid "filter from"
+msgstr "filter afzender"
+
+#: paperless_mail/models.py:131
+msgid "filter subject"
+msgstr "filter onderwerp"
+
+#: paperless_mail/models.py:134
+msgid "filter body"
+msgstr "filter inhoud"
+
+#: paperless_mail/models.py:138
+msgid "filter attachment filename"
+msgstr "Filter bestandsnaam van bijlage"
+
+#: paperless_mail/models.py:140
+msgid ""
+"Only consume documents which entirely match this filename if specified. "
+"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+"Alleen documenten verwerken die volledig overeenkomen, indien aangegeven. Je"
+" kunt jokertekens gebruiken, zoals *.pdf of *factuur*. Dit is niet "
+"hoofdlettergevoelig."
+
+#: paperless_mail/models.py:146
+msgid "maximum age"
+msgstr "Maximale leeftijd"
+
+#: paperless_mail/models.py:148
+msgid "Specified in days."
+msgstr "Aangegeven in dagen"
+
+#: paperless_mail/models.py:151
+msgid "attachment type"
+msgstr "Type bijlage"
+
+#: paperless_mail/models.py:154
+msgid ""
+"Inline attachments include embedded images, so it's best to combine this "
+"option with a filename filter."
+msgstr ""
+"\"Inline\" bijlagen bevatten vaak ook afbeeldingen. In dit geval valt het "
+"aan te raden om ook een filter voor de bestandsnaam op te geven."
+
+#: paperless_mail/models.py:159
+msgid "action"
+msgstr "actie"
+
+#: paperless_mail/models.py:165
+msgid "action parameter"
+msgstr "actie parameters"
+
+#: paperless_mail/models.py:167
+msgid ""
+"Additional parameter for the action selected above, i.e., the target folder "
+"of the move to folder action."
+msgstr ""
+"Extra parameters voor de hierboven gekozen actie, met andere woorden: de "
+"bestemmingsmap voor de verplaats-actie."
+
+#: paperless_mail/models.py:173
+msgid "assign title from"
+msgstr "wijs titel toe van"
+
+#: paperless_mail/models.py:183
+msgid "assign this tag"
+msgstr "wijs dit etiket toe"
+
+#: paperless_mail/models.py:191
+msgid "assign this document type"
+msgstr "wijs dit documenttype toe"
+
+#: paperless_mail/models.py:195
+msgid "assign correspondent from"
+msgstr "wijs correspondent toe van"
+
+#: paperless_mail/models.py:205
+msgid "assign this correspondent"
+msgstr "wijs deze correspondent toe"

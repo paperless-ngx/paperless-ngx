@@ -9,11 +9,11 @@ If you want to implement something big: Please start a discussion about that in 
 
 ## Python
 
-Use python 3.6 for development. Paperless supports python 3.6, 3.7 and 3.8.
+Paperless supports python 3.6, 3.7, 3.8 and 3.9.
 
 ## Branches
 
-master always reflects the latest release.
+master always reflects the latest release. Apart from changes to the documentation or readme, absolutely no functional changes on this branch in between releases.
 
 dev contains all changes that will be part of the next release. Use this branch to start making your changes.
 
@@ -24,3 +24,7 @@ feature-X branches is for experimental stuff that will eventually be merged into
 I'm trying to get most of paperless tested, so please do the same for your code! I know its a hassle, but it makes sure that your code works now and will allow us to detect regressions easily.
 
 To test your code, execute `pytest` in the src/ directory. Executing that in the project root is no good. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
+
+## More info:
+
+... is available in the documentation. https://paperless-ng.readthedocs.io/en/latest/extending.html

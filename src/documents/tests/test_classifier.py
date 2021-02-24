@@ -1,10 +1,13 @@
+import os
 import tempfile
-from time import sleep
+from pathlib import Path
 from unittest import mock
 
+import pytest
+from django.conf import settings
 from django.test import TestCase, override_settings
 
-from documents.classifier import DocumentClassifier, IncompatibleClassifierVersionError
+from documents.classifier import DocumentClassifier, IncompatibleClassifierVersionError, load_classifier
 from documents.models import Correspondent, Document, Tag, DocumentType
 from documents.tests.utils import DirectoriesMixin
 
@@ -82,37 +85,19 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertTrue(self.classifier.train())
         self.assertFalse(self.classifier.train())
 
-        self.classifier.save_classifier()
+        self.classifier.save()
 
         classifier2 = DocumentClassifier()
 
         current_ver = DocumentClassifier.FORMAT_VERSION
         with mock.patch("documents.classifier.DocumentClassifier.FORMAT_VERSION", current_ver+1):
             # assure that we won't load old classifiers.
-            self.assertRaises(IncompatibleClassifierVersionError, classifier2.reload)
+            self.assertRaises(IncompatibleClassifierVersionError, classifier2.load)
 
-            self.classifier.save_classifier()
+            self.classifier.save()
 
             # assure that we can load the classifier after saving it.
-            classifier2.reload()
-
-    def testReload(self):
-
-        self.generate_test_data()
-        self.assertTrue(self.classifier.train())
-        self.classifier.save_classifier()
-
-        classifier2 = DocumentClassifier()
-        classifier2.reload()
-        v1 = classifier2.classifier_version
-
-        # change the classifier after some time.
-        sleep(1)
-        self.classifier.save_classifier()
-
-        classifier2.reload()
-        v2 = classifier2.classifier_version
-        self.assertNotEqual(v1, v2)
+            classifier2.load()
 
     @override_settings(DATA_DIR=tempfile.mkdtemp())
     def testSaveClassifier(self):
@@ -121,11 +106,20 @@ class TestClassifier(DirectoriesMixin, TestCase):
 
         self.classifier.train()
 
-        self.classifier.save_classifier()
+        self.classifier.save()
 
         new_classifier = DocumentClassifier()
-        new_classifier.reload()
+        new_classifier.load()
         self.assertFalse(new_classifier.train())
+
+    @override_settings(MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"))
+    def test_load_and_classify(self):
+        self.generate_test_data()
+
+        new_classifier = DocumentClassifier()
+        new_classifier.load()
+
+        self.assertCountEqual(new_classifier.predict_tags(self.doc2.content), [45, 12])
 
     def test_one_correspondent_predict(self):
         c1 = Correspondent.objects.create(name="c1", matching_algorithm=Correspondent.MATCH_AUTO)
@@ -235,3 +229,42 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.classifier.train()
         self.assertListEqual(self.classifier.predict_tags(doc1.content), [t1.pk])
         self.assertListEqual(self.classifier.predict_tags(doc2.content), [])
+
+    def test_load_classifier_not_exists(self):
+        self.assertFalse(os.path.exists(settings.MODEL_FILE))
+        self.assertIsNone(load_classifier())
+
+    @mock.patch("documents.classifier.DocumentClassifier.load")
+    def test_load_classifier(self, load):
+        Path(settings.MODEL_FILE).touch()
+        self.assertIsNotNone(load_classifier())
+        load.assert_called_once()
+
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}})
+    @override_settings(MODEL_FILE=os.path.join(os.path.dirname(__file__), "data", "model.pickle"))
+    @pytest.mark.skip(reason="Disabled caching due to high memory usage - need to investigate.")
+    def test_load_classifier_cached(self):
+        classifier = load_classifier()
+        self.assertIsNotNone(classifier)
+
+        with mock.patch("documents.classifier.DocumentClassifier.load") as load:
+            classifier2 = load_classifier()
+            load.assert_not_called()
+
+    @mock.patch("documents.classifier.DocumentClassifier.load")
+    def test_load_classifier_incompatible_version(self, load):
+        Path(settings.MODEL_FILE).touch()
+        self.assertTrue(os.path.exists(settings.MODEL_FILE))
+
+        load.side_effect = IncompatibleClassifierVersionError()
+        self.assertIsNone(load_classifier())
+        self.assertFalse(os.path.exists(settings.MODEL_FILE))
+
+    @mock.patch("documents.classifier.DocumentClassifier.load")
+    def test_load_classifier_os_error(self, load):
+        Path(settings.MODEL_FILE).touch()
+        self.assertTrue(os.path.exists(settings.MODEL_FILE))
+
+        load.side_effect = OSError()
+        self.assertIsNone(load_classifier())
+        self.assertTrue(os.path.exists(settings.MODEL_FILE))

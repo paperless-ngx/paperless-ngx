@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component';
@@ -14,7 +14,15 @@ import { ToastService } from 'src/app/services/toast.service';
 export class DocumentTypeEditDialogComponent extends EditDialogComponent<PaperlessDocumentType> {
 
   constructor(service: DocumentTypeService, activeModal: NgbActiveModal, toastService: ToastService) { 
-    super(service, activeModal, toastService, 'document type')
+    super(service, activeModal, toastService)
+  }
+
+  getCreateTitle() {
+    return $localize`Create new document type`
+  }
+
+  getEditTitle() {
+    return $localize`Edit document type`
   }
 
   getForm(): FormGroup {

@@ -2,6 +2,7 @@ import textwrap
 
 from django.conf import settings
 from django.core.checks import Error, register
+from django.core.exceptions import FieldError
 from django.db.utils import OperationalError, ProgrammingError
 
 from documents.signals import document_consumer_declaration
@@ -16,7 +17,7 @@ def changed_password_check(app_configs, **kwargs):
     try:
         encrypted_doc = Document.objects.filter(
             storage_type=Document.STORAGE_TYPE_GPG).first()
-    except (OperationalError, ProgrammingError):
+    except (OperationalError, ProgrammingError, FieldError):
         return []  # No documents table yet
 
     if encrypted_doc:
@@ -50,6 +51,6 @@ def parser_check(app_configs, **kwargs):
 
     if len(parsers) == 0:
         return [Error("No parsers found. This is a bug. The consumer won't be "
-                      "able to onsume any documents without parsers.")]
+                      "able to consume any documents without parsers.")]
     else:
         return []
