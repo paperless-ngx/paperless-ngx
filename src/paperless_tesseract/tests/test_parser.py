@@ -230,7 +230,7 @@ class TestParser(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(parser.archive_path))
         self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
 
-    @override_settings(OOCR_MODE="skip")
+    @override_settings(OCR_MODE="skip")
     def test_multi_page_analog_pages_skip(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
