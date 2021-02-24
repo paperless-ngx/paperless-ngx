@@ -8,7 +8,6 @@ from collections import OrderedDict
 import pathvalidate
 
 import dateutil.parser
-from colorhash import ColorHash
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -92,15 +91,6 @@ class Tag(MatchingModel):
     class Meta:
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
-
-    def save(self, *args, **kwargs):
-        if self.colour == "":
-            self.colour = ColorHash(
-                self.name,
-                lightness=(0.35, 0.45, 0.55, 0.65),
-                saturation=(0.2, 0.3, 0.4, 0.5)).hex
-
-        super().save(*args, **kwargs)
 
 
 class DocumentType(MatchingModel):
