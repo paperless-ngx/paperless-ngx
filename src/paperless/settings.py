@@ -114,7 +114,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication'
     ],
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
-    'DEFAULT_VERSION': 'v1',
+    'DEFAULT_VERSION': '1',
     'ALLOWED_VERSIONS': ['1', '2']
 }
 
