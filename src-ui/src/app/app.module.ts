@@ -60,7 +60,7 @@ import { NumberComponent } from './components/common/input/number/number.compone
 import { SafePipe } from './pipes/safe.pipe';
 import { CustomDatePipe } from './pipes/custom-date.pipe';
 import { DateComponent } from './components/common/input/date/date.component';
-import { ISODateAdapter } from './utils/ngb-date-adapter';
+import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter';
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter';
 
 import localeFr from '@angular/common/locales/fr';
@@ -147,7 +147,7 @@ registerLocaleData(localeEnGb)
     },
     FilterPipe,
     DocumentTitlePipe,
-    {provide: NgbDateAdapter, useClass: ISODateAdapter},
+    {provide: NgbDateAdapter, useClass: ISODateTimeAdapter},
     {provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter}
   ],
   bootstrap: [AppComponent]
