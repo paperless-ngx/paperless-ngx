@@ -47,15 +47,9 @@
           </a>
           <ng-template #previewContent>
             <ng-container *ngIf="getContentType() == 'application/pdf'">
-                <div class="preview pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
-                  <div class="spinner-border text-primary spinner-border-sm" role="status">
-                    <span class="sr-only">Loading...</span>
-                  </div>
-                  <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="false" [show-all]="true" [render-text-mode]="2"></pdf-viewer>
+                <div class="preview">
+                  <object [data]="previewUrl | safe" class="preview" width="100%"></object>
                 </div>
-                <ng-template #nativePdfViewer>
-                    <object [data]="previewUrl | safe" type="application/pdf" class="preview" width="100%"></object>
-                </ng-template>
             </ng-container>
             <ng-container *ngIf="getContentType() == 'text/plain'">
                 <object [data]="previewUrl | safe" type="text/plain" class="preview" width="100%"></object>

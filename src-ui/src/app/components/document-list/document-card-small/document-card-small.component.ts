@@ -70,10 +70,6 @@ export class DocumentCardSmallComponent implements OnInit {
     )
   }
 
-  get useNativePdfViewer(): boolean {
-    return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
-  }
-
   getContentType() {
     return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
   }
