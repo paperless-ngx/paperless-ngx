@@ -83,7 +83,8 @@ export class SettingsService {
       {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)"},
       {code: "de", name: $localize`German`, englishName: "German"},
       {code: "nl", name: $localize`Dutch`, englishName: "Dutch"},
-      {code: "fr", name: $localize`French`, englishName: "French"}
+      {code: "fr", name: $localize`French`, englishName: "French"},
+      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)"}
     ]
   }
 
