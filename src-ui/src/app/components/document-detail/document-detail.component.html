@@ -125,7 +125,7 @@
 
     <div class="col-md-6 col-xl-8 mb-3">
         <ng-container *ngIf="getContentType() == 'application/pdf'">
-          <object [data]="previewUrl | safe" class="preview-sticky" width="100%">If error</object>
+          <object [data]="previewUrl | safe" class="preview-sticky" width="100%"></object>
         </ng-container>
         <ng-container *ngIf="getContentType() == 'text/plain'">
             <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky" width="100%"></object>
