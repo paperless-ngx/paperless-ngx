@@ -23,8 +23,14 @@ wait_for_postgres() {
 	echo "Waiting for PostgreSQL to start..."
 
 	host="${PAPERLESS_DBHOST}"
+	port="${PAPERLESS_DBPORT}"
 
-	while !</dev/tcp/$host/5432 ;
+	if [[ -z $port ]] ;
+	then
+		port="5432"
+	fi
+
+	while !</dev/tcp/$host/$port ;
 	do
 
 		if [ $attempt_num -eq $max_attempts ]
@@ -56,6 +62,7 @@ migrations() {
 		# simultaneously. This also ensures that the db is ready when the command
 		# of the current container starts.
 		flock 200
+		echo "Apply database migrations..."
 		sudo -HEu paperless python3 manage.py migrate
 	)  200>/usr/src/paperless/data/migration_lock
 
@@ -72,13 +79,19 @@ initialize() {
 		fi
 	done
 
+	echo "creating directory /tmp/paperless"
+	mkdir -p /tmp/paperless
+
 	chown -R paperless:paperless ../
+	chown -R paperless:paperless /tmp/paperless
 
 	migrations
 
 }
 
 install_languages() {
+	echo "Installing languages..."
+
 	local langs="$1"
 	read -ra langs <<<"$langs"
 
@@ -113,16 +126,20 @@ install_languages() {
     done
 }
 
-initialize
+echo "Paperless-ng docker container starting..."
 
 # Install additional languages if specified
 if [[ ! -z "$PAPERLESS_OCR_LANGUAGES"  ]]; then
 		install_languages "$PAPERLESS_OCR_LANGUAGES"
 fi
 
+initialize
+
 if [[ "$1" != "/"* ]]; then
+	echo Executing management command "$@"
 	exec sudo -HEu paperless python3 manage.py "$@"
 else
+	echo Executing "$@"
 	exec "$@"
 fi
 

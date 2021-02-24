@@ -1,6 +1,7 @@
 <!doctype html>
 
 {% load static %}
+{% load i18n %}
 
 <html lang="en">
   <head>
@@ -9,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.1.1">
-    <title>Paperless Sign In</title>
+    <title>{% translate "Paperless-ng signed out" %}</title>
 
     <!-- Bootstrap core CSS -->
 		<link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
@@ -36,9 +37,9 @@
 
   <body class="text-center">
     <div class="form-signin">
-			<img class="mb-4" src="{% static 'frontend/assets/logo.svg' %}" alt="" width="300">
-			<p>You have been successfully logged out. Bye!</p>
-			<a href="/">Sign in again</a>
+			<img class="mb-4" src="{% static 'frontend/en-US/assets/logo.svg' %}" alt="" width="300">
+			<p>{% translate "You have been successfully logged out. Bye!" %}</p>
+			<a href="/">{% translate "Sign in again" %}</a>
 		</div>
 	</body>
 </html>

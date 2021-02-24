@@ -25,8 +25,9 @@ This section describes the steps you need to take to start development on paperl
 
     *   Python 3.6.
     *   All dependencies listed in the :ref:`Bare metal route <setup-bare_metal>`
-    *   redis. You can either install redis or use the included scritps/start-redis.sh
-        to use docker to fire up a redis instance.
+    *   redis. You can either install redis or use the included scritps/start-services.sh
+        to use docker to fire up a redis instance (and some other services such as tika,
+        gotenberg and a postgresql server).
 
 Back end development
 ====================
@@ -38,7 +39,7 @@ Install the python dependencies by performing ``pipenv install --dev`` in the sr
 This will also create a virtual environment, which you can enter with ``pipenv shell`` or
 execute one-shot commands in with ``pipenv run``.
 
-In ``src/paperless.conf``, enable debug mode.
+Copy ``paperless.conf.example`` to ``paperless.conf`` and enable debug mode.
 
 Configure the IDE to use the src/ folder as the base source folder. Configure the following
 launch configurations in your IDE:
@@ -102,130 +103,113 @@ In order to build the front end and serve it as part of django, execute
 
 .. code:: shell-session
 
-    $ ng build --prod --output-path ../src/documents/static/frontend/
+    $ ng build --prod
 
 This will build the front end and put it in a location from which the Django server will serve
 it as static content. This way, you can verify that authentication is working.
 
-Making a release
-================
 
-Execute the ``make-release.sh <ver>`` script.
+Building the documentation
+==========================
 
-This will test and assemble everything and also build and tag a docker image.
+The documentation is built using sphinx. I've configured ReadTheDocs to automatically build
+the documentation when changes are pushed. If you want to build the documentation locally,
+this is how you do it:
 
+1.  Install python dependencies.
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless
+        $ pipenv install --dev
+
+2.  Build the documentation
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless/docs
+        $ pipenv run make clean html
+
+This will build the HTML documentation, and put the resulting files in the ``_build/html``
+directory.
 
 Extending Paperless
 ===================
 
-.. warning::
+Paperless does not have any fancy plugin systems and will probably never have. However,
+some parts of the application have been designed to allow easy integration of additional
+features without any modification to the base code.
 
-    This section is not updated to paperless-ng yet.
+Making custom parsers
+---------------------
 
-For the most part, Paperless is monolithic, so extending it is often best
-managed by way of modifying the code directly and issuing a pull request on
-`GitHub`_.  However, over time the project has been evolving to be a little
-more "pluggable" so that users can write their own stuff that talks to it.
+Paperless uses parsers to add documents to paperless. A parser is responsible for:
 
-.. _GitHub: https://github.com/the-paperless-project/paperless
+*   Retrieve the content from the original
+*   Create a thumbnail
+*   Optional: Retrieve a created date from the original
+*   Optional: Create an archived document from the original
 
+Custom parsers can be added to paperless to support more file types. In order to do that,
+you need to write the parser itself and announce its existence to paperless.
 
-.. _extending-parsers:
-
-Parsers
--------
-
-You can leverage Paperless' consumption model to have it consume files *other*
-than ones handled by default like ``.pdf``, ``.jpg``, and ``.tiff``.  To do so,
-you simply follow Django's convention of creating a new app, with a few key
-requirements.
-
-
-.. _extending-parsers-parserspy:
-
-parsers.py
-..........
-
-In this file, you create a class that extends
-``documents.parsers.DocumentParser`` and go about implementing the three
-required methods:
-
-* ``get_thumbnail()``: Returns the path to a file we can use as a thumbnail for
-  this document.
-* ``get_text()``: Returns the text from the document and only the text.
-* ``get_date()``: If possible, this returns the date of the document, otherwise
-  it should return ``None``.
-
-
-.. _extending-parsers-signalspy:
-
-signals.py
-..........
-
-At consumption time, Paperless emits a ``document_consumer_declaration``
-signal which your module has to react to in order to let the consumer know
-whether or not it's capable of handling a particular file.  Think of it like
-this:
-
-1. Consumer finds a file in the consumption directory.
-2. It asks all the available parsers: *"Hey, can you handle this file?"*
-3. Each parser responds with either ``None`` meaning they can't handle the
-   file, or a dictionary in the following format:
+The parser itself must extend ``documents.parsers.DocumentParser`` and must implement the
+methods ``parse`` and ``get_thumbnail``. You can provide your own implementation to
+``get_date`` if you don't want to rely on paperless' default date guessing mechanisms.
 
 .. code:: python
 
-    {
-        "parser": <the class name>,
-        "weight": <an integer>
-    }
+    class MyCustomParser(DocumentParser):
 
-The consumer compares the ``weight`` values from all respondents and uses the
-class with the highest value to consume the document.  The default parser,
-``RasterisedDocumentParser`` has a weight of ``0``.
+        def parse(self, document_path, mime_type):
+            # This method does not return anything. Rather, you should assign
+            # whatever you got from the document to the following fields:
 
+            # The content of the document.
+            self.text = "content"
+            
+            # Optional: path to a PDF document that you created from the original.
+            self.archive_path = os.path.join(self.tempdir, "archived.pdf")
 
-.. _extending-parsers-appspy:
+            # Optional: "created" date of the document.
+            self.date = get_created_from_metadata(document_path)
 
-apps.py
-.......
+        def get_thumbnail(self, document_path, mime_type):
+            # This should return the path to a thumbnail you created for this
+            # document.
+            return os.path.join(self.tempdir, "thumb.png")
 
-This is a standard Django file, but you'll need to add some code to it to
-connect your parser to the ``document_consumer_declaration`` signal.
+If you encounter any issues during parsing, raise a ``documents.parsers.ParseError``.
 
+The ``self.tempdir`` directory is a temporary directory that is guaranteed to be empty
+and removed after consumption finished. You can use that directory to store any
+intermediate files and also use it to store the thumbnail / archived document.
 
-.. _extending-parsers-finally:
-
-Finally
-.......
-
-The last step is to update ``settings.py`` to include your new module.
-Eventually, this will be dynamic, but at the moment, you have to edit the
-``INSTALLED_APPS`` section manually.  Simply add the path to your AppConfig to
-the list like this:
+After that, you need to announce your parser to paperless. You need to connect a
+handler to the ``document_consumer_declaration`` signal. Have a look in the file
+``src/paperless_tesseract/apps.py`` on how that's done. The handler is a method
+that returns information about your parser:
 
 .. code:: python
 
-    INSTALLED_APPS = [
-        ...
-        "my_module.apps.MyModuleConfig",
-        ...
-    ]
+    def myparser_consumer_declaration(sender, **kwargs):
+        return {
+            "parser": MyCustomParser,
+            "weight": 0,
+            "mime_types": {
+                "application/pdf": ".pdf",
+                "image/jpeg": ".jpg",
+            }
+        }
 
-Order doesn't matter, but generally it's a good idea to place your module lower
-in the list so that you don't end up accidentally overriding project defaults
-somewhere.
+*   ``parser`` is a reference to a class that extends ``DocumentParser``.
 
+*   ``weight`` is used whenever two or more parsers are able to parse a file: The parser with
+    the higher weight wins. This can be used to override the parsers provided by
+    paperless.
 
-.. _extending-parsers-example:
-
-An Example
-..........
-
-The core Paperless functionality is based on this design, so if you want to see
-what a parser module should look like, have a look at `parsers.py`_,
-`signals.py`_, and `apps.py`_ in the `paperless_tesseract`_ module.
-
-.. _parsers.py: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/parsers.py
-.. _signals.py: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/signals.py
-.. _apps.py: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/apps.py
-.. _paperless_tesseract: https://github.com/the-paperless-project/paperless/blob/master/src/paperless_tesseract/
+*   ``mime_types`` is a dictionary. The keys are the mime types your parser supports and the value
+    is the default file extension that paperless should use when storing files and serving them for
+    download. We could guess that from the file extensions, but some mime types have many extensions
+    associated with them and the python methods responsible for guessing the extension do not always
+    return the same value.

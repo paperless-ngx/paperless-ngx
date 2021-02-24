@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentService } from 'src/app/services/rest/document.service';
 
 @Component({
@@ -14,16 +13,42 @@ export class DocumentCardLargeComponent implements OnInit {
   constructor(private documentService: DocumentService, private sanitizer: DomSanitizer) { }
 
   @Input()
+  selected = false
+
+  @Output()
+  toggleSelected = new EventEmitter()
+
+  get selectable() {
+    return this.toggleSelected.observers.length > 0
+  }
+
+  @Input()
+  moreLikeThis: boolean = false
+
+  @Input()
   document: PaperlessDocument
 
   @Input()
   details: any
 
   @Output()
-  clickTag = new EventEmitter<PaperlessTag>()
+  clickTag = new EventEmitter<number>()
 
   @Output()
-  clickCorrespondent = new EventEmitter<PaperlessDocument>()
+  clickCorrespondent = new EventEmitter<number>()
+
+  @Input()
+  searchScore: number
+
+  get searchScoreClass() {
+    if (this.searchScore > 0.7) {
+      return "success"
+    } else if (this.searchScore > 0.3) {
+      return "warning"
+    } else {
+      return "danger"
+    }
+  }
 
   ngOnInit(): void {
   }

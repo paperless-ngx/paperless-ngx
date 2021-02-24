@@ -5,19 +5,468 @@
 Changelog
 *********
 
+paperless-ng 1.2.1
+##################
+
+* `Rodrigo Avelino <https://github.com/rodavelino>`_ translated Paperless into Portuguese (Brazil).
+
+* The date input fields now respect the currently selected date format.
+
+* Added a fancy icon when adding paperless to the home screen on iOS devices. Thanks to `Joel Nordell <https://github.com/joelnordell>`_.
+
+* When using regular expression matching, the regular expression is now validated before saving the tag/correspondent/type.
+
+paperless-ng 1.2.0
+##################
+
+* Changes to the OCRmyPDF integration
+
+  * Added support for deskewing and automatic rotation of incorrectly rotated pages. This is enabled by default, see :ref:`configuration-ocr`.
+  * Better support for encrypted files.
+  * Better support for various other PDF files: Paperless will now attempt to force OCR with safe options when OCR fails with the configured options.
+  * Added an explicit option to skip cleaning with ``unpaper``.
+
+* Download multiple selected documents as a zip archive.
+
+* The document list now remembers the current page.
+
+* Improved responsiveness when switching between saved views and the document list.
+
+* Increased the default wait time when observing files in the consumption folder
+  with polling from 1 to 5 seconds. This will decrease the likelihood of paperless
+  consuming partially written files.
+
+* Fixed a crash of the document archiver management command when trying to process documents with unknown mime types.
+
+* Paperless no longer depends on ``libpoppler-cpp-dev``.
+
+.. note::
+
+  Some packages that paperless depends on are slowly dropping Python 3.6
+  support one after another, including the web server. Supporting Python
+  3.6 means that I cannot update these packages anymore.
+
+  At some point, paperless will drop Python 3.6 support. If using a bare
+  metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
+
+  If using docker, this does not affect you.
+
+paperless-ng 1.1.4
+##################
+
+* Added English (GB) locale.
+
+* Added ISO-8601 date display option.
+
+paperless-ng 1.1.3
+##################
+
+* Added a docker-specific configuration option to adjust the number of
+  worker processes of the web server. See :ref:`configuration-docker`.
+
+* Some more memory usage optimizations.
+
+* Don't show inbox statistics if no inbox tag is defined.
+
+paperless-ng 1.1.2
+##################
+
+* Always show top left corner of thumbnails, even for extra wide documents.
+
+* Added a management command for executing the sanity checker directly.
+  See :ref:`utilities-sanity-checker`.
+
+* The weekly sanity check now reports messages in the log files.
+
+* Fixed an issue with the metadata tab not reporting anything in case of missing files.
+
+* Reverted a change from 1.1.0 that caused huge memory usage due to redis caching.
+
+* Some memory usage optimizations.
+
+paperless-ng 1.1.1
+##################
+
+This release contains new database migrations.
+
+* Fixed a bug in the sanity checker that would cause it to display "x not in list" errors instead of actual issues.
+
+* Fixed a bug with filename generation for archive filenames that would cause the archive files of two documents to overlap.
+
+  * This happened when ``PAPERLESS_FILENAME_FORMAT`` is used and the filenames of two or more documents are the same, except for the file extension.
+  * Paperless will now store the archive filename in the database as well instead of deriving it from the original filename, and use the
+    same logic for detecting and avoiding filename clashes that's also used for original filenames.
+  * The migrations will repair any missing archive files. If you're using tika, ensure that tika is running while performing the migration. Docker-compose will take care of that.
+
+* Fixed a bug with thumbnail regeneration when TIKA integration was used.
+
+* Added ASN as a placeholder field to the filename format.
+
+* The docker image now comes with built-in shortcuts for most management commands. These are now the recommended way to execute management commands, since these
+  also ensure that they're always executed as the paperless user and you're less likely to run into permission issues. See :ref:`utilities-management-commands`.
+
+paperless-ng 1.1.0
+##################
+
+* Document processing status
+
+  * Paperless now shows the status of processing documents on the dashboard in real time.
+  * Status notifications when
+
+    * New documents are detected in the consumption folder, in mails, uploaded on the front end,
+      or added with one of the mobile apps.
+    * Documents are successfully added to paperless.
+    * Document consumption failed (with error messages)
+
+  * Configuration options to enable/disable individual notifications.
+
+* Live updates to document lists and saved views when new documents are added.
+
+  .. hint::
+
+    For status notifications and live updates to work, paperless now requires an `ASGI <https://asgi.readthedocs.io/en/latest/>`_-enabled
+    web server. The docker images uses ``gunicorn`` and an ASGI-enabled worker called `uvicorn <http://www.uvicorn.org/>`_,
+    and there is no need to configure anything.
+
+    For bare metal installations, changes are required for the notifications to work. Adapt the service ``paperless-webserver.service``
+    to use the supplied ``gunicorn.conf.py`` configuration file and adapt the reference to the ASGI application as follows:
+
+    .. code::
+
+      ExecStart=/opt/paperless/.local/bin/gunicorn -c /opt/paperless/gunicorn.conf.py paperless.asgi:application
+
+    Paperless will continue to work with WSGI, but you will not get any status notifications.
+
+    Apache ``mod_wsgi`` users, see :ref:`this note <faq-mod_wsgi>`.
+
+* Paperless now offers suggestions for tags, correspondents and types on the document detail page.
+
+* Added an interactive easy install script that automatically downloads, configures and starts paperless with docker.
+
+* Official support for Python 3.9.
+
+* Other changes and fixes
+
+  * Adjusted the default parallelization settings to run more than one task in parallel on systems with 4 or less cores.
+    This addresses issues with paperless not consuming any new files when other tasks are running.
+
+  * Fixed a rare race condition that would cause paperless to process incompletely written files when using the upload on the dashboard.
+
+  * The document classifier no longer issues warnings and errors when auto matching is not used at all.
+
+  * Better icon for document previews.
+
+  * Better info section in the side bar.
+
+  * Paperless no longer logs to the database. Instead, logs are written to rotating log files. This solves many "database is locked"
+    issues on Raspberry Pi, especially when SQLite is used.
+
+  * By default, log files are written to ``PAPERLESS_DATA_DIR/log/``. Logging settings can be adjusted with
+    ``PAPERLESS_LOGGING_DIR``, ``PAPERLESS_LOGROTATE_MAX_SIZE`` and
+    ``PAPERLESS_LOGROTATE_MAX_BACKUPS``.
+
+paperless-ng 1.0.0
+##################
+
+Nothing special about this release, but since there are relatively few bug reports coming in, I think that this is reasonably stable.
+
+* Document export
+
+  * The document exporter has been rewritten to support updating an already existing export in place.
+    This enables incremental backups with ``rsync``.
+  * The document exporter supports naming exported files according to ``PAPERLESS_FILENAME_FORMAT``.
+  * The document exporter locks the media directory and the database during execution to ensure that
+    the resulting export is consistent.
+  * See the :ref:`updated documentation <utilities-exporter>` for more details.
+
+* Other changes and additions
+
+  * Added a language selector to the settings.
+  * Added date format options to the settings.
+  * Range selection with shift clicking is now possible in the document list.
+  * Filtering correspondent, type and tag management pages by name.
+  * Focus "Name" field in dialogs by default.
+
+
+paperless-ng 0.9.14
+###################
+
+Starting with this version, releases are getting built automatically. This release also comes with changes on how to install and
+update paperless.
+
+* Paperless now uses GitHub Actions to make releases and build docker images.
+
+  * Docker images are available for amd64, armhf, and aarch64.
+  * When you pull an image from Docker Hub, Docker will automatically select the correct image for you.
+
+* Changes to docker installations and updates
+
+  * The ``-dockerfiles.tar.xz`` release archive is gone. Instead, simply grab the docker files from ``/docker/compose`` in the repository
+    if you wish to install paperless by pulling from the hub.
+  * The docker compose files in ``/docker/compose`` were changed to always use the ``latest`` version automatically. In order to do further
+    updates, simply do a ``docker-compose pull``. The documentation has been updated.
+  * The docker compose files were changed to restart paperless on system boot only if it was running before shutdown.
+  * Documentation of the docker-compose files about what they do.
+
+* Changes to bare metal installations and updates
+
+  * The release archive is built exactly like before. However, the release now comes with already compiled translation messages and
+    collected static files. Therefore, the update steps ``compilemessages`` and ``collectstatic`` are now obsolete.
+
+* Other changes
+
+  * A new configuration option ``PAPERLESS_IGNORE_DATES`` was added by `jayme-github`_. This can be used to instruct paperless to ignore
+    certain dates (such as your date of birth) when guessing the date from the document content. This was actually introduced in 0.9.12,
+    I just forgot to mention it in the changelog.
+  * The filter drop downs now display selected entries on top of all other entries.
+  * The PostgreSQL client now supports setting an explicit ``sslmode`` to force encryption of the connection to PostgreSQL.
+  * The docker images now come with ``jbig2enc``, which is a lossless image encoder for PDF documents and decreases the size of certain
+    PDF/A documents.
+  * When using any of the manual matching algorithms, paperless now logs messages about when and why these matching algorithms matched.
+  * The default settings for parallelization in paperless were adjusted to always leave one CPU core free.
+  * Added an option to the frontend to choose which method to use for displaying PDF documents.
+
+* Fixes
+
+  * An issue with the tika parser not picking up files from the consumption directory was fixed.
+  * A couple changes to the dark mode and fixes to several other layout issues.
+  * An issue with the drop downs for correspondents, tags and types not properly supporting filtering with special characters was fixed.
+  * Fixed an issue with filenames of downloaded files: Dates where off by one day due to timezone issues.
+  * Searching will continue to work even when the index returns non-existing documents. This resulted in "Document does not exist" errors
+    before. Instead, a warning is logged, indicating the issue.
+  * An issue with the consumer crashing when invalid regular expression were used was fixed.
+
+paperless-ng 0.9.13
+###################
+
+* Fixed an issue with Paperless not starting due to the new Tika integration when ``USERMAP_UID`` and ``USERMAP_GID`` was used
+  in the ``docker-compose.env`` file.
+
+paperless-ng 0.9.12
+###################
+
+* Paperless localization
+
+  * Thanks to the combined efforts of many users, Paperless is now available in English, Dutch, French and German.
+
+* Thanks to `Jo Vandeginste`_, Paperless has optional support for Office documents such as .docx, .doc, .odt and more.
+
+  * See the :ref:`configuration<configuration-tika>` on how to enable this feature. This feature requires two additional services
+    (one for parsing Office documents and metadata extraction and another for converting Office documents to PDF), and is therefore
+    not enabled on default installations.
+  * As with all other documents, paperless converts Office documents to PDF and stores both the original as well as the archived PDF.
+
+* Dark mode
+
+  * Thanks to `Michael Shamoon`_, paperless now has a dark mode. Configuration is available in the settings.
+
+* Other changes and additions
+
+  * The PDF viewer now uses a local copy of some dependencies instead of fetching them from the internet. Thanks to `slorenz`_.
+  * Revamped search bar styling thanks to `Michael Shamoon`_.
+  * Sorting in the document list by clicking on table headers.
+  * A button was added to the document detail page that assigns a new ASN to a document.
+  * Form field validation: When providing invalid input in a form (such as a duplicate ASN or no name), paperless now has visual
+    indicators and clearer error messages about what's wrong.
+  * Paperless disables buttons with network actions (such as save and delete) when a network action is active. This indicates that
+    something is happening and prevents double clicking.
+  * When using "Save & next", the title field is focussed automatically to better support keyboard editing.
+  * E-Mail: Added filter rule parameters to allow inline attachments (watch out for mails with inlined images!) and attachment filename filters
+    with wildcards.
+  * Support for remote user authentication thanks to `Michael Shamoon`_. This is useful for hiding Paperless behind single sign on applications
+    such as `authelia <https://www.authelia.com/>`_.
+  * "Clear filters" has been renamed to "Reset filters" and now correctly restores the default filters on saved views. Thanks to `Michael Shamoon`_
+
+* Fixes
+
+  * Paperless was unable to save views when "Not assigned" was chosen in one of the filter dropdowns.
+  * Clearer error messages when pre and post consumption scripts do not exist.
+  * The post consumption script is executed later in the consumption process. Before the change, an ID was passed to the script referring to
+    a document that did not yet exist in the database.
+
+paperless-ng 0.9.11
+###################
+
+* Fixed an issue with the docker image not starting at all due to a configuration change of the web server.
+
+
+paperless-ng 0.9.10
+###################
+
+* Bulk editing
+
+  * Thanks to `Michael Shamoon`_, we've got a new interface for the bulk editor.
+  * There are some configuration options in the settings to alter the behavior.
+
+* Other changes and additions
+
+  * Thanks to `zjean`_, paperless now publishes a webmanifest, which is useful for adding the application to home screens on mobile devices.
+  * The Paperless-ng logo now navigates to the dashboard.
+  * Filter for documents that don't have any correspondents, types or tags assigned.
+  * Tags, types and correspondents are now sorted case insensitive.
+  * Lots of preparation work for localization support.
+
+* Fixes
+
+  * Added missing dependencies for Raspberry Pi builds.
+  * Fixed an issue with plain text file consumption: Thumbnail generation failed due to missing fonts.
+  * An issue with the search index reporting missing documents after bulk deletes was fixed.
+  * Issue with the tag selector not clearing input correctly.
+  * The consumer used to stop working when encountering an incomplete classifier model file.
+
+.. note::
+
+  The bulk delete operations did not update the search index. Therefore, documents that you deleted remained in the index and
+  caused the search to return messages about missing documents when searching. Further bulk operations will properly update
+  the index.
+
+  However, this change is not retroactive: If you used the delete method of the bulk editor, you need to reindex your search index
+  by :ref:`running the management command document_index with the argument reindex <administration-index>`.
+
+paperless-ng 0.9.9
+##################
+
+Christmas release!
+
+* Bulk editing
+
+  * Paperless now supports bulk editing.
+  * The following operations are available: Add and remove correspondents, tags, document types from selected documents, as well as mass-deleting documents.
+  * We've got a more fancy UI in the works that makes these features more accessible, but that's not quite ready yet.
+
+* Searching
+
+  * Paperless now supports searching for similar documents ("More like this") both from the document detail page as well as from individual search results.
+  * A search score indicates how well a document matches the search query, or how similar a document is to a given reference document.
+
+* Other additions and changes
+
+  * Clarification in the UI that the fields "Match" and "Is insensitive" are not relevant for the Auto matching algorithm.
+  * New select interface for tags, types and correspondents allows filtering. This also improves tag selection. Thanks again to `Michael Shamoon`_!
+  * Page navigation controls for the document viewer, thanks to `Michael Shamoon`_.
+  * Layout changes to the small cards document list.
+  * The dashboard now displays the username (or full name if specified in the admin) on the dashboard.
+
+* Fixes
+
+  * An error that caused the document importer to crash was fixed.
+  * An issue with changes not being possible when ``PAPERLESS_COOKIE_PREFIX`` is used was fixed.
+  * The date selection filters now allow manual entry of dates.
+
+* Feature Removal
+
+  * Most of the guesswork features have been removed. Paperless no longer tries to extract correspondents and tags from file names.
+
+paperless-ng 0.9.8
+##################
+
+This release addresses two severe issues with the previous release.
+
+* The delete buttons for document types, correspondents and tags were not working.
+* The document section in the admin was causing internal server errors (500).
+
+
+paperless-ng 0.9.7
+##################
+
+
+* Front end
+
+  * Thanks to the hard work of `Michael Shamoon`_, paperless now comes with a much more streamlined UI for
+    filtering documents.
+
+  * `Michael Shamoon`_ replaced the document preview with another component. This should fix compatibility with Safari browsers.
+
+  * Added buttons to the management pages to quickly show all documents with one specific tag, correspondent, or title.
+
+  * Paperless now stores your saved views on the server and associates them with your user account.
+    This means that you can access your views on multiple devices and have separate views for different users.
+    You will have to recreate your views.
+
+  * The GitHub and documentation links now open in new tabs/windows. Thanks to `rYR79435`_.
+
+  * Paperless now generates default saved view names when saving views with certain filter rules.
+
+  * Added a small version indicator to the front end.
+
+* Other additions and changes
+
+  * The new filename format field ``{tag_list}`` inserts a list of tags into the filename, separated by comma.
+  * The ``document_retagger`` no longer removes inbox tags or tags without matching rules.
+  * The new configuration option ``PAPERLESS_COOKIE_PREFIX`` allows you to run multiple instances of paperless on different ports.
+    This option enables you to be logged in into multiple instances by specifying different cookie names for each instance.
+
+* Fixes
+
+  * Sometimes paperless would assign dates in the future to newly consumed documents.
+  * The filename format fields ``{created_month}`` and ``{created_day}`` now use a leading zero for single digit values.
+  * The filename format field ``{tags}`` can no longer be used without arguments.
+  * Paperless was not able to consume many images (especially images from mobile scanners) due to missing DPI information.
+    Paperless now assumes A4 paper size for PDF generation if no DPI information is present.
+  * Documents with empty titles could not be opened from the table view due to the link being empty.
+  * Fixed an issue with filenames containing special characters such as ``:`` not being accepted for upload.
+  * Fixed issues with thumbnail generation for plain text files.
+
+
+paperless-ng 0.9.6
+##################
+
+This release focusses primarily on many small issues with the UI.
+
+* Front end
+
+  * Paperless now has proper window titles.
+  * Fixed an issue with the small cards when more than 7 tags were used.
+  * Navigation of the "Show all" links adjusted. They navigate to the saved view now, if available in the sidebar.
+  * Some indication on the document lists that a filter is active was added.
+  * There's a new filter to filter for documents that do *not* have a certain tag.
+  * The file upload box now shows upload progress.
+  * The document edit page was reorganized.
+  * The document edit page shows various information about a document.
+  * An issue with the height of the preview was fixed.
+  * Table issues with too long document titles fixed.
+
+* API
+
+  * The API now serves file names with documents.
+  * The API now serves various metadata about documents.
+  * API documentation updated.
+
+* Other
+
+  * Fixed an issue with the docker image when a non-standard PostgreSQL port was used.
+  * The docker image was trying check for installed languages before actually installing them.
+  * ``FILENAME_FORMAT`` placeholder for document types.
+  * The filename formatter is now less restrictive with file names and tries to
+    conserve the original correspondents, types and titles as much as possible.
+  * The filename formatter does not include the document ID in filenames anymore. It will
+    rather append ``_01``, ``_02``, etc when it detects duplicate filenames.
+
+.. note::
+
+  The changes to the filename format will apply to newly added documents and changed documents.
+  If you want all files to reflect these changes, execute the ``document_renamer`` management
+  command.
+
+
 paperless-ng 0.9.5
 ##################
+
+This release concludes the big changes I wanted to get rolled into paperless. The next releases before 1.0 will
+focus on fixing issues, primarily.
 
 * OCR
 
   * Paperless now uses `OCRmyPDF <https://github.com/jbarlow83/OCRmyPDF>`_ to perform OCR on documents.
+    It still uses tesseract under the hood, but the PDF parser of Paperless has changed considerably and
+    will behave different for some douments.
   * OCRmyPDF creates archived PDF/A documents with embedded text that can be selected in the front end.
   * Paperless stores archived versions of documents alongside with the originals. The originals can be
-    accessed on the document edit page, if available.
+    accessed on the document edit page. If available, a dropdown menu will appear next to the download button.
   * Many of the configuration options regarding OCR have changed. See :ref:`configuration-ocr` for details.
   * Paperless no longer guesses the language of your documents. It always uses the language that you
     specified with ``PAPERLESS_OCR_LANGUAGE``. Be sure to set this to the language the majority of your
-    documents are in.
+    documents are in. Multiple languages can be specified, but that requires more CPU time.
   * The management command :ref:`document_archiver <utilities-archiver>` can be used to create archived versions for already
     existing documents.
 
@@ -27,10 +476,28 @@ paperless-ng 0.9.5
     based on the sub folders a document was found in. This can be configured with ``PAPERLESS_CONSUMER_RECURSIVE`` and
     ``PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS``.
 
+* API
+
+  * The API now offers token authentication.
+  * The endpoint for uploading documents now supports specifying custom titles, correspondents, tags and types.
+    This can be used by clients to override the default behavior of paperless. See :ref:`api-file_uploads`.
+  * The document endpoint of API now serves documents in this form:
+
+    * correspondents, document types and tags are referenced by their ID in the fields ``correspondent``, ``document_type`` and ``tags``. The ``*_id`` versions are gone. These fields are read/write.
+    * paperless does not serve nested tags, correspondents or types anymore.
+
+* Front end
+
+  * Paperless does some basic caching of correspondents, tags and types and will only request them from the server when necessary or when entirely reloading the page.
+  * Document list fetching is about 10%-30% faster now, especially when lots of tags/correspondents are present.
+  * Some minor improvements to the front end, such as document count in the document list, better highlighting of the current page, and improvements to the filter behavior.
+
 * Fixes:
 
   * A bug with the generation of filenames for files with unsupported types caused the exporter and
     document saving to crash.
+  * Mail handling no longer exits entirely when encountering errors. It will skip the account/rule/message on which the error occured.
+  * Assigning correspondents from mail sender names failed for very long names. Paperless no longer assigns correspondents in these cases.
 
 paperless-ng 0.9.4
 ##################
@@ -777,6 +1244,11 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _slorenz: https://github.com/sisao
+.. _Jo Vandeginste: https://github.com/jovandeginste
+.. _zjean: https://github.com/zjean
+.. _rYR79435: https://github.com/rYR79435
+.. _Michael Shamoon: https://github.com/shamoon
 .. _jayme-github: http://github.com/jayme-github
 .. _Brian Conn: https://github.com/TheConnMan
 .. _Christopher Luu: https://github.com/nuudles

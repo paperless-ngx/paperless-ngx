@@ -1,9 +1,18 @@
 <app-page-header [(title)]="title">
-    <button type="button" class="btn btn-sm btn-outline-danger mr-2" (click)="delete()">
+    <div class="input-group input-group-sm mr-5 d-none d-md-flex" *ngIf="getContentType() == 'application/pdf' && !useNativePdfViewer">
+      <div class="input-group-prepend">
+        <div class="input-group-text" i18n>Page</div>
+      </div>
+      <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
+      <div class="input-group-append">
+        <div class="input-group-text" i18n>of {{previewNumPages}}</div>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-sm btn-outline-danger mr-2 ml-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
-        </svg>
-        <span class="d-none d-lg-inline"> Delete</span>
+        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Delete</span>
     </button>
 
     <div class="btn-group mr-2">
@@ -11,65 +20,131 @@
         <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#download" />
-            </svg>
-            <span class="d-none d-lg-inline"> Download</span>
+            </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Download</span>
         </a>
-    
-        <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.paperless__has_archive_version">
-          <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
-          <div class="dropdown-menu" ngbDropdownMenu>
-            <a ngbDropdownItem [href]="downloadOriginalUrl">Download original</a>
-          </div>
-        </div>
-    
-      </div>
 
+        <div class="btn-group" ngbDropdown role="group" *ngIf="metadata?.has_archive_version">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle-split" ngbDropdownToggle></button>
+            <div class="dropdown-menu shadow" ngbDropdownMenu>
+                <a ngbDropdownItem [href]="downloadOriginalUrl" i18n>Download original</a>
+            </div>
+        </div>
+
+    </div>
+
+    <button type="button" class="btn btn-sm btn-outline-primary mr-2" (click)="moreLike()">
+        <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
+        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>More like this</span>
+    </button>
 
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#x" />
-        </svg>
-        <span class="d-none d-lg-inline"> Close</span>
+        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Close</span>
     </button>
 </app-page-header>
 
 
 <div class="row">
-    <div class="col-xl">
+    <div class="col mb-4">
+
         <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-            <app-input-text title="Title" formControlName="title"></app-input-text>
+            <ul ngbNav #nav="ngbNav" class="nav-tabs">
+                <li [ngbNavItem]="1">
+                    <a ngbNavLink i18n>Details</a>
+                    <ng-template ngbNavContent>
 
-            <div class="form-group">
-                <label for="archive_serial_number">Archive Serial Number</label>
-                <input type="number" class="form-control" id="archive_serial_number"
-                    formControlName='archive_serial_number'>
-            </div>
+                        <app-input-text #inputTitle i18n-title title="Title" formControlName="title" [error]="error?.title"></app-input-text>
+                        <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
+                        <app-input-date i18n-title title="Date created" formControlName="created" [error]="error?.created"></app-input-date>
+                        <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
+                            (createNew)="createCorrespondent()" [suggestions]="suggestions?.correspondents"></app-input-select>
+                        <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
+                            (createNew)="createDocumentType()" [suggestions]="suggestions?.document_types"></app-input-select>
+                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags"></app-input-tags>
 
-            <app-input-date-time title="Date created" titleTime="Time created" formControlName="created"></app-input-date-time>
+                    </ng-template>
+                </li>
 
-            <div class="form-group">
-                <label for="content">Content</label>
-                <textarea class="form-control" id="content" rows="5" formControlName='content'></textarea>
-            </div>
+                <li [ngbNavItem]="2">
+                    <a ngbNavLink i18n>Content</a>
+                    <ng-template ngbNavContent>
+                        <div class="form-group">
+                            <textarea class="form-control" id="content" rows="20" formControlName='content'></textarea>
+                        </div>
+                    </ng-template>
+                </li>
 
-            <app-input-select [items]="correspondents" title="Correspondent" formControlName="correspondent_id" allowNull="true" (createNew)="createCorrespondent()"></app-input-select>
+                <li [ngbNavItem]="3">
+                    <a ngbNavLink i18n>Metadata</a>
+                    <ng-template ngbNavContent>
 
-            <app-input-select [items]="documentTypes" title="Document type" formControlName="document_type_id" allowNull="true" (createNew)="createDocumentType()"></app-input-select>
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td i18n>Date modified</td>
+                                    <td>{{document.modified | customDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td i18n>Date added</td>
+                                    <td>{{document.added | customDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td i18n>Media filename</td>
+                                    <td>{{metadata?.media_filename}}</td>
+                                </tr>
+                                <tr>
+                                    <td i18n>Original MD5 checksum</td>
+                                    <td>{{metadata?.original_checksum}}</td>
+                                </tr>
+                                <tr>
+                                    <td i18n>Original file size</td>
+                                    <td>{{metadata?.original_size | fileSize}}</td>
+                                </tr>
+                                <tr>
+                                    <td i18n>Original mime type</td>
+                                    <td>{{metadata?.original_mime_type}}</td>
+                                </tr>
+                                <tr *ngIf="metadata?.has_archive_version">
+                                    <td i18n>Archive MD5 checksum</td>
+                                    <td>{{metadata?.archive_checksum}}</td>
+                                </tr>
+                                <tr *ngIf="metadata?.has_archive_version">
+                                    <td i18n>Archive file size</td>
+                                    <td>{{metadata?.archive_size | fileSize}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-            <app-input-tags formControlName="tags_id" title="Tags"></app-input-tags>
+                        <app-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata.original_metadata" *ngIf="metadata?.original_metadata?.length > 0"></app-metadata-collapse>
+                        <app-metadata-collapse i18n-title title="Archived document metadata" [metadata]="metadata.archive_metadata" *ngIf="metadata?.archive_metadata?.length > 0"></app-metadata-collapse>
 
-            <button type="button" class="btn btn-outline-secondary" (click)="discard()">Discard</button>&nbsp;
-            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()">Save & edit next</button>&nbsp;
-            <button type="submit" class="btn btn-primary">Save</button>&nbsp;
+                    </ng-template>
+                </li>
+            </ul>
+
+            <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+            <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive">Discard</button>&nbsp;
+            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive">Save & next</button>&nbsp;
+            <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>&nbsp;
         </form>
     </div>
 
-    <div class="col-xl">
-        <object [data]="previewUrl | safe" type="application/pdf" width="100%" height="100%">
-            <p>Your browser does not support PDFs.
-                <a href="previewUrl">Download the PDF</a>.</p>
-        </object>
+    <div class="col-md-6 col-xl-8 mb-3">
+        <ng-container *ngIf="getContentType() == 'application/pdf'">
+            <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
+                <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
+            </div>
+            <ng-template #nativePdfViewer>
+                <object [data]="previewUrl | safe" type="application/pdf" class="preview-sticky" width="100%"></object>
+            </ng-template>
+        </ng-container>
+        <ng-container *ngIf="getContentType() == 'text/plain'">
+            <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky" width="100%"></object>
+        </ng-container>
 
     </div>
 </div>

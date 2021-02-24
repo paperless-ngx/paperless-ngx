@@ -1,15 +1,16 @@
 import json
 import os
 import re
-import subprocess
 
-import ocrmypdf
-import pdftotext
 from PIL import Image
 from django.conf import settings
-from ocrmypdf import InputFileError, EncryptedPdfError
 
-from documents.parsers import DocumentParser, ParseError, run_convert
+from documents.parsers import DocumentParser, ParseError, \
+    make_thumbnail_from_pdf
+
+
+class NoTextFoundException(Exception):
+    pass
 
 
 class RasterisedDocumentParser(DocumentParser):
@@ -18,49 +19,43 @@ class RasterisedDocumentParser(DocumentParser):
     image, whether it's a PDF, or other graphical format (JPEG, TIFF, etc.)
     """
 
-    def get_thumbnail(self, document_path, mime_type):
-        """
-        The thumbnail of a PDF is just a 500px wide image of the first page.
-        """
+    logging_name = "paperless.parsing.tesseract"
 
-        out_path = os.path.join(self.tempdir, "convert.png")
+    def extract_metadata(self, document_path, mime_type):
 
-        # Run convert to get a decent thumbnail
-        try:
-            run_convert(density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=True,
-                        input_file="{}[0]".format(document_path),
-                        output_file=out_path,
-                        logging_group=self.logging_group)
-        except ParseError:
-            # if convert fails, fall back to extracting
-            # the first PDF page as a PNG using Ghostscript
-            self.log(
-                'warning',
-                "Thumbnail generation with ImageMagick failed, falling back "
-                "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!")
-            gs_out_path = os.path.join(self.tempdir, "gs_out.png")
-            cmd = [settings.GS_BINARY,
-                   "-q",
-                   "-sDEVICE=pngalpha",
-                   "-o", gs_out_path,
-                   document_path]
-            if not subprocess.Popen(cmd).wait() == 0:
-                raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
-            # then run convert on the output from gs
-            run_convert(density=300,
-                        scale="500x5000>",
-                        alpha="remove",
-                        strip=True,
-                        trim=True,
-                        input_file=gs_out_path,
-                        output_file=out_path,
-                        logging_group=self.logging_group)
+        result = []
+        if mime_type == 'application/pdf':
+            import pikepdf
 
-        return out_path
+            namespace_pattern = re.compile(r"\{(.*)\}(.*)")
+
+            pdf = pikepdf.open(document_path)
+            meta = pdf.open_metadata()
+            for key, value in meta.items():
+                if isinstance(value, list):
+                    value = " ".join([str(e) for e in value])
+                value = str(value)
+                try:
+                    m = namespace_pattern.match(key)
+                    result.append({
+                        "namespace": m.group(1),
+                        "prefix": meta.REVERSE_NS[m.group(1)],
+                        "key": m.group(2),
+                        "value": value
+                    })
+                except Exception as e:
+                    self.log(
+                        "warning",
+                        f"Error while reading metadata {key}: {value}. Error: "
+                        f"{e}"
+                    )
+        return result
+
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
+        return make_thumbnail_from_pdf(
+            self.archive_path or document_path,
+            self.tempdir,
+            self.logging_group)
 
     def is_image(self, mime_type):
         return mime_type in [
@@ -82,98 +77,220 @@ class RasterisedDocumentParser(DocumentParser):
                 f"Error while getting DPI from image {image}: {e}")
             return None
 
-    def parse(self, document_path, mime_type):
-        text_original = get_text_from_pdf(document_path)
-        has_text = text_original and len(text_original) > 50
+    def calculate_a4_dpi(self, image):
+        try:
+            with Image.open(image) as im:
+                width, height = im.size
+                # divide image width by A4 width (210mm) in inches.
+                dpi = int(width / (21 / 2.54))
+                self.log(
+                    'debug',
+                    f"Estimated DPI {dpi} based on image width {width}"
+                )
+                return dpi
 
-        if settings.OCR_MODE == "skip_noarchive" and has_text:
-            self.text = text_original
-            return
+        except Exception as e:
+            self.log(
+                'warning',
+                f"Error while calculating DPI for image {image}: {e}")
+            return None
 
-        archive_path = os.path.join(self.tempdir, "archive.pdf")
+    def extract_text(self, sidecar_file, pdf_file):
+        if sidecar_file and os.path.isfile(sidecar_file):
+            with open(sidecar_file, "r") as f:
+                text = f.read()
 
-        ocr_args = {
-            'input_file': document_path,
-            'output_file': archive_path,
+            if "[OCR skipped on page" not in text:
+                # This happens when there's already text in the input file.
+                # The sidecar file will only contain text for OCR'ed pages.
+                self.log("debug", "Using text from sidecar file")
+                return text
+            else:
+                self.log("debug", "Incomplete sidecar file: discarding.")
+
+        # no success with the sidecar file, try PDF
+
+        if not os.path.isfile(pdf_file):
+            return None
+
+        from pdfminer.high_level import extract_text
+        from pdfminer.pdftypes import PDFException
+
+        try:
+            text = extract_text(pdf_file)
+            stripped = strip_excess_whitespace(text)
+            self.log("debug", f"Extracted text from PDF file {pdf_file}")
+            return stripped
+        except PDFException:
+            # probably not a PDF file.
+            return None
+
+    def construct_ocrmypdf_parameters(self,
+                                      input_file,
+                                      mime_type,
+                                      output_file,
+                                      sidecar_file,
+                                      safe_fallback=False):
+        ocrmypdf_args = {
+            'input_file': input_file,
+            'output_file': output_file,
+            # need to use threads, since this will be run in daemonized
+            # processes by django-q.
             'use_threads': True,
             'jobs': settings.THREADS_PER_WORKER,
             'language': settings.OCR_LANGUAGE,
             'output_type': settings.OCR_OUTPUT_TYPE,
-            'progress_bar': False,
-            'clean': True
+            'progress_bar': False
         }
 
-        if settings.OCR_PAGES > 0:
-            ocr_args['pages'] = f"1-{settings.OCR_PAGES}"
-
-        # Mode selection.
-
-        if settings.OCR_MODE in ['skip', 'skip_noarchive']:
-            ocr_args['skip_text'] = True
+        if settings.OCR_MODE == 'force' or safe_fallback:
+            ocrmypdf_args['force_ocr'] = True
+        elif settings.OCR_MODE in ['skip', 'skip_noarchive']:
+            ocrmypdf_args['skip_text'] = True
         elif settings.OCR_MODE == 'redo':
-            ocr_args['redo_ocr'] = True
-        elif settings.OCR_MODE == 'force':
-            ocr_args['force_ocr'] = True
+            ocrmypdf_args['redo_ocr'] = True
+        else:
+            raise ParseError(
+                f"Invalid ocr mode: {settings.OCR_MODE}")
+
+        if settings.OCR_CLEAN == 'clean':
+            ocrmypdf_args['clean'] = True
+        elif settings.OCR_CLEAN == 'clean-final':
+            if settings.OCR_MODE == 'redo':
+                ocrmypdf_args['clean'] = True
+            else:
+                ocrmypdf_args['clean_final'] = True
+
+        if settings.OCR_DESKEW and not settings.OCR_MODE == 'redo':
+            ocrmypdf_args['deskew'] = True
+
+        if settings.OCR_ROTATE_PAGES:
+            ocrmypdf_args['rotate_pages'] = True
+            ocrmypdf_args['rotate_pages_threshold'] = settings.OCR_ROTATE_PAGES_THRESHOLD  # NOQA: E501
+
+        if settings.OCR_PAGES > 0:
+            ocrmypdf_args['pages'] = f"1-{settings.OCR_PAGES}"
+        else:
+            # sidecar is incompatible with pages
+            ocrmypdf_args['sidecar'] = sidecar_file
 
         if self.is_image(mime_type):
-            dpi = self.get_dpi(document_path)
+            dpi = self.get_dpi(input_file)
+            a4_dpi = self.calculate_a4_dpi(input_file)
             if dpi:
                 self.log(
                     "debug",
-                    f"Detected DPI for image {document_path}: {dpi}"
+                    f"Detected DPI for image {input_file}: {dpi}"
                 )
-                ocr_args['image_dpi'] = dpi
+                ocrmypdf_args['image_dpi'] = dpi
             elif settings.OCR_IMAGE_DPI:
-                ocr_args['image_dpi'] = settings.OCR_IMAGE_DPI
+                ocrmypdf_args['image_dpi'] = settings.OCR_IMAGE_DPI
+            elif a4_dpi:
+                ocrmypdf_args['image_dpi'] = a4_dpi
             else:
                 raise ParseError(
-                    f"Cannot produce archive PDF for image {document_path}, "
+                    f"Cannot produce archive PDF for image {input_file}, "
                     f"no DPI information is present in this image and "
                     f"OCR_IMAGE_DPI is not set.")
 
-        if settings.OCR_USER_ARGS:
+        if settings.OCR_USER_ARGS and not safe_fallback:
             try:
                 user_args = json.loads(settings.OCR_USER_ARGS)
-                ocr_args = {**ocr_args, **user_args}
+                ocrmypdf_args = {**ocrmypdf_args, **user_args}
             except Exception as e:
                 self.log(
                     "warning",
                     f"There is an issue with PAPERLESS_OCR_USER_ARGS, so "
-                    f"they will not be used: {e}")
+                    f"they will not be used. Error: {e}")
 
+        return ocrmypdf_args
+
+    def parse(self, document_path, mime_type, file_name=None):
         # This forces tesseract to use one core per page.
         os.environ['OMP_THREAD_LIMIT'] = "1"
 
-        try:
-            self.log("debug",
-                     f"Calling OCRmyPDF with {str(ocr_args)}")
-            ocrmypdf.ocr(**ocr_args)
-            # success! announce results
-            self.archive_path = archive_path
-            self.text = get_text_from_pdf(archive_path)
+        text_original = self.extract_text(None, document_path)
+        original_has_text = text_original and len(text_original) > 50
 
-        except (InputFileError, EncryptedPdfError) as e:
-            # This happens with some PDFs when used with the redo_ocr option.
-            # This is not the end of the world, we'll just use what we already
-            # have in the document.
+        if settings.OCR_MODE == "skip_noarchive" and original_has_text:
+            self.log("debug",
+                     "Document has text, skipping OCRmyPDF entirely.")
             self.text = text_original
-            # Also, no archived file.
+            return
+
+        import ocrmypdf
+        from ocrmypdf import InputFileError, EncryptedPdfError
+
+        archive_path = os.path.join(self.tempdir, "archive.pdf")
+        sidecar_file = os.path.join(self.tempdir, "sidecar.txt")
+
+        args = self.construct_ocrmypdf_parameters(
+            document_path, mime_type, archive_path, sidecar_file)
+
+        try:
+            self.log("debug", f"Calling OCRmyPDF with args: {args}")
+            ocrmypdf.ocr(**args)
+
+            self.archive_path = archive_path
+            self.text = self.extract_text(sidecar_file, archive_path)
+
             if not self.text:
-                # However, if we don't have anything, fail:
-                raise ParseError(e)
+                raise NoTextFoundException(
+                    "No text was found in the original document")
+        except EncryptedPdfError:
+            self.log("warning",
+                     "This file is encrypted, OCR is impossible. Using "
+                     "any text present in the original file.")
+            if original_has_text:
+                self.text = text_original
+        except (NoTextFoundException, InputFileError) as e:
+            self.log("exception",
+                     f"Encountered the following error while running OCR, "
+                     f"attempting force OCR to get the text.")
+
+            archive_path_fallback = os.path.join(
+                self.tempdir, "archive-fallback.pdf")
+            sidecar_file_fallback = os.path.join(
+                self.tempdir, "sidecar-fallback.txt")
+
+            # Attempt to run OCR with safe settings.
+
+            args = self.construct_ocrmypdf_parameters(
+                document_path, mime_type,
+                archive_path_fallback, sidecar_file_fallback,
+                safe_fallback=True
+            )
+
+            try:
+                self.log("debug",
+                         f"Fallback: Calling OCRmyPDF with args: {args}")
+                ocrmypdf.ocr(**args)
+
+                # Don't return the archived file here, since this file
+                # is bigger and blurry due to --force-ocr.
+
+                self.text = self.extract_text(
+                    sidecar_file_fallback, archive_path_fallback)
+
+            except Exception as e:
+                # If this fails, we have a serious issue at hand.
+                raise ParseError(f"{e.__class__.__name__}: {str(e)}")
 
         except Exception as e:
             # Anything else is probably serious.
-            raise ParseError(e)
+            raise ParseError(f"{e.__class__.__name__}: {str(e)}")
 
+        # As a last resort, if we still don't have any text for any reason,
+        # try to extract the text from the original document.
         if not self.text:
-            # This may happen for files that don't have any text.
-            self.log(
-                'warning',
-                f"Document {document_path} does not have any text."
-                f"This is probably an error or you tried to add an image "
-                f"without text, or something is wrong with this document.")
-            self.text = ""
+            if original_has_text:
+                self.text = text_original
+            else:
+                self.log(
+                    "warning",
+                    f"No text was found in {document_path}, the content will "
+                    f"be empty."
+                )
 
 
 def strip_excess_whitespace(text):
@@ -188,17 +305,3 @@ def strip_excess_whitespace(text):
 
     # TODO: this needs a rework
     return no_trailing_whitespace.strip()
-
-
-def get_text_from_pdf(pdf_file):
-
-    with open(pdf_file, "rb") as f:
-        try:
-            pdf = pdftotext.PDF(f)
-        except pdftotext.Error:
-            # might not be a PDF file
-            return None
-
-    text = "\n".join(pdf)
-
-    return strip_excess_whitespace(text)

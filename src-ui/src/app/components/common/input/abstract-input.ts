@@ -1,9 +1,12 @@
-import { Component, Directive, forwardRef, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Directive, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { ControlValueAccessor } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 
 @Directive()
 export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
+
+  @ViewChild("inputField")
+  inputField: ElementRef
 
   constructor() { }
 
@@ -24,11 +27,20 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
+  focus() {
+    if (this.inputField && this.inputField.nativeElement) {
+      this.inputField.nativeElement.focus()
+    }
+  }
+
   @Input()
   title: string
 
   @Input()
   disabled = false;
+
+  @Input()
+  error: string
 
   value: T
 

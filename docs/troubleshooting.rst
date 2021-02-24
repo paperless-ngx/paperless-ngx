@@ -29,75 +29,182 @@ Check for the following issues:
 Consumer fails to pickup any new files
 ######################################
 
-If you notice, that the consumer will only pickup files in the consumption
-directory at startup, but won't find any other files added later, check out
-the configuration file and enable filesystem polling with the setting
-``PAPERLESS_CONSUMER_POLLING``.
+If you notice that the consumer will only pickup files in the consumption
+directory at startup, but won't find any other files added later, you will need to
+enable filesystem polling with the configuration option
+``PAPERLESS_CONSUMER_POLLING``, see :ref:`here <configuration-polling>`.
+
+This will disable listening to filesystem changes with inotify and paperless will
+manually check the consumption directory for changes instead.
 
 
-Consumer warns ``OCR for XX failed``
+Paperless always redirects to /admin
 ####################################
 
-If you find the OCR accuracy to be too low, and/or the document consumer warns
-that ``OCR for XX failed, but we're going to stick with what we've got since
-FORGIVING_OCR is enabled``, then you might need to install the
-`Tesseract language files <http://packages.ubuntu.com/search?keywords=tesseract-ocr>`_
-marching your document's languages.
-
-As an example, if you are running Paperless from any Ubuntu or Debian
-box, and your documents are written in Spanish you may need to run::
-
-    apt-get install -y tesseract-ocr-spa
+You probably had the old paperless installed at some point. Paperless installed
+a permanent redirect to /admin in your browser, and you need to clear your
+browsing data / cache to fix that.
 
 
+Operation not permitted
+#######################
 
-Consumer dies with ``convert: unable to extent pixel cache``
-############################################################
+You might see errors such as:
 
-During the consumption process, Paperless invokes ImageMagick's ``convert``
-program to translate the source document into something that the OCR engine can
-understand and this can burn a Very Large amount of memory if the original
-document is rather long.  Similarly, if your system doesn't have a lot of
-memory to begin with (ie. a Raspberry Pi), then this can happen for even
-medium-sized documents.
+.. code:: shell-session
 
-The solution is to tell ImageMagick *not* to Use All The RAM, as is its
-default, and instead tell it to used a fixed amount.  ``convert`` will then
-break up the job into hundreds of individual files and use them to slowly
-compile the finished image.  Simply set ``PAPERLESS_CONVERT_MEMORY_LIMIT`` in
-``/etc/paperless.conf`` to something like ``32000000`` and you'll limit
-``convert`` to 32MB.  Fiddle with this value as you like.
+    chown: changing ownership of '../export': Operation not permitted
 
-**HOWEVER**: Simply setting this value may not be enough on system where
-``/tmp`` is mounted as tmpfs, as this is where ``convert`` will write its
-temporary files.  In these cases (most Systemd machines), you need to tell
-ImageMagick to use a different space for its scratch work.  You do this by
-setting ``PAPERLESS_CONVERT_TMPDIR`` in ``/etc/paperless.conf`` to somewhere
-that's actually on a physical disk (and writable by the user running
-Paperless), like ``/var/tmp/paperless`` or ``/home/my_user/tmp`` in a pinch.
+The container tries to set file ownership on the listed directories. This is
+required so that the user running paperless inside docker has write permissions
+to these folders. This happens when pointing these directories to NFS shares,
+for example.
+
+Ensure that ``chown`` is possible on these directories.
 
 
-DecompressionBombWarning and/or no text in the OCR output
-#########################################################
+Classifier error: No training data available
+############################################
 
-Some users have had issues using Paperless to consume PDFs that were created
-by merging Very Large Scanned Images into one PDF.  If this happens to you,
-it's likely because the PDF you've created contains some very large pages
-(millions of pixels) and the process of converting the PDF to a OCR-friendly
-image is exploding.
+This indicates that the Auto matching algorithm found no documents to learn from.
+This may have two reasons:
 
-Typically, this happens because the scanned images are created with a high
-DPI and then rolled into the PDF with an assumed DPI of 72 (the default).
-The best solution then is to specify the DPI used in the scan in the
-conversion-to-PDF step.  So for example, if you scanned the original image
-with a DPI of 300, then merging the images into the single PDF with
-``convert`` should look like this:
+*   You don't use the Auto matching algorithm: The error can be safely ignored in this case.
+*   You are using the Auto matching algorithm: The classifier explicitly excludes documents
+    with Inbox tags. Verify that there are documents in your archive without inbox tags.
+    The algorithm will only learn from documents not in your inbox.
 
-.. code:: bash
 
-    $ convert -density 300 *.jpg finished.pdf
+UserWarning in sklearn on every single document
+###############################################
 
-For more information on this and situations like it, you should take a look
-at `Issue #118`_ as that's where this tip originated.
+You may encounter warnings like this:
 
-.. _Issue #118: https://github.com/the-paperless-project/paperless/issues/118
+.. code::
+    
+    /usr/local/lib/python3.7/site-packages/sklearn/base.py:315:
+    UserWarning: Trying to unpickle estimator CountVectorizer from version 0.23.2 when using version 0.24.0.
+    This might lead to breaking code or invalid results. Use at your own risk.
+
+This happens when certain dependencies of paperless that are responsible for the auto matching algorithm are
+updated. After updating these, your current training data *might* not be compatible anymore. This can be ignored
+in most cases. This warning will disappear automatically when paperless updates the training data.
+
+If you want to get rid of the warning or actually experience issues with automatic matching, delete
+the file ``classification_model.pickle`` in the data directory and let paperless recreate it.
+
+
+504 Server Error: Gateway Timeout when adding Office documents
+##############################################################
+
+You may experience these errors when using the optional TIKA integration:
+
+.. code::
+
+    requests.exceptions.HTTPError: 504 Server Error: Gateway Timeout for url: http://gotenberg:3000/convert/office
+
+Gotenberg is a server that converts Office documents into PDF documents and has a default timeout of 10 seconds.
+When conversion takes longer, Gotenberg raises this error.
+
+You can increase the timeout by configuring an environment variable for gotenberg (see also `here <https://thecodingmachine.github.io/gotenberg/#environment_variables.default_wait_timeout>`__).
+If using docker-compose, this is achieved by the following configuration change in the ``docker-compose.yml`` file:
+
+.. code:: yaml
+
+    gotenberg:
+        image: thecodingmachine/gotenberg
+        restart: unless-stopped
+        environment:
+            DISABLE_GOOGLE_CHROME: 1
+            DEFAULT_WAIT_TIMEOUT: 30
+
+Permission denied errors in the consumption directory
+#####################################################
+
+You might encounter errors such as:
+
+.. code:: shell-session
+
+    The following error occured while consuming document.pdf: [Errno 13] Permission denied: '/usr/src/paperless/src/../consume/document.pdf'
+
+This happens when paperless does not have permission to delete files inside the consumption directory.
+Ensure that ``USERMAP_UID`` and ``USERMAP_GID`` are set to the user id and group id you use on the host operating system, if these are
+different from ``1000``. See :ref:`setup-docker_hub`.
+
+Also ensure that you are able to read and write to the consumption directory on the host.
+
+
+OSError: [Errno 19] No such device when consuming files
+#######################################################
+
+If you experience errors such as:
+
+.. code:: shell-session
+
+    File "/usr/local/lib/python3.7/site-packages/whoosh/codec/base.py", line 570, in open_compound_file
+    return CompoundStorage(dbfile, use_mmap=storage.supports_mmap)
+    File "/usr/local/lib/python3.7/site-packages/whoosh/filedb/compound.py", line 75, in __init__
+    self._source = mmap.mmap(fileno, 0, access=mmap.ACCESS_READ)
+    OSError: [Errno 19] No such device
+
+    During handling of the above exception, another exception occurred:
+
+    Traceback (most recent call last):
+    File "/usr/local/lib/python3.7/site-packages/django_q/cluster.py", line 436, in worker
+    res = f(*task["args"], **task["kwargs"])
+    File "/usr/src/paperless/src/documents/tasks.py", line 73, in consume_file
+    override_tag_ids=override_tag_ids)
+    File "/usr/src/paperless/src/documents/consumer.py", line 271, in try_consume_file
+    raise ConsumerError(e)
+
+Paperless uses a search index to provide better and faster full text searching. This search index is stored inside
+the ``data`` folder. The search index uses memory-mapped files (mmap). The above error indicates that paperless
+was unable to create and open these files.
+
+This happens when you're trying to store the data directory on certain file systems (mostly network shares)
+that don't support memory-mapped files.
+
+
+Web-UI stuck at "Loading..."
+############################
+
+This might have multiple reasons.
+
+
+1.  If you built the docker image yourself or deployed using the bare metal route,
+    make sure that there are files in ``<paperless-root>/static/frontend/<lang-code>/``.
+    If there are no files, make sure that you executed ``collectstatic`` successfully, either
+    manually or as part of the docker image build.
+
+    If the front end is still missing, make sure that the front end is compiled (files present in
+    ``src/documents/static/frontend``). If it is not, you need to compile the front end yourself
+    or download the release archive instead of cloning the repository.
+
+2.  Check the output of the web server. You might see errors like this:
+
+
+    .. code::
+
+        [2021-01-25 10:08:04 +0000] [40] [ERROR] Socket error processing request.
+        Traceback (most recent call last):
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 134, in handle
+            self.handle_request(listener, req, client, addr)
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 190, in handle_request
+            util.reraise(*sys.exc_info())
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/util.py", line 625, in reraise
+            raise value
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 178, in handle_request
+            resp.write_file(respiter)
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/http/wsgi.py", line 396, in write_file
+            if not self.sendfile(respiter):
+        File "/usr/local/lib/python3.7/site-packages/gunicorn/http/wsgi.py", line 386, in sendfile
+            sent += os.sendfile(sockno, fileno, offset + sent, count)
+        OSError: [Errno 22] Invalid argument
+    
+    To fix this issue, add
+
+    .. code::
+
+        SENDFILE=0
+    
+    to your `docker-compose.env` file.

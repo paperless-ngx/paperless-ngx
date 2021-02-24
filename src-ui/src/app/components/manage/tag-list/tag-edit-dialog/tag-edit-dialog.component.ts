@@ -14,7 +14,15 @@ import { ToastService } from 'src/app/services/toast.service';
 export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
 
   constructor(service: TagService, activeModal: NgbActiveModal, toastService: ToastService) {
-    super(service, activeModal, toastService, 'tag')
+    super(service, activeModal, toastService)
+  }
+
+  getCreateTitle() {
+    return $localize`Create new tag`
+  }
+
+  getEditTitle() {
+    return $localize`Edit tag`
   }
 
   getForm(): FormGroup {

@@ -2,14 +2,15 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from documents.classifier import DocumentClassifier, \
-    IncompatibleClassifierVersionError
+from documents.classifier import load_classifier
 from documents.models import Document
-from ...mixins import Renderable
 from ...signals.handlers import set_correspondent, set_document_type, set_tags
 
 
-class Command(Renderable, BaseCommand):
+logger = logging.getLogger("paperless.management.retagger")
+
+
+class Command(BaseCommand):
 
     help = """
         Using the current classification model, assigns correspondents, tags
@@ -17,10 +18,6 @@ class Command(Renderable, BaseCommand):
         back-tag all previously indexed documents with metadata created (or
         modified) after their initial import.
     """.replace("    ", "")
-
-    def __init__(self, *args, **kwargs):
-        self.verbosity = 0
-        BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -62,24 +59,16 @@ class Command(Renderable, BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.verbosity = options["verbosity"]
-
         if options["inbox_only"]:
             queryset = Document.objects.filter(tags__is_inbox_tag=True)
         else:
             queryset = Document.objects.all()
         documents = queryset.distinct()
 
-        classifier = DocumentClassifier()
-        try:
-            classifier.reload()
-        except (FileNotFoundError, IncompatibleClassifierVersionError) as e:
-            logging.getLogger(__name__).warning(
-                f"Cannot classify documents: {e}.")
-            classifier = None
+        classifier = load_classifier()
 
         for document in documents:
-            logging.getLogger(__name__).info(
+            logger.info(
                 f"Processing document {document.title}")
 
             if options['correspondent']:
