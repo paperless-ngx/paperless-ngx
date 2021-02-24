@@ -55,7 +55,6 @@ uvloop = "~=0.14.0"
 # TODO: keep an eye on piwheel builds and update this once available (https://www.piwheels.org/project/cryptography/)
 cryptography = "~=3.3.2"
 "pdfminer.six" = "*"
-colorhash = "*"
 
 [dev-packages]
 coveralls = "*"
