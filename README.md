@@ -51,7 +51,7 @@ Here's what you get:
 	* Searching for similar documents ("More like this")
 * Email processing: Paperless adds documents from your email accounts.
 	* Configure multiple accounts and filters for each account.
-	* When adding documents from mails, paperless can move these mails to a new folder, mark them as read, flag them as important or delete them.
+	* When adding documents from mail, paperless can move these mail to a new folder, mark them as read, flag them as important or delete them.
 * Machine learning powered document matching.
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 * Optimized for multi core systems: Paperless-ng consumes multiple documents in parallel.
