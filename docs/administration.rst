@@ -23,6 +23,12 @@ Options available to any installation of paperless:
 *   The document exporter is also able to update an already existing export.
     Therefore, incremental backups with ``rsync`` are entirely possible.
 
+.. caution::
+
+    You cannot import the export generated with one version of paperless in a
+    different version of paperless. The export contains an exact image of the
+    database, and migrations may change the database layout.
+
 Options available to docker installations:
 
 *   Backup the docker volumes. These usually reside within
@@ -101,17 +107,17 @@ Then you can start paperless-ng with ``-d`` to have it run in the background.
         update to newer versions. In order to enable updates as described above, either
         get the new ``docker-compose.yml`` file from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
         or edit the ``docker-compose.yml`` file, find the line that says
-        
+
             .. code::
 
                 image: jonaswinkler/paperless-ng:0.9.x
-        
+
         and replace the version with ``latest``:
 
             .. code::
 
                 image: jonaswinkler/paperless-ng:latest
-        
+
 Bare Metal Route
 ================
 
@@ -171,25 +177,62 @@ Most of the update process is automated when using the ansible role.
         $ ansible-playbook playbook.yml
 
 
+Downgrading Paperless
+#####################
+
+Downgrades are possible. However, some updates also contain database migrations (these change the layout of the database and may move data).
+In order to move back from a version that applied database migrations, you'll have to revert the database migration *before* downgrading,
+and then downgrade paperless.
+
+This table lists the most recent database migrations for each versions:
+
++---------+-------------------------+
+| Version | Latest migration number |
++---------+-------------------------+
+| 1.0.0   | 1011                    |
++---------+-------------------------+
+| 1.1.0   | 1011                    |
++---------+-------------------------+
+| 1.1.1   | 1012                    |
++---------+-------------------------+
+
+Execute the following management command to migrate your database:
+
+.. code:: shell-session
+
+    $ python3 manage.py migrate documents <migration number>
+
+.. note::
+
+    Some migrations cannot be undone. The command will issue errors if that happens.
+
+.. _utilities-management-commands:
+
 Management utilities
 ####################
 
 Paperless comes with some management commands that perform various maintenance
-tasks on your paperless instance. You can invoke these commands either by
+tasks on your paperless instance. You can invoke these commands in the following way:
+
+With docker-compose, while paperless is running:
 
 .. code:: shell-session
 
     $ cd /path/to/paperless
-    $ docker-compose run --rm webserver <command> <arguments>
+    $ docker-compose exec webserver <command> <arguments>
 
-or
+With docker, while paperless is running:
+
+.. code:: shell-session
+
+    $ docker exec -it <container-name> <command> <arguments>
+
+Bare metal:
 
 .. code:: shell-session
 
     $ cd /path/to/paperless/src
     $ python3 manage.py <command> <arguments>
-
-depending on whether you use docker or not.
 
 All commands have built-in help, which can be accessed by executing them with
 the argument ``--help``.
@@ -210,7 +253,7 @@ backup or migration to another DMS.
     -c, --compare-checksums
     -f, --use-filename-format
     -d, --delete
-    
+
 ``target`` is a folder to which the data gets written. This includes documents,
 thumbnails and a ``manifest.json`` file. The manifest contains all metadata from
 the database (correspondents, tags, etc).
@@ -365,6 +408,34 @@ the naming scheme.
     document_renamer
 
 The command takes no arguments and processes all your documents at once.
+
+
+.. _utilities-sanity-checker:
+
+Sanity checker
+==============
+
+Paperless has a built-in sanity checker that inspects your document collection for issues.
+
+The issues detected by the sanity checker are as follows:
+
+* Missing original files.
+* Missing archive files.
+* Inaccessible original files due to improper permissions.
+* Inaccessible archive files due to improper permissions.
+* Corrupted original documents by comparing their checksum against what is stored in the database.
+* Corrupted archive documents by comparing their checksum against what is stored in the database.
+* Missing thumbnails.
+* Inaccessible thumbnails due to improper permissions.
+* Documents without any content (warning).
+* Orphaned files in the media directory (warning). These are files that are not referenced by any document im paperless.
+
+
+.. code::
+
+    document_sanity_checker
+
+The command takes no arguments. Depending on the size of your document archive, this may take some time.
 
 
 Fetching e-mail

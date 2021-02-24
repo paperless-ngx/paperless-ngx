@@ -1,7 +1,6 @@
 import datetime
 import os
 import shutil
-from unittest import mock
 from uuid import uuid4
 
 from dateutil import tz
@@ -9,7 +8,6 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 
 from documents.parsers import parse_date
-from paperless_tesseract.parsers import RasterisedDocumentParser
 
 
 class TestDate(TestCase):

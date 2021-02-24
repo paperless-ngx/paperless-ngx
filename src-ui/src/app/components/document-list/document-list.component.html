@@ -63,12 +63,12 @@
   <div class="btn-group ml-2 flex-fill" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" ngbDropdownToggle i18n>Views</button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
-      <ng-container *ngIf="!list.savedViewId">
+      <ng-container *ngIf="!list.activeSavedViewId">
         <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
-      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId" i18n>Save "{{list.savedViewTitle}}"</button>
+      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" i18n>Save "{{list.activeSavedViewTitle}}"</button>
       <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
     </div>
   </div>
@@ -86,7 +86,7 @@
     <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
   </p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
-  [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
+  [rotate]="true" aria-label="Default pagination"></ngb-pagination>
 </div>
 
 <div *ngIf="displayMode == 'largeCards'">

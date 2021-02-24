@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateAdapter, NgbDateParserFormatter, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DocumentListComponent } from './components/document-list/document-list.component';
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component';
@@ -39,7 +39,6 @@ import { SelectComponent } from './components/common/input/select/select.compone
 import { CheckComponent } from './components/common/input/check/check.component';
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { DateTimeComponent } from './components/common/input/date-time/date-time.component';
 import { TagsComponent } from './components/common/input/tags/tags.component';
 import { SortableDirective } from './directives/sortable.directive';
 import { CookieService } from 'ngx-cookie-service';
@@ -59,14 +58,21 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { NumberComponent } from './components/common/input/number/number.component';
 import { SafePipe } from './pipes/safe.pipe';
 import { CustomDatePipe } from './pipes/custom-date.pipe';
+import { DateComponent } from './components/common/input/date/date.component';
+import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter';
+import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter';
 
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
 import localeDe from '@angular/common/locales/de';
+import localePt from '@angular/common/locales/pt-PT';
+import localeEnGb from '@angular/common/locales/en-GB';
 
 registerLocaleData(localeFr)
 registerLocaleData(localeNl)
 registerLocaleData(localeDe)
+registerLocaleData(localePt, "pt-BR")
+registerLocaleData(localeEnGb)
 
 @NgModule({
   declarations: [
@@ -101,7 +107,6 @@ registerLocaleData(localeDe)
     SelectComponent,
     CheckComponent,
     SaveViewConfigDialogComponent,
-    DateTimeComponent,
     TagsComponent,
     SortableDirective,
     SavedViewWidgetComponent,
@@ -117,7 +122,8 @@ registerLocaleData(localeDe)
     SelectDialogComponent,
     NumberComponent,
     SafePipe,
-    CustomDatePipe
+    CustomDatePipe,
+    DateComponent
   ],
   imports: [
     BrowserModule,
@@ -138,7 +144,9 @@ registerLocaleData(localeDe)
       multi: true
     },
     FilterPipe,
-    DocumentTitlePipe
+    DocumentTitlePipe,
+    {provide: NgbDateAdapter, useClass: ISODateTimeAdapter},
+    {provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter}
   ],
   bootstrap: [AppComponent]
 })

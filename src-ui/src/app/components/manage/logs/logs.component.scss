@@ -14,3 +14,11 @@
   color: lightcoral !important;
   font-weight: bold;
 }
+
+.log-container {
+
+  overflow: scroll;
+
+  height: calc(100vh - 190px);
+  top: 70px;
+}

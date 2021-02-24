@@ -107,9 +107,13 @@ export class DocumentDetailComponent implements OnInit {
     this.document = doc
     this.documentsService.getMetadata(doc.id).subscribe(result => {
       this.metadata = result
+    }, error => {
+      this.metadata = null
     })
     this.documentsService.getSuggestions(doc.id).subscribe(result => {
       this.suggestions = result
+    }, error => {
+      this.suggestions = null
     })
     this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)
@@ -179,8 +183,8 @@ export class DocumentDetailComponent implements OnInit {
 
   close() {
     this.openDocumentService.closeDocument(this.document)
-    if (this.documentListViewService.savedViewId) {
-      this.router.navigate(['view', this.documentListViewService.savedViewId])
+    if (this.documentListViewService.activeSavedViewId) {
+      this.router.navigate(['view', this.documentListViewService.activeSavedViewId])
     } else {
       this.router.navigate(['documents'])
     }

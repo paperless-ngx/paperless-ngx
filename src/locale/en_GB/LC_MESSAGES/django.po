@@ -1,0 +1,672 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Ali Bates, 2021
+# Jonas Winkler, 2021
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-24 16:49+0100\n"
+"PO-Revision-Date: 2021-02-16 18:37+0000\n"
+"Last-Translator: Jonas Winkler, 2021\n"
+"Language-Team: English (United Kingdom) (https://www.transifex.com/paperless/teams/115905/en_GB/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: documents/apps.py:10
+msgid "Documents"
+msgstr "Documents"
+
+#: documents/models.py:32
+msgid "Any word"
+msgstr "Any word"
+
+#: documents/models.py:33
+msgid "All words"
+msgstr "All words"
+
+#: documents/models.py:34
+msgid "Exact match"
+msgstr "Exact match"
+
+#: documents/models.py:35
+msgid "Regular expression"
+msgstr "Regular expression"
+
+#: documents/models.py:36
+msgid "Fuzzy word"
+msgstr "Fuzzy word"
+
+#: documents/models.py:37
+msgid "Automatic"
+msgstr "Automatic"
+
+#: documents/models.py:41 documents/models.py:364 paperless_mail/models.py:25
+#: paperless_mail/models.py:109
+msgid "name"
+msgstr "name"
+
+#: documents/models.py:45
+msgid "match"
+msgstr "match"
+
+#: documents/models.py:49
+msgid "matching algorithm"
+msgstr "matching algorithm"
+
+#: documents/models.py:55
+msgid "is insensitive"
+msgstr "is insensitive"
+
+#: documents/models.py:74 documents/models.py:134
+msgid "correspondent"
+msgstr "correspondent"
+
+#: documents/models.py:75
+msgid "correspondents"
+msgstr "correspondents"
+
+#: documents/models.py:97
+msgid "color"
+msgstr "colour"
+
+#: documents/models.py:101
+msgid "is inbox tag"
+msgstr "is inbox tag"
+
+#: documents/models.py:103
+msgid ""
+"Marks this tag as an inbox tag: All newly consumed documents will be tagged "
+"with inbox tags."
+msgstr ""
+"Marks this tag as an inbox tag: All newly consumed documents will be tagged "
+"with inbox tags."
+
+#: documents/models.py:108
+msgid "tag"
+msgstr "tag"
+
+#: documents/models.py:109 documents/models.py:165
+msgid "tags"
+msgstr "tags"
+
+#: documents/models.py:115 documents/models.py:147
+msgid "document type"
+msgstr "document type"
+
+#: documents/models.py:116
+msgid "document types"
+msgstr "document types"
+
+#: documents/models.py:124
+msgid "Unencrypted"
+msgstr "Unencrypted"
+
+#: documents/models.py:125
+msgid "Encrypted with GNU Privacy Guard"
+msgstr "Encrypted with GNU Privacy Guard"
+
+#: documents/models.py:138
+msgid "title"
+msgstr "title"
+
+#: documents/models.py:151
+msgid "content"
+msgstr "content"
+
+#: documents/models.py:153
+msgid ""
+"The raw, text-only data of the document. This field is primarily used for "
+"searching."
+msgstr ""
+"The raw, text-only data of the document. This field is primarily used for "
+"searching."
+
+#: documents/models.py:158
+msgid "mime type"
+msgstr "mime type"
+
+#: documents/models.py:169
+msgid "checksum"
+msgstr "checksum"
+
+#: documents/models.py:173
+msgid "The checksum of the original document."
+msgstr "The checksum of the original document."
+
+#: documents/models.py:177
+msgid "archive checksum"
+msgstr "archive checksum"
+
+#: documents/models.py:182
+msgid "The checksum of the archived document."
+msgstr "The checksum of the archived document."
+
+#: documents/models.py:186 documents/models.py:342
+msgid "created"
+msgstr "created"
+
+#: documents/models.py:190
+msgid "modified"
+msgstr "modified"
+
+#: documents/models.py:194
+msgid "storage type"
+msgstr "storage type"
+
+#: documents/models.py:202
+msgid "added"
+msgstr "added"
+
+#: documents/models.py:206
+msgid "filename"
+msgstr "filename"
+
+#: documents/models.py:212
+msgid "Current filename in storage"
+msgstr "Current filename in storage"
+
+#: documents/models.py:216
+msgid "archive filename"
+msgstr "archive filename"
+
+#: documents/models.py:222
+msgid "Current archive filename in storage"
+msgstr "Current archive filename in storage"
+
+#: documents/models.py:226
+msgid "archive serial number"
+msgstr "archive serial number"
+
+#: documents/models.py:231
+msgid "The position of this document in your physical document archive."
+msgstr "The position of this document in your physical document archive."
+
+#: documents/models.py:237
+msgid "document"
+msgstr "document"
+
+#: documents/models.py:238
+msgid "documents"
+msgstr "documents"
+
+#: documents/models.py:325
+msgid "debug"
+msgstr "debug"
+
+#: documents/models.py:326
+msgid "information"
+msgstr "information"
+
+#: documents/models.py:327
+msgid "warning"
+msgstr "warning"
+
+#: documents/models.py:328
+msgid "error"
+msgstr "error"
+
+#: documents/models.py:329
+msgid "critical"
+msgstr "critical"
+
+#: documents/models.py:333
+msgid "group"
+msgstr "group"
+
+#: documents/models.py:336
+msgid "message"
+msgstr "message"
+
+#: documents/models.py:339
+msgid "level"
+msgstr "level"
+
+#: documents/models.py:346
+msgid "log"
+msgstr "log"
+
+#: documents/models.py:347
+msgid "logs"
+msgstr "logs"
+
+#: documents/models.py:358 documents/models.py:408
+msgid "saved view"
+msgstr "saved view"
+
+#: documents/models.py:359
+msgid "saved views"
+msgstr "saved views"
+
+#: documents/models.py:362
+msgid "user"
+msgstr "user"
+
+#: documents/models.py:368
+msgid "show on dashboard"
+msgstr "show on dashboard"
+
+#: documents/models.py:371
+msgid "show in sidebar"
+msgstr "show in sidebar"
+
+#: documents/models.py:375
+msgid "sort field"
+msgstr "sort field"
+
+#: documents/models.py:378
+msgid "sort reverse"
+msgstr "sort reverse"
+
+#: documents/models.py:384
+msgid "title contains"
+msgstr "title contains"
+
+#: documents/models.py:385
+msgid "content contains"
+msgstr "content contains"
+
+#: documents/models.py:386
+msgid "ASN is"
+msgstr "ASN is"
+
+#: documents/models.py:387
+msgid "correspondent is"
+msgstr "correspondent is"
+
+#: documents/models.py:388
+msgid "document type is"
+msgstr "document type is"
+
+#: documents/models.py:389
+msgid "is in inbox"
+msgstr "is in inbox"
+
+#: documents/models.py:390
+msgid "has tag"
+msgstr "has tag"
+
+#: documents/models.py:391
+msgid "has any tag"
+msgstr "has any tag"
+
+#: documents/models.py:392
+msgid "created before"
+msgstr "created before"
+
+#: documents/models.py:393
+msgid "created after"
+msgstr "created after"
+
+#: documents/models.py:394
+msgid "created year is"
+msgstr "created year is"
+
+#: documents/models.py:395
+msgid "created month is"
+msgstr "created month is"
+
+#: documents/models.py:396
+msgid "created day is"
+msgstr "created day is"
+
+#: documents/models.py:397
+msgid "added before"
+msgstr "added before"
+
+#: documents/models.py:398
+msgid "added after"
+msgstr "added after"
+
+#: documents/models.py:399
+msgid "modified before"
+msgstr "modified before"
+
+#: documents/models.py:400
+msgid "modified after"
+msgstr "modified after"
+
+#: documents/models.py:401
+msgid "does not have tag"
+msgstr "does not have tag"
+
+#: documents/models.py:412
+msgid "rule type"
+msgstr "rule type"
+
+#: documents/models.py:416
+msgid "value"
+msgstr "value"
+
+#: documents/models.py:422
+msgid "filter rule"
+msgstr "filter rule"
+
+#: documents/models.py:423
+msgid "filter rules"
+msgstr "filter rules"
+
+#: documents/serialisers.py:52
+#, python-format
+msgid "Invalid regular expresssion: %(error)s"
+msgstr "Invalid regular expresssion: %(error)s"
+
+#: documents/serialisers.py:378
+#, python-format
+msgid "File type %(type)s not supported"
+msgstr "File type %(type)s not supported"
+
+#: documents/templates/index.html:20
+msgid "Paperless-ng is loading..."
+msgstr "Paperless-ng is loading..."
+
+#: documents/templates/registration/logged_out.html:13
+msgid "Paperless-ng signed out"
+msgstr "Paperless-ng signed out"
+
+#: documents/templates/registration/logged_out.html:41
+msgid "You have been successfully logged out. Bye!"
+msgstr "You have been successfully logged out. Bye!"
+
+#: documents/templates/registration/logged_out.html:42
+msgid "Sign in again"
+msgstr "Sign in again"
+
+#: documents/templates/registration/login.html:13
+msgid "Paperless-ng sign in"
+msgstr "Paperless-ng sign in"
+
+#: documents/templates/registration/login.html:42
+msgid "Please sign in."
+msgstr "Please sign in."
+
+#: documents/templates/registration/login.html:45
+msgid "Your username and password didn't match. Please try again."
+msgstr "Your username and password didn't match. Please try again."
+
+#: documents/templates/registration/login.html:48
+msgid "Username"
+msgstr "Username"
+
+#: documents/templates/registration/login.html:49
+msgid "Password"
+msgstr "Password"
+
+#: documents/templates/registration/login.html:54
+msgid "Sign in"
+msgstr "Sign in"
+
+#: paperless/settings.py:291
+msgid "English (US)"
+msgstr "English (US)"
+
+#: paperless/settings.py:292
+msgid "English (GB)"
+msgstr "English (GB)"
+
+#: paperless/settings.py:293
+msgid "German"
+msgstr "German"
+
+#: paperless/settings.py:294
+msgid "Dutch"
+msgstr "Dutch"
+
+#: paperless/settings.py:295
+msgid "French"
+msgstr "French"
+
+#: paperless/settings.py:296
+msgid "Portuguese (Brazil)"
+msgstr "Portuguese (Brazil)"
+
+#: paperless/urls.py:118
+msgid "Paperless-ng administration"
+msgstr "Paperless-ng administration"
+
+#: paperless_mail/admin.py:25
+msgid "Filter"
+msgstr "Filter"
+
+#: paperless_mail/admin.py:27
+msgid ""
+"Paperless will only process mails that match ALL of the filters given below."
+msgstr ""
+"Paperless will only process mails that match ALL of the filters given below."
+
+#: paperless_mail/admin.py:37
+msgid "Actions"
+msgstr "Actions"
+
+#: paperless_mail/admin.py:39
+msgid ""
+"The action applied to the mail. This action is only performed when documents"
+" were consumed from the mail. Mails without attachments will remain entirely"
+" untouched."
+msgstr ""
+"The action applied to the mail. This action is only performed when documents"
+" were consumed from the mail. Mails without attachments will remain entirely"
+" untouched."
+
+#: paperless_mail/admin.py:46
+msgid "Metadata"
+msgstr "Metadata"
+
+#: paperless_mail/admin.py:48
+msgid ""
+"Assign metadata to documents consumed from this rule automatically. If you "
+"do not assign tags, types or correspondents here, paperless will still "
+"process all matching rules that you have defined."
+msgstr ""
+"Assign metadata to documents consumed from this rule automatically. If you "
+"do not assign tags, types or correspondents here, paperless will still "
+"process all matching rules that you have defined."
+
+#: paperless_mail/apps.py:9
+msgid "Paperless mail"
+msgstr "Paperless mail"
+
+#: paperless_mail/models.py:11
+msgid "mail account"
+msgstr "mail account"
+
+#: paperless_mail/models.py:12
+msgid "mail accounts"
+msgstr "mail accounts"
+
+#: paperless_mail/models.py:19
+msgid "No encryption"
+msgstr "No encryption"
+
+#: paperless_mail/models.py:20
+msgid "Use SSL"
+msgstr "Use SSL"
+
+#: paperless_mail/models.py:21
+msgid "Use STARTTLS"
+msgstr "Use STARTTLS"
+
+#: paperless_mail/models.py:29
+msgid "IMAP server"
+msgstr "IMAP server"
+
+#: paperless_mail/models.py:33
+msgid "IMAP port"
+msgstr "IMAP port"
+
+#: paperless_mail/models.py:36
+msgid ""
+"This is usually 143 for unencrypted and STARTTLS connections, and 993 for "
+"SSL connections."
+msgstr ""
+"This is usually 143 for unencrypted and STARTTLS connections, and 993 for "
+"SSL connections."
+
+#: paperless_mail/models.py:40
+msgid "IMAP security"
+msgstr "IMAP security"
+
+#: paperless_mail/models.py:46
+msgid "username"
+msgstr "username"
+
+#: paperless_mail/models.py:50
+msgid "password"
+msgstr "password"
+
+#: paperless_mail/models.py:60
+msgid "mail rule"
+msgstr "mail rule"
+
+#: paperless_mail/models.py:61
+msgid "mail rules"
+msgstr "mail rules"
+
+#: paperless_mail/models.py:67
+msgid "Only process attachments."
+msgstr "Only process attachments."
+
+#: paperless_mail/models.py:68
+msgid "Process all files, including 'inline' attachments."
+msgstr "Process all files, including 'inline' attachments."
+
+#: paperless_mail/models.py:78
+msgid "Mark as read, don't process read mails"
+msgstr "Mark as read, don't process read mails"
+
+#: paperless_mail/models.py:79
+msgid "Flag the mail, don't process flagged mails"
+msgstr "Flag the mail, don't process flagged mails"
+
+#: paperless_mail/models.py:80
+msgid "Move to specified folder"
+msgstr "Move to specified folder"
+
+#: paperless_mail/models.py:81
+msgid "Delete"
+msgstr "Delete"
+
+#: paperless_mail/models.py:88
+msgid "Use subject as title"
+msgstr "Use subject as title"
+
+#: paperless_mail/models.py:89
+msgid "Use attachment filename as title"
+msgstr "Use attachment filename as title"
+
+#: paperless_mail/models.py:99
+msgid "Do not assign a correspondent"
+msgstr "Do not assign a correspondent"
+
+#: paperless_mail/models.py:101
+msgid "Use mail address"
+msgstr "Use mail address"
+
+#: paperless_mail/models.py:103
+msgid "Use name (or mail address if not available)"
+msgstr "Use name (or mail address if not available)"
+
+#: paperless_mail/models.py:105
+msgid "Use correspondent selected below"
+msgstr "Use correspondent selected below"
+
+#: paperless_mail/models.py:113
+msgid "order"
+msgstr "order"
+
+#: paperless_mail/models.py:120
+msgid "account"
+msgstr "account"
+
+#: paperless_mail/models.py:124
+msgid "folder"
+msgstr "folder"
+
+#: paperless_mail/models.py:128
+msgid "filter from"
+msgstr "filter from"
+
+#: paperless_mail/models.py:131
+msgid "filter subject"
+msgstr "filter subject"
+
+#: paperless_mail/models.py:134
+msgid "filter body"
+msgstr "filter body"
+
+#: paperless_mail/models.py:138
+msgid "filter attachment filename"
+msgstr "filter attachment filename"
+
+#: paperless_mail/models.py:140
+msgid ""
+"Only consume documents which entirely match this filename if specified. "
+"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr ""
+"Only consume documents which entirely match this filename if specified. "
+"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+
+#: paperless_mail/models.py:146
+msgid "maximum age"
+msgstr "maximum age"
+
+#: paperless_mail/models.py:148
+msgid "Specified in days."
+msgstr "Specified in days."
+
+#: paperless_mail/models.py:151
+msgid "attachment type"
+msgstr "attachment type"
+
+#: paperless_mail/models.py:154
+msgid ""
+"Inline attachments include embedded images, so it's best to combine this "
+"option with a filename filter."
+msgstr ""
+"Inline attachments include embedded images, so it's best to combine this "
+"option with a filename filter."
+
+#: paperless_mail/models.py:159
+msgid "action"
+msgstr "action"
+
+#: paperless_mail/models.py:165
+msgid "action parameter"
+msgstr "action parameter"
+
+#: paperless_mail/models.py:167
+msgid ""
+"Additional parameter for the action selected above, i.e., the target folder "
+"of the move to folder action."
+msgstr ""
+"Additional parameter for the action selected above, i.e., the target folder "
+"of the move to folder action."
+
+#: paperless_mail/models.py:173
+msgid "assign title from"
+msgstr "assign title from"
+
+#: paperless_mail/models.py:183
+msgid "assign this tag"
+msgstr "assign this tag"
+
+#: paperless_mail/models.py:191
+msgid "assign this document type"
+msgstr "assign this document type"
+
+#: paperless_mail/models.py:195
+msgid "assign correspondent from"
+msgstr "assign correspondent from"
+
+#: paperless_mail/models.py:205
+msgid "assign this correspondent"
+msgstr "assign this correspondent"

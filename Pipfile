@@ -17,19 +17,19 @@ django-filter = "~=2.4.0"
 django-q = "~=1.3.4"
 djangorestframework = "~=3.12.2"
 filelock = "*"
-fuzzywuzzy = "*"
+fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
-pdftotext = "*"
+# numpy 1.20.0 drops python 3.6 support
+numpy = "~=1.19.5"
 pathvalidate = "*"
 # pinned to 8.1.0, since aarch64 wheels might not be available beyond that https://github.com/python-pillow/Pillow/issues/5202
 pillow = "==8.1.0"
-pikepdf = "~=2.2.5"
+pikepdf = "~=2.5.0"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
-python-Levenshtein = "*"
 python-magic = "*"
 psycopg2-binary = "*"
 redis = "*"
@@ -38,10 +38,10 @@ scikit-learn="==0.24.0"
 # Prevent scipy updates because 1.6 is incompatible with python 3.6
 scipy="~=1.5.4"
 whitenoise = "~=5.2.0"
-watchdog = "*"
+watchdog = "~=1.0.0"
 whoosh="~=2.7.4"
 inotifyrecursive = "~=0.3.4"
-ocrmypdf = "~=11.4.5"
+ocrmypdf = "~=11.6"
 tqdm = "*"
 tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
@@ -49,6 +49,12 @@ tika = "*"
 channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+concurrent-log-handler = "*"
+# uvloop 0.15+ incompatible with python 3.6
+uvloop = "~=0.14.0"
+# TODO: keep an eye on piwheel builds and update this once available (https://www.piwheels.org/project/cryptography/)
+cryptography = "~=3.3.2"
+"pdfminer.six" = "*"
 
 [dev-packages]
 coveralls = "*"

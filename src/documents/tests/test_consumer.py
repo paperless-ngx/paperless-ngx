@@ -5,12 +5,14 @@ import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 
 from .utils import DirectoriesMixin
 from ..consumer import Consumer, ConsumerError
 from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
 from ..parsers import DocumentParser, ParseError
+from ..tasks import sanity_check
 
 
 class TestAttributes(TestCase):
@@ -165,7 +167,7 @@ class TestFieldPermutations(TestCase):
 
 class DummyParser(DocumentParser):
 
-    def get_thumbnail(self, document_path, mime_type):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         # not important during tests
         raise NotImplementedError()
 
@@ -174,16 +176,34 @@ class DummyParser(DocumentParser):
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
         self.archive_path = archive_path
 
-    def get_optimised_thumbnail(self, document_path, mime_type):
+    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def parse(self, document_path, mime_type, file_name=None):
         self.text = "The Text"
 
 
+class CopyParser(DocumentParser):
+
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
+        return self.fake_thumb
+
+    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+        return self.fake_thumb
+
+    def __init__(self, logging_group, progress_callback=None):
+        super(CopyParser, self).__init__(logging_group, progress_callback)
+        _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=self.tempdir)
+
+    def parse(self, document_path, mime_type, file_name=None):
+        self.text = "The text"
+        self.archive_path = os.path.join(self.tempdir, "archive.pdf")
+        shutil.copy(document_path, self.archive_path)
+
+
 class FaultyParser(DocumentParser):
 
-    def get_thumbnail(self, document_path, mime_type):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         # not important during tests
         raise NotImplementedError()
 
@@ -191,7 +211,7 @@ class FaultyParser(DocumentParser):
         super(FaultyParser, self).__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
 
-    def get_optimised_thumbnail(self, document_path, mime_type):
+    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
     def parse(self, document_path, mime_type, file_name=None):
@@ -203,6 +223,8 @@ def fake_magic_from_file(file, mime=False):
     if mime:
         if os.path.splitext(file)[1] == ".pdf":
             return "application/pdf"
+        elif os.path.splitext(file)[1] == ".png":
+            return "image/png"
         else:
             return "unknown"
     else:
@@ -274,6 +296,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIsNone(document.correspondent)
         self.assertIsNone(document.document_type)
         self.assertEqual(document.filename, "0000001.pdf")
+        self.assertEqual(document.archive_filename, "0000001.pdf")
 
         self.assertTrue(os.path.isfile(
             document.source_path
@@ -432,6 +455,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.title, "new docs")
         self.assertEqual(document.filename, "none/new docs.pdf")
+        self.assertEqual(document.archive_filename, "none/new docs.pdf")
 
         self._assert_first_last_send_progress()
 
@@ -446,7 +470,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
             filenames.insert(0, f)
             return f
 
-        m.side_effect = lambda f, root: get_filename()
+        m.side_effect = lambda f, archive_filename = False: get_filename()
 
         filename = self.get_test_file()
 
@@ -457,6 +481,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertEqual(document.title, "new docs")
         self.assertIsNotNone(os.path.isfile(document.title))
         self.assertTrue(os.path.isfile(document.source_path))
+        self.assertTrue(os.path.isfile(document.archive_path))
 
         self._assert_first_last_send_progress()
 
@@ -515,6 +540,30 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(dst))
 
         self._assert_first_last_send_progress(last_status="FAILED")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    def test_similar_filenames(self, m):
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.png"), os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.png"), os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"))
+        m.return_value = [(None, {
+            "parser": CopyParser,
+            "mime_types": {"application/pdf": ".pdf", "image/png": ".png"},
+            "weight": 0
+        })]
+        doc1 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
+        doc2 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
+        doc3 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"))
+
+        self.assertEqual(doc1.filename, "simple.png")
+        self.assertEqual(doc1.archive_filename, "simple.pdf")
+        self.assertEqual(doc2.filename, "simple.pdf")
+        self.assertEqual(doc2.archive_filename, "simple_01.pdf")
+        self.assertEqual(doc3.filename, "simple.png.pdf")
+        self.assertEqual(doc3.archive_filename, "simple.png.pdf")
+
+        sanity_check()
 
 
 class PreConsumeTestCase(TestCase):

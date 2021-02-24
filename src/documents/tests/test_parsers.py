@@ -68,7 +68,7 @@ class TestParserDiscovery(TestCase):
             )
 
 
-def fake_get_thumbnail(self, path, mimetype):
+def fake_get_thumbnail(self, path, mimetype, file_name):
     return os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
 
 
@@ -89,15 +89,15 @@ class TestBaseParser(TestCase):
     def test_get_optimised_thumbnail(self):
         parser = DocumentParser(None)
 
-        parser.get_optimised_thumbnail("any", "not important")
+        parser.get_optimised_thumbnail("any", "not important", "document.pdf")
 
     @mock.patch("documents.parsers.DocumentParser.get_thumbnail", fake_get_thumbnail)
     @override_settings(OPTIMIZE_THUMBNAILS=False)
     def test_get_optimised_thumb_disabled(self):
         parser = DocumentParser(None)
 
-        path = parser.get_optimised_thumbnail("any", "not important")
-        self.assertEqual(path, fake_get_thumbnail(None, None, None))
+        path = parser.get_optimised_thumbnail("any", "not important", "document.pdf")
+        self.assertEqual(path, fake_get_thumbnail(None, None, None, None))
 
 
 class TestParserAvailability(TestCase):
@@ -114,8 +114,8 @@ class TestParserAvailability(TestCase):
         self.assertEqual(get_default_file_extension('application/zip'), ".zip")
         self.assertEqual(get_default_file_extension('aasdasd/dgfgf'), "")
 
-        self.assertEqual(get_parser_class_for_mime_type('application/pdf'), RasterisedDocumentParser)
-        self.assertEqual(get_parser_class_for_mime_type('text/plain'), TextDocumentParser)
+        self.assertIsInstance(get_parser_class_for_mime_type('application/pdf')(logging_group=None), RasterisedDocumentParser)
+        self.assertIsInstance(get_parser_class_for_mime_type('text/plain')(logging_group=None), TextDocumentParser)
         self.assertEqual(get_parser_class_for_mime_type('text/sdgsdf'), None)
 
         self.assertTrue(is_file_ext_supported('.pdf'))
