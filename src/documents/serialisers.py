@@ -1,11 +1,13 @@
+import re
+
 import magic
 from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from . import bulk_edit
-from .models import Correspondent, Tag, Document, Log, DocumentType, \
-    SavedView, SavedViewFilterRule
+from .models import Correspondent, Tag, Document, DocumentType, \
+    SavedView, SavedViewFilterRule, MatchingModel
 from .parsers import is_mime_type_supported
 
 from django.utils.translation import gettext as _
@@ -33,15 +35,29 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-class CorrespondentSerializer(serializers.ModelSerializer):
+class MatchingModelSerializer(serializers.ModelSerializer):
 
     document_count = serializers.IntegerField(read_only=True)
-
-    last_correspondence = serializers.DateTimeField(read_only=True)
 
     def get_slug(self, obj):
         return slugify(obj.name)
     slug = SerializerMethodField()
+
+    def validate_match(self, match):
+        if 'matching_algorithm' in self.initial_data and self.initial_data['matching_algorithm'] == MatchingModel.MATCH_REGEX:  # NOQA: E501
+            try:
+                re.compile(match)
+            except Exception as e:
+                raise serializers.ValidationError(
+                    _("Invalid regular expresssion: %(error)s") %
+                    {'error': str(e)}
+                )
+        return match
+
+
+class CorrespondentSerializer(MatchingModelSerializer):
+
+    last_correspondence = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Correspondent
@@ -57,13 +73,7 @@ class CorrespondentSerializer(serializers.ModelSerializer):
         )
 
 
-class DocumentTypeSerializer(serializers.ModelSerializer):
-
-    document_count = serializers.IntegerField(read_only=True)
-
-    def get_slug(self, obj):
-        return slugify(obj.name)
-    slug = SerializerMethodField()
+class DocumentTypeSerializer(MatchingModelSerializer):
 
     class Meta:
         model = DocumentType
@@ -78,13 +88,7 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
         )
 
 
-class TagSerializer(serializers.ModelSerializer):
-
-    document_count = serializers.IntegerField(read_only=True)
-
-    def get_slug(self, obj):
-        return slugify(obj.name)
-    slug = SerializerMethodField()
+class TagSerializer(MatchingModelSerializer):
 
     class Meta:
         model = Tag
@@ -129,7 +133,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
         return obj.get_public_filename()
 
     def get_archived_file_name(self, obj):
-        if obj.archive_checksum:
+        if obj.has_archive_version:
             return obj.get_public_filename(archive=True)
         else:
             return None
@@ -150,19 +154,6 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             "archive_serial_number",
             "original_file_name",
             "archived_file_name",
-        )
-
-
-class LogSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Log
-        fields = (
-            "id",
-            "created",
-            "message",
-            "group",
-            "level"
         )
 
 
@@ -205,13 +196,33 @@ class SavedViewSerializer(serializers.ModelSerializer):
         return saved_view
 
 
-class BulkEditSerializer(serializers.Serializer):
+class DocumentListSerializer(serializers.Serializer):
 
     documents = serializers.ListField(
-        child=serializers.IntegerField(),
+        required=True,
         label="Documents",
-        write_only=True
+        write_only=True,
+        child=serializers.IntegerField()
     )
+
+    def _validate_document_id_list(self, documents, name="documents"):
+        if not type(documents) == list:
+            raise serializers.ValidationError(f"{name} must be a list")
+        if not all([type(i) == int for i in documents]):
+            raise serializers.ValidationError(
+                f"{name} must be a list of integers")
+        count = Document.objects.filter(id__in=documents).count()
+        if not count == len(documents):
+            raise serializers.ValidationError(
+                f"Some documents in {name} don't exist or were "
+                f"specified twice.")
+
+    def validate_documents(self, documents):
+        self._validate_document_id_list(documents)
+        return documents
+
+
+class BulkEditSerializer(DocumentListSerializer):
 
     method = serializers.ChoiceField(
         choices=[
@@ -228,18 +239,6 @@ class BulkEditSerializer(serializers.Serializer):
 
     parameters = serializers.DictField(allow_empty=True)
 
-    def _validate_document_id_list(self, documents, name="documents"):
-        if not type(documents) == list:
-            raise serializers.ValidationError(f"{name} must be a list")
-        if not all([type(i) == int for i in documents]):
-            raise serializers.ValidationError(
-                f"{name} must be a list of integers")
-        count = Document.objects.filter(id__in=documents).count()
-        if not count == len(documents):
-            raise serializers.ValidationError(
-                f"Some documents in {name} don't exist or were "
-                f"specified twice.")
-
     def _validate_tag_id_list(self, tags, name="tags"):
         if not type(tags) == list:
             raise serializers.ValidationError(f"{name} must be a list")
@@ -250,10 +249,6 @@ class BulkEditSerializer(serializers.Serializer):
         if not count == len(tags):
             raise serializers.ValidationError(
                 f"Some tags in {name} don't exist or were specified twice.")
-
-    def validate_documents(self, documents):
-        self._validate_document_id_list(documents)
-        return documents
 
     def validate_method(self, method):
         if method == "set_correspondent":
@@ -405,9 +400,24 @@ class PostDocumentSerializer(serializers.Serializer):
             return None
 
 
-class SelectionDataSerializer(serializers.Serializer):
+class BulkDownloadSerializer(DocumentListSerializer):
 
-    documents = serializers.ListField(
-        required=True,
-        child=serializers.IntegerField()
+    content = serializers.ChoiceField(
+        choices=["archive", "originals", "both"],
+        default="archive"
     )
+
+    compression = serializers.ChoiceField(
+        choices=["none", "deflated", "bzip2", "lzma"],
+        default="none"
+    )
+
+    def validate_compression(self, compression):
+        import zipfile
+
+        return {
+            "none": zipfile.ZIP_STORED,
+            "deflated": zipfile.ZIP_DEFLATED,
+            "bzip2": zipfile.ZIP_BZIP2,
+            "lzma": zipfile.ZIP_LZMA
+        }[compression]

@@ -70,8 +70,8 @@ Contents
    configuration
    api
    faq
-   extending
    troubleshooting
+   extending
    contributing
    scanners
    screenshots

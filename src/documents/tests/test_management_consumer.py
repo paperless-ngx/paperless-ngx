@@ -203,7 +203,7 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
         self.assertRaises(CommandError, call_command, 'document_consumer', '--oneshot')
 
 
-@override_settings(CONSUMER_POLLING=1)
+@override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
 class TestConsumerPolling(TestConsumer):
     # just do all the tests with polling
     pass
@@ -215,8 +215,7 @@ class TestConsumerRecursive(TestConsumer):
     pass
 
 
-@override_settings(CONSUMER_RECURSIVE=True)
-@override_settings(CONSUMER_POLLING=1)
+@override_settings(CONSUMER_RECURSIVE=True, CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
 class TestConsumerRecursivePolling(TestConsumer):
     # just do all the tests with polling and recursive
     pass
@@ -257,6 +256,6 @@ class TestConsumerTags(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
         # their order.
         self.assertCountEqual(kwargs["override_tag_ids"], tag_ids)
 
-    @override_settings(CONSUMER_POLLING=1)
+    @override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
     def test_consume_file_with_path_tags_polling(self):
         self.test_consume_file_with_path_tags()

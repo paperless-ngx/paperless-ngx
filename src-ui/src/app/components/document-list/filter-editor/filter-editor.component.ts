@@ -46,6 +46,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             return $localize`Without any tag`
           }
 
+        case FILTER_TITLE:
+          return $localize`Title: ${rule.value}`
       }
     }
 
@@ -117,7 +119,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     })
   }
 
-  get filterRules() {
+  get filterRules(): FilterRule[] {
     let filterRules: FilterRule[] = []
     if (this._titleFilter) {
       filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})

@@ -6,7 +6,6 @@ import shutil
 import subprocess
 import tempfile
 
-import dateparser
 import magic
 from django.conf import settings
 from django.utils import timezone
@@ -36,7 +35,7 @@ DATE_REGEX = re.compile(
 )
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.parsing")
 
 
 def is_mime_type_supported(mime_type):
@@ -200,6 +199,8 @@ def parse_date(filename, text):
         """
         Call dateparser.parse with a particular date ordering
         """
+        import dateparser
+
         return dateparser.parse(
             ds,
             settings={
@@ -261,6 +262,8 @@ class DocumentParser(LoggingMixin):
     `paperless_tesseract.parsers` for inspiration.
     """
 
+    logging_name = "paperless.parsing"
+
     def __init__(self, logging_group, progress_callback=None):
         super().__init__()
         self.logging_group = logging_group
@@ -273,10 +276,9 @@ class DocumentParser(LoggingMixin):
         self.date = None
         self.progress_callback = progress_callback
 
-    def progress(self, current, max):
-        print(self.progress_callback)
+    def progress(self, current_progress, max_progress):
         if self.progress_callback:
-            self.progress_callback(current, max)
+            self.progress_callback(current_progress, max_progress)
 
     def extract_metadata(self, document_path, mime_type):
         return []
@@ -287,14 +289,17 @@ class DocumentParser(LoggingMixin):
     def get_archive_path(self):
         return self.archive_path
 
-    def get_thumbnail(self, document_path, mime_type):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         """
         Returns the path to a file we can use as a thumbnail for this document.
         """
         raise NotImplementedError()
 
-    def get_optimised_thumbnail(self, document_path, mime_type):
-        thumbnail = self.get_thumbnail(document_path, mime_type)
+    def get_optimised_thumbnail(self,
+                                document_path,
+                                mime_type,
+                                file_name=None):
+        thumbnail = self.get_thumbnail(document_path, mime_type, file_name)
         if settings.OPTIMIZE_THUMBNAILS:
             out_path = os.path.join(self.tempdir, "thumb_optipng.png")
 
@@ -317,5 +322,5 @@ class DocumentParser(LoggingMixin):
         return self.date
 
     def cleanup(self):
-        self.log("debug", "Deleting directory {}".format(self.tempdir))
+        self.log("debug", f"Deleting directory {self.tempdir}")
         shutil.rmtree(self.tempdir)

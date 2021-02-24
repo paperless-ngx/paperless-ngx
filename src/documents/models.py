@@ -16,7 +16,6 @@ from django.utils.timezone import is_aware
 
 from django.utils.translation import gettext_lazy as _
 
-from documents.file_handling import archive_name_from_filename
 from documents.parsers import get_default_file_extension
 
 
@@ -208,8 +207,19 @@ class Document(models.Model):
         max_length=1024,
         editable=False,
         default=None,
+        unique=True,
         null=True,
         help_text=_("Current filename in storage")
+    )
+
+    archive_filename = models.FilePathField(
+        _("archive filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current archive filename in storage")
     )
 
     archive_serial_number = models.IntegerField(
@@ -256,16 +266,18 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
-    def archive_path(self):
-        if self.filename:
-            fname = archive_name_from_filename(self.filename)
-        else:
-            fname = "{:07}.pdf".format(self.pk)
+    def has_archive_version(self):
+        return self.archive_filename is not None
 
-        return os.path.join(
-            settings.ARCHIVE_DIR,
-            fname
-        )
+    @property
+    def archive_path(self):
+        if self.has_archive_version:
+            return os.path.join(
+                settings.ARCHIVE_DIR,
+                str(self.archive_filename)
+            )
+        else:
+            return None
 
     @property
     def archive_file(self):

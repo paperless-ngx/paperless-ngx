@@ -169,15 +169,20 @@ export class ConsumerStatusService {
   }
 
   dismiss(status: FileStatus) {
-    let index = this.consumerStatus.findIndex(s => s.filename == status.filename)
+    let index
+    if (status.taskId != null) {
+      index = this.consumerStatus.findIndex(s => s.taskId == status.taskId)
+    } else {
+      index = this.consumerStatus.findIndex(s => s.filename == status.filename)
+    }
 
     if (index > -1) {
       this.consumerStatus.splice(index, 1)
     }
   }
 
-  dismissAll() {
-    this.consumerStatus = this.consumerStatus.filter(status => status.phase < FileStatusPhase.SUCCESS)
+  dismissCompleted() {
+    this.consumerStatus = this.consumerStatus.filter(status => status.phase != FileStatusPhase.SUCCESS)
   }
 
   onDocumentConsumptionFinished() {

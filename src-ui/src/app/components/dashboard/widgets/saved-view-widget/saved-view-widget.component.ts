@@ -12,7 +12,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
   templateUrl: './saved-view-widget.component.html',
   styleUrls: ['./saved-view-widget.component.scss']
 })
-export class SavedViewWidgetComponent implements OnInit {
+export class SavedViewWidgetComponent implements OnInit, OnDestroy {
 
   constructor(
     private documentService: DocumentService,
@@ -48,7 +48,7 @@ export class SavedViewWidgetComponent implements OnInit {
     if (this.savedView.show_in_sidebar) {
       this.router.navigate(['view', this.savedView.id])
     } else {
-      this.list.load(this.savedView)
+      this.list.loadSavedView(this.savedView, true)
       this.router.navigate(["documents"])
     }
   }

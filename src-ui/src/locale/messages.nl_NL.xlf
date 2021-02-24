@@ -58,11 +58,11 @@
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2155249406916744630">
-        <source>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; saved successfully.</source>
-        <target>View &quot;<x equiv-text="this.list.savedView.name" id="PH"/>&quot; met succes opgeslagen.</target>
+        <source>View &quot;<x equiv-text="this.list.activeSavedViewTitle" id="PH"/>&quot; saved successfully.</source>
+        <target>View &quot;<x equiv-text="this.list.activeSavedViewTitle" id="PH"/>&quot; met succes opgeslagen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6837554170707123455">
@@ -70,7 +70,7 @@
         <target>View &quot;<x equiv-text="savedView.name" id="PH"/>&quot; met succes gemaakt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="9ca82952a6bc860b5391d5975322d8af8ceddfa4">
@@ -129,9 +129,9 @@
           <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="72e7d343f9165602cce1ca7faffbc565fd31ef92">
-        <source>Save &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
-        <target>Opslaan &quot;<x equiv-text="{{list.savedViewTitle}}" id="INTERPOLATION"/>&quot;</target>
+      <trans-unit datatype="html" id="5f5ce787c428d917c30c9bd70789a618e09743a7">
+        <source>Save &quot;<x equiv-text="{{list.activeSavedViewTitle}}" id="INTERPOLATION"/>&quot;</source>
+        <target>Opslaan &quot;<x equiv-text="{{list.activeSavedViewTitle}}" id="INTERPOLATION"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
@@ -214,7 +214,7 @@
         <target>Bevestig het verwijderen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5382975254277698192">
@@ -222,7 +222,7 @@
         <target>Wilt u het document echt verwijderen &quot;<x equiv-text="this.document.title" id="PH"/>&quot;?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">204</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6691075929777935948">
@@ -230,7 +230,7 @@
         <target>De bestanden voor dit document worden definitief verwijderd. Deze bewerking kan niet ongedaan worden gemaakt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="719892092227206532">
@@ -238,7 +238,7 @@
         <target>Verwijder document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">207</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1844801255494293730">
@@ -246,7 +246,7 @@
         <target>Fout bij het verwijderen van het document: <x equiv-text="JSON.stringify(error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">214</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="826b25211922a1b46436589233cb6f1a163d89b7">
@@ -585,14 +585,6 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="5ca707824ab93066c7d9b44e1b8bf216725c2c22">
-        <source>Filter</source>
-        <target>Filter</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
-          <context context-type="linenumber">7</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="5610279464668232148">
         <source>Saved view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; deleted.</source>
         <target>Opgeslagen view &quot;<x equiv-text="savedView.name" id="PH"/>&quot; verwijderd.</target>
@@ -622,7 +614,15 @@
         <target>Datumopmaak van weergavetaal gebruiken</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4912706592792948707">
+        <source>ISO 8601</source>
+        <target>ISO 8601</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -630,7 +630,7 @@
         <target>Fout bij het opslaan van de instellingen: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -649,12 +649,20 @@
           <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="8bcabdf6b16cad0313a86c7e940c5e3ad7f9f8ab">
+        <source>Notifications</source>
+        <target>Meldingen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="99dee94e92dbd9e21a008d4569f9719ed206ae37">
         <source>Saved views</source>
         <target>Opgeslagen views</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="bbe41ac2ea4a6c00ea941a41b33105048f8e9f13">
@@ -777,68 +785,12 @@
           <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="8bcabdf6b16cad0313a86c7e940c5e3ad7f9f8ab">
-        <source>Notifications</source>
-        <target>Meldingen</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">102</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="69c5a98f8aa92e4db060f10dcd37781c8f40a48f">
-        <source>Consumer status</source>
-        <target>Status van de verwerker</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">106</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="2ad4d76b36341c589d94004ad2a213fd4d6f5ca0">
-        <source>Show notifications when new documents are detected</source>
-        <target>Toon meldingen wanneer nieuwe documenten worden gedetecteerd</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">109</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="f2361d3f65b6c77ef0a15fad8af8e858b043ace3">
-        <source>Show notifications when document consumption completes successfully</source>
-        <target>Toon meldingen wanneer documenten met succes zijn verwerkt.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">110</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="2bcbcbe99e207803e21183580b98d90410dd8718">
-        <source>Show notifications when document consumption fails</source>
-        <target>Toon meldingen wanneer het verwerken van documenten faalt.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">111</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="af113f7c9f7e13145c3461f61a1aedf12d57bd71">
-        <source>Suppress notifications on dashboard</source>
-        <target>Onderdruk meldingen op het dashboard</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">112</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="59fe5c9233a2aaab3079a2300e4dfa439ddb1890">
-        <source>This will suppress all consumer related status messages on the dashboard.</source>
-        <target>Dit verbergt alle statusberichten op het dashboard die met de verwerker te maken hebben.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">112</context>
-        </context-group>
-      </trans-unit>
       <trans-unit datatype="html" id="3863a86cd9e69a61d143d3daf51df44203df4a82">
         <source>Bulk editing</source>
         <target>Massabewerking</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="c0ac61661c6c326d6e0e00c231b95cf2ac0c6586">
@@ -846,7 +798,7 @@
         <target>Toon dialoogvenster ter bevestiging</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="291bbe56ecbe945dcf05580a57d679fa7bd1e06a">
@@ -854,7 +806,7 @@
         <target>Er zal altijd om bevestiging gevraagd worden voor het verwijderen van documenten.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cfddc13e04f5545ac63f419ef363505d6f78c2e">
@@ -862,7 +814,55 @@
         <target>Toepassen bij het sluiten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="8680abbea249ebe9c2fe35556559c8e1a9eb5841">
+        <source>Document processing</source>
+        <target>Verwerking van documenten</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="2ad4d76b36341c589d94004ad2a213fd4d6f5ca0">
+        <source>Show notifications when new documents are detected</source>
+        <target>Toon meldingen wanneer nieuwe documenten worden gedetecteerd</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="e775f4f7c40249d31426ae61a21616a0c9d8e84f">
+        <source>Show notifications when document processing completes successfully</source>
+        <target>Toon een melding wanneer documenten met succes zijn verwerkt</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="e3844dd174d8e817ddb551fae28f14ae80ca36b6">
+        <source>Show notifications when document processing fails</source>
+        <target>Toon meldingen wanneer het verwerken van documenten faalt</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="af113f7c9f7e13145c3461f61a1aedf12d57bd71">
+        <source>Suppress notifications on dashboard</source>
+        <target>Onderdruk meldingen op het dashboard</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="e27bd3804d2936a6897e81c2e52e294490e5e5a8">
+        <source>This will suppress all messages about document processing status on the dashboard.</source>
+        <target>Dit verbergt alle statusberichten op het dashboard die met het verwerken van documenten te maken hebben.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
+          <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8cb90334f5dfd7fc67205085f59381e2a334ccfc">
@@ -870,7 +870,7 @@
         <target>Komt voor bij</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">140</context>
+          <context context-type="linenumber">145</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6717cf1acf04728fc2b7c39f6d3297f8ff15fde5">
@@ -878,7 +878,7 @@
         <target>Toon op het dashboard</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">148</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="541bfc5b123b3f8867fd681eaceefb663a811973">
@@ -886,7 +886,7 @@
         <target>Toon in de zijbalk</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">152</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="abba764a7a595d04dc8c3b26e04b3780d4fdb540">
@@ -894,7 +894,7 @@
         <target>Geen opgeslagen views gedefinieerd.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
-          <context context-type="linenumber">157</context>
+          <context context-type="linenumber">162</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="ef60a738a565f498b858e903e42bc5ffc3cc1299">
@@ -1119,7 +1119,7 @@
         <target>Beheren</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="408cb6073e60c5d966296a3207fc596adca75e01">
@@ -1127,15 +1127,15 @@
         <target>Beheer</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">149</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="46aa32e581922d6d2c3d7bc4c87209ad5808b029">
-        <source>Misc</source>
-        <target>Andere</target>
+      <trans-unit datatype="html" id="321e4419a943044e674beb55b8039f42a9761ca5">
+        <source>Info</source>
+        <target>Informatie</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">155</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="fcfd4675b4c90f08d18d3abede9a9a4dff4cfdc7">
@@ -1143,7 +1143,7 @@
         <target>Handleiding</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">167</context>
+          <context context-type="linenumber">162</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="355a222236bc01b9a8cd3cb9ecf76891125aed69">
@@ -1151,7 +1151,15 @@
         <target>GitHub</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">170</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="ea3a452c5238897cabc5781308cceb2d37dcf258">
+        <source>Suggest an idea</source>
+        <target>Ideeënbus</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
+          <context context-type="linenumber">176</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="af665f8de8fabe306aaf27443957e69bcbbce63c">
@@ -1167,7 +1175,7 @@
         <target>Open documenten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="dca5bf9344a759fa5a07f1b21f50286ec242ba44">
@@ -1175,7 +1183,7 @@
         <target>Alles sluiten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5195932016807797291">
@@ -1224,6 +1232,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="6523384805359286307">
+        <source>Title: <x equiv-text="rule.value" id="PH"/></source>
+        <target>Titel: <x equiv-text="rule.value" id="PH"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="02d184c288f567825a1fcbf83bcd3099a10853d5">
@@ -1384,7 +1400,7 @@
         <target>Fout bij het uitvoeren van een massabewerking: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7894972847287473517">
@@ -1392,7 +1408,7 @@
         <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8639884465898458690">
@@ -1400,7 +1416,7 @@
         <target>&quot;<x equiv-text="items[0].name" id="PH"/>&quot; en &quot;<x equiv-text="items[1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">115</context>
         </context-group>
         <note from="description" priority="1">This is for messages like 'modify &quot;tag1&quot; and &quot;tag2&quot;'</note>
       </trans-unit>
@@ -1409,7 +1425,7 @@
         <target>, </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">116</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <note from="description" priority="1">this is used to separate enumerations and should probably be a comma and a whitespace in most languages</note>
       </trans-unit>
@@ -1418,7 +1434,7 @@
         <target><x equiv-text="list" id="PH"/> en &quot;<x equiv-text="items[items.length - 1].name" id="PH_1"/>&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <note from="description" priority="1">this is for messages like 'modify &quot;tag1&quot;, &quot;tag2&quot; and &quot;tag3&quot;'</note>
       </trans-unit>
@@ -1427,7 +1443,7 @@
         <target>Bevestig toewijzen van etiketten</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6619516195038467207">
@@ -1435,7 +1451,7 @@
         <target>Het etiket &quot;<x equiv-text="tag.name" id="PH"/>&quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">130</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1894412783609570695">
@@ -1443,7 +1459,7 @@
         <target>De etiketten <x equiv-text="this._localizeList(changedTags.itemsToAdd)" id="PH"/> zullen aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">132</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7181166515756808573">
@@ -1451,7 +1467,7 @@
         <target>Het etiket &quot;<x equiv-text="tag.name" id="PH"/>&quot; zal verwijderd worden van <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3819792277998068944">
@@ -1459,7 +1475,7 @@
         <target>De etiketten <x equiv-text="this._localizeList(changedTags.itemsToRemove)" id="PH"/> zullen verwijderd worden van <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2739066218579571288">
@@ -1467,7 +1483,7 @@
         <target>De etiketten <x equiv-text="this._localizeList(changedTags.itemsToAdd)" id="PH"/> zullen toegevoegd worden aan, en de etiketten <x equiv-text="this._localizeList(changedTags.itemsToRemove)" id="PH_1"/> zullen verwijderd worden van <x equiv-text="this.list.selected.size" id="PH_2"/> geselecteerd(e) document(en).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">139</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2996713129519325161">
@@ -1475,7 +1491,7 @@
         <target>Bevestig toewijzen van correspondent</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">159</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6900893559485781849">
@@ -1483,7 +1499,7 @@
         <target>De correspondent &quot;<x equiv-text="correspondent.name" id="PH"/>&quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">160</context>
+          <context context-type="linenumber">161</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1257522660364398440">
@@ -1491,7 +1507,7 @@
         <target>De correspondent zal verwijderd worden van <x equiv-text="this.list.selected.size" id="PH"/> geselecteerd(e) document(en).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">162</context>
+          <context context-type="linenumber">163</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5393409374423140648">
@@ -1499,7 +1515,7 @@
         <target>Bevestig toewijzen van documenttype</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">181</context>
+          <context context-type="linenumber">182</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="332180123895325027">
@@ -1507,7 +1523,7 @@
         <target>Het documenttype &quot;<x equiv-text="documentType.name" id="PH"/>&quot; zal aan <x equiv-text="this.list.selected.size" id="PH_1"/> geselecteerd(e) document(en) worden toegewezen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">183</context>
+          <context context-type="linenumber">184</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2236642492594872779">
@@ -1515,7 +1531,7 @@
         <target>Het documenttype zal verwijderd worden van <x equiv-text="this.list.selected.size" id="PH"/> geselecteerd(e) document(en).</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">185</context>
+          <context context-type="linenumber">186</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="749430623564850405">
@@ -1523,7 +1539,7 @@
         <target>Bevestig verwijderen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">201</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4303174930844518780">
@@ -1531,7 +1547,7 @@
         <target><x equiv-text="this.list.selected.size" id="PH"/> geselecteerd(e) document(en) zullen permanent worden verwijderd.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">202</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5641451190833696892">
@@ -1539,7 +1555,7 @@
         <target>Deze actie kan niet ongedaan worden gemaakt.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6734339521247847366">
@@ -1547,7 +1563,7 @@
         <target>Verwijder document(en)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8b0609df23817024b3bed12beb9b64fc1009f588">
@@ -1572,6 +1588,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="fc2de37422d7c4af6686842283cc2afd781b6848">
+        <source>Download originals</source>
+        <target>Originelen downloaden</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="a1e6c11f20d4bf6e8e6b43e3c6d2561b2080645e">
@@ -1606,20 +1630,20 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="46c8fe557cf52c9389783627d4f85453f4ddb459">
-        <source>Documents in inbox: <x equiv-text="{{statistics.documents_inbox}}" id="INTERPOLATION"/></source>
-        <target>Documenten in &quot;Postvak in&quot;: <x equiv-text="{{statistics.documents_inbox}}" id="INTERPOLATION"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
-          <context context-type="linenumber">3</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="c327c0e67bcac7494dcbaa9afb3b42d5008c6438">
-        <source>Total documents: <x equiv-text="{{statistics.documents_total}}" id="INTERPOLATION"/></source>
-        <target>Totaal aantal documenten: <x equiv-text="{{statistics.documents_total}}" id="INTERPOLATION"/></target>
+      <trans-unit datatype="html" id="c0d907c2687c09612395aee6ef7c04ca8e5e5e0a">
+        <source>Total documents: <x equiv-text="{{statistics?.documents_total}}" id="INTERPOLATION"/></source>
+        <target>Totaal aantal documenten: <x equiv-text="{{statistics?.documents_total}}" id="INTERPOLATION"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="13e8d49dbcad9f9d71e66a9a56d6f328cff430c9">
+        <source>Documents in inbox: <x equiv-text="{{statistics?.documents_inbox}}" id="INTERPOLATION"/></source>
+        <target>Documenten in &quot;Postvak in&quot;: <x equiv-text="{{statistics?.documents_inbox}}" id="INTERPOLATION"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
+          <context context-type="linenumber">3</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6443586946875325554">
@@ -1662,12 +1686,20 @@
           <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
-      <trans-unit datatype="html" id="3994065460580948013">
-        <source>Waiting for consumer...</source>
-        <target>Wachten op het verwerken...</target>
+      <trans-unit datatype="html" id="7446520539098045935">
+        <source>Upload complete, waiting...</source>
+        <target>Upload voltooid, klaar voor meer...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">126</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="1405142710727603568">
+        <source>HTTP error: <x equiv-text="error.status" id="PH"/> <x equiv-text="error.statusText" id="PH_1"/></source>
+        <target>HTTP fout: <x equiv-text="error.status" id="PH"/> <x equiv-text="error.statusText" id="PH_1"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="e022072b3e4dd77e3f09960817ef3359a49963b3">
@@ -1701,21 +1733,23 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
+        <note from="description" priority="1">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
       </trans-unit>
-      <trans-unit datatype="html" id="1fc4e0a1e93fdda0ed3c9e590971d283afb68265">
-        <source><x equiv-text="{{getStatusHidden().length}}" id="INTERPOLATION"/> more hidden</source>
-        <target><x equiv-text="{{getStatusHidden().length}}" id="INTERPOLATION"/> niet getoond</target>
+      <trans-unit datatype="html" id="90917e1a0a7bb59e9d11bdde9183e9391963e17b">
+        <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
+        <target>{VAR_PLURAL, plural, =1 {Nog één document} other {Nog <x id="INTERPOLATION"/> documenten}}</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
+        <note from="description" priority="1">This is shown as a summary line when there are more than 5 document in the processing pipeline.</note>
       </trans-unit>
       <trans-unit datatype="html" id="710254a196a2649674438edf8a15b7ab1f48271b">
         <source>Open document</source>
         <target>Open document</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="45854ddec74086b271e62be6a363f4fa5036f7fc">
@@ -1830,12 +1864,20 @@
           <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="6987083569809053351">
+        <source>English (GB)</source>
+        <target>Engels (Brits)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="1858110241312746425">
         <source>German</source>
         <target>Duits</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3071065188816255493">
@@ -1843,7 +1885,7 @@
         <target>Nederlands</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7633754075223722162">
@@ -1851,7 +1893,7 @@
         <target>Frans</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2119857572761283468">
@@ -1859,7 +1901,7 @@
         <target>Document bestaat al.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="148389968432135849">
@@ -1867,7 +1909,7 @@
         <target>Bestand niet gevonden.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1520671543092565667">
@@ -1875,39 +1917,43 @@
         <target>Pre-verwerkingsscript bestaat niet.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">17</context>
         </context-group>
+        <note from="description" priority="1">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="7742915911032564889">
         <source>Error while executing pre-consume script.</source>
         <target>Fout tijdens het uitvoeren van het pre-verwerkingsscript</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">18</context>
         </context-group>
+        <note from="description" priority="1">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="8995193730018060346">
         <source>Post-consume script does not exist.</source>
         <target>Post-verwerkingsscript bestaat niet.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">19</context>
         </context-group>
+        <note from="description" priority="1">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="256773668518189604">
         <source>Error while executing post-consume script.</source>
         <target>Fout tijdens het uitvoeren van het post-verwerkingsscript</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">20</context>
         </context-group>
+        <note from="description" priority="1">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
       <trans-unit datatype="html" id="6252258095055634191">
         <source>Received new file.</source>
         <target>Nieuw bestand ontvangen.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7337565919209746135">
@@ -1915,7 +1961,7 @@
         <target>Bestandstype niet ondersteund.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5002399167376099234">
@@ -1923,7 +1969,7 @@
         <target>Document wordt verwerkt...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1085975194762600381">
@@ -1931,7 +1977,7 @@
         <target>Voorbeeldweergave wordt gemaakt...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3280851677698431426">
@@ -1939,7 +1985,7 @@
         <target>Datum wordt gezocht in document...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7162102384876037296">
@@ -1947,7 +1993,7 @@
         <target>Document wordt opgeslagen...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4550450765009165976">
@@ -1955,7 +2001,7 @@
         <target>Klaar.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1519954996184640001">

@@ -1,15 +1,20 @@
+import datetime
+import io
 import json
 import os
 import shutil
 import tempfile
+import zipfile
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 from documents import index, bulk_edit
-from documents.models import Document, Correspondent, DocumentType, Tag, SavedView
+from documents.models import Document, Correspondent, DocumentType, Tag, SavedView, MatchingModel
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -144,20 +149,18 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_thumbnail)
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_download_with_archive(self):
-
-        _, filename = tempfile.mkstemp(dir=self.dirs.originals_dir)
 
         content = b"This is a test"
         content_archive = b"This is the same test but archived"
 
-        with open(filename, "wb") as f:
-            f.write(content)
-
-        filename = os.path.basename(filename)
-
-        doc = Document.objects.create(title="none", filename=filename,
+        doc = Document.objects.create(title="none", filename="my_document.pdf",
+                                      archive_filename="archived.pdf",
                                       mime_type="application/pdf")
+
+        with open(doc.source_path, "wb") as f:
+            f.write(content)
 
         with open(doc.archive_path, "wb") as f:
             f.write(content_archive)
@@ -442,6 +445,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data['documents_total'], 3)
         self.assertEqual(response.data['documents_inbox'], 1)
 
+    def test_statistics_no_inbox_tag(self):
+        Document.objects.create(title="none1", checksum="A")
+
+        response = self.client.get("/api/statistics/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['documents_inbox'], None)
+
     @mock.patch("documents.views.async_task")
     def test_upload(self, m):
 
@@ -575,10 +585,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         async_task.assert_not_called()
 
     def test_get_metadata(self):
-        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png", archive_checksum="A")
+        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="image/png", archive_checksum="A", archive_filename="archive.pdf")
 
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), doc.source_path)
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), doc.archive_path)
+        source_file = os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png")
+        archive_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
+
+        shutil.copy(source_file, doc.source_path)
+        shutil.copy(archive_file, doc.archive_path)
 
         response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
         self.assertEqual(response.status_code, 200)
@@ -589,6 +602,10 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertTrue(meta['has_archive_version'])
         self.assertEqual(len(meta['original_metadata']), 0)
         self.assertGreater(len(meta['archive_metadata']), 0)
+        self.assertEqual(meta['media_filename'], "file.pdf")
+        self.assertEqual(meta['archive_media_filename'], "archive.pdf")
+        self.assertEqual(meta['original_size'], os.stat(source_file).st_size)
+        self.assertEqual(meta['archive_size'], os.stat(archive_file).st_size)
 
     def test_get_metadata_invalid_doc(self):
         response = self.client.get(f"/api/documents/34576/metadata/")
@@ -608,6 +625,22 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertFalse(meta['has_archive_version'])
         self.assertGreater(len(meta['original_metadata']), 0)
         self.assertIsNone(meta['archive_metadata'])
+        self.assertIsNone(meta['archive_media_filename'])
+
+    def test_get_metadata_missing_files(self):
+        doc = Document.objects.create(title="test", filename="file.pdf", mime_type="application/pdf", archive_filename="file.pdf", archive_checksum="B", checksum="A")
+
+        response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
+        self.assertEqual(response.status_code, 200)
+
+        meta = response.data
+
+        self.assertTrue(meta['has_archive_version'])
+        self.assertIsNone(meta['original_metadata'])
+        self.assertIsNone(meta['original_size'])
+        self.assertIsNone(meta['archive_metadata'])
+        self.assertIsNone(meta['archive_size'])
+
 
     def test_get_empty_suggestions(self):
         doc = Document.objects.create(title="test", mime_type="application/pdf")
@@ -716,6 +749,63 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
         v1 = SavedView.objects.get(id=v1.id)
         self.assertEqual(v1.filter_rules.count(), 0)
+
+    def test_get_logs(self):
+        response = self.client.get("/api/logs/")
+        self.assertEqual(response.status_code, 200)
+        self.assertCountEqual(response.data, ["mail", "paperless"])
+
+    def test_get_invalid_log(self):
+        response = self.client.get("/api/logs/bogus_log/")
+        self.assertEqual(response.status_code, 404)
+
+    @override_settings(LOGGING_DIR="bogus_dir")
+    def test_get_nonexistent_log(self):
+        response = self.client.get("/api/logs/paperless/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_log(self):
+        log_data = "test\ntest2\n"
+        with open(os.path.join(settings.LOGGING_DIR, "paperless.log"), "w") as f:
+            f.write(log_data)
+        response = self.client.get("/api/logs/paperless/")
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response.data, ["test", "test2"])
+
+    def test_invalid_regex_other_algorithm(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "matching_algorithm": MatchingModel.MATCH_ANY,
+                "match": "["
+            }, format='json')
+            self.assertEqual(response.status_code, 201, endpoint)
+
+    def test_invalid_regex(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "matching_algorithm": MatchingModel.MATCH_REGEX,
+                "match": "["
+            }, format='json')
+            self.assertEqual(response.status_code, 400, endpoint)
+
+    def test_valid_regex(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "matching_algorithm": MatchingModel.MATCH_REGEX,
+                "match": "[0-9]"
+            }, format='json')
+            self.assertEqual(response.status_code, 201, endpoint)
+
+    def test_regex_no_algorithm(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "match": "[0-9]"
+            }, format='json')
+            self.assertEqual(response.status_code, 201, endpoint)
 
 
 class TestBulkEdit(DirectoriesMixin, APITestCase):
@@ -1071,6 +1161,113 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.assertCountEqual(response.data['selected_document_types'], [{"id": self.c1.id, "document_count": 1}, {"id": self.c2.id, "document_count": 0}])
 
 
+class TestBulkDownload(DirectoriesMixin, APITestCase):
+
+    def setUp(self):
+        super(TestBulkDownload, self).setUp()
+
+        user = User.objects.create_superuser(username="temp_admin")
+        self.client.force_login(user=user)
+
+        self.doc1 = Document.objects.create(title="unrelated", checksum="A")
+        self.doc2 = Document.objects.create(title="document A", filename="docA.pdf", mime_type="application/pdf", checksum="B", created=datetime.datetime(2021, 1, 1))
+        self.doc2b = Document.objects.create(title="document A", filename="docA2.pdf", mime_type="application/pdf", checksum="D", created=datetime.datetime(2021, 1, 1))
+        self.doc3 = Document.objects.create(title="document B", filename="docB.jpg", mime_type="image/jpeg", checksum="C", created=datetime.datetime(2020, 3, 21), archive_filename="docB.pdf", archive_checksum="D")
+
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), self.doc2.source_path)
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.png"), self.doc2b.source_path)
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.jpg"), self.doc3.source_path)
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "test_with_bom.pdf"), self.doc3.archive_path)
+
+    def test_download_originals(self):
+        response = self.client.post("/api/documents/bulk_download/", json.dumps({
+            "documents": [self.doc2.id, self.doc3.id],
+            "content": "originals"
+        }), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+            self.assertEqual(len(zipf.filelist), 2)
+            self.assertIn("2021-01-01 document A.pdf", zipf.namelist())
+            self.assertIn("2020-03-21 document B.jpg", zipf.namelist())
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("2021-01-01 document A.pdf"))
+
+            with self.doc3.source_file as f:
+                self.assertEqual(f.read(), zipf.read("2020-03-21 document B.jpg"))
+
+    def test_download_default(self):
+        response = self.client.post("/api/documents/bulk_download/", json.dumps({
+            "documents": [self.doc2.id, self.doc3.id]
+        }), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+            self.assertEqual(len(zipf.filelist), 2)
+            self.assertIn("2021-01-01 document A.pdf", zipf.namelist())
+            self.assertIn("2020-03-21 document B.pdf", zipf.namelist())
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("2021-01-01 document A.pdf"))
+
+            with self.doc3.archive_file as f:
+                self.assertEqual(f.read(), zipf.read("2020-03-21 document B.pdf"))
+
+    def test_download_both(self):
+        response = self.client.post("/api/documents/bulk_download/", json.dumps({
+            "documents": [self.doc2.id, self.doc3.id],
+            "content": "both"
+        }), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+            self.assertEqual(len(zipf.filelist), 3)
+            self.assertIn("originals/2021-01-01 document A.pdf", zipf.namelist())
+            self.assertIn("archive/2020-03-21 document B.pdf", zipf.namelist())
+            self.assertIn("originals/2020-03-21 document B.jpg", zipf.namelist())
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("originals/2021-01-01 document A.pdf"))
+
+            with self.doc3.archive_file as f:
+                self.assertEqual(f.read(), zipf.read("archive/2020-03-21 document B.pdf"))
+
+            with self.doc3.source_file as f:
+                self.assertEqual(f.read(), zipf.read("originals/2020-03-21 document B.jpg"))
+
+    def test_filename_clashes(self):
+        response = self.client.post("/api/documents/bulk_download/", json.dumps({
+            "documents": [self.doc2.id, self.doc2b.id]
+        }), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/zip')
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as zipf:
+            self.assertEqual(len(zipf.filelist), 2)
+
+            self.assertIn("2021-01-01 document A.pdf", zipf.namelist())
+            self.assertIn("2021-01-01 document A_01.pdf", zipf.namelist())
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("2021-01-01 document A.pdf"))
+
+            with self.doc2b.source_file as f:
+                self.assertEqual(f.read(), zipf.read("2021-01-01 document A_01.pdf"))
+
+    def test_compression(self):
+        response = self.client.post("/api/documents/bulk_download/", json.dumps({
+            "documents": [self.doc2.id, self.doc2b.id],
+            "compression": "lzma"
+        }), content_type='application/json')
+
 class TestApiAuth(APITestCase):
 
     def test_auth_required(self):
@@ -1094,4 +1291,5 @@ class TestApiAuth(APITestCase):
         self.assertEqual(self.client.get("/api/search/").status_code, 401)
         self.assertEqual(self.client.get("/api/search/auto_complete/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/bulk_edit/").status_code, 401)
+        self.assertEqual(self.client.get("/api/documents/bulk_download/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/selection_data/").status_code, 401)

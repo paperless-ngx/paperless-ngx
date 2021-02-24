@@ -7,7 +7,6 @@ from django import db
 from django.core.management.base import BaseCommand
 
 from documents.models import Document
-from ...mixins import Renderable
 from ...parsers import get_parser_class_for_mime_type
 
 
@@ -23,22 +22,21 @@ def _process_document(doc_in):
 
     try:
         thumb = parser.get_optimised_thumbnail(
-            document.source_path, document.mime_type)
+            document.source_path,
+            document.mime_type,
+            document.get_public_filename()
+        )
 
         shutil.move(thumb, document.thumbnail_path)
     finally:
         parser.cleanup()
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         This will regenerate the thumbnails for all documents.
     """.replace("    ", "")
-
-    def __init__(self, *args, **kwargs):
-        self.verbosity = 0
-        BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -51,9 +49,6 @@ class Command(Renderable, BaseCommand):
         )
 
     def handle(self, *args, **options):
-
-        self.verbosity = options["verbosity"]
-
         logging.getLogger().handlers[0].level = logging.ERROR
 
         if options['document']:

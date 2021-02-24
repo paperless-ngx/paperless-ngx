@@ -47,6 +47,8 @@ MESSAGE_FINISHED = "finished"
 
 class Consumer(LoggingMixin):
 
+    logging_name = "paperless.consumer"
+
     def _send_progress(self, current_progress, max_progress, status,
                        message=None, document_id=None):
         payload = {
@@ -198,8 +200,6 @@ class Consumer(LoggingMixin):
                 MESSAGE_UNSUPPORTED_TYPE,
                 f"Unsupported mime type {mime_type}"
             )
-        else:
-            self.log("debug", f"Parser: {parser_class.__name__}")
 
         # Notify all listeners that we're going to do some work.
 
@@ -220,6 +220,8 @@ class Consumer(LoggingMixin):
 
         document_parser = parser_class(self.logging_group, progress_callback)
 
+        self.log("debug", f"Parser: {type(document_parser).__name__}")
+
         # However, this already created working directories which we have to
         # clean up.
 
@@ -239,7 +241,7 @@ class Consumer(LoggingMixin):
             self._send_progress(70, 100, 'WORKING',
                                 MESSAGE_GENERATING_THUMBNAIL)
             thumbnail = document_parser.get_optimised_thumbnail(
-                self.path, mime_type)
+                self.path, mime_type, self.filename)
 
             text = document_parser.get_text()
             date = document_parser.get_date()
@@ -290,8 +292,7 @@ class Consumer(LoggingMixin):
                 # After everything is in the database, copy the files into
                 # place. If this fails, we'll also rollback the transaction.
                 with FileLock(settings.MEDIA_LOCK):
-                    document.filename = generate_unique_filename(
-                        document, settings.ORIGINALS_DIR)
+                    document.filename = generate_unique_filename(document)
                     create_source_path_directory(document.source_path)
 
                     self._write(document.storage_type,
@@ -301,6 +302,10 @@ class Consumer(LoggingMixin):
                                 thumbnail, document.thumbnail_path)
 
                     if archive_path and os.path.isfile(archive_path):
+                        document.archive_filename = generate_unique_filename(
+                            document,
+                            archive_filename=True
+                        )
                         create_source_path_directory(document.archive_path)
                         self._write(document.storage_type,
                                     archive_path, document.archive_path)

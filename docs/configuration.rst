@@ -72,13 +72,13 @@ PAPERLESS_CONSUMPTION_DIR=<path>
     container. Change the local consumption directory in the docker-compose.yml
     file instead.
 
-    Defaults to "../consume", relative to the "src" directory.
+    Defaults to "../consume/", relative to the "src" directory.
 
 PAPERLESS_DATA_DIR=<path>
     This is where paperless stores all its data (search index, SQLite database,
     classification model, etc).
 
-    Defaults to "../data", relative to the "src" directory.
+    Defaults to "../data/", relative to the "src" directory.
 
 PAPERLESS_MEDIA_ROOT=<path>
     This is where your documents and thumbnails are stored.
@@ -86,7 +86,7 @@ PAPERLESS_MEDIA_ROOT=<path>
     You can set this and PAPERLESS_DATA_DIR to the same folder to have paperless
     store all its data within the same volume.
 
-    Defaults to "../media", relative to the "src" directory.
+    Defaults to "../media/", relative to the "src" directory.
 
 PAPERLESS_STATICDIR=<path>
     Override the default STATIC_ROOT here.  This is where all static files
@@ -94,13 +94,32 @@ PAPERLESS_STATICDIR=<path>
 
     Unless you're doing something fancy, there is no need to override this.
 
-    Defaults to "../static", relative to the "src" directory.
+    Defaults to "../static/", relative to the "src" directory.
 
 PAPERLESS_FILENAME_FORMAT=<format>
     Changes the filenames paperless uses to store documents in the media directory.
     See :ref:`advanced-file_name_handling` for details.
 
     Default is none, which disables this feature.
+
+PAPERLESS_LOGGING_DIR=<path>
+    This is where paperless will store log files.
+
+    Defaults to "``PAPERLESS_DATA_DIR``/log/".
+
+
+Logging
+#######
+
+PAPERLESS_LOGROTATE_MAX_SIZE=<num>
+    Maximum file size for log files before they are rotated, in bytes.
+
+    Defaults to 1 MiB.
+
+PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>
+    Number of rotated log files to keep.
+
+    Defaults to 20.
 
 Hosting & Security
 ##################
@@ -183,7 +202,6 @@ Paperless uses `OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/>`_ for
 performing OCR on documents and images. Paperless uses sensible defaults for
 most settings, but all of them can be configured to your needs.
 
-
 PAPERLESS_OCR_LANGUAGE=<lang>
     Customize the language that paperless will attempt to use when
     parsing documents.
@@ -226,6 +244,54 @@ PAPERLESS_OCR_MODE=<mode>
     The default is ``skip``, which only performs OCR when necessary and always
     creates archived documents.
 
+    Read more about this in the `OCRmyPDF documentation <https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped>`_.
+
+PAPERLESS_OCR_CLEAN=<mode>
+    Tells paperless to use ``unpaper`` to clean any input document before
+    sending it to tesseract. This uses more resources, but generally results
+    in better OCR results. The following modes are available:
+
+    *   ``clean``: Apply unpaper.
+    *   ``clean-final``: Apply unpaper, and use the cleaned images to build the
+        output file instead of the original images.
+    *   ``none``: Do not apply unpaper.
+
+    Defaults to ``clean``.
+
+    .. note::
+
+        ``clean-final`` is incompatible with ocr mode ``redo``. When both
+        ``clean-final`` and the ocr mode ``redo`` is configured, ``clean``
+        is used instead.
+
+PAPERLESS_OCR_DESKEW=<bool>
+    Tells paperless to correct skewing (slight rotation of input images mainly
+    due to improper scanning)
+
+    Defaults to ``true``, which enables this feature.
+
+    .. note::
+
+        Deskewing is incompatible with ocr mode ``redo``. Deskewing will get
+        disabled automatically if ``redo`` is used as the ocr mode.
+
+PAPERLESS_OCR_ROTATE_PAGES=<bool>
+    Tells paperless to correct page rotation (90°, 180° and 270° rotation).
+
+    If you notice that paperless is not rotating incorrectly rotated
+    pages (or vice versa), try adjusting the threshold up or down (see below).
+
+    Defaults to ``true``, which enables this feature.
+
+
+PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>
+    Adjust the threshold for automatic page rotation by ``PAPERLESS_OCR_ROTATE_PAGES``.
+    This is an arbitrary value reported by tesseract. "15" is a very conservative value,
+    whereas "2" is a very aggressive option and will often result in correctly rotated pages
+    being rotated as well.
+
+    Defaults to "12".
+
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
 
@@ -252,7 +318,6 @@ PAPERLESS_OCR_PAGES=<num>
 
     Defaults to 0, which disables this feature and always uses all pages.
 
-
 PAPERLESS_OCR_IMAGE_DPI=<num>
     Paperless will OCR any images you put into the system and convert them
     into PDF documents. This is useful if your scanner produces images.
@@ -263,8 +328,8 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
 
     Set this to the DPI your scanner produces images at.
 
-    Default is none, which causes paperless to fail if no DPI information is
-    present in an image.
+    Default is none, which will automatically calculate image DPI so that
+    the produced PDF documents are A4 sized.
 
 
 PAPERLESS_OCR_USER_ARGS=<json>
@@ -273,7 +338,7 @@ PAPERLESS_OCR_USER_ARGS=<json>
     the API of OCRmyPDF, you have to specify these in a format that can be
     passed to the API. See `the API reference of OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/api.html#reference>`_
     for valid parameters. All command line options are supported, but they
-    use underscores instead of dashed.
+    use underscores instead of dashes.
 
     .. caution::
 
@@ -333,7 +398,7 @@ requires are as follows:
                 PAPERLESS_TIKA_ENABLED: 1
                 PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
                 PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-        
+
         # ...
 
         gotenberg:
@@ -536,3 +601,65 @@ PAPERLESS_GS_BINARY=<path>
 
 PAPERLESS_OPTIPNG_BINARY=<path>
     Defaults to "/usr/bin/optipng".
+
+
+.. _configuration-docker:
+
+Docker-specific options
+#######################
+
+These options don't have any effect in ``paperless.conf``. These options adjust
+the behavior of the docker container. Configure these in `docker-compose.env`.
+
+PAPERLESS_WEBSERVER_WORKERS=<num>
+    The number of worker processes the webserver should spawn. More worker processes
+    usually result in the front end to load data much quicker. However, each worker process
+    also loads the entire application into memory separately, so increasing this value
+    will increase RAM usage.
+
+    Consider configuring this to 1 on low power devices with limited amount of RAM.
+
+    Defaults to 2.
+
+USERMAP_UID=<uid>
+    The ID of the paperless user in the container. Set this to your actual user ID on the
+    host system, which you can get by executing
+
+    .. code:: shell-session
+
+        $ id -u
+
+    Paperless will change ownership on its folders to this user, so you need to get this right
+    in order to be able to write to the consumption directory.
+
+    Defaults to 1000.
+
+USERMAP_GID=<gid>
+    The ID of the paperless Group in the container. Set this to your actual group ID on the
+    host system, which you can get by executing
+
+    .. code:: shell-session
+
+        $ id -g
+
+    Paperless will change ownership on its folders to this group, so you need to get this right
+    in order to be able to write to the consumption directory.
+
+    Defaults to 1000.
+
+PAPERLESS_OCR_LANGUAGES=<list>
+    Additional OCR languages to install. By default, paperless comes with
+    English, German, Italian, Spanish and French. If your language is not in this list, install
+    additional languages with this configuration option:
+
+    .. code:: bash
+
+        PAPERLESS_OCR_LANGUAGES=tur ces
+
+    To actually use these languages, also set the default OCR language of paperless:
+
+    .. code:: bash
+
+        PAPERLESS_OCR_LANGUAGE=tur
+
+    Defaults to none, which does not install any additional languages.

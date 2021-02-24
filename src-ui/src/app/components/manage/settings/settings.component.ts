@@ -34,7 +34,7 @@ export class SettingsComponent implements OnInit {
   savedViews: PaperlessSavedView[]
 
   get computedDateLocale(): string {
-    return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage
+    return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage || this.currentLocale
   }
 
   constructor(
@@ -86,11 +86,15 @@ export class SettingsComponent implements OnInit {
   }
 
   get displayLanguageOptions(): LanguageOption[] {
-    return [{code: "", name: $localize`Use system language`}].concat(this.settings.getLanguageOptions())
+    return [
+      {code: "", name: $localize`Use system language`}
+    ].concat(this.settings.getLanguageOptions())
   }
 
   get dateLocaleOptions(): LanguageOption[] {
-    return [{code: "", name: $localize`Use date format of display language`}].concat(this.settings.getLanguageOptions())
+    return [
+      {code: "", name: $localize`Use date format of display language`}
+    ].concat(this.settings.getDateLocaleOptions())
   }
 
   get today() {

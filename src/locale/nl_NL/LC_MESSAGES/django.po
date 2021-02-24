@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
+# Jonas Winkler, 2021
 # Jo Vandeginste <jo.vandeginste@gmail.com>, 2021
-# Ben <bzweekhorst@gmail.com>, 2021
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-28 22:02+0100\n"
-"PO-Revision-Date: 2020-12-30 19:27+0000\n"
-"Last-Translator: Ben <bzweekhorst@gmail.com>, 2021\n"
+"POT-Creation-Date: 2021-02-16 14:52+0100\n"
+"PO-Revision-Date: 2021-02-16 18:37+0000\n"
+"Last-Translator: Jo Vandeginste <jo.vandeginste@gmail.com>, 2021\n"
 "Language-Team: Dutch (Netherlands) (https://www.transifex.com/paperless/teams/115905/nl_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,64 +26,64 @@ msgstr ""
 msgid "Documents"
 msgstr "Documenten"
 
-#: documents/models.py:33
+#: documents/models.py:32
 msgid "Any word"
 msgstr "Eender welk woord"
 
-#: documents/models.py:34
+#: documents/models.py:33
 msgid "All words"
 msgstr "Alle woorden"
 
-#: documents/models.py:35
+#: documents/models.py:34
 msgid "Exact match"
 msgstr "Exacte overeenkomst"
 
-#: documents/models.py:36
+#: documents/models.py:35
 msgid "Regular expression"
 msgstr "Reguliere expressie"
 
-#: documents/models.py:37
+#: documents/models.py:36
 msgid "Fuzzy word"
 msgstr "Gelijkaardig woord"
 
-#: documents/models.py:38
+#: documents/models.py:37
 msgid "Automatic"
 msgstr "Automatisch"
 
-#: documents/models.py:42 documents/models.py:352 paperless_mail/models.py:25
+#: documents/models.py:41 documents/models.py:364 paperless_mail/models.py:25
 #: paperless_mail/models.py:109
 msgid "name"
 msgstr "naam"
 
-#: documents/models.py:46
+#: documents/models.py:45
 msgid "match"
 msgstr "Overeenkomst"
 
-#: documents/models.py:50
+#: documents/models.py:49
 msgid "matching algorithm"
 msgstr "Algoritme voor het bepalen van de overeenkomst"
 
-#: documents/models.py:56
+#: documents/models.py:55
 msgid "is insensitive"
 msgstr "is niet hoofdlettergevoelig"
 
-#: documents/models.py:75 documents/models.py:135
+#: documents/models.py:74 documents/models.py:134
 msgid "correspondent"
 msgstr "correspondent"
 
-#: documents/models.py:76
+#: documents/models.py:75
 msgid "correspondents"
 msgstr "correspondenten"
 
-#: documents/models.py:98
+#: documents/models.py:97
 msgid "color"
 msgstr "Kleur"
 
-#: documents/models.py:102
+#: documents/models.py:101
 msgid "is inbox tag"
 msgstr "is \"Postvak in\"-etiket"
 
-#: documents/models.py:104
+#: documents/models.py:103
 msgid ""
 "Marks this tag as an inbox tag: All newly consumed documents will be tagged "
 "with inbox tags."
@@ -91,39 +91,39 @@ msgstr ""
 "Markeer dit etiket als een \"Postvak in\"-etiket: alle nieuw verwerkte "
 "documenten krijgen de \"Postvak in\"-etiketten."
 
-#: documents/models.py:109
+#: documents/models.py:108
 msgid "tag"
 msgstr "etiket"
 
-#: documents/models.py:110 documents/models.py:166
+#: documents/models.py:109 documents/models.py:165
 msgid "tags"
 msgstr "etiketten"
 
-#: documents/models.py:116 documents/models.py:148
+#: documents/models.py:115 documents/models.py:147
 msgid "document type"
 msgstr "documenttype"
 
-#: documents/models.py:117
+#: documents/models.py:116
 msgid "document types"
 msgstr "documenttypen"
 
-#: documents/models.py:125
+#: documents/models.py:124
 msgid "Unencrypted"
 msgstr "Niet versleuteld"
 
-#: documents/models.py:126
+#: documents/models.py:125
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "Versleuteld met GNU Privacy Guard"
 
-#: documents/models.py:139
+#: documents/models.py:138
 msgid "title"
 msgstr "titel"
 
-#: documents/models.py:152
+#: documents/models.py:151
 msgid "content"
 msgstr "inhoud"
 
-#: documents/models.py:154
+#: documents/models.py:153
 msgid ""
 "The raw, text-only data of the document. This field is primarily used for "
 "searching."
@@ -131,43 +131,43 @@ msgstr ""
 "De onbewerkte gegevens van het document. Dit veld wordt voornamelijk "
 "gebruikt om te zoeken."
 
-#: documents/models.py:159
+#: documents/models.py:158
 msgid "mime type"
 msgstr "mimetype"
 
-#: documents/models.py:170
+#: documents/models.py:169
 msgid "checksum"
 msgstr "checksum"
 
-#: documents/models.py:174
+#: documents/models.py:173
 msgid "The checksum of the original document."
 msgstr "Het controlecijfer van het originele document."
 
-#: documents/models.py:178
+#: documents/models.py:177
 msgid "archive checksum"
 msgstr "archief checksum"
 
-#: documents/models.py:183
+#: documents/models.py:182
 msgid "The checksum of the archived document."
 msgstr "De checksum van het gearchiveerde document."
 
-#: documents/models.py:187 documents/models.py:330
+#: documents/models.py:186 documents/models.py:342
 msgid "created"
 msgstr "aangemaakt"
 
-#: documents/models.py:191
+#: documents/models.py:190
 msgid "modified"
 msgstr "gewijzigd"
 
-#: documents/models.py:195
+#: documents/models.py:194
 msgid "storage type"
 msgstr "type opslag"
 
-#: documents/models.py:203
+#: documents/models.py:202
 msgid "added"
 msgstr "toegevoegd"
 
-#: documents/models.py:207
+#: documents/models.py:206
 msgid "filename"
 msgstr "bestandsnaam"
 
@@ -176,178 +176,186 @@ msgid "Current filename in storage"
 msgstr "Huidige bestandsnaam in opslag"
 
 #: documents/models.py:216
+msgid "archive filename"
+msgstr "Bestandsnaam in archief"
+
+#: documents/models.py:222
+msgid "Current archive filename in storage"
+msgstr "Huidige bestandsnaam in archief"
+
+#: documents/models.py:226
 msgid "archive serial number"
 msgstr "serienummer in archief"
 
-#: documents/models.py:221
+#: documents/models.py:231
 msgid "The position of this document in your physical document archive."
 msgstr "De positie van dit document in je fysieke documentenarchief."
 
-#: documents/models.py:227
+#: documents/models.py:237
 msgid "document"
 msgstr "document"
 
-#: documents/models.py:228
+#: documents/models.py:238
 msgid "documents"
 msgstr "documenten"
 
-#: documents/models.py:313
+#: documents/models.py:325
 msgid "debug"
 msgstr "debug"
 
-#: documents/models.py:314
+#: documents/models.py:326
 msgid "information"
 msgstr "informatie"
 
-#: documents/models.py:315
+#: documents/models.py:327
 msgid "warning"
 msgstr "waarschuwing"
 
-#: documents/models.py:316
+#: documents/models.py:328
 msgid "error"
 msgstr "fout"
 
-#: documents/models.py:317
+#: documents/models.py:329
 msgid "critical"
 msgstr "kritisch"
 
-#: documents/models.py:321
+#: documents/models.py:333
 msgid "group"
 msgstr "groep"
 
-#: documents/models.py:324
+#: documents/models.py:336
 msgid "message"
 msgstr "bericht"
 
-#: documents/models.py:327
+#: documents/models.py:339
 msgid "level"
 msgstr "niveau"
 
-#: documents/models.py:334
+#: documents/models.py:346
 msgid "log"
 msgstr "bericht"
 
-#: documents/models.py:335
+#: documents/models.py:347
 msgid "logs"
 msgstr "berichten"
 
-#: documents/models.py:346 documents/models.py:396
+#: documents/models.py:358 documents/models.py:408
 msgid "saved view"
 msgstr "opgeslagen view"
 
-#: documents/models.py:347
+#: documents/models.py:359
 msgid "saved views"
 msgstr "opgeslagen views"
 
-#: documents/models.py:350
+#: documents/models.py:362
 msgid "user"
 msgstr "gebruiker"
 
-#: documents/models.py:356
+#: documents/models.py:368
 msgid "show on dashboard"
 msgstr "weergeven op dashboard"
 
-#: documents/models.py:359
+#: documents/models.py:371
 msgid "show in sidebar"
 msgstr "weergeven in zijbalk"
 
-#: documents/models.py:363
+#: documents/models.py:375
 msgid "sort field"
 msgstr "sorteerveld"
 
-#: documents/models.py:366
+#: documents/models.py:378
 msgid "sort reverse"
 msgstr "omgekeerd sorteren"
 
-#: documents/models.py:372
+#: documents/models.py:384
 msgid "title contains"
 msgstr "titel bevat"
 
-#: documents/models.py:373
+#: documents/models.py:385
 msgid "content contains"
 msgstr "inhoud bevat"
 
-#: documents/models.py:374
+#: documents/models.py:386
 msgid "ASN is"
 msgstr "ASN is"
 
-#: documents/models.py:375
+#: documents/models.py:387
 msgid "correspondent is"
 msgstr "correspondent is"
 
-#: documents/models.py:376
+#: documents/models.py:388
 msgid "document type is"
 msgstr "documenttype is"
 
-#: documents/models.py:377
+#: documents/models.py:389
 msgid "is in inbox"
 msgstr "zit in \"Postvak in\""
 
-#: documents/models.py:378
+#: documents/models.py:390
 msgid "has tag"
 msgstr "heeft etiket"
 
-#: documents/models.py:379
+#: documents/models.py:391
 msgid "has any tag"
 msgstr "heeft één van de etiketten"
 
-#: documents/models.py:380
+#: documents/models.py:392
 msgid "created before"
 msgstr "aangemaakt voor"
 
-#: documents/models.py:381
+#: documents/models.py:393
 msgid "created after"
 msgstr "aangemaakt na"
 
-#: documents/models.py:382
+#: documents/models.py:394
 msgid "created year is"
 msgstr "aangemaakt jaar is"
 
-#: documents/models.py:383
+#: documents/models.py:395
 msgid "created month is"
 msgstr "aangemaakte maand is"
 
-#: documents/models.py:384
+#: documents/models.py:396
 msgid "created day is"
 msgstr "aangemaakte dag is"
 
-#: documents/models.py:385
+#: documents/models.py:397
 msgid "added before"
 msgstr "toegevoegd voor"
 
-#: documents/models.py:386
+#: documents/models.py:398
 msgid "added after"
 msgstr "toegevoegd na"
 
-#: documents/models.py:387
+#: documents/models.py:399
 msgid "modified before"
 msgstr "gewijzigd voor"
 
-#: documents/models.py:388
+#: documents/models.py:400
 msgid "modified after"
 msgstr "gewijzigd na"
 
-#: documents/models.py:389
+#: documents/models.py:401
 msgid "does not have tag"
 msgstr "heeft geen etiket"
 
-#: documents/models.py:400
+#: documents/models.py:412
 msgid "rule type"
 msgstr "type regel"
 
-#: documents/models.py:404
+#: documents/models.py:416
 msgid "value"
 msgstr "waarde"
 
-#: documents/models.py:410
+#: documents/models.py:422
 msgid "filter rule"
 msgstr "filterregel"
 
-#: documents/models.py:411
+#: documents/models.py:423
 msgid "filter rules"
 msgstr "filterregels"
 
-#: documents/serialisers.py:383
+#: documents/serialisers.py:370
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Bestandstype %(type)s niet ondersteund"
@@ -392,19 +400,23 @@ msgstr "Wachtwoord"
 msgid "Sign in"
 msgstr "Aanmelden"
 
-#: paperless/settings.py:286
-msgid "English"
-msgstr "Engels"
+#: paperless/settings.py:291
+msgid "English (US)"
+msgstr "Engels (US)"
 
-#: paperless/settings.py:287
+#: paperless/settings.py:292
+msgid "English (GB)"
+msgstr "Engels (Brits)"
+
+#: paperless/settings.py:293
 msgid "German"
 msgstr "Duits"
 
-#: paperless/settings.py:288
+#: paperless/settings.py:294
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: paperless/settings.py:289
+#: paperless/settings.py:295
 msgid "French"
 msgstr "Frans"
 

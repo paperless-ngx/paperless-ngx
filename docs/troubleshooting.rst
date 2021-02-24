@@ -60,7 +60,8 @@ required so that the user running paperless inside docker has write permissions
 to these folders. This happens when pointing these directories to NFS shares,
 for example.
 
-Ensure that `chown` is possible on these directories.
+Ensure that ``chown`` is possible on these directories.
+
 
 Classifier error: No training data available
 ############################################
@@ -72,6 +73,7 @@ This may have two reasons:
 *   You are using the Auto matching algorithm: The classifier explicitly excludes documents
     with Inbox tags. Verify that there are documents in your archive without inbox tags.
     The algorithm will only learn from documents not in your inbox.
+
 
 UserWarning in sklearn on every single document
 ###############################################
@@ -91,6 +93,31 @@ in most cases. This warning will disappear automatically when paperless updates 
 If you want to get rid of the warning or actually experience issues with automatic matching, delete
 the file ``classification_model.pickle`` in the data directory and let paperless recreate it.
 
+
+504 Server Error: Gateway Timeout when adding Office documents
+##############################################################
+
+You may experience these errors when using the optional TIKA integration:
+
+.. code::
+
+    requests.exceptions.HTTPError: 504 Server Error: Gateway Timeout for url: http://gotenberg:3000/convert/office
+
+Gotenberg is a server that converts Office documents into PDF documents and has a default timeout of 10 seconds.
+When conversion takes longer, Gotenberg raises this error.
+
+You can increase the timeout by configuring an environment variable for gotenberg (see also `here <https://thecodingmachine.github.io/gotenberg/#environment_variables.default_wait_timeout>`__).
+If using docker-compose, this is achieved by the following configuration change in the ``docker-compose.yml`` file:
+
+.. code:: yaml
+
+    gotenberg:
+        image: thecodingmachine/gotenberg
+        restart: unless-stopped
+        environment:
+            DISABLE_GOOGLE_CHROME: 1
+            DEFAULT_WAIT_TIMEOUT: 30
+
 Permission denied errors in the consumption directory
 #####################################################
 
@@ -105,6 +132,38 @@ Ensure that ``USERMAP_UID`` and ``USERMAP_GID`` are set to the user id and group
 different from ``1000``. See :ref:`setup-docker_hub`.
 
 Also ensure that you are able to read and write to the consumption directory on the host.
+
+
+OSError: [Errno 19] No such device when consuming files
+#######################################################
+
+If you experience errors such as:
+
+.. code:: shell-session
+
+    File "/usr/local/lib/python3.7/site-packages/whoosh/codec/base.py", line 570, in open_compound_file
+    return CompoundStorage(dbfile, use_mmap=storage.supports_mmap)
+    File "/usr/local/lib/python3.7/site-packages/whoosh/filedb/compound.py", line 75, in __init__
+    self._source = mmap.mmap(fileno, 0, access=mmap.ACCESS_READ)
+    OSError: [Errno 19] No such device
+
+    During handling of the above exception, another exception occurred:
+
+    Traceback (most recent call last):
+    File "/usr/local/lib/python3.7/site-packages/django_q/cluster.py", line 436, in worker
+    res = f(*task["args"], **task["kwargs"])
+    File "/usr/src/paperless/src/documents/tasks.py", line 73, in consume_file
+    override_tag_ids=override_tag_ids)
+    File "/usr/src/paperless/src/documents/consumer.py", line 271, in try_consume_file
+    raise ConsumerError(e)
+
+Paperless uses a search index to provide better and faster full text searching. This search index is stored inside
+the ``data`` folder. The search index uses memory-mapped files (mmap). The above error indicates that paperless
+was unable to create and open these files.
+
+This happens when you're trying to store the data directory on certain file systems (mostly network shares)
+that don't support memory-mapped files.
+
 
 Web-UI stuck at "Loading..."
 ############################
