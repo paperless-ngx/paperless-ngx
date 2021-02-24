@@ -62,6 +62,7 @@ import { CustomDatePipe } from './pipes/custom-date.pipe';
 import { DateComponent } from './components/common/input/date/date.component';
 import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter';
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter';
+import { ApiVersionInterceptor } from './interceptors/api-version.interceptor';
 
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
@@ -143,6 +144,10 @@ registerLocaleData(localeEnGb)
     CookieService, {
       provide: HTTP_INTERCEPTORS,
       useClass: CsrfInterceptor,
+      multi: true
+    },{
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiVersionInterceptor,
       multi: true
     },
     FilterPipe,
