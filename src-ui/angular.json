@@ -19,7 +19,8 @@
 					"de": "src/locale/messages.de.xlf",
 					"nl-NL": "src/locale/messages.nl_NL.xlf",
 					"fr": "src/locale/messages.fr.xlf",
-					"en-GB": "src/locale/messages.en_GB.xlf"
+					"en-GB": "src/locale/messages.en_GB.xlf",
+					"pt-BR": "src/locale/messages.pt_BR.xlf"
 				}
 			},
 			"architect": {
