@@ -78,7 +78,7 @@ class Correspondent(MatchingModel):
 
 class Tag(MatchingModel):
 
-    colour = models.CharField(
+    color = models.CharField(
         _("color"),
         blank=True, max_length=7)
 
