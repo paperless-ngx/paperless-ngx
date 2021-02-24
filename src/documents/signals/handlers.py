@@ -1,24 +1,24 @@
 import logging
 import os
-from subprocess import Popen
 
 from django.conf import settings
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, DatabaseError
+from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
-from rest_framework.reverse import reverse
+from filelock import FileLock
 
-from .. import index, matching
-from ..file_handling import delete_empty_directories, generate_filename, \
-    create_source_path_directory, archive_name_from_filename
+from .. import matching
+from ..file_handling import delete_empty_directories, \
+    create_source_path_directory, \
+    generate_unique_filename
 from ..models import Document, Tag
 
 
-def logger(message, group):
-    logging.getLogger(__name__).debug(message, extra={"group": group})
+logger = logging.getLogger("paperless.handlers")
 
 
 def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
@@ -36,7 +36,7 @@ def set_correspondent(sender,
     if document.correspondent and not replace:
         return
 
-    potential_correspondents = matching.match_correspondents(document.content,
+    potential_correspondents = matching.match_correspondents(document,
                                                              classifier)
 
     potential_count = len(potential_correspondents)
@@ -46,23 +46,23 @@ def set_correspondent(sender,
         selected = None
     if potential_count > 1:
         if use_first:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential correspondents, "
                 f"so we've opted for {selected}",
-                logging_group
+                extra={'group': logging_group}
             )
         else:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential correspondents, "
                 f"not assigning any correspondent",
-                logging_group
+                extra={'group': logging_group}
             )
             return
 
     if selected or replace:
-        logger(
+        logger.info(
             f"Assigning correspondent {selected} to {document}",
-            logging_group
+            extra={'group': logging_group}
         )
 
         document.correspondent = selected
@@ -79,7 +79,7 @@ def set_document_type(sender,
     if document.document_type and not replace:
         return
 
-    potential_document_type = matching.match_document_types(document.content,
+    potential_document_type = matching.match_document_types(document,
                                                             classifier)
 
     potential_count = len(potential_document_type)
@@ -90,23 +90,23 @@ def set_document_type(sender,
 
     if potential_count > 1:
         if use_first:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential document types, "
                 f"so we've opted for {selected}",
-                logging_group
+                extra={'group': logging_group}
             )
         else:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential document types, "
                 f"not assigning any document type",
-                logging_group
+                extra={'group': logging_group}
             )
             return
 
     if selected or replace:
-        logger(
+        logger.info(
             f"Assigning document type {selected} to {document}",
-            logging_group
+            extra={'group': logging_group}
         )
 
         document.document_type = selected
@@ -119,13 +119,16 @@ def set_tags(sender,
              classifier=None,
              replace=False,
              **kwargs):
-    if replace:
-        document.tags.clear()
-        current_tags = set([])
-    else:
-        current_tags = set(document.tags.all())
 
-    matched_tags = matching.match_tags(document.content, classifier)
+    if replace:
+        Document.tags.through.objects.filter(document=document).exclude(
+            Q(tag__is_inbox_tag=True)).exclude(
+            Q(tag__match="") & ~Q(tag__matching_algorithm=Tag.MATCH_AUTO)
+        ).delete()
+
+    current_tags = set(document.tags.all())
+
+    matched_tags = matching.match_tags(document, classifier)
 
     relevant_tags = set(matched_tags) - current_tags
 
@@ -133,82 +136,60 @@ def set_tags(sender,
         return
 
     message = 'Tagging "{}" with "{}"'
-    logger(
-        message.format(document, ", ".join([t.slug for t in relevant_tags])),
-        logging_group
+    logger.info(
+        message.format(document, ", ".join([t.name for t in relevant_tags])),
+        extra={'group': logging_group}
     )
 
     document.tags.add(*relevant_tags)
 
 
-def run_pre_consume_script(sender, filename, **kwargs):
-
-    if not settings.PRE_CONSUME_SCRIPT:
-        return
-
-    Popen((settings.PRE_CONSUME_SCRIPT, filename)).wait()
-
-
-def run_post_consume_script(sender, document, **kwargs):
-
-    if not settings.POST_CONSUME_SCRIPT:
-        return
-
-    Popen((
-        settings.POST_CONSUME_SCRIPT,
-        str(document.pk),
-        document.file_name,
-        os.path.normpath(document.source_path),
-        os.path.normpath(document.thumbnail_path),
-        reverse("document-download", kwargs={"pk": document.pk}),
-        reverse("document-thumb", kwargs={"pk": document.pk}),
-        str(document.correspondent),
-        str(",".join(document.tags.all().values_list("slug", flat=True)))
-    )).wait()
-
-
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
-    for f in (instance.source_path,
-              instance.archive_path,
-              instance.thumbnail_path):
-        if os.path.isfile(f):
-            try:
-                os.unlink(f)
-                logging.getLogger(__name__).debug(
-                    f"Deleted file {f}.")
-            except OSError as e:
-                logging.getLogger(__name__).warning(
-                    f"While deleting document {instance.file_name}, the file "
-                    f"{f} could not be deleted: {e}"
-                )
+    with FileLock(settings.MEDIA_LOCK):
+        for filename in (instance.source_path,
+                         instance.archive_path,
+                         instance.thumbnail_path):
+            if filename and os.path.isfile(filename):
+                try:
+                    os.unlink(filename)
+                    logger.debug(
+                        f"Deleted file {filename}.")
+                except OSError as e:
+                    logger.warning(
+                        f"While deleting document {str(instance)}, the file "
+                        f"{filename} could not be deleted: {e}"
+                    )
 
-    delete_empty_directories(
-        os.path.dirname(instance.source_path),
-        root=settings.ORIGINALS_DIR
-    )
+        delete_empty_directories(
+            os.path.dirname(instance.source_path),
+            root=settings.ORIGINALS_DIR
+        )
 
-    delete_empty_directories(
-        os.path.dirname(instance.archive_path),
-        root=settings.ARCHIVE_DIR
-    )
+        if instance.has_archive_version:
+            delete_empty_directories(
+                os.path.dirname(instance.archive_path),
+                root=settings.ARCHIVE_DIR
+            )
+
+
+class CannotMoveFilesException(Exception):
+    pass
 
 
 def validate_move(instance, old_path, new_path):
     if not os.path.isfile(old_path):
         # Can't do anything if the old file does not exist anymore.
-        logging.getLogger(__name__).fatal(
+        logger.fatal(
             f"Document {str(instance)}: File {old_path} has gone.")
-        return False
+        raise CannotMoveFilesException()
 
     if os.path.isfile(new_path):
         # Can't do anything if the new file already exists. Skip updating file.
-        logging.getLogger(__name__).warning(
+        logger.warning(
             f"Document {str(instance)}: Cannot rename file "
             f"since target path {new_path} already exists.")
-        return False
-
-    return True
+        raise CannotMoveFilesException()
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
@@ -226,81 +207,86 @@ def update_filename_and_move_files(sender, instance, **kwargs):
         # This will in turn cause this logic to move the file where it belongs.
         return
 
-    old_filename = instance.filename
-    new_filename = generate_filename(instance)
-
-    if new_filename == instance.filename:
-        # Don't do anything if its the same.
-        return
-
-    old_source_path = instance.source_path
-    new_source_path = os.path.join(settings.ORIGINALS_DIR, new_filename)
-
-    if not validate_move(instance, old_source_path, new_source_path):
-        return
-
-    # archive files are optional, archive checksum tells us if we have one,
-    # since this is None for documents without archived files.
-    if instance.archive_checksum:
-        new_archive_filename = archive_name_from_filename(new_filename)
-        old_archive_path = instance.archive_path
-        new_archive_path = os.path.join(settings.ARCHIVE_DIR,
-                                        new_archive_filename)
-
-        if not validate_move(instance, old_archive_path, new_archive_path):
-            return
-
-        create_source_path_directory(new_archive_path)
-    else:
-        old_archive_path = None
-        new_archive_path = None
-
-    create_source_path_directory(new_source_path)
-
-    try:
-        os.rename(old_source_path, new_source_path)
-        if instance.archive_checksum:
-            os.rename(old_archive_path, new_archive_path)
-        instance.filename = new_filename
-        # Don't save here to prevent infinite recursion.
-        Document.objects.filter(pk=instance.pk).update(filename=new_filename)
-
-        logging.getLogger(__name__).debug(
-            f"Moved file {old_source_path} to {new_source_path}.")
-
-        if instance.archive_checksum:
-            logging.getLogger(__name__).debug(
-                f"Moved file {old_archive_path} to {new_archive_path}.")
-
-    except OSError as e:
-        instance.filename = old_filename
-        # this happens when we can't move a file. If that's the case for the
-        # archive file, we try our best to revert the changes.
+    with FileLock(settings.MEDIA_LOCK):
         try:
-            os.rename(new_source_path, old_source_path)
-            os.rename(new_archive_path, old_archive_path)
-        except Exception as e:
-            # This is fine, since:
-            # A: if we managed to move source from A to B, we will also manage
-            #  to move it from B to A. If not, we have a serious issue
-            #  that's going to get caught by the santiy checker.
-            #  all files remain in place and will never be overwritten,
-            #  so this is not the end of the world.
-            # B: if moving the orignal file failed, nothing has changed anyway.
-            pass
-    except DatabaseError as e:
-        os.rename(new_source_path, old_source_path)
-        if instance.archive_checksum:
-            os.rename(new_archive_path, old_archive_path)
-        instance.filename = old_filename
+            old_filename = instance.filename
+            old_source_path = instance.source_path
 
-    if not os.path.isfile(old_source_path):
-        delete_empty_directories(os.path.dirname(old_source_path),
-                                 root=settings.ORIGINALS_DIR)
+            instance.filename = generate_unique_filename(instance)
+            move_original = old_filename != instance.filename
 
-    if old_archive_path and not os.path.isfile(old_archive_path):
-        delete_empty_directories(os.path.dirname(old_archive_path),
-                                 root=settings.ARCHIVE_DIR)
+            old_archive_filename = instance.archive_filename
+            old_archive_path = instance.archive_path
+
+            if instance.has_archive_version:
+
+                instance.archive_filename = generate_unique_filename(
+                    instance, archive_filename=True
+                )
+
+                move_archive = old_archive_filename != instance.archive_filename  # NOQA: E501
+            else:
+                move_archive = False
+
+            if not move_original and not move_archive:
+                # Don't do anything if filenames did not change.
+                return
+
+            if move_original:
+                validate_move(instance, old_source_path, instance.source_path)
+                create_source_path_directory(instance.source_path)
+                os.rename(old_source_path, instance.source_path)
+
+            if move_archive:
+                validate_move(
+                    instance, old_archive_path, instance.archive_path)
+                create_source_path_directory(instance.archive_path)
+                os.rename(old_archive_path, instance.archive_path)
+
+            # Don't save() here to prevent infinite recursion.
+            Document.objects.filter(pk=instance.pk).update(
+                filename=instance.filename,
+                archive_filename=instance.archive_filename,
+            )
+
+        except (OSError, DatabaseError, CannotMoveFilesException):
+            # This happens when either:
+            #  - moving the files failed due to file system errors
+            #  - saving to the database failed due to database errors
+            # In both cases, we need to revert to the original state.
+
+            # Try to move files to their original location.
+            try:
+                if move_original and os.path.isfile(instance.source_path):
+                    os.rename(instance.source_path, old_source_path)
+
+                if move_archive and os.path.isfile(instance.archive_path):
+                    os.rename(instance.archive_path, old_archive_path)
+
+            except Exception as e:
+                # This is fine, since:
+                # A: if we managed to move source from A to B, we will also
+                #  manage to move it from B to A. If not, we have a serious
+                #  issue that's going to get caught by the santiy checker.
+                #  All files remain in place and will never be overwritten,
+                #  so this is not the end of the world.
+                # B: if moving the orignal file failed, nothing has changed
+                #  anyway.
+                pass
+
+            # restore old values on the instance
+            instance.filename = old_filename
+            instance.archive_filename = old_archive_filename
+
+        # finally, remove any empty sub folders. This will do nothing if
+        # something has failed above.
+        if not os.path.isfile(old_source_path):
+            delete_empty_directories(os.path.dirname(old_source_path),
+                                     root=settings.ORIGINALS_DIR)
+
+        if instance.has_archive_version and not os.path.isfile(old_archive_path):  # NOQA: E501
+            delete_empty_directories(os.path.dirname(old_archive_path),
+                                     root=settings.ARCHIVE_DIR)
 
 
 def set_log_entry(sender, document=None, logging_group=None, **kwargs):
@@ -319,4 +305,6 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
 
 
 def add_to_index(sender, document, **kwargs):
+    from documents import index
+
     index.add_or_update_document(document)

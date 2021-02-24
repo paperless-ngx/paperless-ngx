@@ -1,19 +1,33 @@
 import json
+import logging
 import os
 import shutil
+from contextlib import contextmanager
 
+import tqdm
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models.signals import post_save, m2m_changed
+from filelock import FileLock
 
 from documents.models import Document
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
-from ...file_handling import generate_filename, create_source_path_directory
-from ...mixins import Renderable
+from ...file_handling import create_source_path_directory
+from ...signals.handlers import update_filename_and_move_files
 
 
-class Command(Renderable, BaseCommand):
+@contextmanager
+def disable_signal(sig, receiver, sender):
+    try:
+        sig.disconnect(receiver=receiver, sender=sender)
+        yield
+    finally:
+        sig.connect(receiver=receiver, sender=sender)
+
+
+class Command(BaseCommand):
 
     help = """
         Using a manifest.json file, load the data from there, and import the
@@ -30,6 +44,8 @@ class Command(Renderable, BaseCommand):
 
     def handle(self, *args, **options):
 
+        logging.getLogger().handlers[0].level = logging.ERROR
+
         self.source = options["source"]
 
         if not os.path.exists(self.source):
@@ -45,11 +61,19 @@ class Command(Renderable, BaseCommand):
             self.manifest = json.load(f)
 
         self._check_manifest()
+        with disable_signal(post_save,
+                            receiver=update_filename_and_move_files,
+                            sender=Document):
+            with disable_signal(m2m_changed,
+                                receiver=update_filename_and_move_files,
+                                sender=Document.tags.through):
+                # Fill up the database with whatever is in the manifest
+                call_command("loaddata", manifest_path)
 
-        # Fill up the database with whatever is in the manifest
-        call_command("loaddata", manifest_path)
+                self._import_files_from_manifest()
 
-        self._import_files_from_manifest()
+        print("Updating search index...")
+        call_command('document_index', 'reindex')
 
     @staticmethod
     def _check_manifest_exists(path):
@@ -93,10 +117,13 @@ class Command(Renderable, BaseCommand):
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
-        for record in self.manifest:
+        print("Copy files into paperless...")
 
-            if not record["model"] == "documents.document":
-                continue
+        manifest_documents = list(filter(
+            lambda r: r["model"] == "documents.document",
+            self.manifest))
+
+        for record in tqdm.tqdm(manifest_documents):
 
             document = Document.objects.get(pk=record["pk"])
 
@@ -114,17 +141,19 @@ class Command(Renderable, BaseCommand):
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
-            document.filename = generate_filename(document)
+            with FileLock(settings.MEDIA_LOCK):
+                if os.path.isfile(document.source_path):
+                    raise FileExistsError(document.source_path)
 
-            if os.path.isfile(document.source_path):
-                raise FileExistsError(document.source_path)
+                create_source_path_directory(document.source_path)
 
-            create_source_path_directory(document.source_path)
-
-            print(f"Moving {document_path} to {document.source_path}")
-            shutil.copy(document_path, document.source_path)
-            shutil.copy(thumbnail_path, document.thumbnail_path)
-            if archive_path:
-                shutil.copy(archive_path, document.archive_path)
+                shutil.copy2(document_path, document.source_path)
+                shutil.copy2(thumbnail_path, document.thumbnail_path)
+                if archive_path:
+                    create_source_path_directory(document.archive_path)
+                    # TODO: this assumes that the export is valid and
+                    #  archive_filename is present on all documents with
+                    #  archived files
+                    shutil.copy2(archive_path, document.archive_path)
 
             document.save()

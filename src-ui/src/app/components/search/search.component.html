@@ -1,21 +1,28 @@
-<app-page-header title="Search results">
+<app-page-header i18n-title title="Search results">
 </app-page-header>
 
-<div *ngIf="errorMessage" class="alert alert-danger">Invalid search query: {{errorMessage}}</div>
+<div *ngIf="errorMessage" class="alert alert-danger" i18n>Invalid search query: {{errorMessage}}</div>
 
-<p>
-    Search string: <i>{{query}}</i>
+<p *ngIf="more_like" i18n>
+    Showing documents similar to <a routerLink="/documents/{{more_like}}">{{more_like_doc?.original_file_name}}</a>
+</p>
+
+<p *ngIf="query">
+    <ng-container i18n>Search query: <i>{{query}}</i></ng-container>
     <ng-container *ngIf="correctedQuery">
-        - Did you mean "<a [routerLink]="" (click)="searchCorrectedQuery()">{{correctedQuery}}</a>"?
+        - <ng-container i18n>Did you mean "<a [routerLink]="" (click)="searchCorrectedQuery()">{{correctedQuery}}</a>"?</ng-container>
     </ng-container>
-
 </p>
 
 <div *ngIf="!errorMessage" [class.result-content-searching]="searching" infiniteScroll (scrolled)="onScroll()">
-    <p>{{resultCount}} result(s)</p>
-    <app-document-card-large *ngFor="let result of results"
-        [document]="result.document"
-        [details]="result.highlights">
+    <p i18n>{resultCount, plural, =0 {No results} =1 {One result} other {{{resultCount}} results}}</p>
+    <ng-container *ngFor="let result of results">
+        <app-document-card-large *ngIf="result.document"
+            [document]="result.document"
+            [details]="result.highlights"
+            [searchScore]="result.score / maxScore"
+            [moreLikeThis]="true">
+        </app-document-card-large>
+    </ng-container>
 
-</app-document-card-large>
 </div>

@@ -13,6 +13,16 @@
 			"root": "",
 			"sourceRoot": "src",
 			"prefix": "app",
+			"i18n": {
+				"sourceLocale": "en-US",
+				"locales": {
+					"de": "src/locale/messages.de.xlf",
+					"nl-NL": "src/locale/messages.nl_NL.xlf",
+					"fr": "src/locale/messages.fr.xlf",
+					"en-GB": "src/locale/messages.en_GB.xlf",
+					"pt-BR": "src/locale/messages.pt_BR.xlf"
+				}
+			},
 			"architect": {
 				"build": {
 					"builder": "@angular-devkit/build-angular:browser",
@@ -23,15 +33,25 @@
 						"main": "src/main.ts",
 						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.app.json",
+						"localize": true,
 						"aot": true,
 						"assets": [
 							"src/favicon.ico",
-							"src/assets"
+							"src/apple-touch-icon.png",
+							"src/assets",
+							"src/manifest.webmanifest", {
+								"glob": "pdf.worker.min.js",
+								"input": "node_modules/pdfjs-dist/build/",
+								"output": "/assets/js/"
+							}
 						],
 						"styles": [
 							"src/styles.scss"
 						],
-						"scripts": []
+						"scripts": [],
+						"allowedCommonJsDependencies": [
+							"ng2-pdf-viewer"
+						]
 					},
 					"configurations": {
 						"production": {
@@ -41,6 +61,7 @@
 									"with": "src/environments/environment.prod.ts"
 								}
 							],
+							"outputPath": "../src/documents/static/frontend/",
 							"optimization": true,
 							"outputHashing": "none",
 							"sourceMap": false,
@@ -61,13 +82,16 @@
 									"maximumError": "10kb"
 								}
 							]
+						},
+						"en-US": {
+							"localize": ["en-US"]
 						}
 					}
 				},
 				"serve": {
 					"builder": "@angular-devkit/build-angular:dev-server",
 					"options": {
-						"browserTarget": "paperless-ui:build"
+						"browserTarget": "paperless-ui:build:en-US"
 					},
 					"configurations": {
 						"production": {
@@ -90,7 +114,9 @@
 						"karmaConfig": "karma.conf.js",
 						"assets": [
 							"src/favicon.ico",
-							"src/assets"
+							"src/apple-touch-icon.png",
+							"src/assets",
+							"src/manifest.webmanifest"
 						],
 						"styles": [
 							"src/styles.scss"
