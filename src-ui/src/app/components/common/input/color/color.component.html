@@ -13,7 +13,7 @@
         
       </ng-template>
 
-      <input class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [autoClose]="'outside'" [ngbPopover]="popContent" placement="bottom">
+      <input class="form-control" [class.is-invalid]="error" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" [autoClose]="'outside'" [ngbPopover]="popContent" placement="bottom" popoverClass="shadow">
 
       <div class="input-group-append">
         <button class="btn btn-outline-secondary" type="button" (click)="randomize()">
