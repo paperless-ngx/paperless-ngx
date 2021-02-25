@@ -20,7 +20,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.7
       -
         name: Get pip cache dir
         id: pip-cache
@@ -49,6 +49,39 @@ jobs:
           name: documentation
           path: docs/_build/html/
 
+  codestyle:
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      -
+        name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+      -
+        name: Persistent Github pip cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip${{ matrix.python-version }}
+      -
+        name: Install dependencies
+        run: |
+          pip install --upgrade pipenv
+          pipenv install --system --dev --ignore-pipfile
+      -
+        name: Codestyle
+        run: |
+          cd src/
+          pycodestyle
+
   tests:
     runs-on: ubuntu-20.04
     strategy:
@@ -76,7 +109,7 @@ jobs:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip${{ matrix.python-version }}
       -
-        name: Prepare tests
+        name: Install dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng
@@ -87,11 +120,6 @@ jobs:
         run: |
           cd src/
           pytest
-      -
-        name: Codestyle
-        run: |
-          cd src/
-          pycodestyle
       -
         name: Publish coverage results
         if: matrix.python-version == '3.8'
@@ -130,7 +158,7 @@ jobs:
         path: src/documents/static/frontend/
 
   build-release:
-    needs: [frontend, documentation, tests]
+    needs: [frontend, documentation, tests, codestyle]
     runs-on: ubuntu-20.04
     steps:
       -
@@ -240,7 +268,7 @@ jobs:
   build-docker-image:
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/ng-'))
     runs-on: ubuntu-latest
-    needs: [frontend, tests]
+    needs: [frontend, tests, codestyle]
     steps:
       -
         name: Prepare

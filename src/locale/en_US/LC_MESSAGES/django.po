@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 14:52+0100\n"
+"POT-Creation-Date: 2021-02-24 16:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -346,7 +346,12 @@ msgstr ""
 msgid "filter rules"
 msgstr ""
 
-#: documents/serialisers.py:370
+#: documents/serialisers.py:52
+#, python-format
+msgid "Invalid regular expresssion: %(error)s"
+msgstr ""
+
+#: documents/serialisers.py:378
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
@@ -411,7 +416,11 @@ msgstr ""
 msgid "French"
 msgstr ""
 
-#: paperless/urls.py:114
+#: paperless/settings.py:296
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: paperless/urls.py:118
 msgid "Paperless-ng administration"
 msgstr ""
 
