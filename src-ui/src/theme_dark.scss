@@ -147,18 +147,11 @@ $border-color-dark-mode: #47494f;
     }
   }
 
-  .doc-img-inverted {
-    mix-blend-mode: normal;
+  .doc-img.inverted {
     filter: invert(95%) hue-rotate(180deg);
-    border-radius: 0;
-    border-color: $bg-dark-mode;
-
-    &.border-right {
-      border-right: none !important;
-    }
   }
 
-  .card-selected .doc-img .doc-img-inverted {
+  .card-selected .doc-img {
     mix-blend-mode: luminosity;
   }
 

@@ -1,7 +1,7 @@
 <div class="col p-2 h-100">
   <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected">
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
-      <img class="card-img {{ getIsThumbInverted() ? 'doc-img-inverted' : 'doc-img' }} rounded-top" [src]="getThumbUrl()">
+      <img class="card-img doc-img rounded-top" [class.inverted]="getIsThumbInverted()" [src]="getThumbUrl()">
 
       <div class="border-right border-bottom bg-light p-1 rounded document-card-check">
         <div class="custom-control custom-checkbox">
