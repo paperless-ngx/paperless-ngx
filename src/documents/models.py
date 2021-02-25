@@ -79,7 +79,9 @@ class Tag(MatchingModel):
 
     color = models.CharField(
         _("color"),
-        blank=True, max_length=7)
+        max_length=7,
+        default="#a6cee3"
+    )
 
     is_inbox_tag = models.BooleanField(
         _("is inbox tag"),

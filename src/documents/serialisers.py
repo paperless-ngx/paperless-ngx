@@ -111,7 +111,7 @@ class ColorField(serializers.Field):
         for id, color in self.COLOURS:
             if id == data:
                 return color
-        return "#a6cee3"
+        raise serializers.ValidationError()
 
     def to_representation(self, value):
         for id, color in self.COLOURS:
@@ -122,7 +122,7 @@ class ColorField(serializers.Field):
 
 class TagSerializerVersion1(MatchingModelSerializer):
 
-    colour = ColorField(source='color')
+    colour = ColorField(source='color', default="#a6cee3")
 
     class Meta:
         model = Tag
@@ -142,7 +142,7 @@ class TagSerializerVersion1(MatchingModelSerializer):
 class TagSerializer(MatchingModelSerializer):
 
     def get_text_color(self, obj):
-        if obj.color:
+        try:
             h = obj.color.lstrip('#')
             rgb = tuple(int(h[i:i + 2], 16)/256 for i in (0, 2, 4))
             luminance = math.sqrt(
@@ -151,7 +151,7 @@ class TagSerializer(MatchingModelSerializer):
                 0.114 * math.pow(rgb[2], 2)
             )
             return "#ffffff" if luminance < 0.5 else "#000000"
-        else:
+        except ValueError:
             return "#000000"
 
     text_color = serializers.SerializerMethodField()
