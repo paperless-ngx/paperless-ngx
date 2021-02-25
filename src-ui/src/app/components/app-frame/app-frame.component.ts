@@ -77,6 +77,20 @@ export class AppFrameComponent implements OnInit {
     this.router.navigate(['search'], {queryParams: {query: this.searchField.value}})
   }
 
+  closeDocument(d: PaperlessDocument) {
+    this.closeMenu()
+    this.openDocumentsService.closeDocument(d)
+
+    // TODO: is there a better way to do this? (taken from closeAll)
+    let route = this.activatedRoute
+    while (route.firstChild) {
+      route = route.firstChild
+    }
+    if (route.component == DocumentDetailComponent) {
+      this.router.navigate([""])
+    }
+  }
+
   closeAll() {
     this.closeMenu()
     this.openDocumentsService.closeAll()
