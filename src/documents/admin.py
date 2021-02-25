@@ -19,12 +19,12 @@ class TagAdmin(admin.ModelAdmin):
 
     list_display = (
         "name",
-        "colour",
+        "color",
         "match",
         "matching_algorithm"
     )
-    list_filter = ("colour", "matching_algorithm")
-    list_editable = ("colour", "match", "matching_algorithm")
+    list_filter = ("color", "matching_algorithm")
+    list_editable = ("color", "match", "matching_algorithm")
 
 
 class DocumentTypeAdmin(admin.ModelAdmin):

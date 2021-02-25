@@ -77,25 +77,11 @@ class Correspondent(MatchingModel):
 
 class Tag(MatchingModel):
 
-    COLOURS = (
-        (1, "#a6cee3"),
-        (2, "#1f78b4"),
-        (3, "#b2df8a"),
-        (4, "#33a02c"),
-        (5, "#fb9a99"),
-        (6, "#e31a1c"),
-        (7, "#fdbf6f"),
-        (8, "#ff7f00"),
-        (9, "#cab2d6"),
-        (10, "#6a3d9a"),
-        (11, "#b15928"),
-        (12, "#000000"),
-        (13, "#cccccc")
-    )
-
-    colour = models.PositiveIntegerField(
+    color = models.CharField(
         _("color"),
-        choices=COLOURS, default=1)
+        max_length=7,
+        default="#a6cee3"
+    )
 
     is_inbox_tag = models.BooleanField(
         _("is inbox tag"),
