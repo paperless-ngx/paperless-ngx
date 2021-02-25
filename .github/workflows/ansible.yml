@@ -47,7 +47,6 @@ jobs:
           molecule converge
           molecule idempotence
           molecule verify
-          molecule destroy
         working-directory: "${{ github.repository }}"
   # # https://galaxy.ansible.com/docs/contributing/importing.html
   # release:
