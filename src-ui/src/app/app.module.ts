@@ -67,7 +67,7 @@ import { ApiVersionInterceptor } from './interceptors/api-version.interceptor';
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
 import localeDe from '@angular/common/locales/de';
-import localePt from '@angular/common/locales/pt-PT';
+import localePt from '@angular/common/locales/pt';
 import localeEnGb from '@angular/common/locales/en-GB';
 
 registerLocaleData(localeFr)
