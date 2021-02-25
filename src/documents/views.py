@@ -89,6 +89,7 @@ class IndexView(TemplateView):
         context['polyfills_js'] = f"frontend/{self.get_language()}/polyfills.js"  # NOQA: E501
         context['main_js'] = f"frontend/{self.get_language()}/main.js"
         context['webmanifest'] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
+        context['apple_touch_icon'] = f"frontend/{self.get_language()}/apple-touch-icon.png"  # NOQA: E501
         return context
 
 
