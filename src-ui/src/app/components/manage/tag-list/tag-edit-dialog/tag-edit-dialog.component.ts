@@ -5,6 +5,7 @@ import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { randomColor } from 'src/app/utils/color';
 
 @Component({
   selector: 'app-tag-edit-dialog',
@@ -28,7 +29,7 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      color: new FormControl(''),
+      color: new FormControl(randomColor()),
       is_inbox_tag: new FormControl(false),
       matching_algorithm: new FormControl(1),
       match: new FormControl(""),
