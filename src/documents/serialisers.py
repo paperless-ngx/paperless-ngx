@@ -150,7 +150,7 @@ class TagSerializer(MatchingModelSerializer):
                 0.587 * math.pow(rgb[1], 2) +
                 0.114 * math.pow(rgb[2], 2)
             )
-            return "#ffffff" if luminance < 0.5 else "#000000"
+            return "#ffffff" if luminance < 0.53 else "#000000"
         except ValueError:
             return "#000000"
 
