@@ -2,9 +2,15 @@
 - name: update previous release to newest release
   hosts: all
   tasks:
+    - name: install git dependency
+      apt:
+        pkg: git
+    - name: obtain latest git hash in current tree
+      command: git rev-parse HEAD
+      register: git_hash
     - name: set current github commit as version when available
       set_fact:
-        paperlessng_version: "{{ lookup('env', 'GITHUB_SHA') | default('master', True) }}"
+        paperlessng_version: "{{ git_hash.stdout }}"
     - name: update to newest paperless-ng release
       include_role:
         name: ansible
