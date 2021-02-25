@@ -25,7 +25,7 @@ This section describes the steps you need to take to start development on paperl
 
     *   Python 3.6.
     *   All dependencies listed in the :ref:`Bare metal route <setup-bare_metal>`
-    *   redis. You can either install redis or use the included scritps/start-services.sh
+    *   redis. You can either install redis or use the included scripts/start-services.sh
         to use docker to fire up a redis instance (and some other services such as tika,
         gotenberg and a postgresql server).
 
