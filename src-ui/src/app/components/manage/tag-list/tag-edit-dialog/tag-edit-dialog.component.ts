@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component';
-import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -28,20 +28,12 @@ export class TagEditDialogComponent extends EditDialogComponent<PaperlessTag> {
   getForm(): FormGroup {
     return new FormGroup({
       name: new FormControl(''),
-      colour: new FormControl(''),
+      color: new FormControl(''),
       is_inbox_tag: new FormControl(false),
       matching_algorithm: new FormControl(1),
       match: new FormControl(""),
       is_insensitive: new FormControl(true)
     })
-  }
-
-  getColours() {
-    return TAG_COLOURS
-  }
-
-  getColor(id) {
-    return TAG_COLOURS.find(c => c.id == id)
   }
 
 }
