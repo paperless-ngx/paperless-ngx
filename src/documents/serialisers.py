@@ -1,6 +1,7 @@
 import re
 
 import magic
+import math
 from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -88,7 +89,40 @@ class DocumentTypeSerializer(MatchingModelSerializer):
         )
 
 
-class TagSerializer(MatchingModelSerializer):
+class ColorField(serializers.Field):
+
+    COLOURS = (
+        (1, "#a6cee3"),
+        (2, "#1f78b4"),
+        (3, "#b2df8a"),
+        (4, "#33a02c"),
+        (5, "#fb9a99"),
+        (6, "#e31a1c"),
+        (7, "#fdbf6f"),
+        (8, "#ff7f00"),
+        (9, "#cab2d6"),
+        (10, "#6a3d9a"),
+        (11, "#b15928"),
+        (12, "#000000"),
+        (13, "#cccccc")
+    )
+
+    def to_internal_value(self, data):
+        for id, color in self.COLOURS:
+            if id == data:
+                return color
+        raise serializers.ValidationError()
+
+    def to_representation(self, value):
+        for id, color in self.COLOURS:
+            if color == value:
+                return id
+        return 1
+
+
+class TagSerializerVersion1(MatchingModelSerializer):
+
+    colour = ColorField(source='color', default="#a6cee3")
 
     class Meta:
         model = Tag
@@ -103,6 +137,45 @@ class TagSerializer(MatchingModelSerializer):
             "is_inbox_tag",
             "document_count"
         )
+
+
+class TagSerializer(MatchingModelSerializer):
+
+    def get_text_color(self, obj):
+        try:
+            h = obj.color.lstrip('#')
+            rgb = tuple(int(h[i:i + 2], 16)/256 for i in (0, 2, 4))
+            luminance = math.sqrt(
+                0.299 * math.pow(rgb[0], 2) +
+                0.587 * math.pow(rgb[1], 2) +
+                0.114 * math.pow(rgb[2], 2)
+            )
+            return "#ffffff" if luminance < 0.53 else "#000000"
+        except ValueError:
+            return "#000000"
+
+    text_color = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Tag
+        fields = (
+            "id",
+            "slug",
+            "name",
+            "color",
+            "text_color",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "is_inbox_tag",
+            "document_count"
+        )
+
+    def validate_color(self, color):
+        regex = r"#[0-9a-fA-F]{6}"
+        if not re.match(regex, color):
+            raise serializers.ValidationError(_("Invalid color."))
+        return color
 
 
 class CorrespondentField(serializers.PrimaryKeyRelatedField):

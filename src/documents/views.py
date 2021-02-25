@@ -50,6 +50,7 @@ from .parsers import get_parser_class_for_mime_type
 from .serialisers import (
     CorrespondentSerializer,
     DocumentSerializer,
+    TagSerializerVersion1,
     TagSerializer,
     DocumentTypeSerializer,
     PostDocumentSerializer,
@@ -119,7 +120,12 @@ class TagViewSet(ModelViewSet):
     queryset = Tag.objects.annotate(
         document_count=Count('documents')).order_by(Lower('name'))
 
-    serializer_class = TagSerializer
+    def get_serializer_class(self):
+        if int(self.request.version) == 1:
+            return TagSerializerVersion1
+        else:
+            return TagSerializer
+
     pagination_class = StandardPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
