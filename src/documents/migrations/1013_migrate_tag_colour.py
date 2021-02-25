@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tag',
             name='color',
-            field=models.CharField(blank=True, max_length=7, verbose_name='color'),
+            field=models.CharField(default='#a6cee3', max_length=7, verbose_name='color'),
         ),
         migrations.RunPython(forward, reverse),
         migrations.RemoveField(
