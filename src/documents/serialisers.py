@@ -1,6 +1,7 @@
 import re
 
 import magic
+import math
 from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -140,6 +141,21 @@ class TagSerializerVersion1(MatchingModelSerializer):
 
 class TagSerializer(MatchingModelSerializer):
 
+    def get_text_color(self, obj):
+        if obj.color:
+            h = obj.color.lstrip('#')
+            rgb = tuple(int(h[i:i + 2], 16)/256 for i in (0, 2, 4))
+            luminance = math.sqrt(
+                0.299 * math.pow(rgb[0], 2) +
+                0.587 * math.pow(rgb[1], 2) +
+                0.114 * math.pow(rgb[2], 2)
+            )
+            return "#ffffff" if luminance < 0.5 else "#000000"
+        else:
+            return "#000000"
+
+    text_color = serializers.SerializerMethodField()
+
     class Meta:
         model = Tag
         fields = (
@@ -147,6 +163,7 @@ class TagSerializer(MatchingModelSerializer):
             "slug",
             "name",
             "color",
+            "text_color",
             "match",
             "matching_algorithm",
             "is_insensitive",
