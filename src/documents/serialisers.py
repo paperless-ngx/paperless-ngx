@@ -171,6 +171,12 @@ class TagSerializer(MatchingModelSerializer):
             "document_count"
         )
 
+    def validate_color(self, color):
+        regex = r"#[0-9a-fA-F]{6}"
+        if not re.match(regex, color):
+            raise serializers.ValidationError(_("Invalid color."))
+        return color
+
 
 class CorrespondentField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
