@@ -26,8 +26,8 @@
   <tbody>
     <tr *ngFor="let tag of data">
       <td scope="row">{{ tag.name }}</td>
-      <td scope="row"><span class="badge" [style.color]="getColor(tag.colour).textColor"
-          [style.background-color]="tag.colour">{{ getColor(tag.colour).name }}</span></td>
+      <td scope="row"><span class="badge" [style.color]="tag.text_color"
+          [style.background-color]="tag.color">{{tag.color}}</span></td>
       <td scope="row">{{ getMatching(tag) }}</td>
       <td scope="row">{{ tag.document_count }}</td>
       <td scope="row">
