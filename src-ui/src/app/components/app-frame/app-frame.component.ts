@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { from, Observable, Subscription } from 'rxjs';
@@ -16,7 +16,7 @@ import { Meta } from '@angular/platform-browser';
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss']
 })
-export class AppFrameComponent implements OnInit, OnDestroy {
+export class AppFrameComponent implements OnInit {
 
   constructor (
     public router: Router,
@@ -26,7 +26,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     public savedViewService: SavedViewService,
     private meta: Meta
     ) {
-      
+
   }
 
   versionString = `${environment.appTitle} ${environment.version}`
@@ -39,9 +39,9 @@ export class AppFrameComponent implements OnInit, OnDestroy {
 
   searchField = new FormControl('')
 
-  openDocuments: PaperlessDocument[] = []
-
-  openDocumentsSubscription: Subscription
+  get openDocuments(): PaperlessDocument[] {
+    return this.openDocumentsService.getOpenDocuments()
+  }
 
   searchAutoComplete = (text$: Observable<string>) =>
     text$.pipe(
@@ -92,13 +92,6 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.openDocuments = this.openDocumentsService.getOpenDocuments()
-  }
-
-  ngOnDestroy() {
-    if (this.openDocumentsSubscription) {
-      this.openDocumentsSubscription.unsubscribe()
-    }
   }
 
   get displayName() {
