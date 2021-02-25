@@ -112,7 +112,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication'
-    ]
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
+    'DEFAULT_VERSION': '1',
+    'ALLOWED_VERSIONS': ['1', '2']
 }
 
 if DEBUG:
@@ -142,7 +145,7 @@ ASGI_APPLICATION = "paperless.asgi.application"
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 
-# what is this used for?
+# TODO: what is this used for?
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -292,7 +295,8 @@ LANGUAGES = [
     ("en-gb", _("English (GB)")),
     ("de", _("German")),
     ("nl-nl", _("Dutch")),
-    ("fr", _("French"))
+    ("fr", _("French")),
+    ("pt-br", _("Portuguese (Brazil)"))
 ]
 
 LOCALE_PATHS = [
