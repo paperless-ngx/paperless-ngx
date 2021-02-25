@@ -94,7 +94,7 @@
               </svg>&nbsp;{{d.title | documentTitle}}
             </a>
           </li>
-          <li class="nav-item w-100" *ngIf="openDocuments.length > 1">
+          <li class="nav-item w-100" *ngIf="openDocuments.length >= 1">
             <a class="nav-link text-truncate" [routerLink]="" (click)="closeAll()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#x"/>
