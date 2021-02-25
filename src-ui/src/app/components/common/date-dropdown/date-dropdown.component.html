@@ -20,7 +20,7 @@
           </div>
 
           <div class="input-group input-group-sm">
-            <input class="form-control" [placeholder]="datePlaceHolder" id="dateAfter" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
+            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
                     [(ngModel)]="dateAfter" ngbDatepicker #dateAfterPicker="ngbDatepicker">
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" (click)="dateAfterPicker.toggle()" type="button">
@@ -45,7 +45,7 @@
           </div>
 
           <div class="input-group input-group-sm">
-            <input class="form-control" [placeholder]="datePlaceHolder" id="dateBefore" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
+            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
                     [(ngModel)]="dateBefore" ngbDatepicker #dateBeforePicker="ngbDatepicker">
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" (click)="dateBeforePicker.toggle()" type="button">
