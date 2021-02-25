@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 
 @Component({
   selector: 'app-tag',
@@ -20,14 +20,6 @@ export class TagComponent implements OnInit {
   clickable: boolean = false
 
   ngOnInit(): void {
-  }
-
-  getColour() {
-    var color = TAG_COLOURS.find(c => c.id == this.tag.colour)
-    if (color) {
-      return color
-    }
-    return { id: this.tag.colour, name: this.tag.colour, textColor: "#ffffff" }
   }
 
 }

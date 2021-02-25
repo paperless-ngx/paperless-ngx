@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FILTER_HAS_TAG } from 'src/app/data/filter-rule-type';
-import { TAG_COLOURS, PaperlessTag } from 'src/app/data/paperless-tag';
+import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { TagService } from 'src/app/services/rest/tag.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -20,14 +20,6 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
     toastService: ToastService
   ) {
     super(tagService, modalService, TagEditDialogComponent, toastService)
-  }
-
-  getColor(id) {
-    var color = TAG_COLOURS.find(c => c.id == id)
-    if (color) {
-      return color
-    }
-    return { id: id, name: id, textColor: "#ffffff" }
   }
 
   getDeleteMessage(object: PaperlessTag) {

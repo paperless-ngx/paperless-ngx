@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   apiBaseUrl: "/api/",
-  apiVersion: "1",
+  apiVersion: "2",
   appTitle: "Paperless-ng",
   version: "1.2.1",
   webSocketHost: window.location.host,
