@@ -20,7 +20,7 @@
     "@angular/platform-browser": "~10.1.5",
     "@angular/platform-browser-dynamic": "~10.1.5",
     "@angular/router": "~10.1.5",
-    "@ng-bootstrap/ng-bootstrap": "^8.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^8.0.4",
     "@ng-select/ng-select": "^5.0.9",
     "bootstrap": "^4.5.0",
     "file-saver": "^2.0.5",

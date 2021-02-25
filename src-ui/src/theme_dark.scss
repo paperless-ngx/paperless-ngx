@@ -246,6 +246,16 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .btn-light:not(:disabled):not(.disabled) {
+    background-color: $bg-dark-mode;
+    color: $text-color-dark-mode-accent;
+
+    &:hover {
+      background-color: $text-color-dark-mode;
+      color: $bg-dark-mode;
+    }
+  }
+
   .btn-link:not(:disabled):not(.disabled) {
     color: $primary-dark-mode;
   }
@@ -365,6 +375,12 @@ $border-color-dark-mode: #47494f;
 
   .progress-bar.bg-primary {
     background-color: darken($primary-dark-mode, 5%) !important;
+  }
+
+  .ngb-dp-header,
+  .ngb-dp-weekdays,
+  .ngb-dp-month {
+    background-color: $bg-light-dark-mode;
   }
 }
 

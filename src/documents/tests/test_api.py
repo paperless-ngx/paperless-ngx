@@ -14,7 +14,7 @@ from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 from documents import index, bulk_edit
-from documents.models import Document, Correspondent, DocumentType, Tag, SavedView
+from documents.models import Document, Correspondent, DocumentType, Tag, SavedView, MatchingModel
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -771,6 +771,41 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get("/api/logs/paperless/")
         self.assertEqual(response.status_code, 200)
         self.assertListEqual(response.data, ["test", "test2"])
+
+    def test_invalid_regex_other_algorithm(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "matching_algorithm": MatchingModel.MATCH_ANY,
+                "match": "["
+            }, format='json')
+            self.assertEqual(response.status_code, 201, endpoint)
+
+    def test_invalid_regex(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "matching_algorithm": MatchingModel.MATCH_REGEX,
+                "match": "["
+            }, format='json')
+            self.assertEqual(response.status_code, 400, endpoint)
+
+    def test_valid_regex(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "matching_algorithm": MatchingModel.MATCH_REGEX,
+                "match": "[0-9]"
+            }, format='json')
+            self.assertEqual(response.status_code, 201, endpoint)
+
+    def test_regex_no_algorithm(self):
+        for endpoint in ['correspondents', 'tags', 'document_types']:
+            response = self.client.post(f"/api/{endpoint}/", {
+                "name": "test",
+                "match": "[0-9]"
+            }, format='json')
+            self.assertEqual(response.status_code, 201, endpoint)
 
 
 class TestBulkEdit(DirectoriesMixin, APITestCase):
