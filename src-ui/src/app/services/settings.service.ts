@@ -26,6 +26,7 @@ export const SETTINGS_KEYS = {
   DOCUMENT_LIST_SIZE: 'general-settings:documentListSize',
   DARK_MODE_USE_SYSTEM: 'general-settings:dark-mode:use-system',
   DARK_MODE_ENABLED: 'general-settings:dark-mode:enabled',
+  DARK_MODE_THUMB_INVERTED: 'general-settings:dark-mode:thumb-inverted',
   USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer',
   DATE_LOCALE: 'general-settings:date-display:date-locale',
   DATE_FORMAT: 'general-settings:date-display:date-format',
@@ -41,6 +42,7 @@ const SETTINGS: PaperlessSettings[] = [
   {key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE, type: "number", default: 50},
   {key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, type: "boolean", default: true},
   {key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: "boolean", default: false},
+  {key: SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED, type: "boolean", default: true},
   {key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: "boolean", default: false},
   {key: SETTINGS_KEYS.DATE_LOCALE, type: "string", default: ""},
   {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"},
@@ -90,7 +92,8 @@ export class SettingsService {
       {code: "de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
       {code: "nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
       {code: "fr", name: $localize`French`, englishName: "French", dateInputFormat: "dd/mm/yyyy"},
-      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"}
+      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"},
+      {code: "it", name: $localize`Italian`, englishName: "Italian", dateInputFormat: "dd/mm/yyyy"}
     ]
   }
 
