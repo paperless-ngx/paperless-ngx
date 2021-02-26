@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-24 16:49+0100\n"
+"POT-Creation-Date: 2021-02-26 12:56+0100\n"
 "PO-Revision-Date: 2021-02-16 18:37+0000\n"
 "Last-Translator: Jonas Winkler, 2021\n"
 "Language-Team: English (United Kingdom) (https://www.transifex.com/paperless/teams/115905/en_GB/)\n"
@@ -50,7 +50,7 @@ msgstr "Fuzzy word"
 msgid "Automatic"
 msgstr "Automatic"
 
-#: documents/models.py:41 documents/models.py:364 paperless_mail/models.py:25
+#: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:109
 msgid "name"
 msgstr "name"
@@ -67,7 +67,7 @@ msgstr "matching algorithm"
 msgid "is insensitive"
 msgstr "is insensitive"
 
-#: documents/models.py:74 documents/models.py:134
+#: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
 msgstr "correspondent"
 
@@ -75,15 +75,15 @@ msgstr "correspondent"
 msgid "correspondents"
 msgstr "correspondents"
 
-#: documents/models.py:97
+#: documents/models.py:81
 msgid "color"
 msgstr "colour"
 
-#: documents/models.py:101
+#: documents/models.py:87
 msgid "is inbox tag"
 msgstr "is inbox tag"
 
-#: documents/models.py:103
+#: documents/models.py:89
 msgid ""
 "Marks this tag as an inbox tag: All newly consumed documents will be tagged "
 "with inbox tags."
@@ -91,39 +91,39 @@ msgstr ""
 "Marks this tag as an inbox tag: All newly consumed documents will be tagged "
 "with inbox tags."
 
-#: documents/models.py:108
+#: documents/models.py:94
 msgid "tag"
 msgstr "tag"
 
-#: documents/models.py:109 documents/models.py:165
+#: documents/models.py:95 documents/models.py:151
 msgid "tags"
 msgstr "tags"
 
-#: documents/models.py:115 documents/models.py:147
+#: documents/models.py:101 documents/models.py:133
 msgid "document type"
 msgstr "document type"
 
-#: documents/models.py:116
+#: documents/models.py:102
 msgid "document types"
 msgstr "document types"
 
-#: documents/models.py:124
+#: documents/models.py:110
 msgid "Unencrypted"
 msgstr "Unencrypted"
 
-#: documents/models.py:125
+#: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "Encrypted with GNU Privacy Guard"
 
-#: documents/models.py:138
+#: documents/models.py:124
 msgid "title"
 msgstr "title"
 
-#: documents/models.py:151
+#: documents/models.py:137
 msgid "content"
 msgstr "content"
 
-#: documents/models.py:153
+#: documents/models.py:139
 msgid ""
 "The raw, text-only data of the document. This field is primarily used for "
 "searching."
@@ -131,241 +131,245 @@ msgstr ""
 "The raw, text-only data of the document. This field is primarily used for "
 "searching."
 
-#: documents/models.py:158
+#: documents/models.py:144
 msgid "mime type"
 msgstr "mime type"
 
-#: documents/models.py:169
+#: documents/models.py:155
 msgid "checksum"
 msgstr "checksum"
 
-#: documents/models.py:173
+#: documents/models.py:159
 msgid "The checksum of the original document."
 msgstr "The checksum of the original document."
 
-#: documents/models.py:177
+#: documents/models.py:163
 msgid "archive checksum"
 msgstr "archive checksum"
 
-#: documents/models.py:182
+#: documents/models.py:168
 msgid "The checksum of the archived document."
 msgstr "The checksum of the archived document."
 
-#: documents/models.py:186 documents/models.py:342
+#: documents/models.py:172 documents/models.py:328
 msgid "created"
 msgstr "created"
 
-#: documents/models.py:190
+#: documents/models.py:176
 msgid "modified"
 msgstr "modified"
 
-#: documents/models.py:194
+#: documents/models.py:180
 msgid "storage type"
 msgstr "storage type"
 
-#: documents/models.py:202
+#: documents/models.py:188
 msgid "added"
 msgstr "added"
 
-#: documents/models.py:206
+#: documents/models.py:192
 msgid "filename"
 msgstr "filename"
 
-#: documents/models.py:212
+#: documents/models.py:198
 msgid "Current filename in storage"
 msgstr "Current filename in storage"
 
-#: documents/models.py:216
+#: documents/models.py:202
 msgid "archive filename"
 msgstr "archive filename"
 
-#: documents/models.py:222
+#: documents/models.py:208
 msgid "Current archive filename in storage"
 msgstr "Current archive filename in storage"
 
-#: documents/models.py:226
+#: documents/models.py:212
 msgid "archive serial number"
 msgstr "archive serial number"
 
-#: documents/models.py:231
+#: documents/models.py:217
 msgid "The position of this document in your physical document archive."
 msgstr "The position of this document in your physical document archive."
 
-#: documents/models.py:237
+#: documents/models.py:223
 msgid "document"
 msgstr "document"
 
-#: documents/models.py:238
+#: documents/models.py:224
 msgid "documents"
 msgstr "documents"
 
-#: documents/models.py:325
+#: documents/models.py:311
 msgid "debug"
 msgstr "debug"
 
-#: documents/models.py:326
+#: documents/models.py:312
 msgid "information"
 msgstr "information"
 
-#: documents/models.py:327
+#: documents/models.py:313
 msgid "warning"
 msgstr "warning"
 
-#: documents/models.py:328
+#: documents/models.py:314
 msgid "error"
 msgstr "error"
 
-#: documents/models.py:329
+#: documents/models.py:315
 msgid "critical"
 msgstr "critical"
 
-#: documents/models.py:333
+#: documents/models.py:319
 msgid "group"
 msgstr "group"
 
-#: documents/models.py:336
+#: documents/models.py:322
 msgid "message"
 msgstr "message"
 
-#: documents/models.py:339
+#: documents/models.py:325
 msgid "level"
 msgstr "level"
 
-#: documents/models.py:346
+#: documents/models.py:332
 msgid "log"
 msgstr "log"
 
-#: documents/models.py:347
+#: documents/models.py:333
 msgid "logs"
 msgstr "logs"
 
-#: documents/models.py:358 documents/models.py:408
+#: documents/models.py:344 documents/models.py:394
 msgid "saved view"
 msgstr "saved view"
 
-#: documents/models.py:359
+#: documents/models.py:345
 msgid "saved views"
 msgstr "saved views"
 
-#: documents/models.py:362
+#: documents/models.py:348
 msgid "user"
 msgstr "user"
 
-#: documents/models.py:368
+#: documents/models.py:354
 msgid "show on dashboard"
 msgstr "show on dashboard"
 
-#: documents/models.py:371
+#: documents/models.py:357
 msgid "show in sidebar"
 msgstr "show in sidebar"
 
-#: documents/models.py:375
+#: documents/models.py:361
 msgid "sort field"
 msgstr "sort field"
 
-#: documents/models.py:378
+#: documents/models.py:364
 msgid "sort reverse"
 msgstr "sort reverse"
 
-#: documents/models.py:384
+#: documents/models.py:370
 msgid "title contains"
 msgstr "title contains"
 
-#: documents/models.py:385
+#: documents/models.py:371
 msgid "content contains"
 msgstr "content contains"
 
-#: documents/models.py:386
+#: documents/models.py:372
 msgid "ASN is"
 msgstr "ASN is"
 
-#: documents/models.py:387
+#: documents/models.py:373
 msgid "correspondent is"
 msgstr "correspondent is"
 
-#: documents/models.py:388
+#: documents/models.py:374
 msgid "document type is"
 msgstr "document type is"
 
-#: documents/models.py:389
+#: documents/models.py:375
 msgid "is in inbox"
 msgstr "is in inbox"
 
-#: documents/models.py:390
+#: documents/models.py:376
 msgid "has tag"
 msgstr "has tag"
 
-#: documents/models.py:391
+#: documents/models.py:377
 msgid "has any tag"
 msgstr "has any tag"
 
-#: documents/models.py:392
+#: documents/models.py:378
 msgid "created before"
 msgstr "created before"
 
-#: documents/models.py:393
+#: documents/models.py:379
 msgid "created after"
 msgstr "created after"
 
-#: documents/models.py:394
+#: documents/models.py:380
 msgid "created year is"
 msgstr "created year is"
 
-#: documents/models.py:395
+#: documents/models.py:381
 msgid "created month is"
 msgstr "created month is"
 
-#: documents/models.py:396
+#: documents/models.py:382
 msgid "created day is"
 msgstr "created day is"
 
-#: documents/models.py:397
+#: documents/models.py:383
 msgid "added before"
 msgstr "added before"
 
-#: documents/models.py:398
+#: documents/models.py:384
 msgid "added after"
 msgstr "added after"
 
-#: documents/models.py:399
+#: documents/models.py:385
 msgid "modified before"
 msgstr "modified before"
 
-#: documents/models.py:400
+#: documents/models.py:386
 msgid "modified after"
 msgstr "modified after"
 
-#: documents/models.py:401
+#: documents/models.py:387
 msgid "does not have tag"
 msgstr "does not have tag"
 
-#: documents/models.py:412
+#: documents/models.py:398
 msgid "rule type"
 msgstr "rule type"
 
-#: documents/models.py:416
+#: documents/models.py:402
 msgid "value"
 msgstr "value"
 
-#: documents/models.py:422
+#: documents/models.py:408
 msgid "filter rule"
 msgstr "filter rule"
 
-#: documents/models.py:423
+#: documents/models.py:409
 msgid "filter rules"
 msgstr "filter rules"
 
-#: documents/serialisers.py:52
+#: documents/serialisers.py:53
 #, python-format
 msgid "Invalid regular expresssion: %(error)s"
 msgstr "Invalid regular expresssion: %(error)s"
 
-#: documents/serialisers.py:378
+#: documents/serialisers.py:177
+msgid "Invalid color."
+msgstr "Invalid colour."
+
+#: documents/serialisers.py:451
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "File type %(type)s not supported"
 
-#: documents/templates/index.html:20
+#: documents/templates/index.html:21
 msgid "Paperless-ng is loading..."
 msgstr "Paperless-ng is loading..."
 
@@ -405,29 +409,33 @@ msgstr "Password"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: paperless/settings.py:291
+#: paperless/settings.py:297
 msgid "English (US)"
 msgstr "English (US)"
 
-#: paperless/settings.py:292
+#: paperless/settings.py:298
 msgid "English (GB)"
 msgstr "English (GB)"
 
-#: paperless/settings.py:293
+#: paperless/settings.py:299
 msgid "German"
 msgstr "German"
 
-#: paperless/settings.py:294
+#: paperless/settings.py:300
 msgid "Dutch"
 msgstr "Dutch"
 
-#: paperless/settings.py:295
+#: paperless/settings.py:301
 msgid "French"
 msgstr "French"
 
-#: paperless/settings.py:296
+#: paperless/settings.py:302
 msgid "Portuguese (Brazil)"
 msgstr "Portuguese (Brazil)"
+
+#: paperless/settings.py:303
+msgid "Italian"
+msgstr "Italian"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
