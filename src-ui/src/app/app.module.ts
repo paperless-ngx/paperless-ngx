@@ -63,6 +63,8 @@ import { DateComponent } from './components/common/input/date/date.component';
 import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter';
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter';
 import { ApiVersionInterceptor } from './interceptors/api-version.interceptor';
+import { ColorSliderModule } from 'ngx-color/slider';
+import { ColorComponent } from './components/common/input/color/color.component';
 
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
@@ -125,7 +127,8 @@ registerLocaleData(localeEnGb)
     NumberComponent,
     SafePipe,
     CustomDatePipe,
-    DateComponent
+    DateComponent,
+    ColorComponent
   ],
   imports: [
     BrowserModule,
@@ -137,7 +140,8 @@ registerLocaleData(localeEnGb)
     NgxFileDropModule,
     InfiniteScrollModule,
     PdfViewerModule,
-    NgSelectModule
+    NgSelectModule,
+    ColorSliderModule
   ],
   providers: [
     DatePipe,
