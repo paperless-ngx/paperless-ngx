@@ -478,7 +478,7 @@
         <target>Wil je het etiket echt verwijderen &quot;<x equiv-text="object.name" id="PH"/>&quot;?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="cafc87479686947e2590b9f588a88040aeaf660b">
@@ -606,7 +606,7 @@
         <target>Gebruik de systeemtaal</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">92</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7729897675462249787">
@@ -614,15 +614,7 @@
         <target>Datumopmaak van weergavetaal gebruiken</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">96</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="4912706592792948707">
-        <source>ISO 8601</source>
-        <target>ISO 8601</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8488620293789898901">
@@ -630,7 +622,7 @@
         <target>Fout bij het opslaan van de instellingen: <x equiv-text="JSON.stringify(error.error)" id="PH"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="121cc5391cd2a5115bc2b3160379ee5b36cd7716">
@@ -998,7 +990,7 @@
         <target>Nieuw etiket maken</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5872175735754226507">
@@ -1006,7 +998,7 @@
         <target>Etiket bewerken</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="f2a30b4e1a89a8a0db0bd147b54d6626b9a9bc42">
@@ -1014,7 +1006,7 @@
         <target>&quot;Postvak in&quot;-etiket</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="5e2f1a4ea12a1b8606ee3f0548d0ba64bf266077">
@@ -1022,7 +1014,7 @@
         <target>&quot;Postvak in&quot;-etiketten worden automatisch toegewezen aan alle verwerkte documenten.&quot;</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6672809941092516947">
@@ -1296,7 +1288,7 @@
         <target>Afgelopen 7 dagen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4463380307954693363">
@@ -1304,7 +1296,7 @@
         <target>Afgelopen maand</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="8697368973702409683">
@@ -1312,7 +1304,7 @@
         <target>Afgelopen 3 maanden</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3566342898065860218">
@@ -1320,7 +1312,7 @@
         <target>Afgelopen jaar</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="be2add3a3d9e4e2556b8f9048a15a9c0f00bf1ad">
@@ -1336,7 +1328,7 @@
         <target>Voor</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="99ee4faa69cd2ea8e3678c1f557c0ff1f05aae46">
@@ -1832,6 +1824,14 @@
           <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
+      <trans-unit datatype="html" id="d6529debfc1613db22d6fa096ebfeb8a85fa739d">
+        <source>Invalid date.</source>
+        <target>Ongeldige datum.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
       <trans-unit datatype="html" id="2807800733729323332">
         <source>Yes</source>
         <target>Ja</target>
@@ -1861,7 +1861,7 @@
         <target>Engels (US)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">88</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="6987083569809053351">
@@ -1869,7 +1869,7 @@
         <target>Engels (Brits)</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">89</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="1858110241312746425">
@@ -1877,7 +1877,7 @@
         <target>Duits</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">90</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="3071065188816255493">
@@ -1885,7 +1885,7 @@
         <target>Nederlands</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="7633754075223722162">
@@ -1893,7 +1893,31 @@
         <target>Frans</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="9184513005098760425">
+        <source>Portuguese (Brazil)</source>
+        <target>Portugees (Brazilië)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="2935232983274991580">
+        <source>Italian</source>
+        <target>Italiaans</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit datatype="html" id="4912706592792948707">
+        <source>ISO 8601</source>
+        <target>ISO 8601</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="2119857572761283468">
@@ -2074,110 +2098,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">23</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="2056433880533904076">
-        <source>Light blue</source>
-        <target>Licht blauw</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">6</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="4082253113407591781">
-        <source>Blue</source>
-        <target>Blauw</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">7</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="1143414876575720034">
-        <source>Light green</source>
-        <target>Licht groen</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">8</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="119581980963263815">
-        <source>Green</source>
-        <target>Groen</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">9</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="3250646524116252719">
-        <source>Light red</source>
-        <target>Licht rood</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">10</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="1628552745302385832">
-        <source>Red </source>
-        <target>Rood</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">11</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="5479028842846122610">
-        <source>Light orange</source>
-        <target>Licht oranje</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">12</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="8598918991528773310">
-        <source>Orange</source>
-        <target>Oranje</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="1789283185177957430">
-        <source>Light violet</source>
-        <target>Licht paars</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">14</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="2682868487071320453">
-        <source>Violet</source>
-        <target>Paars</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">15</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="1449010446077321264">
-        <source>Brown</source>
-        <target>Bruin</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="30300572504753589">
-        <source>Black</source>
-        <target>Zwart</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit datatype="html" id="461048771215121187">
-        <source>Light grey</source>
-        <target>Licht grijs</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/paperless-tag.ts</context>
-          <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
       <trans-unit datatype="html" id="4561076822163447092">
