@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
@@ -86,7 +86,7 @@ export class AppFrameComponent implements OnInit {
     while (route.firstChild) {
       route = route.firstChild
     }
-    if (route.component == DocumentDetailComponent && (route.params as BehaviorSubject).getValue()['id'] == d.id) {
+    if (route.component == DocumentDetailComponent && (route.params as BehaviorSubject<Params>).getValue()['id'] == d.id) {
       this.router.navigate([""])
     }
   }
