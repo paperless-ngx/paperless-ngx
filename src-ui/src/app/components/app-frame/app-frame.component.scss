@@ -81,11 +81,11 @@
     height: 100%;
 
     svg {
-      opacity: 50%;
+      opacity: 0.5;
     }
 
     &:hover svg {
-      opacity: 100%;
+      opacity: 1;
     }
   }
 
