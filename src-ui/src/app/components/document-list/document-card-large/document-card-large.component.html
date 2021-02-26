@@ -1,7 +1,7 @@
 <div class="card mb-3 shadow-sm" [class.card-selected]="selected" [class.document-card]="selectable">
   <div class="row no-gutters">
     <div class="col-md-2 d-none d-lg-block doc-img-background rounded-left" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
-      <img [src]="getThumbUrl()" class="card-img doc-img border-right rounded-left">
+      <img [src]="getThumbUrl()" class="card-img doc-img border-right rounded-left" [class.inverted]="getIsThumbInverted()">
 
       <div style="top: 0; left: 0" class="position-absolute border-right border-bottom bg-light p-1" [class.document-card-check]="!selected">
         <div class="custom-control custom-checkbox">

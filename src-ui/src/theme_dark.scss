@@ -139,13 +139,16 @@ $border-color-dark-mode: #47494f;
 
   .doc-img {
     mix-blend-mode: normal;
-    filter: invert(95%) hue-rotate(180deg);
     border-radius: 0;
     border-color: $bg-dark-mode;
-
+    filter: invert(10%);
     &.border-right {
       border-right: none !important;
     }
+  }
+
+  .doc-img.inverted {
+    filter: invert(95%) hue-rotate(180deg);
   }
 
   .card-selected .doc-img {
