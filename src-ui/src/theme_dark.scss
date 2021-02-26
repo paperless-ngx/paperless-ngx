@@ -141,7 +141,7 @@ $border-color-dark-mode: #47494f;
     mix-blend-mode: normal;
     border-radius: 0;
     border-color: $bg-dark-mode;
-
+    filter: invert(10%);
     &.border-right {
       border-right: none !important;
     }
