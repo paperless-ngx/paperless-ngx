@@ -13,17 +13,20 @@ const FORMAT_TO_ISO_FORMAT = {
 })
 export class CustomDatePipe extends DatePipe implements PipeTransform {
 
+  private defaultLocale: string
+
   constructor(@Inject(LOCALE_ID) locale: string, private settings: SettingsService) {
     super(locale)
+    this.defaultLocale = locale
   }
 
   transform(value: any, format?: string, timezone?: string, locale?: string): string | null {
-    let l = locale || this.settings.get(SETTINGS_KEYS.DATE_LOCALE)
+    let l = locale || this.settings.get(SETTINGS_KEYS.DATE_LOCALE) || this.defaultLocale
     let f = format || this.settings.get(SETTINGS_KEYS.DATE_FORMAT)
     if (l == "iso-8601") {
       return super.transform(value, FORMAT_TO_ISO_FORMAT[f], timezone)
     } else {
-      return super.transform(value, format || this.settings.get(SETTINGS_KEYS.DATE_FORMAT), timezone, locale)
+      return super.transform(value, format || this.settings.get(SETTINGS_KEYS.DATE_FORMAT), timezone, l)
     }
   }
 
