@@ -305,6 +305,19 @@ API versions are specified by submitting an additional HTTP ``Accept`` header wi
 If an invalid version is specified, Paperless 1.3.0 will respond with "406 Not Acceptable" and an error message in the body.
 Earlier versions of Paperless will serve API version 1 regardless of whether a version is specified via the ``Accept`` header.
 
+If a client wishes to verify whether it is compatible with any given server, the following procedure should be performed:
+
+1.  Perform an *authenticated* request against any API endpoint. If the server is on version 1.3.0 or newer, the server will
+    add two custom headers to the response:
+
+    .. code::
+
+        X-Api-Version: 2
+        X-Version: 1.3.0
+
+2.  Determine whether the client is compatible with this server based on the presence/absence of these headers and their values if present.
+
+
 API Changelog
 =============
 
