@@ -3,9 +3,6 @@
 Paperless development
 #####################
 
-General information
-===================
-
 This section describes the steps you need to take to start development on paperless-ng.
 
 1.  Check out the source from github. The repository is organized in the following way:
@@ -56,12 +53,11 @@ To do the setup you need to perform the steps from the following chapters in a c
     .. code:: shell-session
 
         pipenv install --dev
-7. Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only).
+7. Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From root folder:
 
     .. code:: shell-session
 
-        pipenv shell 
-        cd /src-ui && ng build --prod
+        compile-frontend.sh
 8. Apply migrations and create a superuser for your dev instance:
 
     .. code:: shell-session
@@ -84,9 +80,6 @@ Back end development
 
 The backend is a django application. I use PyCharm for development, but you can use whatever
 you want.
-
-This will also create a virtual environment, which you can enter with ``pipenv shell`` or
-execute one-shot commands in with ``pipenv run``.
 
 Configure the IDE to use the src/ folder as the base source folder. Configure the following
 launch configurations in your IDE:
