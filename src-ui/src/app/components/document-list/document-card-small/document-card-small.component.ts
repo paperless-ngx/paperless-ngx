@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { DocumentService } from 'src/app/services/rest/document.service';
+import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-document-card-small',
@@ -10,7 +11,7 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 })
 export class DocumentCardSmallComponent implements OnInit {
 
-  constructor(private documentService: DocumentService) { }
+  constructor(private documentService: DocumentService, private settingsService: SettingsService) { }
 
   @Input()
   selected = false
@@ -30,6 +31,10 @@ export class DocumentCardSmallComponent implements OnInit {
   moreTags: number = null
 
   ngOnInit(): void {
+  }
+
+  getIsThumbInverted() {
+    return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
   }
 
   getThumbUrl() {
