@@ -13,6 +13,8 @@ class ApiVersionMiddleware:
         if request.user.is_authenticated:
             versions = settings.REST_FRAMEWORK['ALLOWED_VERSIONS']
             response['X-Api-Version'] = versions[len(versions)-1]
-            response['X-Version'] = ".".join([str(_) for _ in version.__version__])
+            response['X-Version'] = ".".join(
+                [str(_) for _ in version.__version__]
+            )
 
         return response
