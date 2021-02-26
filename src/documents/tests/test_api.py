@@ -1356,3 +1356,16 @@ class TestApiAuth(APITestCase):
         self.assertEqual(self.client.get("/api/documents/bulk_edit/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/bulk_download/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/selection_data/").status_code, 401)
+
+    def test_api_version_no_auth(self):
+
+        response = self.client.get("/api/")
+        self.assertNotIn("X-Api-Version", response)
+        self.assertNotIn("X-Version", response)
+
+    def test_api_version_with_auth(self):
+        user = User.objects.create_superuser(username="test")
+        self.client.force_login(user)
+        response = self.client.get("/api/")
+        self.assertIn("X-Api-Version", response)
+        self.assertIn("X-Version", response)
