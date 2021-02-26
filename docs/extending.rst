@@ -3,6 +3,9 @@
 Paperless development
 #####################
 
+General information
+===================
+
 This section describes the steps you need to take to start development on paperless-ng.
 
 1.  Check out the source from github. The repository is organized in the following way:
@@ -21,13 +24,60 @@ This section describes the steps you need to take to start development on paperl
     *   ``scripts/`` - Various scripts that help with different parts of development.
     *   ``docker/`` - Files required to build the docker image.
 
-2.  Install some dependencies.
+Initial setup and first start 
+=============================
 
-    *   Python 3.6.
-    *   All dependencies listed in the :ref:`Bare metal route <setup-bare_metal>`
-    *   redis. You can either install redis or use the included scripts/start-services.sh
-        to use docker to fire up a redis instance (and some other services such as tika,
-        gotenberg and a postgresql server).
+After you forked and cloned the code from github you need to perform a first-time setup. 
+To do the setup you need to perform the steps from the following chapters in a certain order:
+
+1. Install prerequisites + pipenv as mentioned in :ref:`Bare metal route <setup-bare_metal>`
+2. Copy ``paperless.conf.example`` to ``paperless.conf`` and enable debug mode.
+3. Install the Angular CLI interface:
+
+    .. code:: shell-session
+
+        $ npm install -g @angular/cli 
+
+4. Create ``consume`` and ``media`` folders in the cloned root folder.
+   
+    .. code:: shell-session
+
+        mkdir -p consume media
+5. You can now either ... :
+    *  install redis or 
+    *  use the included scripts/start-services.sh to use docker to fire up a redis instance (and some other services such as tika, gotenberg and a postgresql server) or
+    *  spin up a bare redis container 
+
+        .. code:: shell-session
+
+            docker run -d -p 6379:6379 -restart unless-stopped redis:latest
+6. Install the python dependencies by performing in the src/ directory.
+
+    .. code:: shell-session
+
+        pipenv install --dev
+7. Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only).
+
+    .. code:: shell-session
+
+        pipenv shell 
+        cd /src-ui && ng build --prod
+8. Apply migrations and create a superuser for your dev instance:
+
+    .. code:: shell-session
+
+        python3 manage.py migrate
+        python3 manage.py createsuperuser
+
+9. Now spin up the dev backend. Depending on which part of paperless you're developing for, you need to have some or all of them running.
+
+    .. code:: shell-session
+
+        python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
+
+10. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
+ 
+Backend development environment is now ready, to start Frontend development go to ``/src-ui`` and run ``ng serve``. From there you can use ``http://localhost:4200`` for a preview.
 
 Back end development
 ====================
@@ -35,21 +85,21 @@ Back end development
 The backend is a django application. I use PyCharm for development, but you can use whatever
 you want.
 
-Install the python dependencies by performing ``pipenv install --dev`` in the src/ directory.
 This will also create a virtual environment, which you can enter with ``pipenv shell`` or
 execute one-shot commands in with ``pipenv run``.
-
-Copy ``paperless.conf.example`` to ``paperless.conf`` and enable debug mode.
 
 Configure the IDE to use the src/ folder as the base source folder. Configure the following
 launch configurations in your IDE:
 
 *   python3 manage.py runserver
 *   python3 manage.py qcluster
-*   python3 manage.py consumer
+*   python3 manage.py document_consumer
 
-Depending on which part of paperless you're developing for, you need to have some or all of
-them running.
+To start them all:
+
+.. code:: shell-session
+
+    python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
 
 Testing and code style:
 
