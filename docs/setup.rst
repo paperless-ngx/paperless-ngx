@@ -284,6 +284,12 @@ writing. Windows is not and will never be supported.
     *   ``libmagic-dev`` for mime type detection
     *   ``mime-support`` for mime type detection
 
+    Use this list for your preferred package management:
+
+    .. code:: 
+
+        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support
+
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
     *   ``unpaper``
@@ -296,6 +302,12 @@ writing. Windows is not and will never be supported.
     *   ``zlib1g``
     *   ``tesseract-ocr`` >= 4.0.0 for OCR
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
+
+    Use this list for your preferred package management:
+
+    .. code:: 
+
+        unpaper ghostscript icc-profiles-free qpdf liblept5 libxml2 pngquant zlib1g tesseract-ocr
 
     On Raspberry Pi, these libraries are required as well:
 
