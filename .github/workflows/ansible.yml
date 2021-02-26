@@ -48,6 +48,8 @@ jobs:
           molecule idempotence
           molecule verify
         working-directory: "${{ github.repository }}"
+        env:
+          TARGET_GITHUB_SHA: "${{ github.event.pull_request.head.sha }}"
   # # https://galaxy.ansible.com/docs/contributing/importing.html
   # release:
   #   runs-on: ubuntu-latest
