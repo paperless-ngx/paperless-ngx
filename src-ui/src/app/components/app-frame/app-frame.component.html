@@ -92,9 +92,14 @@
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
               </svg>&nbsp;{{d.title | documentTitle}}
+              <span class="close bg-light" (click)="closeDocument(d); $event.preventDefault()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                  <use xlink:href="assets/bootstrap-icons.svg#x"/>
+                </svg>
+              </span>
             </a>
           </li>
-          <li class="nav-item w-100" *ngIf="openDocuments.length >= 1">
+          <li class="nav-item w-100" *ngIf="openDocuments.length > 1">
             <a class="nav-link text-truncate" [routerLink]="" (click)="closeAll()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#x"/>
