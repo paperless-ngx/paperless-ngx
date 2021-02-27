@@ -81,12 +81,11 @@ export class AppFrameComponent implements OnInit {
     this.closeMenu()
     this.openDocumentsService.closeDocument(d)
 
-    // TODO: is there a better way to do this? (taken from closeAll)
-    let route = this.activatedRoute
+    let route = this.activatedRoute.snapshot
     while (route.firstChild) {
       route = route.firstChild
     }
-    if (route.component == DocumentDetailComponent && (route.params as BehaviorSubject<Params>).getValue()['id'] == d.id) {
+    if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
       this.router.navigate([""])
     }
   }
@@ -95,8 +94,7 @@ export class AppFrameComponent implements OnInit {
     this.closeMenu()
     this.openDocumentsService.closeAll()
 
-    // TODO: is there a better way to do this?
-    let route = this.activatedRoute
+    let route = this.activatedRoute.snapshot
     while (route.firstChild) {
       route = route.firstChild
     }
