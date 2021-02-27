@@ -63,6 +63,10 @@ $border-color-dark-mode: #47494f;
       background-color: $bg-dark-mode;
       color: $text-color-dark-mode;
       border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+
+      .close {
+        background-color: inherit !important;
+      }
     }
 
     &:hover {
