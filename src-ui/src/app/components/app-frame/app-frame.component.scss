@@ -79,6 +79,14 @@
     right: .4rem;
     width: 1.8rem;
     height: 100%;
+
+    svg {
+      opacity: 0.5;
+    }
+
+    &:hover svg {
+      opacity: 1;
+    }
   }
 
   .nav-link-additional {
