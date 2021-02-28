@@ -286,6 +286,8 @@ was started successfully. No additional status information about the consumption
 process itself is available, since that happens in a different process.
 
 
+.. _api-versioning:
+
 API Versioning
 ##############
 

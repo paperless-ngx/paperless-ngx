@@ -184,17 +184,17 @@ Downgrades are possible. However, some updates also contain database migrations 
 In order to move back from a version that applied database migrations, you'll have to revert the database migration *before* downgrading,
 and then downgrade paperless.
 
-This table lists the most recent database migrations for each versions:
+This table lists the compatible versions for each database migration number.
 
-+---------+-------------------------+
-| Version | Latest migration number |
-+---------+-------------------------+
-| 1.0.0   | 1011                    |
-+---------+-------------------------+
-| 1.1.0   | 1011                    |
-+---------+-------------------------+
-| 1.1.1   | 1012                    |
-+---------+-------------------------+
++------------------+-----------------+
+| Migration number | Version range   |
++------------------+-----------------+
+| 1011             | 1.0.0           |
++------------------+-----------------+
+| 1012             | 1.1.0 - 1.2.1   |
++------------------+-----------------+
+| 1013             | 1.3.0 - current |
++------------------+-----------------+
 
 Execute the following management command to migrate your database:
 
