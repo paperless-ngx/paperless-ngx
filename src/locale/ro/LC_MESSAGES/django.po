@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-26 12:56+0100\n"
+"POT-Creation-Date: 2021-02-28 12:40+0100\n"
 "PO-Revision-Date: 2021-02-16 18:37+0000\n"
 "Last-Translator: Cubic Lemon <lemonsarecubic@gmail.com>, 2021\n"
 "Language-Team: Romanian (https://www.transifex.com/paperless/teams/115905/ro/)\n"
@@ -437,6 +437,10 @@ msgstr "Portugheza (Brazilia)"
 msgid "Italian"
 msgstr "Italiana"
 
+#: paperless/settings.py:304
+msgid "Romanian"
+msgstr "Romana"
+
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
 msgstr "Administrare Paperless-ng"
@@ -676,7 +680,7 @@ msgstr "atribuie acest tip"
 
 #: paperless_mail/models.py:195
 msgid "assign correspondent from"
-msgstr "atribuie acest corespondent"
+msgstr "atribuie corespondent din"
 
 #: paperless_mail/models.py:205
 msgid "assign this correspondent"
