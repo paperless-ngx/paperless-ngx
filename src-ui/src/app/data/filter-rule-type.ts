@@ -20,6 +20,8 @@ export const FILTER_DOES_NOT_HAVE_TAG = 17
 
 export const FILTER_ASN_ISNULL = 18
 
+export const FILTER_TITLE_CONTENT = 19
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
 
   {id: FILTER_TITLE, filtervar: "title__icontains", datatype: "string", multi: false, default: ""},
@@ -47,7 +49,9 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
 
   {id: FILTER_MODIFIED_BEFORE, filtervar: "modified__date__lt", datatype: "date", multi: false},
   {id: FILTER_MODIFIED_AFTER, filtervar: "modified__date__gt", datatype: "date", multi: false},
-  {id: FILTER_ASN_ISNULL, filtervar: "archive_serial_number__isnull", datatype: "boolean", multi: false}
+  {id: FILTER_ASN_ISNULL, filtervar: "archive_serial_number__isnull", datatype: "boolean", multi: false},
+
+  {id: FILTER_TITLE_CONTENT, filtervar: "title_content", datatype: "string", multi: false}
 ]
 
 export interface FilterRuleType {
