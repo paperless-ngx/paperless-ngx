@@ -300,7 +300,8 @@ LANGUAGES = [
     ("nl-nl", _("Dutch")),
     ("fr", _("French")),
     ("pt-br", _("Portuguese (Brazil)")),
-    ("it", _("Italian"))
+    ("it", _("Italian")),
+    ("ro", _("Romanian"))
 ]
 
 LOCALE_PATHS = [
