@@ -385,6 +385,8 @@ class SavedViewFilterRule(models.Model):
         (15, _("modified before")),
         (16, _("modified after")),
         (17, _("does not have tag")),
+        (18, _("does not have ASN")),
+        (19, _("title or content contains")),
     ]
 
     saved_view = models.ForeignKey(
