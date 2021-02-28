@@ -5,6 +5,22 @@
 Changelog
 *********
 
+paperless-ng 1.3.0
+##################
+
+This release contains new database migrations.
+
+* Added a color picker for tag colors.
+
+* Added translations into Italian and Romanian. Thank you!
+
+* Close individual documents from the sidebar.
+
+* `BolkoSchreiber <https://github.com/BolkoSchreiber>`_ added an option to disable/enable thumbnail inversion in dark mode.
+
+* The REST API is versioned from this point onwards. See the documentation about :ref:`api-versioning` for details.
+
+
 paperless-ng 1.2.1
 ##################
 
