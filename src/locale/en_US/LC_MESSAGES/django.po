@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-26 12:56+0100\n"
+"POT-Creation-Date: 2021-02-28 12:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -426,6 +426,10 @@ msgstr ""
 
 #: paperless/settings.py:303
 msgid "Italian"
+msgstr ""
+
+#: paperless/settings.py:304
+msgid "Romanian"
 msgstr ""
 
 #: paperless/urls.py:118
