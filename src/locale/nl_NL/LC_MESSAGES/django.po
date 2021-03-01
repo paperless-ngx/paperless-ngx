@@ -6,15 +6,16 @@
 # Translators:
 # Jonas Winkler, 2021
 # Jo Vandeginste <jo.vandeginste@gmail.com>, 2021
+# Ben <bzweekhorst@gmail.com>, 2021
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-26 12:56+0100\n"
+"POT-Creation-Date: 2021-02-28 12:40+0100\n"
 "PO-Revision-Date: 2021-02-16 18:37+0000\n"
-"Last-Translator: Jo Vandeginste <jo.vandeginste@gmail.com>, 2021\n"
+"Last-Translator: Ben <bzweekhorst@gmail.com>, 2021\n"
 "Language-Team: Dutch (Netherlands) (https://www.transifex.com/paperless/teams/115905/nl_NL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -436,6 +437,10 @@ msgstr "Portugees (Brazilië)"
 #: paperless/settings.py:303
 msgid "Italian"
 msgstr "Italiaans"
+
+#: paperless/settings.py:304
+msgid "Romanian"
+msgstr "Roemeens"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
