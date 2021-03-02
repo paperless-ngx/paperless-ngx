@@ -192,7 +192,17 @@ PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>
     applications.
 
     Defaults to `false` which disables this feature.
-
+    
+PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<strl>
+    If `PAPERLESS_ENABLE_HTTP_REMOTE_USER` is enabled, this property allows to 
+    customize the name of the HTTP header from which the username is extracted.
+    Values are in terms of
+    [HttpRequest.META](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.META).
+    Thus, the configured value must start with `HTTP_` followed by the 
+    normalized actual header name.
+    
+    Defaults to `HTTP_REMOTE_USER`.
+    
 .. _configuration-ocr:
 
 OCR settings
