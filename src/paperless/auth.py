@@ -33,5 +33,4 @@ class HttpRemoteUserMiddleware(RemoteUserMiddleware):
     """ This class allows authentication via HTTP_REMOTE_USER which is set for
         example by certain SSO applications.
     """
-
-    header = 'HTTP_REMOTE_USER'
+    header = settings.HTTP_REMOTE_USER_HEADER_NAME
