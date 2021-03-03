@@ -18,7 +18,12 @@ This release contains new database migrations.
 
 * `BolkoSchreiber <https://github.com/BolkoSchreiber>`_ added an option to disable/enable thumbnail inversion in dark mode.
 
+* Fixed an issue with the auto matching algorithm when more than 256 tags were used.
+
+* `Simon Taddiken <https://github.com/skuzzle>`_ added the ability to customize the header used for remote user authentication with SSO applications.
+
 * The REST API is versioned from this point onwards. See the documentation about :ref:`api-versioning` for details.
+
 
 
 paperless-ng 1.2.1
