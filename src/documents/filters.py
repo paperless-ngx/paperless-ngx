@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django_filters.rest_framework import BooleanFilter, FilterSet, Filter
 
 from .models import Correspondent, Document, Tag, DocumentType, Log
@@ -70,6 +71,16 @@ class InboxFilter(Filter):
             return qs
 
 
+class TitleContentFilter(Filter):
+
+    def filter(self, qs, value):
+        if value:
+            return qs.filter(Q(title__icontains=value) |
+                             Q(content__icontains=value))
+        else:
+            return qs
+
+
 class DocumentFilterSet(FilterSet):
 
     is_tagged = BooleanFilter(
@@ -84,6 +95,8 @@ class DocumentFilterSet(FilterSet):
     tags__id__none = TagsFilter(exclude=True)
 
     is_in_inbox = InboxFilter()
+
+    title_content = TitleContentFilter()
 
     class Meta:
         model = Document

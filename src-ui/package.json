@@ -25,6 +25,7 @@
     "bootstrap": "^4.5.0",
     "file-saver": "^2.0.5",
     "ng-bootstrap": "^1.6.3",
+    "ngx-color": "^6.2.0",
     "ngx-cookie-service": "^10.1.1",
     "ngx-file-drop": "^10.0.0",
     "ngx-infinite-scroll": "^9.1.0",

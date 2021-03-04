@@ -8,9 +8,12 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE } from 'src/app/data/filter-rule-type';
+import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE, FILTER_TITLE_CONTENT } from 'src/app/data/filter-rule-type';
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
+
+const TEXT_FILTER_TARGET_TITLE = "title"
+const TEXT_FILTER_TARGET_TITLE_CONTENT = "title-content"
 
 @Component({
   selector: 'app-filter-editor',
@@ -64,7 +67,19 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
 
-  _titleFilter = ""
+  _textFilter = ""
+
+  textFilterTargets = [
+    {id: TEXT_FILTER_TARGET_TITLE, name: $localize`Title`},
+    {id: TEXT_FILTER_TARGET_TITLE_CONTENT, name: $localize`Title & content`}
+  ]
+
+  textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
+
+  get textFilterTargetName() {
+    return this.textFilterTargets.find(t => t.id == this.textFilterTarget)?.name
+  }
+
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -80,7 +95,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.documentTypeSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
-    this._titleFilter = null
+    this._textFilter = null
     this.dateAddedBefore = null
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
@@ -89,7 +104,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     value.forEach(rule => {
       switch (rule.rule_type) {
         case FILTER_TITLE:
-          this._titleFilter = rule.value
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_TITLE
+          break
+        case FILTER_TITLE_CONTENT:
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
           break
         case FILTER_CREATED_AFTER:
           this.dateCreatedAfter = rule.value
@@ -121,8 +141,11 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   get filterRules(): FilterRule[] {
     let filterRules: FilterRule[] = []
-    if (this._titleFilter) {
-      filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})
+    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE_CONTENT) {
+      filterRules.push({rule_type: FILTER_TITLE_CONTENT, value: this._textFilter})
+    }
+    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
+      filterRules.push({rule_type: FILTER_TITLE, value: this._textFilter})
     }
     if (this.tagSelectionModel.isNoneSelected()) {
       filterRules.push({rule_type: FILTER_HAS_ANY_TAG, value: "false"})
@@ -165,15 +188,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.filterRulesChange.next(this.filterRules)
   }
 
-  get titleFilter() {
-    return this._titleFilter
+  get textFilter() {
+    return this._textFilter
   }
 
-  set titleFilter(value) {
-    this.titleFilterDebounce.next(value)
+  set textFilter(value) {
+    this.textFilterDebounce.next(value)
   }
 
-  titleFilterDebounce: Subject<string>
+  textFilterDebounce: Subject<string>
   subscription: Subscription
 
   ngOnInit() {
@@ -181,19 +204,19 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
     this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
 
-    this.titleFilterDebounce = new Subject<string>()
+    this.textFilterDebounce = new Subject<string>()
 
-    this.subscription = this.titleFilterDebounce.pipe(
+    this.subscription = this.textFilterDebounce.pipe(
       debounceTime(400),
       distinctUntilChanged()
-    ).subscribe(title => {
-      this._titleFilter = title
+    ).subscribe(text => {
+      this._textFilter = text
       this.updateRules()
     })
   }
 
   ngOnDestroy() {
-    this.titleFilterDebounce.complete()
+    this.textFilterDebounce.complete()
   }
 
   resetSelected() {
@@ -222,5 +245,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   onDocumentTypeDropdownOpen() {
     this.documentTypeSelectionModel.apply()
+  }
+
+  changeTextFilterTarget(target) {
+    this.textFilterTarget = target
+    this.updateRules()
   }
 }

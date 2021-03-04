@@ -123,10 +123,11 @@ class DocumentClassifier(object):
             m.update(y.to_bytes(4, 'little', signed=True))
             labels_correspondent.append(y)
 
-            tags = [tag.pk for tag in doc.tags.filter(
+            tags = sorted([tag.pk for tag in doc.tags.filter(
                 matching_algorithm=MatchingModel.MATCH_AUTO
-            )]
-            m.update(bytearray(tags))
+            )])
+            for tag in tags:
+                m.update(tag.to_bytes(4, 'little', signed=True))
             labels_tags.append(tags)
 
         if not data:
