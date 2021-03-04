@@ -5,16 +5,39 @@
 Changelog
 *********
 
+paperless-ng 1.3.0
+##################
+
+This release contains new database migrations.
+
+* Added a color picker for tag colors.
+
+* Added translations into Italian and Romanian. Thank you!
+
+* Close individual documents from the sidebar.
+
+* `BolkoSchreiber <https://github.com/BolkoSchreiber>`_ added an option to disable/enable thumbnail inversion in dark mode.
+
+* Fixed an issue with the auto matching algorithm when more than 256 tags were used.
+
+* `Simon Taddiken <https://github.com/skuzzle>`_ added the ability to customize the header used for remote user authentication with SSO applications.
+
+* The REST API is versioned from this point onwards. See the documentation about :ref:`api-versioning` for details.
+
+
+
 paperless-ng 1.2.1
 ##################
 
-* `Rodrigo Avelino <https://github.com/rodavelino>`_ translated Paperless into Portuguese (Brazil).
+* `Rodrigo Avelino <https://github.com/rodavelino>`_ translated Paperless into Portuguese (Brazil)!
 
 * The date input fields now respect the currently selected date format.
 
 * Added a fancy icon when adding paperless to the home screen on iOS devices. Thanks to `Joel Nordell <https://github.com/joelnordell>`_.
 
 * When using regular expression matching, the regular expression is now validated before saving the tag/correspondent/type.
+
+* Regression fix: Dates on the front end did not respect date locale settings in some cases.
 
 paperless-ng 1.2.0
 ##################

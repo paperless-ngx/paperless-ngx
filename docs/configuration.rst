@@ -191,8 +191,28 @@ PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>
     Allows authentication via HTTP_REMOTE_USER which is used by some SSO
     applications.
 
-    Defaults to `false` which disables this feature.
+    .. warning::
 
+        This will allow authentication by simply adding a ``Remote-User: <username>`` header
+        to a request. Use with care! You especially *must* ensure that any such header is not
+        passed from your proxy server to paperless.
+
+        If you're exposing paperless to the internet directly, do not use this.
+
+        Also see the warning `in the official documentation <https://docs.djangoproject.com/en/3.1/howto/auth-remote-user/#configuration>`.
+
+    Defaults to `false` which disables this feature.
+    
+PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>
+    If `PAPERLESS_ENABLE_HTTP_REMOTE_USER` is enabled, this property allows to 
+    customize the name of the HTTP header from which the authenticated username 
+    is extracted. Values are in terms of
+    [HttpRequest.META](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.META).
+    Thus, the configured value must start with `HTTP_` followed by the 
+    normalized actual header name.
+    
+    Defaults to `HTTP_REMOTE_USER`.
+    
 .. _configuration-ocr:
 
 OCR settings

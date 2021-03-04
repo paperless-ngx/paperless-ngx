@@ -284,3 +284,53 @@ The endpoint supports the following optional form fields:
 The endpoint will immediately return "OK" if the document consumption process
 was started successfully. No additional status information about the consumption
 process itself is available, since that happens in a different process.
+
+
+.. _api-versioning:
+
+API Versioning
+##############
+
+The REST API is versioned since Paperless-ng 1.3.0.
+
+* Versioning ensures that changes to the API don't break older clients.
+* Clients specify the specific version of the API they wish to use with every request and Paperless will handle the request using the specified API version.
+* Even if the underlying data model changes, older API versions will always serve compatible data.
+* If no version is specified, Paperless will serve version 1 to ensure compatibility with older clients that do not request a specific API version.
+
+API versions are specified by submitting an additional HTTP ``Accept`` header with every request:
+
+.. code::
+
+    Accept: application/json; version=6
+
+If an invalid version is specified, Paperless 1.3.0 will respond with "406 Not Acceptable" and an error message in the body.
+Earlier versions of Paperless will serve API version 1 regardless of whether a version is specified via the ``Accept`` header.
+
+If a client wishes to verify whether it is compatible with any given server, the following procedure should be performed:
+
+1.  Perform an *authenticated* request against any API endpoint. If the server is on version 1.3.0 or newer, the server will
+    add two custom headers to the response:
+
+    .. code::
+
+        X-Api-Version: 2
+        X-Version: 1.3.0
+
+2.  Determine whether the client is compatible with this server based on the presence/absence of these headers and their values if present.
+
+
+API Changelog
+=============
+
+Version 1
+---------
+
+Initial API version.
+
+Version 2
+---------
+
+* Added field ``Tag.color``. This read/write string field contains a hex color such as ``#a6cee3``.
+* Added read-only field ``Tag.text_color``. This field contains the text color to use for a specific tag, which is either black or white depending on the brightness of ``Tag.color``.
+* Removed field ``Tag.colour``.

@@ -62,15 +62,44 @@
   flex-wrap: nowrap;
 }
 
-.nav-item .nav-link-additional {
-  margin-top: 0.2rem;
-  margin-left: 0.25rem;
-  padding-top: 0.5rem;
+.nav-item {
+  position: relative;
 
-  svg {
-    margin-bottom: 2px;
+  &:hover .close {
+    display: block;
+  }
+
+  .close {
+    display: none;
+    position: absolute;
+    cursor: pointer;
+    opacity: 1;
+    top: 0;
+    padding: .25rem .3rem 0;
+    right: .4rem;
+    width: 1.8rem;
+    height: 100%;
+
+    svg {
+      opacity: 0.5;
+    }
+
+    &:hover svg {
+      opacity: 1;
+    }
+  }
+
+  .nav-link-additional {
+    margin-top: 0.2rem;
+    margin-left: 0.25rem;
+    padding-top: 0.5rem;
+
+    svg {
+      margin-bottom: 2px;
+    }
   }
 }
+
 
 /*
  * Navbar

@@ -112,7 +112,12 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication'
-    ]
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
+    'DEFAULT_VERSION': '1',
+    # Make sure these are ordered and that the most recent version appears
+    # last
+    'ALLOWED_VERSIONS': ['1', '2']
 }
 
 if DEBUG:
@@ -128,6 +133,7 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'paperless.middleware.ApiVersionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -142,7 +148,7 @@ ASGI_APPLICATION = "paperless.asgi.application"
 
 STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
 
-# what is this used for?
+# TODO: what is this used for?
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -183,6 +189,7 @@ if AUTO_LOGIN_USERNAME:
     MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
 
 ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
+HTTP_REMOTE_USER_HEADER_NAME = os.getenv("PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME", "HTTP_REMOTE_USER")
 
 if ENABLE_HTTP_REMOTE_USER:
     MIDDLEWARE.append(
@@ -293,7 +300,9 @@ LANGUAGES = [
     ("de", _("German")),
     ("nl-nl", _("Dutch")),
     ("fr", _("French")),
-    ("pt-br", _("Portuguese (Brazil)"))
+    ("pt-br", _("Portuguese (Brazil)")),
+    ("it", _("Italian")),
+    ("ro", _("Romanian"))
 ]
 
 LOCALE_PATHS = [

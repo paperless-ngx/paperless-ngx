@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { from, Observable, Subscription } from 'rxjs';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
@@ -16,7 +16,7 @@ import { Meta } from '@angular/platform-browser';
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss']
 })
-export class AppFrameComponent implements OnInit, OnDestroy {
+export class AppFrameComponent implements OnInit {
 
   constructor (
     public router: Router,
@@ -26,7 +26,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     public savedViewService: SavedViewService,
     private meta: Meta
     ) {
-      
+
   }
 
   versionString = `${environment.appTitle} ${environment.version}`
@@ -39,9 +39,9 @@ export class AppFrameComponent implements OnInit, OnDestroy {
 
   searchField = new FormControl('')
 
-  openDocuments: PaperlessDocument[] = []
-
-  openDocumentsSubscription: Subscription
+  get openDocuments(): PaperlessDocument[] {
+    return this.openDocumentsService.getOpenDocuments()
+  }
 
   searchAutoComplete = (text$: Observable<string>) =>
     text$.pipe(
@@ -77,12 +77,24 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     this.router.navigate(['search'], {queryParams: {query: this.searchField.value}})
   }
 
+  closeDocument(d: PaperlessDocument) {
+    this.closeMenu()
+    this.openDocumentsService.closeDocument(d)
+
+    let route = this.activatedRoute.snapshot
+    while (route.firstChild) {
+      route = route.firstChild
+    }
+    if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
+      this.router.navigate([""])
+    }
+  }
+
   closeAll() {
     this.closeMenu()
     this.openDocumentsService.closeAll()
 
-    // TODO: is there a better way to do this?
-    let route = this.activatedRoute
+    let route = this.activatedRoute.snapshot
     while (route.firstChild) {
       route = route.firstChild
     }
@@ -92,13 +104,6 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.openDocuments = this.openDocumentsService.getOpenDocuments()
-  }
-
-  ngOnDestroy() {
-    if (this.openDocumentsSubscription) {
-      this.openDocumentsSubscription.unsubscribe()
-    }
   }
 
   get displayName() {
