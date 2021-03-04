@@ -53,9 +53,7 @@
             </a>
             <ng-template #previewContent>
               <ng-container *ngIf="getContentType() == 'application/pdf'">
-                  <div class="preview">
-                    <object [data]="previewUrl | safe" class="preview" width="100%"></object>
-                  </div>
+                <object [data]="previewUrl | safe" class="preview" width="100%"></object>
               </ng-container>
               <ng-container *ngIf="getContentType() == 'text/plain'">
                   <object [data]="previewUrl | safe" type="text/plain" class="preview" width="100%"></object>
