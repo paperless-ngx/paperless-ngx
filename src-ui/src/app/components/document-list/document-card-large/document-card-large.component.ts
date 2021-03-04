@@ -8,7 +8,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: ['./document-card-large.component.scss']
+  styleUrls: ['./document-card-large.component.scss', '../popover-preview/popover-preview.scss']
 })
 export class DocumentCardLargeComponent implements OnInit {
 
