@@ -278,9 +278,7 @@ class TestParser(DirectoriesMixin, TestCase):
         with open(os.path.join(parser.tempdir, "sidecar.txt")) as f:
             sidecar = f.read()
 
-        self.assertIn("[OCR skipped on page 4]", sidecar)
-        self.assertIn("[OCR skipped on page 5]", sidecar)
-        self.assertIn("[OCR skipped on page 6]", sidecar)
+        self.assertIn("[OCR skipped on page(s) 4-6]", sidecar)
 
     @override_settings(OCR_MODE="skip_noarchive")
     def test_multi_page_mixed_no_archive(self):

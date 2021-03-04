@@ -61,18 +61,26 @@ import { CustomDatePipe } from './pipes/custom-date.pipe';
 import { DateComponent } from './components/common/input/date/date.component';
 import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter';
 import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter';
+import { ApiVersionInterceptor } from './interceptors/api-version.interceptor';
+import { ColorSliderModule } from 'ngx-color/slider';
+import { ColorComponent } from './components/common/input/color/color.component';
 
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
 import localeDe from '@angular/common/locales/de';
-import localePt from '@angular/common/locales/pt-PT';
+import localePt from '@angular/common/locales/pt';
+import localeIt from '@angular/common/locales/it';
 import localeEnGb from '@angular/common/locales/en-GB';
+import localeRo from '@angular/common/locales/ro';
+
 
 registerLocaleData(localeFr)
 registerLocaleData(localeNl)
 registerLocaleData(localeDe)
 registerLocaleData(localePt, "pt-BR")
+registerLocaleData(localeIt)
 registerLocaleData(localeEnGb)
+registerLocaleData(localeRo)
 
 @NgModule({
   declarations: [
@@ -123,7 +131,8 @@ registerLocaleData(localeEnGb)
     NumberComponent,
     SafePipe,
     CustomDatePipe,
-    DateComponent
+    DateComponent,
+    ColorComponent
   ],
   imports: [
     BrowserModule,
@@ -134,13 +143,18 @@ registerLocaleData(localeEnGb)
     ReactiveFormsModule,
     NgxFileDropModule,
     InfiniteScrollModule,
-    NgSelectModule
+    NgSelectModule,
+    ColorSliderModule
   ],
   providers: [
     DatePipe,
     CookieService, {
       provide: HTTP_INTERCEPTORS,
       useClass: CsrfInterceptor,
+      multi: true
+    },{
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiVersionInterceptor,
       multi: true
     },
     FilterPipe,

@@ -8,13 +8,13 @@
 -i https://pypi.python.org/simple
 --extra-index-url https://www.piwheels.org/simple
 aioredis==1.3.1
-arrow==0.17.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+arrow==1.0.1; python_version >= '3.6'
 asgiref==3.3.1; python_version >= '3.5'
 async-timeout==3.0.1; python_full_version >= '3.5.3'
 attrs==20.3.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-autobahn==21.2.1; python_version >= '3.6'
+autobahn==21.2.2; python_version >= '3.7'
 automat==20.2.0
-blessed==1.17.12
+blessed==1.18.0
 certifi==2020.12.5
 cffi==1.14.5
 channels-redis==3.2.0
@@ -24,9 +24,9 @@ click==7.1.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 
 coloredlogs==15.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 concurrent-log-handler==0.9.19
 constantly==15.1.0
-cryptography==3.3.2
+cryptography==3.4.6
 daphne==3.0.1; python_version >= '3.6'
-dateparser==0.7.6
+dateparser==1.0.0
 django-cors-headers==3.7.0
 django-extensions==3.1.1
 django-filter==2.4.0
@@ -43,7 +43,7 @@ httptools==0.1.1
 humanfriendly==9.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 hyperlink==21.0.0
 idna==2.10; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-imap-tools==0.37.0
+imap-tools==0.38.1
 img2pdf==0.4.0
 incremental==17.5.0
 inotify-simple==1.3.5; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
@@ -53,7 +53,7 @@ langdetect==1.0.8
 lxml==4.6.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 msgpack==1.0.2
 numpy==1.19.5
-ocrmypdf==11.6.2
+ocrmypdf==11.7.0
 pathvalidate==2.3.2
 pdfminer.six==20201018
 pikepdf==2.5.2
@@ -64,7 +64,6 @@ psycopg2-binary==2.8.6
 pyasn1-modules==0.2.8
 pyasn1==0.4.8
 pycparser==2.20; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-pyhamcrest==2.0.2; python_version >= '3.5'
 pyopenssl==20.0.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 python-dateutil==2.8.1
 python-dotenv==0.15.0
@@ -85,8 +84,8 @@ sortedcontainers==2.3.0
 sqlparse==0.4.1; python_version >= '3.5'
 threadpoolctl==2.1.0; python_version >= '3.5'
 tika==1.24
-tqdm==4.57.0
-twisted[tls]==20.3.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+tqdm==4.58.0
+twisted[tls]==21.2.0; python_full_version >= '3.5.4'
 txaio==21.2.1; python_version >= '3.6'
 tzlocal==2.1
 urllib3==1.26.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'

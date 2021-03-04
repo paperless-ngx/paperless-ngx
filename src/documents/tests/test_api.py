@@ -807,6 +807,69 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             }, format='json')
             self.assertEqual(response.status_code, 201, endpoint)
 
+    def test_tag_color_default(self):
+        response = self.client.post("/api/tags/", {
+            "name": "tag"
+        }, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Tag.objects.get(id=response.data['id']).color, "#a6cee3")
+        self.assertEqual(self.client.get(f"/api/tags/{response.data['id']}/", format="json").data['colour'], 1)
+
+    def test_tag_color(self):
+        response = self.client.post("/api/tags/", {
+            "name": "tag",
+            "colour": 3
+        }, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Tag.objects.get(id=response.data['id']).color, "#b2df8a")
+        self.assertEqual(self.client.get(f"/api/tags/{response.data['id']}/", format="json").data['colour'], 3)
+
+    def test_tag_color_invalid(self):
+        response = self.client.post("/api/tags/", {
+            "name": "tag",
+            "colour": 34
+        }, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_tag_color_custom(self):
+        tag = Tag.objects.create(name="test", color="#abcdef")
+        self.assertEqual(self.client.get(f"/api/tags/{tag.id}/", format="json").data['colour'], 1)
+
+
+class TestDocumentApiV2(DirectoriesMixin, APITestCase):
+
+    def setUp(self):
+        super(TestDocumentApiV2, self).setUp()
+
+        self.user = User.objects.create_superuser(username="temp_admin")
+
+        self.client.force_login(user=self.user)
+        self.client.defaults['HTTP_ACCEPT'] = 'application/json; version=2'
+
+    def test_tag_validate_color(self):
+        self.assertEqual(self.client.post("/api/tags/", {"name": "test", "color": "#12fFaA"}, format="json").status_code, 201)
+
+        self.assertEqual(self.client.post("/api/tags/", {"name": "test1", "color": "abcdef"}, format="json").status_code, 400)
+        self.assertEqual(self.client.post("/api/tags/", {"name": "test2", "color": "#abcdfg"}, format="json").status_code, 400)
+        self.assertEqual(self.client.post("/api/tags/", {"name": "test3", "color": "#asd"}, format="json").status_code, 400)
+        self.assertEqual(self.client.post("/api/tags/", {"name": "test4", "color": "#12121212"}, format="json").status_code, 400)
+
+    def test_tag_text_color(self):
+        t = Tag.objects.create(name="tag1", color="#000000")
+        self.assertEqual(self.client.get(f"/api/tags/{t.id}/", format="json").data['text_color'], "#ffffff")
+
+        t.color = "#ffffff"
+        t.save()
+        self.assertEqual(self.client.get(f"/api/tags/{t.id}/", format="json").data['text_color'], "#000000")
+
+        t.color = "asdf"
+        t.save()
+        self.assertEqual(self.client.get(f"/api/tags/{t.id}/", format="json").data['text_color'], "#000000")
+
+        t.color = "123"
+        t.save()
+        self.assertEqual(self.client.get(f"/api/tags/{t.id}/", format="json").data['text_color'], "#000000")
+
 
 class TestBulkEdit(DirectoriesMixin, APITestCase):
 
@@ -1293,3 +1356,16 @@ class TestApiAuth(APITestCase):
         self.assertEqual(self.client.get("/api/documents/bulk_edit/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/bulk_download/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/selection_data/").status_code, 401)
+
+    def test_api_version_no_auth(self):
+
+        response = self.client.get("/api/")
+        self.assertNotIn("X-Api-Version", response)
+        self.assertNotIn("X-Version", response)
+
+    def test_api_version_with_auth(self):
+        user = User.objects.create_superuser(username="test")
+        self.client.force_login(user)
+        response = self.client.get("/api/")
+        self.assertIn("X-Api-Version", response)
+        self.assertIn("X-Version", response)
