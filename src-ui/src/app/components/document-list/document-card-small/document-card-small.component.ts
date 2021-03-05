@@ -1,13 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
+import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { DocumentService } from 'src/app/services/rest/document.service';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-document-card-small',
   templateUrl: './document-card-small.component.html',
-  styleUrls: ['./document-card-small.component.scss']
+  styleUrls: ['./document-card-small.component.scss', '../popover-preview/popover-preview.scss']
 })
 export class DocumentCardSmallComponent implements OnInit {
 
@@ -15,7 +17,7 @@ export class DocumentCardSmallComponent implements OnInit {
 
   @Input()
   selected = false
-  
+
   @Output()
   toggleSelected = new EventEmitter()
 
@@ -30,7 +32,17 @@ export class DocumentCardSmallComponent implements OnInit {
 
   moreTags: number = null
 
+  @ViewChild('popover') popover: NgbPopover
+
+  mouseOnPreview = false
+  popoverHidden = true
+
+  metadata: PaperlessDocumentMetadata
+
   ngOnInit(): void {
+    this.documentService.getMetadata(this.document?.id).subscribe(result => {
+      this.metadata = result
+    })
   }
 
   getIsThumbInverted() {
@@ -45,7 +57,7 @@ export class DocumentCardSmallComponent implements OnInit {
     return this.documentService.getDownloadUrl(this.document.id)
   }
 
-  getPreviewUrl() {
+  get previewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
   }
 
@@ -62,4 +74,32 @@ export class DocumentCardSmallComponent implements OnInit {
     )
   }
 
+  getContentType() {
+    return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
+  }
+
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+      // we're going to open but hide to pre-load content during hover delay
+      this.popover.open()
+      this.popoverHidden = true
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          // show popover
+          this.popoverHidden = false
+        } else {
+          this.popover.close()
+        }
+      }, 600);
+    }
+  }
+
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+  }
+
+  mouseLeaveCard() {
+    this.popover.close()
+  }
 }

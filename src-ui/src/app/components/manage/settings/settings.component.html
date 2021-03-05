@@ -80,17 +80,6 @@
 
         <div class="form-row form-group">
           <div class="col-md-3 col-form-label">
-            <span i18n>Document editor</span>
-          </div>
-          <div class="col">
-
-            <app-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></app-input-check>
-
-          </div>
-        </div>
-
-        <div class="form-row form-group">
-          <div class="col-md-3 col-form-label">
             <span i18n>Dark mode</span>
           </div>
           <div class="col">
@@ -111,11 +100,11 @@
 
       </ng-template>
     </li>
-    
+
     <li [ngbNavItem]="2">
       <a ngbNavLink i18n>Notifications</a>
       <ng-template ngbNavContent>
-        
+
         <h4 i18n>Document processing</h4>
 
         <div class="form-row form-group">
