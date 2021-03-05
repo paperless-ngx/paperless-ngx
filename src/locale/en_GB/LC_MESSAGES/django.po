@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-26 12:56+0100\n"
+"POT-Creation-Date: 2021-02-28 12:40+0100\n"
 "PO-Revision-Date: 2021-02-16 18:37+0000\n"
 "Last-Translator: Jonas Winkler, 2021\n"
 "Language-Team: English (United Kingdom) (https://www.transifex.com/paperless/teams/115905/en_GB/)\n"
@@ -436,6 +436,10 @@ msgstr "Portuguese (Brazil)"
 #: paperless/settings.py:303
 msgid "Italian"
 msgstr "Italian"
+
+#: paperless/settings.py:304
+msgid "Romanian"
+msgstr "Romanian"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
