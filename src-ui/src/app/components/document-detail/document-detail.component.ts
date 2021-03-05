@@ -15,7 +15,6 @@ import { DocumentService } from 'src/app/services/rest/document.service';
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component';
 import { CorrespondentEditDialogComponent } from '../manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from '../manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
-import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 import { ToastService } from 'src/app/services/toast.service';
 import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
@@ -61,9 +60,6 @@ export class DocumentDetailComponent implements OnInit {
     tags: new FormControl([])
   })
 
-  previewCurrentPage: number = 1
-  previewNumPages: number = 1
-
   constructor(
     private documentsService: DocumentService,
     private route: ActivatedRoute,
@@ -76,10 +72,6 @@ export class DocumentDetailComponent implements OnInit {
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService) { }
-
-  get useNativePdfViewer(): boolean {
-    return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
-  }
 
   getContentType() {
     return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
@@ -224,10 +216,6 @@ export class DocumentDetailComponent implements OnInit {
 
   hasNext() {
     return this.documentListViewService.hasNext(this.documentId)
-  }
-
-  pdfPreviewLoaded(pdf: PDFDocumentProxy) {
-    this.previewNumPages = pdf.numPages
   }
 
 }
