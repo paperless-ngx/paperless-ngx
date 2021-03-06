@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 ask() {
 	while true ; do
 		if [[ -z $3 ]] ; then
@@ -74,6 +72,8 @@ if [ $? -ne 0 ] ; then
 	echo ""
 	sleep 3
 fi
+
+set -e
 
 echo ""
 echo "############################################"
