@@ -270,6 +270,30 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         results = response.data['results']
         self.assertEqual(len(results), 0)
 
+    def test_documents_title_content_filter(self):
+
+        doc1 = Document.objects.create(title="title A", content="content A", checksum="A", mime_type="application/pdf")
+        doc2 = Document.objects.create(title="title B", content="content A", checksum="B", mime_type="application/pdf")
+        doc3 = Document.objects.create(title="title A", content="content B", checksum="C", mime_type="application/pdf")
+        doc4 = Document.objects.create(title="title B", content="content B", checksum="D", mime_type="application/pdf")
+
+        response = self.client.get("/api/documents/?title_content=A")
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 3)
+        self.assertCountEqual([results[0]['id'], results[1]['id'], results[2]['id']], [doc1.id, doc2.id, doc3.id])
+
+        response = self.client.get("/api/documents/?title_content=B")
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 3)
+        self.assertCountEqual([results[0]['id'], results[1]['id'], results[2]['id']], [doc2.id, doc3.id, doc4.id])
+
+        response = self.client.get("/api/documents/?title_content=X")
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 0)
+
     def test_search_no_query(self):
         response = self.client.get("/api/search/")
         results = response.data['results']
