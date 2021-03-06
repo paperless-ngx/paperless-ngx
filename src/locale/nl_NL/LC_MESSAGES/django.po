@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"PO-Revision-Date: 2021-03-06 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -64,7 +64,7 @@ msgstr "is niet hoofdlettergevoelig"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr ""
+msgstr "correspondent"
 
 #: documents/models.py:75
 msgid "correspondents"
@@ -124,7 +124,7 @@ msgstr "mimetype"
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
@@ -180,7 +180,7 @@ msgstr "De positie van dit document in je fysieke documentenarchief."
 
 #: documents/models.py:223
 msgid "document"
-msgstr ""
+msgstr "document"
 
 #: documents/models.py:224
 msgid "documents"
@@ -188,7 +188,7 @@ msgstr "documenten"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:312
 msgid "information"
@@ -264,11 +264,11 @@ msgstr "inhoud bevat"
 
 #: documents/models.py:372
 msgid "ASN is"
-msgstr ""
+msgstr "ASN is"
 
 #: documents/models.py:373
 msgid "correspondent is"
-msgstr ""
+msgstr "correspondent is"
 
 #: documents/models.py:374
 msgid "document type is"
@@ -434,7 +434,7 @@ msgstr "Paperless-ng administratie"
 
 #: paperless_mail/admin.py:25
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:27
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -450,7 +450,7 @@ msgstr "De actie die wordt toegepast op de mail. Deze actie wordt alleen uitgevo
 
 #: paperless_mail/admin.py:46
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:48
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -566,7 +566,7 @@ msgstr "volgorde"
 
 #: paperless_mail/models.py:120
 msgid "account"
-msgstr ""
+msgstr "account"
 
 #: paperless_mail/models.py:124
 msgid "folder"
