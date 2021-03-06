@@ -269,6 +269,23 @@ this is how you do it:
 This will build the HTML documentation, and put the resulting files in the ``_build/html``
 directory.
 
+Building the Docker image
+=========================
+
+Building the docker image from source requires the following two steps:
+
+1.  Build the front end.
+
+    .. code:: shell-session
+
+        ./compile-frontend.sh
+
+2.  Build the docker image.
+
+    .. code:: shell-session
+
+        docker build . -t <your-tag>
+
 Extending Paperless
 ===================
 
