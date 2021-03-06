@@ -16,6 +16,8 @@ This release contains new database migrations.
 
   * Added a color picker for tag colors.
 
+  * Added the ability to use the filter for searching the document content as well.
+
   * Added translations into Italian and Romanian. Thank you!
 
   * Close individual documents from the sidebar. Thanks to `Michael Shamoon`_.
