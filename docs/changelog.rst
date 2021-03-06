@@ -10,20 +10,25 @@ paperless-ng 1.3.0
 
 This release contains new database migrations.
 
-* Added a color picker for tag colors.
+* Changes
 
-* Added translations into Italian and Romanian. Thank you!
+  * The REST API is versioned from this point onwards. This will allow me to make changes without breaking existing clients. See the documentation about :ref:`api-versioning` for details.
 
-* Close individual documents from the sidebar.
+  * Added a color picker for tag colors.
 
-* `BolkoSchreiber <https://github.com/BolkoSchreiber>`_ added an option to disable/enable thumbnail inversion in dark mode.
+  * Added the ability to use the filter for searching the document content as well.
 
-* Fixed an issue with the auto matching algorithm when more than 256 tags were used.
+  * Added translations into Italian and Romanian. Thank you!
 
-* `Simon Taddiken <https://github.com/skuzzle>`_ added the ability to customize the header used for remote user authentication with SSO applications.
+  * Close individual documents from the sidebar. Thanks to `Michael Shamoon`_.
 
-* The REST API is versioned from this point onwards. See the documentation about :ref:`api-versioning` for details.
+  * `BolkoSchreiber <https://github.com/BolkoSchreiber>`_ added an option to disable/enable thumbnail inversion in dark mode.
 
+  * `Simon Taddiken <https://github.com/skuzzle>`_ added the ability to customize the header used for remote user authentication with SSO applications.
+
+* Bug fixes
+
+  * Fixed an issue with the auto matching algorithm when more than 256 tags were used.
 
 
 paperless-ng 1.2.1

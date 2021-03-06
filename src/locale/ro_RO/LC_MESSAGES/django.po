@@ -1,0 +1,642 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: paperless-ng\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-28 12:40+0100\n"
+"PO-Revision-Date: 2021-03-06 21:39\n"
+"Last-Translator: \n"
+"Language-Team: Romanian\n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
+"X-Crowdin-Project: paperless-ng\n"
+"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Language: ro\n"
+"X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
+"X-Crowdin-File-ID: 54\n"
+
+#: documents/apps.py:10
+msgid "Documents"
+msgstr "Documente"
+
+#: documents/models.py:32
+msgid "Any word"
+msgstr "Orice cuvant"
+
+#: documents/models.py:33
+msgid "All words"
+msgstr "Toate cuvintele"
+
+#: documents/models.py:34
+msgid "Exact match"
+msgstr "Potrivire exacta"
+
+#: documents/models.py:35
+msgid "Regular expression"
+msgstr "Expresie regulata"
+
+#: documents/models.py:36
+msgid "Fuzzy word"
+msgstr "Cuvant neclar"
+
+#: documents/models.py:37
+msgid "Automatic"
+msgstr "Automat"
+
+#: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
+#: paperless_mail/models.py:109
+msgid "name"
+msgstr "nume"
+
+#: documents/models.py:45
+msgid "match"
+msgstr "potrivire"
+
+#: documents/models.py:49
+msgid "matching algorithm"
+msgstr "algoritm de potrivire"
+
+#: documents/models.py:55
+msgid "is insensitive"
+msgstr "ignora majusculele"
+
+#: documents/models.py:74 documents/models.py:120
+msgid "correspondent"
+msgstr "corespondent"
+
+#: documents/models.py:75
+msgid "correspondents"
+msgstr "corespondenti"
+
+#: documents/models.py:81
+msgid "color"
+msgstr "culoare"
+
+#: documents/models.py:87
+msgid "is inbox tag"
+msgstr "este eticheta inbox"
+
+#: documents/models.py:89
+msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
+msgstr "Marcheaza aceasta eticheta ca eticheta inbox: Toate documentele nou consumate primesc aceasta eticheta."
+
+#: documents/models.py:94
+msgid "tag"
+msgstr "eticheta"
+
+#: documents/models.py:95 documents/models.py:151
+msgid "tags"
+msgstr "etichete"
+
+#: documents/models.py:101 documents/models.py:133
+msgid "document type"
+msgstr "tip de document"
+
+#: documents/models.py:102
+msgid "document types"
+msgstr "tipuri de document"
+
+#: documents/models.py:110
+msgid "Unencrypted"
+msgstr "Necriptat"
+
+#: documents/models.py:111
+msgid "Encrypted with GNU Privacy Guard"
+msgstr "Criptat cu GNU Privacy Guard"
+
+#: documents/models.py:124
+msgid "title"
+msgstr "titlu"
+
+#: documents/models.py:137
+msgid "content"
+msgstr "continut"
+
+#: documents/models.py:139
+msgid "The raw, text-only data of the document. This field is primarily used for searching."
+msgstr "Textul brut al documentului. Acest camp este folosit in principal pentru cautare."
+
+#: documents/models.py:144
+msgid "mime type"
+msgstr "tip mime"
+
+#: documents/models.py:155
+msgid "checksum"
+msgstr "suma de control"
+
+#: documents/models.py:159
+msgid "The checksum of the original document."
+msgstr "Suma de control a documentului original."
+
+#: documents/models.py:163
+msgid "archive checksum"
+msgstr "suma de control a arhivei"
+
+#: documents/models.py:168
+msgid "The checksum of the archived document."
+msgstr "Suma de control a documentului arhivat."
+
+#: documents/models.py:172 documents/models.py:328
+msgid "created"
+msgstr "creat"
+
+#: documents/models.py:176
+msgid "modified"
+msgstr "modificat"
+
+#: documents/models.py:180
+msgid "storage type"
+msgstr "tip de stocare"
+
+#: documents/models.py:188
+msgid "added"
+msgstr "adaugat"
+
+#: documents/models.py:192
+msgid "filename"
+msgstr "nume fisier"
+
+#: documents/models.py:198
+msgid "Current filename in storage"
+msgstr "Numele curent al fisierului stocat"
+
+#: documents/models.py:202
+msgid "archive filename"
+msgstr "nume fisier arhiva"
+
+#: documents/models.py:208
+msgid "Current archive filename in storage"
+msgstr "Numele curent al arhivei stocate"
+
+#: documents/models.py:212
+msgid "archive serial number"
+msgstr "numar serial in arhiva"
+
+#: documents/models.py:217
+msgid "The position of this document in your physical document archive."
+msgstr "Pozitia acestui document in arhiva fizica."
+
+#: documents/models.py:223
+msgid "document"
+msgstr ""
+
+#: documents/models.py:224
+msgid "documents"
+msgstr "documente"
+
+#: documents/models.py:311
+msgid "debug"
+msgstr "depanare"
+
+#: documents/models.py:312
+msgid "information"
+msgstr "informatii"
+
+#: documents/models.py:313
+msgid "warning"
+msgstr "avertizare"
+
+#: documents/models.py:314
+msgid "error"
+msgstr "eroare"
+
+#: documents/models.py:315
+msgid "critical"
+msgstr "critic"
+
+#: documents/models.py:319
+msgid "group"
+msgstr "grup"
+
+#: documents/models.py:322
+msgid "message"
+msgstr "mesaj"
+
+#: documents/models.py:325
+msgid "level"
+msgstr "nivel"
+
+#: documents/models.py:332
+msgid "log"
+msgstr "jurnal"
+
+#: documents/models.py:333
+msgid "logs"
+msgstr "jurnale"
+
+#: documents/models.py:344 documents/models.py:394
+msgid "saved view"
+msgstr "vizualizare"
+
+#: documents/models.py:345
+msgid "saved views"
+msgstr "vizualizari"
+
+#: documents/models.py:348
+msgid "user"
+msgstr "utilizator"
+
+#: documents/models.py:354
+msgid "show on dashboard"
+msgstr "afiseaza pe tabloul de bord"
+
+#: documents/models.py:357
+msgid "show in sidebar"
+msgstr "afiseaza in bara laterala"
+
+#: documents/models.py:361
+msgid "sort field"
+msgstr "sorteaza camp"
+
+#: documents/models.py:364
+msgid "sort reverse"
+msgstr "sorteaza invers"
+
+#: documents/models.py:370
+msgid "title contains"
+msgstr "titlul contine"
+
+#: documents/models.py:371
+msgid "content contains"
+msgstr "continutul contine"
+
+#: documents/models.py:372
+msgid "ASN is"
+msgstr "ASN-ul este"
+
+#: documents/models.py:373
+msgid "correspondent is"
+msgstr "corespondentul este"
+
+#: documents/models.py:374
+msgid "document type is"
+msgstr "tipul documentului este"
+
+#: documents/models.py:375
+msgid "is in inbox"
+msgstr "este in inbox"
+
+#: documents/models.py:376
+msgid "has tag"
+msgstr "are eticheta"
+
+#: documents/models.py:377
+msgid "has any tag"
+msgstr "are orice eticheta"
+
+#: documents/models.py:378
+msgid "created before"
+msgstr "creat inainte de"
+
+#: documents/models.py:379
+msgid "created after"
+msgstr "creat dupa"
+
+#: documents/models.py:380
+msgid "created year is"
+msgstr "anul crearii este"
+
+#: documents/models.py:381
+msgid "created month is"
+msgstr "luna crearii este"
+
+#: documents/models.py:382
+msgid "created day is"
+msgstr "ziua crearii este"
+
+#: documents/models.py:383
+msgid "added before"
+msgstr "adaugat inainte de"
+
+#: documents/models.py:384
+msgid "added after"
+msgstr "adaugat dupa"
+
+#: documents/models.py:385
+msgid "modified before"
+msgstr "modificat inainte de"
+
+#: documents/models.py:386
+msgid "modified after"
+msgstr "modificat dupa"
+
+#: documents/models.py:387
+msgid "does not have tag"
+msgstr "nu are eticheta"
+
+#: documents/models.py:398
+msgid "rule type"
+msgstr "tip de regula"
+
+#: documents/models.py:402
+msgid "value"
+msgstr "valoare"
+
+#: documents/models.py:408
+msgid "filter rule"
+msgstr "regula de filtrare"
+
+#: documents/models.py:409
+msgid "filter rules"
+msgstr "reguli de filtrare"
+
+#: documents/serialisers.py:53
+#, python-format
+msgid "Invalid regular expresssion: %(error)s"
+msgstr "Expresie regulata invalida: %(error)s"
+
+#: documents/serialisers.py:177
+msgid "Invalid color."
+msgstr "Culoare invalida."
+
+#: documents/serialisers.py:451
+#, python-format
+msgid "File type %(type)s not supported"
+msgstr "Tip de fisier %(type)s nesuportat "
+
+#: documents/templates/index.html:21
+msgid "Paperless-ng is loading..."
+msgstr "Paperless-ng se incarca..."
+
+#: documents/templates/registration/logged_out.html:13
+msgid "Paperless-ng signed out"
+msgstr "Paperless-ng s-a deconectat"
+
+#: documents/templates/registration/logged_out.html:41
+msgid "You have been successfully logged out. Bye!"
+msgstr "Ati fost deconectat cu succes. La revedere !"
+
+#: documents/templates/registration/logged_out.html:42
+msgid "Sign in again"
+msgstr "Conectati-va din nou"
+
+#: documents/templates/registration/login.html:13
+msgid "Paperless-ng sign in"
+msgstr "Conectare Paperless-ng"
+
+#: documents/templates/registration/login.html:42
+msgid "Please sign in."
+msgstr "Va rugam conectati-va."
+
+#: documents/templates/registration/login.html:45
+msgid "Your username and password didn't match. Please try again."
+msgstr "Numele si parola nu sunt corecte. Va rugam incercati din nou."
+
+#: documents/templates/registration/login.html:48
+msgid "Username"
+msgstr "Nume"
+
+#: documents/templates/registration/login.html:49
+msgid "Password"
+msgstr "Parola"
+
+#: documents/templates/registration/login.html:54
+msgid "Sign in"
+msgstr "Conectare"
+
+#: paperless/settings.py:297
+msgid "English (US)"
+msgstr "Engleza (SUA)"
+
+#: paperless/settings.py:298
+msgid "English (GB)"
+msgstr "Engleza (UK)"
+
+#: paperless/settings.py:299
+msgid "German"
+msgstr "Germana"
+
+#: paperless/settings.py:300
+msgid "Dutch"
+msgstr "Olandeza"
+
+#: paperless/settings.py:301
+msgid "French"
+msgstr "Franceza"
+
+#: paperless/settings.py:302
+msgid "Portuguese (Brazil)"
+msgstr "Portugheza (Brazilia)"
+
+#: paperless/settings.py:303
+msgid "Italian"
+msgstr "Italiana"
+
+#: paperless/settings.py:304
+msgid "Romanian"
+msgstr "Romana"
+
+#: paperless/urls.py:118
+msgid "Paperless-ng administration"
+msgstr "Administrare Paperless-ng"
+
+#: paperless_mail/admin.py:25
+msgid "Filter"
+msgstr "Filtru"
+
+#: paperless_mail/admin.py:27
+msgid "Paperless will only process mails that match ALL of the filters given below."
+msgstr "Paperless va procesa numai email-urile care se potrivesc cu TOATE filtrele de mai jos."
+
+#: paperless_mail/admin.py:37
+msgid "Actions"
+msgstr "Acțiuni"
+
+#: paperless_mail/admin.py:39
+msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
+msgstr "Actiunea aplicata tuturol email-urilor. Aceasta este realizata doar cand sunt consumate documente din email. Cele fara atasamente nu vor fi procesate."
+
+#: paperless_mail/admin.py:46
+msgid "Metadata"
+msgstr "Metadate"
+
+#: paperless_mail/admin.py:48
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgstr "Atribuie metadate documentelor consumate prin aceasta regula in mod automat. Chiar daca nu sunt atribuite etichete, tipuri sau corespondenti, Paperless va procesa toate regulile definite care se potrivesc."
+
+#: paperless_mail/apps.py:9
+msgid "Paperless mail"
+msgstr "Email Paperless"
+
+#: paperless_mail/models.py:11
+msgid "mail account"
+msgstr "cont de email"
+
+#: paperless_mail/models.py:12
+msgid "mail accounts"
+msgstr "conturi de email"
+
+#: paperless_mail/models.py:19
+msgid "No encryption"
+msgstr "Fara criptare"
+
+#: paperless_mail/models.py:20
+msgid "Use SSL"
+msgstr "Foloseste SSL"
+
+#: paperless_mail/models.py:21
+msgid "Use STARTTLS"
+msgstr "Foloseste STARTTLS"
+
+#: paperless_mail/models.py:29
+msgid "IMAP server"
+msgstr "server IMAP"
+
+#: paperless_mail/models.py:33
+msgid "IMAP port"
+msgstr "port IMAP"
+
+#: paperless_mail/models.py:36
+msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgstr "De obicei este 143 pentru conexiuni necriptate si STARTTLS, sau 993 pentru conexiuni SSL."
+
+#: paperless_mail/models.py:40
+msgid "IMAP security"
+msgstr "securitate IMAP"
+
+#: paperless_mail/models.py:46
+msgid "username"
+msgstr "nume"
+
+#: paperless_mail/models.py:50
+msgid "password"
+msgstr "parola"
+
+#: paperless_mail/models.py:60
+msgid "mail rule"
+msgstr "regula email"
+
+#: paperless_mail/models.py:61
+msgid "mail rules"
+msgstr "reguli email"
+
+#: paperless_mail/models.py:67
+msgid "Only process attachments."
+msgstr "Proceseaza doar atasamentele."
+
+#: paperless_mail/models.py:68
+msgid "Process all files, including 'inline' attachments."
+msgstr "Proceseaza toate fisierele, inclusiv atasamentele \"inline\"."
+
+#: paperless_mail/models.py:78
+msgid "Mark as read, don't process read mails"
+msgstr "Marcheaza ca citit, nu procesa email-uri citite"
+
+#: paperless_mail/models.py:79
+msgid "Flag the mail, don't process flagged mails"
+msgstr "Semnalizeaza, nu procesa email-uri semnalizate"
+
+#: paperless_mail/models.py:80
+msgid "Move to specified folder"
+msgstr "Muta in directorul specificat"
+
+#: paperless_mail/models.py:81
+msgid "Delete"
+msgstr "Sterge"
+
+#: paperless_mail/models.py:88
+msgid "Use subject as title"
+msgstr "Foloseste subiectul ca titlu"
+
+#: paperless_mail/models.py:89
+msgid "Use attachment filename as title"
+msgstr "Foloseste numele atasamentului ca titlu"
+
+#: paperless_mail/models.py:99
+msgid "Do not assign a correspondent"
+msgstr "Nu atribui un corespondent"
+
+#: paperless_mail/models.py:101
+msgid "Use mail address"
+msgstr "Foloseste adresa de email"
+
+#: paperless_mail/models.py:103
+msgid "Use name (or mail address if not available)"
+msgstr "Foloseste numele (daca nu exista, foloseste adresa de email)"
+
+#: paperless_mail/models.py:105
+msgid "Use correspondent selected below"
+msgstr "Foloseste corespondentul selectat mai jos"
+
+#: paperless_mail/models.py:113
+msgid "order"
+msgstr "ordoneaza"
+
+#: paperless_mail/models.py:120
+msgid "account"
+msgstr "cont"
+
+#: paperless_mail/models.py:124
+msgid "folder"
+msgstr "director"
+
+#: paperless_mail/models.py:128
+msgid "filter from"
+msgstr "filtreaza de la"
+
+#: paperless_mail/models.py:131
+msgid "filter subject"
+msgstr "filtreaza subiect"
+
+#: paperless_mail/models.py:134
+msgid "filter body"
+msgstr "filtreaza corpul email-ului"
+
+#: paperless_mail/models.py:138
+msgid "filter attachment filename"
+msgstr "filtreaza numele atasamentului"
+
+#: paperless_mail/models.py:140
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Consuma doar documentele care se potrivesc in intregime cu acest nume de fisier, daca este specificat. Simbolul * tine locul oricarui sir de caractere. Majusculele nu conteaza."
+
+#: paperless_mail/models.py:146
+msgid "maximum age"
+msgstr "varsta maxima"
+
+#: paperless_mail/models.py:148
+msgid "Specified in days."
+msgstr "Specificata in zile."
+
+#: paperless_mail/models.py:151
+msgid "attachment type"
+msgstr "tipul atasamentului"
+
+#: paperless_mail/models.py:154
+msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
+msgstr "Atasamentele \"inline\" includ si imaginile incorporate, deci aceasta optiune functioneaza cel mai bine combinata cu un filtru pentru numele fisierului."
+
+#: paperless_mail/models.py:159
+msgid "action"
+msgstr "actiune"
+
+#: paperless_mail/models.py:165
+msgid "action parameter"
+msgstr "parametru al actiunii"
+
+#: paperless_mail/models.py:167
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action."
+msgstr "Parametru aditional pentru actiunea definita mai sus (ex. directorul in care sa se realizeze o mutare)"
+
+#: paperless_mail/models.py:173
+msgid "assign title from"
+msgstr "atribuie titlu din"
+
+#: paperless_mail/models.py:183
+msgid "assign this tag"
+msgstr "atribuie aceasta eticheta"
+
+#: paperless_mail/models.py:191
+msgid "assign this document type"
+msgstr "atribuie acest tip"
+
+#: paperless_mail/models.py:195
+msgid "assign correspondent from"
+msgstr "atribuie corespondent din"
+
+#: paperless_mail/models.py:205
+msgid "assign this correspondent"
+msgstr "atribuie acest corespondent"
+
