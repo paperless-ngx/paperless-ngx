@@ -297,12 +297,12 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ("en-us", _("English (US)")),
     ("en-gb", _("English (GB)")),
-    ("de", _("German")),
+    ("de-de", _("German")),
     ("nl-nl", _("Dutch")),
-    ("fr", _("French")),
+    ("fr-fr", _("French")),
     ("pt-br", _("Portuguese (Brazil)")),
-    ("it", _("Italian")),
-    ("ro", _("Romanian"))
+    ("it-it", _("Italian")),
+    ("ro-ro", _("Romanian"))
 ]
 
 LOCALE_PATHS = [

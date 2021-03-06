@@ -174,7 +174,7 @@ Front end localization
 *   The translated strings need to be placed in the "src-ui/src/locale/" folder.
 *   In order to extract added or changed strings from the source files, call ``ng xi18n --ivy``.
 
-Adding new languages requires adding the translated files in the "src-ui/src/locale/" fodler and adjusting a couple files.
+Adding new languages requires adding the translated files in the "src-ui/src/locale/" folder and adjusting a couple files.
 
 1.  Adjust "src-ui/angular.json":
 
@@ -268,6 +268,23 @@ this is how you do it:
 
 This will build the HTML documentation, and put the resulting files in the ``_build/html``
 directory.
+
+Building the Docker image
+=========================
+
+Building the docker image from source requires the following two steps:
+
+1.  Build the front end.
+
+    .. code:: shell-session
+
+        ./compile-frontend.sh
+
+2.  Build the docker image.
+
+    .. code:: shell-session
+
+        docker build . -t <your-tag>
 
 Extending Paperless
 ===================
