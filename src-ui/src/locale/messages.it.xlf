@@ -1744,7 +1744,7 @@
       </trans-unit>
       <trans-unit datatype="html" id="bd4a8607e4a002d939cffb347ec056664dfb2c73">
         <source>Dismiss completed</source>
-        <target>Messaggi ignorati</target>
+        <target>Ignora completati</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">4</context>
