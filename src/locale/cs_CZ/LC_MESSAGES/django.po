@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"PO-Revision-Date: 2021-03-06 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -84,7 +84,7 @@ msgstr "Označí tento tag jako tag pro příchozí: Všechny nově zkonzumovan�
 
 #: documents/models.py:94
 msgid "tag"
-msgstr ""
+msgstr "tag"
 
 #: documents/models.py:95 documents/models.py:151
 msgid "tags"
@@ -188,7 +188,7 @@ msgstr "dokumenty"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:312
 msgid "information"
@@ -450,7 +450,7 @@ msgstr "Akce provedena na emailu. Tato akce je provedena jen pokud byly dokument
 
 #: paperless_mail/admin.py:46
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:48
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -482,11 +482,11 @@ msgstr "Používat STARTTLS"
 
 #: paperless_mail/models.py:29
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP server"
 
 #: paperless_mail/models.py:33
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP port"
 
 #: paperless_mail/models.py:36
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."

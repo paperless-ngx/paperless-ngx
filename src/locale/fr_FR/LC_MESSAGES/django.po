@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"PO-Revision-Date: 2021-03-06 22:56\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "Documents"
 
 #: documents/models.py:32
 msgid "Any word"
@@ -180,11 +180,11 @@ msgstr "Le classement de ce document dans votre archive de documents physiques."
 
 #: documents/models.py:223
 msgid "document"
-msgstr ""
+msgstr "document"
 
 #: documents/models.py:224
 msgid "documents"
-msgstr ""
+msgstr "documents"
 
 #: documents/models.py:311
 msgid "debug"
@@ -192,7 +192,7 @@ msgstr "débogage"
 
 #: documents/models.py:312
 msgid "information"
-msgstr ""
+msgstr "information"
 
 #: documents/models.py:313
 msgid "warning"
@@ -212,7 +212,7 @@ msgstr "groupe"
 
 #: documents/models.py:322
 msgid "message"
-msgstr ""
+msgstr "message"
 
 #: documents/models.py:325
 msgid "level"
@@ -442,7 +442,7 @@ msgstr "Paperless-ng ne traitera que les courriers qui correspondent à TOUS les
 
 #: paperless_mail/admin.py:37
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: paperless_mail/admin.py:39
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
@@ -610,7 +610,7 @@ msgstr "Les pièces jointes en ligne comprennent les images intégrées, il est 
 
 #: paperless_mail/models.py:159
 msgid "action"
-msgstr ""
+msgstr "action"
 
 #: paperless_mail/models.py:165
 msgid "action parameter"
