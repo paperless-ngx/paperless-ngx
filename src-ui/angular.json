@@ -16,13 +16,13 @@
 			"i18n": {
 				"sourceLocale": "en-US",
 				"locales": {
-					"de": "src/locale/messages.de.xlf",
+					"de-DE": "src/locale/messages.de_DE.xlf",
 					"nl-NL": "src/locale/messages.nl_NL.xlf",
-					"fr": "src/locale/messages.fr.xlf",
+					"fr-FR": "src/locale/messages.fr_FR.xlf",
 					"en-GB": "src/locale/messages.en_GB.xlf",
 					"pt-BR": "src/locale/messages.pt_BR.xlf",
-					"it": "src/locale/messages.it.xlf",
-					"ro": "src/locale/messages.ro.xlf"
+					"it-IT": "src/locale/messages.it_IT.xlf",
+					"ro-RO": "src/locale/messages.ro_RO.xlf"
 				}
 			},
 			"architect": {
