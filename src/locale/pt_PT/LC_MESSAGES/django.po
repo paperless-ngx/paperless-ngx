@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"PO-Revision-Date: 2021-03-06 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "Documentos"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "Qualquer palavra"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "Todas as palavras"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "Detecção exata"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "Expressão regular"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Palavra difusa (fuzzy)"
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr ""
+msgstr "Automático"
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:109
@@ -398,23 +398,23 @@ msgstr ""
 
 #: paperless/settings.py:297
 msgid "English (US)"
-msgstr ""
+msgstr "Inglês (EUA)"
 
 #: paperless/settings.py:298
 msgid "English (GB)"
-msgstr ""
+msgstr "English (GB)"
 
 #: paperless/settings.py:299
 msgid "German"
-msgstr ""
+msgstr "Deutsch"
 
 #: paperless/settings.py:300
 msgid "Dutch"
-msgstr ""
+msgstr "Nederlandse"
 
 #: paperless/settings.py:301
 msgid "French"
-msgstr ""
+msgstr "Français"
 
 #: paperless/settings.py:302
 msgid "Portuguese (Brazil)"
@@ -442,7 +442,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:37
 msgid "Actions"
-msgstr ""
+msgstr "Ações"
 
 #: paperless_mail/admin.py:39
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
@@ -450,7 +450,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:46
 msgid "Metadata"
-msgstr ""
+msgstr "Metadados"
 
 #: paperless_mail/admin.py:48
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -534,7 +534,7 @@ msgstr ""
 
 #: paperless_mail/models.py:81
 msgid "Delete"
-msgstr ""
+msgstr "Excluir"
 
 #: paperless_mail/models.py:88
 msgid "Use subject as title"
