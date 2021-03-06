@@ -193,7 +193,7 @@ This table lists the compatible versions for each database migration number.
 +------------------+-----------------+
 | 1012             | 1.1.0 - 1.2.1   |
 +------------------+-----------------+
-| 1013             | 1.3.0 - current |
+| 1014             | 1.3.0 - current |
 +------------------+-----------------+
 
 Execute the following management command to migrate your database:
