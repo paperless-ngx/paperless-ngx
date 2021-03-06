@@ -1,357 +1,362 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
-# Translators:
-# Štěpán Šebestian <mys.orangeorange0123@gmail.com>, 2021
-# 
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-28 22:02+0100\n"
-"PO-Revision-Date: 2020-12-30 19:27+0000\n"
-"Last-Translator: Štěpán Šebestian <mys.orangeorange0123@gmail.com>, 2021\n"
-"Language-Team: Czech (https://www.transifex.com/paperless/teams/115905/cs/)\n"
+"POT-Creation-Date: 2021-02-28 12:40+0100\n"
+"PO-Revision-Date: 2021-03-06 21:40\n"
+"Last-Translator: \n"
+"Language-Team: Czech\n"
+"Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
+"X-Crowdin-Project: paperless-ng\n"
+"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Language: cs\n"
+"X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
+"X-Crowdin-File-ID: 54\n"
 
 #: documents/apps.py:10
 msgid "Documents"
 msgstr "Dokumenty"
 
-#: documents/models.py:33
+#: documents/models.py:32
 msgid "Any word"
 msgstr "Jakékoliv slovo"
 
-#: documents/models.py:34
+#: documents/models.py:33
 msgid "All words"
 msgstr "Všechna slova"
 
-#: documents/models.py:35
+#: documents/models.py:34
 msgid "Exact match"
 msgstr "Přesná shoda"
 
-#: documents/models.py:36
+#: documents/models.py:35
 msgid "Regular expression"
 msgstr "Regulární výraz"
 
-#: documents/models.py:37
+#: documents/models.py:36
 msgid "Fuzzy word"
 msgstr "Fuzzy slovo"
 
-#: documents/models.py:38
+#: documents/models.py:37
 msgid "Automatic"
 msgstr "Automatický"
 
-#: documents/models.py:42 documents/models.py:352 paperless_mail/models.py:25
+#: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:109
 msgid "name"
 msgstr "název"
 
-#: documents/models.py:46
+#: documents/models.py:45
 msgid "match"
 msgstr "shoda"
 
-#: documents/models.py:50
+#: documents/models.py:49
 msgid "matching algorithm"
 msgstr "algoritmus pro shodu"
 
-#: documents/models.py:56
+#: documents/models.py:55
 msgid "is insensitive"
 msgstr "je ignorováno"
 
-#: documents/models.py:75 documents/models.py:135
+#: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
 msgstr "korespondent"
 
-#: documents/models.py:76
+#: documents/models.py:75
 msgid "correspondents"
 msgstr "korespondenti"
 
-#: documents/models.py:98
+#: documents/models.py:81
 msgid "color"
 msgstr "barva"
 
-#: documents/models.py:102
+#: documents/models.py:87
 msgid "is inbox tag"
 msgstr "tag přichozí"
 
-#: documents/models.py:104
-msgid ""
-"Marks this tag as an inbox tag: All newly consumed documents will be tagged "
-"with inbox tags."
-msgstr ""
-"Označí tento tag jako tag pro příchozí: Všechny nově zkonzumované dokumenty "
-"budou označeny tagem pro přichozí"
+#: documents/models.py:89
+msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
+msgstr "Označí tento tag jako tag pro příchozí: Všechny nově zkonzumované dokumenty budou označeny tagem pro přichozí"
 
-#: documents/models.py:109
+#: documents/models.py:94
 msgid "tag"
-msgstr "tag"
+msgstr ""
 
-#: documents/models.py:110 documents/models.py:166
+#: documents/models.py:95 documents/models.py:151
 msgid "tags"
 msgstr "tagy"
 
-#: documents/models.py:116 documents/models.py:148
+#: documents/models.py:101 documents/models.py:133
 msgid "document type"
 msgstr "typ dokumentu"
 
-#: documents/models.py:117
+#: documents/models.py:102
 msgid "document types"
 msgstr "typy dokumentu"
 
-#: documents/models.py:125
+#: documents/models.py:110
 msgid "Unencrypted"
 msgstr "Nešifrované"
 
-#: documents/models.py:126
+#: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
 msgstr "Šifrované pomocí GNU Privacy Guard"
 
-#: documents/models.py:139
+#: documents/models.py:124
 msgid "title"
 msgstr "titulek"
 
-#: documents/models.py:152
+#: documents/models.py:137
 msgid "content"
 msgstr "obsah"
 
-#: documents/models.py:154
-msgid ""
-"The raw, text-only data of the document. This field is primarily used for "
-"searching."
-msgstr ""
-"Nezpracovaná, pouze textová data dokumentu. Toto pole je používáno především"
-" pro vyhledávání."
+#: documents/models.py:139
+msgid "The raw, text-only data of the document. This field is primarily used for searching."
+msgstr "Nezpracovaná, pouze textová data dokumentu. Toto pole je používáno především pro vyhledávání."
 
-#: documents/models.py:159
+#: documents/models.py:144
 msgid "mime type"
 msgstr "mime typ"
 
-#: documents/models.py:170
+#: documents/models.py:155
 msgid "checksum"
 msgstr "kontrolní součet"
 
-#: documents/models.py:174
+#: documents/models.py:159
 msgid "The checksum of the original document."
 msgstr "Kontrolní součet původního dokumentu"
 
-#: documents/models.py:178
+#: documents/models.py:163
 msgid "archive checksum"
 msgstr "kontrolní součet archivu"
 
-#: documents/models.py:183
+#: documents/models.py:168
 msgid "The checksum of the archived document."
 msgstr "Kontrolní součet archivovaného dokumentu."
 
-#: documents/models.py:187 documents/models.py:330
+#: documents/models.py:172 documents/models.py:328
 msgid "created"
 msgstr "vytvořeno"
 
-#: documents/models.py:191
+#: documents/models.py:176
 msgid "modified"
 msgstr "upraveno"
 
-#: documents/models.py:195
+#: documents/models.py:180
 msgid "storage type"
 msgstr "typ úložiště"
 
-#: documents/models.py:203
+#: documents/models.py:188
 msgid "added"
 msgstr "přidáno"
 
-#: documents/models.py:207
+#: documents/models.py:192
 msgid "filename"
 msgstr "název souboru"
 
-#: documents/models.py:212
+#: documents/models.py:198
 msgid "Current filename in storage"
 msgstr "Aktuální název souboru v úložišti"
 
-#: documents/models.py:216
+#: documents/models.py:202
+msgid "archive filename"
+msgstr ""
+
+#: documents/models.py:208
+msgid "Current archive filename in storage"
+msgstr ""
+
+#: documents/models.py:212
 msgid "archive serial number"
 msgstr "sériové číslo archivu"
 
-#: documents/models.py:221
+#: documents/models.py:217
 msgid "The position of this document in your physical document archive."
 msgstr "Pozice dokumentu ve vašem archivu fyzických dokumentů"
 
-#: documents/models.py:227
+#: documents/models.py:223
 msgid "document"
 msgstr "dokument"
 
-#: documents/models.py:228
+#: documents/models.py:224
 msgid "documents"
 msgstr "dokumenty"
 
-#: documents/models.py:313
+#: documents/models.py:311
 msgid "debug"
-msgstr "debug"
+msgstr ""
 
-#: documents/models.py:314
+#: documents/models.py:312
 msgid "information"
 msgstr "informace"
 
-#: documents/models.py:315
+#: documents/models.py:313
 msgid "warning"
 msgstr "varování"
 
-#: documents/models.py:316
+#: documents/models.py:314
 msgid "error"
 msgstr "chyba"
 
-#: documents/models.py:317
+#: documents/models.py:315
 msgid "critical"
 msgstr "kritická"
 
-#: documents/models.py:321
+#: documents/models.py:319
 msgid "group"
 msgstr "skupina"
 
-#: documents/models.py:324
+#: documents/models.py:322
 msgid "message"
 msgstr "zpráva"
 
-#: documents/models.py:327
+#: documents/models.py:325
 msgid "level"
 msgstr "úroveň"
 
-#: documents/models.py:334
+#: documents/models.py:332
 msgid "log"
 msgstr "záznam"
 
-#: documents/models.py:335
+#: documents/models.py:333
 msgid "logs"
 msgstr "záznamy"
 
-#: documents/models.py:346 documents/models.py:396
+#: documents/models.py:344 documents/models.py:394
 msgid "saved view"
 msgstr "uložený pohled"
 
-#: documents/models.py:347
+#: documents/models.py:345
 msgid "saved views"
 msgstr "uložené pohledy"
 
-#: documents/models.py:350
+#: documents/models.py:348
 msgid "user"
 msgstr "uživatel"
 
-#: documents/models.py:356
+#: documents/models.py:354
 msgid "show on dashboard"
 msgstr "zobrazit v dashboardu"
 
-#: documents/models.py:359
+#: documents/models.py:357
 msgid "show in sidebar"
 msgstr "zobrazit v postranním menu"
 
-#: documents/models.py:363
+#: documents/models.py:361
 msgid "sort field"
 msgstr "pole na řazení"
 
-#: documents/models.py:366
+#: documents/models.py:364
 msgid "sort reverse"
 msgstr "třídit opačně"
 
-#: documents/models.py:372
+#: documents/models.py:370
 msgid "title contains"
 msgstr "titulek obsahuje"
 
-#: documents/models.py:373
+#: documents/models.py:371
 msgid "content contains"
 msgstr "obsah obsahuje"
 
-#: documents/models.py:374
+#: documents/models.py:372
 msgid "ASN is"
 msgstr "ASN je"
 
-#: documents/models.py:375
+#: documents/models.py:373
 msgid "correspondent is"
 msgstr "korespondent je"
 
-#: documents/models.py:376
+#: documents/models.py:374
 msgid "document type is"
 msgstr "typ dokumentu je"
 
-#: documents/models.py:377
+#: documents/models.py:375
 msgid "is in inbox"
 msgstr "je v příchozích"
 
-#: documents/models.py:378
+#: documents/models.py:376
 msgid "has tag"
 msgstr "má tag"
 
-#: documents/models.py:379
+#: documents/models.py:377
 msgid "has any tag"
 msgstr "má jakýkoliv tag"
 
-#: documents/models.py:380
+#: documents/models.py:378
 msgid "created before"
 msgstr "vytvořeno před"
 
-#: documents/models.py:381
+#: documents/models.py:379
 msgid "created after"
 msgstr "vytvořeno po"
 
-#: documents/models.py:382
+#: documents/models.py:380
 msgid "created year is"
 msgstr "rok vytvoření je"
 
-#: documents/models.py:383
+#: documents/models.py:381
 msgid "created month is"
 msgstr "měsíc vytvoření je"
 
-#: documents/models.py:384
+#: documents/models.py:382
 msgid "created day is"
 msgstr "den vytvoření je"
 
-#: documents/models.py:385
+#: documents/models.py:383
 msgid "added before"
 msgstr "přidáno před"
 
-#: documents/models.py:386
+#: documents/models.py:384
 msgid "added after"
 msgstr "přidáno po"
 
-#: documents/models.py:387
+#: documents/models.py:385
 msgid "modified before"
 msgstr "upraveno před"
 
-#: documents/models.py:388
+#: documents/models.py:386
 msgid "modified after"
 msgstr "upraveno po"
 
-#: documents/models.py:389
+#: documents/models.py:387
 msgid "does not have tag"
 msgstr "nemá tag"
 
-#: documents/models.py:400
+#: documents/models.py:398
 msgid "rule type"
 msgstr "typ pravidla"
 
-#: documents/models.py:404
+#: documents/models.py:402
 msgid "value"
 msgstr "hodnota"
 
-#: documents/models.py:410
+#: documents/models.py:408
 msgid "filter rule"
 msgstr "filtrovací pravidlo"
 
-#: documents/models.py:411
+#: documents/models.py:409
 msgid "filter rules"
 msgstr "filtrovací pravidla"
 
-#: documents/serialisers.py:383
+#: documents/serialisers.py:53
+#, python-format
+msgid "Invalid regular expresssion: %(error)s"
+msgstr ""
+
+#: documents/serialisers.py:177
+msgid "Invalid color."
+msgstr ""
+
+#: documents/serialisers.py:451
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ souboru %(type)s není podporován"
 
-#: documents/templates/index.html:20
+#: documents/templates/index.html:21
 msgid "Paperless-ng is loading..."
 msgstr "Paperless-ng se načítá..."
 
@@ -391,23 +396,39 @@ msgstr "Heslo"
 msgid "Sign in"
 msgstr "Přihlásit se"
 
-#: paperless/settings.py:286
-msgid "English"
-msgstr "Angličtina"
+#: paperless/settings.py:297
+msgid "English (US)"
+msgstr ""
 
-#: paperless/settings.py:287
+#: paperless/settings.py:298
+msgid "English (GB)"
+msgstr ""
+
+#: paperless/settings.py:299
 msgid "German"
 msgstr "Němčina"
 
-#: paperless/settings.py:288
+#: paperless/settings.py:300
 msgid "Dutch"
 msgstr "Holandština"
 
-#: paperless/settings.py:289
+#: paperless/settings.py:301
 msgid "French"
 msgstr "Francouzština"
 
-#: paperless/urls.py:114
+#: paperless/settings.py:302
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: paperless/settings.py:303
+msgid "Italian"
+msgstr ""
+
+#: paperless/settings.py:304
+msgid "Romanian"
+msgstr ""
+
+#: paperless/urls.py:118
 msgid "Paperless-ng administration"
 msgstr "Správa Paperless-ng"
 
@@ -416,37 +437,24 @@ msgid "Filter"
 msgstr "Filtr"
 
 #: paperless_mail/admin.py:27
-msgid ""
-"Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
-"Paperless zpracuje pouze emaily které odpovídají VŠEM níže zadaným filtrům."
+msgid "Paperless will only process mails that match ALL of the filters given below."
+msgstr "Paperless zpracuje pouze emaily které odpovídají VŠEM níže zadaným filtrům."
 
 #: paperless_mail/admin.py:37
 msgid "Actions"
 msgstr "Akce"
 
 #: paperless_mail/admin.py:39
-msgid ""
-"The action applied to the mail. This action is only performed when documents"
-" were consumed from the mail. Mails without attachments will remain entirely"
-" untouched."
-msgstr ""
-"Akce provedena na emailu. Tato akce je provedena jen pokud byly dokumenty "
-"zkonzumovány z emailu. Emaily bez příloh zůstanou nedotčeny."
+msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
+msgstr "Akce provedena na emailu. Tato akce je provedena jen pokud byly dokumenty zkonzumovány z emailu. Emaily bez příloh zůstanou nedotčeny."
 
 #: paperless_mail/admin.py:46
 msgid "Metadata"
-msgstr "Metadata"
+msgstr ""
 
 #: paperless_mail/admin.py:48
-msgid ""
-"Assign metadata to documents consumed from this rule automatically. If you "
-"do not assign tags, types or correspondents here, paperless will still "
-"process all matching rules that you have defined."
-msgstr ""
-"Automaticky přiřadit metadata dokumentům zkonzumovaných z tohoto pravidla. "
-"Pokud zde nepřiřadíte tagy, typy nebo korespondenty, paperless stále "
-"zpracuje všechna shodující-se pravidla které jste definovali."
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgstr "Automaticky přiřadit metadata dokumentům zkonzumovaných z tohoto pravidla. Pokud zde nepřiřadíte tagy, typy nebo korespondenty, paperless stále zpracuje všechna shodující-se pravidla které jste definovali."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
@@ -474,19 +482,15 @@ msgstr "Používat STARTTLS"
 
 #: paperless_mail/models.py:29
 msgid "IMAP server"
-msgstr "IMAP server"
+msgstr ""
 
 #: paperless_mail/models.py:33
 msgid "IMAP port"
-msgstr "IMAP port"
+msgstr ""
 
 #: paperless_mail/models.py:36
-msgid ""
-"This is usually 143 for unencrypted and STARTTLS connections, and 993 for "
-"SSL connections."
-msgstr ""
-"Toto je většinou 143 pro nešifrovaná připojení/připojení používající "
-"STARTTLS a 993 pro SSL připojení."
+msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgstr "Toto je většinou 143 pro nešifrovaná připojení/připojení používající STARTTLS a 993 pro SSL připojení."
 
 #: paperless_mail/models.py:40
 msgid "IMAP security"
@@ -585,13 +589,8 @@ msgid "filter attachment filename"
 msgstr "název souboru u přílohy filtru"
 
 #: paperless_mail/models.py:140
-msgid ""
-"Only consume documents which entirely match this filename if specified. "
-"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
-"Konzumovat jen dokumenty které přesně odpovídají tomuto názvu souboru pokud "
-"specifikováno. Zástupné znaky jako *.pdf nebo *invoice* jsou povoleny. "
-"Nezáleží na velikosti písmen."
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Konzumovat jen dokumenty které přesně odpovídají tomuto názvu souboru pokud specifikováno. Zástupné znaky jako *.pdf nebo *invoice* jsou povoleny. Nezáleží na velikosti písmen."
 
 #: paperless_mail/models.py:146
 msgid "maximum age"
@@ -606,12 +605,8 @@ msgid "attachment type"
 msgstr "typ přílohy"
 
 #: paperless_mail/models.py:154
-msgid ""
-"Inline attachments include embedded images, so it's best to combine this "
-"option with a filename filter."
-msgstr ""
-"Vložené přílohy zahrnují vložené obrázky, takže je nejlepší tuto možnost "
-"kombinovat s filtrem na název souboru"
+msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
+msgstr "Vložené přílohy zahrnují vložené obrázky, takže je nejlepší tuto možnost kombinovat s filtrem na název souboru"
 
 #: paperless_mail/models.py:159
 msgid "action"
@@ -622,12 +617,8 @@ msgid "action parameter"
 msgstr "parametr akce"
 
 #: paperless_mail/models.py:167
-msgid ""
-"Additional parameter for the action selected above, i.e., the target folder "
-"of the move to folder action."
-msgstr ""
-"Další parametr pro výše vybranou akci, napříkad cílová složka akce přesunutí"
-" do složky."
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action."
+msgstr "Další parametr pro výše vybranou akci, napříkad cílová složka akce přesunutí do složky."
 
 #: paperless_mail/models.py:173
 msgid "assign title from"
@@ -648,3 +639,4 @@ msgstr "přiřadit korespondenta z"
 #: paperless_mail/models.py:205
 msgid "assign this correspondent"
 msgstr "přiřadit tohoto korespondenta"
+

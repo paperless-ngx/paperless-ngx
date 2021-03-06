@@ -1,26 +1,21 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
-# Translators:
-# Jonas Winkler, 2021
-# Rodrigo A <rodrigo.avelino@meliuz.com.br>, 2021
-# 
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-02-16 18:37+0000\n"
-"Last-Translator: Rodrigo A <rodrigo.avelino@meliuz.com.br>, 2021\n"
-"Language-Team: Portuguese (Brazil) (https://www.transifex.com/paperless/teams/115905/pt_BR/)\n"
+"PO-Revision-Date: 2021-03-06 21:40\n"
+"Last-Translator: \n"
+"Language-Team: Portuguese, Brazilian\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: paperless-ng\n"
+"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Language: pt-BR\n"
+"X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
+"X-Crowdin-File-ID: 54\n"
 
 #: documents/apps.py:10
 msgid "Documents"
@@ -84,12 +79,8 @@ msgid "is inbox tag"
 msgstr "é etiqueta caixa de entrada"
 
 #: documents/models.py:89
-msgid ""
-"Marks this tag as an inbox tag: All newly consumed documents will be tagged "
-"with inbox tags."
-msgstr ""
-"Marca essa etiqueta como caixa de entrada: Todos os novos documentos "
-"consumidos terão as etiquetas de caixa de entrada."
+msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
+msgstr "Marca essa etiqueta como caixa de entrada: Todos os novos documentos consumidos terão as etiquetas de caixa de entrada."
 
 #: documents/models.py:94
 msgid "tag"
@@ -124,12 +115,8 @@ msgid "content"
 msgstr "conteúdo"
 
 #: documents/models.py:139
-msgid ""
-"The raw, text-only data of the document. This field is primarily used for "
-"searching."
-msgstr ""
-"O conteúdo de texto bruto do documento. Esse campo é usado principalmente "
-"para busca."
+msgid "The raw, text-only data of the document. This field is primarily used for searching."
+msgstr "O conteúdo de texto bruto do documento. Esse campo é usado principalmente para busca."
 
 #: documents/models.py:144
 msgid "mime type"
@@ -201,7 +188,7 @@ msgstr "documentos"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr "debug"
+msgstr ""
 
 #: documents/models.py:312
 msgid "information"
@@ -233,11 +220,11 @@ msgstr "nível"
 
 #: documents/models.py:332
 msgid "log"
-msgstr "log"
+msgstr ""
 
 #: documents/models.py:333
 msgid "logs"
-msgstr "logs"
+msgstr ""
 
 #: documents/models.py:344 documents/models.py:394
 msgid "saved view"
@@ -450,42 +437,28 @@ msgid "Filter"
 msgstr "Filtro"
 
 #: paperless_mail/admin.py:27
-msgid ""
-"Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
-"Paperless processará somente e-mails que se encaixam em TODOS os filtros "
-"abaixo."
+msgid "Paperless will only process mails that match ALL of the filters given below."
+msgstr "Paperless processará somente e-mails que se encaixam em TODOS os filtros abaixo."
 
 #: paperless_mail/admin.py:37
 msgid "Actions"
 msgstr "Ações"
 
 #: paperless_mail/admin.py:39
-msgid ""
-"The action applied to the mail. This action is only performed when documents"
-" were consumed from the mail. Mails without attachments will remain entirely"
-" untouched."
-msgstr ""
-"A ação se aplica ao e-mail. Essa ação só é executada quando documentos foram"
-" consumidos do e-mail. E-mails sem anexos permanecerão intactos."
+msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
+msgstr "A ação se aplica ao e-mail. Essa ação só é executada quando documentos foram consumidos do e-mail. E-mails sem anexos permanecerão intactos."
 
 #: paperless_mail/admin.py:46
 msgid "Metadata"
 msgstr "Metadados"
 
 #: paperless_mail/admin.py:48
-msgid ""
-"Assign metadata to documents consumed from this rule automatically. If you "
-"do not assign tags, types or correspondents here, paperless will still "
-"process all matching rules that you have defined."
-msgstr ""
-"Atribua metadados aos documentos consumidos por esta regra automaticamente. "
-"Se você não atribuir etiquetas, tipos ou correspondentes aqui, paperless "
-"ainda sim processará todas as regras de detecção que você definiu."
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamente. Se você não atribuir etiquetas, tipos ou correspondentes aqui, paperless ainda sim processará todas as regras de detecção que você definiu."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr "Paperless mail"
+msgstr ""
 
 #: paperless_mail/models.py:11
 msgid "mail account"
@@ -516,12 +489,8 @@ msgid "IMAP port"
 msgstr "Porta IMAP"
 
 #: paperless_mail/models.py:36
-msgid ""
-"This is usually 143 for unencrypted and STARTTLS connections, and 993 for "
-"SSL connections."
-msgstr ""
-"É geralmente 143 para não encriptado e conexões STARTTLS, e 993 para "
-"conexões SSL."
+msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgstr "É geralmente 143 para não encriptado e conexões STARTTLS, e 993 para conexões SSL."
 
 #: paperless_mail/models.py:40
 msgid "IMAP security"
@@ -620,11 +589,8 @@ msgid "filter attachment filename"
 msgstr "filtrar nome do arquivo anexo"
 
 #: paperless_mail/models.py:140
-msgid ""
-"Only consume documents which entirely match this filename if specified. "
-"Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
-"Consumir somente documentos que correspondem a este nome de arquivo se especificado.\n"
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Consumir somente documentos que correspondem a este nome de arquivo se especificado.\n"
 "Curingas como *.pdf ou *invoice* são permitidos. Sem diferenciação de maiúsculas e minúsculas."
 
 #: paperless_mail/models.py:146
@@ -640,12 +606,8 @@ msgid "attachment type"
 msgstr "tipo de anexo"
 
 #: paperless_mail/models.py:154
-msgid ""
-"Inline attachments include embedded images, so it's best to combine this "
-"option with a filename filter."
-msgstr ""
-"Anexos inline incluem imagens inseridas, por isso é melhor combinar essa "
-"opção com um filtro de nome de arquivo."
+msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
+msgstr "Anexos inline incluem imagens inseridas, por isso é melhor combinar essa opção com um filtro de nome de arquivo."
 
 #: paperless_mail/models.py:159
 msgid "action"
@@ -656,12 +618,8 @@ msgid "action parameter"
 msgstr "parâmetro da ação"
 
 #: paperless_mail/models.py:167
-msgid ""
-"Additional parameter for the action selected above, i.e., the target folder "
-"of the move to folder action."
-msgstr ""
-"Parâmetro adicional para a ação selecionada acima, por exemplo: a pasta de "
-"destino da ação de mover pasta."
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action."
+msgstr "Parâmetro adicional para a ação selecionada acima, por exemplo: a pasta de destino da ação de mover pasta."
 
 #: paperless_mail/models.py:173
 msgid "assign title from"
@@ -682,3 +640,4 @@ msgstr "atribuir correspondente de"
 #: paperless_mail/models.py:205
 msgid "assign this correspondent"
 msgstr "atribuir este correspondente"
+
