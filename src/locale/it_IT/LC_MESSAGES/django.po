@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"PO-Revision-Date: 2021-03-06 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -84,7 +84,7 @@ msgstr "Contrassegna questo tag come tag in arrivo: tutti i documenti elaborati 
 
 #: documents/models.py:94
 msgid "tag"
-msgstr ""
+msgstr "tag"
 
 #: documents/models.py:95 documents/models.py:151
 msgid "tags"
@@ -124,7 +124,7 @@ msgstr "tipo mime"
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
@@ -188,7 +188,7 @@ msgstr "documenti"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:312
 msgid "information"
@@ -220,7 +220,7 @@ msgstr "livello"
 
 #: documents/models.py:332
 msgid "log"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:333
 msgid "logs"
@@ -390,7 +390,7 @@ msgstr "Nome utente"
 
 #: documents/templates/registration/login.html:49
 msgid "Password"
-msgstr ""
+msgstr "Password"
 
 #: documents/templates/registration/login.html:54
 msgid "Sign in"
@@ -502,7 +502,7 @@ msgstr "nome utente"
 
 #: paperless_mail/models.py:50
 msgid "password"
-msgstr ""
+msgstr "password"
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
@@ -566,7 +566,7 @@ msgstr "priorità"
 
 #: paperless_mail/models.py:120
 msgid "account"
-msgstr ""
+msgstr "account"
 
 #: paperless_mail/models.py:124
 msgid "folder"

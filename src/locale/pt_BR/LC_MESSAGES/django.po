@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"PO-Revision-Date: 2021-03-06 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -188,7 +188,7 @@ msgstr "documentos"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:312
 msgid "information"
@@ -220,11 +220,11 @@ msgstr "nível"
 
 #: documents/models.py:332
 msgid "log"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:333
 msgid "logs"
-msgstr ""
+msgstr "logs"
 
 #: documents/models.py:344 documents/models.py:394
 msgid "saved view"
@@ -458,7 +458,7 @@ msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamen
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless mail"
 
 #: paperless_mail/models.py:11
 msgid "mail account"

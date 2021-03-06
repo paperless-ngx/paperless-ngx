@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:39\n"
+"PO-Revision-Date: 2021-03-06 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -180,7 +180,7 @@ msgstr "Pozitia acestui document in arhiva fizica."
 
 #: documents/models.py:223
 msgid "document"
-msgstr ""
+msgstr "document"
 
 #: documents/models.py:224
 msgid "documents"
