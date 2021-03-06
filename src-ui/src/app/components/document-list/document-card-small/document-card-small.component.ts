@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
 import { DocumentService } from 'src/app/services/rest/document.service';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -37,12 +36,7 @@ export class DocumentCardSmallComponent implements OnInit {
   mouseOnPreview = false
   popoverHidden = true
 
-  metadata: PaperlessDocumentMetadata
-
   ngOnInit(): void {
-    this.documentService.getMetadata(this.document?.id).subscribe(result => {
-      this.metadata = result
-    })
   }
 
   getIsThumbInverted() {
@@ -72,10 +66,6 @@ export class DocumentCardSmallComponent implements OnInit {
         }
       })
     )
-  }
-
-  getContentType() {
-    return this.metadata?.has_archive_version ? 'application/pdf' : this.metadata?.original_mime_type
   }
 
   mouseEnterPreview() {
