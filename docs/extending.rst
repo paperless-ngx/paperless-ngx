@@ -174,7 +174,7 @@ Front end localization
 *   The translated strings need to be placed in the "src-ui/src/locale/" folder.
 *   In order to extract added or changed strings from the source files, call ``ng xi18n --ivy``.
 
-Adding new languages requires adding the translated files in the "src-ui/src/locale/" fodler and adjusting a couple files.
+Adding new languages requires adding the translated files in the "src-ui/src/locale/" folder and adjusting a couple files.
 
 1.  Adjust "src-ui/angular.json":
 
