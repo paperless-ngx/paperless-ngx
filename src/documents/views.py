@@ -35,6 +35,7 @@ from rest_framework.viewsets import (
 
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
+from . import index
 from .bulk_download import OriginalAndArchiveStrategy, OriginalsOnlyStrategy, \
     ArchiveOnlyStrategy
 from .classifier import load_classifier
@@ -325,6 +326,45 @@ class DocumentViewSet(RetrieveModelMixin,
         except (FileNotFoundError, Document.DoesNotExist):
             raise Http404()
 
+
+class SearchResultSerializer(DocumentSerializer):
+
+    def to_representation(self, instance):
+        doc = Document.objects.get(id=instance['id'])
+        # repressentation = super(SearchResultSerializer, self).to_representation(doc)
+        # repressentation['__search_hit__'] = {
+        #     "score": instance.score
+        # }
+        return super(SearchResultSerializer, self).to_representation(doc)
+
+
+class UnifiedSearchViewSet(DocumentViewSet):
+
+    def get_serializer_class(self):
+        if self._is_search_request():
+            return SearchResultSerializer
+        else:
+            return DocumentSerializer
+
+    def _is_search_request(self):
+        return "query" in self.request.query_params
+
+    def filter_queryset(self, queryset):
+
+        if self._is_search_request():
+            ix = index.open_index()
+            return index.DelayedQuery(ix, self.searcher, self.request.query_params, self.paginator.page_size)
+        else:
+            return super(UnifiedSearchViewSet, self).filter_queryset(queryset)
+
+    def list(self, request, *args, **kwargs):
+        if self._is_search_request():
+            ix = index.open_index()
+            with ix.searcher() as s:
+                self.searcher = s
+                return super(UnifiedSearchViewSet, self).list(request)
+        else:
+            return super(UnifiedSearchViewSet, self).list(request)
 
 class LogViewSet(ViewSet):
 
