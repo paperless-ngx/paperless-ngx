@@ -2,6 +2,7 @@ import logging
 import os
 from contextlib import contextmanager
 
+import math
 from django.conf import settings
 from whoosh import highlight, classify, query
 from whoosh.fields import Schema, TEXT, NUMERIC, KEYWORD, DATETIME
@@ -9,8 +10,10 @@ from whoosh.highlight import Formatter, get_text
 from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser import MultifieldParser
 from whoosh.qparser.dateparse import DateParserPlugin
+from whoosh.searching import ResultsPage
 from whoosh.writing import AsyncWriter
 
+from documents.models import Document
 
 logger = logging.getLogger("paperless.index")
 
@@ -66,6 +69,7 @@ def get_schema():
         title=TEXT(stored=True),
         content=TEXT(),
         correspondent=TEXT(stored=True),
+        correspondent_id=NUMERIC(stored=True, numtype=int),
         tag=KEYWORD(stored=True, commas=True, scorable=True, lowercase=True),
         type=TEXT(stored=True),
         created=DATETIME(stored=True, sortable=True),
@@ -109,6 +113,7 @@ def update_document(writer, doc):
         title=doc.title,
         content=doc.content,
         correspondent=doc.correspondent.name if doc.correspondent else None,
+        correspondent_id=doc.correspondent.id if doc.correspondent else None,
         tag=tags if tags else None,
         type=doc.document_type.name if doc.document_type else None,
         created=doc.created,
@@ -179,6 +184,65 @@ def query_page(ix, page, querystring, more_like_doc_id, more_like_doc_content):
         yield result_page, corrected_query
     finally:
         searcher.close()
+
+
+class DelayedQuery:
+
+    @property
+    def _query(self):
+        if 'query' in self.query_params:
+            qp = MultifieldParser(
+                ["content", "title", "correspondent", "tag", "type"],
+                self.ix.schema)
+            qp.add_plugin(DateParserPlugin())
+            q = qp.parse(self.query_params['query'])
+        elif 'more_like_id' in self.query_params:
+            more_like_doc_id = int(self.query_params['more_like_id'])
+            content = Document.objects.get(id=more_like_doc_id).content
+
+            docnum = self.searcher.document_number(id=more_like_doc_id)
+            kts = self.searcher.key_terms_from_text(
+                'content', content, numterms=20,
+                model=classify.Bo1Model, normalize=False)
+            q = query.Or(
+                [query.Term('content', word, boost=weight)
+                 for word, weight in kts])
+        else:
+            raise ValueError(
+                "Either query or more_like_id is required."
+            )
+        return q
+
+    @property
+    def _query_filter(self):
+        criterias = []
+        for k, v in self.query_params.items():
+            if k == 'correspondent__id':
+                criterias.append(query.Term('correspondent_id', v))
+        if len(criterias) > 0:
+            return query.And(criterias)
+        else:
+            return None
+
+    def __init__(self, ix, searcher, query_params, page_size):
+        self.ix = ix
+        self.searcher = searcher
+        self.query_params = query_params
+        self.page_size = page_size
+
+    def __len__(self):
+        results = self.searcher.search(self._query, limit=1, filter=self._query_filter)
+        return len(results)
+        #return 1000
+
+    def __getitem__(self, item):
+        page: ResultsPage = self.searcher.search_page(
+            self._query,
+            filter=self._query_filter,
+            pagenum=math.floor(item.start / self.page_size) + 1,
+            pagelen=self.page_size
+        )
+        return page
 
 
 def autocomplete(ix, term, limit=10):
