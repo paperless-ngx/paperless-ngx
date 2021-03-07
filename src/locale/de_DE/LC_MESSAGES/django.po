@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 22:56\n"
+"PO-Revision-Date: 2021-03-07 10:08\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -618,7 +618,7 @@ msgstr "Parameter für Aktion"
 
 #: paperless_mail/models.py:167
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action."
-msgstr "Zusätzlicher Parameter für die oben ausgewählte Aktion, zum Beispiel der Zielordner für die Aktion \"In angegebenen Ordner verschieben\""
+msgstr "Zusätzlicher Parameter für die oben ausgewählte Aktion, zum Beispiel der Zielordner für die Aktion \"In angegebenen Ordner verschieben\"."
 
 #: paperless_mail/models.py:173
 msgid "assign title from"
