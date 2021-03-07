@@ -1945,11 +1945,19 @@
         </context-group>
         <target>crwdns3320:0crwdne3320:0</target>
       </trans-unit>
+      <trans-unit id="7137419789978325708" datatype="html">
+        <source>Russian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <target>crwdns3404:0crwdne3404:0</target>
+      </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <target>crwdns3322:0crwdne3322:0</target>
       </trans-unit>
