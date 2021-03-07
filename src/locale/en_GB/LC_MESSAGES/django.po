@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 22:56\n"
+"POT-Creation-Date: 2021-03-07 21:34+0100\n"
+"PO-Revision-Date: 2021-03-07 21:35\n"
 "Last-Translator: \n"
 "Language-Team: English, United Kingdom\n"
 "Language: en_GB\n"
@@ -226,7 +226,7 @@ msgstr "log"
 msgid "logs"
 msgstr "logs"
 
-#: documents/models.py:344 documents/models.py:394
+#: documents/models.py:344 documents/models.py:396
 msgid "saved view"
 msgstr "saved view"
 
@@ -326,26 +326,34 @@ msgstr "modified after"
 msgid "does not have tag"
 msgstr "does not have tag"
 
-#: documents/models.py:398
+#: documents/models.py:388
+msgid "does not have ASN"
+msgstr "does not have ASN"
+
+#: documents/models.py:389
+msgid "title or content contains"
+msgstr "title or content contains"
+
+#: documents/models.py:400
 msgid "rule type"
 msgstr "rule type"
 
-#: documents/models.py:402
+#: documents/models.py:404
 msgid "value"
 msgstr "value"
 
-#: documents/models.py:408
+#: documents/models.py:410
 msgid "filter rule"
 msgstr "filter rule"
 
-#: documents/models.py:409
+#: documents/models.py:411
 msgid "filter rules"
 msgstr "filter rules"
 
 #: documents/serialisers.py:53
 #, python-format
-msgid "Invalid regular expresssion: %(error)s"
-msgstr "Invalid regular expresssion: %(error)s"
+msgid "Invalid regular expression: %(error)s"
+msgstr "Invalid regular expression: %(error)s"
 
 #: documents/serialisers.py:177
 msgid "Invalid color."
@@ -396,37 +404,41 @@ msgstr "Password"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: paperless/settings.py:297
+#: paperless/settings.py:298
 msgid "English (US)"
 msgstr "English (US)"
 
-#: paperless/settings.py:298
+#: paperless/settings.py:299
 msgid "English (GB)"
 msgstr "English (GB)"
 
-#: paperless/settings.py:299
+#: paperless/settings.py:300
 msgid "German"
 msgstr "German"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:301
 msgid "Dutch"
 msgstr "Dutch"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:302
 msgid "French"
 msgstr "French"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:303
 msgid "Portuguese (Brazil)"
 msgstr "Portuguese (Brazil)"
 
-#: paperless/settings.py:303
+#: paperless/settings.py:304
 msgid "Italian"
 msgstr "Italian"
 
-#: paperless/settings.py:304
+#: paperless/settings.py:305
 msgid "Romanian"
 msgstr "Romanian"
+
+#: paperless/settings.py:306
+msgid "Russian"
+msgstr "Russian"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
