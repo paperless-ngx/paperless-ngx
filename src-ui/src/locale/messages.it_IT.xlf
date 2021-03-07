@@ -384,7 +384,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="translated">Nome del file multimediale</target>
+        <target state="translated">Nome file</target>
       </trans-unit>
       <trans-unit id="74a894d2a8ae24a1eed4bc56e9afdc27dc2c31c8" datatype="html">
         <source>Original MD5 checksum</source>
@@ -392,7 +392,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Somma MD5 originale</target>
+        <target state="translated">Checksum MD5 originale</target>
       </trans-unit>
       <trans-unit id="e92ca184ea785769fb26138fc25ee9fa06fff6e5" datatype="html">
         <source>Original file size</source>
@@ -400,7 +400,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Dimensione del file originale</target>
+        <target state="translated">Dimensione file originale</target>
       </trans-unit>
       <trans-unit id="b5e93f30cc3411f20bd62025a6cc7394568f1bfd" datatype="html">
         <source>Original mime type</source>
@@ -416,7 +416,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="translated">Checksum MD5 dell'archivio</target>
+        <target state="translated">Checksum MD5 archivio</target>
       </trans-unit>
       <trans-unit id="e6bf12eadecbfd80016eca15fa78651c6ca90c64" datatype="html">
         <source>Archive file size</source>
@@ -424,7 +424,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="translated">Dimensione dell'archivio</target>
+        <target state="translated">Dimensione file archivio</target>
       </trans-unit>
       <trans-unit id="203c7adb5bd74ae18e84e1e3b66ddfe76bc0023f" datatype="html">
         <source>Original document metadata</source>
@@ -616,7 +616,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="translated">Usa il formato data della lingua di visualizzazione</target>
+        <target state="translated">Usa il formato data della lingua</target>
       </trans-unit>
       <trans-unit id="8488620293789898901" datatype="html">
         <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -808,7 +808,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="translated">L'eliminazione dei documenti chiederà sempre la conferma.</target>
+        <target state="translated">Verrà sempre chiesta una conferma prima di eliminare documenti.</target>
       </trans-unit>
       <trans-unit id="8cfddc13e04f5545ac63f419ef363505d6f78c2e" datatype="html">
         <source>Apply on close</source>
@@ -1951,7 +1951,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Russian</target>
+        <target state="translated">Russo</target>
       </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
