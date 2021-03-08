@@ -1823,7 +1823,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Consultati documentatia pentru a afla cum sa folositi aceste functii. Sectiunea de baza contine informatii despre cum sa folositi Paperless in general.</target>
+        <target state="translated">Consultați documentația pentru a afla cum să folosiți aceste funcții. Secțiunea de baza conține informații despre cum să folosiți Paperless în general.</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
@@ -1839,7 +1839,7 @@
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Selecteaza</target>
+        <target state="translated">Selectează</target>
       </trans-unit>
       <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
@@ -1847,7 +1847,7 @@
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Selectati un obiect</target>
+        <target state="translated">Selectați un obiect</target>
       </trans-unit>
       <trans-unit id="d6529debfc1613db22d6fa096ebfeb8a85fa739d" datatype="html">
         <source>Invalid date.</source>
@@ -1855,7 +1855,7 @@
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Data invalida.</target>
+        <target state="translated">Data invalidă.</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
@@ -1879,7 +1879,7 @@
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">(fara titlu)</target>
+        <target state="translated">(fără titlu)</target>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
         <source>English (US)</source>
@@ -1887,7 +1887,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">Engleza (SUA)</target>
+        <target state="translated">Engleză (Americană)</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -1895,7 +1895,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="translated">Engleza (UK)</target>
+        <target state="translated">Engleză (Britanică)</target>
       </trans-unit>
       <trans-unit id="1858110241312746425" datatype="html">
         <source>German</source>
@@ -1903,7 +1903,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="translated">Germana</target>
+        <target state="translated">Germană</target>
       </trans-unit>
       <trans-unit id="3071065188816255493" datatype="html">
         <source>Dutch</source>
@@ -1911,7 +1911,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="translated">Olandeza</target>
+        <target state="translated">Olandeză</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html">
         <source>French</source>
@@ -1919,7 +1919,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="translated">Franceza</target>
+        <target state="translated">Franceză</target>
       </trans-unit>
       <trans-unit id="9184513005098760425" datatype="html">
         <source>Portuguese (Brazil)</source>
@@ -1927,7 +1927,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="translated">Portugheza (Brazilia)</target>
+        <target state="translated">Portugheză (Brazilia)</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
@@ -1935,7 +1935,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="translated">Italiana</target>
+        <target state="translated">Italiană</target>
       </trans-unit>
       <trans-unit id="8118856427047826368" datatype="html">
         <source>Romanian</source>
@@ -1943,7 +1943,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">Romana</target>
+        <target state="translated">Română</target>
       </trans-unit>
       <trans-unit id="7137419789978325708" datatype="html">
         <source>Russian</source>
@@ -1967,7 +1967,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Documentul exista deja.</target>
+        <target state="translated">Documentul există deja.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
@@ -1975,7 +1975,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Fisierul nu a fost gasit.</target>
+        <target state="translated">Fișierul nu a fost găsit.</target>
       </trans-unit>
       <trans-unit id="1520671543092565667" datatype="html">
         <source>Pre-consume script does not exist.</source>
@@ -1984,7 +1984,7 @@
           <context context-type="linenumber">17</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Scriptul pre-consum nu exista.</target>
+        <target state="translated">Scriptul pre-consum nu există.</target>
       </trans-unit>
       <trans-unit id="7742915911032564889" datatype="html">
         <source>Error while executing pre-consume script.</source>
@@ -1993,7 +1993,7 @@
           <context context-type="linenumber">18</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Eroare la executia scriptului pre-consum.</target>
+        <target state="translated">Eroare la execuția scriptului pre-consum.</target>
       </trans-unit>
       <trans-unit id="8995193730018060346" datatype="html">
         <source>Post-consume script does not exist.</source>
@@ -2002,7 +2002,7 @@
           <context context-type="linenumber">19</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Scriptul post-consum nu exista.</target>
+        <target state="translated">Scriptul post-consum nu există.</target>
       </trans-unit>
       <trans-unit id="256773668518189604" datatype="html">
         <source>Error while executing post-consume script.</source>
@@ -2011,7 +2011,7 @@
           <context context-type="linenumber">20</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Eroare la executia scriptului post-consum.</target>
+        <target state="translated">Eroare la execuția scriptului post-consum.</target>
       </trans-unit>
       <trans-unit id="6252258095055634191" datatype="html">
         <source>Received new file.</source>
@@ -2019,7 +2019,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Fisier nou primit.</target>
+        <target state="translated">Fișier nou primit.</target>
       </trans-unit>
       <trans-unit id="7337565919209746135" datatype="html">
         <source>File type not supported.</source>
@@ -2027,7 +2027,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Tip de fisier nesuportat.</target>
+        <target state="translated">Tip de fișier nesuportat.</target>
       </trans-unit>
       <trans-unit id="5002399167376099234" datatype="html">
         <source>Processing document...</source>
@@ -2035,7 +2035,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Se proceseaza documentul...</target>
+        <target state="translated">Se procesează documentul...</target>
       </trans-unit>
       <trans-unit id="1085975194762600381" datatype="html">
         <source>Generating thumbnail...</source>
@@ -2043,7 +2043,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Se genereaza miniatura...</target>
+        <target state="translated">Se generează miniatura...</target>
       </trans-unit>
       <trans-unit id="3280851677698431426" datatype="html">
         <source>Retrieving date from document...</source>
@@ -2059,7 +2059,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Se salveaza documentul...</target>
+        <target state="translated">Se salvează documentul...</target>
       </trans-unit>
       <trans-unit id="4550450765009165976" datatype="html">
         <source>Finished.</source>
@@ -2083,7 +2083,7 @@
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Informatii</target>
+        <target state="translated">Informații</target>
       </trans-unit>
       <trans-unit id="7517688192215738656" datatype="html">
         <source>ASN</source>
@@ -2123,7 +2123,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Adaugat</target>
+        <target state="translated">Adăugat</target>
       </trans-unit>
       <trans-unit id="3553216189604488439" datatype="html">
         <source>Modified</source>
@@ -2139,7 +2139,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="translated">Creeaza articol nou</target>
+        <target state="translated">Crează articol nou</target>
       </trans-unit>
       <trans-unit id="5324147361912094446" datatype="html">
         <source>Edit item</source>
@@ -2147,7 +2147,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="translated">Modifica articol</target>
+        <target state="translated">Modifică articol</target>
       </trans-unit>
       <trans-unit id="1699589597032579396" datatype="html">
         <source>Could not save element: <x id="PH" equiv-text="error"/></source>
@@ -2171,7 +2171,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">Sunteti sigur ca doriti sa stergeti acest element?</target>
+        <target state="translated">Sunteți sigur că doriți să ștergeți acest element?</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
@@ -2179,7 +2179,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="translated">Documentele asociate nu vor fi sterse.</target>
+        <target state="translated">Documentele asociate nu vor fi șterse.</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
@@ -2187,7 +2187,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="translated">Sterge</target>
+        <target state="translated">Șterge</target>
       </trans-unit>
       <trans-unit id="5467489005440577210" datatype="html">
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -2195,7 +2195,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="translated">Eroare la stergerea elementului: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated">Eroare la ștergerea elementului: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
       <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
@@ -2203,7 +2203,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Oricare cuvant</target>
+        <target state="translated">Oricare cuvânt</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -2211,7 +2211,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Oricare: Documentul contine oricare dintre aceste cuvinte (separate prin spatiu)</target>
+        <target state="translated">Oricare: Documentul conține oricare dintre aceste cuvinte (separate prin spațiu)</target>
       </trans-unit>
       <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>
@@ -2227,7 +2227,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Toate: Documentul contine toate aceste cuvinte (separate prin spatiu)</target>
+        <target state="translated">Toate: Documentul conține toate aceste cuvinte (separate prin spațiu)</target>
       </trans-unit>
       <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
@@ -2243,7 +2243,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Exact: Documentul contine acest sir de caractere</target>
+        <target state="translated">Exact: Documentul conține acest șir de caractere</target>
       </trans-unit>
       <trans-unit id="1338733395833138319" datatype="html">
         <source>Regular expression</source>
@@ -2251,7 +2251,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Expresie regulata</target>
+        <target state="translated">Expresie regulată</target>
       </trans-unit>
       <trans-unit id="7548151332424148033" datatype="html">
         <source>Regular expression: Document matches this regular expression</source>
@@ -2259,7 +2259,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Expresie regulata: Documentul se potriveste cu aceasta expresie regulata</target>
+        <target state="translated">Expresie regulată: Documentul se potrivește cu această expresie regulată</target>
       </trans-unit>
       <trans-unit id="1856513373880048959" datatype="html">
         <source>Fuzzy word</source>
@@ -2267,7 +2267,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Cuvant neclar</target>
+        <target state="translated">Cuvânt neclar</target>
       </trans-unit>
       <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
@@ -2275,7 +2275,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Neclar: Documentul contine un cuvant similar cu acesta</target>
+        <target state="translated">Neclar: Documentul conține un cuvânt similar cu acesta</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
@@ -2283,7 +2283,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Auto: Invata potrivirile automat</target>
+        <target state="translated">Auto: Învață potrivirea automat</target>
       </trans-unit>
     </body>
   </file>
