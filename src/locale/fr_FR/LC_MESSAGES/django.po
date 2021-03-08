@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-07 21:34+0100\n"
-"PO-Revision-Date: 2021-03-07 21:35\n"
+"PO-Revision-Date: 2021-03-08 08:06\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -220,11 +220,11 @@ msgstr "niveau"
 
 #: documents/models.py:332
 msgid "log"
-msgstr "rapport"
+msgstr "journal"
 
 #: documents/models.py:333
 msgid "logs"
-msgstr "rapports"
+msgstr "journaux"
 
 #: documents/models.py:344 documents/models.py:396
 msgid "saved view"
