@@ -1058,19 +1058,19 @@
         </context-group>
         <target>crwdns3100:0{{errorMessage}}crwdne3100:0</target>
       </trans-unit>
-      <trans-unit id="2abff6a01d9b342a5a14b7fb90309a95ce934f8e" datatype="html">
-        <source> Showing documents similar to <x id="START_LINK" equiv-text="&lt;a routerLink=&quot;/documents/{{more_like}}&quot;&gt;{{more_like_doc?.original_file_name}}"/><x id="INTERPOLATION" equiv-text="{{more_like_doc?.original_file_name}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/></source>
+      <trans-unit id="f7f2e30106223a69bcf0f8e586e6be9dc4e72226" datatype="html">
+        <source>Showing documents similar to <x id="START_LINK" equiv-text="&lt;a routerLink=&quot;/documents/{{more_like}}&quot;&gt;{{more_like_doc?.original_file_name}}"/><x id="INTERPOLATION" equiv-text="{{more_like_doc?.original_file_name}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">7</context>
+          <context context-type="linenumber">6</context>
         </context-group>
-        <target>crwdns3102:0{{more_like}}crwdnd3102:0{{more_like_doc?.original_file_name}}crwdnd3102:0{{more_like_doc?.original_file_name}}crwdne3102:0</target>
+        <target>crwdns3406:0{{more_like}}crwdnd3406:0{{more_like_doc?.original_file_name}}crwdnd3406:0{{more_like_doc?.original_file_name}}crwdne3406:0</target>
       </trans-unit>
       <trans-unit id="6e0b0a1ea16f18f2fb1586c53d99d2f22e1aee2e" datatype="html">
         <source>Search query: <x id="START_ITALIC_TEXT" equiv-text="&lt;i&gt;{{query}}"/><x id="INTERPOLATION" equiv-text="{{query}}&lt;/i&gt;"/><x id="CLOSE_ITALIC_TEXT" equiv-text="&lt;/i&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <target>crwdns3104:0{{query}}crwdnd3104:0{{query}}crwdne3104:0</target>
       </trans-unit>
@@ -1078,7 +1078,7 @@
         <source>Did you mean &quot;<x id="START_LINK" equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}"/><x id="INTERPOLATION" equiv-text="{{correctedQuery}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">11</context>
         </context-group>
         <target>crwdns3106:0[routerLink]crwdnd3106:0{{correctedQuery}}crwdnd3106:0{{correctedQuery}}crwdne3106:0</target>
       </trans-unit>
@@ -1086,7 +1086,7 @@
         <source>{VAR_PLURAL, plural, =0 {No results} =1 {One result} other {<x id="INTERPOLATION"/> results}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <target>crwdns3108:0VAR_PLURAL={VAR_PLURAL}crwdne3108:0</target>
       </trans-unit>
@@ -1191,7 +1191,7 @@
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">77</context>
         </context-group>
         <target>crwdns3134:0crwdne3134:0</target>
       </trans-unit>
@@ -1199,15 +1199,23 @@
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <target>crwdns3136:0crwdne3136:0</target>
+      </trans-unit>
+      <trans-unit id="7517688192215738656" datatype="html">
+        <source>ASN</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+        <target>crwdns3354:0crwdne3354:0</target>
       </trans-unit>
       <trans-unit id="5195932016807797291" datatype="html">
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">33</context>
         </context-group>
         <target>crwdns3138:0crwdne3138:0</target>
       </trans-unit>
@@ -1215,7 +1223,7 @@
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target>crwdns3140:0crwdne3140:0</target>
       </trans-unit>
@@ -1223,7 +1231,7 @@
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <target>crwdns3142:0crwdne3142:0</target>
       </trans-unit>
@@ -1231,7 +1239,7 @@
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target>crwdns3144:0crwdne3144:0</target>
       </trans-unit>
@@ -1239,7 +1247,7 @@
         <source>Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <target>crwdns3146:0crwdne3146:0</target>
       </trans-unit>
@@ -1247,7 +1255,7 @@
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target>crwdns3148:0crwdne3148:0</target>
       </trans-unit>
@@ -1255,9 +1263,17 @@
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <target>crwdns3150:0crwdne3150:0</target>
+      </trans-unit>
+      <trans-unit id="1872523635812236432" datatype="html">
+        <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <target>crwdns3416:0crwdne3416:0</target>
       </trans-unit>
       <trans-unit id="02d184c288f567825a1fcbf83bcd3099a10853d5" datatype="html">
         <source>Filter tags</source>
@@ -1945,11 +1961,19 @@
         </context-group>
         <target>crwdns3320:0crwdne3320:0</target>
       </trans-unit>
+      <trans-unit id="7137419789978325708" datatype="html">
+        <source>Russian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <target>crwdns3404:0crwdne3404:0</target>
+      </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <target>crwdns3322:0crwdne3322:0</target>
       </trans-unit>
@@ -2076,14 +2100,6 @@
           <context context-type="linenumber">39</context>
         </context-group>
         <target>crwdns3352:0crwdne3352:0</target>
-      </trans-unit>
-      <trans-unit id="7517688192215738656" datatype="html">
-        <source>ASN</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-        <target>crwdns3354:0crwdne3354:0</target>
       </trans-unit>
       <trans-unit id="2691296884221415710" datatype="html">
         <source>Correspondent</source>

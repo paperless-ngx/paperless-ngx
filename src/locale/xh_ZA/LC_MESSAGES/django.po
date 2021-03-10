@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:39\n"
+"POT-Creation-Date: 2021-03-07 21:34+0100\n"
+"PO-Revision-Date: 2021-03-07 20:36\n"
 "Last-Translator: \n"
 "Language-Team: Xhosa\n"
 "Language: xh_ZA\n"
@@ -226,7 +226,7 @@ msgstr "crwdns2628:0crwdne2628:0"
 msgid "logs"
 msgstr "crwdns2630:0crwdne2630:0"
 
-#: documents/models.py:344 documents/models.py:394
+#: documents/models.py:344 documents/models.py:396
 msgid "saved view"
 msgstr "crwdns2632:0crwdne2632:0"
 
@@ -326,26 +326,34 @@ msgstr "crwdns2678:0crwdne2678:0"
 msgid "does not have tag"
 msgstr "crwdns2680:0crwdne2680:0"
 
-#: documents/models.py:398
+#: documents/models.py:388
+msgid "does not have ASN"
+msgstr "crwdns3408:0crwdne3408:0"
+
+#: documents/models.py:389
+msgid "title or content contains"
+msgstr "crwdns3410:0crwdne3410:0"
+
+#: documents/models.py:400
 msgid "rule type"
 msgstr "crwdns2682:0crwdne2682:0"
 
-#: documents/models.py:402
+#: documents/models.py:404
 msgid "value"
 msgstr "crwdns2684:0crwdne2684:0"
 
-#: documents/models.py:408
+#: documents/models.py:410
 msgid "filter rule"
 msgstr "crwdns2686:0crwdne2686:0"
 
-#: documents/models.py:409
+#: documents/models.py:411
 msgid "filter rules"
 msgstr "crwdns2688:0crwdne2688:0"
 
 #: documents/serialisers.py:53
 #, python-format
-msgid "Invalid regular expresssion: %(error)s"
-msgstr "crwdns2690:0%(error)scrwdne2690:0"
+msgid "Invalid regular expression: %(error)s"
+msgstr "crwdns3412:0%(error)scrwdne3412:0"
 
 #: documents/serialisers.py:177
 msgid "Invalid color."
@@ -396,37 +404,41 @@ msgstr "crwdns2712:0crwdne2712:0"
 msgid "Sign in"
 msgstr "crwdns2714:0crwdne2714:0"
 
-#: paperless/settings.py:297
+#: paperless/settings.py:298
 msgid "English (US)"
 msgstr "crwdns2716:0crwdne2716:0"
 
-#: paperless/settings.py:298
+#: paperless/settings.py:299
 msgid "English (GB)"
 msgstr "crwdns2718:0crwdne2718:0"
 
-#: paperless/settings.py:299
+#: paperless/settings.py:300
 msgid "German"
 msgstr "crwdns2720:0crwdne2720:0"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:301
 msgid "Dutch"
 msgstr "crwdns2722:0crwdne2722:0"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:302
 msgid "French"
 msgstr "crwdns2724:0crwdne2724:0"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:303
 msgid "Portuguese (Brazil)"
 msgstr "crwdns2726:0crwdne2726:0"
 
-#: paperless/settings.py:303
+#: paperless/settings.py:304
 msgid "Italian"
 msgstr "crwdns2728:0crwdne2728:0"
 
-#: paperless/settings.py:304
+#: paperless/settings.py:305
 msgid "Romanian"
 msgstr "crwdns2730:0crwdne2730:0"
+
+#: paperless/settings.py:306
+msgid "Russian"
+msgstr "crwdns3414:0crwdne3414:0"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"

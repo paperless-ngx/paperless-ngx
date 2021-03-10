@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"POT-Creation-Date: 2021-03-07 21:34+0100\n"
+"PO-Revision-Date: 2021-03-08 23:34\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -19,44 +19,44 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "Documentos"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "Qualquer palavra"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "Todas as palavras"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "Detecção exata"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "Expressão regular"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Palavra difusa (fuzzy)"
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr ""
+msgstr "Automático"
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:109
 msgid "name"
-msgstr ""
+msgstr "nome"
 
 #: documents/models.py:45
 msgid "match"
-msgstr ""
+msgstr "correspondência"
 
 #: documents/models.py:49
 msgid "matching algorithm"
-msgstr ""
+msgstr "algoritmo correspondente"
 
 #: documents/models.py:55
 msgid "is insensitive"
@@ -64,19 +64,19 @@ msgstr ""
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr ""
+msgstr "correspondente"
 
 #: documents/models.py:75
 msgid "correspondents"
-msgstr ""
+msgstr "correspondentes"
 
 #: documents/models.py:81
 msgid "color"
-msgstr ""
+msgstr "cor"
 
 #: documents/models.py:87
 msgid "is inbox tag"
-msgstr ""
+msgstr "é etiqueta de novo"
 
 #: documents/models.py:89
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
@@ -84,35 +84,35 @@ msgstr ""
 
 #: documents/models.py:94
 msgid "tag"
-msgstr ""
+msgstr "etiqueta"
 
 #: documents/models.py:95 documents/models.py:151
 msgid "tags"
-msgstr ""
+msgstr "etiquetas"
 
 #: documents/models.py:101 documents/models.py:133
 msgid "document type"
-msgstr ""
+msgstr "tipo de documento"
 
 #: documents/models.py:102
 msgid "document types"
-msgstr ""
+msgstr "tipos de documento"
 
 #: documents/models.py:110
 msgid "Unencrypted"
-msgstr ""
+msgstr "Não encriptado"
 
 #: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Encriptado com GNU Privacy Guard"
 
 #: documents/models.py:124
 msgid "title"
-msgstr ""
+msgstr "título"
 
 #: documents/models.py:137
 msgid "content"
-msgstr ""
+msgstr "conteúdo"
 
 #: documents/models.py:139
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
@@ -140,23 +140,23 @@ msgstr ""
 
 #: documents/models.py:172 documents/models.py:328
 msgid "created"
-msgstr ""
+msgstr "criado"
 
 #: documents/models.py:176
 msgid "modified"
-msgstr ""
+msgstr "modificado"
 
 #: documents/models.py:180
 msgid "storage type"
-msgstr ""
+msgstr "tipo de armazenamento"
 
 #: documents/models.py:188
 msgid "added"
-msgstr ""
+msgstr "adicionado"
 
 #: documents/models.py:192
 msgid "filename"
-msgstr ""
+msgstr "nome de ficheiro"
 
 #: documents/models.py:198
 msgid "Current filename in storage"
@@ -180,53 +180,53 @@ msgstr ""
 
 #: documents/models.py:223
 msgid "document"
-msgstr ""
+msgstr "documento"
 
 #: documents/models.py:224
 msgid "documents"
-msgstr ""
+msgstr "documentos"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "depurar"
 
 #: documents/models.py:312
 msgid "information"
-msgstr ""
+msgstr "informação"
 
 #: documents/models.py:313
 msgid "warning"
-msgstr ""
+msgstr "aviso"
 
 #: documents/models.py:314
 msgid "error"
-msgstr ""
+msgstr "erro"
 
 #: documents/models.py:315
 msgid "critical"
-msgstr ""
+msgstr "crítico"
 
 #: documents/models.py:319
 msgid "group"
-msgstr ""
+msgstr "grupo"
 
 #: documents/models.py:322
 msgid "message"
-msgstr ""
+msgstr "mensagem"
 
 #: documents/models.py:325
 msgid "level"
-msgstr ""
+msgstr "nível"
 
 #: documents/models.py:332
 msgid "log"
-msgstr ""
+msgstr "registo"
 
 #: documents/models.py:333
 msgid "logs"
-msgstr ""
+msgstr "registos"
 
-#: documents/models.py:344 documents/models.py:394
+#: documents/models.py:344 documents/models.py:396
 msgid "saved view"
 msgstr ""
 
@@ -236,11 +236,11 @@ msgstr ""
 
 #: documents/models.py:348
 msgid "user"
-msgstr ""
+msgstr "utilizador"
 
 #: documents/models.py:354
 msgid "show on dashboard"
-msgstr ""
+msgstr "exibir no painel de controlo"
 
 #: documents/models.py:357
 msgid "show in sidebar"
@@ -326,25 +326,33 @@ msgstr ""
 msgid "does not have tag"
 msgstr ""
 
-#: documents/models.py:398
+#: documents/models.py:388
+msgid "does not have ASN"
+msgstr ""
+
+#: documents/models.py:389
+msgid "title or content contains"
+msgstr ""
+
+#: documents/models.py:400
 msgid "rule type"
 msgstr ""
 
-#: documents/models.py:402
+#: documents/models.py:404
 msgid "value"
 msgstr ""
 
-#: documents/models.py:408
+#: documents/models.py:410
 msgid "filter rule"
 msgstr ""
 
-#: documents/models.py:409
+#: documents/models.py:411
 msgid "filter rules"
 msgstr ""
 
 #: documents/serialisers.py:53
 #, python-format
-msgid "Invalid regular expresssion: %(error)s"
+msgid "Invalid regular expression: %(error)s"
 msgstr ""
 
 #: documents/serialisers.py:177
@@ -396,37 +404,41 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
-#: paperless/settings.py:297
-msgid "English (US)"
-msgstr ""
-
 #: paperless/settings.py:298
-msgid "English (GB)"
-msgstr ""
+msgid "English (US)"
+msgstr "Inglês (EUA)"
 
 #: paperless/settings.py:299
-msgid "German"
-msgstr ""
+msgid "English (GB)"
+msgstr "English (GB)"
 
 #: paperless/settings.py:300
-msgid "Dutch"
-msgstr ""
+msgid "German"
+msgstr "Deutsch"
 
 #: paperless/settings.py:301
-msgid "French"
-msgstr ""
+msgid "Dutch"
+msgstr "Nederlandse"
 
 #: paperless/settings.py:302
+msgid "French"
+msgstr "Français"
+
+#: paperless/settings.py:303
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:303
+#: paperless/settings.py:304
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:304
+#: paperless/settings.py:305
 msgid "Romanian"
 msgstr ""
+
+#: paperless/settings.py:306
+msgid "Russian"
+msgstr "Russo"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
@@ -442,7 +454,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:37
 msgid "Actions"
-msgstr ""
+msgstr "Ações"
 
 #: paperless_mail/admin.py:39
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
@@ -450,7 +462,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:46
 msgid "Metadata"
-msgstr ""
+msgstr "Metadados"
 
 #: paperless_mail/admin.py:48
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -534,7 +546,7 @@ msgstr ""
 
 #: paperless_mail/models.py:81
 msgid "Delete"
-msgstr ""
+msgstr "Excluir"
 
 #: paperless_mail/models.py:88
 msgid "Use subject as title"

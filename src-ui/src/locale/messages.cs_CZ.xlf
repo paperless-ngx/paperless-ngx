@@ -56,7 +56,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">Dokumenty</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -256,7 +256,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Delete</target>
+        <target state="translated">Odstranit</target>
       </trans-unit>
       <trans-unit id="dc75033a5238fdc4f462212c847a45ba8018a3fd" datatype="html">
         <source>Download</source>
@@ -304,7 +304,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Metadata</target>
+        <target state="translated">Metadata</target>
       </trans-unit>
       <trans-unit id="3f5a652a1f473f4e243e3c6805ef1b383e270bb7" datatype="html">
         <source>Discard</source>
@@ -544,7 +544,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Actions</target>
+        <target state="translated">Akce</target>
       </trans-unit>
       <trans-unit id="9d51b3c90afda70700229d1b8a55371c13cb3bce" datatype="html">
         <source>Documents</source>
@@ -552,7 +552,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Documents</target>
+        <target state="translated">Dokumenty</target>
       </trans-unit>
       <trans-unit id="28f86ffd419b869711aa13f5e5ff54be6d70731c" datatype="html">
         <source>Edit</source>
@@ -1058,19 +1058,19 @@
         </context-group>
         <target state="needs-translation">Invalid search query: <x id="INTERPOLATION" equiv-text="{{errorMessage}}"/></target>
       </trans-unit>
-      <trans-unit id="2abff6a01d9b342a5a14b7fb90309a95ce934f8e" datatype="html">
-        <source> Showing documents similar to <x id="START_LINK" equiv-text="&lt;a routerLink=&quot;/documents/{{more_like}}&quot;&gt;{{more_like_doc?.original_file_name}}"/><x id="INTERPOLATION" equiv-text="{{more_like_doc?.original_file_name}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/></source>
+      <trans-unit id="f7f2e30106223a69bcf0f8e586e6be9dc4e72226" datatype="html">
+        <source>Showing documents similar to <x id="START_LINK" equiv-text="&lt;a routerLink=&quot;/documents/{{more_like}}&quot;&gt;{{more_like_doc?.original_file_name}}"/><x id="INTERPOLATION" equiv-text="{{more_like_doc?.original_file_name}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">7</context>
+          <context context-type="linenumber">6</context>
         </context-group>
-        <target state="needs-translation"> Showing documents similar to <x id="START_LINK" equiv-text="&lt;a routerLink=&quot;/documents/{{more_like}}&quot;&gt;{{more_like_doc?.original_file_name}}"/><x id="INTERPOLATION" equiv-text="{{more_like_doc?.original_file_name}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/></target>
+        <target state="needs-translation">Showing documents similar to <x id="START_LINK" equiv-text="&lt;a routerLink=&quot;/documents/{{more_like}}&quot;&gt;{{more_like_doc?.original_file_name}}"/><x id="INTERPOLATION" equiv-text="{{more_like_doc?.original_file_name}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="6e0b0a1ea16f18f2fb1586c53d99d2f22e1aee2e" datatype="html">
         <source>Search query: <x id="START_ITALIC_TEXT" equiv-text="&lt;i&gt;{{query}}"/><x id="INTERPOLATION" equiv-text="{{query}}&lt;/i&gt;"/><x id="CLOSE_ITALIC_TEXT" equiv-text="&lt;/i&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <target state="needs-translation">Search query: <x id="START_ITALIC_TEXT" equiv-text="&lt;i&gt;{{query}}"/><x id="INTERPOLATION" equiv-text="{{query}}&lt;/i&gt;"/><x id="CLOSE_ITALIC_TEXT" equiv-text="&lt;/i&gt;"/></target>
       </trans-unit>
@@ -1078,7 +1078,7 @@
         <source>Did you mean &quot;<x id="START_LINK" equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}"/><x id="INTERPOLATION" equiv-text="{{correctedQuery}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">13</context>
+          <context context-type="linenumber">11</context>
         </context-group>
         <target state="needs-translation">Did you mean "<x id="START_LINK" equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}"/><x id="INTERPOLATION" equiv-text="{{correctedQuery}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/>"?</target>
       </trans-unit>
@@ -1086,7 +1086,7 @@
         <source>{VAR_PLURAL, plural, =0 {No results} =1 {One result} other {<x id="INTERPOLATION"/> results}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <target state="needs-translation">{VAR_PLURAL, plural, =0 {No results} =1 {One result} other {<x id="INTERPOLATION"/> results}}</target>
       </trans-unit>
@@ -1191,7 +1191,7 @@
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">77</context>
         </context-group>
         <target state="needs-translation">Title</target>
       </trans-unit>
@@ -1199,15 +1199,23 @@
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <target state="needs-translation">Title &amp; content</target>
+      </trans-unit>
+      <trans-unit id="7517688192215738656" datatype="html">
+        <source>ASN</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+        <target state="needs-translation">ASN</target>
       </trans-unit>
       <trans-unit id="5195932016807797291" datatype="html">
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">33</context>
         </context-group>
         <target state="needs-translation">Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></target>
       </trans-unit>
@@ -1215,7 +1223,7 @@
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target state="needs-translation">Without correspondent</target>
       </trans-unit>
@@ -1223,7 +1231,7 @@
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <target state="needs-translation">Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></target>
       </trans-unit>
@@ -1231,7 +1239,7 @@
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="needs-translation">Without document type</target>
       </trans-unit>
@@ -1239,7 +1247,7 @@
         <source>Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
@@ -1247,7 +1255,7 @@
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">50</context>
         </context-group>
         <target state="needs-translation">Without any tag</target>
       </trans-unit>
@@ -1255,9 +1263,17 @@
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <target state="needs-translation">Title: <x id="PH" equiv-text="rule.value"/></target>
+      </trans-unit>
+      <trans-unit id="1872523635812236432" datatype="html">
+        <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <target state="needs-translation">ASN: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="02d184c288f567825a1fcbf83bcd3099a10853d5" datatype="html">
         <source>Filter tags</source>
@@ -1831,7 +1847,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Metadata</target>
+        <target state="translated">Metadata</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html">
         <source>Select</source>
@@ -1903,7 +1919,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">German</target>
+        <target state="translated">Němčina</target>
       </trans-unit>
       <trans-unit id="3071065188816255493" datatype="html">
         <source>Dutch</source>
@@ -1911,7 +1927,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">Dutch</target>
+        <target state="translated">Holandština</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html">
         <source>French</source>
@@ -1919,7 +1935,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">French</target>
+        <target state="translated">Francouzština</target>
       </trans-unit>
       <trans-unit id="9184513005098760425" datatype="html">
         <source>Portuguese (Brazil)</source>
@@ -1945,11 +1961,19 @@
         </context-group>
         <target state="needs-translation">Romanian</target>
       </trans-unit>
+      <trans-unit id="7137419789978325708" datatype="html">
+        <source>Russian</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <target state="needs-translation">Russian</target>
+      </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <target state="needs-translation">ISO 8601</target>
       </trans-unit>
@@ -2077,14 +2101,6 @@
         </context-group>
         <target state="needs-translation">Information</target>
       </trans-unit>
-      <trans-unit id="7517688192215738656" datatype="html">
-        <source>ASN</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-        <target state="needs-translation">ASN</target>
-      </trans-unit>
       <trans-unit id="2691296884221415710" datatype="html">
         <source>Correspondent</source>
         <context-group purpose="location">
@@ -2155,7 +2171,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Automatic</target>
+        <target state="translated">Automatický</target>
       </trans-unit>
       <trans-unit id="5044611416737085530" datatype="html">
         <source>Do you really want to delete this element?</source>
@@ -2179,7 +2195,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="needs-translation">Delete</target>
+        <target state="translated">Odstranit</target>
       </trans-unit>
       <trans-unit id="5467489005440577210" datatype="html">
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -2195,7 +2211,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Any word</target>
+        <target state="translated">Jakékoliv slovo</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -2211,7 +2227,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">All words</target>
+        <target state="translated">Všechna slova</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -2227,7 +2243,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Exact match</target>
+        <target state="translated">Přesná shoda</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
@@ -2243,7 +2259,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Regular expression</target>
+        <target state="translated">Regulární výraz</target>
       </trans-unit>
       <trans-unit id="7548151332424148033" datatype="html">
         <source>Regular expression: Document matches this regular expression</source>
@@ -2259,7 +2275,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Fuzzy word</target>
+        <target state="translated">Fuzzy slovo</target>
       </trans-unit>
       <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
