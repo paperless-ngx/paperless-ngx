@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-07 21:34+0100\n"
-"PO-Revision-Date: 2021-03-07 20:36\n"
+"PO-Revision-Date: 2021-03-08 23:34\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -48,15 +48,15 @@ msgstr "Automático"
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:109
 msgid "name"
-msgstr ""
+msgstr "nome"
 
 #: documents/models.py:45
 msgid "match"
-msgstr ""
+msgstr "correspondência"
 
 #: documents/models.py:49
 msgid "matching algorithm"
-msgstr ""
+msgstr "algoritmo correspondente"
 
 #: documents/models.py:55
 msgid "is insensitive"
@@ -64,19 +64,19 @@ msgstr ""
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr ""
+msgstr "correspondente"
 
 #: documents/models.py:75
 msgid "correspondents"
-msgstr ""
+msgstr "correspondentes"
 
 #: documents/models.py:81
 msgid "color"
-msgstr ""
+msgstr "cor"
 
 #: documents/models.py:87
 msgid "is inbox tag"
-msgstr ""
+msgstr "é etiqueta de novo"
 
 #: documents/models.py:89
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
@@ -84,35 +84,35 @@ msgstr ""
 
 #: documents/models.py:94
 msgid "tag"
-msgstr ""
+msgstr "etiqueta"
 
 #: documents/models.py:95 documents/models.py:151
 msgid "tags"
-msgstr ""
+msgstr "etiquetas"
 
 #: documents/models.py:101 documents/models.py:133
 msgid "document type"
-msgstr ""
+msgstr "tipo de documento"
 
 #: documents/models.py:102
 msgid "document types"
-msgstr ""
+msgstr "tipos de documento"
 
 #: documents/models.py:110
 msgid "Unencrypted"
-msgstr ""
+msgstr "Não encriptado"
 
 #: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Encriptado com GNU Privacy Guard"
 
 #: documents/models.py:124
 msgid "title"
-msgstr ""
+msgstr "título"
 
 #: documents/models.py:137
 msgid "content"
-msgstr ""
+msgstr "conteúdo"
 
 #: documents/models.py:139
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
@@ -140,23 +140,23 @@ msgstr ""
 
 #: documents/models.py:172 documents/models.py:328
 msgid "created"
-msgstr ""
+msgstr "criado"
 
 #: documents/models.py:176
 msgid "modified"
-msgstr ""
+msgstr "modificado"
 
 #: documents/models.py:180
 msgid "storage type"
-msgstr ""
+msgstr "tipo de armazenamento"
 
 #: documents/models.py:188
 msgid "added"
-msgstr ""
+msgstr "adicionado"
 
 #: documents/models.py:192
 msgid "filename"
-msgstr ""
+msgstr "nome de ficheiro"
 
 #: documents/models.py:198
 msgid "Current filename in storage"
@@ -180,51 +180,51 @@ msgstr ""
 
 #: documents/models.py:223
 msgid "document"
-msgstr ""
+msgstr "documento"
 
 #: documents/models.py:224
 msgid "documents"
-msgstr ""
+msgstr "documentos"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "depurar"
 
 #: documents/models.py:312
 msgid "information"
-msgstr ""
+msgstr "informação"
 
 #: documents/models.py:313
 msgid "warning"
-msgstr ""
+msgstr "aviso"
 
 #: documents/models.py:314
 msgid "error"
-msgstr ""
+msgstr "erro"
 
 #: documents/models.py:315
 msgid "critical"
-msgstr ""
+msgstr "crítico"
 
 #: documents/models.py:319
 msgid "group"
-msgstr ""
+msgstr "grupo"
 
 #: documents/models.py:322
 msgid "message"
-msgstr ""
+msgstr "mensagem"
 
 #: documents/models.py:325
 msgid "level"
-msgstr ""
+msgstr "nível"
 
 #: documents/models.py:332
 msgid "log"
-msgstr ""
+msgstr "registo"
 
 #: documents/models.py:333
 msgid "logs"
-msgstr ""
+msgstr "registos"
 
 #: documents/models.py:344 documents/models.py:396
 msgid "saved view"
@@ -236,11 +236,11 @@ msgstr ""
 
 #: documents/models.py:348
 msgid "user"
-msgstr ""
+msgstr "utilizador"
 
 #: documents/models.py:354
 msgid "show on dashboard"
-msgstr ""
+msgstr "exibir no painel de controlo"
 
 #: documents/models.py:357
 msgid "show in sidebar"
@@ -438,7 +438,7 @@ msgstr ""
 
 #: paperless/settings.py:306
 msgid "Russian"
-msgstr ""
+msgstr "Russo"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"

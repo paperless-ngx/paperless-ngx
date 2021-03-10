@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-07 21:34+0100\n"
-"PO-Revision-Date: 2021-03-07 21:35\n"
+"PO-Revision-Date: 2021-03-08 20:02\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -332,7 +332,7 @@ msgstr ""
 
 #: documents/models.py:389
 msgid "title or content contains"
-msgstr ""
+msgstr "título ou conteúdo contém"
 
 #: documents/models.py:400
 msgid "rule type"
