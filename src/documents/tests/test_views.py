@@ -15,7 +15,7 @@ class TestViews(TestCase):
 
     def test_index(self):
         self.client.force_login(self.user)
-        for (language_given, language_actual) in [("", "en-US"), ("en-US", "en-US"), ("de", "de"), ("en", "en-US"), ("en-us", "en-US"), ("fr", "fr"), ("jp", "en-US")]:
+        for (language_given, language_actual) in [("", "en-US"), ("en-US", "en-US"), ("de", "de-DE"), ("en", "en-US"), ("en-us", "en-US"), ("fr", "fr-FR"), ("jp", "en-US")]:
             if language_given:
                 self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: language_given})
             elif settings.LANGUAGE_COOKIE_NAME in self.client.cookies.keys():

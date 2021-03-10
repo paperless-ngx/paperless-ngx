@@ -4,8 +4,8 @@ import { SettingsService, SETTINGS_KEYS } from '../services/settings.service';
 
 const FORMAT_TO_ISO_FORMAT = {
   "longDate": "y-MM-dd",
-  "mediumDate": "yy-MM-dd",
-  "shortDate": "yy-MM-dd"
+  "mediumDate": "y-MM-dd",
+  "shortDate": "y-MM-dd"
 }
 
 @Pipe({
