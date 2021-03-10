@@ -22,6 +22,7 @@ export class SettingsComponent implements OnInit {
     'darkModeUseSystem': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)),
     'darkModeEnabled': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED)),
     'darkModeInvertThumbs': new FormControl(this.settings.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)),
+    'useNativePdfViewer': new FormControl(this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)),
     'savedViews': this.savedViewGroup,
     'displayLanguage': new FormControl(this.settings.getLanguage()),
     'dateLocale': new FormControl(this.settings.get(SETTINGS_KEYS.DATE_LOCALE)),
@@ -75,6 +76,7 @@ export class SettingsComponent implements OnInit {
     this.settings.set(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
     this.settings.set(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED, (this.settingsForm.value.darkModeInvertThumbs == true).toString())
+    this.settings.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, this.settingsForm.value.useNativePdfViewer)
     this.settings.set(SETTINGS_KEYS.DATE_LOCALE, this.settingsForm.value.dateLocale)
     this.settings.set(SETTINGS_KEYS.DATE_FORMAT, this.settingsForm.value.dateFormat)
     this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT, this.settingsForm.value.notificationsConsumerNewDocument)
