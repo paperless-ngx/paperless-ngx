@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-07 21:34+0100\n"
-"PO-Revision-Date: 2021-03-08 08:06\n"
+"PO-Revision-Date: 2021-03-08 21:07\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -328,11 +328,11 @@ msgstr "ne porte pas d'étiquette"
 
 #: documents/models.py:388
 msgid "does not have ASN"
-msgstr ""
+msgstr "ne porte pas de NSA"
 
 #: documents/models.py:389
 msgid "title or content contains"
-msgstr ""
+msgstr "le titre ou le contenu contient"
 
 #: documents/models.py:400
 msgid "rule type"
@@ -438,7 +438,7 @@ msgstr "Roumain"
 
 #: paperless/settings.py:306
 msgid "Russian"
-msgstr ""
+msgstr "Russe"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
