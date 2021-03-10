@@ -5,6 +5,20 @@
 Changelog
 *********
 
+paperless-ng 1.3.1
+##################
+
+* Added Russian locale.
+
+* ISO-8601 date format will now always show years with 4 digits.
+
+* Fixed an issue with the search results score indicator.
+
+* Added the ability to search for a document with a specific ASN.
+
+* The startup check for write permissions now works properly on NFS shares.
+
+
 paperless-ng 1.3.0
 ##################
 
