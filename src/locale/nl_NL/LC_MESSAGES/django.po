@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 21:40\n"
+"POT-Creation-Date: 2021-03-07 21:34+0100\n"
+"PO-Revision-Date: 2021-03-08 06:44\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -64,7 +64,7 @@ msgstr "is niet hoofdlettergevoelig"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr ""
+msgstr "correspondent"
 
 #: documents/models.py:75
 msgid "correspondents"
@@ -124,7 +124,7 @@ msgstr "mimetype"
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
@@ -180,7 +180,7 @@ msgstr "De positie van dit document in je fysieke documentenarchief."
 
 #: documents/models.py:223
 msgid "document"
-msgstr ""
+msgstr "document"
 
 #: documents/models.py:224
 msgid "documents"
@@ -188,7 +188,7 @@ msgstr "documenten"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:312
 msgid "information"
@@ -226,7 +226,7 @@ msgstr "bericht"
 msgid "logs"
 msgstr "berichten"
 
-#: documents/models.py:344 documents/models.py:394
+#: documents/models.py:344 documents/models.py:396
 msgid "saved view"
 msgstr "opgeslagen view"
 
@@ -264,11 +264,11 @@ msgstr "inhoud bevat"
 
 #: documents/models.py:372
 msgid "ASN is"
-msgstr ""
+msgstr "ASN is"
 
 #: documents/models.py:373
 msgid "correspondent is"
-msgstr ""
+msgstr "correspondent is"
 
 #: documents/models.py:374
 msgid "document type is"
@@ -326,25 +326,33 @@ msgstr "gewijzigd na"
 msgid "does not have tag"
 msgstr "heeft geen etiket"
 
-#: documents/models.py:398
+#: documents/models.py:388
+msgid "does not have ASN"
+msgstr "heeft geen ASN"
+
+#: documents/models.py:389
+msgid "title or content contains"
+msgstr "titel of inhoud bevat"
+
+#: documents/models.py:400
 msgid "rule type"
 msgstr "type regel"
 
-#: documents/models.py:402
+#: documents/models.py:404
 msgid "value"
 msgstr "waarde"
 
-#: documents/models.py:408
+#: documents/models.py:410
 msgid "filter rule"
 msgstr "filterregel"
 
-#: documents/models.py:409
+#: documents/models.py:411
 msgid "filter rules"
 msgstr "filterregels"
 
 #: documents/serialisers.py:53
 #, python-format
-msgid "Invalid regular expresssion: %(error)s"
+msgid "Invalid regular expression: %(error)s"
 msgstr "Ongeldige reguliere expressie: %(error)s"
 
 #: documents/serialisers.py:177
@@ -396,37 +404,41 @@ msgstr "Wachtwoord"
 msgid "Sign in"
 msgstr "Aanmelden"
 
-#: paperless/settings.py:297
+#: paperless/settings.py:298
 msgid "English (US)"
 msgstr "Engels (US)"
 
-#: paperless/settings.py:298
+#: paperless/settings.py:299
 msgid "English (GB)"
 msgstr "Engels (Brits)"
 
-#: paperless/settings.py:299
+#: paperless/settings.py:300
 msgid "German"
 msgstr "Duits"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:301
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:302
 msgid "French"
 msgstr "Frans"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:303
 msgid "Portuguese (Brazil)"
 msgstr "Portugees (Brazilië)"
 
-#: paperless/settings.py:303
+#: paperless/settings.py:304
 msgid "Italian"
 msgstr "Italiaans"
 
-#: paperless/settings.py:304
+#: paperless/settings.py:305
 msgid "Romanian"
 msgstr "Roemeens"
+
+#: paperless/settings.py:306
+msgid "Russian"
+msgstr "Russisch"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
@@ -434,7 +446,7 @@ msgstr "Paperless-ng administratie"
 
 #: paperless_mail/admin.py:25
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:27
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -450,7 +462,7 @@ msgstr "De actie die wordt toegepast op de mail. Deze actie wordt alleen uitgevo
 
 #: paperless_mail/admin.py:46
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:48
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -566,7 +578,7 @@ msgstr "volgorde"
 
 #: paperless_mail/models.py:120
 msgid "account"
-msgstr ""
+msgstr "account"
 
 #: paperless_mail/models.py:124
 msgid "folder"

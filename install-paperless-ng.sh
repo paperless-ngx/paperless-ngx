@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 ask() {
 	while true ; do
 		if [[ -z $3 ]] ; then
@@ -63,6 +61,19 @@ if [[ -z $(which docker-compose) ]] ; then
 	echo "docker-compose executable not found. Is docker-compose installed?"
 	exit 1
 fi
+
+# Check if user has permissions to run Docker by trying to get the status of Docker (docker status). 
+# If this fails, the user probably does not have permissions for Docker.
+docker stats --no-stream 2>/dev/null 1>&2
+if [ $? -ne 0 ] ; then
+	echo ""
+	echo "WARN: It look like the current user does not have Docker permissions."
+	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user."
+	echo ""
+	sleep 3
+fi
+
+set -e
 
 echo ""
 echo "############################################"

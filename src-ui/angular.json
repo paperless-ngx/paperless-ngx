@@ -22,7 +22,8 @@
 					"en-GB": "src/locale/messages.en_GB.xlf",
 					"pt-BR": "src/locale/messages.pt_BR.xlf",
 					"it-IT": "src/locale/messages.it_IT.xlf",
-					"ro-RO": "src/locale/messages.ro_RO.xlf"
+					"ro-RO": "src/locale/messages.ro_RO.xlf",
+					"ru-RU": "src/locale/messages.ru_RU.xlf"
 				}
 			},
 			"architect": {
@@ -104,7 +105,8 @@
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
 					"options": {
-						"browserTarget": "paperless-ui:build"
+						"browserTarget": "paperless-ui:build",
+						"ivy": true
 					}
 				},
 				"test": {
