@@ -1,9 +1,13 @@
 @import "/src/theme";
 
+.card-text {
+  font-size: 90%;
+}
+
 .doc-img {
   object-fit: cover;
   object-position: top left;
-  height: 200px;
+  height: 190px;
   mix-blend-mode: multiply;
 }
 
@@ -33,4 +37,25 @@
 
 .doc-img-background-selected {
   background-color: $primaryFaded;
+}
+
+.card-metadata {
+  line-height: 1;
+
+  .btn {
+    line-height: 1;
+  }
+
+  .metadata-icon {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+}
+
+.card-footer .btn {
+  padding-top: .10rem;
+}
+
+::ng-deep .tooltip-inner {
+  text-align: left !important;
 }

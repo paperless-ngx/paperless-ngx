@@ -226,7 +226,7 @@ $border-color-dark-mode: #47494f;
   }
 
   .btn-outline-secondary {
-    border-color: $text-color-dark-mode;
+    border-color: darken($text-color-dark-mode, 30%);
     color: $text-color-dark-mode;
 
     &:not(:disabled):not(.disabled):hover {
