@@ -37,3 +37,21 @@
 .doc-img-background-selected {
   background-color: $primaryFaded;
 }
+
+.card-metadata {
+  line-height: 1;
+
+  button {
+    line-height: 1;
+
+    &:hover,
+    &:focus {
+      background-color: transparent !important;
+    }
+  }
+
+  .metadata-icon {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+}
