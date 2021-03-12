@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-07 21:34+0100\n"
-"PO-Revision-Date: 2021-03-07 21:35\n"
+"PO-Revision-Date: 2021-03-10 23:00\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -390,7 +390,7 @@ msgstr "Bitte melden Sie sich an."
 
 #: documents/templates/registration/login.html:45
 msgid "Your username and password didn't match. Please try again."
-msgstr "Ihr Benutzername und Passwort stimmen nicht überein. Bitte versuchen Sie es erneut."
+msgstr "Ihr Benutzername und Kennwort stimmen nicht überein. Bitte versuchen Sie es erneut."
 
 #: documents/templates/registration/login.html:48
 msgid "Username"
@@ -398,7 +398,7 @@ msgstr "Benutzername"
 
 #: documents/templates/registration/login.html:49
 msgid "Password"
-msgstr "Passwort"
+msgstr "Kennwort"
 
 #: documents/templates/registration/login.html:54
 msgid "Sign in"
@@ -514,7 +514,7 @@ msgstr "Benutzername"
 
 #: paperless_mail/models.py:50
 msgid "password"
-msgstr "Passwort"
+msgstr "Kennwort"
 
 #: paperless_mail/models.py:60
 msgid "mail rule"
