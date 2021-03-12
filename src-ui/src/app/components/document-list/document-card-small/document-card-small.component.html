@@ -29,8 +29,8 @@
       </p>
     </div>
     <div class="card-footer pt-0 pb-2 px-2">
-      <div class="list-group list-group-flush border-0 pt-0 pb-2 card-metadata">
-        <button *ngIf="document.document_type" type="button" class="list-group-item list-group-item-action text-left pl-0 p-1 border-0"
+      <div class="list-group list-group-flush border-0 pt-1 pb-2 card-metadata">
+        <button *ngIf="document.document_type" type="button" class="list-group-item list-group-item-action bg-light text-left pl-0 p-1 border-0"
           placement="left" ngbTooltip="Filter by document type"
          (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
           <svg class="metadata-icon mr-2 text-muted bi bi-file-earmark" viewBox="0 0 16 16" fill="currentColor">
@@ -38,13 +38,13 @@
           </svg>
           <small>{{(document.document_type$ | async)?.name}}</small>
         </button>
-        <button *ngIf="document.archive_serial_number" type="button" disabled="disabled" class="list-group-item list-group-item-action text-left pl-0 p-1 border-0">
+        <button *ngIf="document.archive_serial_number" type="button" disabled="disabled" class="list-group-item list-group-item-action bg-light text-left pl-0 p-1 border-0">
           <svg class="metadata-icon mr-2 text-muted bi bi-upc-scan" viewBox="0 0 16 16" fill="currentColor">
             <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5zM3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
           </svg>
           <small>#{{document.archive_serial_number}}</small>
         </button>
-        <button type="button" class="list-group-item list-group-item-action text-left pl-0 p-1 border-0" placement="left" ngbTooltip="Added:&nbsp;{{document.added | customDate:'shortDate'}} Created:&nbsp;{{document.created | customDate:'shortDate'}}">
+        <button type="button" class="list-group-item list-group-item-action bg-light text-left pl-0 p-1 border-0" placement="left" ngbTooltip="Added:&nbsp;{{document.added | customDate:'shortDate'}} Created:&nbsp;{{document.created | customDate:'shortDate'}}">
           <svg class="metadata-icon mr-2 text-muted bi bi-calendar-event" viewBox="0 0 16 16" fill="currentColor">
             <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
