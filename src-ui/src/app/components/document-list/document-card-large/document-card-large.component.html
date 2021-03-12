@@ -61,25 +61,25 @@
             </a>
           </div>
 
-          <div class="list-group list-group-horizontal border-0 card-info ml-md-auto mt-2 mt-md-0 text-light">
-            <li *ngIf="searchScore" class="list-group-item bg-light text-light p-1 mr-5 border-0 d-flex search-score">
+          <div class="list-group list-group-horizontal border-0 card-info ml-md-auto mt-2 mt-md-0">
+            <li *ngIf="searchScore" class="list-group-item bg-light text-dark p-1 mr-5 border-0 d-flex search-score">
               <small class="text-muted" i18n>Score:</small>
               <ngb-progressbar [type]="searchScoreClass" [value]="searchScore" class="search-score-bar mx-2 mt-1" [max]="1"></ngb-progressbar>
             </li>
-            <button *ngIf="document.document_type" type="button" class="list-group-item btn btn-sm bg-light text-light p-1 border-0 mr-2" title="Filter by document type"
+            <button *ngIf="document.document_type" type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 mr-2" title="Filter by document type"
              (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
               <svg class="metadata-icon mr-2 text-muted bi bi-file-earmark" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
               </svg>
               <small>{{(document.document_type$ | async)?.name}}</small>
             </button>
-            <li *ngIf="document.archive_serial_number" class="list-group-item mr-2 bg-light text-light p-1 border-0">
+            <li *ngIf="document.archive_serial_number" class="list-group-item mr-2 bg-light text-dark p-1 border-0">
               <svg class="metadata-icon mr-2 text-muted bi bi-upc-scan" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5zM3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
               </svg>
               <small>#{{document.archive_serial_number}}</small>
             </li>
-            <li class="list-group-item bg-light text-light p-1 border-0" placement="top" ngbTooltip="Added:&nbsp;{{document.added | customDate:'shortDate'}} Created:&nbsp;{{document.created | customDate:'shortDate'}}">
+            <li class="list-group-item bg-light text-dark p-1 border-0" placement="top" ngbTooltip="Added:&nbsp;{{document.added | customDate:'shortDate'}} Created:&nbsp;{{document.created | customDate:'shortDate'}}">
               <svg class="metadata-icon mr-2 text-muted bi bi-calendar-event" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
