@@ -90,7 +90,7 @@
 </div>
 
 <div *ngIf="displayMode == 'largeCards'">
-  <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
+  <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)">
   </app-document-card-large>
 </div>
 
