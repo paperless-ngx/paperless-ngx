@@ -29,7 +29,7 @@
       </p>
     </div>
     <div class="card-footer pt-0 pb-2 px-2">
-      <div class="list-group list-group-flush border-0 pt-1 pb-2 card-metadata">
+      <div class="list-group list-group-flush border-0 pt-1 pb-2 card-info">
         <button *ngIf="document.document_type" type="button" class="list-group-item list-group-item-action bg-light text-left pl-0 p-1 border-0"
           placement="left" ngbTooltip="Filter by document type"
          (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
