@@ -283,6 +283,10 @@ $border-color-dark-mode: #47494f;
     background-color: $bg-dark-mode !important;
   }
 
+  .card-footer button:hover {
+    color: $primary-dark-mode !important;
+  }
+
   .form-control:not(.is-invalid):not(.btn),
   input:not(.is-invalid),
   textarea:not(.is-invalid) {
