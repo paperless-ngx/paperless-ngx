@@ -76,6 +76,10 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .page-item.active .page-link {
+    background-color: darken($primary-dark-mode, 10%);
+  }
+
   .nav-tabs {
     border-color: $border-color-dark-mode;
 
