@@ -49,6 +49,19 @@ wait_for_postgres() {
 
 }
 
+superuser() {
+
+    if [[ -n "${PAPERLESS_DBHOST}" ]]
+    then
+        wait_for_postgres
+    fi
+
+    if [[ ! -z "${PAPERLESS_ADMIN_PASSWORD}" ]]
+	then
+		sudo -HEu paperless python3 manage.py manage_superuser
+	fi
+
+}
 
 migrations() {
 
@@ -86,6 +99,7 @@ initialize() {
 	chown -R paperless:paperless /tmp/paperless
 
 	migrations
+    superuser
 
 }
 
