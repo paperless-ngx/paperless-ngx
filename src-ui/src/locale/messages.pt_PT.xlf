@@ -1384,7 +1384,7 @@
         <source>View</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">52</context>
         </context-group>
         <target state="translated">Ver</target>
       </trans-unit>
@@ -1392,7 +1392,7 @@
         <source>Created: <x id="INTERPOLATION" equiv-text="{{document.created | customDate}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <target state="translated">Criado: <x id="INTERPOLATION" equiv-text="{{document.created | customDate}}"/></target>
       </trans-unit>
@@ -1416,17 +1416,9 @@
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">66</context>
         </context-group>
         <target state="translated">Pontuação:</target>
-      </trans-unit>
-      <trans-unit id="2840db547019ce8c76b2cdbe3a1653c5b68b06af" datatype="html">
-        <source>View in browser</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">40</context>
-        </context-group>
-        <target state="translated">Ver no navegador</target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -1969,11 +1961,19 @@
         </context-group>
         <target state="translated">Russo</target>
       </trans-unit>
+      <trans-unit id="5190825892106392539" datatype="html">
+        <source>Spanish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <target state="needs-translation">Spanish</target>
+      </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target state="translated">ISO 8601</target>
       </trans-unit>
