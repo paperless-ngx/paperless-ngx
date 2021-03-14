@@ -76,6 +76,10 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .page-item.active .page-link {
+    background-color: darken($primary-dark-mode, 10%);
+  }
+
   .nav-tabs {
     border-color: $border-color-dark-mode;
 
@@ -226,7 +230,7 @@ $border-color-dark-mode: #47494f;
   }
 
   .btn-outline-secondary {
-    border-color: $text-color-dark-mode;
+    border-color: darken($text-color-dark-mode, 30%);
     color: $text-color-dark-mode;
 
     &:not(:disabled):not(.disabled):hover {
@@ -277,6 +281,10 @@ $border-color-dark-mode: #47494f;
 
   button.bg-light:hover {
     background-color: $bg-dark-mode !important;
+  }
+
+  .card-footer button:hover {
+    color: $primary-dark-mode !important;
   }
 
   .form-control:not(.is-invalid):not(.btn),
