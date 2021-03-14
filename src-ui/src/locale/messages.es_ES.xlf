@@ -1749,7 +1749,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Arrastra aquí los doumentos o</target>
+        <target state="translated">Arrastra aquí los documentos o</target>
       </trans-unit>
       <trans-unit id="865c511f4a24558ed0e954f9bbbff557bbb8954d" datatype="html">
         <source>Browse files</source>

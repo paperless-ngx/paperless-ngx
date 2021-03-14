@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-07 21:34+0100\n"
-"PO-Revision-Date: 2021-03-13 19:05\n"
+"PO-Revision-Date: 2021-03-14 01:49\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -366,7 +366,7 @@ msgstr "Tipo de fichero %(type)s no suportado"
 
 #: documents/templates/index.html:21
 msgid "Paperless-ng is loading..."
-msgstr "Paperless-ng está cargándose…"
+msgstr "Paperless-ng está cargándose..."
 
 #: documents/templates/registration/logged_out.html:13
 msgid "Paperless-ng signed out"
