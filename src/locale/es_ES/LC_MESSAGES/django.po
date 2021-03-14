@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-07 21:34+0100\n"
-"PO-Revision-Date: 2021-03-09 23:16\n"
+"PO-Revision-Date: 2021-03-14 01:49\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -64,11 +64,11 @@ msgstr "es insensible"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr ""
+msgstr "Tipo de documento"
 
 #: documents/models.py:75
 msgid "correspondents"
-msgstr ""
+msgstr "Tipos de documento"
 
 #: documents/models.py:81
 msgid "color"
@@ -76,11 +76,11 @@ msgstr "color"
 
 #: documents/models.py:87
 msgid "is inbox tag"
-msgstr ""
+msgstr "es etiqueta de bandeja"
 
 #: documents/models.py:89
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Marca esta etiqueta como una etiqueta de bandeja: todos los documentos recién consumidos serán etiquetados con las etiquetas de bandeja."
 
 #: documents/models.py:94
 msgid "tag"
@@ -116,7 +116,7 @@ msgstr "contenido"
 
 #: documents/models.py:139
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Los datos de texto en bruto del documento. Este campo se utiliza principalmente para las búsquedas."
 
 #: documents/models.py:144
 msgid "mime type"
@@ -124,19 +124,19 @@ msgstr "tipo MIME"
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr ""
+msgstr "Cadena de verificación"
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "La cadena de verificación del documento original."
 
 #: documents/models.py:163
 msgid "archive checksum"
-msgstr ""
+msgstr "cadena de comprobación del archivo"
 
 #: documents/models.py:168
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "La cadena de verificación del documento archivado."
 
 #: documents/models.py:172 documents/models.py:328
 msgid "created"
@@ -156,11 +156,11 @@ msgstr "añadido"
 
 #: documents/models.py:192
 msgid "filename"
-msgstr ""
+msgstr "nombre del archivo"
 
 #: documents/models.py:198
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Nombre de archivo actual en disco"
 
 #: documents/models.py:202
 msgid "archive filename"
@@ -168,11 +168,11 @@ msgstr "nombre de archivo"
 
 #: documents/models.py:208
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Nombre de archivo actual en disco"
 
 #: documents/models.py:212
 msgid "archive serial number"
-msgstr ""
+msgstr "número de serie del archivo"
 
 #: documents/models.py:217
 msgid "The position of this document in your physical document archive."
@@ -240,7 +240,7 @@ msgstr "usuario"
 
 #: documents/models.py:354
 msgid "show on dashboard"
-msgstr ""
+msgstr "mostrar en el panel de control"
 
 #: documents/models.py:357
 msgid "show in sidebar"
@@ -264,11 +264,11 @@ msgstr "el contenido contiene"
 
 #: documents/models.py:372
 msgid "ASN is"
-msgstr ""
+msgstr "ASN es"
 
 #: documents/models.py:373
 msgid "correspondent is"
-msgstr ""
+msgstr "tipo de documento es"
 
 #: documents/models.py:374
 msgid "document type is"
@@ -276,7 +276,7 @@ msgstr "el tipo de documento es"
 
 #: documents/models.py:375
 msgid "is in inbox"
-msgstr ""
+msgstr "está en la bandeja de entrada"
 
 #: documents/models.py:376
 msgid "has tag"
@@ -328,11 +328,11 @@ msgstr "no tiene la etiqueta"
 
 #: documents/models.py:388
 msgid "does not have ASN"
-msgstr ""
+msgstr "no tiene ASN"
 
 #: documents/models.py:389
 msgid "title or content contains"
-msgstr ""
+msgstr "el título o cuerpo contiene"
 
 #: documents/models.py:400
 msgid "rule type"
@@ -366,7 +366,7 @@ msgstr "Tipo de fichero %(type)s no suportado"
 
 #: documents/templates/index.html:21
 msgid "Paperless-ng is loading..."
-msgstr "Paperless-ng está cargándose…"
+msgstr "Paperless-ng está cargándose..."
 
 #: documents/templates/registration/logged_out.html:13
 msgid "Paperless-ng signed out"
@@ -466,11 +466,11 @@ msgstr "Metadatos"
 
 #: paperless_mail/admin.py:48
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Asignar metadatos a documentos consumidos por esta regla automáticamente. Si no asigna etiquetas, o ipos aquí, paperless procesará igualmente todas las reglas que haya definido."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Correo Paperless"
 
 #: paperless_mail/models.py:11
 msgid "mail account"
@@ -558,7 +558,7 @@ msgstr "Usar nombre del fichero adjunto como título"
 
 #: paperless_mail/models.py:99
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "No asignar un tipo de documento"
 
 #: paperless_mail/models.py:101
 msgid "Use mail address"
@@ -570,7 +570,7 @@ msgstr "Usar nombre (o dirección de correo si no está disponible)"
 
 #: paperless_mail/models.py:105
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Usar el tipo seleccionado debajo"
 
 #: paperless_mail/models.py:113
 msgid "order"
@@ -586,7 +586,7 @@ msgstr "carpeta"
 
 #: paperless_mail/models.py:128
 msgid "filter from"
-msgstr ""
+msgstr "filtrar desde"
 
 #: paperless_mail/models.py:131
 msgid "filter subject"
@@ -602,7 +602,7 @@ msgstr "filtrar nombre del fichero adjunto"
 
 #: paperless_mail/models.py:140
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Sólo consumirá documentos que coincidan completamente con este nombre de archivo si se especifica. Se permiten comodines como *.pdf o *factura*. No diferencia mayúsculas."
 
 #: paperless_mail/models.py:146
 msgid "maximum age"
@@ -646,9 +646,9 @@ msgstr "asignar este tipo de documento"
 
 #: paperless_mail/models.py:195
 msgid "assign correspondent from"
-msgstr ""
+msgstr "Asignar tipo de documento desde"
 
 #: paperless_mail/models.py:205
 msgid "assign this correspondent"
-msgstr ""
+msgstr "asignar este tipo de documento"
 
