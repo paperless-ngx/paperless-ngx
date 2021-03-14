@@ -39,6 +39,9 @@ export class DocumentCardLargeComponent implements OnInit {
   @Output()
   clickCorrespondent = new EventEmitter<number>()
 
+  @Output()
+  clickDocumentType = new EventEmitter<number>()
+
   @Input()
   searchScore: number
 
