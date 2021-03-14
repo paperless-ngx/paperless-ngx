@@ -1384,7 +1384,7 @@
         <source>View</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">52</context>
         </context-group>
         <target>crwdns3178:0crwdne3178:0</target>
       </trans-unit>
@@ -1392,7 +1392,7 @@
         <source>Created: <x id="INTERPOLATION" equiv-text="{{document.created | customDate}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">71</context>
         </context-group>
         <target>crwdns3180:0{{document.created | customDate}}crwdne3180:0</target>
       </trans-unit>
@@ -1416,17 +1416,9 @@
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">66</context>
         </context-group>
         <target>crwdns3186:0crwdne3186:0</target>
-      </trans-unit>
-      <trans-unit id="2840db547019ce8c76b2cdbe3a1653c5b68b06af" datatype="html">
-        <source>View in browser</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
-          <context context-type="linenumber">40</context>
-        </context-group>
-        <target>crwdns3188:0crwdne3188:0</target>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -1969,11 +1961,19 @@
         </context-group>
         <target>crwdns3404:0crwdne3404:0</target>
       </trans-unit>
+      <trans-unit id="5190825892106392539" datatype="html">
+        <source>Spanish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <target>crwdns3418:0crwdne3418:0</target>
+      </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">105</context>
         </context-group>
         <target>crwdns3322:0crwdne3322:0</target>
       </trans-unit>
