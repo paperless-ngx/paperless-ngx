@@ -81,8 +81,8 @@ class TestParser(DirectoriesMixin, TestCase):
 
     def test_thumbnail(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
-        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
-        # dont really know how to test it, just call it and assert that it does not raise anything.
+        thumb = parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
+        self.assertTrue(os.path.isfile(thumb))
 
     @mock.patch("documents.parsers.run_convert")
     def test_thumbnail_fallback(self, m):
@@ -96,8 +96,13 @@ class TestParser(DirectoriesMixin, TestCase):
         m.side_effect = call_convert
 
         parser = RasterisedDocumentParser(uuid.uuid4())
-        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
-        # dont really know how to test it, just call it and assert that it does not raise anything.
+        thumb = parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
+        self.assertTrue(os.path.isfile(thumb))
+
+    def test_thumbnail_encrypted(self):
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        thumb = parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'encrypted.pdf'), "application/pdf")
+        self.assertTrue(os.path.isfile(thumb))
 
     def test_get_dpi(self):
         parser = RasterisedDocumentParser(None)
@@ -136,13 +141,23 @@ class TestParser(DirectoriesMixin, TestCase):
         self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
 
     @override_settings(OCR_MODE="skip")
+    def test_signed(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "signed.pdf"), "application/pdf")
+
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(parser.get_text(), ["This is a digitally signed PDF, created with Acrobat Pro for the Paperless project to enable", "automated testing of signed/encrypted PDFs"])
+
+    @override_settings(OCR_MODE="skip")
     def test_encrypted(self):
         parser = RasterisedDocumentParser(None)
 
         parser.parse(os.path.join(self.SAMPLE_FILES, "encrypted.pdf"), "application/pdf")
 
         self.assertIsNone(parser.archive_path)
-        self.assertContainsStrings(parser.get_text(), ["This is a digitally signed PDF, created with Acrobat Pro for the Paperless project to enable", "automated testing of signed/encrypted PDFs"])
+        self.assertEqual(parser.get_text(), "")
+
 
     @override_settings(OCR_MODE="redo")
     def test_with_form_error_notext(self):
