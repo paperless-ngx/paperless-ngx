@@ -303,7 +303,8 @@ LANGUAGES = [
     ("pt-br", _("Portuguese (Brazil)")),
     ("it-it", _("Italian")),
     ("ro-ro", _("Romanian")),
-    ("ru-ru", _("Russian"))
+    ("ru-ru", _("Russian")),
+    ("es-es", _("Spanish"))
 ]
 
 LOCALE_PATHS = [
