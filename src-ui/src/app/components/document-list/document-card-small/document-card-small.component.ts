@@ -29,6 +29,9 @@ export class DocumentCardSmallComponent implements OnInit {
   @Output()
   clickCorrespondent = new EventEmitter<number>()
 
+  @Output()
+  clickDocumentType = new EventEmitter<number>()
+
   moreTags: number = null
 
   @ViewChild('popover') popover: NgbPopover
