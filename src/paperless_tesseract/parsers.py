@@ -291,6 +291,7 @@ class RasterisedDocumentParser(DocumentParser):
                     f"No text was found in {document_path}, the content will "
                     f"be empty."
                 )
+                self.text = ""
 
 
 def strip_excess_whitespace(text):
