@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-14 13:33+0100\n"
-"PO-Revision-Date: 2021-03-14 13:57\n"
+"PO-Revision-Date: 2021-03-14 14:58\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -60,7 +60,7 @@ msgstr "algoritmo correspondente"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "é insensível"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
@@ -442,7 +442,7 @@ msgstr "Russo"
 
 #: paperless/settings.py:307
 msgid "Spanish"
-msgstr ""
+msgstr "Espanhol"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"
