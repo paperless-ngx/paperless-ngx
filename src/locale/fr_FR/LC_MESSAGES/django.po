@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 22:56\n"
+"POT-Creation-Date: 2021-03-14 13:33+0100\n"
+"PO-Revision-Date: 2021-03-14 20:04\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -220,13 +220,13 @@ msgstr "niveau"
 
 #: documents/models.py:332
 msgid "log"
-msgstr "rapport"
+msgstr "journal"
 
 #: documents/models.py:333
 msgid "logs"
-msgstr "rapports"
+msgstr "journaux"
 
-#: documents/models.py:344 documents/models.py:394
+#: documents/models.py:344 documents/models.py:396
 msgid "saved view"
 msgstr "vue enregistrée"
 
@@ -326,25 +326,33 @@ msgstr "modifié après"
 msgid "does not have tag"
 msgstr "ne porte pas d'étiquette"
 
-#: documents/models.py:398
+#: documents/models.py:388
+msgid "does not have ASN"
+msgstr "ne porte pas de NSA"
+
+#: documents/models.py:389
+msgid "title or content contains"
+msgstr "le titre ou le contenu contient"
+
+#: documents/models.py:400
 msgid "rule type"
 msgstr "type de règle"
 
-#: documents/models.py:402
+#: documents/models.py:404
 msgid "value"
 msgstr "valeur"
 
-#: documents/models.py:408
+#: documents/models.py:410
 msgid "filter rule"
 msgstr "règle de filtrage"
 
-#: documents/models.py:409
+#: documents/models.py:411
 msgid "filter rules"
 msgstr "règles de filtrage"
 
 #: documents/serialisers.py:53
 #, python-format
-msgid "Invalid regular expresssion: %(error)s"
+msgid "Invalid regular expression: %(error)s"
 msgstr "Expression régulière incorrecte : %(error)s"
 
 #: documents/serialisers.py:177
@@ -396,37 +404,45 @@ msgstr "Mot de passe"
 msgid "Sign in"
 msgstr "S'identifier"
 
-#: paperless/settings.py:297
+#: paperless/settings.py:298
 msgid "English (US)"
 msgstr "Anglais (US)"
 
-#: paperless/settings.py:298
+#: paperless/settings.py:299
 msgid "English (GB)"
 msgstr "Anglais (GB)"
 
-#: paperless/settings.py:299
+#: paperless/settings.py:300
 msgid "German"
 msgstr "Allemand"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:301
 msgid "Dutch"
 msgstr "Néerlandais"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:302
 msgid "French"
 msgstr "Français"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:303
 msgid "Portuguese (Brazil)"
 msgstr "Portugais (Brésil)"
 
-#: paperless/settings.py:303
+#: paperless/settings.py:304
 msgid "Italian"
 msgstr "Italien"
 
-#: paperless/settings.py:304
+#: paperless/settings.py:305
 msgid "Romanian"
 msgstr "Roumain"
+
+#: paperless/settings.py:306
+msgid "Russian"
+msgstr "Russe"
+
+#: paperless/settings.py:307
+msgid "Spanish"
+msgstr "Espagnol"
 
 #: paperless/urls.py:118
 msgid "Paperless-ng administration"

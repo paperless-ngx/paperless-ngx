@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib import auth
 from django.contrib.auth.models import User
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import authentication
@@ -11,6 +12,7 @@ class AutoLoginMiddleware(MiddlewareMixin):
         try:
             request.user = User.objects.get(
                 username=settings.AUTO_LOGIN_USERNAME)
+            auth.login(request, request.user)
         except User.DoesNotExist:
             pass
 
