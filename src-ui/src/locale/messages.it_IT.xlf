@@ -528,7 +528,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Corrispondenza</target>
+        <target state="translated">Assegnazione</target>
       </trans-unit>
       <trans-unit id="9bcf8d20d23c111eca1431abd2d2ce0de324499c" datatype="html">
         <source>Document count</source>
@@ -928,7 +928,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Ultrima corrispondenza</target>
+        <target state="translated">Ultima assegnazione</target>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html">
         <source>Confirmation</source>
@@ -976,7 +976,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Algoritmo di corrispondenza</target>
+        <target state="translated">Algoritmo di assegnazione</target>
       </trans-unit>
       <trans-unit id="eab7fc7cf2d663e54de934b779fce4275a303f0f" datatype="html">
         <source>Matching pattern</source>
@@ -984,7 +984,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">Criterio di corrispondenza</target>
+        <target state="translated">Criterio di assegnazione</target>
       </trans-unit>
       <trans-unit id="632e529f49cf3d367dfbd15bd055e9b53aef30fb" datatype="html">
         <source>Case insensitive</source>
@@ -2291,7 +2291,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Automatico: apprende automaticamente la corrispondenza</target>
+        <target state="translated">Automatico: apprende l'assegnazione automaticamente</target>
       </trans-unit>
     </body>
   </file>
