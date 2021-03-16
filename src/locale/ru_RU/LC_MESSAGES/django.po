@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-14 13:33+0100\n"
-"PO-Revision-Date: 2021-03-14 22:17\n"
+"PO-Revision-Date: 2021-03-15 17:33\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -328,11 +328,11 @@ msgstr "не имеет тега"
 
 #: documents/models.py:388
 msgid "does not have ASN"
-msgstr ""
+msgstr "не имеет архивного номера"
 
 #: documents/models.py:389
 msgid "title or content contains"
-msgstr ""
+msgstr "Название или содержимое включает"
 
 #: documents/models.py:400
 msgid "rule type"
