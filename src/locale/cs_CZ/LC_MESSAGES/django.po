@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-28 12:40+0100\n"
-"PO-Revision-Date: 2021-03-06 22:56\n"
+"POT-Creation-Date: 2021-03-14 13:33+0100\n"
+"PO-Revision-Date: 2021-03-14 13:58\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -226,7 +226,7 @@ msgstr "záznam"
 msgid "logs"
 msgstr "záznamy"
 
-#: documents/models.py:344 documents/models.py:394
+#: documents/models.py:344 documents/models.py:396
 msgid "saved view"
 msgstr "uložený pohled"
 
@@ -326,25 +326,33 @@ msgstr "upraveno po"
 msgid "does not have tag"
 msgstr "nemá tag"
 
-#: documents/models.py:398
+#: documents/models.py:388
+msgid "does not have ASN"
+msgstr ""
+
+#: documents/models.py:389
+msgid "title or content contains"
+msgstr ""
+
+#: documents/models.py:400
 msgid "rule type"
 msgstr "typ pravidla"
 
-#: documents/models.py:402
+#: documents/models.py:404
 msgid "value"
 msgstr "hodnota"
 
-#: documents/models.py:408
+#: documents/models.py:410
 msgid "filter rule"
 msgstr "filtrovací pravidlo"
 
-#: documents/models.py:409
+#: documents/models.py:411
 msgid "filter rules"
 msgstr "filtrovací pravidla"
 
 #: documents/serialisers.py:53
 #, python-format
-msgid "Invalid regular expresssion: %(error)s"
+msgid "Invalid regular expression: %(error)s"
 msgstr ""
 
 #: documents/serialisers.py:177
@@ -396,36 +404,44 @@ msgstr "Heslo"
 msgid "Sign in"
 msgstr "Přihlásit se"
 
-#: paperless/settings.py:297
+#: paperless/settings.py:298
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings.py:298
+#: paperless/settings.py:299
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings.py:299
+#: paperless/settings.py:300
 msgid "German"
 msgstr "Němčina"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:301
 msgid "Dutch"
 msgstr "Holandština"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:302
 msgid "French"
 msgstr "Francouzština"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:303
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings.py:303
+#: paperless/settings.py:304
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings.py:304
+#: paperless/settings.py:305
 msgid "Romanian"
+msgstr ""
+
+#: paperless/settings.py:306
+msgid "Russian"
+msgstr ""
+
+#: paperless/settings.py:307
+msgid "Spanish"
 msgstr ""
 
 #: paperless/urls.py:118

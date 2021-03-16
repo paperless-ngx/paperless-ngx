@@ -1,13 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { DocumentService } from 'src/app/services/rest/document.service';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: ['./document-card-large.component.scss']
+  styleUrls: ['./document-card-large.component.scss', '../popover-preview/popover-preview.scss']
 })
 export class DocumentCardLargeComponent implements OnInit {
 
@@ -38,8 +39,16 @@ export class DocumentCardLargeComponent implements OnInit {
   @Output()
   clickCorrespondent = new EventEmitter<number>()
 
+  @Output()
+  clickDocumentType = new EventEmitter<number>()
+
   @Input()
   searchScore: number
+
+  @ViewChild('popover') popover: NgbPopover
+
+  mouseOnPreview = false
+  popoverHidden = true
 
   get searchScoreClass() {
     if (this.searchScore > 0.7) {
@@ -79,7 +88,32 @@ export class DocumentCardLargeComponent implements OnInit {
     return this.documentService.getDownloadUrl(this.document.id)
   }
 
-  getPreviewUrl() {
+  get previewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
+  }
+
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+      // we're going to open but hide to pre-load content during hover delay
+      this.popover.open()
+      this.popoverHidden = true
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          // show popover
+          this.popoverHidden = false
+        } else {
+          this.popover.close()
+        }
+      }, 600);
+    }
+  }
+
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+  }
+
+  mouseLeaveCard() {
+    this.popover.close()
   }
 }

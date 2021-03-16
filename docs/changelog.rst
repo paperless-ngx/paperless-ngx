@@ -5,6 +5,31 @@
 Changelog
 *********
 
+paperless-ng 1.3.1
+##################
+
+* Added translation into Spanish and Russian.
+
+* Other changes
+
+  * ISO-8601 date format will now always show years with 4 digits.
+
+  * Added the ability to search for a document with a specific ASN.
+
+  * The document cards now display ASN, types and dates in a more organized way.
+
+  * Added document previews when hovering over the preview button.
+
+* Fixes
+
+  * The startup check for write permissions now works properly on NFS shares.
+
+  * Fixed an issue with the search results score indicator.
+
+  * Paperless was unable to generate thumbnails for encrypted PDF files and failed. Paperless will now generate a default thumbnail for these files.
+
+  * Fixed ``AUTO_LOGIN_USERNAME``: Unable to perform POST/PUT/DELETE requests and unable to receive WebSocket messages.
+
 paperless-ng 1.3.0
 ##################
 

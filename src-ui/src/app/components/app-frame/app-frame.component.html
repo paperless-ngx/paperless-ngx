@@ -31,7 +31,7 @@
       </button>
       <div ngbDropdownMenu class="dropdown-menu-right shadow mr-2" aria-labelledby="userDropdown">
         <div *ngIf="displayName" class="d-sm-none">
-          <p class="small mb-0 px-3" i18n>Logged in as {{displayName}}</p>
+          <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{displayName}}</p>
           <div class="dropdown-divider"></div>
         </div>
         <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()">
