@@ -1,4 +1,4 @@
-import { Component, ElementRef, AfterViewChecked, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
 import { LogService } from 'src/app/services/rest/log.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { LogService } from 'src/app/services/rest/log.service';
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss']
 })
-export class LogsComponent implements AfterViewChecked {
+export class LogsComponent implements OnInit, AfterViewChecked {
 
   constructor(private logService: LogService) { }
 
