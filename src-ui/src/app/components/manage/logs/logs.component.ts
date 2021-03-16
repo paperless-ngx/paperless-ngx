@@ -35,7 +35,6 @@ export class LogsComponent implements OnInit, AfterViewChecked {
   reloadLogs() {
     this.logService.get(this.activeLog).subscribe(result => {
       this.logs = result
-      this.scrollToBottom()
     }, error => {
       this.logs = []
     })
