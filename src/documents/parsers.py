@@ -143,6 +143,46 @@ def run_convert(input_file,
         raise ParseError("Convert failed at {}".format(args))
 
 
+def get_default_thumbnail():
+    return os.path.join(os.path.dirname(__file__), "resources", "document.png")
+
+
+def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None):
+    out_path = os.path.join(temp_dir, "convert_gs.png")
+
+    # if convert fails, fall back to extracting
+    # the first PDF page as a PNG using Ghostscript
+    logger.warning(
+        "Thumbnail generation with ImageMagick failed, falling back "
+        "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!",
+        extra={'group': logging_group}
+    )
+    gs_out_path = os.path.join(temp_dir, "gs_out.png")
+    cmd = [settings.GS_BINARY,
+           "-q",
+           "-sDEVICE=pngalpha",
+           "-o", gs_out_path,
+           in_path]
+    try:
+        if not subprocess.Popen(cmd).wait() == 0:
+            raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
+        # then run convert on the output from gs
+        run_convert(density=300,
+                    scale="500x5000>",
+                    alpha="remove",
+                    strip=True,
+                    trim=False,
+                    auto_orient=True,
+                    input_file=gs_out_path,
+                    output_file=out_path,
+                    logging_group=logging_group)
+
+        return out_path
+
+    except ParseError:
+        return get_default_thumbnail()
+
+
 def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
     """
     The thumbnail of a PDF is just a 500px wide image of the first page.
@@ -161,31 +201,8 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
                     output_file=out_path,
                     logging_group=logging_group)
     except ParseError:
-        # if convert fails, fall back to extracting
-        # the first PDF page as a PNG using Ghostscript
-        logger.warning(
-            "Thumbnail generation with ImageMagick failed, falling back "
-            "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!",
-            extra={'group': logging_group}
-        )
-        gs_out_path = os.path.join(temp_dir, "gs_out.png")
-        cmd = [settings.GS_BINARY,
-               "-q",
-               "-sDEVICE=pngalpha",
-               "-o", gs_out_path,
-               in_path]
-        if not subprocess.Popen(cmd).wait() == 0:
-            raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
-        # then run convert on the output from gs
-        run_convert(density=300,
-                    scale="500x5000>",
-                    alpha="remove",
-                    strip=True,
-                    trim=False,
-                    auto_orient=True,
-                    input_file=gs_out_path,
-                    output_file=out_path,
-                    logging_group=logging_group)
+        out_path = make_thumbnail_from_pdf_gs_fallback(
+            in_path, temp_dir, logging_group)
 
     return out_path
 
