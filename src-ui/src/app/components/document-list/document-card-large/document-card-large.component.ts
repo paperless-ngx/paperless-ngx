@@ -4,6 +4,8 @@ import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { DocumentService } from 'src/app/services/rest/document.service';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
 @Component({
   selector: 'app-document-card-large',
@@ -25,13 +27,7 @@ export class DocumentCardLargeComponent implements OnInit {
   }
 
   @Input()
-  moreLikeThis: boolean = false
-
-  @Input()
   document: PaperlessDocument
-
-  @Input()
-  details: any
 
   @Output()
   clickTag = new EventEmitter<number>()
@@ -41,6 +37,9 @@ export class DocumentCardLargeComponent implements OnInit {
 
   @Output()
   clickDocumentType = new EventEmitter<number>()
+
+  @Output()
+  clickMoreLike= new EventEmitter()
 
   @Input()
   searchScore: number
@@ -65,19 +64,6 @@ export class DocumentCardLargeComponent implements OnInit {
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
-  }
-
-  getDetailsAsString() {
-    if (typeof this.details === 'string') {
-      return this.details.substring(0, 500)
-    }
-  }
-
-  getDetailsAsHighlight() {
-    //TODO: this is not an exact typecheck, can we do better
-    if (this.details instanceof Array) {
-      return this.details
-    }
   }
 
   getThumbUrl() {
@@ -115,5 +101,9 @@ export class DocumentCardLargeComponent implements OnInit {
 
   mouseLeaveCard() {
     this.popover.close()
+  }
+
+  get contentTrimmed() {
+    return this.document.content.substr(0, 500)
   }
 }

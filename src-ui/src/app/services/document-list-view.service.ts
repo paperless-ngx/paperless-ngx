@@ -1,7 +1,9 @@
+import { Route } from '@angular/compiler/src/core';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
+import { FILTER_FULLTEXT_MORELIKE, FILTER_FULLTEXT_QUERY } from '../data/filter-rule-type';
 import { PaperlessDocument } from '../data/paperless-document';
 import { PaperlessSavedView } from '../data/paperless-saved-view';
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
@@ -207,7 +209,11 @@ export class DocumentListViewService {
     this.activeListViewState.currentPage = 1
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
-    this.router.navigate(["documents"])
+    if (this.router.url == "/documents") {
+      this.reload()
+    } else {
+      this.router.navigate(["documents"])
+    }
   }
 
   getLastPage(): number {
@@ -317,7 +323,7 @@ export class DocumentListViewService {
     return this.documents.map(d => d.id).indexOf(documentID)
   }
 
-  constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
+  constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router, private route: ActivatedRoute) {
      let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {
