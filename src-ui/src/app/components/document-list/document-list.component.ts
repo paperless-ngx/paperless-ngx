@@ -207,6 +207,13 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     })
   }
 
+  clickMoreLike(documentID: number) {
+    this.list.selectNone()
+    setTimeout(() => {
+      //this.filterEditor.moreLikeThis(doc)
+    })
+  }
+
   trackByDocumentId(index, item: PaperlessDocument) {
     return item.id
   }
