@@ -10,6 +10,8 @@ import { SearchService } from 'src/app/services/rest/search.service';
 import { environment } from 'src/environments/environment';
 import { DocumentDetailComponent } from '../document-detail/document-detail.component';
 import { Meta } from '@angular/platform-browser';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type';
 
 @Component({
   selector: 'app-app-frame',
@@ -24,6 +26,7 @@ export class AppFrameComponent implements OnInit {
     private openDocumentsService: OpenDocumentsService,
     private searchService: SearchService,
     public savedViewService: SavedViewService,
+    private list: DocumentListViewService,
     private meta: Meta
     ) {
 
@@ -74,7 +77,7 @@ export class AppFrameComponent implements OnInit {
 
   search() {
     this.closeMenu()
-    this.router.navigate(['search'], {queryParams: {query: this.searchField.value}})
+    this.list.quickFilter([{rule_type: FILTER_FULLTEXT_QUERY, value: this.searchField.value}])
   }
 
   closeDocument(d: PaperlessDocument) {

@@ -8,13 +8,17 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_ASN, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE, FILTER_TITLE_CONTENT } from 'src/app/data/filter-rule-type';
+import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_ASN, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_FULLTEXT_MORELIKE, FILTER_FULLTEXT_QUERY, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE, FILTER_TITLE_CONTENT } from 'src/app/data/filter-rule-type';
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
+import { DocumentService } from 'src/app/services/rest/document.service';
+import { PaperlessDocument } from 'src/app/data/paperless-document';
 
 const TEXT_FILTER_TARGET_TITLE = "title"
 const TEXT_FILTER_TARGET_TITLE_CONTENT = "title-content"
 const TEXT_FILTER_TARGET_ASN = "asn"
+const TEXT_FILTER_TARGET_FULLTEXT_QUERY = "fulltext-query"
+const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = "fulltext-morelike"
 
 @Component({
   selector: 'app-filter-editor',
@@ -64,7 +68,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private correspondentService: CorrespondentService
+    private correspondentService: CorrespondentService,
+    private documentService: DocumentService
   ) { }
 
   tags: PaperlessTag[] = []
@@ -72,12 +77,21 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   documentTypes: PaperlessDocumentType[] = []
 
   _textFilter = ""
+  _moreLikeId: number
+  _moreLikeDoc: PaperlessDocument
 
-  textFilterTargets = [
-    {id: TEXT_FILTER_TARGET_TITLE, name: $localize`Title`},
-    {id: TEXT_FILTER_TARGET_TITLE_CONTENT, name: $localize`Title & content`},
-    {id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN`}
-  ]
+  get textFilterTargets() {
+    let targets = [
+      {id: TEXT_FILTER_TARGET_TITLE, name: $localize`Title`},
+      {id: TEXT_FILTER_TARGET_TITLE_CONTENT, name: $localize`Title & content`},
+      {id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN`},
+      {id: TEXT_FILTER_TARGET_FULLTEXT_QUERY, name: $localize`Fulltext search`}
+    ]
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
+      targets.push({id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE, name: $localize`More like`})
+    }
+    return targets
+  }
 
   textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
 
@@ -101,6 +115,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
     this._textFilter = null
+    this._moreLikeId = null
     this.dateAddedBefore = null
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
@@ -119,6 +134,17 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         case FILTER_ASN:
           this._textFilter = rule.value
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          break
+        case FILTER_FULLTEXT_QUERY:
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
+          break
+        case FILTER_FULLTEXT_MORELIKE:
+          this._moreLikeId = +rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
+          this.documentService.get(this._moreLikeId).subscribe(result => {
+            this._moreLikeDoc = result
+          })
           break
         case FILTER_CREATED_AFTER:
           this.dateCreatedAfter = rule.value
@@ -158,6 +184,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     }
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
       filterRules.push({rule_type: FILTER_ASN, value: this._textFilter})
+    }
+    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_QUERY) {
+      filterRules.push({rule_type: FILTER_FULLTEXT_QUERY, value: this._textFilter})
+    }
+    if (this._moreLikeId && this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
+      filterRules.push({rule_type: FILTER_FULLTEXT_MORELIKE, value: this._moreLikeId?.toString()})
     }
     if (this.tagSelectionModel.isNoneSelected()) {
       filterRules.push({rule_type: FILTER_HAS_ANY_TAG, value: "false"})
@@ -232,6 +264,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   resetSelected() {
+    this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
     this.reset.next()
   }
 

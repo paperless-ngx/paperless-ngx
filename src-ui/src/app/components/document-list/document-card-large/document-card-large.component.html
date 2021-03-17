@@ -25,14 +25,14 @@
           </h5>
         </div>
         <p class="card-text">
-          <app-result-highlight *ngIf="getDetailsAsHighlight()" class="result-content" [highlights]="getDetailsAsHighlight()"></app-result-highlight>
-          <span *ngIf="getDetailsAsString()" class="result-content">{{getDetailsAsString()}}</span>
+          <span *ngIf="document.__search_hit__" [innerHtml]="document.__search_hit__.highlights"></span>
+          <span *ngIf="!document.__search_hit__" class="result-content">{{contentTrimmed}}</span>
         </p>
 
 
         <div class="d-flex flex-column flex-md-row align-items-md-center">
           <div class="btn-group">
-            <a routerLink="/search" [queryParams]="{'more_like': document.id}" class="btn btn-sm btn-outline-secondary" *ngIf="moreLikeThis">
+            <a class="btn btn-sm btn-outline-secondary" (click)="clickMoreLike.emit()">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
               </svg>&nbsp;<span class="d-block d-md-inline" i18n>More like this</span>
@@ -62,9 +62,9 @@
           </div>
 
           <div class="list-group list-group-horizontal border-0 card-info ml-md-auto mt-2 mt-md-0">
-            <div *ngIf="searchScore" class="list-group-item bg-light text-dark p-1 mr-5 border-0 d-flex search-score">
+            <div *ngIf="document.__search_hit__" class="list-group-item bg-light text-dark p-1 mr-5 border-0 d-flex search-score">
               <small class="text-muted" i18n>Score:</small>
-              <ngb-progressbar [type]="searchScoreClass" [value]="searchScore" class="search-score-bar mx-2 mt-1" [max]="1"></ngb-progressbar>
+              <ngb-progressbar [type]="searchScoreClass" [value]="document.__search_hit__.score" class="search-score-bar mx-2 mt-1" [max]="1"></ngb-progressbar>
             </div>
             <button *ngIf="document.document_type" type="button" class="list-group-item btn btn-sm bg-light text-dark p-1 border-0 mr-2" title="Filter by document type"
              (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">

@@ -10,7 +10,6 @@ import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
 import { TagListComponent } from './components/manage/tag-list/tag-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { SearchComponent } from './components/search/search.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
@@ -18,7 +17,6 @@ const routes: Routes = [
     {path: 'dashboard', component: DashboardComponent },
     {path: 'documents', component: DocumentListComponent },
     {path: 'view/:id', component: DocumentListComponent },
-    {path: 'search', component: SearchComponent },
     {path: 'documents/:id', component: DocumentDetailComponent },
   
     {path: 'tags', component: TagListComponent },

@@ -16,7 +16,6 @@ from documents.views import (
     LogViewSet,
     TagViewSet,
     DocumentTypeViewSet,
-    SearchView,
     IndexView,
     SearchAutoCompleteView,
     StatisticsView,
@@ -46,10 +45,6 @@ urlpatterns = [
         re_path(r"^search/autocomplete/",
                 SearchAutoCompleteView.as_view(),
                 name="autocomplete"),
-
-        re_path(r"^search/",
-                SearchView.as_view(),
-                name="search"),
 
         re_path(r"^statistics/",
                 StatisticsView.as_view(),

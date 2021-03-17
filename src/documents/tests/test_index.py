@@ -1,18 +1,8 @@
 from django.test import TestCase
 
 from documents import index
-from documents.index import JsonFormatter
 from documents.models import Document
 from documents.tests.utils import DirectoriesMixin
-
-
-class JsonFormatterTest(TestCase):
-
-    def setUp(self) -> None:
-        self.formatter = JsonFormatter()
-
-    def test_empty_fragments(self):
-        self.assertListEqual(self.formatter.format([]), [])
 
 
 class TestAutoComplete(DirectoriesMixin, TestCase):

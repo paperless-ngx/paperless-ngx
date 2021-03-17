@@ -36,7 +36,6 @@ from rest_framework.viewsets import (
 
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
-from . import index
 from .bulk_download import OriginalAndArchiveStrategy, OriginalsOnlyStrategy, \
     ArchiveOnlyStrategy
 from .classifier import load_classifier
@@ -332,14 +331,22 @@ class SearchResultSerializer(DocumentSerializer):
 
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance['id'])
-        # repressentation = super(SearchResultSerializer, self).to_representation(doc)
-        # repressentation['__search_hit__'] = {
-        #     "score": instance.score
-        # }
-        return super(SearchResultSerializer, self).to_representation(doc)
+        representation = super(SearchResultSerializer, self).to_representation(doc)
+        representation['__search_hit__'] = {
+            "score": instance.score,
+            "highlights": instance.highlights("content",
+                                   text=doc.content) if doc else None,  # NOQA: E501
+            "rank": instance.rank
+        }
+
+        return representation
 
 
 class UnifiedSearchViewSet(DocumentViewSet):
+
+    def __init__(self, *args, **kwargs):
+        super(UnifiedSearchViewSet, self).__init__(*args, **kwargs)
+        self.searcher = None
 
     def get_serializer_class(self):
         if self._is_search_request():
@@ -348,24 +355,38 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return DocumentSerializer
 
     def _is_search_request(self):
-        return "query" in self.request.query_params
+        return "query" in self.request.query_params or "more_like_id" in self.request.query_params
 
     def filter_queryset(self, queryset):
-
         if self._is_search_request():
-            ix = index.open_index()
-            return index.DelayedQuery(ix, self.searcher, self.request.query_params, self.paginator.page_size)
+            from documents import index
+
+            if "query" in self.request.query_params:
+                query_class = index.DelayedFullTextQuery
+            elif "more_like_id" in self.request.query_params:
+                query_class = index.DelayedMoreLikeThisQuery
+            else:
+                raise ValueError()
+
+            return query_class(
+                self.searcher,
+                self.request.query_params,
+                self.paginator.get_page_size(self.request))
         else:
             return super(UnifiedSearchViewSet, self).filter_queryset(queryset)
 
     def list(self, request, *args, **kwargs):
         if self._is_search_request():
-            ix = index.open_index()
-            with ix.searcher() as s:
-                self.searcher = s
-                return super(UnifiedSearchViewSet, self).list(request)
+            from documents import index
+            try:
+                with index.open_index_searcher() as s:
+                    self.searcher = s
+                    return super(UnifiedSearchViewSet, self).list(request)
+            except Exception as e:
+                return HttpResponseBadRequest(str(e))
         else:
             return super(UnifiedSearchViewSet, self).list(request)
+
 
 class LogViewSet(ViewSet):
 
@@ -516,74 +537,6 @@ class SelectionDataView(GenericAPIView):
         })
 
         return r
-
-
-class SearchView(APIView):
-
-    permission_classes = (IsAuthenticated,)
-
-    def add_infos_to_hit(self, r):
-        try:
-            doc = Document.objects.get(id=r['id'])
-        except Document.DoesNotExist:
-            logger.warning(
-                f"Search index returned a non-existing document: "
-                f"id: {r['id']}, title: {r['title']}. "
-                f"Search index needs reindex."
-            )
-            doc = None
-
-        return {'id': r['id'],
-                'highlights': r.highlights("content", text=doc.content) if doc else None,  # NOQA: E501
-                'score': r.score,
-                'rank': r.rank,
-                'document': DocumentSerializer(doc).data if doc else None,
-                'title': r['title']
-                }
-
-    def get(self, request, format=None):
-        from documents import index
-
-        if 'query' in request.query_params:
-            query = request.query_params['query']
-        else:
-            query = None
-
-        if 'more_like' in request.query_params:
-            more_like_id = request.query_params['more_like']
-            more_like_content = Document.objects.get(id=more_like_id).content
-        else:
-            more_like_id = None
-            more_like_content = None
-
-        if not query and not more_like_id:
-            return Response({
-                'count': 0,
-                'page': 0,
-                'page_count': 0,
-                'corrected_query': None,
-                'results': []})
-
-        try:
-            page = int(request.query_params.get('page', 1))
-        except (ValueError, TypeError):
-            page = 1
-
-        if page < 1:
-            page = 1
-
-        ix = index.open_index()
-
-        try:
-            with index.query_page(ix, page, query, more_like_id, more_like_content) as (result_page, corrected_query):  # NOQA: E501
-                return Response(
-                    {'count': len(result_page),
-                     'page': result_page.pagenum,
-                     'page_count': result_page.pagecount,
-                     'corrected_query': corrected_query,
-                     'results': list(map(self.add_infos_to_hit, result_page))})
-        except Exception as e:
-            return HttpResponseBadRequest(str(e))
 
 
 class SearchAutoCompleteView(APIView):
