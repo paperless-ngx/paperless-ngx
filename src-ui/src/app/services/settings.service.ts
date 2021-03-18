@@ -92,6 +92,7 @@ export class SettingsService {
       {code: "de-de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
       {code: "nl-nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
       {code: "fr-fr", name: $localize`French`, englishName: "French", dateInputFormat: "dd/mm/yyyy"},
+      {code: "pt-pt", name: $localize`Portuguese`, englishName: "Portuguese", dateInputFormat: "dd/mm/yyyy"},
       {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"},
       {code: "it-it", name: $localize`Italian`, englishName: "Italian", dateInputFormat: "dd/mm/yyyy"},
       {code: "ro-ro", name: $localize`Romanian`, englishName: "Romanian", dateInputFormat: "dd.mm.yyyy"},
