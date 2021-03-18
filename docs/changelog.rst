@@ -5,6 +5,21 @@
 Changelog
 *********
 
+paperless-ng 1.3.2
+##################
+
+* Added translation into Portuguese.
+
+* Changes
+
+  * The exporter now exports user accounts, mail accounts, mail rules and saved views as well.
+
+* Fixes
+
+  * Minor layout issues with document cards and the log viewer.
+
+  * Fixed an issue with any/all/exact matching when characters used in regular expressions were used for the match.
+
 paperless-ng 1.3.1
 ##################
 
