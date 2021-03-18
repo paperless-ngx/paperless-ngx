@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-14 13:33+0100\n"
-"PO-Revision-Date: 2021-03-14 15:58\n"
+"POT-Creation-Date: 2021-03-17 22:31+0100\n"
+"PO-Revision-Date: 2021-03-17 21:47\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -429,18 +429,22 @@ msgid "Portuguese (Brazil)"
 msgstr "Portugees (Brazilië)"
 
 #: paperless/settings.py:304
+msgid "Portuguese"
+msgstr ""
+
+#: paperless/settings.py:305
 msgid "Italian"
 msgstr "Italiaans"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:306
 msgid "Romanian"
 msgstr "Roemeens"
 
-#: paperless/settings.py:306
+#: paperless/settings.py:307
 msgid "Russian"
 msgstr "Russisch"
 
-#: paperless/settings.py:307
+#: paperless/settings.py:308
 msgid "Spanish"
 msgstr "Spaans"
 
