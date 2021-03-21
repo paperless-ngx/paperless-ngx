@@ -11,25 +11,27 @@ RUN ./configure && make
 FROM python:3.7-slim
 
 # Binary dependencies
-RUN apt-get update \
+RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
+  && apt-get update \
   && apt-get -y --no-install-recommends install \
   	# Basic dependencies
 		curl \
-		file \
-		# fonts for text file thumbnail generation
-		fonts-liberation \
-		# for making translations further down
-		gettext \
 		gnupg \
 		imagemagick \
+		gettext \
+		sudo \
+		tzdata \
+		# fonts for text file thumbnail generation
+		fonts-liberation \
 		# for Numpy
 		libatlas-base-dev \
 		libxslt1-dev \
-		mime-support \
 		# thumbnail size reduction
 		optipng \
-		sudo \
-		tzdata \
+		# Mime type detection
+		file \
+		libmagic-dev \
+		mime-support \
   	# OCRmyPDF dependencies
 		ghostscript \
 		icc-profiles-free \
@@ -45,14 +47,7 @@ RUN apt-get update \
 		tesseract-ocr-spa \
 		unpaper \
 		zlib1g \
-
-# This pulls in updated dependencies from bullseye to fix some issues with file type detection.
-# TODO: Remove this once bullseye releases.
-  && echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
-  && apt-get update \
-  && apt-get install --no-install-recommends -y file libmagic-dev \
-  && rm -rf /var/lib/apt/lists/* \
-  && rm /etc/apt/sources.list.d/bullseye.list
+  && rm -rf /var/lib/apt/lists/*
 
 # copy jbig2enc
 COPY --from=jbig2enc /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
