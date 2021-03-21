@@ -31,7 +31,7 @@ RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.lis
 		# Mime type detection
 		file \
 		libmagic-dev \
-		mime-support \
+		media-types \
   	# OCRmyPDF dependencies
 		ghostscript \
 		icc-profiles-free \
