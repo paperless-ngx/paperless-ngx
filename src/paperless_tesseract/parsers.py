@@ -119,6 +119,8 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             text = extract_text(pdf_file)
             stripped = strip_excess_whitespace(text)
+            stripped = stripped.replace("\0", " ")
+
             self.log("debug", f"Extracted text from PDF file {pdf_file}")
             return stripped
         except PDFException:
