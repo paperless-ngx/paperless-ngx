@@ -246,9 +246,9 @@ class RasterisedDocumentParser(DocumentParser):
             if original_has_text:
                 self.text = text_original
         except (NoTextFoundException, InputFileError) as e:
-            self.log("exception",
-                     f"Encountered the following error while running OCR, "
-                     f"attempting force OCR to get the text.")
+            self.log("warning",
+                     f"Encountered an error while running OCR: {str(e)}. "
+                     f"Attempting force OCR to get the text.")
 
             archive_path_fallback = os.path.join(
                 self.tempdir, "archive-fallback.pdf")
