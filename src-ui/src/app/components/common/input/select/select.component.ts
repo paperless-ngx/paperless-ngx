@@ -34,7 +34,9 @@ export class SelectComponent extends AbstractInputComponent<number> {
   suggestions: number[]
 
   @Output()
-  createNew = new EventEmitter()
+  createNew = new EventEmitter<string>()
+
+  private _lastSearchTerm: string
 
   showPlusButton(): boolean {
     return this.createNew.observers.length > 0
@@ -46,6 +48,19 @@ export class SelectComponent extends AbstractInputComponent<number> {
     } else {
       return []
     }
+  }
+
+  clickNew() {
+    this.createNew.next(this._lastSearchTerm)
+    this._lastSearchTerm = null
+  }
+
+  onFocus() {
+    this._lastSearchTerm = null
+  }
+
+  onSearch($event) {
+    this._lastSearchTerm = $event.term
   }
 
 }
