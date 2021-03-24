@@ -87,9 +87,6 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
         this.onChange(this.value)
       })
     })
-    modal.result.then(() => {
-      this._lastSearchTerm = null
-    })
   }
 
   getSuggestions() {
