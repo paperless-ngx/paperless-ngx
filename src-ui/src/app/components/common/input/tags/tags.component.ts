@@ -113,4 +113,10 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     this._lastSearchTerm = $event.term
   }
 
+  onBlur() {
+    setTimeout(() => {
+      this._lastSearchTerm = null
+    }, 3000);
+  }
+
 }

@@ -9,7 +9,8 @@
       [hideSelected]="true"
       (change)="onChange(value)"
       (search)="onSearch($event)"
-      (focus)="onFocus()">
+      (focus)="onFocus()"
+      (blur)="onBlur()">
 
       <ng-template ng-label-tmp let-item="item">
         <span class="tag-wrap tag-wrap-delete" (click)="removeTag(item.id)">
