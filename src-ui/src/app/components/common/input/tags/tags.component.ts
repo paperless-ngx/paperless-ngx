@@ -105,7 +105,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     this.onChange(this.value)
   }
 
-  onFocus() {
+  clearLastSearchTerm() {
     this._lastSearchTerm = null
   }
 
@@ -115,7 +115,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   onBlur() {
     setTimeout(() => {
-      this._lastSearchTerm = null
+      this.clearLastSearchTerm()
     }, 3000);
   }
 
