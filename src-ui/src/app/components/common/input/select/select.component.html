@@ -11,7 +11,8 @@
       bindValue="id"
       (change)="onChange(value)"
       (search)="onSearch($event)"
-      (focus)="onFocus()"
+      (focus)="clearLastSearchTerm()"
+      (clear)="clearLastSearchTerm()"
       (blur)="onBlur()">
     </ng-select>
 

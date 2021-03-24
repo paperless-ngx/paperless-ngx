@@ -52,10 +52,10 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   clickNew() {
     this.createNew.next(this._lastSearchTerm)
-    this._lastSearchTerm = null
+    this.clearLastSearchTerm()
   }
 
-  onFocus() {
+  clearLastSearchTerm() {
     this._lastSearchTerm = null
   }
 
@@ -65,7 +65,7 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   onBlur() {
     setTimeout(() => {
-      this._lastSearchTerm = null
+      this.clearLastSearchTerm()
     }, 3000);
   }
 
