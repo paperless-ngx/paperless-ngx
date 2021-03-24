@@ -56,6 +56,8 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   tags: PaperlessTag[]
 
+  private _lastSearchTerm: string
+
   getTag(id) {
     if (this.tags) {
       return this.tags.find(tag => tag.id == id)
@@ -77,12 +79,16 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   createTag() {
     var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (this._lastSearchTerm) modal.componentInstance.object = { name: this._lastSearchTerm }
     modal.componentInstance.success.subscribe(newTag => {
       this.tagService.listAll().subscribe(tags => {
         this.tags = tags.results
         this.value = [...this.value, newTag.id]
         this.onChange(this.value)
       })
+    })
+    modal.result.then(() => {
+      this._lastSearchTerm = null
     })
   }
 
@@ -97,6 +103,14 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   addTag(id) {
     this.value = [...this.value, id]
     this.onChange(this.value)
+  }
+
+  onFocus() {
+    this._lastSearchTerm = null
+  }
+
+  onSearch($event) {
+    this._lastSearchTerm = $event.term
   }
 
 }
