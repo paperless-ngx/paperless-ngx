@@ -10,11 +10,12 @@
       bindLabel="name"
       bindValue="id"
       (change)="onChange(value)"
-      (blur)="onTouched()">
+      (search)="onSearch($event)"
+      (focus)="onFocus()">
     </ng-select>
 
     <div *ngIf="showPlusButton()" class="input-group-append">
-      <button class="btn btn-outline-secondary" type="button" (click)="createNew.emit()">
+      <button class="btn btn-outline-secondary" type="button" (click)="clickNew()">
         <svg class="buttonicon" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#plus" />
         </svg>
@@ -27,7 +28,7 @@
     <ng-container *ngFor="let s of getSuggestions()">
       <a (click)="value = s.id; onChange(value)" [routerLink]="">{{s.name}}</a>&nbsp;
     </ng-container>
-    
-    
+
+
   </small>
 </div>
