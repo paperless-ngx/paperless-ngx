@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {DocumentService} from "../../services/rest/document.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {CorrespondentService} from "../../services/rest/correspondent.service";
-import {DocumentTypeService} from "../../services/rest/document-type.service";
 import {FILTER_ASN} from "../../data/filter-rule-type";
 
 @Component({
@@ -12,12 +10,10 @@ import {FILTER_ASN} from "../../data/filter-rule-type";
 })
 export class DocumentAsnComponent implements OnInit {
 
-  asn: string;
+  asn: string
   constructor(
     private documentsService: DocumentService,
     private route: ActivatedRoute,
-    private correspondentService: CorrespondentService,
-    private documentTypeService: DocumentTypeService,
     private router: Router) { }
 
 
