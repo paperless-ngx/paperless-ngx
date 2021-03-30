@@ -75,6 +75,7 @@ import localeEnGb from '@angular/common/locales/en-GB';
 import localeRo from '@angular/common/locales/ro';
 import localeRu from '@angular/common/locales/ru';
 import localeEs from '@angular/common/locales/es';
+import { DocumentASNComponentComponent } from './components/document-asncomponent/document-asncomponent.component';
 
 
 registerLocaleData(localeFr)
@@ -138,7 +139,8 @@ registerLocaleData(localeEs)
     SafePipe,
     CustomDatePipe,
     DateComponent,
-    ColorComponent
+    ColorComponent,
+    DocumentASNComponentComponent
   ],
   imports: [
     BrowserModule,
