@@ -7,10 +7,10 @@ import {FILTER_ASN} from "../../data/filter-rule-type";
 
 @Component({
   selector: 'app-document-asncomponent',
-  templateUrl: './document-asncomponent.component.html',
-  styleUrls: ['./document-asncomponent.component.scss']
+  templateUrl: './document-asn.component.html',
+  styleUrls: ['./document-asn.component.scss']
 })
-export class DocumentASNComponentComponent implements OnInit {
+export class DocumentAsnComponent implements OnInit {
 
   asn: string;
   constructor(
