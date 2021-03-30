@@ -11,7 +11,7 @@ import { SettingsComponent } from './components/manage/settings/settings.compone
 import { TagListComponent } from './components/manage/tag-list/tag-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { SearchComponent } from './components/search/search.component';
-import {DocumentASNComponentComponent} from "./components/document-asncomponent/document-asncomponent.component";
+import {DocumentAsnComponent} from "./components/document-asn/document-asn.component";
 
 const routes: Routes = [
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
@@ -21,7 +21,7 @@ const routes: Routes = [
     {path: 'view/:id', component: DocumentListComponent },
     {path: 'search', component: SearchComponent },
     {path: 'documents/:id', component: DocumentDetailComponent },
-      {path: 'asn/:id', component: DocumentASNComponentComponent },
+      {path: 'asn/:id', component: DocumentAsnComponent },
 
     {path: 'tags', component: TagListComponent },
     {path: 'documenttypes', component: DocumentTypeListComponent },
