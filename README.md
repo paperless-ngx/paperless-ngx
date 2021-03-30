@@ -12,12 +12,12 @@
 
 Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. These key points should help you decide whether Paperless-ng is something you would prefer over Paperless:
 
-* Interface: The new front end is the main interface for paperless-ng, the old interface still exists but most customizations (such as thumbnails for the document list) have been removed.
+* Interface: The new front end is the main interface for Paperless-ng, the old interface still exists but most customizations (such as thumbnails for the document list) have been removed.0
 * Encryption: Paperless-ng does not support GnuPG anymore, since storing your data on encrypted file systems (that you optionally mount on demand) achieves about the same result.
-* Resource usage: Paperless-ng does use a bit more resources than Paperless. Running the web server requires about 300MB of RAM or more, depending on the configuration. While adding documents, it requires about 300MB additional RAM, depending on the document. It still runs on Pi (many users do that), but it has been generally geared to better use the resources of more powerful systems.
+* Resource usage: Paperless-ng does use a bit more resources than Paperless. Running the web server requires about 300MB of RAM or more, depending on the configuration. While adding documents, it requires about 300MB additional RAM, depending on the document. It still runs on Raspberry Pi (many users do that), but it has been generally geared to better use the resources of more powerful systems.
 * API changes: If you rely on the REST API of paperless, some of its functionality has been changed.
 
-For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation.
+For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation, especially the section about the [0.9.0 release](https://paperless-ng.readthedocs.io/en/latest/changelog.html#paperless-ng-0-9-0).
 
 # How it Works
 
@@ -25,7 +25,7 @@ Paperless does not control your scanner, it only helps you deal with what your s
 
 1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ng.readthedocs.io/en/latest/scanners.html) page. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
 
-	- Alternatively, you can use any of the mobile scanning apps out there. We have an app that allows you to share documents with paperless, if you're on Android. See the section on affiliated projects.
+	- Alternatively, you can use any of the mobile scanning apps out there. We have an app that allows you to share documents with paperless, if you're on Android. See the section on affiliated projects below.
 
 2. Wait for paperless to process your files. OCR is expensive, and depending on the power of your machine, this might take a bit of time.
 3. Use the web frontend to sift through the database and find what you want.
@@ -34,6 +34,8 @@ Paperless does not control your scanner, it only helps you deal with what your s
 Here's what you get:
 
 ![Dashboard](https://github.com/jonaswinkler/paperless-ng/raw/master/docs/_static/screenshots/dashboard.png)
+
+If you want to see paperless-ng in action, [more screenshots are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
 
 # Features
 
@@ -58,19 +60,17 @@ Here's what you get:
 * Optimized for multi core systems: Paperless-ng consumes multiple documents in parallel.
 * The integrated sanity checker makes sure that your document archive is in good health.
 
-If you want to see some screenshots of paperless-ng in action, [some are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
-
 # Getting started
 
 The recommended way to deploy paperless is docker-compose. The files in the /docker/hub directory are configured to pull the image from Docker Hub.
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
-Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has a step by step guide on how to do it.
+Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has a step by step guide on how to do it. Consider giving the Ansible role a shot, this essentially automates the entire bare metal installation process.
 
-# Migrating to paperless-ng
+# Migrating from Paperless to Paperless-ng
 
-Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation. Its also entirely possible to go back to paperless by reverting the database migrations.
+Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation. Its also entirely possible to go back to Paperless by reverting the database migrations.
 
 # Documentation
 
@@ -78,9 +78,7 @@ The documentation for Paperless-ng is available on [ReadTheDocs](https://paperle
 
 # Translation
 
-Paperless is currently available in English, German, Dutch, French, Portuguese, Italian, and Romanian.
-
-There's an active translation project at crowdin! If you want to help out by translating paperless into your language, please head over to https://github.com/jonaswinkler/paperless-ng/issues/212 for details.
+Paperless is available in many different languages. Translation is coordinated at crowdin. If you want to help out by translating paperless into your language, please head over to https://github.com/jonaswinkler/paperless-ng/issues/212 for details!
 
 # Feature Requests
 
@@ -94,7 +92,7 @@ For bugs please [open an issue](https://github.com/jonaswinkler/paperless-ng/iss
 
 There's still lots of things to be done, just have a look at open issues & discussions. If you feel like contributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome. The documentation has some basic information on how to get started.
 
-If you want to implement something big: Please start a discussion about that in the issues! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested. See the roadmap above.
+If you want to implement something big: Please start a discussion about that! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested.
 
 # Affiliated Projects
 
