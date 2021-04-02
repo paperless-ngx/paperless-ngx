@@ -38,7 +38,15 @@
           <small>{{(document.document_type$ | async)?.name}}</small>
         </button>
         <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
-          <div class="pl-0 p-1" placement="top" ngbTooltip="Added:&nbsp;{{document.added | customDate:'mediumDate'}} Created:&nbsp;{{document.created | customDate:'mediumDate'}}">
+          <ng-template #dateTooltip>
+            <div class="d-flex flex-column">
+              <span i18n>Created: {{ document.created | customDate}}</span>
+              <span i18n>Added: {{ document.added | customDate}}</span>
+              <span i18n>Modified: {{ document.modified | customDate}}</span>
+            </div>
+          </ng-template>
+
+          <div class="pl-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
             <svg class="metadata-icon mr-2 text-muted bi bi-calendar-event" viewBox="0 0 16 16" fill="currentColor">
               <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
               <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
