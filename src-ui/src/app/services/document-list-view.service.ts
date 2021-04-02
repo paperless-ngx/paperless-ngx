@@ -197,7 +197,7 @@ export class DocumentListViewService {
         sortField: this.activeListViewState.sortField,
         sortReverse: this.activeListViewState.sortReverse
       }
-      sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(savedState))
+      localStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(savedState))
     }
   }
 
@@ -318,7 +318,7 @@ export class DocumentListViewService {
   }
 
   constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
-     let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
+     let documentListViewConfigJson = localStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {
         let savedState: ListViewState = JSON.parse(documentListViewConfigJson)
@@ -332,7 +332,7 @@ export class DocumentListViewService {
         let newState = Object.assign(this.defaultListViewState(), savedState)
         this.listViewStates.set(null, newState)
       } catch (e) {
-        sessionStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
+        localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
       }
     }
   }
