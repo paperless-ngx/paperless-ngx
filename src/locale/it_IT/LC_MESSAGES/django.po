@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-03-17 22:31+0100\n"
-"PO-Revision-Date: 2021-03-23 11:21\n"
+"PO-Revision-Date: 2021-04-01 11:51\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -374,11 +374,11 @@ msgstr "Paperless-ng è uscito"
 
 #: documents/templates/registration/logged_out.html:41
 msgid "You have been successfully logged out. Bye!"
-msgstr "Vi siete disconnessi. Ciao!"
+msgstr "Ti sei disconnesso. A presto!"
 
 #: documents/templates/registration/logged_out.html:42
 msgid "Sign in again"
-msgstr "Rientra nuovamente"
+msgstr "Accedi nuovamente"
 
 #: documents/templates/registration/login.html:13
 msgid "Paperless-ng sign in"
