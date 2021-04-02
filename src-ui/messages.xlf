@@ -2,6 +2,48 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en-US" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="9103526311244275943" datatype="html">
+        <source>Document added</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9204248378636247318" datatype="html">
+        <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1931214133925051574" datatype="html">
+        <source>Open document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8582620835547864448" datatype="html">
+        <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1710712016675379662" datatype="html">
+        <source>New document detected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="587031278561344416" datatype="html">
+        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
         <context-group purpose="location">
@@ -350,48 +392,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">131</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="9103526311244275943" datatype="html">
-        <source>Document added</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">51</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="9204248378636247318" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">51</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="1931214133925051574" datatype="html">
-        <source>Open document</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">51</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="8582620835547864448" datatype="html">
-        <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">59</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="1710712016675379662" datatype="html">
-        <source>New document detected</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">65</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="587031278561344416" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">65</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8765497970646365998" datatype="html">
@@ -1236,6 +1236,27 @@
           <context context-type="linenumber">66</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="727d980bba2b3e0b3d8705607f1208eef046479b" datatype="html">
+        <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0f5d856cb63c69fde44fbfc653ec0655f9040865" datatype="html">
+        <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a205126adef6251fc63305f1a6228d07bc2795a8" datatype="html">
+        <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
         <context-group purpose="location">
@@ -1738,41 +1759,6 @@
           <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="2691296884221415710" datatype="html">
-        <source>Correspondent</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5066119607229701477" datatype="html">
-        <source>Document type</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">20</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4207916966377787111" datatype="html">
-        <source>Created</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">21</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="231679111972850796" datatype="html">
-        <source>Added</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">22</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="3553216189604488439" datatype="html">
-        <source>Modified</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
-          <context context-type="linenumber">23</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="2119857572761283468" datatype="html">
         <source>Document already exists.</source>
         <context-group purpose="location">
@@ -1880,6 +1866,41 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2691296884221415710" datatype="html">
+        <source>Correspondent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5066119607229701477" datatype="html">
+        <source>Document type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4207916966377787111" datatype="html">
+        <source>Created</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="231679111972850796" datatype="html">
+        <source>Added</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3553216189604488439" datatype="html">
+        <source>Modified</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4561076822163447092" datatype="html">
