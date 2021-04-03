@@ -109,8 +109,23 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   dateAddedBefore: string
   dateAddedAfter: string
 
+  _unmodifiedFilterRules: FilterRule[] = []
+  _filterRules: FilterRule[] = []
+
+  @Input()
+  set unmodifiedFilterRules(value: FilterRule[]) {
+    this._unmodifiedFilterRules = value
+    this.checkIfRulesHaveChanged()
+  }
+
+  get unmodifiedFilterRules(): FilterRule[] {
+    return this._unmodifiedFilterRules
+  }
+
   @Input()
   set filterRules (value: FilterRule[]) {
+    this._filterRules = value
+    
     this.documentTypeSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
@@ -172,6 +187,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           break
       }
     })
+    this.checkIfRulesHaveChanged()
   }
 
   get filterRules(): FilterRule[] {
@@ -222,11 +238,26 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
-  @Output()
-  reset = new EventEmitter()
-
-  @Input()
   rulesModified: boolean = false
+
+  private checkIfRulesHaveChanged() {
+    let modified = false
+    if (this._unmodifiedFilterRules.length != this._filterRules.length) {
+      modified = true
+    } else {
+      modified = this._unmodifiedFilterRules.some(rule => {
+        return (this._filterRules.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined)
+      })
+
+      if (!modified) {
+        // only check other direction if we havent already determined is modified
+        modified = this._filterRules.some(rule => {
+          this._unmodifiedFilterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined
+        })
+      }
+    }
+    this.rulesModified = modified
+  }
 
   updateRules() {
     this.filterRulesChange.next(this.filterRules)
@@ -265,7 +296,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   resetSelected() {
     this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
-    this.reset.next()
+    this.filterRules = this._unmodifiedFilterRules
+    this.updateRules()
   }
 
   toggleTag(tagId: number) {
