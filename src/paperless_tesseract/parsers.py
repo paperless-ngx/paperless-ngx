@@ -104,7 +104,7 @@ class RasterisedDocumentParser(DocumentParser):
                 # This happens when there's already text in the input file.
                 # The sidecar file will only contain text for OCR'ed pages.
                 self.log("debug", "Using text from sidecar file")
-                return text
+                return post_process_text(text)
             else:
                 self.log("debug", "Incomplete sidecar file: discarding.")
 
@@ -113,12 +113,12 @@ class RasterisedDocumentParser(DocumentParser):
         if not os.path.isfile(pdf_file):
             return None
 
-        from pdfminer.high_level import extract_text
+        from pdfminer.high_level import extract_text as pdfminer_extract_text
         from pdfminer.pdftypes import PDFException
 
         try:
-            text = extract_text(pdf_file)
-            stripped = strip_excess_whitespace(text)
+            stripped = post_process_text(pdfminer_extract_text(pdf_file))
+
             self.log("debug", f"Extracted text from PDF file {pdf_file}")
             return stripped
         except PDFException:
@@ -244,9 +244,9 @@ class RasterisedDocumentParser(DocumentParser):
             if original_has_text:
                 self.text = text_original
         except (NoTextFoundException, InputFileError) as e:
-            self.log("exception",
-                     f"Encountered the following error while running OCR, "
-                     f"attempting force OCR to get the text.")
+            self.log("warning",
+                     f"Encountered an error while running OCR: {str(e)}. "
+                     f"Attempting force OCR to get the text.")
 
             archive_path_fallback = os.path.join(
                 self.tempdir, "archive-fallback.pdf")
@@ -294,7 +294,7 @@ class RasterisedDocumentParser(DocumentParser):
                 self.text = ""
 
 
-def strip_excess_whitespace(text):
+def post_process_text(text):
     if not text:
         return None
 
@@ -305,4 +305,6 @@ def strip_excess_whitespace(text):
         r"([^\S\n\r]+)$", '', no_leading_whitespace)
 
     # TODO: this needs a rework
-    return no_trailing_whitespace.strip()
+    # replace \0 prevents issues with saving to postgres.
+    # text may contain \0 when this character is present in PDF files.
+    return no_trailing_whitespace.strip().replace("\0", " ")

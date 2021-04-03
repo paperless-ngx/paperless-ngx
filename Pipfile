@@ -24,9 +24,8 @@ langdetect = "*"
 # numpy 1.20.0 drops python 3.6 support
 numpy = "~=1.19.5"
 pathvalidate = "*"
-# pinned to 8.1.0, since aarch64 wheels might not be available beyond that https://github.com/python-pillow/Pillow/issues/5202
-pillow = "==8.1.0"
-pikepdf = "~=2.5.0"
+pillow = "~=8.1"
+pikepdf = "~=2.5"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
@@ -52,7 +51,6 @@ uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 # uvloop 0.15+ incompatible with python 3.6
 uvloop = "~=0.14.0"
-# TODO: keep an eye on piwheel builds and update this once available (https://www.piwheels.org/project/cryptography/)
 cryptography = "~=3.4"
 "pdfminer.six" = "*"
 
