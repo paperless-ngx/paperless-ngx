@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
+import { FILTER_FULLTEXT_MORELIKE, FILTER_FULLTEXT_QUERY } from '../data/filter-rule-type';
 import { PaperlessDocument } from '../data/paperless-document';
 import { PaperlessSavedView } from '../data/paperless-saved-view';
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
@@ -134,6 +135,9 @@ export class DocumentListViewService {
 
   set filterRules(filterRules: FilterRule[]) {
     this.activeListViewState.filterRules = filterRules
+    if (filterRules.find(r => (r.rule_type == FILTER_FULLTEXT_QUERY || r.rule_type == FILTER_FULLTEXT_MORELIKE))) {
+      this.activeListViewState.currentPage = 1
+    }
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
