@@ -76,7 +76,7 @@
 </app-page-header>
 
 <div class="w-100 mb-2 mb-sm-4">
-  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [rulesModified]="filterRulesModified" (filterRulesChange)="rulesChanged()" (reset)="resetFilters()" #filterEditor></app-filter-editor>
+  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 
