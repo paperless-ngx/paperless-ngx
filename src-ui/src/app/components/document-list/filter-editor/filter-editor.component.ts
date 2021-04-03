@@ -11,6 +11,7 @@ import { FilterRule } from 'src/app/data/filter-rule';
 import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_ASN, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE, FILTER_TITLE_CONTENT } from 'src/app/data/filter-rule-type';
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
+import { DocumentService } from 'src/app/services/rest/document.service';
 
 const TEXT_FILTER_TARGET_TITLE = "title"
 const TEXT_FILTER_TARGET_TITLE_CONTENT = "title-content"
@@ -64,7 +65,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private correspondentService: CorrespondentService
+    private correspondentService: CorrespondentService,
+    private documentService: DocumentService
   ) { }
 
   tags: PaperlessTag[] = []
@@ -223,6 +225,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       distinctUntilChanged()
     ).subscribe(text => {
       this._textFilter = text
+      this.documentService.setSearchQuery(text)
       this.updateRules()
     })
   }
