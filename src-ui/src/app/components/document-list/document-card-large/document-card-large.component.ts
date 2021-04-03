@@ -41,21 +41,20 @@ export class DocumentCardLargeComponent implements OnInit {
   @Output()
   clickMoreLike= new EventEmitter()
 
-  @Input()
-  searchScore: number
-
   @ViewChild('popover') popover: NgbPopover
 
   mouseOnPreview = false
   popoverHidden = true
 
   get searchScoreClass() {
-    if (this.searchScore > 0.7) {
-      return "success"
-    } else if (this.searchScore > 0.3) {
-      return "warning"
-    } else {
-      return "danger"
+    if (this.document.__search_hit__) {
+      if (this.document.__search_hit__.score > 0.7) {
+        return "success"
+      } else if (this.document.__search_hit__.score > 0.3) {
+        return "warning"
+      } else {
+        return "danger"
+      }
     }
   }
 
