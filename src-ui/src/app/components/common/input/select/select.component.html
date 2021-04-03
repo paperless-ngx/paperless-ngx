@@ -1,28 +1,29 @@
 <div class="form-group paperless-input-select">
   <label [for]="inputId">{{title}}</label>
-  <div [class.input-group]="showPlusButton()">
-    <ng-select name="inputId" [(ngModel)]="value"
+  <div>
+    <ng-select *ngIf="allowCreateNew; else noAddTag" name="inputId" [(ngModel)]="value"
       [disabled]="disabled"
       [style.color]="textColor"
       [style.background]="backgroundColor"
       [clearable]="allowNull"
       [items]="items"
+      [addTag]="addItemRef"
       bindLabel="name"
       bindValue="id"
-      (change)="onChange(value)"
-      (search)="onSearch($event)"
-      (focus)="clearLastSearchTerm()"
-      (clear)="clearLastSearchTerm()"
-      (blur)="onBlur()">
+      (blur)="onTouched()">
     </ng-select>
-
-    <div *ngIf="showPlusButton()" class="input-group-append">
-      <button class="btn btn-outline-secondary" type="button" (click)="clickNew()">
-        <svg class="buttonicon" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#plus" />
-        </svg>
-      </button>
-    </div>
+    <ng-template #noAddTag>
+      <ng-select name="inputId" [(ngModel)]="value"
+        [disabled]="disabled"
+        [style.color]="textColor"
+        [style.background]="backgroundColor"
+        [clearable]="allowNull"
+        [items]="items"
+        bindLabel="name"
+        bindValue="id"
+        (blur)="onTouched()">
+      </ng-select>
+    </ng-template>
   </div>
   <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
   <small *ngIf="getSuggestions().length > 0">
