@@ -17,6 +17,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_q.tasks import async_task
 from rest_framework import parsers
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (
@@ -382,6 +383,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 with index.open_index_searcher() as s:
                     self.searcher = s
                     return super(UnifiedSearchViewSet, self).list(request)
+            except NotFound:
+                raise
             except Exception as e:
                 return HttpResponseBadRequest(str(e))
         else:
