@@ -332,15 +332,15 @@ class SearchResultSerializer(DocumentSerializer):
 
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance['id'])
-        representation = super(SearchResultSerializer, self).to_representation(doc)
-        representation['__search_hit__'] = {
+        r = super(SearchResultSerializer, self).to_representation(doc)
+        r['__search_hit__'] = {
             "score": instance.score,
             "highlights": instance.highlights("content",
                                    text=doc.content) if doc else None,  # NOQA: E501
             "rank": instance.rank
         }
 
-        return representation
+        return r
 
 
 class UnifiedSearchViewSet(DocumentViewSet):
@@ -356,7 +356,8 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return DocumentSerializer
 
     def _is_search_request(self):
-        return "query" in self.request.query_params or "more_like_id" in self.request.query_params
+        return ("query" in self.request.query_params or
+                "more_like_id" in self.request.query_params)
 
     def filter_queryset(self, queryset):
         if self._is_search_request():
