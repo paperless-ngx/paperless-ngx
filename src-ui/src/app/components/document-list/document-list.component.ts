@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
@@ -208,10 +209,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   clickMoreLike(documentID: number) {
-    this.list.selectNone()
-    setTimeout(() => {
-      //this.filterEditor.moreLikeThis(doc)
-    })
+    this.list.quickFilter([{rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString()}])
   }
 
   trackByDocumentId(index, item: PaperlessDocument) {
