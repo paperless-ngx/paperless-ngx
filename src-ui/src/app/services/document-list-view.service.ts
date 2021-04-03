@@ -1,9 +1,7 @@
-import { Route } from '@angular/compiler/src/core';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
-import { FILTER_FULLTEXT_MORELIKE, FILTER_FULLTEXT_QUERY } from '../data/filter-rule-type';
 import { PaperlessDocument } from '../data/paperless-document';
 import { PaperlessSavedView } from '../data/paperless-saved-view';
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
@@ -40,6 +38,7 @@ interface ListViewState {
 export class DocumentListViewService {
 
   isReloading: boolean = false
+  error: string = null
 
   rangeSelectionAnchorIndex: number
   lastRangeSelectionToIndex: number
@@ -103,6 +102,7 @@ export class DocumentListViewService {
 
   reload(onFinish?) {
     this.isReloading = true
+    this.error = null
     let activeListViewState = this.activeListViewState
 
     this.documentService.listFiltered(
@@ -126,6 +126,8 @@ export class DocumentListViewService {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             activeListViewState.currentPage = 1
             this.reload()
+          } else {
+            this.error = error.error
           }
         })
   }
