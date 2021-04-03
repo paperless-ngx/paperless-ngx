@@ -423,6 +423,54 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]['id'], d3.id)
         self.assertEqual(results[1]['id'], d1.id)
 
+    def test_search_filtering(self):
+        t = Tag.objects.create(name="tag")
+        t2 = Tag.objects.create(name="tag2")
+        c = Correspondent.objects.create(name="correspondent")
+        dt = DocumentType.objects.create(name="type")
+
+        d1 = Document.objects.create(checksum="1", correspondent=c, content="test")
+        d2 = Document.objects.create(checksum="2", document_type=dt, content="test")
+        d3 = Document.objects.create(checksum="3", content="test")
+        d3.tags.add(t)
+        d3.tags.add(t2)
+        d4 = Document.objects.create(checksum="4", created=datetime.datetime(2020, 7, 13), content="test")
+        d4.tags.add(t2)
+        d5 = Document.objects.create(checksum="5", added=datetime.datetime(2020, 7, 13), content="test")
+        d6 = Document.objects.create(checksum="6", content="test2")
+
+        with AsyncWriter(index.open_index()) as writer:
+            for doc in Document.objects.all():
+                index.update_document(writer, doc)
+
+        def search_query(q):
+            r = self.client.get("/api/documents/?query=test" + q)
+            self.assertEqual(r.status_code, 200)
+            return [hit['id'] for hit in r.data['results']]
+
+        self.assertCountEqual(search_query(""), [d1.id, d2.id, d3.id, d4.id, d5.id])
+        self.assertCountEqual(search_query("&is_tagged=true"), [d3.id, d4.id])
+        self.assertCountEqual(search_query("&is_tagged=false"), [d1.id, d2.id, d5.id])
+        self.assertCountEqual(search_query("&correspondent__id=" + str(c.id)), [d1.id])
+        self.assertCountEqual(search_query("&document_type__id=" + str(dt.id)), [d2.id])
+        self.assertCountEqual(search_query("&correspondent__isnull"), [d2.id, d3.id, d4.id, d5.id])
+        self.assertCountEqual(search_query("&document_type__isnull"), [d1.id, d3.id, d4.id, d5.id])
+        self.assertCountEqual(search_query("&tags__id__all=" + str(t.id) + "," + str(t2.id)), [d3.id])
+        self.assertCountEqual(search_query("&tags__id__all=" + str(t.id)), [d3.id])
+        self.assertCountEqual(search_query("&tags__id__all=" + str(t2.id)), [d3.id, d4.id])
+
+        self.assertIn(d4.id, search_query("&created__date__lt=" + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d")))
+        self.assertNotIn(d4.id, search_query("&created__date__gt=" + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d")))
+
+        self.assertNotIn(d4.id, search_query("&created__date__lt=" + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d")))
+        self.assertIn(d4.id, search_query("&created__date__gt=" + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d")))
+
+        self.assertIn(d5.id, search_query("&added__date__lt=" + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d")))
+        self.assertNotIn(d5.id, search_query("&added__date__gt=" + datetime.datetime(2020, 9, 2).strftime("%Y-%m-%d")))
+
+        self.assertNotIn(d5.id, search_query("&added__date__lt=" + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d")))
+        self.assertIn(d5.id, search_query("&added__date__gt=" + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d")))
+
     def test_statistics(self):
 
         doc1 = Document.objects.create(title="none1", checksum="A")
