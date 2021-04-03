@@ -12,6 +12,7 @@ import { DocumentTypeService } from './document-type.service';
 import { TagService } from './tag.service';
 import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
+import { ActivatedRoute } from '@angular/router';
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -39,8 +40,14 @@ export interface SelectionData {
 })
 export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
 
-  constructor(http: HttpClient, private correspondentService: CorrespondentService, private documentTypeService: DocumentTypeService, private tagService: TagService) {
+  private searchQuery: string
+
+  constructor(http: HttpClient, private correspondentService: CorrespondentService, private documentTypeService: DocumentTypeService, private tagService: TagService, private route: ActivatedRoute) {
     super(http, 'documents')
+
+    this.route.queryParamMap.subscribe(paramMap => {
+      this.searchQuery = paramMap.get('query')
+    })
   }
 
   private filterRulesToQueryParams(filterRules: FilterRule[]) {
@@ -92,6 +99,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   getPreviewUrl(id: number, original: boolean = false): string {
     let url = this.getResourceUrl(id, 'preview')
+    if (this.searchQuery) url += `#search="${this.searchQuery}"`
     if (original) {
       url += "?original=true"
     }
@@ -136,6 +144,10 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   bulkDownload(ids: number[], content="both") {
     return this.http.post(this.getResourceUrl(null, 'bulk_download'), {"documents": ids, "content": content}, { responseType: 'blob' })
+  }
+
+  public setSearchQuery(query: string) {
+    this.searchQuery = query
   }
 
 }
