@@ -85,7 +85,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       {id: TEXT_FILTER_TARGET_TITLE, name: $localize`Title`},
       {id: TEXT_FILTER_TARGET_TITLE_CONTENT, name: $localize`Title & content`},
       {id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN`},
-      {id: TEXT_FILTER_TARGET_FULLTEXT_QUERY, name: $localize`Fulltext search`}
+      {id: TEXT_FILTER_TARGET_FULLTEXT_QUERY, name: $localize`Advanced search`}
     ]
     if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
       targets.push({id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE, name: $localize`More like`})
