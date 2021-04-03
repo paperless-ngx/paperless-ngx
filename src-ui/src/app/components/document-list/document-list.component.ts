@@ -114,6 +114,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       }
       this.savedViewService.patch(savedView).subscribe(result => {
         this.toastService.showInfo($localize`View "${this.list.activeSavedViewTitle}" saved successfully.`)
+        this.unmodifiedFilterRules = this.list.filterRules
       })
     }
   }
