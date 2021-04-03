@@ -82,11 +82,8 @@ def open_index(recreate=False):
 
 
 @contextmanager
-def open_index_writer(ix=None, optimize=False):
-    if ix:
-        writer = AsyncWriter(ix)
-    else:
-        writer = AsyncWriter(open_index())
+def open_index_writer(optimize=False):
+    writer = AsyncWriter(open_index())
 
     try:
         yield writer
@@ -98,11 +95,8 @@ def open_index_writer(ix=None, optimize=False):
 
 
 @contextmanager
-def open_index_searcher(ix=None):
-    if ix:
-        searcher = ix.searcher()
-    else:
-        searcher = open_index().searcher()
+def open_index_searcher():
+    searcher = open_index().searcher()
 
     try:
         yield searcher
