@@ -7,6 +7,7 @@ import tempfile
 import zipfile
 from unittest import mock
 
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import override_settings
@@ -294,12 +295,6 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         results = response.data['results']
         self.assertEqual(len(results), 0)
 
-    def test_search_no_query(self):
-        response = self.client.get("/api/search/")
-        results = response.data['results']
-
-        self.assertEqual(len(results), 0)
-
     def test_search(self):
         d1=Document.objects.create(title="invoice", content="the thing i bought at a shop and paid with bank account", checksum="A", pk=1)
         d2=Document.objects.create(title="bank statement 1", content="things i paid for in august", pk=2, checksum="B")
@@ -311,32 +306,24 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             index.update_document(writer, d1)
             index.update_document(writer, d2)
             index.update_document(writer, d3)
-        response = self.client.get("/api/search/?query=bank")
+        response = self.client.get("/api/documents/?query=bank")
         results = response.data['results']
         self.assertEqual(response.data['count'], 3)
-        self.assertEqual(response.data['page'], 1)
-        self.assertEqual(response.data['page_count'], 1)
         self.assertEqual(len(results), 3)
 
-        response = self.client.get("/api/search/?query=september")
+        response = self.client.get("/api/documents/?query=september")
         results = response.data['results']
         self.assertEqual(response.data['count'], 1)
-        self.assertEqual(response.data['page'], 1)
-        self.assertEqual(response.data['page_count'], 1)
         self.assertEqual(len(results), 1)
 
-        response = self.client.get("/api/search/?query=statement")
+        response = self.client.get("/api/documents/?query=statement")
         results = response.data['results']
         self.assertEqual(response.data['count'], 2)
-        self.assertEqual(response.data['page'], 1)
-        self.assertEqual(response.data['page_count'], 1)
         self.assertEqual(len(results), 2)
 
-        response = self.client.get("/api/search/?query=sfegdfg")
+        response = self.client.get("/api/documents/?query=sfegdfg")
         results = response.data['results']
         self.assertEqual(response.data['count'], 0)
-        self.assertEqual(response.data['page'], 0)
-        self.assertEqual(response.data['page_count'], 0)
         self.assertEqual(len(results), 0)
 
     def test_search_multi_page(self):
@@ -349,34 +336,23 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         seen_ids = []
 
         for i in range(1, 6):
-            response = self.client.get(f"/api/search/?query=content&page={i}")
+            response = self.client.get(f"/api/documents/?query=content&page={i}&page_size=10")
             results = response.data['results']
             self.assertEqual(response.data['count'], 55)
-            self.assertEqual(response.data['page'], i)
-            self.assertEqual(response.data['page_count'], 6)
             self.assertEqual(len(results), 10)
 
             for result in results:
                 self.assertNotIn(result['id'], seen_ids)
                 seen_ids.append(result['id'])
 
-        response = self.client.get(f"/api/search/?query=content&page=6")
+        response = self.client.get(f"/api/documents/?query=content&page=6&page_size=10")
         results = response.data['results']
         self.assertEqual(response.data['count'], 55)
-        self.assertEqual(response.data['page'], 6)
-        self.assertEqual(response.data['page_count'], 6)
         self.assertEqual(len(results), 5)
 
         for result in results:
             self.assertNotIn(result['id'], seen_ids)
             seen_ids.append(result['id'])
-
-        response = self.client.get(f"/api/search/?query=content&page=7")
-        results = response.data['results']
-        self.assertEqual(response.data['count'], 55)
-        self.assertEqual(response.data['page'], 6)
-        self.assertEqual(response.data['page_count'], 6)
-        self.assertEqual(len(results), 5)
 
     def test_search_invalid_page(self):
         with AsyncWriter(index.open_index()) as writer:
@@ -384,18 +360,10 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 doc = Document.objects.create(checksum=str(i), pk=i+1, title=f"Document {i+1}", content="content")
                 index.update_document(writer, doc)
 
-        first_page = self.client.get(f"/api/search/?query=content&page=1").data
-        second_page = self.client.get(f"/api/search/?query=content&page=2").data
-        should_be_first_page_1 = self.client.get(f"/api/search/?query=content&page=0").data
-        should_be_first_page_2 = self.client.get(f"/api/search/?query=content&page=dgfd").data
-        should_be_first_page_3 = self.client.get(f"/api/search/?query=content&page=").data
-        should_be_first_page_4 = self.client.get(f"/api/search/?query=content&page=-7868").data
-
-        self.assertDictEqual(first_page, should_be_first_page_1)
-        self.assertDictEqual(first_page, should_be_first_page_2)
-        self.assertDictEqual(first_page, should_be_first_page_3)
-        self.assertDictEqual(first_page, should_be_first_page_4)
-        self.assertNotEqual(len(first_page['results']), len(second_page['results']))
+        response = self.client.get(f"/api/documents/?query=content&page=0&page_size=10")
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get(f"/api/documents/?query=content&page=3&page_size=10")
+        self.assertEqual(response.status_code, 404)
 
     @mock.patch("documents.index.autocomplete")
     def test_search_autocomplete(self, m):
@@ -419,6 +387,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 10)
 
+    @pytest.mark.skip(reason="Not implemented yet")
     def test_search_spelling_correction(self):
         with AsyncWriter(index.open_index()) as writer:
             for i in range(55):
@@ -444,7 +413,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             index.update_document(writer, d2)
             index.update_document(writer, d3)
 
-        response = self.client.get(f"/api/search/?more_like={d2.id}")
+        response = self.client.get(f"/api/documents/?more_like_id={d2.id}")
 
         self.assertEqual(response.status_code, 200)
 
@@ -1375,8 +1344,7 @@ class TestApiAuth(APITestCase):
         self.assertEqual(self.client.get("/api/logs/").status_code, 401)
         self.assertEqual(self.client.get("/api/saved_views/").status_code, 401)
 
-        self.assertEqual(self.client.get("/api/search/").status_code, 401)
-        self.assertEqual(self.client.get("/api/search/auto_complete/").status_code, 401)
+        self.assertEqual(self.client.get("/api/search/autocomplete/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/bulk_edit/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/bulk_download/").status_code, 401)
         self.assertEqual(self.client.get("/api/documents/selection_data/").status_code, 401)
