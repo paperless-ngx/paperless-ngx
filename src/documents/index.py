@@ -193,20 +193,21 @@ class DelayedQuery:
 
     @property
     def _query_sortedby(self):
-        if not 'ordering' in self.query_params:
-            return None, False
+        # if not 'ordering' in self.query_params:
+        return None, False
 
-        o: str = self.query_params['ordering']
-        if o.startswith('-'):
-            return o[1:], True
-        else:
-            return o, False
+        # o: str = self.query_params['ordering']
+        # if o.startswith('-'):
+        #     return o[1:], True
+        # else:
+        #     return o, False
 
     def __init__(self, searcher: Searcher, query_params, page_size):
         self.searcher = searcher
         self.query_params = query_params
         self.page_size = page_size
         self.saved_results = dict()
+        self.first_score = None
 
     def __len__(self):
         page = self[0:1]
@@ -219,7 +220,6 @@ class DelayedQuery:
         q, mask = self._query
         sortedby, reverse = self._query_sortedby
 
-        print("OY", self.page_size)
         page: ResultsPage = self.searcher.search_page(
             q,
             mask=mask,
@@ -232,6 +232,15 @@ class DelayedQuery:
         page.results.fragmenter = highlight.ContextFragmenter(
             surround=50)
         page.results.formatter = HtmlFormatter(tagname="span", between=" ... ")
+
+        if not self.first_score and len(page.results) > 0:
+            self.first_score = page.results[0].score
+
+        if self.first_score:
+            page.results.top_n = list(map(
+                lambda hit: (hit[0] / self.first_score, hit[1]),
+                page.results.top_n
+            ))
 
         self.saved_results[item.start] = page
 
