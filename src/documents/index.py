@@ -3,6 +3,7 @@ import os
 from contextlib import contextmanager
 
 import math
+from dateutil.parser import isoparse
 from django.conf import settings
 from whoosh import highlight, classify, query
 from whoosh.fields import Schema, TEXT, NUMERIC, KEYWORD, DATETIME, BOOLEAN
@@ -174,13 +175,17 @@ class DelayedQuery:
             elif k == 'document_type__isnull':
                 criterias.append(query.Term("has_type", v == "false"))
             elif k == 'created__date__lt':
-                pass
+                criterias.append(
+                    query.DateRange("created", start=None, end=isoparse(v)))
             elif k == 'created__date__gt':
-                pass
+                criterias.append(
+                    query.DateRange("created", start=isoparse(v), end=None))
             elif k == 'added__date__gt':
-                pass
+                criterias.append(
+                    query.DateRange("added", start=isoparse(v), end=None))
             elif k == 'added__date__lt':
-                pass
+                criterias.append(
+                    query.DateRange("added", start=None, end=isoparse(v)))
         if len(criterias) > 0:
             return query.And(criterias)
         else:
