@@ -10,6 +10,7 @@ import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
 import { TagListComponent } from './components/manage/tag-list/tag-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import {DocumentAsnComponent} from "./components/document-asn/document-asn.component";
 
 const routes: Routes = [
   {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
@@ -18,13 +19,14 @@ const routes: Routes = [
     {path: 'documents', component: DocumentListComponent },
     {path: 'view/:id', component: DocumentListComponent },
     {path: 'documents/:id', component: DocumentDetailComponent },
-  
+      {path: 'asn/:id', component: DocumentAsnComponent },
+
     {path: 'tags', component: TagListComponent },
     {path: 'documenttypes', component: DocumentTypeListComponent },
     {path: 'correspondents', component: CorrespondentListComponent },
     {path: 'logs', component: LogsComponent },
     {path: 'settings', component: SettingsComponent },
-  ]}, 
+  ]},
 
   {path: '404', component: NotFoundComponent},
   {path: '**', redirectTo: '/404', pathMatch: 'full'}

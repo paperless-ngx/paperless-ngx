@@ -90,7 +90,7 @@ def matches(matching_model, document):
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_LITERAL:
         result = bool(re.search(
-            rf"\b{matching_model.match}\b",
+            rf"\b{re.escape(matching_model.match)}\b",
             document_content,
             **search_kwargs
         ))
@@ -161,6 +161,9 @@ def _split_match(matching_model):
     findterms = re.compile(r'"([^"]+)"|(\S+)').findall
     normspace = re.compile(r"\s+").sub
     return [
-        normspace(" ", (t[0] or t[1]).strip()).replace(" ", r"\s+")
+        # normspace(" ", (t[0] or t[1]).strip()).replace(" ", r"\s+")
+        re.escape(
+            normspace(" ", (t[0] or t[1]).strip())
+        ).replace(r"\ ", r"\s+")
         for t in findterms(matching_model.match)
     ]
