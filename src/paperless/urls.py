@@ -12,11 +12,10 @@ from django.utils.translation import gettext_lazy as _
 from paperless.consumers import StatusConsumer
 from documents.views import (
     CorrespondentViewSet,
-    DocumentViewSet,
+    UnifiedSearchViewSet,
     LogViewSet,
     TagViewSet,
     DocumentTypeViewSet,
-    SearchView,
     IndexView,
     SearchAutoCompleteView,
     StatisticsView,
@@ -31,7 +30,7 @@ from paperless.views import FaviconView
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
 api_router.register(r"document_types", DocumentTypeViewSet)
-api_router.register(r"documents", DocumentViewSet)
+api_router.register(r"documents", UnifiedSearchViewSet)
 api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
@@ -46,10 +45,6 @@ urlpatterns = [
         re_path(r"^search/autocomplete/",
                 SearchAutoCompleteView.as_view(),
                 name="autocomplete"),
-
-        re_path(r"^search/",
-                SearchView.as_view(),
-                name="search"),
 
         re_path(r"^statistics/",
                 StatisticsView.as_view(),

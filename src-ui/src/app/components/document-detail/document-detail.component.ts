@@ -20,6 +20,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
 @Component({
   selector: 'app-document-detail',
@@ -219,7 +220,7 @@ export class DocumentDetailComponent implements OnInit {
   }
 
   moreLike() {
-    this.router.navigate(["search"], {queryParams: {more_like:this.document.id}})
+    this.documentListViewService.quickFilter([{rule_type: FILTER_FULLTEXT_MORELIKE, value: this.documentId.toString()}])
   }
 
   hasNext() {
