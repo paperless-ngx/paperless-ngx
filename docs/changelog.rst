@@ -5,6 +5,28 @@
 Changelog
 *********
 
+paperless-ng 1.4.0
+##################
+
+* Docker images now use tesseract 4.1.1, which should fix a series of issues with OCR.
+
+* The full text search now displays results using the default document list. This enables
+  selection, filtering and bulk edit on search results.
+
+* Changes
+
+  * New URL pattern for accessing documents by ASN directly (http://<paperless>/asn/123)
+
+  * Added logging when executing pre- and post-consume scripts.
+
+  * Better error logging during document consumption.
+
+  * Updated python dependencies.
+
+* Fixes
+
+  * Fixed an issue with null characters in the document content.
+
 paperless-ng 1.3.2
 ##################
 
