@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1014_auto_20210228_1614'),
+        ('documents', '1015_remove_null_characters'),
     ]
 
     operations = [
