@@ -1,30 +1,45 @@
 <div class="form-group paperless-input-select">
   <label [for]="inputId">{{title}}</label>
-  <div>
-    <ng-select *ngIf="allowCreateNew; else noAddTag" name="inputId" [(ngModel)]="value"
-      [disabled]="disabled"
-      [style.color]="textColor"
-      [style.background]="backgroundColor"
-      [clearable]="allowNull"
-      [items]="items"
-      [addTag]="addItemRef"
-      bindLabel="name"
-      bindValue="id"
-      (blur)="onTouched()">
-    </ng-select>
-    <ng-template #noAddTag>
-      <ng-select name="inputId" [(ngModel)]="value"
+    <div [class.input-group]="allowCreateNew">
+      <ng-select *ngIf="allowCreateNew; else noAddTag" name="inputId" [(ngModel)]="value"
         [disabled]="disabled"
         [style.color]="textColor"
         [style.background]="backgroundColor"
         [clearable]="allowNull"
         [items]="items"
+        [addTag]="addItemRef"
         bindLabel="name"
         bindValue="id"
-        (blur)="onTouched()">
+        (change)="onChange(value)"
+        (search)="onSearch($event)"
+        (focus)="clearLastSearchTerm()"
+        (clear)="clearLastSearchTerm()"
+        (blur)="onBlur()">
       </ng-select>
-    </ng-template>
-  </div>
+      <ng-template #noAddTag>
+        <ng-select name="inputId" [(ngModel)]="value"
+          [disabled]="disabled"
+          [style.color]="textColor"
+          [style.background]="backgroundColor"
+          [clearable]="allowNull"
+          [items]="items"
+          bindLabel="name"
+          bindValue="id"
+          (change)="onChange(value)"
+          (search)="onSearch($event)"
+          (focus)="clearLastSearchTerm()"
+          (clear)="clearLastSearchTerm()"
+          (blur)="onBlur()">
+        </ng-select>
+      </ng-template>
+      <div *ngIf="allowCreateNew" class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" (click)="addItem()">
+          <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#plus" />
+          </svg>
+        </button>
+      </div>
+    </div>
   <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
   <small *ngIf="getSuggestions().length > 0">
     <span i18n>Suggestions:</span>&nbsp;
