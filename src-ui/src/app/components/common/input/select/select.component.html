@@ -1,13 +1,13 @@
 <div class="form-group paperless-input-select">
   <label [for]="inputId">{{title}}</label>
     <div [class.input-group]="allowCreateNew">
-      <ng-select *ngIf="allowCreateNew; else noAddTag" name="inputId" [(ngModel)]="value"
+      <ng-select name="inputId" [(ngModel)]="value"
         [disabled]="disabled"
         [style.color]="textColor"
         [style.background]="backgroundColor"
         [clearable]="allowNull"
         [items]="items"
-        [addTag]="addItemRef"
+        [addTag]="allowCreateNew && addItemRef"
         bindLabel="name"
         bindValue="id"
         (change)="onChange(value)"
@@ -16,22 +16,6 @@
         (clear)="clearLastSearchTerm()"
         (blur)="onBlur()">
       </ng-select>
-      <ng-template #noAddTag>
-        <ng-select name="inputId" [(ngModel)]="value"
-          [disabled]="disabled"
-          [style.color]="textColor"
-          [style.background]="backgroundColor"
-          [clearable]="allowNull"
-          [items]="items"
-          bindLabel="name"
-          bindValue="id"
-          (change)="onChange(value)"
-          (search)="onSearch($event)"
-          (focus)="clearLastSearchTerm()"
-          (clear)="clearLastSearchTerm()"
-          (blur)="onBlur()">
-        </ng-select>
-      </ng-template>
       <div *ngIf="allowCreateNew" class="input-group-append">
         <button class="btn btn-outline-secondary" type="button" (click)="addItem()">
           <svg class="buttonicon" fill="currentColor">
