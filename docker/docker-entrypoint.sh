@@ -68,6 +68,17 @@ migrations() {
 
 }
 
+search_index() {
+	index_version=1
+	index_version_file=/usr/src/paperless/data/.index_version
+
+	if [[ (! -f "$index_version_file") || $(< $index_version_file) != "$index_version" ]]; then
+		echo "Search index out of date. Updating..."
+		sudo -HEu paperless python3 manage.py document_index reindex
+		echo $index_version | sudo -HEu paperless tee $index_version_file >/dev/null
+	fi
+}
+
 initialize() {
 	map_uidgid
 
@@ -87,6 +98,7 @@ initialize() {
 
 	migrations
 
+	search_index
 }
 
 install_languages() {
