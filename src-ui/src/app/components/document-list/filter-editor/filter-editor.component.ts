@@ -290,9 +290,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       distinctUntilChanged()
     ).subscribe(text => {
       this._textFilter = text
-      this.documentService.setSearchQuery(text)
+      this.documentService.searchQuery = text
       this.updateRules()
     })
+
+    if (this._textFilter) this.documentService.searchQuery = this._textFilter
+
   }
 
   ngOnDestroy() {
