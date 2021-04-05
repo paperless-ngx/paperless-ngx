@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
@@ -71,6 +71,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     private correspondentService: CorrespondentService,
     private documentService: DocumentService
   ) { }
+
+  @ViewChild("textFilterInput")
+  textFilterInput: ElementRef
 
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[] = []
@@ -330,6 +333,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       this._textFilter = ""
     }
     this.textFilterTarget = target
+    this.textFilterInput.nativeElement.focus()
     this.updateRules()
   }
 }
