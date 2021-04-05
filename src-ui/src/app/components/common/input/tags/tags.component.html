@@ -7,8 +7,13 @@
       [closeOnSelect]="false"
       [clearSearchOnAdd]="true"
       [hideSelected]="true"
+      [addTag]="createTagRef"
+      addTagText="Add tag"
       (change)="onChange(value)"
-      (blur)="onTouched()">
+      (search)="onSearch($event)"
+      (focus)="clearLastSearchTerm()"
+      (clear)="clearLastSearchTerm()"
+      (blur)="onBlur()">
 
       <ng-template ng-label-tmp let-item="item">
         <span class="tag-wrap tag-wrap-delete" (click)="removeTag(item.id)">
@@ -39,8 +44,8 @@
     <ng-container *ngFor="let tag of getSuggestions()">
       <a (click)="addTag(tag.id)" [routerLink]="">{{tag.name}}</a>&nbsp;
     </ng-container>
-    
-    
+
+
   </small>
 
 </div>
