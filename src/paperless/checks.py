@@ -23,9 +23,12 @@ def path_check(var, directory):
                 exists_hint.format(directory)
             ))
         else:
-            test_file = os.path.join(directory, '__paperless_write_test__')
+            test_file = os.path.join(
+                directory, f'__paperless_write_test_{os.getpid()}__'
+            )
             try:
-                open(test_file, 'w')
+                with open(test_file, 'w'):
+                    pass
             except PermissionError:
                 messages.append(Error(
                     writeable_message.format(var),
@@ -33,8 +36,9 @@ def path_check(var, directory):
                         f'\n{stat.filemode(os.stat(directory).st_mode)} '
                         f'{directory}\n')
                 ))
-            else:
-                os.remove(test_file)
+            finally:
+                if os.path.isfile(test_file):
+                    os.remove(test_file)
 
     return messages
 
