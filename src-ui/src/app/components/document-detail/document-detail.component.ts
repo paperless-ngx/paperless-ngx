@@ -128,9 +128,10 @@ export class DocumentDetailComponent implements OnInit {
     this.documentForm.patchValue(doc)
   }
 
-  createDocumentType() {
+  createDocumentType(newName: string) {
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.success.subscribe(newDocumentType => {
       this.documentTypeService.listAll().subscribe(documentTypes => {
         this.documentTypes = documentTypes.results
@@ -139,9 +140,10 @@ export class DocumentDetailComponent implements OnInit {
     })
   }
 
-  createCorrespondent() {
+  createCorrespondent(newName: string) {
     var modal = this.modalService.open(CorrespondentEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.success.subscribe(newCorrespondent => {
       this.correspondentService.listAll().subscribe(correspondents => {
         this.correspondents = correspondents.results
