@@ -159,6 +159,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
           this.documentService.get(this._moreLikeId).subscribe(result => {
             this._moreLikeDoc = result
+            this._textFilter = result.title
           })
           break
         case FILTER_CREATED_AFTER:
@@ -325,6 +326,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   changeTextFilterTarget(target) {
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE && target != TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
+      this._textFilter = ""
+    }
     this.textFilterTarget = target
     this.updateRules()
   }
