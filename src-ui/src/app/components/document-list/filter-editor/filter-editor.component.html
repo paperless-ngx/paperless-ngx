@@ -8,8 +8,7 @@
               <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget == t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
             </div>
           </div>
-          <input class="form-control form-control-sm" type="text" [(ngModel)]="textFilter" *ngIf="textFilterTarget != 'fulltext-morelike'">
-          <span class="form-control form-control-sm text-truncate" *ngIf="textFilterTarget == 'fulltext-morelike'">{{_moreLikeDoc?.title}}</span>
+          <input class="form-control form-control-sm" type="text" [(ngModel)]="textFilter" [readonly]="textFilterTarget == 'fulltext-morelike'">
          </div>
      </div>
   </div>
