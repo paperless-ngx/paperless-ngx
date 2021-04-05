@@ -17,8 +17,9 @@ import { TagService } from 'src/app/services/rest/tag.service';
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
 
-  constructor(private tagService: TagService, private modalService: NgbModal) { }
-
+  constructor(private tagService: TagService, private modalService: NgbModal) {
+    this.createTagRef = this.createTag.bind(this)
+  }
 
   onChange = (newValue: number[]) => {};
 
@@ -56,6 +57,10 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   tags: PaperlessTag[]
 
+  public createTagRef: (name) => void
+
+  private _lastSearchTerm: string
+
   getTag(id) {
     if (this.tags) {
       return this.tags.find(tag => tag.id == id)
@@ -74,9 +79,11 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-  createTag() {
+  createTag(name: string = null) {
     var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (name) modal.componentInstance.object = { name: name }
+    else if (this._lastSearchTerm) modal.componentInstance.object = { name: this._lastSearchTerm }
     modal.componentInstance.success.subscribe(newTag => {
       this.tagService.listAll().subscribe(tags => {
         this.tags = tags.results
@@ -97,6 +104,20 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   addTag(id) {
     this.value = [...this.value, id]
     this.onChange(this.value)
+  }
+
+  clearLastSearchTerm() {
+    this._lastSearchTerm = null
+  }
+
+  onSearch($event) {
+    this._lastSearchTerm = $event.term
+  }
+
+  onBlur() {
+    setTimeout(() => {
+      this.clearLastSearchTerm()
+    }, 3000);
   }
 
 }
