@@ -21,8 +21,6 @@ import { CorrespondentEditDialogComponent } from './components/manage/correspond
 import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { TagComponent } from './components/common/tag/tag.component';
-import { SearchComponent } from './components/search/search.component';
-import { ResultHighlightComponent } from './components/search/result-highlight/result-highlight.component';
 import { PageHeaderComponent } from './components/common/page-header/page-header.component';
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
@@ -75,6 +73,7 @@ import localeEnGb from '@angular/common/locales/en-GB';
 import localeRo from '@angular/common/locales/ro';
 import localeRu from '@angular/common/locales/ru';
 import localeEs from '@angular/common/locales/es';
+import { DocumentAsnComponent } from './components/document-asn/document-asn.component';
 
 
 registerLocaleData(localeFr)
@@ -105,8 +104,6 @@ registerLocaleData(localeEs)
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     TagComponent,
-    SearchComponent,
-    ResultHighlightComponent,
     PageHeaderComponent,
     AppFrameComponent,
     ToastsComponent,
@@ -138,7 +135,8 @@ registerLocaleData(localeEs)
     SafePipe,
     CustomDatePipe,
     DateComponent,
-    ColorComponent
+    ColorComponent,
+    DocumentAsnComponent
   ],
   imports: [
     BrowserModule,

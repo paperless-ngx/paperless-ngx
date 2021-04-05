@@ -359,7 +359,10 @@ class SavedView(models.Model):
 
     sort_field = models.CharField(
         _("sort field"),
-        max_length=128)
+        max_length=128,
+        null=True,
+        blank=True
+    )
     sort_reverse = models.BooleanField(
         _("sort reverse"),
         default=False)
@@ -387,6 +390,8 @@ class SavedViewFilterRule(models.Model):
         (17, _("does not have tag")),
         (18, _("does not have ASN")),
         (19, _("title or content contains")),
+        (20, _("fulltext query")),
+        (21, _("more like this"))
     ]
 
     saved_view = models.ForeignKey(
