@@ -23,9 +23,29 @@ paperless-ng 1.4.0
 
   * Updated python dependencies.
 
+  * Automatically inserts typed text when opening "Create new" dialogs on the document details page.
+
 * Fixes
 
   * Fixed an issue with null characters in the document content.
+
+.. note::
+
+  The changed to the full text searching require you to reindex your documents.
+  *The docker image does this automatically, you don't need to do anything.*
+  To do this, execute the ``document_index reindex`` management command
+  (see :ref:`administration-index`).
+
+.. note::
+
+  Some packages that paperless depends on are slowly dropping Python 3.6
+  support one after another, including the web server. Supporting Python
+  3.6 means that I cannot update these packages anymore.
+
+  At some point, paperless will drop Python 3.6 support. If using a bare
+  metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
+
+  If using docker, this does not affect you.
 
 paperless-ng 1.3.2
 ##################
@@ -129,17 +149,6 @@ paperless-ng 1.2.0
 * Fixed a crash of the document archiver management command when trying to process documents with unknown mime types.
 
 * Paperless no longer depends on ``libpoppler-cpp-dev``.
-
-.. note::
-
-  Some packages that paperless depends on are slowly dropping Python 3.6
-  support one after another, including the web server. Supporting Python
-  3.6 means that I cannot update these packages anymore.
-
-  At some point, paperless will drop Python 3.6 support. If using a bare
-  metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
-
-  If using docker, this does not affect you.
 
 paperless-ng 1.1.4
 ##################
