@@ -255,6 +255,8 @@ Here are a couple examples of tags and types that you could use in your collecti
 * A tag ``missing_metadata`` when you still need to add some metadata to a document, but can't
   or don't want to do this right now.
 
+.. _basic-usage_searching:
+
 Searching
 #########
 
