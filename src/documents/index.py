@@ -29,7 +29,7 @@ def get_schema():
             sortable=True
         ),
         content=TEXT(),
-        archive_serial_number=NUMERIC(
+        asn=NUMERIC(
             sortable=True
         ),
 
@@ -122,7 +122,7 @@ def update_document(writer, doc):
         has_type=doc.document_type is not None,
         created=doc.created,
         added=doc.added,
-        archive_serial_number=doc.archive_serial_number,
+        asn=doc.archive_serial_number,
         modified=doc.modified,
     )
 
