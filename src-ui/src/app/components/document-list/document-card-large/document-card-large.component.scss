@@ -60,3 +60,8 @@
     padding-top: 0.35rem !important;
   }
 }
+
+span ::ng-deep .match {
+  color: black;
+  background-color: rgb(255, 211, 66);
+}

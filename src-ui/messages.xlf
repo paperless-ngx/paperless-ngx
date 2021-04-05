@@ -48,21 +48,21 @@
         <source>Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">116</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9ca82952a6bc860b5391d5975322d8af8ceddfa4" datatype="html">
@@ -146,77 +146,77 @@
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7b5c6286aaded63fb279d6deb8aa8c704e085ced" datatype="html">
         <source>Correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">117</context>
         </context-group>
       </trans-unit>
       <trans-unit id="fdf7cbdc140d0aab0f0b6c06065a0fd448ed6a2e" datatype="html">
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2bd5919e8098513664a89d5b7b52d61e3063950f" datatype="html">
         <source>Document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1b051734b0ee9021991c91b3ed4e81c244322462" datatype="html">
         <source>Created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">129</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="80e3b490720757978c99a7b5af3885faf202b955" datatype="html">
         <source>Added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">141</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">203</context>
+          <context context-type="linenumber">204</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">205</context>
+          <context context-type="linenumber">206</context>
         </context-group>
       </trans-unit>
       <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">207</context>
+          <context context-type="linenumber">208</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1844801255494293730" datatype="html">
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">215</context>
         </context-group>
       </trans-unit>
       <trans-unit id="826b25211922a1b46436589233cb6f1a163d89b7" datatype="html">
@@ -912,48 +912,6 @@
           <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="49c9ede51100b454f7841b24cd02355c6622bf44" datatype="html">
-        <source>Search results</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">1</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="31976d04f98e8a38098f66ac3a83ad33b576e5db" datatype="html">
-        <source>Invalid search query: <x id="INTERPOLATION" equiv-text="{{errorMessage}}"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">4</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="f7f2e30106223a69bcf0f8e586e6be9dc4e72226" datatype="html">
-        <source>Showing documents similar to <x id="START_LINK" equiv-text="&lt;a routerLink=&quot;/documents/{{more_like}}&quot;&gt;{{more_like_doc?.original_file_name}}"/><x id="INTERPOLATION" equiv-text="{{more_like_doc?.original_file_name}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">6</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6e0b0a1ea16f18f2fb1586c53d99d2f22e1aee2e" datatype="html">
-        <source>Search query: <x id="START_ITALIC_TEXT" equiv-text="&lt;i&gt;{{query}}"/><x id="INTERPOLATION" equiv-text="{{query}}&lt;/i&gt;"/><x id="CLOSE_ITALIC_TEXT" equiv-text="&lt;/i&gt;"/></source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">9</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="afa760e48c97d64d19c1455d18b7834a2256e23f" datatype="html">
-        <source>Did you mean &quot;<x id="START_LINK" equiv-text="&lt;a [routerLink]=&quot;&quot; (click)=&quot;searchCorrectedQuery()&quot;&gt;{{correctedQuery}}"/><x id="INTERPOLATION" equiv-text="{{correctedQuery}}&lt;/a&gt;"/><x id="CLOSE_LINK" equiv-text="&lt;/a&gt;"/>&quot;?</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">11</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="fe6ced3fcc803bba5a2e6c1a067b9ce62542500e" datatype="html">
-        <source>{VAR_PLURAL, plural, =0 {No results} =1 {One result} other {<x id="INTERPOLATION"/> results}}</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/search/search.component.html</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="41147374f427980a9f1a8cd5e3f4b1666e6f2418" datatype="html">
         <source>Paperless-ng</source>
         <context-group purpose="location">
@@ -1039,81 +997,95 @@
           <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="5701618810648052610" datatype="html">
-        <source>Title</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">77</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="3100631071441658964" datatype="html">
-        <source>Title &amp; content</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">78</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7517688192215738656" datatype="html">
-        <source>ASN</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">79</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="5195932016807797291" datatype="html">
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8170755470576301659" datatype="html">
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8705701325879965907" datatype="html">
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1872523635812236432" datatype="html">
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5701618810648052610" datatype="html">
+        <source>Title</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3100631071441658964" datatype="html">
+        <source>Title &amp; content</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7517688192215738656" datatype="html">
+        <source>ASN</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1010505078885609376" datatype="html">
+        <source>Advanced search</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2649431021108393503" datatype="html">
+        <source>More like</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit id="02d184c288f567825a1fcbf83bcd3099a10853d5" datatype="html">
@@ -1233,7 +1205,28 @@
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="727d980bba2b3e0b3d8705607f1208eef046479b" datatype="html">
+        <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0f5d856cb63c69fde44fbfc653ec0655f9040865" datatype="html">
+        <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a205126adef6251fc63305f1a6228d07bc2795a8" datatype="html">
+        <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7985804062689412812" datatype="html">
@@ -1624,6 +1617,13 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="bd5ca454e336126f3eeb67417d9264696b5c852c" datatype="html">
+        <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
+          <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
