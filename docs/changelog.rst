@@ -15,6 +15,8 @@ paperless-ng 1.4.0
 
 * Changes
 
+  * Firefox only: Highlight search query in PDF previews.
+
   * New URL pattern for accessing documents by ASN directly (http://<paperless>/asn/123)
 
   * Added logging when executing pre- and post-consume scripts.
