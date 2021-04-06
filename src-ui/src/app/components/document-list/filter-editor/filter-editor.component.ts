@@ -128,7 +128,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Input()
   set filterRules (value: FilterRule[]) {
     this._filterRules = value
-    
+
     this.documentTypeSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
@@ -290,8 +290,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       distinctUntilChanged()
     ).subscribe(text => {
       this._textFilter = text
+      this.documentService.searchQuery = text
       this.updateRules()
     })
+
+    if (this._textFilter) this.documentService.searchQuery = this._textFilter
+
   }
 
   ngOnDestroy() {
