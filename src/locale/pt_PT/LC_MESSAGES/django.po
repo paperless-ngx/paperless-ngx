@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-17 22:31+0100\n"
-"PO-Revision-Date: 2021-03-18 22:23\n"
+"POT-Creation-Date: 2021-04-05 22:05+0200\n"
+"PO-Revision-Date: 2021-04-05 21:31\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -226,7 +226,7 @@ msgstr "registo"
 msgid "logs"
 msgstr "registos"
 
-#: documents/models.py:344 documents/models.py:396
+#: documents/models.py:344 documents/models.py:401
 msgid "saved view"
 msgstr "vista guardada"
 
@@ -250,103 +250,111 @@ msgstr "mostrar na navegação lateral"
 msgid "sort field"
 msgstr "ordenar campo"
 
-#: documents/models.py:364
+#: documents/models.py:367
 msgid "sort reverse"
 msgstr "ordenar inversamente"
 
-#: documents/models.py:370
+#: documents/models.py:373
 msgid "title contains"
 msgstr "o título contém"
 
-#: documents/models.py:371
+#: documents/models.py:374
 msgid "content contains"
 msgstr "o conteúdo contém"
 
-#: documents/models.py:372
+#: documents/models.py:375
 msgid "ASN is"
 msgstr "O NSA é"
 
-#: documents/models.py:373
+#: documents/models.py:376
 msgid "correspondent is"
 msgstr "o correspondente é"
 
-#: documents/models.py:374
+#: documents/models.py:377
 msgid "document type is"
 msgstr "o tipo de documento é"
 
-#: documents/models.py:375
+#: documents/models.py:378
 msgid "is in inbox"
 msgstr "está na entrada"
 
-#: documents/models.py:376
+#: documents/models.py:379
 msgid "has tag"
 msgstr "tem etiqueta"
 
-#: documents/models.py:377
+#: documents/models.py:380
 msgid "has any tag"
 msgstr "tem qualquer etiqueta"
 
-#: documents/models.py:378
+#: documents/models.py:381
 msgid "created before"
 msgstr "criado antes"
 
-#: documents/models.py:379
+#: documents/models.py:382
 msgid "created after"
 msgstr "criado depois"
 
-#: documents/models.py:380
+#: documents/models.py:383
 msgid "created year is"
 msgstr "ano criada é"
 
-#: documents/models.py:381
+#: documents/models.py:384
 msgid "created month is"
 msgstr "mês criado é"
 
-#: documents/models.py:382
+#: documents/models.py:385
 msgid "created day is"
 msgstr "dia criado é"
 
-#: documents/models.py:383
+#: documents/models.py:386
 msgid "added before"
 msgstr "adicionada antes"
 
-#: documents/models.py:384
+#: documents/models.py:387
 msgid "added after"
 msgstr "adicionado depois de"
 
-#: documents/models.py:385
+#: documents/models.py:388
 msgid "modified before"
 msgstr "modificado antes de"
 
-#: documents/models.py:386
+#: documents/models.py:389
 msgid "modified after"
 msgstr "modificado depois de"
 
-#: documents/models.py:387
+#: documents/models.py:390
 msgid "does not have tag"
 msgstr "não tem etiqueta"
 
-#: documents/models.py:388
+#: documents/models.py:391
 msgid "does not have ASN"
 msgstr "não possui um NSA"
 
-#: documents/models.py:389
+#: documents/models.py:392
 msgid "title or content contains"
 msgstr "título ou conteúdo contém"
 
-#: documents/models.py:400
+#: documents/models.py:393
+msgid "fulltext query"
+msgstr "consulta de texto completo"
+
+#: documents/models.py:394
+msgid "more like this"
+msgstr "mais como este"
+
+#: documents/models.py:405
 msgid "rule type"
 msgstr "tipo de regra"
 
-#: documents/models.py:404
+#: documents/models.py:409
 msgid "value"
 msgstr "valor"
 
-#: documents/models.py:410
+#: documents/models.py:415
 msgid "filter rule"
 msgstr "regra de filtragem"
 
-#: documents/models.py:411
+#: documents/models.py:416
 msgid "filter rules"
 msgstr "regras de filtragem"
 
@@ -448,7 +456,7 @@ msgstr "Russo"
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: paperless/urls.py:118
+#: paperless/urls.py:113
 msgid "Paperless-ng administration"
 msgstr "Administração do Paperless-ng"
 
