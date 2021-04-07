@@ -78,6 +78,7 @@ RUN cd docker \
 	&& mkdir /var/log/supervisord /var/run/supervisord \
 	&& cp supervisord.conf /etc/supervisord.conf \
 	&& cp docker-entrypoint.sh /sbin/docker-entrypoint.sh \
+	&& cp docker-prepare.sh /sbin/docker-prepare.sh \
 	&& chmod 755 /sbin/docker-entrypoint.sh \
 	&& chmod +x install_management_commands.sh \
 	&& ./install_management_commands.sh \
