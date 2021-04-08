@@ -44,7 +44,7 @@ migrations() {
 		# of the current container starts.
 		flock 200
 		echo "Apply database migrations..."
-		sudo -HEu paperless python3 manage.py migrate
+		python3 manage.py migrate
 	)  200>/usr/src/paperless/data/migration_lock
 }
 
@@ -55,7 +55,7 @@ search_index() {
 	if [[ (! -f "$index_version_file") || $(< $index_version_file) != "$index_version" ]]; then
 		echo "Search index out of date. Updating..."
 		python3 manage.py document_index reindex
-		echo $index_version | sudo -HEu paperless tee $index_version_file >/dev/null
+		echo $index_version | tee $index_version_file >/dev/null
 	fi
 }
 
