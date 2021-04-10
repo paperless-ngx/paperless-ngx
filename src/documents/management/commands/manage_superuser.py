@@ -26,5 +26,8 @@ class Command(BaseCommand):
                     # Create superuser based on env variables
                     User.objects.create_superuser(PAPERLESS_ADMIN_USER, PAPERLESS_ADMIN_MAIL, PAPERLESS_ADMIN_PASSWORD)
                     self.stdout.write(f'Created superuser "{PAPERLESS_ADMIN_USER}" with provided password.')
+                else:
+                    self.stdout.write(f'Did not create superuser "{PAPERLESS_ADMIN_USER}".')
+                    self.stdout.write('Make sure you specified "PAPERLESS_ADMIN_PASSWORD" in your "docker-compose.env" file.')
             except Exception as error:
-                self.stdout.write(f'Exception occured while managing superuser: {error}')
+                self.stdout.write(f'Exception occured while creating superuser: {error}')
