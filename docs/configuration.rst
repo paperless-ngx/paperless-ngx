@@ -180,7 +180,7 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 PAPERLESS_ADMIN_USER=<username>
     If this environment variable is specified, Paperless automatically creates 
     a superuser with the provided username at start. This is useful in cases 
-    where you can not run the `create-superuser` command seperately, such as Kubernetes 
+    where you can not run the `createsuperuser` command seperately, such as Kubernetes 
     or AWS ECS.
     
     Requires `PAPERLESS_ADMIN_PASSWORD` to be set.
