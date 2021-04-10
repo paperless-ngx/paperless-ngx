@@ -1,5 +1,6 @@
 import logging
 
+import tqdm
 from django.core.management.base import BaseCommand
 
 from documents.classifier import load_classifier
@@ -67,9 +68,7 @@ class Command(BaseCommand):
 
         classifier = load_classifier()
 
-        for document in documents:
-            logger.info(
-                f"Processing document {document.title}")
+        for document in tqdm.tqdm(documents):
 
             if options['correspondent']:
                 set_correspondent(

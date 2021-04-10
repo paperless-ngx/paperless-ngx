@@ -46,13 +46,13 @@ def set_correspondent(sender,
         selected = None
     if potential_count > 1:
         if use_first:
-            logger.info(
+            logger.debug(
                 f"Detected {potential_count} potential correspondents, "
                 f"so we've opted for {selected}",
                 extra={'group': logging_group}
             )
         else:
-            logger.info(
+            logger.debug(
                 f"Detected {potential_count} potential correspondents, "
                 f"not assigning any correspondent",
                 extra={'group': logging_group}
