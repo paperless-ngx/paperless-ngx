@@ -56,7 +56,7 @@ superuser() {
         wait_for_postgres
     fi
 
-    if [[ ! -z "${PAPERLESS_ADMIN_PASSWORD}" ]]
+    if [[ ! -z "${PAPERLESS_ADMIN_USER}" ]]
 	then
 		sudo -HEu paperless python3 manage.py manage_superuser
 	fi
