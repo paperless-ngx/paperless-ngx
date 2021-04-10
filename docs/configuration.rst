@@ -177,6 +177,30 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 
     Defaults to none, which disables this feature.
 
+PAPERLESS_ADMIN_USER=<username>
+    If this environment variable is specified, Paperless automatically creates 
+    a superuser with the provided username at start. This is useful in cases 
+    where you can not run the `create-superuser` command seperately, such as Kubernetes 
+    or AWS ECS.
+    
+    Requires `PAPERLESS_ADMIN_PASSWORD` to be set.
+
+    .. note::
+
+        This will not change an existing [super]user's password, nor will
+        it recreate a user that already exists. You can leave this throughout
+        the lifecycle of the containers.
+
+PAPERLESS_ADMIN_MAIL=<email>
+    (Optional) Specify superuser email address. Only used when 
+    `PAPERLESS_ADMIN_USER` is set.
+
+    Defaults to ``root@localhost``.
+
+PAPERLESS_ADMIN_PASSWORD=<password>
+    Only used when `PAPERLESS_ADMIN_USER` is set.
+    This will be the password of the automatically created superuser.
+
 
 PAPERLESS_COOKIE_PREFIX=<str>
     Specify a prefix that is added to the cookies used by paperless to identify
