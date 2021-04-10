@@ -11,7 +11,9 @@ RUN ./configure && make
 FROM python:3.7-slim
 
 # Binary dependencies
-RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
+RUN apt-get update \
+	&& apt-get -y --no-install-recommends install sudo \
+  && echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
   && apt-get update \
   && apt-get -y --no-install-recommends install \
   	# Basic dependencies
@@ -19,7 +21,6 @@ RUN echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.lis
 		gnupg \
 		imagemagick \
 		gettext \
-		sudo \
 		tzdata \
 		# fonts for text file thumbnail generation
 		fonts-liberation \
