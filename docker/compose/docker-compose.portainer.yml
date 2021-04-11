@@ -65,12 +65,29 @@ services:
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
-      PAPERLESS_OCR_LANGUAGES: tur ces
-      PAPERLESS_SECRET_KEY: change-me
-      PAPERLESS_TIME_ZONE: America/Los_Angeles
-      PAPERLESS_OCR_LANGUAGE: eng
+# The UID and GID of the user used to run paperless in the container. Set this
+# to your UID and GID on the host so that you have write access to the
+# consumption directory.
       USERMAP_UID: 1000
       USERMAP_GID: 100
+# Additional languages to install for text recognition, separated by a
+# whitespace. Note that this is
+# different from PAPERLESS_OCR_LANGUAGE (default=eng), which defines the
+# language used for OCR.
+# The container installs English, German, Italian, Spanish and French by
+# default.
+# See https://packages.debian.org/search?keywords=tesseract-ocr-&searchon=names&suite=buster
+# for available languages.
+      #PAPERLESS_OCR_LANGUAGES: tur ces
+# Adjust this key if you plan to make paperless available publicly. It should
+# be a very long sequence of random characters. You don't need to remember it.
+      #PAPERLESS_SECRET_KEY: change-me
+# Use this variable to set a timezone for the Paperless Docker containers. If not specified, defaults to UTC.
+      #PAPERLESS_TIME_ZONE: America/Los_Angeles
+# The default language to use for OCR. Set this to the language most of your
+# documents are written in.
+      #PAPERLESS_OCR_LANGUAGE: eng
+
 volumes:
   data:
   media:
