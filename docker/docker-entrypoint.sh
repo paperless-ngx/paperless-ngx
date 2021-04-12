@@ -16,7 +16,9 @@ map_uidgid() {
 }
 
 initialize() {
-	map_uidgid
+	if [[ ! "$PAPERLESS_ROOTLESS" ]]; then
+		map_uidgid
+	fi
 
 	for dir in export data data/index media media/documents media/documents/originals media/documents/thumbnails; do
 		if [[ ! -d "../$dir" ]]; then
@@ -28,13 +30,15 @@ initialize() {
 	echo "Creating directory /tmp/paperless"
 	mkdir -p /tmp/paperless
 
-	set +e
-	echo "Adjusting permissions of paperless files. This may take a while."
-	chown -R paperless:paperless /tmp/paperless
-	find .. -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
-	set -e
+	if [[ ! "$PAPERLESS_ROOTLESS" ]]; then
+		set +e
+		echo "Adjusting permissions of paperless files. This may take a while."
+		chown -R paperless:paperless /tmp/paperless
+		find .. -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+		set -e
+	fi
 
-	gosu paperless /sbin/docker-prepare.sh
+	${SUDO_CMD} /sbin/docker-prepare.sh
 }
 
 install_languages() {
@@ -76,6 +80,12 @@ install_languages() {
 
 echo "Paperless-ng docker container starting..."
 
+if [[ ! "$PAPERLESS_ROOTLESS" ]]; then
+	SUDO_CMD="gosu paperless"
+else
+	SUDO_CMD=""
+fi
+
 # Install additional languages if specified
 if [[ ! -z "$PAPERLESS_OCR_LANGUAGES" ]]; then
 	install_languages "$PAPERLESS_OCR_LANGUAGES"
@@ -85,7 +95,7 @@ initialize
 
 if [[ "$1" != "/"* ]]; then
 	echo Executing management command "$@"
-	exec gosu paperless python3 manage.py "$@"
+	exec ${SUDO_CMD} python3 manage.py "$@"
 else
 	echo Executing "$@"
 	exec "$@"

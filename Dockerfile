@@ -10,6 +10,9 @@ RUN ./configure && make
 
 FROM python:3.9-slim-bullseye
 
+ARG ROOTLESS
+ENV PAPERLESS_ROOTLESS=${ROOTLESS}
+
 # Binary dependencies
 RUN apt-get update \
 	&& apt-get -y --no-install-recommends install \
@@ -75,7 +78,7 @@ COPY docker/ ./docker/
 RUN cd docker \
   && cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
 	&& mkdir /var/log/supervisord /var/run/supervisord \
-	&& cp supervisord.conf /etc/supervisord.conf \
+	&& cp supervisord$(if [ "${ROOTLESS}" ]; then echo "-rootless"; fi).conf /etc/supervisord.conf \
 	&& cp docker-entrypoint.sh /sbin/docker-entrypoint.sh \
 	&& cp docker-prepare.sh /sbin/docker-prepare.sh \
 	&& chmod 755 /sbin/docker-entrypoint.sh \
@@ -90,11 +93,13 @@ COPY gunicorn.conf.py ../
 COPY src/ ./
 
 # add users, setup scripts
-RUN addgroup --gid 1000 paperless \
+RUN if [ ! "${ROOTLESS}" ]; then SUDOCMD="gosu paperless"; \
+	addgroup --gid 1000 paperless \
 	&& useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
-	&& chown -R paperless:paperless ../ \
-	&& gosu paperless python3 manage.py collectstatic --clear --no-input \
-	&& gosu paperless python3 manage.py compilemessages
+	&& chown -R paperless:paperless ../; \
+	fi; \
+	${SUDOCMD} python3 manage.py collectstatic --clear --no-input \
+	&& ${SUDOCMD} python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
