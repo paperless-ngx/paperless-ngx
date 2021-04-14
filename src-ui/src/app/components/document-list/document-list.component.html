@@ -75,7 +75,7 @@
 
 </app-page-header>
 
-<div class="w-100 sticky-top py-2 mt-n3 py-sm-4 bg-body">
+<div class="sticky-top py-2 mt-n3 py-sm-4 bg-body mx-n3 px-3">
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
