@@ -37,6 +37,10 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .bg-body {
+    background-color: $bg-dark-mode !important;
+  }
+
   .text-light {
     color: $text-color-dark-mode !important;
   }
