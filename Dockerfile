@@ -12,16 +12,14 @@ FROM python:3.7-slim
 
 # Binary dependencies
 RUN apt-get update \
-	&& apt-get -y --no-install-recommends install sudo \
-  && echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
-  && apt-get update \
-  && apt-get -y --no-install-recommends install \
+	&& apt-get -y --no-install-recommends install \
   	# Basic dependencies
 		curl \
 		gnupg \
 		imagemagick \
 		gettext \
 		tzdata \
+		sudo \
 		# fonts for text file thumbnail generation
 		fonts-liberation \
 		# for Numpy
@@ -29,16 +27,21 @@ RUN apt-get update \
 		libxslt1-dev \
 		# thumbnail size reduction
 		optipng \
+		libxml2 \
+		pngquant \
+		unpaper \
+		zlib1g \
+		ghostscript \
+		icc-profiles-free \
+  && echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
+  && apt-get update \
+  && apt-get -y --no-install-recommends install \
 		# Mime type detection
 		file \
 		libmagic-dev \
 		media-types \
   	# OCRmyPDF dependencies
-		ghostscript \
-		icc-profiles-free \
 		liblept5 \
-		libxml2 \
-		pngquant \
 		qpdf \
 		tesseract-ocr \
 		tesseract-ocr-eng \
@@ -46,8 +49,6 @@ RUN apt-get update \
 		tesseract-ocr-fra \
 		tesseract-ocr-ita \
 		tesseract-ocr-spa \
-		unpaper \
-		zlib1g \
   && rm -rf /var/lib/apt/lists/*
 
 # copy jbig2enc
