@@ -9,16 +9,13 @@ wait_for_postgres() {
 	host="${PAPERLESS_DBHOST}"
 	port="${PAPERLESS_DBPORT}"
 
-	if [[ -z $port ]] ;
-	then
+	if [[ -z $port ]]; then
 		port="5432"
 	fi
 
-	while !</dev/tcp/$host/$port ;
-	do
+	while ! </dev/tcp/$host/$port; do
 
-		if [ $attempt_num -eq $max_attempts ]
-		then
+		if [ $attempt_num -eq $max_attempts ]; then
 			echo "Unable to connect to database."
 			exit 1
 		else
@@ -31,13 +28,7 @@ wait_for_postgres() {
 	done
 }
 
-
 migrations() {
-	if [[ -n "${PAPERLESS_DBHOST}" ]]
-	then
-		wait_for_postgres
-	fi
-
 	(
 		# flock is in place to prevent multiple containers from doing migrations
 		# simultaneously. This also ensures that the db is ready when the command
@@ -45,24 +36,37 @@ migrations() {
 		flock 200
 		echo "Apply database migrations..."
 		python3 manage.py migrate
-	)  200>/usr/src/paperless/data/migration_lock
+	) 200>/usr/src/paperless/data/migration_lock
 }
 
 search_index() {
 	index_version=1
 	index_version_file=/usr/src/paperless/data/.index_version
 
-	if [[ (! -f "$index_version_file") || $(< $index_version_file) != "$index_version" ]]; then
+	if [[ (! -f "$index_version_file") || $(<$index_version_file) != "$index_version" ]]; then
 		echo "Search index out of date. Updating..."
 		python3 manage.py document_index reindex
 		echo $index_version | tee $index_version_file >/dev/null
 	fi
 }
 
-do_work() {
-	migrations;
-	
-	search_index;
+superuser() {
+	if [[ -n "${PAPERLESS_ADMIN_USER}" ]]; then
+		sudo -HEu paperless python3 manage.py manage_superuser
+	fi
 }
 
-do_work;
+do_work() {
+	if [[ -n "${PAPERLESS_DBHOST}" ]]; then
+		wait_for_postgres
+	fi
+
+	migrations
+
+	search_index
+
+	superuser
+
+}
+
+do_work
