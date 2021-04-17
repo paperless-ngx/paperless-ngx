@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-14 13:33+0100\n"
-"PO-Revision-Date: 2021-03-14 13:57\n"
+"POT-Creation-Date: 2021-04-05 22:05+0200\n"
+"PO-Revision-Date: 2021-04-05 21:31\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -226,7 +226,7 @@ msgstr "log"
 msgid "logs"
 msgstr "log"
 
-#: documents/models.py:344 documents/models.py:396
+#: documents/models.py:344 documents/models.py:401
 msgid "saved view"
 msgstr "vista salvata"
 
@@ -250,103 +250,111 @@ msgstr "mostra nella barra laterale"
 msgid "sort field"
 msgstr "campo di ordinamento"
 
-#: documents/models.py:364
+#: documents/models.py:367
 msgid "sort reverse"
 msgstr "ordine invertito"
 
-#: documents/models.py:370
+#: documents/models.py:373
 msgid "title contains"
 msgstr "il titolo contiene"
 
-#: documents/models.py:371
+#: documents/models.py:374
 msgid "content contains"
 msgstr "il contenuto contiene"
 
-#: documents/models.py:372
+#: documents/models.py:375
 msgid "ASN is"
 msgstr "ASN è"
 
-#: documents/models.py:373
+#: documents/models.py:376
 msgid "correspondent is"
 msgstr "la corrispondenza è"
 
-#: documents/models.py:374
+#: documents/models.py:377
 msgid "document type is"
 msgstr "il tipo di documento è"
 
-#: documents/models.py:375
+#: documents/models.py:378
 msgid "is in inbox"
 msgstr "è in arrivo"
 
-#: documents/models.py:376
+#: documents/models.py:379
 msgid "has tag"
 msgstr "ha etichetta"
 
-#: documents/models.py:377
+#: documents/models.py:380
 msgid "has any tag"
 msgstr "ha qualsiasi etichetta"
 
-#: documents/models.py:378
+#: documents/models.py:381
 msgid "created before"
 msgstr "creato prima del"
 
-#: documents/models.py:379
+#: documents/models.py:382
 msgid "created after"
 msgstr "creato dopo il"
 
-#: documents/models.py:380
+#: documents/models.py:383
 msgid "created year is"
 msgstr "l'anno di creazione è"
 
-#: documents/models.py:381
+#: documents/models.py:384
 msgid "created month is"
 msgstr "il mese di creazione è"
 
-#: documents/models.py:382
+#: documents/models.py:385
 msgid "created day is"
 msgstr "il giorno di creazione è"
 
-#: documents/models.py:383
+#: documents/models.py:386
 msgid "added before"
 msgstr "aggiunto prima del"
 
-#: documents/models.py:384
+#: documents/models.py:387
 msgid "added after"
 msgstr "aggiunto dopo il"
 
-#: documents/models.py:385
+#: documents/models.py:388
 msgid "modified before"
 msgstr "modificato prima del"
 
-#: documents/models.py:386
+#: documents/models.py:389
 msgid "modified after"
 msgstr "modificato dopo"
 
-#: documents/models.py:387
+#: documents/models.py:390
 msgid "does not have tag"
 msgstr "non ha tag"
 
-#: documents/models.py:388
+#: documents/models.py:391
 msgid "does not have ASN"
 msgstr "non ha ASN"
 
-#: documents/models.py:389
+#: documents/models.py:392
 msgid "title or content contains"
 msgstr "il titolo o il contenuto contiene"
 
-#: documents/models.py:400
+#: documents/models.py:393
+msgid "fulltext query"
+msgstr "query fulltext"
+
+#: documents/models.py:394
+msgid "more like this"
+msgstr "altro come questo"
+
+#: documents/models.py:405
 msgid "rule type"
 msgstr "tipo di regola"
 
-#: documents/models.py:404
+#: documents/models.py:409
 msgid "value"
 msgstr "valore"
 
-#: documents/models.py:410
+#: documents/models.py:415
 msgid "filter rule"
 msgstr "regola filtro"
 
-#: documents/models.py:411
+#: documents/models.py:416
 msgid "filter rules"
 msgstr "regole filtro"
 
@@ -366,7 +374,7 @@ msgstr "Il tipo di file %(type)s non è supportato"
 
 #: documents/templates/index.html:21
 msgid "Paperless-ng is loading..."
-msgstr "Paperless-ng si sta caricando..."
+msgstr "Paperless-ng è in caricamento..."
 
 #: documents/templates/registration/logged_out.html:13
 msgid "Paperless-ng signed out"
@@ -374,11 +382,11 @@ msgstr "Paperless-ng è uscito"
 
 #: documents/templates/registration/logged_out.html:41
 msgid "You have been successfully logged out. Bye!"
-msgstr "Vi siete disconnessi. Ciao!"
+msgstr "Ti sei disconnesso. A presto!"
 
 #: documents/templates/registration/logged_out.html:42
 msgid "Sign in again"
-msgstr "Rientra nuovamente"
+msgstr "Accedi nuovamente"
 
 #: documents/templates/registration/login.html:13
 msgid "Paperless-ng sign in"
@@ -429,22 +437,26 @@ msgid "Portuguese (Brazil)"
 msgstr "Portoghese (Brasile)"
 
 #: paperless/settings.py:304
+msgid "Portuguese"
+msgstr "Portoghese"
+
+#: paperless/settings.py:305
 msgid "Italian"
 msgstr "Italiano"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:306
 msgid "Romanian"
 msgstr "Rumeno"
 
-#: paperless/settings.py:306
+#: paperless/settings.py:307
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings.py:307
+#: paperless/settings.py:308
 msgid "Spanish"
-msgstr ""
+msgstr "Spagnolo"
 
-#: paperless/urls.py:118
+#: paperless/urls.py:113
 msgid "Paperless-ng administration"
 msgstr "Amministrazione di Paperless-ng"
 

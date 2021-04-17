@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-14 13:33+0100\n"
-"PO-Revision-Date: 2021-03-14 13:57\n"
+"POT-Creation-Date: 2021-04-05 22:05+0200\n"
+"PO-Revision-Date: 2021-04-05 21:31\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -226,7 +226,7 @@ msgstr "журнал"
 msgid "logs"
 msgstr "логи"
 
-#: documents/models.py:344 documents/models.py:396
+#: documents/models.py:344 documents/models.py:401
 msgid "saved view"
 msgstr "сохранённое представление"
 
@@ -250,103 +250,111 @@ msgstr "показать в боковой панели"
 msgid "sort field"
 msgstr "Поле сортировки"
 
-#: documents/models.py:364
+#: documents/models.py:367
 msgid "sort reverse"
 msgstr "обратная сортировка"
 
-#: documents/models.py:370
+#: documents/models.py:373
 msgid "title contains"
 msgstr "заголовок содержит"
 
-#: documents/models.py:371
+#: documents/models.py:374
 msgid "content contains"
 msgstr "содержимое содержит"
 
-#: documents/models.py:372
+#: documents/models.py:375
 msgid "ASN is"
 msgstr "АН"
 
-#: documents/models.py:373
+#: documents/models.py:376
 msgid "correspondent is"
 msgstr "корреспондент"
 
-#: documents/models.py:374
+#: documents/models.py:377
 msgid "document type is"
 msgstr "тип документа"
 
-#: documents/models.py:375
+#: documents/models.py:378
 msgid "is in inbox"
 msgstr "во входящих"
 
-#: documents/models.py:376
+#: documents/models.py:379
 msgid "has tag"
 msgstr "есть тег"
 
-#: documents/models.py:377
+#: documents/models.py:380
 msgid "has any tag"
 msgstr "есть любой тег"
 
-#: documents/models.py:378
+#: documents/models.py:381
 msgid "created before"
 msgstr "создан до"
 
-#: documents/models.py:379
+#: documents/models.py:382
 msgid "created after"
 msgstr "создан после"
 
-#: documents/models.py:380
+#: documents/models.py:383
 msgid "created year is"
 msgstr "год создания"
 
-#: documents/models.py:381
+#: documents/models.py:384
 msgid "created month is"
 msgstr "месяц создания"
 
-#: documents/models.py:382
+#: documents/models.py:385
 msgid "created day is"
 msgstr "день создания"
 
-#: documents/models.py:383
+#: documents/models.py:386
 msgid "added before"
 msgstr "добавлен до"
 
-#: documents/models.py:384
+#: documents/models.py:387
 msgid "added after"
 msgstr "добавлен после"
 
-#: documents/models.py:385
+#: documents/models.py:388
 msgid "modified before"
 msgstr "изменен до"
 
-#: documents/models.py:386
+#: documents/models.py:389
 msgid "modified after"
 msgstr "изменен после"
 
-#: documents/models.py:387
+#: documents/models.py:390
 msgid "does not have tag"
 msgstr "не имеет тега"
 
-#: documents/models.py:388
+#: documents/models.py:391
 msgid "does not have ASN"
-msgstr ""
+msgstr "не имеет архивного номера"
 
-#: documents/models.py:389
+#: documents/models.py:392
 msgid "title or content contains"
-msgstr ""
+msgstr "Название или содержимое включает"
 
-#: documents/models.py:400
+#: documents/models.py:393
+msgid "fulltext query"
+msgstr "полнотекстовый запрос"
+
+#: documents/models.py:394
+msgid "more like this"
+msgstr "больше похожих"
+
+#: documents/models.py:405
 msgid "rule type"
 msgstr "Тип правила"
 
-#: documents/models.py:404
+#: documents/models.py:409
 msgid "value"
 msgstr "значение"
 
-#: documents/models.py:410
+#: documents/models.py:415
 msgid "filter rule"
 msgstr "Правило фильтрации"
 
-#: documents/models.py:411
+#: documents/models.py:416
 msgid "filter rules"
 msgstr "правила фильтрации"
 
@@ -429,22 +437,26 @@ msgid "Portuguese (Brazil)"
 msgstr "Portuguese (Brazil)"
 
 #: paperless/settings.py:304
+msgid "Portuguese"
+msgstr "Португальский"
+
+#: paperless/settings.py:305
 msgid "Italian"
 msgstr "Italian"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:306
 msgid "Romanian"
 msgstr "Romanian"
 
-#: paperless/settings.py:306
-msgid "Russian"
-msgstr ""
-
 #: paperless/settings.py:307
-msgid "Spanish"
-msgstr ""
+msgid "Russian"
+msgstr "Русский"
 
-#: paperless/urls.py:118
+#: paperless/settings.py:308
+msgid "Spanish"
+msgstr "Испанский"
+
+#: paperless/urls.py:113
 msgid "Paperless-ng administration"
 msgstr "Администрирование Paperless-ng"
 

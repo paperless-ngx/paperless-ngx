@@ -39,6 +39,8 @@ export interface SelectionData {
 })
 export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
 
+  private _searchQuery: string
+
   constructor(http: HttpClient, private correspondentService: CorrespondentService, private documentTypeService: DocumentTypeService, private tagService: TagService) {
     super(http, 'documents')
   }
@@ -92,6 +94,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   getPreviewUrl(id: number, original: boolean = false): string {
     let url = this.getResourceUrl(id, 'preview')
+    if (this._searchQuery) url += `#search="${this._searchQuery}"`
     if (original) {
       url += "?original=true"
     }
@@ -136,6 +139,10 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   bulkDownload(ids: number[], content="both") {
     return this.http.post(this.getResourceUrl(null, 'bulk_download'), {"documents": ids, "content": content}, { responseType: 'blob' })
+  }
+
+  public set searchQuery(query: string) {
+    this._searchQuery = query
   }
 
 }

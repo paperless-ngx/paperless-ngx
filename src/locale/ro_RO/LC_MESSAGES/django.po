@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-14 13:33+0100\n"
-"PO-Revision-Date: 2021-03-14 13:57\n"
+"POT-Creation-Date: 2021-04-05 22:05+0200\n"
+"PO-Revision-Date: 2021-04-05 20:19\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -226,7 +226,7 @@ msgstr "jurnal"
 msgid "logs"
 msgstr "jurnale"
 
-#: documents/models.py:344 documents/models.py:396
+#: documents/models.py:344 documents/models.py:401
 msgid "saved view"
 msgstr "vizualizare"
 
@@ -250,103 +250,111 @@ msgstr "afișează in bara laterala"
 msgid "sort field"
 msgstr "sortează camp"
 
-#: documents/models.py:364
+#: documents/models.py:367
 msgid "sort reverse"
 msgstr "sortează invers"
 
-#: documents/models.py:370
+#: documents/models.py:373
 msgid "title contains"
 msgstr "titlul conține"
 
-#: documents/models.py:371
+#: documents/models.py:374
 msgid "content contains"
 msgstr "conținutul conține"
 
-#: documents/models.py:372
+#: documents/models.py:375
 msgid "ASN is"
 msgstr "Avizul prealabil de expediție este"
 
-#: documents/models.py:373
+#: documents/models.py:376
 msgid "correspondent is"
 msgstr "corespondentul este"
 
-#: documents/models.py:374
+#: documents/models.py:377
 msgid "document type is"
 msgstr "tipul documentului este"
 
-#: documents/models.py:375
+#: documents/models.py:378
 msgid "is in inbox"
 msgstr "este în inbox"
 
-#: documents/models.py:376
+#: documents/models.py:379
 msgid "has tag"
 msgstr "are eticheta"
 
-#: documents/models.py:377
+#: documents/models.py:380
 msgid "has any tag"
 msgstr "are orice eticheta"
 
-#: documents/models.py:378
+#: documents/models.py:381
 msgid "created before"
 msgstr "creat înainte de"
 
-#: documents/models.py:379
+#: documents/models.py:382
 msgid "created after"
 msgstr "creat după"
 
-#: documents/models.py:380
+#: documents/models.py:383
 msgid "created year is"
 msgstr "anul creării este"
 
-#: documents/models.py:381
+#: documents/models.py:384
 msgid "created month is"
 msgstr "luna creării este"
 
-#: documents/models.py:382
+#: documents/models.py:385
 msgid "created day is"
 msgstr "ziua creării este"
 
-#: documents/models.py:383
+#: documents/models.py:386
 msgid "added before"
 msgstr "adăugat înainte de"
 
-#: documents/models.py:384
+#: documents/models.py:387
 msgid "added after"
 msgstr "adăugat după"
 
-#: documents/models.py:385
+#: documents/models.py:388
 msgid "modified before"
 msgstr "modificat înainte de"
 
-#: documents/models.py:386
+#: documents/models.py:389
 msgid "modified after"
 msgstr "modificat după"
 
-#: documents/models.py:387
+#: documents/models.py:390
 msgid "does not have tag"
 msgstr "nu are etichetă"
 
-#: documents/models.py:388
+#: documents/models.py:391
 msgid "does not have ASN"
 msgstr "nu are aviz prealabil de expediție"
 
-#: documents/models.py:389
+#: documents/models.py:392
 msgid "title or content contains"
 msgstr "titlul sau conținutul conține"
 
-#: documents/models.py:400
+#: documents/models.py:393
+msgid "fulltext query"
+msgstr ""
+
+#: documents/models.py:394
+msgid "more like this"
+msgstr ""
+
+#: documents/models.py:405
 msgid "rule type"
 msgstr "tip de regula"
 
-#: documents/models.py:404
+#: documents/models.py:409
 msgid "value"
 msgstr "valoare"
 
-#: documents/models.py:410
+#: documents/models.py:415
 msgid "filter rule"
 msgstr "regulă de filtrare"
 
-#: documents/models.py:411
+#: documents/models.py:416
 msgid "filter rules"
 msgstr "reguli de filtrare"
 
@@ -429,22 +437,26 @@ msgid "Portuguese (Brazil)"
 msgstr "Portugheză (Brazilia)"
 
 #: paperless/settings.py:304
+msgid "Portuguese"
+msgstr "Portugheză"
+
+#: paperless/settings.py:305
 msgid "Italian"
 msgstr "Italiană"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:306
 msgid "Romanian"
 msgstr "Română"
 
-#: paperless/settings.py:306
+#: paperless/settings.py:307
 msgid "Russian"
 msgstr "Rusă"
 
-#: paperless/settings.py:307
+#: paperless/settings.py:308
 msgid "Spanish"
-msgstr ""
+msgstr "Spaniolă"
 
-#: paperless/urls.py:118
+#: paperless/urls.py:113
 msgid "Paperless-ng administration"
 msgstr "Administrare Paperless-ng"
 

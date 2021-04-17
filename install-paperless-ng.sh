@@ -62,7 +62,7 @@ if [[ -z $(which docker-compose) ]] ; then
 	exit 1
 fi
 
-# Check if user has permissions to run Docker by trying to get the status of Docker (docker status). 
+# Check if user has permissions to run Docker by trying to get the status of Docker (docker status).
 # If this fails, the user probably does not have permissions for Docker.
 docker stats --no-stream 2>/dev/null 1>&2
 if [ $? -ne 0 ] ; then
@@ -72,6 +72,8 @@ if [ $? -ne 0 ] ; then
 	echo ""
 	sleep 3
 fi
+
+default_time_zone=$(timedatectl show -p Timezone --value)
 
 set -e
 
@@ -144,6 +146,15 @@ echo ""
 
 ask "Port" "8000"
 PORT=$ask_result
+
+echo ""
+echo "Paperless requires you to configure the current time zone correctly."
+echo "Otherwise, the dates of your documents may appear off by one day,"
+echo "depending on where you are on earth."
+echo ""
+
+ask "Current time zone" "$default_time_zone"
+TIME_ZONE=$ask_result
 
 echo ""
 echo "Database backend: PostgreSQL and SQLite are available. Use PostgreSQL"
@@ -280,6 +291,7 @@ DEFAULT_LANGUAGES="deu eng fra ita spa"
 	if [[ ! $USERMAP_GID == "1000" ]] ; then
 		echo "USERMAP_GID=$USERMAP_GID"
 	fi
+	echo "PAPERLESS_ZIME_ZONE=$TIME_ZONE"
 	echo "PAPERLESS_OCR_LANGUAGE=$OCR_LANGUAGE"
 	echo "PAPERLESS_SECRET_KEY=$SECRET_KEY"
 	if [[ ! " ${DEFAULT_LANGUAGES[@]} " =~ " ${OCR_LANGUAGE} " ]] ; then

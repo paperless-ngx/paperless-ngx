@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
 import { LogService } from 'src/app/services/rest/log.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { LogService } from 'src/app/services/rest/log.service';
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.scss']
 })
-export class LogsComponent implements OnInit {
+export class LogsComponent implements OnInit, AfterViewChecked {
 
   constructor(private logService: LogService) { }
 
@@ -16,6 +16,8 @@ export class LogsComponent implements OnInit {
 
   activeLog: string
 
+  @ViewChild('logContainer') logContainer: ElementRef
+
   ngOnInit(): void {
     this.logService.list().subscribe(result => {
       this.logFiles = result
@@ -24,6 +26,10 @@ export class LogsComponent implements OnInit {
         this.reloadLogs()
       }
     })
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
   }
 
   reloadLogs() {
@@ -46,6 +52,14 @@ export class LogsComponent implements OnInit {
     } else {
       return 20
     }
+  }
+
+  scrollToBottom(): void {
+    this.logContainer?.nativeElement.scroll({
+      top: this.logContainer.nativeElement.scrollHeight,
+      left: 0,
+      behavior: 'auto'
+    });
   }
 
 }
