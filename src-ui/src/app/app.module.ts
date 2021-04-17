@@ -63,6 +63,7 @@ import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter'
 import { ApiVersionInterceptor } from './interceptors/api-version.interceptor';
 import { ColorSliderModule } from 'ngx-color/slider';
 import { ColorComponent } from './components/common/input/color/color.component';
+import { DocumentAsnComponent } from './components/document-asn/document-asn.component';
 
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
@@ -73,7 +74,7 @@ import localeEnGb from '@angular/common/locales/en-GB';
 import localeRo from '@angular/common/locales/ro';
 import localeRu from '@angular/common/locales/ru';
 import localeEs from '@angular/common/locales/es';
-import { DocumentAsnComponent } from './components/document-asn/document-asn.component';
+import localePl from '@angular/common/locales/pl';
 
 
 registerLocaleData(localeFr)
@@ -86,6 +87,7 @@ registerLocaleData(localeEnGb)
 registerLocaleData(localeRo)
 registerLocaleData(localeRu)
 registerLocaleData(localeEs)
+registerLocaleData(localePl)
 
 @NgModule({
   declarations: [
