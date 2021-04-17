@@ -288,6 +288,8 @@ if os.getenv("PAPERLESS_DBHOST"):
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 ###############################################################################
 # Internationalization                                                        #
 ###############################################################################
