@@ -28,12 +28,12 @@ initialize() {
 
 	echo "creating directory /tmp/paperless"
 	mkdir -p /tmp/paperless
-    
+
     set +e
 	chown -R paperless:paperless ../
 	chown -R paperless:paperless /tmp/paperless
     set -e
-    
+
     sudo -HEu paperless /sbin/docker-prepare.sh
 }
 
