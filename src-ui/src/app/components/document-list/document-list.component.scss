@@ -34,3 +34,12 @@ $paperless-card-breakpoints: (
   right: 0 !important;
   left: auto !important;
 }
+
+.sticky-top {
+  z-index: 1000; // below main navbar
+  top: calc(7rem - 2px); // height of navbar (mobile)
+
+  @media (min-width: 580px) {
+    top: 3.5rem; // height of navbar
+  }
+}
