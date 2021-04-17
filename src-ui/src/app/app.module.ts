@@ -21,8 +21,6 @@ import { CorrespondentEditDialogComponent } from './components/manage/correspond
 import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { TagComponent } from './components/common/tag/tag.component';
-import { SearchComponent } from './components/search/search.component';
-import { ResultHighlightComponent } from './components/search/result-highlight/result-highlight.component';
 import { PageHeaderComponent } from './components/common/page-header/page-header.component';
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
@@ -65,6 +63,7 @@ import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter'
 import { ApiVersionInterceptor } from './interceptors/api-version.interceptor';
 import { ColorSliderModule } from 'ngx-color/slider';
 import { ColorComponent } from './components/common/input/color/color.component';
+import { DocumentAsnComponent } from './components/document-asn/document-asn.component';
 
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
@@ -75,17 +74,20 @@ import localeEnGb from '@angular/common/locales/en-GB';
 import localeRo from '@angular/common/locales/ro';
 import localeRu from '@angular/common/locales/ru';
 import localeEs from '@angular/common/locales/es';
+import localePl from '@angular/common/locales/pl';
 
 
 registerLocaleData(localeFr)
 registerLocaleData(localeNl)
 registerLocaleData(localeDe)
 registerLocaleData(localePt, "pt-BR")
+registerLocaleData(localePt, "pt-PT")
 registerLocaleData(localeIt)
 registerLocaleData(localeEnGb)
 registerLocaleData(localeRo)
 registerLocaleData(localeRu)
 registerLocaleData(localeEs)
+registerLocaleData(localePl)
 
 @NgModule({
   declarations: [
@@ -104,8 +106,6 @@ registerLocaleData(localeEs)
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     TagComponent,
-    SearchComponent,
-    ResultHighlightComponent,
     PageHeaderComponent,
     AppFrameComponent,
     ToastsComponent,
@@ -137,7 +137,8 @@ registerLocaleData(localeEs)
     SafePipe,
     CustomDatePipe,
     DateComponent,
-    ColorComponent
+    ColorComponent,
+    DocumentAsnComponent
   ],
   imports: [
     BrowserModule,

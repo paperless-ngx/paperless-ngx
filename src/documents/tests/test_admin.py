@@ -27,7 +27,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         doc.title = "new title"
         self.doc_admin.save_model(None, doc, None, None)
         self.assertEqual(Document.objects.get(id=doc.id).title, "new title")
-        self.assertEqual(self.get_document_from_index(doc)['title'], "new title")
+        self.assertEqual(self.get_document_from_index(doc)['id'], doc.id)
 
     def test_delete_model(self):
         doc = Document.objects.create(title="test")

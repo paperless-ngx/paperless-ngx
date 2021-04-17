@@ -20,6 +20,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
 @Component({
   selector: 'app-document-detail',
@@ -127,9 +128,10 @@ export class DocumentDetailComponent implements OnInit {
     this.documentForm.patchValue(doc)
   }
 
-  createDocumentType() {
+  createDocumentType(newName: string) {
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.success.subscribe(newDocumentType => {
       this.documentTypeService.listAll().subscribe(documentTypes => {
         this.documentTypes = documentTypes.results
@@ -138,9 +140,10 @@ export class DocumentDetailComponent implements OnInit {
     })
   }
 
-  createCorrespondent() {
+  createCorrespondent(newName: string) {
     var modal = this.modalService.open(CorrespondentEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.success.subscribe(newCorrespondent => {
       this.correspondentService.listAll().subscribe(correspondents => {
         this.correspondents = correspondents.results
@@ -219,7 +222,7 @@ export class DocumentDetailComponent implements OnInit {
   }
 
   moreLike() {
-    this.router.navigate(["search"], {queryParams: {more_like:this.document.id}})
+    this.documentListViewService.quickFilter([{rule_type: FILTER_FULLTEXT_MORELIKE, value: this.documentId.toString()}])
   }
 
   hasNext() {

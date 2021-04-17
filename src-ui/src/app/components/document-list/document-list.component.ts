@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { FilterRule } from 'src/app/data/filter-rule';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
@@ -37,7 +39,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
-  filterRulesModified: boolean = false
+  unmodifiedFilterRules: FilterRule[] = []
 
   private consumptionFinishedSubscription: Subscription
 
@@ -81,12 +83,12 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           }
           this.list.activateSavedView(view)
           this.list.reload()
-          this.rulesChanged()
+          this.unmodifiedFilterRules = view.filter_rules
         })
       } else {
         this.list.activateSavedView(null)
         this.list.reload()
-        this.rulesChanged()
+        this.unmodifiedFilterRules = []
       }
     })
   }
@@ -100,7 +102,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   loadViewConfig(view: PaperlessSavedView) {
     this.list.loadSavedView(view)
     this.list.reload()
-    this.rulesChanged()
   }
 
   saveViewConfig() {
@@ -113,6 +114,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       }
       this.savedViewService.patch(savedView).subscribe(result => {
         this.toastService.showInfo($localize`View "${this.list.activeSavedViewTitle}" saved successfully.`)
+        this.unmodifiedFilterRules = this.list.filterRules
       })
     }
   }
@@ -141,46 +143,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     })
   }
 
-  resetFilters(): void {
-    this.filterRulesModified = false
-    if (this.list.activeSavedViewId) {
-      this.savedViewService.getCached(this.list.activeSavedViewId).subscribe(viewUntouched => {
-        this.list.filterRules = viewUntouched.filter_rules
-        this.list.reload()
-      })
-    } else {
-      this.list.filterRules = []
-      this.list.reload()
-    }
-  }
-
-  rulesChanged() {
-    let modified = false
-    if (this.list.activeSavedViewId == null) {
-      modified = this.list.filterRules.length > 0 // documents list is modified if it has any filters
-    } else {
-      // compare savedView current filters vs original
-      this.savedViewService.getCached(this.list.activeSavedViewId).subscribe(view => {
-        let filterRulesInitial = view.filter_rules
-
-        if (this.list.filterRules.length !== filterRulesInitial.length) modified = true
-        else {
-          modified = this.list.filterRules.some(rule => {
-            return (filterRulesInitial.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined)
-          })
-
-          if (!modified) {
-            // only check other direction if we havent already determined is modified
-            modified = filterRulesInitial.some(rule => {
-              this.list.filterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined
-            })
-          }
-        }
-      })
-    }
-    this.filterRulesModified = modified
-  }
-
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
     if (!event.shiftKey) this.list.toggleSelected(document)
     else this.list.selectRangeTo(document)
@@ -205,6 +167,10 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.filterEditor.toggleDocumentType(documentTypeID)
     })
+  }
+
+  clickMoreLike(documentID: number) {
+    this.list.quickFilter([{rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString()}])
   }
 
   trackByDocumentId(index, item: PaperlessDocument) {
