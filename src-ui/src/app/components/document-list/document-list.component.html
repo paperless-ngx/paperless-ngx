@@ -75,7 +75,7 @@
 
 </app-page-header>
 
-<div class="w-100 mb-2 mb-sm-4">
+<div class="sticky-top py-2 mt-n2 mt-sm-n3 py-sm-4 bg-body mx-n3 px-3">
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
@@ -99,7 +99,7 @@
     <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickMoreLike)="clickMoreLike(d.id)">
     </app-document-card-large>
   </div>
-  
+
   <table class="table table-sm border shadow-sm" *ngIf="displayMode == 'details'">
     <thead>
       <th></th>
@@ -174,10 +174,10 @@
       </tr>
     </tbody>
   </table>
-  
+
   <div class="m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
     <app-document-card-small [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
   </div>
-  
+
 
 </ng-template>
