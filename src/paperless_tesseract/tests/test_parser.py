@@ -7,7 +7,7 @@ from django.test import TestCase, override_settings
 
 from documents.parsers import ParseError, run_convert
 from documents.tests.utils import DirectoriesMixin
-from paperless_tesseract.parsers import RasterisedDocumentParser, strip_excess_whitespace
+from paperless_tesseract.parsers import RasterisedDocumentParser, post_process_text
 
 image_to_string_calls = []
 
@@ -30,8 +30,6 @@ class FakeImageFile(ContextManager):
 
     def __enter__(self):
         return os.path.basename(self.fname)
-
-
 
 
 class TestParser(DirectoriesMixin, TestCase):
@@ -58,9 +56,9 @@ class TestParser(DirectoriesMixin, TestCase):
         )
     ]
 
-    def test_strip_excess_whitespace(self):
+    def test_post_process_text(self):
         for source, result in self.text_cases:
-            actual_result = strip_excess_whitespace(source)
+            actual_result = post_process_text(source)
             self.assertEqual(
                 result,
                 actual_result,

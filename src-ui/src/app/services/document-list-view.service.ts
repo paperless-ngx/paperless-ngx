@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { cloneFilterRules, FilterRule } from '../data/filter-rule';
+import { FILTER_FULLTEXT_MORELIKE, FILTER_FULLTEXT_QUERY } from '../data/filter-rule-type';
 import { PaperlessDocument } from '../data/paperless-document';
 import { PaperlessSavedView } from '../data/paperless-saved-view';
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
@@ -38,6 +39,7 @@ interface ListViewState {
 export class DocumentListViewService {
 
   isReloading: boolean = false
+  error: string = null
 
   rangeSelectionAnchorIndex: number
   lastRangeSelectionToIndex: number
@@ -101,6 +103,7 @@ export class DocumentListViewService {
 
   reload(onFinish?) {
     this.isReloading = true
+    this.error = null
     let activeListViewState = this.activeListViewState
 
     this.documentService.listFiltered(
@@ -124,12 +127,17 @@ export class DocumentListViewService {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             activeListViewState.currentPage = 1
             this.reload()
+          } else {
+            this.error = error.error
           }
         })
   }
 
   set filterRules(filterRules: FilterRule[]) {
     this.activeListViewState.filterRules = filterRules
+    if (filterRules.find(r => (r.rule_type == FILTER_FULLTEXT_QUERY || r.rule_type == FILTER_FULLTEXT_MORELIKE))) {
+      this.activeListViewState.currentPage = 1
+    }
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
@@ -197,7 +205,7 @@ export class DocumentListViewService {
         sortField: this.activeListViewState.sortField,
         sortReverse: this.activeListViewState.sortReverse
       }
-      sessionStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(savedState))
+      localStorage.setItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG, JSON.stringify(savedState))
     }
   }
 
@@ -207,7 +215,11 @@ export class DocumentListViewService {
     this.activeListViewState.currentPage = 1
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
-    this.router.navigate(["documents"])
+    if (this.router.url == "/documents") {
+      this.reload()
+    } else {
+      this.router.navigate(["documents"])
+    }
   }
 
   getLastPage(): number {
@@ -317,8 +329,8 @@ export class DocumentListViewService {
     return this.documents.map(d => d.id).indexOf(documentID)
   }
 
-  constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router) {
-     let documentListViewConfigJson = sessionStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
+  constructor(private documentService: DocumentService, private settings: SettingsService, private router: Router, private route: ActivatedRoute) {
+     let documentListViewConfigJson = localStorage.getItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
     if (documentListViewConfigJson) {
       try {
         let savedState: ListViewState = JSON.parse(documentListViewConfigJson)
@@ -332,7 +344,7 @@ export class DocumentListViewService {
         let newState = Object.assign(this.defaultListViewState(), savedState)
         this.listViewStates.set(null, newState)
       } catch (e) {
-        sessionStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
+        localStorage.removeItem(DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG)
       }
     }
   }

@@ -6,15 +6,18 @@ import time
 
 import tqdm
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from filelock import FileLock
 
-from documents.models import Document, Correspondent, Tag, DocumentType
+from documents.models import Document, Correspondent, Tag, DocumentType, \
+    SavedView, SavedViewFilterRule
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
 from paperless.db import GnuPG
+from paperless_mail.models import MailAccount, MailRule
 from ...file_handling import generate_filename, delete_empty_directories
 
 
@@ -104,6 +107,21 @@ class Command(BaseCommand):
             document_manifest = json.loads(
                 serializers.serialize("json", documents))
             manifest += document_manifest
+
+            manifest += json.loads(serializers.serialize(
+                "json", MailAccount.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", MailRule.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", SavedView.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", SavedViewFilterRule.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", User.objects.all()))
 
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(enumerate(document_manifest),

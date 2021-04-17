@@ -69,7 +69,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 7)
+        self.assertEqual(len(manifest), 8)
         self.assertEqual(len(list(filter(lambda e: e['model'] == 'documents.document', manifest))), 4)
 
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))

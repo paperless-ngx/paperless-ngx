@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-14 13:33+0100\n"
-"PO-Revision-Date: 2021-03-14 13:57\n"
+"POT-Creation-Date: 2021-04-05 22:05+0200\n"
+"PO-Revision-Date: 2021-04-06 12:03\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -226,7 +226,7 @@ msgstr "bericht"
 msgid "logs"
 msgstr "berichten"
 
-#: documents/models.py:344 documents/models.py:396
+#: documents/models.py:344 documents/models.py:401
 msgid "saved view"
 msgstr "opgeslagen view"
 
@@ -250,103 +250,111 @@ msgstr "weergeven in zijbalk"
 msgid "sort field"
 msgstr "sorteerveld"
 
-#: documents/models.py:364
+#: documents/models.py:367
 msgid "sort reverse"
 msgstr "omgekeerd sorteren"
 
-#: documents/models.py:370
+#: documents/models.py:373
 msgid "title contains"
 msgstr "titel bevat"
 
-#: documents/models.py:371
+#: documents/models.py:374
 msgid "content contains"
 msgstr "inhoud bevat"
 
-#: documents/models.py:372
+#: documents/models.py:375
 msgid "ASN is"
 msgstr "ASN is"
 
-#: documents/models.py:373
+#: documents/models.py:376
 msgid "correspondent is"
 msgstr "correspondent is"
 
-#: documents/models.py:374
+#: documents/models.py:377
 msgid "document type is"
 msgstr "documenttype is"
 
-#: documents/models.py:375
+#: documents/models.py:378
 msgid "is in inbox"
 msgstr "zit in \"Postvak in\""
 
-#: documents/models.py:376
+#: documents/models.py:379
 msgid "has tag"
 msgstr "heeft etiket"
 
-#: documents/models.py:377
+#: documents/models.py:380
 msgid "has any tag"
 msgstr "heeft één van de etiketten"
 
-#: documents/models.py:378
+#: documents/models.py:381
 msgid "created before"
 msgstr "aangemaakt voor"
 
-#: documents/models.py:379
+#: documents/models.py:382
 msgid "created after"
 msgstr "aangemaakt na"
 
-#: documents/models.py:380
+#: documents/models.py:383
 msgid "created year is"
 msgstr "aangemaakt jaar is"
 
-#: documents/models.py:381
+#: documents/models.py:384
 msgid "created month is"
 msgstr "aangemaakte maand is"
 
-#: documents/models.py:382
+#: documents/models.py:385
 msgid "created day is"
 msgstr "aangemaakte dag is"
 
-#: documents/models.py:383
+#: documents/models.py:386
 msgid "added before"
 msgstr "toegevoegd voor"
 
-#: documents/models.py:384
+#: documents/models.py:387
 msgid "added after"
 msgstr "toegevoegd na"
 
-#: documents/models.py:385
+#: documents/models.py:388
 msgid "modified before"
 msgstr "gewijzigd voor"
 
-#: documents/models.py:386
+#: documents/models.py:389
 msgid "modified after"
 msgstr "gewijzigd na"
 
-#: documents/models.py:387
+#: documents/models.py:390
 msgid "does not have tag"
 msgstr "heeft geen etiket"
 
-#: documents/models.py:388
+#: documents/models.py:391
 msgid "does not have ASN"
 msgstr "heeft geen ASN"
 
-#: documents/models.py:389
+#: documents/models.py:392
 msgid "title or content contains"
 msgstr "titel of inhoud bevat"
 
-#: documents/models.py:400
+#: documents/models.py:393
+msgid "fulltext query"
+msgstr "inhoud doorzoeken"
+
+#: documents/models.py:394
+msgid "more like this"
+msgstr "meer zoals dit"
+
+#: documents/models.py:405
 msgid "rule type"
 msgstr "type regel"
 
-#: documents/models.py:404
+#: documents/models.py:409
 msgid "value"
 msgstr "waarde"
 
-#: documents/models.py:410
+#: documents/models.py:415
 msgid "filter rule"
 msgstr "filterregel"
 
-#: documents/models.py:411
+#: documents/models.py:416
 msgid "filter rules"
 msgstr "filterregels"
 
@@ -429,22 +437,26 @@ msgid "Portuguese (Brazil)"
 msgstr "Portugees (Brazilië)"
 
 #: paperless/settings.py:304
+msgid "Portuguese"
+msgstr "Portugees"
+
+#: paperless/settings.py:305
 msgid "Italian"
 msgstr "Italiaans"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:306
 msgid "Romanian"
 msgstr "Roemeens"
 
-#: paperless/settings.py:306
+#: paperless/settings.py:307
 msgid "Russian"
 msgstr "Russisch"
 
-#: paperless/settings.py:307
+#: paperless/settings.py:308
 msgid "Spanish"
-msgstr ""
+msgstr "Spaans"
 
-#: paperless/urls.py:118
+#: paperless/urls.py:113
 msgid "Paperless-ng administration"
 msgstr "Paperless-ng administratie"
 

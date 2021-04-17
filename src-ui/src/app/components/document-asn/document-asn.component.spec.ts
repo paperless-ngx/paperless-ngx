@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResultHighlightComponent } from './result-highlight.component';
+import { DocumentAsnComponent } from './document-asn.component';
 
-describe('ResultHighlightComponent', () => {
-  let component: ResultHighlightComponent;
-  let fixture: ComponentFixture<ResultHighlightComponent>;
+describe('DocumentASNComponentComponent', () => {
+  let component: DocumentAsnComponent;
+  let fixture: ComponentFixture<DocumentAsnComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ResultHighlightComponent ]
+      declarations: [ DocumentAsnComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultHighlightComponent);
+    fixture = TestBed.createComponent(DocumentAsnComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
