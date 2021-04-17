@@ -208,3 +208,16 @@ This might have multiple reasons.
         SENDFILE=0
     
     to your `docker-compose.env` file.
+
+Error while reading metadata
+############################
+
+You might find messages like these in your log files:
+
+.. code::
+
+    [WARNING] [paperless.parsing.tesseract] Error while reading metadata
+
+This indicates that paperless failed to read PDF metadata from one of your documents. This happens when you
+open the affected documents in paperless for editing. Paperless will continue to work, and will simply not
+show the invalid metadata.
