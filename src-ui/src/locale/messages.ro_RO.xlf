@@ -214,7 +214,7 @@
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">206</context>
         </context-group>
         <target state="translated">Confirmă ștergerea</target>
       </trans-unit>
@@ -222,7 +222,7 @@
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">205</context>
+          <context context-type="linenumber">207</context>
         </context-group>
         <target state="translated">Sunteţi sigur că doriţi să ştergeţi documentul "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
@@ -230,7 +230,7 @@
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">208</context>
         </context-group>
         <target state="translated">Fișierele pentru acest document vor fi șterse permanent. Operațiunea este ireversibila.</target>
       </trans-unit>
@@ -238,7 +238,7 @@
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">210</context>
         </context-group>
         <target state="translated">Șterge document</target>
       </trans-unit>
@@ -246,7 +246,7 @@
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">215</context>
+          <context context-type="linenumber">217</context>
         </context-group>
         <target state="translated">Eroare la ștergerea documentului: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
       </trans-unit>
@@ -1207,7 +1207,7 @@
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">85</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <target state="translated">Titlu</target>
       </trans-unit>
@@ -1215,7 +1215,7 @@
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">89</context>
         </context-group>
         <target state="translated">Titlu si conținut</target>
       </trans-unit>
@@ -1223,7 +1223,7 @@
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">90</context>
         </context-group>
         <target state="translated">Aviz prealabil de expediție</target>
       </trans-unit>
@@ -1231,7 +1231,7 @@
         <source>Advanced search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">91</context>
         </context-group>
         <target state="needs-translation">Advanced search</target>
       </trans-unit>
@@ -1239,7 +1239,7 @@
         <source>More like</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
-          <context context-type="linenumber">91</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="needs-translation">More like</target>
       </trans-unit>
@@ -1247,7 +1247,7 @@
         <source>Filter tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="translated">Filtrează etichete</target>
       </trans-unit>
@@ -1255,7 +1255,7 @@
         <source>Filter correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="translated">Filtrează corespondenți</target>
       </trans-unit>
@@ -1263,7 +1263,7 @@
         <source>Filter document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <target state="translated">Filtrează tipuri de documente</target>
       </trans-unit>
@@ -1271,7 +1271,7 @@
         <source>Reset filters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">57</context>
         </context-group>
         <target state="translated">Resetare filtre</target>
       </trans-unit>
@@ -1376,7 +1376,7 @@
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <target state="translated">Scor:</target>
       </trans-unit>
@@ -1611,7 +1611,7 @@
         <source>Suggestions:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <target state="translated">Sugestii:</target>
       </trans-unit>
@@ -1968,6 +1968,14 @@
           <context context-type="linenumber">100</context>
         </context-group>
         <target state="translated">Spaniolă</target>
+      </trans-unit>
+      <trans-unit id="792060551707690640" datatype="html">
+        <source>Polish</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/settings.service.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+        <target state="needs-translation">Polish</target>
       </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
