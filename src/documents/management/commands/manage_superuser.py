@@ -28,6 +28,7 @@ class Command(BaseCommand):
             user: User = User.objects.get_by_natural_key(username)
             user.set_password(password)
             user.save()
+            self.stdout.write(f"Changed password of user {username}.")
         elif password:
             # Create superuser based on env variables
             User.objects.create_superuser(username, mail, password)
@@ -37,4 +38,5 @@ class Command(BaseCommand):
             self.stdout.write(
                 f'Did not create superuser "{username}".')
             self.stdout.write(
-                'Make sure you specified "PAPERLESS_ADMIN_PASSWORD" in your "docker-compose.env" file.')
+                'Make sure you specified "PAPERLESS_ADMIN_PASSWORD" in your '
+                '"docker-compose.env" file.')
