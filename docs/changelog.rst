@@ -5,6 +5,22 @@
 Changelog
 *********
 
+paperless-ng 1.4.1
+##################
+
+* Added Polish locale.
+
+* Changed some parts of the Dockerfile to hopefully restore functionality on certain ARM devices.
+
+* Updated python dependencies.
+
+* `Michael Shamoon`_ added a sticky filter / bulk edit bar.
+
+* `sbrl`_ changed the docker-entrypoint.sh script to increase compatibility with NFS shares.
+
+* `Chris Nagy`_ added support for creating a super user by passing ``PAPERLESS_ADMIN_USER`` and
+  ``PAPERLESS_ADMIN_PASSWORD`` as environment variables to the docker container.
+
 paperless-ng 1.4.0
 ##################
 
@@ -1345,6 +1361,8 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _Chris Nagy: https://github.com/what-name
+.. _sbrl: https://github.com/sbrl
 .. _slorenz: https://github.com/sisao
 .. _Jo Vandeginste: https://github.com/jovandeginste
 .. _zjean: https://github.com/zjean
