@@ -106,6 +106,12 @@ class Command(BaseCommand):
             help="Specify the ID of a document, and this command will only "
                  "run on this specific document."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def handle(self, *args, **options):
 
@@ -140,7 +146,8 @@ class Command(BaseCommand):
                         handle_document,
                         document_ids
                     ),
-                    total=len(document_ids)
+                    total=len(document_ids),
+                    disable=options['no_progress_bar']
                 ))
         except KeyboardInterrupt:
             print("Aborting...")
