@@ -36,6 +36,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("source")
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -70,7 +76,7 @@ class Command(BaseCommand):
                 # Fill up the database with whatever is in the manifest
                 call_command("loaddata", manifest_path)
 
-                self._import_files_from_manifest()
+                self._import_files_from_manifest(options['no_progress_bar'])
 
         print("Updating search index...")
         call_command('document_index', 'reindex')
@@ -111,7 +117,7 @@ class Command(BaseCommand):
                         f"does not appear to be in the source directory."
                     )
 
-    def _import_files_from_manifest(self):
+    def _import_files_from_manifest(self, progress_bar_disable):
 
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
@@ -123,7 +129,10 @@ class Command(BaseCommand):
             lambda r: r["model"] == "documents.document",
             self.manifest))
 
-        for record in tqdm.tqdm(manifest_documents):
+        for record in tqdm.tqdm(
+            manifest_documents,
+            disable=progress_bar_disable
+        ):
 
             document = Document.objects.get(pk=record["pk"])
 
