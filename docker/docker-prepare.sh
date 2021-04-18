@@ -52,7 +52,7 @@ search_index() {
 
 superuser() {
 	if [[ -n "${PAPERLESS_ADMIN_USER}" ]]; then
-		sudo -HEu paperless python3 manage.py manage_superuser
+		python3 manage.py manage_superuser
 	fi
 }
 
