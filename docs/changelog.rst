@@ -5,6 +5,11 @@
 Changelog
 *********
 
+paperless-ng 1.4.2
+##################
+
+* Fixed an issue with ``sudo`` that caused paperless to not start on many Raspberry Pi devices. Thank you `WhiteHatTux`_!
+
 paperless-ng 1.4.1
 ##################
 
@@ -1361,6 +1366,7 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _WhiteHatTux: https://github.com/WhiteHatTux
 .. _Chris Nagy: https://github.com/what-name
 .. _sbrl: https://github.com/sbrl
 .. _slorenz: https://github.com/sisao
