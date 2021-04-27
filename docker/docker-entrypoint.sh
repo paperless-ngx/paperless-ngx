@@ -34,7 +34,7 @@ initialize() {
 	chown -R paperless:paperless /tmp/paperless
     set -e
 
-    sudo -HEu paperless /sbin/docker-prepare.sh
+    gosu paperless /sbin/docker-prepare.sh
 }
 
 install_languages() {
@@ -85,7 +85,7 @@ initialize
 
 if [[ "$1" != "/"* ]]; then
 	echo Executing management command "$@"
-	exec sudo -HEu paperless python3 manage.py "$@"
+	exec gosu paperless python3 manage.py "$@"
 else
 	echo Executing "$@"
 	exec "$@"
