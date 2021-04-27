@@ -19,7 +19,7 @@ RUN apt-get update \
 		imagemagick \
 		gettext \
 		tzdata \
-		sudo \
+		gosu \
 		# fonts for text file thumbnail generation
 		fonts-liberation \
 		# for Numpy
@@ -96,8 +96,8 @@ COPY src/ ./
 RUN addgroup --gid 1000 paperless \
 	&& useradd --uid 1000 --gid paperless --home-dir /usr/src/paperless paperless \
 	&& chown -R paperless:paperless ../ \
-	&& sudo -HEu paperless python3 manage.py collectstatic --clear --no-input \
-	&& sudo -HEu paperless python3 manage.py compilemessages
+	&& gosu paperless python3 manage.py collectstatic --clear --no-input \
+	&& gosu paperless python3 manage.py compilemessages
 
 VOLUME ["/usr/src/paperless/data", "/usr/src/paperless/media", "/usr/src/paperless/consume", "/usr/src/paperless/export"]
 ENTRYPOINT ["/sbin/docker-entrypoint.sh"]
