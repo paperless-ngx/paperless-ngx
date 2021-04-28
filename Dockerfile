@@ -36,11 +36,13 @@ RUN apt-get update \
   && echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
   && apt-get update \
   && apt-get -y --no-install-recommends install \
+		# fixes sudo / gosu issues
+		libseccomp2 \
 		# Mime type detection
 		file \
 		libmagic-dev \
 		media-types \
-  	# OCRmyPDF dependencies
+  		# OCRmyPDF dependencies
 		liblept5 \
 		qpdf \
 		tesseract-ocr \
