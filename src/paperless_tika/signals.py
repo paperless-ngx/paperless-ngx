@@ -1,4 +1,3 @@
-
 def get_parser(*args, **kwargs):
     from .parsers import TikaDocumentParser
 
@@ -20,5 +19,6 @@ def tika_consumer_declaration(sender, **kwargs):
             "application/vnd.oasis.opendocument.presentation": ".odp",
             "application/vnd.oasis.opendocument.spreadsheet": ".ods",
             "application/vnd.oasis.opendocument.text": ".odt",
+            "text/rtf": ".rtf",
         },
     }
