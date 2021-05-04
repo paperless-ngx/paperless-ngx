@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-17 13:41+0200\n"
-"PO-Revision-Date: 2021-04-17 11:47\n"
+"PO-Revision-Date: 2021-05-02 17:00\n"
 "Last-Translator: \n"
 "Language-Team: English, United Kingdom\n"
 "Language: en_GB\n"
@@ -336,11 +336,11 @@ msgstr "title or content contains"
 
 #: documents/models.py:393
 msgid "fulltext query"
-msgstr ""
+msgstr "fulltext query"
 
 #: documents/models.py:394
 msgid "more like this"
-msgstr ""
+msgstr "more like this"
 
 #: documents/models.py:405
 msgid "rule type"
@@ -458,7 +458,7 @@ msgstr "Spanish"
 
 #: paperless/settings.py:309
 msgid "Polish"
-msgstr ""
+msgstr "Polish"
 
 #: paperless/urls.py:113
 msgid "Paperless-ng administration"
