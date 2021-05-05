@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-17 13:41+0200\n"
-"PO-Revision-Date: 2021-05-02 17:00\n"
+"POT-Creation-Date: 2021-05-04 15:00+0000\n"
+"PO-Revision-Date: 2021-05-04 21:51\n"
 "Last-Translator: \n"
 "Language-Team: English, United Kingdom\n"
 "Language: en_GB\n"
@@ -412,53 +412,57 @@ msgstr "Password"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: paperless/settings.py:298
+#: paperless/settings.py:300
 msgid "English (US)"
 msgstr "English (US)"
 
-#: paperless/settings.py:299
+#: paperless/settings.py:301
 msgid "English (GB)"
 msgstr "English (GB)"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:302
 msgid "German"
 msgstr "German"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:303
 msgid "Dutch"
 msgstr "Dutch"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:304
 msgid "French"
 msgstr "French"
 
-#: paperless/settings.py:303
+#: paperless/settings.py:305
 msgid "Portuguese (Brazil)"
 msgstr "Portuguese (Brazil)"
 
-#: paperless/settings.py:304
+#: paperless/settings.py:306
 msgid "Portuguese"
 msgstr "Portuguese"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:307
 msgid "Italian"
 msgstr "Italian"
 
-#: paperless/settings.py:306
+#: paperless/settings.py:308
 msgid "Romanian"
 msgstr "Romanian"
 
-#: paperless/settings.py:307
+#: paperless/settings.py:309
 msgid "Russian"
 msgstr "Russian"
 
-#: paperless/settings.py:308
+#: paperless/settings.py:310
 msgid "Spanish"
 msgstr "Spanish"
 
-#: paperless/settings.py:309
+#: paperless/settings.py:311
 msgid "Polish"
 msgstr "Polish"
+
+#: paperless/settings.py:312
+msgid "Swedish"
+msgstr ""
 
 #: paperless/urls.py:113
 msgid "Paperless-ng administration"
