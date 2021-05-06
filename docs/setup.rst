@@ -485,29 +485,22 @@ Install Paperless using ansible
 
         ansible -m ping YourAnsibleTargetHostGoesHere
 
-2.  Clone the repository of paperless-ng:
+2.  Install the latest tag of the ansible role using ansible-galaxy
 
     .. code:: sh
 
-        git clone https://github.com/jonaswinkler/paperless-ng
+        ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,ng-1.4.2
 
-    Checkout the latest release tag:
-
-    .. code:: sh
-
-        cd paperless-ng
-        git checkout ng-1.0.0
-
-3.  Create an ansible ``playbook.yml`` in the paperless-ng root directory:
+3.  Create an ansible ``playbook.yml`` in a directory of your choice:
 
     .. code:: yaml
 
         - hosts: YourAnsibleTargetHostGoesHere
           become: yes
           vars_files:
-            - ansible/vars.yml
+            - vars/paperless-ng.yml
           roles:
-            - ansible
+            - paperless-ng
 
     Optional: If you also want to use PostgreSQL on the target system, install and add (for example) the `geerlingguy.postgresql <https://github.com/geerlingguy/ansible-role-postgresql>`_ role:
 
@@ -520,10 +513,10 @@ Install Paperless using ansible
         - hosts: YourAnsibleTargetHostGoesHere
           become: yes
           vars_files:
-            - ansible/vars.yml
+            - vars/paperless-ng.yml
           roles:
             - geerlingguy.postgresql
-            - ansible
+            - paperless-ng
 
     Optional: If you also want to use a reverse proxy on the target system, install and add (for example) the `geerlingguy.nginx <https://github.com/geerlingguy/ansible-role-nginx>`_ role:
 
@@ -536,13 +529,13 @@ Install Paperless using ansible
         - hosts: YourAnsibleTargetHostGoesHere
           become: yes
           vars_files:
-            - ansible/vars.yml
+            - vars/paperless-ng.yml
           roles:
             - geerlingguy.postgresql
-            - ansible
+            - paperless-ng
             - geerlingguy.nginx
 
-4.  Create ``ansible/vars.yml`` to configure your ansible deployment:
+4.  Create ``vars/paperless-ng.yml`` to configure your ansible deployment:
 
     .. code:: yaml
 
