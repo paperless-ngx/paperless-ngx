@@ -460,6 +460,7 @@ Install Paperless using ansible
 .. note::
 
     This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
+		Additionally, only i386 or amd64 based hosts are supported right now, i.e. installation on arm hosts will fail.
 
 1.  Install ansible 2.7+ on the management node.
     This may be the target host paperless-ng is being installed on or any remote host which can access the target host.
