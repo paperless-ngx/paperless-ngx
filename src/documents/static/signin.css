@@ -42,3 +42,58 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+@media (prefers-color-scheme: dark) {
+  /*
+  From theme_dark.scss
+  $primary-dark-mode: #45973a;
+  $danger-dark-mode: #b71631;
+  $bg-dark-mode: #161618;
+  $bg-dark-mode-accent: #21262d;
+  $bg-light-dark-mode: #1c1c1f;
+  $text-color-dark-mode: #abb2bf;
+  $border-color-dark-mode: #47494f;
+   */
+  body {
+    background-color: #161618 !important;
+    color: #abb2bf;
+  }
+
+  svg.logo .text {
+    fill: #abb2bf!important;
+  }
+
+  .form-control:not(.is-invalid):not(.btn) {
+    border-color: #47494f;
+  }
+
+  .form-control:not(.btn) {
+    background-color: #161618;
+    color: #abb2bf;
+  }
+
+  .form-control:not(.btn)::placeholder {
+    color: #abb2bf;
+  }
+
+  .form-control:not(.btn):focus {
+    background-color: #1c1c1f !important;
+    color: #8e97a9 !important;
+  }
+
+  .btn-primary {
+  color: #fff;
+    background-color: #17541f;
+    border-color: #17541f;
+  }
+
+  .btn-primary:hover, .btn-primary:focus {
+    background-color: #0f3614;
+    border-color: #0c2c10;
+  }
+
+  .btn-primary:not(:disabled):not(.disabled):active {
+    background-color: #0c2c10;
+    border-color: #09220d;
+  }
+}
