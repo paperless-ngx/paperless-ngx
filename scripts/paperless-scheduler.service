@@ -1,5 +1,5 @@
 [Unit]
-Description=Paperless consumer
+Description=Paperless scheduler
 Requires=redis.service
 
 [Service]
