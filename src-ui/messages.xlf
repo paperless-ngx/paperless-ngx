@@ -1413,6 +1413,7 @@
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
+        <note priority="1" from="description">Used for both types and correspondents</note>
       </trans-unit>
       <trans-unit id="a1e6c11f20d4bf6e8e6b43e3c6d2561b2080645e" datatype="html">
         <source>Suggestions:</source>
