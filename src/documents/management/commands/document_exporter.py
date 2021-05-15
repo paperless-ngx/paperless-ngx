@@ -57,6 +57,12 @@ class Command(BaseCommand):
                  "do not belong to the current export, such as files from "
                  "deleted documents."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -81,9 +87,9 @@ class Command(BaseCommand):
             raise CommandError("That path doesn't appear to be writable")
 
         with FileLock(settings.MEDIA_LOCK):
-            self.dump()
+            self.dump(options['no_progress_bar'])
 
-    def dump(self):
+    def dump(self, progress_bar_disable=False):
         # 1. Take a snapshot of what files exist in the current export folder
         for root, dirs, files in os.walk(self.target):
             self.files_in_export_dir.extend(
@@ -124,8 +130,11 @@ class Command(BaseCommand):
                 "json", User.objects.all()))
 
         # 3. Export files from each document
-        for index, document_dict in tqdm.tqdm(enumerate(document_manifest),
-                                              total=len(document_manifest)):
+        for index, document_dict in tqdm.tqdm(
+            enumerate(document_manifest),
+            total=len(document_manifest),
+            disable=progress_bar_disable
+        ):
             # 3.1. store files unencrypted
             document_dict["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED  # NOQA: E501
 
