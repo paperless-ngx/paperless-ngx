@@ -7,7 +7,7 @@ from dateutil.parser import isoparse
 from django.conf import settings
 from whoosh import highlight, classify, query
 from whoosh.fields import Schema, TEXT, NUMERIC, KEYWORD, DATETIME, BOOLEAN
-from whoosh.highlight import Formatter, get_text, HtmlFormatter
+from whoosh.highlight import HtmlFormatter
 from whoosh.index import create_in, exists_in, open_dir
 from whoosh.qparser import MultifieldParser
 from whoosh.qparser.dateparse import DateParserPlugin
@@ -147,12 +147,10 @@ def remove_document_from_index(document):
 
 class DelayedQuery:
 
-    @property
-    def _query(self):
+    def _get_query(self):
         raise NotImplementedError()
 
-    @property
-    def _query_filter(self):
+    def _get_query_filter(self):
         criterias = []
         for k, v in self.query_params.items():
             if k == 'correspondent__id':
@@ -185,16 +183,32 @@ class DelayedQuery:
         else:
             return None
 
-    @property
-    def _query_sortedby(self):
-        # if not 'ordering' in self.query_params:
-        return None, False
+    def _get_query_sortedby(self):
+        if 'ordering' not in self.query_params:
+            return None, False
 
-        # o: str = self.query_params['ordering']
-        # if o.startswith('-'):
-        #     return o[1:], True
-        # else:
-        #     return o, False
+        field: str = self.query_params['ordering']
+
+        sort_fields_map = {
+            "created": "created",
+            "modified": "modified",
+            "added": "added",
+            "title": "title",
+            "correspondent__name": "correspondent",
+            "document_type__name": "type",
+            "archive_serial_number": "asn"
+        }
+
+        if field.startswith('-'):
+            field = field[1:]
+            reverse = True
+        else:
+            reverse = False
+
+        if field not in sort_fields_map:
+            return None, False
+        else:
+            return sort_fields_map[field], reverse
 
     def __init__(self, searcher: Searcher, query_params, page_size):
         self.searcher = searcher
@@ -211,13 +225,13 @@ class DelayedQuery:
         if item.start in self.saved_results:
             return self.saved_results[item.start]
 
-        q, mask = self._query
-        sortedby, reverse = self._query_sortedby
+        q, mask = self._get_query()
+        sortedby, reverse = self._get_query_sortedby()
 
         page: ResultsPage = self.searcher.search_page(
             q,
             mask=mask,
-            filter=self._query_filter,
+            filter=self._get_query_filter(),
             pagenum=math.floor(item.start / self.page_size) + 1,
             pagelen=self.page_size,
             sortedby=sortedby,
@@ -227,14 +241,18 @@ class DelayedQuery:
             surround=50)
         page.results.formatter = HtmlFormatter(tagname="span", between=" ... ")
 
-        if not self.first_score and len(page.results) > 0:
+        if (not self.first_score and
+                len(page.results) > 0 and
+                sortedby is None):
             self.first_score = page.results[0].score
 
-        if self.first_score:
-            page.results.top_n = list(map(
-                lambda hit: (hit[0] / self.first_score, hit[1]),
-                page.results.top_n
-            ))
+        page.results.top_n = list(map(
+            lambda hit: (
+                (hit[0] / self.first_score) if self.first_score else None,
+                hit[1]
+            ),
+            page.results.top_n
+        ))
 
         self.saved_results[item.start] = page
 
@@ -243,8 +261,7 @@ class DelayedQuery:
 
 class DelayedFullTextQuery(DelayedQuery):
 
-    @property
-    def _query(self):
+    def _get_query(self):
         q_str = self.query_params['query']
         qp = MultifieldParser(
             ["content", "title", "correspondent", "tag", "type"],
@@ -261,8 +278,7 @@ class DelayedFullTextQuery(DelayedQuery):
 
 class DelayedMoreLikeThisQuery(DelayedQuery):
 
-    @property
-    def _query(self):
+    def _get_query(self):
         more_like_doc_id = int(self.query_params['more_like_id'])
         content = Document.objects.get(id=more_like_doc_id).content
 

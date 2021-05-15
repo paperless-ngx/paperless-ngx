@@ -8,10 +8,10 @@
 -i https://pypi.python.org/simple
 --extra-index-url https://www.piwheels.org/simple
 aioredis==1.3.1
-arrow==1.0.3; python_version >= '3.6'
+arrow==1.1.0; python_version >= '3.6'
 asgiref==3.3.4; python_version >= '3.6'
 async-timeout==3.0.1; python_full_version >= '3.5.3'
-attrs==20.3.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+attrs==21.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 autobahn==21.3.1; python_version >= '3.7'
 automat==20.2.0
 blessed==1.18.0
@@ -28,35 +28,35 @@ cryptography==3.4.7
 daphne==3.0.2; python_version >= '3.6'
 dateparser==1.0.0
 django-cors-headers==3.7.0
-django-extensions==3.1.2
+django-extensions==3.1.3
 django-filter==2.4.0
 django-picklefield==3.0.1; python_version >= '3'
 django-q==1.3.4
-django==3.2
+django==3.2.3
 djangorestframework==3.12.4
 filelock==3.0.12
 fuzzywuzzy[speedup]==0.18.0
 gunicorn==20.1.0
 h11==0.12.0; python_version >= '3.6'
 hiredis==2.0.0; python_version >= '3.6'
-httptools==0.1.1
+httptools==0.1.2
 humanfriendly==9.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 hyperlink==21.0.0
 idna==2.10; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-imap-tools==0.39.0
-img2pdf==0.4.0
+imap-tools==0.41.0
+img2pdf==0.4.1
 incremental==21.3.0
 inotify-simple==1.3.5; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 inotifyrecursive==0.3.5
 joblib==1.0.1; python_version >= '3.6'
-langdetect==1.0.8
+langdetect==1.0.9
 lxml==4.6.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 msgpack==1.0.2
 numpy==1.19.5
-ocrmypdf==11.7.3
+ocrmypdf==12.0.1
 pathvalidate==2.4.1
 pdfminer.six==20201018
-pikepdf==2.11.1
+pikepdf==2.12.0
 pillow==8.2.0
 pluggy==0.13.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 portalocker==2.3.0; python_version >= '3'
@@ -66,7 +66,7 @@ pyasn1==0.4.8
 pycparser==2.20; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 pyopenssl==20.0.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 python-dateutil==2.8.1
-python-dotenv==0.17.0
+python-dotenv==0.17.1
 python-gnupg==0.4.7
 python-levenshtein==0.12.2
 python-magic==0.4.22
@@ -78,8 +78,8 @@ reportlab==3.5.67; python_version >= '2.7' and python_version < '4'
 requests==2.25.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 scikit-learn==0.24.0
 scipy==1.5.4
-service-identity==18.1.0
-six==1.15.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+service-identity==21.1.0
+six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 sortedcontainers==2.3.0
 sqlparse==0.4.1; python_version >= '3.5'
 threadpoolctl==2.1.0; python_version >= '3.5'

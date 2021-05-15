@@ -9,6 +9,8 @@ from rest_framework.routers import DefaultRouter
 
 from django.utils.translation import gettext_lazy as _
 
+from django.conf import settings
+
 from paperless.consumers import StatusConsumer
 from documents.views import (
     CorrespondentViewSet,
@@ -73,31 +75,36 @@ urlpatterns = [
     re_path(r"^fetch/", include([
         re_path(
             r"^doc/(?P<pk>\d+)$",
-            RedirectView.as_view(url='/api/documents/%(pk)s/download/'),
+            RedirectView.as_view(url=settings.BASE_URL +
+                                 'api/documents/%(pk)s/download/'),
         ),
         re_path(
             r"^thumb/(?P<pk>\d+)$",
-            RedirectView.as_view(url='/api/documents/%(pk)s/thumb/'),
+            RedirectView.as_view(url=settings.BASE_URL +
+                                 'api/documents/%(pk)s/thumb/'),
         ),
         re_path(
             r"^preview/(?P<pk>\d+)$",
-            RedirectView.as_view(url='/api/documents/%(pk)s/preview/'),
+            RedirectView.as_view(url=settings.BASE_URL +
+                                 'api/documents/%(pk)s/preview/'),
         ),
     ])),
 
     re_path(r"^push$", csrf_exempt(
-        RedirectView.as_view(url='/api/documents/post_document/'))),
+        RedirectView.as_view(url=settings.BASE_URL +
+                             'api/documents/post_document/'))),
 
     # Frontend assets TODO: this is pretty bad, but it works.
     path('assets/<path:path>',
-         RedirectView.as_view(url='/static/frontend/en-US/assets/%(path)s')),
+         RedirectView.as_view(url=settings.STATIC_URL +
+                              'frontend/en-US/assets/%(path)s')),
     # TODO: with localization, this is even worse! :/
 
     # login, logout
     path('accounts/', include('django.contrib.auth.urls')),
 
     # Root of the Frontent
-    re_path(r".*", login_required(IndexView.as_view())),
+    re_path(r".*", login_required(IndexView.as_view()), name='base'),
 ]
 
 

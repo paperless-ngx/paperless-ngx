@@ -125,7 +125,7 @@ export class ConsumerStatusService {
   connect() {
     this.disconnect()
 
-    this.statusWebSocket = new WebSocket(`${environment.webSocketProtocol}//${environment.webSocketHost}/ws/status/`);
+    this.statusWebSocket = new WebSocket(`${environment.webSocketProtocol}//${environment.webSocketHost}${environment.webSocketBaseUrl}status/`);
     this.statusWebSocket.onmessage = (ev) => {
       let statusMessage: WebsocketConsumerStatusMessage = JSON.parse(ev['data'])
 

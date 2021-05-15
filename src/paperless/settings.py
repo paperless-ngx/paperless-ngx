@@ -142,11 +142,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'paperless.urls'
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
+BASE_URL = (FORCE_SCRIPT_NAME or "") + "/"
+LOGIN_URL = BASE_URL + "accounts/login/"
 
 WSGI_APPLICATION = 'paperless.wsgi.application'
 ASGI_APPLICATION = "paperless.asgi.application"
 
-STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
+STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
+WHITENOISE_STATIC_PREFIX = "/static/"
 
 # TODO: what is this used for?
 TEMPLATES = [
