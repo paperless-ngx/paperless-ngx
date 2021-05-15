@@ -1889,6 +1889,14 @@
           <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="4460262093225954455" datatype="html">
+        <source>Search score</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
+      </trans-unit>
       <trans-unit id="4561076822163447092" datatype="html">
         <source>Create new item</source>
         <context-group purpose="location">
