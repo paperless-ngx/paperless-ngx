@@ -1,0 +1,30 @@
+@media print {
+  #sidebarMenu, .btn-toolbar {
+    display: none !important
+  }
+
+  .sticky-top {
+    display: none;
+  }
+
+  main, main.ml-sm-auto, main.mx-sm-auto {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  main.col-lg-10 {
+    max-width: 100%;
+    flex-basis: 100%;
+    display: block;
+  }
+
+  .d-none.d-lg-table-cell { // always display ASN on print
+    display: table-cell !important;
+  }
+
+  app-document-list table {
+    thead th:first-child, tbody td:first-child { // hide checkboxes
+      display: none;
+    }
+  }
+}
