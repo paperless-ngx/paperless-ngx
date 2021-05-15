@@ -246,11 +246,13 @@ class DelayedQuery:
                 sortedby is None):
             self.first_score = page.results[0].score
 
-        if self.first_score:
-            page.results.top_n = list(map(
-                lambda hit: (hit[0] / self.first_score, hit[1]),
-                page.results.top_n
-            ))
+        page.results.top_n = list(map(
+            lambda hit: (
+                (hit[0] / self.first_score) if self.first_score else None,
+                hit[1]
+            ),
+            page.results.top_n
+        ))
 
         self.saved_results[item.start] = page
 
