@@ -60,12 +60,7 @@ def check_sanity(progress=False):
     if lockfile in present_files:
         present_files.remove(lockfile)
 
-    if progress:
-        docs = tqdm(Document.objects.all())
-    else:
-        docs = Document.objects.all()
-
-    for doc in docs:
+    for doc in tqdm(Document.objects.all(), disable=not progress):
         # Check sanity of the thumbnail
         if not os.path.isfile(doc.thumbnail_path):
             messages.error(f"Thumbnail of document {doc.pk} does not exist.")
