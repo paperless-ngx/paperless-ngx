@@ -121,7 +121,12 @@ class RasterisedDocumentParser(DocumentParser):
 
             self.log("debug", f"Extracted text from PDF file {pdf_file}")
             return stripped
-        except PDFException:
+        except Exception:
+            # TODO catch all for various issues with PDFminer.six.
+            #  If PDFminer fails, fall back to OCR.
+            self.log("warn",
+                     "Error while getting text from PDF document with "
+                     "pdfminer.six", exc_info=True)
             # probably not a PDF file.
             return None
 
