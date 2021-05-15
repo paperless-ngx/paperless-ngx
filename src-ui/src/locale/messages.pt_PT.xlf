@@ -1607,11 +1607,20 @@
         </context-group>
         <target state="translated">Descarregar originais</target>
       </trans-unit>
+      <trans-unit id="0f72a164f5a5d10d1fbdeeb84ac80a63c04b7e1b" datatype="html">
+        <source>Add item</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <note priority="1" from="description">Used for both types and correspondents</note>
+        <target state="needs-translation">Add item</target>
+      </trans-unit>
       <trans-unit id="a1e6c11f20d4bf6e8e6b43e3c6d2561b2080645e" datatype="html">
         <source>Suggestions:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <target state="translated">Sugestões:</target>
       </trans-unit>
@@ -1622,6 +1631,14 @@
           <context context-type="linenumber">3</context>
         </context-group>
         <target state="translated">Guardar a vista atual</target>
+      </trans-unit>
+      <trans-unit id="21fd41eb147f55ca26362f9c398e47733639837a" datatype="html">
+        <source>Add tag</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="needs-translation">Add tag</target>
       </trans-unit>
       <trans-unit id="4eb84de23219c85432e38fb4fbdeb6c0f103ff8b" datatype="html">
         <source>Show all</source>
@@ -2156,6 +2173,15 @@
           <context context-type="linenumber">23</context>
         </context-group>
         <target state="translated">Modificado</target>
+      </trans-unit>
+      <trans-unit id="4460262093225954455" datatype="html">
+        <source>Search score</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
+        <target state="needs-translation">Search score</target>
       </trans-unit>
       <trans-unit id="4561076822163447092" datatype="html">
         <source>Create new item</source>
