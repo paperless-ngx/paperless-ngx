@@ -184,7 +184,7 @@ class DelayedQuery:
             return None
 
     def _get_query_sortedby(self):
-        if not 'ordering' in self.query_params:
+        if 'ordering' not in self.query_params:
             return None, False
 
         field: str = self.query_params['ordering']
@@ -196,8 +196,7 @@ class DelayedQuery:
             "title": "title",
             "correspondent__name": "correspondent",
             "document_type__name": "type",
-            "archive_serial_number": "asn",
-            "score": None,
+            "archive_serial_number": "asn"
         }
 
         if field.startswith('-'):
