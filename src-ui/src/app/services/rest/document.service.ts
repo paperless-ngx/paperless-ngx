@@ -23,6 +23,11 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'modified', name: $localize`Modified` }
 ]
 
+export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
+  ...DOCUMENT_SORT_FIELDS,
+  { field: 'score', name: $localize`:Score is a value returned by the full text search engine and specifies how well a result matches the given query:Search score` }
+]
+
 export interface SelectionDataItem {
   id: number
   document_count: number
