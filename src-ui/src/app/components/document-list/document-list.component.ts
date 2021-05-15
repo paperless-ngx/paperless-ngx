@@ -2,14 +2,14 @@ import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
-import { FilterRule } from 'src/app/data/filter-rule';
+import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule';
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
+import { DOCUMENT_SORT_FIELDS, DOCUMENT_SORT_FIELDS_FULLTEXT } from 'src/app/services/rest/document.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { FilterEditorComponent } from './filter-editor/filter-editor.component';
@@ -52,7 +52,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   getSortFields() {
-    return DOCUMENT_SORT_FIELDS
+    return isFullTextFilterRule(this.list.filterRules) ? DOCUMENT_SORT_FIELDS_FULLTEXT : DOCUMENT_SORT_FIELDS
   }
 
   onSort(event: SortEvent) {
