@@ -47,6 +47,12 @@ class Command(BaseCommand):
             help="Specify the ID of a document, and this command will only "
                  "run on this specific document."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def handle(self, *args, **options):
         logging.getLogger().handlers[0].level = logging.ERROR
@@ -65,5 +71,7 @@ class Command(BaseCommand):
 
         with multiprocessing.Pool() as pool:
             list(tqdm.tqdm(
-                pool.imap_unordered(_process_document, ids), total=len(ids)
+                pool.imap_unordered(_process_document, ids),
+                total=len(ids),
+                disable=options['no_progress_bar']
             ))

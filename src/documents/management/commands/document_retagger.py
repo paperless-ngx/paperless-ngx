@@ -57,6 +57,12 @@ class Command(BaseCommand):
                  "set correspondent, document and remove correspondents, types"
                  "and tags that do not match anymore due to changed rules."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def handle(self, *args, **options):
 
@@ -68,7 +74,10 @@ class Command(BaseCommand):
 
         classifier = load_classifier()
 
-        for document in tqdm.tqdm(documents):
+        for document in tqdm.tqdm(
+            documents,
+            disable=options['no_progress_bar']
+        ):
 
             if options['correspondent']:
                 set_correspondent(
