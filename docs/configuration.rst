@@ -154,10 +154,6 @@ PAPERLESS_FORCE_SCRIPT_NAME=<path>
     To host paperless under a subpath url like example.com/paperless you set
     this value to /paperless. No trailing slash!
 
-    .. note::
-
-        I don't know if this works in paperless-ng. Probably not.
-
     Defaults to none, which hosts paperless at "/".
 
 PAPERLESS_STATIC_URL=<path>

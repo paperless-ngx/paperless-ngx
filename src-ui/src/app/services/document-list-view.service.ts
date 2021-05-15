@@ -1,28 +1,53 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { cloneFilterRules, FilterRule } from '../data/filter-rule';
-import { FILTER_FULLTEXT_MORELIKE, FILTER_FULLTEXT_QUERY } from '../data/filter-rule-type';
+import { cloneFilterRules, FilterRule, isFullTextFilterRule } from '../data/filter-rule';
 import { PaperlessDocument } from '../data/paperless-document';
 import { PaperlessSavedView } from '../data/paperless-saved-view';
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys';
 import { DocumentService } from './rest/document.service';
 import { SettingsService, SETTINGS_KEYS } from './settings.service';
 
+/**
+ * Captures the current state of the list view.
+ */
 interface ListViewState {
 
+  /**
+   * Title of the document list view. Either "Documents" (localized) or the name of a saved view.
+   */
   title?: string
 
+  /**
+   * Current paginated list of documents displayed.
+   */
   documents?: PaperlessDocument[]
 
   currentPage: number
+
+  /**
+   * Total amount of documents with the current filter rules. Used to calculate the number of pages.
+   */
   collectionSize: number
 
+  /**
+   * Currently selected sort field.
+   */
   sortField: string
+
+  /**
+   * True if the list is sorted in reverse.
+   */
   sortReverse: boolean
 
+  /**
+   * Filter rules for the current list view.
+   */
   filterRules: FilterRule[]
 
+  /**
+   * Contains the IDs of all selected documents.
+   */
   selected?: Set<number>
 
 }
@@ -134,10 +159,10 @@ export class DocumentListViewService {
   }
 
   set filterRules(filterRules: FilterRule[]) {
-    this.activeListViewState.filterRules = filterRules
-    if (filterRules.find(r => (r.rule_type == FILTER_FULLTEXT_QUERY || r.rule_type == FILTER_FULLTEXT_MORELIKE))) {
-      this.activeListViewState.currentPage = 1
+    if (!isFullTextFilterRule(filterRules) && this.activeListViewState.sortField == "score") {
+      this.activeListViewState.sortField = "created"
     }
+    this.activeListViewState.filterRules = filterRules
     this.reload()
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
@@ -213,6 +238,10 @@ export class DocumentListViewService {
     this._activeSavedViewId = null
     this.activeListViewState.filterRules = filterRules
     this.activeListViewState.currentPage = 1
+    if (isFullTextFilterRule(filterRules)) {
+      this.activeListViewState.sortField = "score"
+      this.activeListViewState.sortReverse = false
+    }
     this.reduceSelectionToFilter()
     this.saveDocumentListView()
     if (this.router.url == "/documents") {
