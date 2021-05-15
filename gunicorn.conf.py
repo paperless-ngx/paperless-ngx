@@ -2,7 +2,7 @@ import os
 
 bind = '0.0.0.0:8000'
 workers = int(os.getenv("PAPERLESS_WEBSERVER_WORKERS", 2))
-worker_class = 'uvicorn.workers.UvicornWorker'
+worker_class = 'paperless.workers.ConfigurableWorker'
 timeout = 120
 
 def pre_fork(server, worker):
