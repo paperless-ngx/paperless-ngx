@@ -5,6 +5,23 @@
 Changelog
 *********
 
+paperless-ng 1.4.3
+##################
+
+* Additions and changes
+
+  * Added Swedish locale.
+  * `Stéphane Brunner`_ added an option to disable the progress bars of all management commands.
+  * `Jo Vandeginste`_ added support for RTF documents to the Apache TIKA parser.
+  * `Michael Shamoon`_ added dark mode for the login and logout pages.
+  * `Alexander Menk`_ added additional stylesheets for printing. You can now print any page of paperless and the print result will hide the page header, sidebar, and action buttons.
+  * Added support for sorting when using full text search.
+  
+* Fixes
+
+  * `puuu`_ fixed ``PAPERLESS_FORCE_SCRIPT_NAME``. You can now host paperless on sub paths such as ``https://localhost:8000/paperless/``.
+  * Fixed an issue with the document consumer crashing on certain documents due to issues with pdfminer.six. This library is used for PDF text extraction.
+
 paperless-ng 1.4.2
 ##################
 
@@ -1366,6 +1383,8 @@ bulk of the work on this big change.
 
 * Initial release
 
+.. _Alexander Menk: https://github.com/amenk
+.. _puuu: https://github.com/puuu
 .. _WhiteHatTux: https://github.com/WhiteHatTux
 .. _Chris Nagy: https://github.com/what-name
 .. _sbrl: https://github.com/sbrl
