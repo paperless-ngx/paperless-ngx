@@ -8,6 +8,8 @@
         [clearable]="allowNull"
         [items]="items"
         [addTag]="allowCreateNew && addItemRef"
+        addTagText="Add item"
+        i18n-addTagText
         bindLabel="name"
         bindValue="id"
         (change)="onChange(value)"
