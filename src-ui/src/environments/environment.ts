@@ -9,7 +9,8 @@ export const environment = {
   appTitle: "Paperless-ng",
   version: "DEVELOPMENT",
   webSocketHost: "localhost:8000",
-  webSocketProtocol: "ws:"
+  webSocketProtocol: "ws:",
+  webSocketBaseUrl: "/ws/",
 };
 
 /*
