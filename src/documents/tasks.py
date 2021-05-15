@@ -20,13 +20,13 @@ def index_optimize():
     writer.commit(optimize=True)
 
 
-def index_reindex():
+def index_reindex(progress_bar_disable=False):
     documents = Document.objects.all()
 
     ix = index.open_index(recreate=True)
 
     with AsyncWriter(ix) as writer:
-        for document in tqdm.tqdm(documents):
+        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
             index.update_document(writer, document)
 
 
