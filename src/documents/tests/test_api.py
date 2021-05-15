@@ -471,6 +471,31 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertNotIn(d5.id, search_query("&added__date__lt=" + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d")))
         self.assertIn(d5.id, search_query("&added__date__gt=" + datetime.datetime(2020, 1, 2).strftime("%Y-%m-%d")))
 
+    def test_search_sorting(self):
+        c1 = Correspondent.objects.create(name="corres Ax")
+        c2 = Correspondent.objects.create(name="corres Cx")
+        c3 = Correspondent.objects.create(name="corres Bx")
+        d1 = Document.objects.create(checksum="1", correspondent=c1, content="test", archive_serial_number=2, title="3")
+        d2 = Document.objects.create(checksum="2", correspondent=c2, content="test", archive_serial_number=3, title="2")
+        d3 = Document.objects.create(checksum="3", correspondent=c3, content="test", archive_serial_number=1, title="1")
+
+        with AsyncWriter(index.open_index()) as writer:
+            for doc in Document.objects.all():
+                index.update_document(writer, doc)
+
+        def search_query(q):
+            r = self.client.get("/api/documents/?query=test" + q)
+            self.assertEqual(r.status_code, 200)
+            return [hit['id'] for hit in r.data['results']]
+
+        self.assertListEqual(search_query("&ordering=archive_serial_number"), [d3.id, d1.id, d2.id])
+        self.assertListEqual(search_query("&ordering=-archive_serial_number"), [d2.id, d1.id, d3.id])
+        self.assertListEqual(search_query("&ordering=title"), [d3.id, d2.id, d1.id])
+        self.assertListEqual(search_query("&ordering=-title"), [d1.id, d2.id, d3.id])
+        self.assertListEqual(search_query("&ordering=correspondent__name"), [d1.id, d3.id, d2.id])
+        self.assertListEqual(search_query("&ordering=-correspondent__name"), [d2.id, d3.id, d1.id])
+
+
     def test_statistics(self):
 
         doc1 = Document.objects.create(title="none1", checksum="A")
