@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-04 15:00+0000\n"
-"PO-Revision-Date: 2021-05-04 21:51\n"
+"POT-Creation-Date: 2021-05-16 09:38+0000\n"
+"PO-Revision-Date: 2021-05-16 10:09\n"
 "Last-Translator: \n"
 "Language-Team: Xhosa\n"
 "Language: xh_ZA\n"
@@ -46,7 +46,7 @@ msgid "Automatic"
 msgstr "crwdns2540:0crwdne2540:0"
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
-#: paperless_mail/models.py:109
+#: paperless_mail/models.py:117
 msgid "name"
 msgstr "crwdns2542:0crwdne2542:0"
 
@@ -372,123 +372,131 @@ msgstr "crwdns2692:0crwdne2692:0"
 msgid "File type %(type)s not supported"
 msgstr "crwdns2694:0%(type)scrwdne2694:0"
 
-#: documents/templates/index.html:21
+#: documents/templates/index.html:22
 msgid "Paperless-ng is loading..."
 msgstr "crwdns2696:0crwdne2696:0"
 
-#: documents/templates/registration/logged_out.html:13
+#: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ng signed out"
 msgstr "crwdns2698:0crwdne2698:0"
 
-#: documents/templates/registration/logged_out.html:41
+#: documents/templates/registration/logged_out.html:45
 msgid "You have been successfully logged out. Bye!"
 msgstr "crwdns2700:0crwdne2700:0"
 
-#: documents/templates/registration/logged_out.html:42
+#: documents/templates/registration/logged_out.html:46
 msgid "Sign in again"
 msgstr "crwdns2702:0crwdne2702:0"
 
-#: documents/templates/registration/login.html:13
+#: documents/templates/registration/login.html:15
 msgid "Paperless-ng sign in"
 msgstr "crwdns2704:0crwdne2704:0"
 
-#: documents/templates/registration/login.html:42
+#: documents/templates/registration/login.html:47
 msgid "Please sign in."
 msgstr "crwdns2706:0crwdne2706:0"
 
-#: documents/templates/registration/login.html:45
+#: documents/templates/registration/login.html:50
 msgid "Your username and password didn't match. Please try again."
 msgstr "crwdns2708:0crwdne2708:0"
 
-#: documents/templates/registration/login.html:48
+#: documents/templates/registration/login.html:53
 msgid "Username"
 msgstr "crwdns2710:0crwdne2710:0"
 
-#: documents/templates/registration/login.html:49
+#: documents/templates/registration/login.html:54
 msgid "Password"
 msgstr "crwdns2712:0crwdne2712:0"
 
-#: documents/templates/registration/login.html:54
+#: documents/templates/registration/login.html:59
 msgid "Sign in"
 msgstr "crwdns2714:0crwdne2714:0"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:303
 msgid "English (US)"
 msgstr "crwdns2716:0crwdne2716:0"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:304
 msgid "English (GB)"
 msgstr "crwdns2718:0crwdne2718:0"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:305
 msgid "German"
 msgstr "crwdns2720:0crwdne2720:0"
 
-#: paperless/settings.py:303
+#: paperless/settings.py:306
 msgid "Dutch"
 msgstr "crwdns2722:0crwdne2722:0"
 
-#: paperless/settings.py:304
+#: paperless/settings.py:307
 msgid "French"
 msgstr "crwdns2724:0crwdne2724:0"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:308
 msgid "Portuguese (Brazil)"
 msgstr "crwdns2726:0crwdne2726:0"
 
-#: paperless/settings.py:306
+#: paperless/settings.py:309
 msgid "Portuguese"
 msgstr "crwdns3424:0crwdne3424:0"
 
-#: paperless/settings.py:307
+#: paperless/settings.py:310
 msgid "Italian"
 msgstr "crwdns2728:0crwdne2728:0"
 
-#: paperless/settings.py:308
+#: paperless/settings.py:311
 msgid "Romanian"
 msgstr "crwdns2730:0crwdne2730:0"
 
-#: paperless/settings.py:309
+#: paperless/settings.py:312
 msgid "Russian"
 msgstr "crwdns3414:0crwdne3414:0"
 
-#: paperless/settings.py:310
+#: paperless/settings.py:313
 msgid "Spanish"
 msgstr "crwdns3420:0crwdne3420:0"
 
-#: paperless/settings.py:311
+#: paperless/settings.py:314
 msgid "Polish"
 msgstr "crwdns3444:0crwdne3444:0"
 
-#: paperless/settings.py:312
+#: paperless/settings.py:315
 msgid "Swedish"
 msgstr "crwdns3448:0crwdne3448:0"
 
-#: paperless/urls.py:113
+#: paperless/urls.py:120
 msgid "Paperless-ng administration"
 msgstr "crwdns2732:0crwdne2732:0"
 
-#: paperless_mail/admin.py:25
+#: paperless_mail/admin.py:15
+msgid "Authentication"
+msgstr "crwdns3456:0crwdne3456:0"
+
+#: paperless_mail/admin.py:18
+msgid "Advanced settings"
+msgstr "crwdns3458:0crwdne3458:0"
+
+#: paperless_mail/admin.py:37
 msgid "Filter"
 msgstr "crwdns2734:0crwdne2734:0"
 
-#: paperless_mail/admin.py:27
+#: paperless_mail/admin.py:39
 msgid "Paperless will only process mails that match ALL of the filters given below."
 msgstr "crwdns2736:0crwdne2736:0"
 
-#: paperless_mail/admin.py:37
+#: paperless_mail/admin.py:49
 msgid "Actions"
 msgstr "crwdns2738:0crwdne2738:0"
 
-#: paperless_mail/admin.py:39
+#: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
 msgstr "crwdns2740:0crwdne2740:0"
 
-#: paperless_mail/admin.py:46
+#: paperless_mail/admin.py:58
 msgid "Metadata"
 msgstr "crwdns2742:0crwdne2742:0"
 
-#: paperless_mail/admin.py:48
+#: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "crwdns2744:0crwdne2744:0"
 
@@ -540,139 +548,151 @@ msgstr "crwdns2766:0crwdne2766:0"
 msgid "password"
 msgstr "crwdns2768:0crwdne2768:0"
 
-#: paperless_mail/models.py:60
+#: paperless_mail/models.py:54
+msgid "character set"
+msgstr "crwdns3460:0crwdne3460:0"
+
+#: paperless_mail/models.py:57
+msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
+msgstr "crwdns3462:0crwdne3462:0"
+
+#: paperless_mail/models.py:68
 msgid "mail rule"
 msgstr "crwdns2770:0crwdne2770:0"
 
-#: paperless_mail/models.py:61
+#: paperless_mail/models.py:69
 msgid "mail rules"
 msgstr "crwdns2772:0crwdne2772:0"
 
-#: paperless_mail/models.py:67
+#: paperless_mail/models.py:75
 msgid "Only process attachments."
 msgstr "crwdns2774:0crwdne2774:0"
 
-#: paperless_mail/models.py:68
+#: paperless_mail/models.py:76
 msgid "Process all files, including 'inline' attachments."
 msgstr "crwdns2776:0crwdne2776:0"
 
-#: paperless_mail/models.py:78
+#: paperless_mail/models.py:86
 msgid "Mark as read, don't process read mails"
 msgstr "crwdns2778:0crwdne2778:0"
 
-#: paperless_mail/models.py:79
+#: paperless_mail/models.py:87
 msgid "Flag the mail, don't process flagged mails"
 msgstr "crwdns2780:0crwdne2780:0"
 
-#: paperless_mail/models.py:80
+#: paperless_mail/models.py:88
 msgid "Move to specified folder"
 msgstr "crwdns2782:0crwdne2782:0"
 
-#: paperless_mail/models.py:81
+#: paperless_mail/models.py:89
 msgid "Delete"
 msgstr "crwdns2784:0crwdne2784:0"
 
-#: paperless_mail/models.py:88
+#: paperless_mail/models.py:96
 msgid "Use subject as title"
 msgstr "crwdns2786:0crwdne2786:0"
 
-#: paperless_mail/models.py:89
+#: paperless_mail/models.py:97
 msgid "Use attachment filename as title"
 msgstr "crwdns2788:0crwdne2788:0"
 
-#: paperless_mail/models.py:99
+#: paperless_mail/models.py:107
 msgid "Do not assign a correspondent"
 msgstr "crwdns2790:0crwdne2790:0"
 
-#: paperless_mail/models.py:101
+#: paperless_mail/models.py:109
 msgid "Use mail address"
 msgstr "crwdns2792:0crwdne2792:0"
 
-#: paperless_mail/models.py:103
+#: paperless_mail/models.py:111
 msgid "Use name (or mail address if not available)"
 msgstr "crwdns2794:0crwdne2794:0"
 
-#: paperless_mail/models.py:105
+#: paperless_mail/models.py:113
 msgid "Use correspondent selected below"
 msgstr "crwdns2796:0crwdne2796:0"
 
-#: paperless_mail/models.py:113
+#: paperless_mail/models.py:121
 msgid "order"
 msgstr "crwdns2798:0crwdne2798:0"
 
-#: paperless_mail/models.py:120
+#: paperless_mail/models.py:128
 msgid "account"
 msgstr "crwdns2800:0crwdne2800:0"
 
-#: paperless_mail/models.py:124
+#: paperless_mail/models.py:132
 msgid "folder"
 msgstr "crwdns2802:0crwdne2802:0"
 
-#: paperless_mail/models.py:128
+#: paperless_mail/models.py:134
+msgid "Subfolders must be separated by dots."
+msgstr "crwdns3464:0crwdne3464:0"
+
+#: paperless_mail/models.py:138
 msgid "filter from"
 msgstr "crwdns2804:0crwdne2804:0"
 
-#: paperless_mail/models.py:131
+#: paperless_mail/models.py:141
 msgid "filter subject"
 msgstr "crwdns2806:0crwdne2806:0"
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:144
 msgid "filter body"
 msgstr "crwdns2808:0crwdne2808:0"
 
-#: paperless_mail/models.py:138
+#: paperless_mail/models.py:148
 msgid "filter attachment filename"
 msgstr "crwdns2810:0crwdne2810:0"
 
-#: paperless_mail/models.py:140
+#: paperless_mail/models.py:150
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "crwdns2812:0crwdne2812:0"
 
-#: paperless_mail/models.py:146
+#: paperless_mail/models.py:156
 msgid "maximum age"
 msgstr "crwdns2814:0crwdne2814:0"
 
-#: paperless_mail/models.py:148
+#: paperless_mail/models.py:158
 msgid "Specified in days."
 msgstr "crwdns2816:0crwdne2816:0"
 
-#: paperless_mail/models.py:151
+#: paperless_mail/models.py:161
 msgid "attachment type"
 msgstr "crwdns2818:0crwdne2818:0"
 
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:164
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "crwdns2820:0crwdne2820:0"
 
-#: paperless_mail/models.py:159
+#: paperless_mail/models.py:169
 msgid "action"
 msgstr "crwdns2822:0crwdne2822:0"
 
-#: paperless_mail/models.py:165
+#: paperless_mail/models.py:175
 msgid "action parameter"
 msgstr "crwdns2824:0crwdne2824:0"
 
-#: paperless_mail/models.py:167
-msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action."
-msgstr "crwdns2826:0crwdne2826:0"
+#: paperless_mail/models.py:177
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
+msgstr "crwdns3466:0crwdne3466:0"
 
-#: paperless_mail/models.py:173
+#: paperless_mail/models.py:184
 msgid "assign title from"
 msgstr "crwdns2828:0crwdne2828:0"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:194
 msgid "assign this tag"
 msgstr "crwdns2830:0crwdne2830:0"
 
-#: paperless_mail/models.py:191
+#: paperless_mail/models.py:202
 msgid "assign this document type"
 msgstr "crwdns2832:0crwdne2832:0"
 
-#: paperless_mail/models.py:195
+#: paperless_mail/models.py:206
 msgid "assign correspondent from"
 msgstr "crwdns2834:0crwdne2834:0"
 
-#: paperless_mail/models.py:205
+#: paperless_mail/models.py:216
 msgid "assign this correspondent"
 msgstr "crwdns2836:0crwdne2836:0"
 
