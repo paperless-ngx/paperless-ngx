@@ -200,8 +200,10 @@ class MailAccountHandler(LoggingMixin):
             f"{str(AND(**criterias))}")
 
         try:
-            messages = M.fetch(criteria=AND(**criterias),
-                               mark_seen=False, charset='UTF-8')
+            messages = M.fetch(
+                criteria=AND(**criterias),
+                mark_seen=False,
+                charset=rule.account.character_set)
         except Exception:
             raise MailError(
                 f"Rule {rule}: Error while fetching folder {rule.folder}")
