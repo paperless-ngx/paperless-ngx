@@ -8,6 +8,18 @@ class MailAccountAdmin(admin.ModelAdmin):
 
     list_display = ("name", "imap_server", "username")
 
+    fieldsets = [
+        (None, {
+            'fields': ['name', 'imap_server', 'imap_port']
+        }),
+        (_("Authentication"), {
+            'fields': ['imap_security', 'username', 'password']
+        }),
+        (_("Advanced settings"), {
+            'fields': ['character_set']
+        })
+    ]
+
 
 class MailRuleAdmin(admin.ModelAdmin):
 
