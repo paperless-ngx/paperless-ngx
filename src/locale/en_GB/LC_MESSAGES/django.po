@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-04 15:00+0000\n"
-"PO-Revision-Date: 2021-05-05 21:40\n"
+"POT-Creation-Date: 2021-05-16 09:38+0000\n"
+"PO-Revision-Date: 2021-05-16 10:09\n"
 "Last-Translator: \n"
 "Language-Team: English, United Kingdom\n"
 "Language: en_GB\n"
@@ -46,7 +46,7 @@ msgid "Automatic"
 msgstr "Automatic"
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
-#: paperless_mail/models.py:109
+#: paperless_mail/models.py:117
 msgid "name"
 msgstr "name"
 
@@ -372,123 +372,131 @@ msgstr "Invalid colour."
 msgid "File type %(type)s not supported"
 msgstr "File type %(type)s not supported"
 
-#: documents/templates/index.html:21
+#: documents/templates/index.html:22
 msgid "Paperless-ng is loading..."
 msgstr "Paperless-ng is loading..."
 
-#: documents/templates/registration/logged_out.html:13
+#: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ng signed out"
 msgstr "Paperless-ng signed out"
 
-#: documents/templates/registration/logged_out.html:41
+#: documents/templates/registration/logged_out.html:45
 msgid "You have been successfully logged out. Bye!"
 msgstr "You have been successfully logged out. Bye!"
 
-#: documents/templates/registration/logged_out.html:42
+#: documents/templates/registration/logged_out.html:46
 msgid "Sign in again"
 msgstr "Sign in again"
 
-#: documents/templates/registration/login.html:13
+#: documents/templates/registration/login.html:15
 msgid "Paperless-ng sign in"
 msgstr "Paperless-ng sign in"
 
-#: documents/templates/registration/login.html:42
+#: documents/templates/registration/login.html:47
 msgid "Please sign in."
 msgstr "Please sign in."
 
-#: documents/templates/registration/login.html:45
+#: documents/templates/registration/login.html:50
 msgid "Your username and password didn't match. Please try again."
 msgstr "Your username and password didn't match. Please try again."
 
-#: documents/templates/registration/login.html:48
+#: documents/templates/registration/login.html:53
 msgid "Username"
 msgstr "Username"
 
-#: documents/templates/registration/login.html:49
+#: documents/templates/registration/login.html:54
 msgid "Password"
 msgstr "Password"
 
-#: documents/templates/registration/login.html:54
+#: documents/templates/registration/login.html:59
 msgid "Sign in"
 msgstr "Sign in"
 
-#: paperless/settings.py:300
+#: paperless/settings.py:303
 msgid "English (US)"
 msgstr "English (US)"
 
-#: paperless/settings.py:301
+#: paperless/settings.py:304
 msgid "English (GB)"
 msgstr "English (GB)"
 
-#: paperless/settings.py:302
+#: paperless/settings.py:305
 msgid "German"
 msgstr "German"
 
-#: paperless/settings.py:303
+#: paperless/settings.py:306
 msgid "Dutch"
 msgstr "Dutch"
 
-#: paperless/settings.py:304
+#: paperless/settings.py:307
 msgid "French"
 msgstr "French"
 
-#: paperless/settings.py:305
+#: paperless/settings.py:308
 msgid "Portuguese (Brazil)"
 msgstr "Portuguese (Brazil)"
 
-#: paperless/settings.py:306
+#: paperless/settings.py:309
 msgid "Portuguese"
 msgstr "Portuguese"
 
-#: paperless/settings.py:307
+#: paperless/settings.py:310
 msgid "Italian"
 msgstr "Italian"
 
-#: paperless/settings.py:308
+#: paperless/settings.py:311
 msgid "Romanian"
 msgstr "Romanian"
 
-#: paperless/settings.py:309
+#: paperless/settings.py:312
 msgid "Russian"
 msgstr "Russian"
 
-#: paperless/settings.py:310
+#: paperless/settings.py:313
 msgid "Spanish"
 msgstr "Spanish"
 
-#: paperless/settings.py:311
+#: paperless/settings.py:314
 msgid "Polish"
 msgstr "Polish"
 
-#: paperless/settings.py:312
+#: paperless/settings.py:315
 msgid "Swedish"
 msgstr "Swedish"
 
-#: paperless/urls.py:113
+#: paperless/urls.py:120
 msgid "Paperless-ng administration"
 msgstr "Paperless-ng administration"
 
-#: paperless_mail/admin.py:25
+#: paperless_mail/admin.py:15
+msgid "Authentication"
+msgstr ""
+
+#: paperless_mail/admin.py:18
+msgid "Advanced settings"
+msgstr ""
+
+#: paperless_mail/admin.py:37
 msgid "Filter"
 msgstr "Filter"
 
-#: paperless_mail/admin.py:27
+#: paperless_mail/admin.py:39
 msgid "Paperless will only process mails that match ALL of the filters given below."
 msgstr "Paperless will only process mails that match ALL of the filters given below."
 
-#: paperless_mail/admin.py:37
+#: paperless_mail/admin.py:49
 msgid "Actions"
 msgstr "Actions"
 
-#: paperless_mail/admin.py:39
+#: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
 msgstr "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
 
-#: paperless_mail/admin.py:46
+#: paperless_mail/admin.py:58
 msgid "Metadata"
 msgstr "Metadata"
 
-#: paperless_mail/admin.py:48
+#: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 msgstr "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
 
@@ -540,139 +548,151 @@ msgstr "username"
 msgid "password"
 msgstr "password"
 
-#: paperless_mail/models.py:60
+#: paperless_mail/models.py:54
+msgid "character set"
+msgstr ""
+
+#: paperless_mail/models.py:57
+msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
+msgstr ""
+
+#: paperless_mail/models.py:68
 msgid "mail rule"
 msgstr "mail rule"
 
-#: paperless_mail/models.py:61
+#: paperless_mail/models.py:69
 msgid "mail rules"
 msgstr "mail rules"
 
-#: paperless_mail/models.py:67
+#: paperless_mail/models.py:75
 msgid "Only process attachments."
 msgstr "Only process attachments."
 
-#: paperless_mail/models.py:68
+#: paperless_mail/models.py:76
 msgid "Process all files, including 'inline' attachments."
 msgstr "Process all files, including 'inline' attachments."
 
-#: paperless_mail/models.py:78
+#: paperless_mail/models.py:86
 msgid "Mark as read, don't process read mails"
 msgstr "Mark as read, don't process read mails"
 
-#: paperless_mail/models.py:79
+#: paperless_mail/models.py:87
 msgid "Flag the mail, don't process flagged mails"
 msgstr "Flag the mail, don't process flagged mails"
 
-#: paperless_mail/models.py:80
+#: paperless_mail/models.py:88
 msgid "Move to specified folder"
 msgstr "Move to specified folder"
 
-#: paperless_mail/models.py:81
+#: paperless_mail/models.py:89
 msgid "Delete"
 msgstr "Delete"
 
-#: paperless_mail/models.py:88
+#: paperless_mail/models.py:96
 msgid "Use subject as title"
 msgstr "Use subject as title"
 
-#: paperless_mail/models.py:89
+#: paperless_mail/models.py:97
 msgid "Use attachment filename as title"
 msgstr "Use attachment filename as title"
 
-#: paperless_mail/models.py:99
+#: paperless_mail/models.py:107
 msgid "Do not assign a correspondent"
 msgstr "Do not assign a correspondent"
 
-#: paperless_mail/models.py:101
+#: paperless_mail/models.py:109
 msgid "Use mail address"
 msgstr "Use mail address"
 
-#: paperless_mail/models.py:103
+#: paperless_mail/models.py:111
 msgid "Use name (or mail address if not available)"
 msgstr "Use name (or mail address if not available)"
 
-#: paperless_mail/models.py:105
+#: paperless_mail/models.py:113
 msgid "Use correspondent selected below"
 msgstr "Use correspondent selected below"
 
-#: paperless_mail/models.py:113
+#: paperless_mail/models.py:121
 msgid "order"
 msgstr "order"
 
-#: paperless_mail/models.py:120
+#: paperless_mail/models.py:128
 msgid "account"
 msgstr "account"
 
-#: paperless_mail/models.py:124
+#: paperless_mail/models.py:132
 msgid "folder"
 msgstr "folder"
 
-#: paperless_mail/models.py:128
+#: paperless_mail/models.py:134
+msgid "Subfolders must be separated by dots."
+msgstr ""
+
+#: paperless_mail/models.py:138
 msgid "filter from"
 msgstr "filter from"
 
-#: paperless_mail/models.py:131
+#: paperless_mail/models.py:141
 msgid "filter subject"
 msgstr "filter subject"
 
-#: paperless_mail/models.py:134
+#: paperless_mail/models.py:144
 msgid "filter body"
 msgstr "filter body"
 
-#: paperless_mail/models.py:138
+#: paperless_mail/models.py:148
 msgid "filter attachment filename"
 msgstr "filter attachment filename"
 
-#: paperless_mail/models.py:140
+#: paperless_mail/models.py:150
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 
-#: paperless_mail/models.py:146
+#: paperless_mail/models.py:156
 msgid "maximum age"
 msgstr "maximum age"
 
-#: paperless_mail/models.py:148
+#: paperless_mail/models.py:158
 msgid "Specified in days."
 msgstr "Specified in days."
 
-#: paperless_mail/models.py:151
+#: paperless_mail/models.py:161
 msgid "attachment type"
 msgstr "attachment type"
 
-#: paperless_mail/models.py:154
+#: paperless_mail/models.py:164
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 msgstr "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
 
-#: paperless_mail/models.py:159
+#: paperless_mail/models.py:169
 msgid "action"
 msgstr "action"
 
-#: paperless_mail/models.py:165
+#: paperless_mail/models.py:175
 msgid "action parameter"
 msgstr "action parameter"
 
-#: paperless_mail/models.py:167
-msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action."
-msgstr "Additional parameter for the action selected above, i.e., the target folder of the move to folder action."
+#: paperless_mail/models.py:177
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
+msgstr ""
 
-#: paperless_mail/models.py:173
+#: paperless_mail/models.py:184
 msgid "assign title from"
 msgstr "assign title from"
 
-#: paperless_mail/models.py:183
+#: paperless_mail/models.py:194
 msgid "assign this tag"
 msgstr "assign this tag"
 
-#: paperless_mail/models.py:191
+#: paperless_mail/models.py:202
 msgid "assign this document type"
 msgstr "assign this document type"
 
-#: paperless_mail/models.py:195
+#: paperless_mail/models.py:206
 msgid "assign correspondent from"
 msgstr "assign correspondent from"
 
-#: paperless_mail/models.py:205
+#: paperless_mail/models.py:216
 msgid "assign this correspondent"
 msgstr "assign this correspondent"
 
