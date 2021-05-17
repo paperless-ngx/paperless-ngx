@@ -360,7 +360,11 @@ writing. Windows is not and will never be supported.
     Adjust as necessary if you configured different folders.
 
 8.  Install python requirements from the ``requirements.txt`` file.
-    It is up to you if you wish to use a virtual environment or not.
+    It is up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
+		
+    .. code:: shell-session
+
+        sudo -Hu paperless pip3 install --upgrade pip
 
     .. code:: shell-session
 
