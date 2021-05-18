@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2021-05-16 11:15\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -470,11 +470,11 @@ msgstr "Paperless-ng Administration"
 
 #: paperless_mail/admin.py:15
 msgid "Authentication"
-msgstr ""
+msgstr "Authentifizierung"
 
 #: paperless_mail/admin.py:18
 msgid "Advanced settings"
-msgstr ""
+msgstr "Erweiterte Einstellungen"
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
@@ -550,11 +550,11 @@ msgstr "Kennwort"
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr ""
+msgstr "Zeichensatz"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Der Zeichensatz, der bei der Kommunikation mit dem Mailserver verwendet werden soll, wie z.B. 'UTF-8' oder 'US-ASCII'."
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
@@ -626,7 +626,7 @@ msgstr "Ordner"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Unterordner müssen durch Punkte getrennt werden."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
@@ -674,7 +674,7 @@ msgstr "Parameter für Aktion"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Zusätzlicher Parameter für die oben ausgewählte Aktion, zum Beispiel der Zielordner für die Aktion \"In angegebenen Ordner verschieben\". Unterordner müssen durch Punkte getrennt werden."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
