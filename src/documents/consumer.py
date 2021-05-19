@@ -334,7 +334,10 @@ class Consumer(LoggingMixin):
                 os.unlink(self.path)
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
-                shadow_file = os.path.join(os.path.dirname(self.path), "._" + os.path.basename(self.path))
+                shadow_file = os.path.join(
+                    os.path.dirname(self.path),
+                    "._" + os.path.basename(self.path))
+
                 if os.path.isfile(shadow_file):
                     self.log("debug", "Deleting file {}".format(shadow_file))
                     os.unlink(shadow_file)
