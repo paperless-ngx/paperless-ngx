@@ -36,8 +36,19 @@ def _tags_from_path(filepath):
     return tag_ids
 
 
+def _is_ignored(filepath):
+    # https://github.com/jonaswinkler/paperless-ng/discussions/1037
+    basename = os.path.basename(filepath)
+    if basename == ".DS_STORE":
+        return True
+    if basename.startswith("._"):
+        return True
+
+    return False
+
+
 def _consume(filepath):
-    if os.path.isdir(filepath):
+    if os.path.isdir(filepath) or _is_ignored(filepath):
         return
 
     if not os.path.isfile(filepath):
@@ -71,6 +82,9 @@ def _consume(filepath):
 
 
 def _consume_wait_unmodified(file):
+    if _is_ignored(file):
+        return
+
     logger.debug(f"Waiting for file {file} to remain unmodified")
     mtime = -1
     current_try = 0
