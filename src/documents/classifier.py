@@ -13,6 +13,10 @@ class IncompatibleClassifierVersionError(Exception):
     pass
 
 
+class ClassifierModelCorruptError(Exception):
+    pass
+
+
 logger = logging.getLogger("paperless.classifier")
 
 
@@ -34,9 +38,8 @@ def load_classifier():
     try:
         classifier.load()
 
-    except (EOFError,
-            IncompatibleClassifierVersionError,
-            pickle.UnpicklingError):
+    except (ClassifierModelCorruptError,
+            IncompatibleClassifierVersionError):
         # there's something wrong with the model file.
         logger.exception(
             f"Unrecoverable error while loading document "
@@ -46,7 +49,12 @@ def load_classifier():
         classifier = None
     except OSError:
         logger.exception(
-            f"Error while loading document classification model"
+            f"IO error while loading document classification model"
+        )
+        classifier = None
+    except Exception:
+        logger.exception(
+            f"Unknown error while loading document classification model"
         )
         classifier = None
 
@@ -76,13 +84,16 @@ class DocumentClassifier(object):
                 raise IncompatibleClassifierVersionError(
                     "Cannor load classifier, incompatible versions.")
             else:
-                self.data_hash = pickle.load(f)
-                self.data_vectorizer = pickle.load(f)
-                self.tags_binarizer = pickle.load(f)
+                try:
+                    self.data_hash = pickle.load(f)
+                    self.data_vectorizer = pickle.load(f)
+                    self.tags_binarizer = pickle.load(f)
 
-                self.tags_classifier = pickle.load(f)
-                self.correspondent_classifier = pickle.load(f)
-                self.document_type_classifier = pickle.load(f)
+                    self.tags_classifier = pickle.load(f)
+                    self.correspondent_classifier = pickle.load(f)
+                    self.document_type_classifier = pickle.load(f)
+                except Exception:
+                    raise ClassifierModelCorruptError()
 
     def save(self):
         with open(settings.MODEL_FILE, "wb") as f:
