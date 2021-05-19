@@ -317,6 +317,25 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress()
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT=None)
+    def testDeleteMacFiles(self):
+        # https://github.com/jonaswinkler/paperless-ng/discussions/1037
+
+        filename = self.get_test_file()
+        shadowFile = os.path.join(os.path.dirname(filename), "._" + os.path.basename(filename))
+
+        shutil.copy(filename, shadowFile)
+
+        document = self.consumer.try_consume_file(filename)
+
+        self.assertTrue(os.path.isfile(
+            document.source_path
+        ))
+
+        self.assertFalse(os.path.isfile(shadowFile))
+        self.assertFalse(os.path.isfile(filename))
+
+
     def testOverrideFilename(self):
         filename = self.get_test_file()
         override_filename = "Statement for November.pdf"
