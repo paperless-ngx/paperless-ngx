@@ -34,7 +34,9 @@ def load_classifier():
     try:
         classifier.load()
 
-    except (EOFError, IncompatibleClassifierVersionError) as e:
+    except (EOFError,
+            IncompatibleClassifierVersionError,
+            pickle.UnpicklingError):
         # there's something wrong with the model file.
         logger.exception(
             f"Unrecoverable error while loading document "
@@ -42,9 +44,9 @@ def load_classifier():
         )
         os.unlink(settings.MODEL_FILE)
         classifier = None
-    except OSError as e:
-        logger.error(
-            f"Error while loading document classification model: {str(e)}"
+    except OSError:
+        logger.exception(
+            f"Error while loading document classification model"
         )
         classifier = None
 
