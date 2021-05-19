@@ -60,10 +60,10 @@ class ConsumerMixin:
 
         super(ConsumerMixin, self).tearDown()
 
-    def wait_for_task_mock_call(self):
+    def wait_for_task_mock_call(self, excpeted_call_count=1):
         n = 0
         while n < 100:
-            if self.task_mock.call_count > 0:
+            if self.task_mock.call_count >= excpeted_call_count:
                 # give task_mock some time to finish and raise errors
                 sleep(1)
                 return
@@ -201,6 +201,26 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
     def test_consumption_directory_unset(self):
 
         self.assertRaises(CommandError, call_command, 'document_consumer', '--oneshot')
+
+    def test_mac_write(self):
+        self.task_mock.side_effect = self.bogus_task
+
+        self.t_start()
+
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, ".DS_STORE"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "my_file.pdf"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "._my_file.pdf"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "my_second_file.pdf"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "._my_second_file.pdf"))
+
+        sleep(5)
+
+        self.wait_for_task_mock_call(excpeted_call_count=2)
+
+        self.assertEqual(2, self.task_mock.call_count)
+
+        fnames = [os.path.basename(args[1]) for args, _ in self.task_mock.call_args_list]
+        self.assertCountEqual(fnames, ["my_file.pdf", "my_second_file.pdf"])
 
 
 @override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
