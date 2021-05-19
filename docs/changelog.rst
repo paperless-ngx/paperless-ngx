@@ -5,6 +5,14 @@
 Changelog
 *********
 
+paperless-ng 1.4.4
+##################
+
+* Drastically increased the startup time of the docker container. The startup script adjusts the file permissions of all data only if changes are required.
+* Paperless mail: Added ability to specify character set for each server.
+* Updated translations.
+* Document consumption: Ignore Mac OS specific files such as ``.DS_STORE`` and ``._XXXXX.pdf``.
+
 paperless-ng 1.4.3
 ##################
 
