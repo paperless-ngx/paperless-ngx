@@ -65,10 +65,6 @@ class MatchingModel(models.Model):
 
 class Correspondent(MatchingModel):
 
-    # This regex is probably more restrictive than it needs to be, but it's
-    # better safe than sorry.
-    SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
-
     class Meta:
         ordering = ("name",)
         verbose_name = _("correspondent")
