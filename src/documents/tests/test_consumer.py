@@ -322,9 +322,11 @@ class TestConsumer(DirectoriesMixin, TestCase):
         # https://github.com/jonaswinkler/paperless-ng/discussions/1037
 
         filename = self.get_test_file()
-        shadowFile = os.path.join(os.path.dirname(filename), "._" + os.path.basename(filename))
+        shadow_file = os.path.join(self.dirs.scratch_dir, "._sample.pdf")
 
-        shutil.copy(filename, shadowFile)
+        shutil.copy(filename, shadow_file)
+
+        self.assertTrue(os.path.isfile(shadow_file))
 
         document = self.consumer.try_consume_file(filename)
 
@@ -332,7 +334,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
             document.source_path
         ))
 
-        self.assertFalse(os.path.isfile(shadowFile))
+        self.assertFalse(os.path.isfile(shadow_file))
         self.assertFalse(os.path.isfile(filename))
 
 
