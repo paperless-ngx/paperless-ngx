@@ -149,22 +149,15 @@ Ansible Route
 
 Most of the update process is automated when using the ansible role.
 
-1.  Backup your defined role variables file outside the paperless source-tree:
+1.  Update the role to the release tag you want to update to making sure the ansible scripts are compatible:
 
     .. code:: shell-session
 
-        $ cp ansible/vars.yml ~/vars.yml.old
+        $ ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,ng-1.4.4 --force
 
-2.  Pull the release tag you want to update to:
+2.  Update the role variable definitions ``vars/paperless-ng.yml`` (where appropriate).
 
-    .. code:: shell-session
-
-        $ git fetch --all
-        $ git checkout ng-0.9.14
-
-3.  Update the role variable definitions ``ansible/vars.yml`` (where appropriate).
-
-4.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
+3.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
 
     .. note::
 
