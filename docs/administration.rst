@@ -149,11 +149,11 @@ Ansible Route
 
 Most of the update process is automated when using the ansible role.
 
-1.  Update the role to the release tag you want to update to making sure the ansible scripts are compatible:
+1.  Update the role to the target release tag to make sure the ansible scripts are compatible:
 
     .. code:: shell-session
 
-        $ ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,ng-1.4.4 --force
+        $ ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,master --force
 
 2.  Update the role variable definitions ``vars/paperless-ng.yml`` (where appropriate).
 
