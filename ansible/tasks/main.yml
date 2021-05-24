@@ -178,10 +178,23 @@
 
 - block:
     - name: backup current paperless-ng installation
-      copy:
-        src: "{{ paperlessng_directory }}"
-        remote_src: yes
-        dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601 }}/"
+      archive:
+        path:
+          - "{{ paperlessng_directory }}/gunicorn.conf.py"
+          - "{{ paperlessng_directory }}/.installed_version"
+          - "{{ paperlessng_directory }}/scripts"
+          - "{{ paperlessng_directory }}/src"
+          - "{{ paperlessng_directory }}/paperless.conf.template"
+          - /etc/paperless.conf
+          - "{{ paperlessng_data_dir }}"
+          - "{{ paperlessng_staticdir }}"
+          - "{{ paperlessng_virtualenv }}"
+        exclude_path:
+          - "{{ paperlessng_directory }}/docs"
+          - "{{ paperlessng_consumption_dir }}"
+          - "{{ paperlessng_media_root }}"
+        dest: "{{ paperlessng_directory }}-{{ ansible_date_time.iso8601_basic_short }}.tgz"
+      when: paperlessng_backup_before_update
     - name: remove current paperless sources
       file:
         path: "{{ paperlessng_directory }}/{{ item }}"

@@ -81,3 +81,6 @@ paperlessng_system_group: paperlessng
 # Webserver settings
 paperlessng_listen_address: 127.0.0.1
 paperlessng_listen_port: 8000
+
+# Create a backup of the existing installation before performing an update
+paperlessng_backup_before_update: True
