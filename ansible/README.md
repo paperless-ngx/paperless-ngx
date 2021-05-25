@@ -84,6 +84,10 @@ System user and group to run the paperless-ng services as (will be created if re
 
 Address and port for the paperless-ng service to listen on.
 
+    paperlessng_backup_before_update: True
+
+Whether to create a backup of the application before installing an update.
+
 Dependencies
 ------------
 
