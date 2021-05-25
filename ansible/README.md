@@ -91,7 +91,7 @@ Whether to create a backup of the application before installing an update.
 Dependencies
 ------------
 
-No ansible dependencies.
+To use the backup mechanism during updates, the collection `community.general` needs to be present.
 
 Example Playbook
 ----------------
