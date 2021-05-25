@@ -37,6 +37,9 @@
       - build-essential
       - python3-setuptools
       - python3-wheel
+      # ansible requirements
+      - tar # unarchive
+      - gzip # archive
 
 # upstream virtualenv in Ubuntu 20.04 is broken
 # https://github.com/pypa/virtualenv/issues/1873
