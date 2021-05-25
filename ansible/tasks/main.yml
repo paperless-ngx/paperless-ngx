@@ -4,6 +4,10 @@
     msg: Sorry, only Debian and Ubuntu supported at the moment.
   when: not(ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
+- name: sanitize paperless directory
+  set_fact:
+    paperlessng_directory: "{{ paperlessng_directory | regex_replace('\\/$', '') }}"
+
 - name: install base dependencies
   apt:
     update_cache: yes
