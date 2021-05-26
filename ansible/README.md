@@ -25,9 +25,11 @@ For a full listing including explanations and allowed values, see the current [d
 
 Additional variables available in this role are listed below, along with default values:
 
-    paperlessng_version: 0.9.14
+    paperlessng_version: latest
 
 The [release](https://github.com/jonaswinkler/paperless-ng/releases) archive version of paperless-ng to install.
+`latest` stands for the latest release of paperless-ng.
+To install a specific version of paperless-ng, use the tag name of the release, e. g. `ng-1.4.4`, or specify a branch or commit id.
 
     paperlessng_redis_host: localhost
     paperlessng_redis_port: 6379
