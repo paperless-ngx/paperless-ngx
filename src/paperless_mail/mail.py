@@ -75,9 +75,9 @@ def get_rule_action(rule):
 
 def make_criterias(rule):
     maximum_age = date.today() - timedelta(days=rule.maximum_age)
-    criterias = {
-        "date_gte": maximum_age
-    }
+    criterias = {}
+    if rule.maximum_age > 0:
+        criterias["date_gte"] = maximum_age    
     if rule.filter_from:
         criterias["from_"] = rule.filter_from
     if rule.filter_subject:
