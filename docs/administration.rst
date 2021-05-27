@@ -216,6 +216,8 @@ With docker-compose, while paperless is running:
     $ cd /path/to/paperless
     $ docker-compose exec webserver <command> <arguments>
 
+*If you use a command within a cronjob you might use the "-t" flag behind exec to suppress "The input device is not a TTY" errors.*
+
 With docker, while paperless is running:
 
 .. code:: shell-session
