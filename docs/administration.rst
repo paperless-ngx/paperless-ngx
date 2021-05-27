@@ -216,8 +216,6 @@ With docker-compose, while paperless is running:
     $ cd /path/to/paperless
     $ docker-compose exec webserver <command> <arguments>
 
-*If you use a command within a cronjob you might use the "-t" flag behind exec to suppress "The input device is not a TTY" errors.*
-
 With docker, while paperless is running:
 
 .. code:: shell-session
@@ -240,7 +238,9 @@ Document exporter
 =================
 
 The document exporter exports all your data from paperless into a folder for
-backup or migration to another DMS.
+backup or migration to another DMS. 
+
+If you use the document exporter within a cronjob to backup your data you might use the ``-t`` flag behind exec to suppress "The input device is not a TTY" errors. For example: ``docker-compose exec -t webserver document_exporter ../export``
 
 .. code::
 
