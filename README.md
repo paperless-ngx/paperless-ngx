@@ -100,6 +100,7 @@ Paperless has been around a while now, and people are starting to build stuff on
 
 * [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless. Updated to work with paperless-ng.
 * [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
+* [Scan to Paperless](https://github.com/sbrunner/scan-to-paperless): Scan and prepare (crop, deskew, OCR, ...) your documents for Paperless.
 
 These projects also exist, but their status and compatibility with paperless-ng is unknown.
 
