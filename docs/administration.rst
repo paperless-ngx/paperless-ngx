@@ -161,15 +161,15 @@ Most of the update process is automated when using the ansible role.
 
     .. note::
 
-        When ansible detects that an update run is in progress, it backs up the entire ``paperlessng_directory`` to ``paperlessng_directory-TIMESTAMP``.
-        Updates can be rolled back by simply moving the timestamped folder back to the original location.
-        If the update succeeds and you want to continue using the new release, please don't forget to delete the backup folder.
+        When ansible detects that an update run is in progress, it creates a backup of the core folders of paperless-ng as the archive ``paperlessng_directory-TIMESTAMP.tgz``.
+        Updates can be rolled back by performing the stes given in :ref:`Restoring a backup created during an update using the Ansible Route <downgrading_paperless-ansible>`.
+        If the update succeeds and you want to continue using the new release, please don't forget to delete the backup archive.
 
     .. code:: shell-session
 
         $ ansible-playbook playbook.yml
 
-
+.. _downgrading_paperless:
 Downgrading Paperless
 #####################
 
@@ -200,6 +200,64 @@ Execute the following management command to migrate your database:
 .. note::
 
     Some migrations cannot be undone. The command will issue errors if that happens.
+
+.. _downgrading_paperless-ansible:
+
+Restoring a backup created during an update using the Ansible Route
+===================================================================
+
+.. note::
+    Check whether you need to downgrade the database, see :ref:`Downgrading Paperless <downgrading_paperless>`.
+    In case a downgrade is necessary, perform the migrations *before* restoring the backup.
+
+Stop the paperless services.
+
+.. code:: shell-session
+
+    $ sudo systemctl stop paperless-{webserver,scheduler,consumer}
+
+Move the broken installation to a temporary directory.
+
+.. code:: shell-session
+
+    $ sudo mv /opt/paperless-ng /opt/paperless-ng-broken
+
+In case ``paperlessng_data_dir``, ``paperlessng_staticdir``, ``paperlessng_virtualenv`` resided outside of ``paperlessng_directory``, move them away on your own.
+
+Restore a backup.
+
+.. code:: shell-session
+
+    $ sudo tar -xf /opt/paperless-ng-TIMESTAMP.tgz -C /
+
+Fix folder permissions.
+
+.. code:: shell-session
+
+    $ sudo find /opt/paperless-ng -maxdepth 1 -type d -exec chown paperlessng:paperlessng {} \; -exec chmod 750 {} \;
+
+In case ``paperlessng_data_dir``, ``paperlessng_staticdir``, ``paperlessng_virtualenv`` resided outside of ``paperlessng_directory``, fix permissions on your own.
+
+Move the parts not contained in the backup into the restored installation.
+Ignore any errors in case you had configured the corresponding folders to reside outside of ``paperlessng_directory``.
+
+.. code:: shell-session
+
+    $ sudo mv /opt/paperless-ng-broken/{consumption,media} /opt/paperless-ng/
+
+Fire up the paperless services.
+
+.. code:: shell-session
+
+    $ sudo systemctl start paperless-{webserver,scheduler,consumer}
+
+Make sure everything is working again.
+Then delete the remains of the broken installation.
+
+.. code:: shell-session
+
+    $ sudo rm -r /opt/paperless-ng-broken
+
 
 .. _utilities-management-commands:
 
