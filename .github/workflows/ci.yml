@@ -85,6 +85,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
         name: Ensure there are no trailing spaces
         run: |
           .github/workflow-scripts/check-trailing-whitespace
