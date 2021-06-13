@@ -3,6 +3,7 @@ import logging
 import os
 import pickle
 import re
+import shutil
 
 from django.conf import settings
 
@@ -96,7 +97,10 @@ class DocumentClassifier(object):
                     raise ClassifierModelCorruptError()
 
     def save(self):
-        with open(settings.MODEL_FILE, "wb") as f:
+        target_file = settings.MODEL_FILE
+        target_file_temp = settings.MODEL_FILE + ".part"
+
+        with open(target_file_temp, "wb") as f:
             pickle.dump(self.FORMAT_VERSION, f)
             pickle.dump(self.data_hash, f)
             pickle.dump(self.data_vectorizer, f)
@@ -106,6 +110,10 @@ class DocumentClassifier(object):
             pickle.dump(self.tags_classifier, f)
             pickle.dump(self.correspondent_classifier, f)
             pickle.dump(self.document_type_classifier, f)
+
+        if os.path.isfile(target_file):
+            os.unlink(target_file)
+        shutil.move(target_file_temp, target_file)
 
     def train(self):
 
