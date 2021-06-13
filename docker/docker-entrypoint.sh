@@ -29,13 +29,9 @@ initialize() {
 	mkdir -p /tmp/paperless
 
 	set +e
-	CURRENT_USER=$(stat -c '%U' ../)
-	CURRENT_GROUP=$(stat -c '%G' ../)
-	if [[ ${CURRENT_USER} != "paperless" || ${CURRENT_GROUP} != "paperless" ]] ; then
-		echo "Adjusting permissions of paperless files. This may take a while."
-		chown -R paperless:paperless ../
-	fi
+	echo "Adjusting permissions of paperless files. This may take a while."
 	chown -R paperless:paperless /tmp/paperless
+	find .. -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
 	set -e
 
 	gosu paperless /sbin/docker-prepare.sh
