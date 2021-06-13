@@ -30,7 +30,7 @@ export class ConfirmDialogComponent implements OnInit {
 
   @Input()
   buttonsEnabled = true
-  
+
   confirmButtonEnabled = true
   seconds = 0
 

@@ -25,7 +25,7 @@ paperless-ng 1.4.3
   * `Michael Shamoon`_ added dark mode for the login and logout pages.
   * `Alexander Menk`_ added additional stylesheets for printing. You can now print any page of paperless and the print result will hide the page header, sidebar, and action buttons.
   * Added support for sorting when using full text search.
-  
+
 * Fixes
 
   * `puuu`_ fixed ``PAPERLESS_FORCE_SCRIPT_NAME``. You can now host paperless on sub paths such as ``https://localhost:8000/paperless/``.

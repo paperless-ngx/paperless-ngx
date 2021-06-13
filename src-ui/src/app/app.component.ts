@@ -45,7 +45,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.consumerStatusService.connect()
 
-    
+
     this.successSubscription = this.consumerStatusService.onDocumentConsumptionFinished().subscribe(status => {
       if (this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)) {
         this.toastService.show({title: $localize`Document added`, delay: 10000, content: $localize`Document ${status.filename} was added to paperless.`, actionName: $localize`Open document`, action: () => {

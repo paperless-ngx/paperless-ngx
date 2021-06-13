@@ -12,27 +12,29 @@ Note that this role requires root access, so either run it in a playbook with a 
 
     - hosts: all
       roles:
-        - role: ansible
+        - role: paperless-ng
           become: yes
 
 Role Variables
 --------------
 
 Most configuration variables from paperless-ng itself are available and accept their respective arguments.
-Every `PAPERLESS_*` configuration varaible is lowercased and instead prefixed with `paperlessng_*` in `defaults/main.yml`.
+Every `PAPERLESS_*` configuration variable is lowercased and instead prefixed with `paperlessng_*` in `defaults/main.yml`.
 
-For a full listing including explainations and allowed values, see the current [documentation](https://paperless-ng.readthedocs.io/en/ng-0.9.14/configuration.html).
+For a full listing including explanations and allowed values, see the current [documentation](https://paperless-ng.readthedocs.io/en/latest/configuration.html).
 
 Additional variables available in this role are listed below, along with default values:
 
-    paperlessng_version: 0.9.14
+    paperlessng_version: latest
 
 The [release](https://github.com/jonaswinkler/paperless-ng/releases) archive version of paperless-ng to install.
+`latest` stands for the latest release of paperless-ng.
+To install a specific version of paperless-ng, use the tag name of the release, e. g. `ng-1.4.4`, or specify a branch or commit id.
 
     paperlessng_redis_host: localhost
     paperlessng_redis_port: 6379
 
-Seperate configuration values that combine into `PAPERLESS_REDIS`.
+Separate configuration values that combine into `PAPERLESS_REDIS`.
 
     paperlessng_db_type: sqlite
 
@@ -96,11 +98,11 @@ Example Playbook
     - hosts: all
       become: yes
       vars_files:
-        - vars/main.yml
+        - vars/paperless-ng.yml
       roles:
-        - ansible
+        - paperless-ng
 
-`vars/main.yml`:
+`vars/paperless-ng.yml`:
 
     paperlessng_media_root: /mnt/media/smbshare
 
