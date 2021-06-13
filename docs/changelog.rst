@@ -5,6 +5,19 @@
 Changelog
 *********
 
+paperless-ng 1.4.5
+##################
+
+This is primarily a maintenance release.
+
+* Updated Python and Angular dependencies.
+* Changed the algorithm that changes permissions during startup. This is still fast,
+  and will hopefully cause less issues.
+* Fixed an issue that would sometimes cause paperless to write an incomplete
+  classification model file to disk.
+* Fixed an issue with the OCRmyPDF parser that would always try to extract text
+  with PDFminer even from non-PDF files.
+
 paperless-ng 1.4.4
 ##################
 
