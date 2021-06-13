@@ -23,10 +23,10 @@ Apart from that, the folder structure is as follows:
 *   ``scripts/`` - Various scripts that help with different parts of development.
 *   ``docker/`` - Files required to build the docker image.
 
-Initial setup and first start 
+Initial setup and first start
 =============================
 
-After you forked and cloned the code from github you need to perform a first-time setup. 
+After you forked and cloned the code from github you need to perform a first-time setup.
 To do the setup you need to perform the steps from the following chapters in a certain order:
 
 1.  Install prerequisites + pipenv as mentioned in :ref:`Bare metal route <setup-bare_metal>`
@@ -35,19 +35,19 @@ To do the setup you need to perform the steps from the following chapters in a c
 
     .. code:: shell-session
 
-        $ npm install -g @angular/cli 
+        $ npm install -g @angular/cli
 
 4.  Create ``consume`` and ``media`` folders in the cloned root folder.
-   
+
     .. code:: shell-session
 
         mkdir -p consume media
 
 5.  You can now either ...
 
-    *  install redis or 
+    *  install redis or
     *  use the included scripts/start-services.sh to use docker to fire up a redis instance (and some other services such as tika, gotenberg and a postgresql server) or
-    *  spin up a bare redis container 
+    *  spin up a bare redis container
 
         .. code:: shell-session
 
@@ -79,7 +79,7 @@ To do the setup you need to perform the steps from the following chapters in a c
         python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
 
 10. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
- 
+
 Backend development environment is now ready, to start Frontend development go to ``/src-ui`` and run ``ng serve``. From there you can use ``http://localhost:4200`` for a preview.
 
 Back end development
@@ -207,7 +207,7 @@ Adding new languages requires adding the translated files in the "src-ui/src/loc
                 // Add your new language here
             ]
         }
-    
+
     ``dateInputFormat`` is a special string that defines the behavior of the date input fields and absolutely needs to contain "dd", "mm" and "yyyy".
 
 3.  Import and register the Angular data for this locale in "src-ui/src/app/app.module.ts":
@@ -320,7 +320,7 @@ methods ``parse`` and ``get_thumbnail``. You can provide your own implementation
 
             # The content of the document.
             self.text = "content"
-            
+
             # Optional: path to a PDF document that you created from the original.
             self.archive_path = os.path.join(self.tempdir, "archived.pdf")
 

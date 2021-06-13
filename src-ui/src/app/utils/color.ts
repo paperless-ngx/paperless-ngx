@@ -6,7 +6,7 @@ function componentToHex(c) {
 
 /**
  * https://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
- * 
+ *
  * Converts an HSL color value to RGB. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
  * Assumes h, s, and l are contained in the set [0, 1] and
