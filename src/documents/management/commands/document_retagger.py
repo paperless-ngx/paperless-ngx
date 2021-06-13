@@ -63,8 +63,20 @@ class Command(BaseCommand):
             action="store_true",
             help="If set, the progress bar will not be shown"
         )
+        parser.add_argument(
+            "--suggest",
+            default=False,
+            action="store_true",
+            help="Return the suggestion, don't change anything."
+        )
+        parser.add_argument(
+            "--base-url",
+            help="The base URL to use to build the link to the documents."
+        )
 
     def handle(self, *args, **options):
+        # Detect if we support color
+        color = self.style.ERROR("test") != "test"
 
         if options["inbox_only"]:
             queryset = Document.objects.filter(tags__is_inbox_tag=True)
@@ -85,18 +97,27 @@ class Command(BaseCommand):
                     document=document,
                     classifier=classifier,
                     replace=options['overwrite'],
-                    use_first=options['use_first'])
+                    use_first=options['use_first'],
+                    suggest=options['suggest'],
+                    base_url=options['base_url'],
+                    color=color)
 
             if options['document_type']:
                 set_document_type(sender=None,
                                   document=document,
                                   classifier=classifier,
                                   replace=options['overwrite'],
-                                  use_first=options['use_first'])
+                                  use_first=options['use_first'],
+                                  suggest=options['suggest'],
+                                  base_url=options['base_url'],
+                                  color=color)
 
             if options['tags']:
                 set_tags(
                     sender=None,
                     document=document,
                     classifier=classifier,
-                    replace=options['overwrite'])
+                    replace=options['overwrite'],
+                    suggest=options['suggest'],
+                    base_url=options['base_url'],
+                    color=color)

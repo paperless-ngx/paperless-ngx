@@ -1,6 +1,7 @@
 import logging
 import os
 
+from django.utils import termcolors
 from django.conf import settings
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
@@ -8,14 +9,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models, DatabaseError
 from django.db.models import Q
 from django.dispatch import receiver
-from django.utils import timezone
+from django.utils import termcolors, timezone
 from filelock import FileLock
 
 from .. import matching
 from ..file_handling import delete_empty_directories, \
     create_source_path_directory, \
     generate_unique_filename
-from ..models import Document, Tag
+from ..models import Document, Tag, MatchingModel
 
 
 logger = logging.getLogger("paperless.handlers")
@@ -32,6 +33,9 @@ def set_correspondent(sender,
                       classifier=None,
                       replace=False,
                       use_first=True,
+                      suggest=False,
+                      base_url=None,
+                      color=False,
                       **kwargs):
     if document.correspondent and not replace:
         return
@@ -60,13 +64,31 @@ def set_correspondent(sender,
             return
 
     if selected or replace:
-        logger.info(
-            f"Assigning correspondent {selected} to {document}",
-            extra={'group': logging_group}
-        )
+        if suggest:
+            if base_url:
+                print(
+                    termcolors.colorize(str(document), fg='green')
+                    if color
+                    else str(document)
+                )
+                print(f"{base_url}/documents/{document.pk}")
+            else:
+                print(
+                    (
+                        termcolors.colorize(str(document), fg='green')
+                        if color
+                        else str(document)
+                    ) + f" [{document.pk}]"
+                )
+            print(f"Suggest correspondent {selected}")
+        else:
+            logger.info(
+                f"Assigning correspondent {selected} to {document}",
+                extra={'group': logging_group}
+            )
 
-        document.correspondent = selected
-        document.save(update_fields=("correspondent",))
+            document.correspondent = selected
+            document.save(update_fields=("correspondent",))
 
 
 def set_document_type(sender,
@@ -75,6 +97,9 @@ def set_document_type(sender,
                       classifier=None,
                       replace=False,
                       use_first=True,
+                      suggest=False,
+                      base_url=None,
+                      color=False,
                       **kwargs):
     if document.document_type and not replace:
         return
@@ -104,13 +129,31 @@ def set_document_type(sender,
             return
 
     if selected or replace:
-        logger.info(
-            f"Assigning document type {selected} to {document}",
-            extra={'group': logging_group}
-        )
+        if suggest:
+            if base_url:
+                print(
+                    termcolors.colorize(str(document), fg='green')
+                    if color
+                    else str(document)
+                )
+                print(f"{base_url}/documents/{document.pk}")
+            else:
+                print(
+                    (
+                        termcolors.colorize(str(document), fg='green')
+                        if color
+                        else str(document)
+                    ) + f" [{document.pk}]"
+                )
+            print(f"Sugest document type {selected}")
+        else:
+            logger.info(
+                f"Assigning document type {selected} to {document}",
+                extra={'group': logging_group}
+            )
 
-        document.document_type = selected
-        document.save(update_fields=("document_type",))
+            document.document_type = selected
+            document.save(update_fields=("document_type",))
 
 
 def set_tags(sender,
@@ -118,6 +161,9 @@ def set_tags(sender,
              logging_group=None,
              classifier=None,
              replace=False,
+             suggest=False,
+             base_url=None,
+             color=False,
              **kwargs):
 
     if replace:
@@ -132,16 +178,48 @@ def set_tags(sender,
 
     relevant_tags = set(matched_tags) - current_tags
 
-    if not relevant_tags:
-        return
+    if suggest:
+        extra_tags = current_tags - set(matched_tags)
+        extra_tags = [
+            t for t in extra_tags
+            if t.matching_algorithm == MatchingModel.MATCH_AUTO
+        ]
+        if not relevant_tags and not extra_tags:
+            return
+        if base_url:
+            print(
+                termcolors.colorize(str(document), fg='green')
+                if color
+                else str(document)
+            )
+            print(f"{base_url}/documents/{document.pk}")
+        else:
+            print(
+                (
+                    termcolors.colorize(str(document), fg='green')
+                    if color
+                    else str(document)
+                ) + f" [{document.pk}]"
+            )
+        if relevant_tags:
+            print(
+                "Suggest tags: " + ", ".join([t.name for t in relevant_tags])
+            )
+        if extra_tags:
+            print("Extra tags: " + ", ".join([t.name for t in extra_tags]))
+    else:
+        if not relevant_tags:
+            return
 
-    message = 'Tagging "{}" with "{}"'
-    logger.info(
-        message.format(document, ", ".join([t.name for t in relevant_tags])),
-        extra={'group': logging_group}
-    )
+        message = 'Tagging "{}" with "{}"'
+        logger.info(
+            message.format(
+                document, ", ".join([t.name for t in relevant_tags])
+            ),
+            extra={'group': logging_group}
+        )
 
-    document.tags.add(*relevant_tags)
+        document.tags.add(*relevant_tags)
 
 
 @receiver(models.signals.post_delete, sender=Document)
