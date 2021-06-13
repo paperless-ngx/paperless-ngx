@@ -72,7 +72,6 @@
 							"optimization": true,
 							"outputHashing": "none",
 							"sourceMap": false,
-							"extractCss": true,
 							"namedChunks": false,
 							"extractLicenses": true,
 							"vendorChunk": false,
