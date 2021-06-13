@@ -8,7 +8,7 @@ Changelog
 paperless-ng 1.4.5
 ##################
 
-This is primarily a maintenance release.
+This is a maintenance release.
 
 * Updated Python and Angular dependencies.
 * Changed the algorithm that changes permissions during startup. This is still fast,
