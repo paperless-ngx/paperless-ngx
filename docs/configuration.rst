@@ -621,14 +621,14 @@ PAPERLESS_IGNORE_DATES=<string>
     Example: "2020-12-02,22.04.1999"
 
     Defaults to an empty string to not ignore any dates.
-    
+
 PAPERLESS_DATE_ORDER=<format>
     Paperless will try to determine the document creation date from its contents.
     Specify the date format Paperless should expect to see within your documents.
-    
-    This option defaults to DMY which translates to day first, month second, and year 
+
+    This option defaults to DMY which translates to day first, month second, and year
     last order. Characters D, M, or Y can be shuffled to meet the required order.
-    
+
 
 
 Binaries
