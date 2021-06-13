@@ -116,9 +116,7 @@ performs all the steps described in :ref:`setup-docker_hub` automatically.
 
     .. code:: shell-session
 
-        $ wget https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/install-paperless-ng.sh
-        $ chmod +x install-paperless-ng.sh
-        $ ./install-paperless-ng.sh
+        $ curl -L https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/install-paperless-ng.sh | bash
 
 .. _setup-docker_hub:
 
@@ -286,7 +284,7 @@ writing. Windows is not and will never be supported.
 
     Use this list for your preferred package management:
 
-    .. code:: 
+    .. code::
 
         python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support
 
@@ -305,7 +303,7 @@ writing. Windows is not and will never be supported.
 
     Use this list for your preferred package management:
 
-    .. code:: 
+    .. code::
 
         unpaper ghostscript icc-profiles-free qpdf liblept5 libxml2 pngquant zlib1g tesseract-ocr
 
@@ -361,7 +359,7 @@ writing. Windows is not and will never be supported.
 
 8.  Install python requirements from the ``requirements.txt`` file.
     It is up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
-		
+
     .. code:: shell-session
 
         sudo -Hu paperless pip3 install --upgrade pip

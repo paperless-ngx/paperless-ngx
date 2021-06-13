@@ -81,7 +81,7 @@ UserWarning in sklearn on every single document
 You may encounter warnings like this:
 
 .. code::
-    
+
     /usr/local/lib/python3.7/site-packages/sklearn/base.py:315:
     UserWarning: Trying to unpickle estimator CountVectorizer from version 0.23.2 when using version 0.24.0.
     This might lead to breaking code or invalid results. Use at your own risk.
@@ -200,13 +200,13 @@ This might have multiple reasons.
         File "/usr/local/lib/python3.7/site-packages/gunicorn/http/wsgi.py", line 386, in sendfile
             sent += os.sendfile(sockno, fileno, offset + sent, count)
         OSError: [Errno 22] Invalid argument
-    
+
     To fix this issue, add
 
     .. code::
 
         SENDFILE=0
-    
+
     to your `docker-compose.env` file.
 
 Error while reading metadata

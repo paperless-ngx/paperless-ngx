@@ -3,7 +3,7 @@
      <div class="form-inline d-flex align-items-center">
          <div class="input-group input-group-sm flex-fill w-auto">
            <div class="input-group-prepend" ngbDropdown>
-            <button class="btn btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>   
+            <button class="btn btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
             <div class="dropdown-menu shadow" ngbDropdownMenu>
               <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget == t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
             </div>

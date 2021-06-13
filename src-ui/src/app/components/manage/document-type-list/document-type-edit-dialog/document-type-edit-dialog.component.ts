@@ -13,7 +13,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class DocumentTypeEditDialogComponent extends EditDialogComponent<PaperlessDocumentType> {
 
-  constructor(service: DocumentTypeService, activeModal: NgbActiveModal, toastService: ToastService) { 
+  constructor(service: DocumentTypeService, activeModal: NgbActiveModal, toastService: ToastService) {
     super(service, activeModal, toastService)
   }
 

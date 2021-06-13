@@ -10,10 +10,10 @@ import { DocumentService } from './document.service';
   providedIn: 'root'
 })
 export class SearchService {
-  
+
   constructor(private http: HttpClient) { }
 
   autocomplete(term: string): Observable<string[]> {
     return this.http.get<string[]>(`${environment.apiBaseUrl}search/autocomplete/`, {params: new HttpParams().set('term', term)})
   }
-} 
+}

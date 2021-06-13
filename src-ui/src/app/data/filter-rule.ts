@@ -6,7 +6,7 @@ export function cloneFilterRules(filterRules: FilterRule[]): FilterRule[] {
     for (let rule of filterRules) {
       newRules.push({rule_type: rule.rule_type, value: rule.value})
     }
-    return newRules      
+    return newRules
   } else {
     return null
   }
