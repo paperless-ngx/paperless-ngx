@@ -71,7 +71,7 @@ your documents:
 
     This process can be configured to fit your needs. If you don't want paperless
     to create archived versions for digital documents, you can configure that by
-    configuring ``PAPERLESS_OCR_MODE=skip_noarchive``. Please read the 
+    configuring ``PAPERLESS_OCR_MODE=skip_noarchive``. Please read the
     :ref:`relevant section in the documentation <configuration-ocr>`.
 
 .. note::
@@ -289,7 +289,7 @@ Matching specific tags, correspondents or types:
 Matching dates:
 
 .. code::
-  
+
   created:[2005 to 2009]
   added:yesterday
   modified:today
@@ -306,11 +306,11 @@ Matching inexact words:
   auto complete and query correction.
 
 All of these constructs can be combined as you see fit.
-If you want to learn more about the query language used by paperless, paperless uses Whoosh's default query language. 
+If you want to learn more about the query language used by paperless, paperless uses Whoosh's default query language.
 Head over to `Whoosh query language <https://whoosh.readthedocs.io/en/latest/querylang.html>`_.
 For details on what date parsing utilities are available, see
 `Date parsing <https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries>`_.
- 
+
 
 .. _usage-recommended_workflow:
 
@@ -385,7 +385,7 @@ Once you have scanned in a document, proceed in paperless as follows.
 6.  Remove inbox tags from the documents.
 
 .. hint::
-    
+
     You can setup manual matching rules for your correspondents and tags and
     paperless will assign them automatically. After consuming a couple documents,
     you can even ask paperless to *learn* when to assign tags and correspondents
