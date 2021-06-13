@@ -44,7 +44,7 @@ export class SavedViewService extends AbstractPaperlessService<PaperlessSavedVie
       tap(() => this.reload())
     )
   }
-  
+
   patchMany(objects: PaperlessSavedView[]): Observable<PaperlessSavedView[]> {
     return combineLatest(objects.map(o => super.patch(o))).pipe(
       tap(() => this.reload())

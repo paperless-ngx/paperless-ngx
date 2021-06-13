@@ -32,6 +32,6 @@ export class CorrespondentEditDialogComponent extends EditDialogComponent<Paperl
       match: new FormControl(""),
       is_insensitive: new FormControl(true)
     })
-  }  
+  }
 
 }

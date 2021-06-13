@@ -1,6 +1,6 @@
 /**
  * https://gist.github.com/JonCatmull/ecdf9441aaa37336d9ae2c7f9cb7289a
- * 
+ *
  * @license
  * Copyright (c) 2019 Jonathan Catmull.
  *

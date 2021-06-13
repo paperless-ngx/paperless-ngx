@@ -174,11 +174,11 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
     Defaults to none, which disables this feature.
 
 PAPERLESS_ADMIN_USER=<username>
-    If this environment variable is specified, Paperless automatically creates 
-    a superuser with the provided username at start. This is useful in cases 
-    where you can not run the `createsuperuser` command seperately, such as Kubernetes 
+    If this environment variable is specified, Paperless automatically creates
+    a superuser with the provided username at start. This is useful in cases
+    where you can not run the `createsuperuser` command seperately, such as Kubernetes
     or AWS ECS.
-    
+
     Requires `PAPERLESS_ADMIN_PASSWORD` to be set.
 
     .. note::
@@ -188,7 +188,7 @@ PAPERLESS_ADMIN_USER=<username>
         the lifecycle of the containers.
 
 PAPERLESS_ADMIN_MAIL=<email>
-    (Optional) Specify superuser email address. Only used when 
+    (Optional) Specify superuser email address. Only used when
     `PAPERLESS_ADMIN_USER` is set.
 
     Defaults to ``root@localhost``.
@@ -222,17 +222,17 @@ PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>
         Also see the warning `in the official documentation <https://docs.djangoproject.com/en/3.1/howto/auth-remote-user/#configuration>`.
 
     Defaults to `false` which disables this feature.
-    
+
 PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>
-    If `PAPERLESS_ENABLE_HTTP_REMOTE_USER` is enabled, this property allows to 
-    customize the name of the HTTP header from which the authenticated username 
+    If `PAPERLESS_ENABLE_HTTP_REMOTE_USER` is enabled, this property allows to
+    customize the name of the HTTP header from which the authenticated username
     is extracted. Values are in terms of
     [HttpRequest.META](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.META).
-    Thus, the configured value must start with `HTTP_` followed by the 
+    Thus, the configured value must start with `HTTP_` followed by the
     normalized actual header name.
-    
+
     Defaults to `HTTP_REMOTE_USER`.
-    
+
 .. _configuration-ocr:
 
 OCR settings
