@@ -420,6 +420,8 @@ Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
     'recycle': 1,
+    'retry': 1800,
+    'timeout': 1800,
     'workers': TASK_WORKERS,
     'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 }
