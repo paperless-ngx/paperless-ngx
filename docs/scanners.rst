@@ -24,6 +24,8 @@ Physical scanners
 +---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `ADS-1500W`_   | yes | no  | yes | yes  |`danielquinn`_  |
 +---------+----------------+-----+-----+-----+------+----------------+
+| Brother | `ADS-1100W`_   | yes | no  | no  | no   |`ytzelf`_       |
++---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `MFC-J6930DW`_ | yes |     |     |      |`ayounggun`_    |
 +---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `MFC-L5850DW`_ | yes |     |     | yes  |`holzhannes`_   |
@@ -43,6 +45,7 @@ Physical scanners
 .. _ADS-1700W: https://www.brother-usa.com/products/ads1700w
 .. _ADS-1600W: https://www.brother-usa.com/products/ads1600w
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
+.. _ADS-1100W: https://support.brother.com/g/b/downloadtop.aspx?c=fr&lang=fr&prod=ads1100w_eu_as_cn
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
 .. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
@@ -59,6 +62,7 @@ Physical scanners
 .. _Skylinar: https://github.com/Skylinar
 .. _jonaswinkler: https://github.com/jonaswinkler
 .. _holzhannes: https://github.com/holzhannes
+.. _ytzelf: https://github.com/ytzelf
 
 Mobile phone software
 =====================
