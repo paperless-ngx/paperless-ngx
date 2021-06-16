@@ -1,5 +1,13 @@
 #!/bin/bash
 
+SED_I=(sed -i"")
+if [[ $(uname) == "Darwin" ]]; then
+	# On MacOS (and probably some other BSD-based seds), the file extension must
+	# be specified and must be a separate argument. There is not currently a single
+	# invocation that works for both GNU sed and BSD sed.
+  SED_I=(sed -i "")
+fi
+
 ask() {
 	while true ; do
 		if [[ -z $3 ]] ; then
@@ -280,7 +288,7 @@ fi
 wget "https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
 wget "https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/docker/compose/.env" -O .env
 
-SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+SECRET_KEY=$(cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
 DEFAULT_LANGUAGES="deu eng fra ita spa"
 
@@ -299,16 +307,16 @@ DEFAULT_LANGUAGES="deu eng fra ita spa"
 	fi
 } > docker-compose.env
 
-sed -i "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
+"${SED_I[@]}" "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
 
-sed -i "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/paperless/consume#g" docker-compose.yml
+"${SED_I[@]}" "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/paperless/consume#g" docker-compose.yml
 
 if [[ -n $MEDIA_FOLDER ]] ; then
-	sed -i "s#- media:/usr/src/paperless/media#- $MEDIA_FOLDER:/usr/src/paperless/media#g" docker-compose.yml
+	"${SED_I[@]}" "s#- media:/usr/src/paperless/media#- $MEDIA_FOLDER:/usr/src/paperless/media#g" docker-compose.yml
 fi
 
 if [[ -n $DATA_FOLDER ]] ; then
-	sed -i "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
+	"${SED_I[@]}" "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
 fi
 
 docker-compose pull
