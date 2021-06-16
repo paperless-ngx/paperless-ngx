@@ -411,9 +411,8 @@ writing. Windows is not and will never be supported.
 
 		The ``socket`` script enables ``gunicorn`` to run on port 80 without
 		root privileges. For this you need to uncomment the ``Require=paperless-webserver.socket``
-		in the ``webserver`` script and configure ``gunicorn`` to listen on port 80 (see 
+		in the ``webserver`` script and configure ``gunicorn`` to listen on port 80 (see ``paperless/gunicorn.conf.py``).
 
-``paperless/gunicorn.conf.py``).
     You may need to adjust the path to the ``gunicorn`` executable. This
     will be installed as part of the python dependencies, and is either located
     in the ``bin`` folder of your virtual environment, or in ``~/.local/bin/`` if
