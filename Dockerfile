@@ -1,3 +1,12 @@
+FROM node AS compile-frontend
+
+COPY . /src
+
+WORKDIR /src/src-ui
+RUN npm install
+RUN ./node_modules/.bin/ng build --prod
+
+
 FROM ubuntu:20.04 AS jbig2enc
 
 WORKDIR /usr/src/jbig2enc
@@ -92,7 +101,7 @@ RUN cd docker \
 COPY gunicorn.conf.py ../
 
 # copy app
-COPY src/ ./
+COPY --from=compile-frontend /src/src/ ./
 
 # add users, setup scripts
 RUN addgroup --gid 1000 paperless \

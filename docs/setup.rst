@@ -248,9 +248,7 @@ Build the Docker image yourself
         webserver:
             build: .
 
-4.  Run the ``compile-frontend.sh`` script. This requires ``node`` and ``npm >= v15``.
-
-5.  Follow steps 3 to 8 of :ref:`setup-docker_hub`. When asked to run
+4.  Follow steps 3 to 8 of :ref:`setup-docker_hub`. When asked to run
     ``docker-compose pull`` to pull the image, do
 
     .. code:: shell-session
@@ -782,7 +780,7 @@ configuring some options in paperless can help improve performance immensely:
     your documents before feeding them into paperless. Some scanners are able to
     do this! You might want to even specify ``skip_noarchive`` to skip archive
     file generation for already ocr'ed documents entirely.
-*   If you want to perform OCR on the the device, consider using ``PAPERLESS_OCR_CLEAN=none``.
+*   If you want to perform OCR on the device, consider using ``PAPERLESS_OCR_CLEAN=none``.
     This will speed up OCR times and use less memory at the expense of slightly worse
     OCR results.
 *   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
