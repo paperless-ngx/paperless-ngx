@@ -1,4 +1,4 @@
-FROM node AS compile-frontend
+FROM node:15 AS compile-frontend
 
 COPY . /src
 
