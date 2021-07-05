@@ -92,7 +92,6 @@ B.  If you built the image yourself, do the following:
     .. code:: shell-session
 
         $ git pull
-        $ ./compile-frontend.sh
         $ docker-compose build
         $ docker-compose up
 

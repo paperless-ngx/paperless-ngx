@@ -59,11 +59,11 @@ To do the setup you need to perform the steps from the following chapters in a c
 
         pipenv install --dev
 
-7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From root folder:
+7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
 
     .. code:: shell-session
 
-        compile-frontend.sh
+        ./node_modules/.bin/ng build --prod
 
 8.  Apply migrations and create a superuser for your dev instance:
 
@@ -272,15 +272,7 @@ directory.
 Building the Docker image
 =========================
 
-Building the docker image from source requires the following two steps:
-
-1.  Build the front end.
-
-    .. code:: shell-session
-
-        ./compile-frontend.sh
-
-2.  Build the docker image.
+Building the docker image from source:
 
     .. code:: shell-session
 
