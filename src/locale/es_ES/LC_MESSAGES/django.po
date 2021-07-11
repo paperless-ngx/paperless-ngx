@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2021-07-11 07:21\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -100,11 +100,11 @@ msgstr "tipos de documento"
 
 #: documents/models.py:110
 msgid "Unencrypted"
-msgstr "Sin encriptar"
+msgstr "Sin cifrar"
 
 #: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
-msgstr "Encriptado con GNU Privacy Guard"
+msgstr "Cifrado con GNU Privacy Guard"
 
 #: documents/models.py:124
 msgid "title"
