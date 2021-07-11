@@ -1201,7 +1201,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">ASN: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">NSA: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="5701618810648052610" datatype="html">
         <source>Title</source>
