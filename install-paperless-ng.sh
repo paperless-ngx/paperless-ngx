@@ -283,7 +283,17 @@ wget "https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/docker/
 
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
-DEFAULT_LANGUAGES="deu eng fra ita spa"
+DEFAULT_LANGUAGES=(deu eng fra ita spa)
+ADDITIONAL_LANGUAGES=()
+
+# Split "OCR_LANGUAGE" on the "+" character and loop through that list
+for l in ${OCR_LANGUAGE//+/ }
+do :
+	# Check which languages are not in the list of default languages, meaning they need to be installed
+	if [[ ! " ${DEFAULT_LANGUAGES[@]} " =~ " ${l} " ]] ; then
+		ADDITIONAL_LANGUAGES+=($l)
+	fi
+done
 
 {
 	if [[ ! $USERMAP_UID == "1000" ]] ; then
@@ -295,8 +305,10 @@ DEFAULT_LANGUAGES="deu eng fra ita spa"
 	echo "PAPERLESS_TIME_ZONE=$TIME_ZONE"
 	echo "PAPERLESS_OCR_LANGUAGE=$OCR_LANGUAGE"
 	echo "PAPERLESS_SECRET_KEY=$SECRET_KEY"
-	if [[ ! " ${DEFAULT_LANGUAGES[@]} " =~ " ${OCR_LANGUAGE} " ]] ; then
-		echo "PAPERLESS_OCR_LANGUAGES=$OCR_LANGUAGE"
+	# If there are additional languages to install, specify them in the PAPERLESS_OCR_LANGUAGES variable, separated by a whitespace
+	if [[ $ADDITIONAL_LANGUAGES ]] ; then
+		PAPERLESS_OCR_LANGUAGES=$(IFS=" " ; echo "${ADDITIONAL_LANGUAGES[*]}")
+		echo "PAPERLESS_OCR_LANGUAGES=$PAPERLESS_OCR_LANGUAGES"
 	fi
 } > docker-compose.env
 
