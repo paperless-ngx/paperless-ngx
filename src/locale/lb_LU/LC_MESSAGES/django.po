@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-13 21:45\n"
+"PO-Revision-Date: 2021-07-14 08:42\n"
 "Last-Translator: \n"
 "Language-Team: Luxembourgish\n"
 "Language: lb_LU\n"
@@ -116,7 +116,7 @@ msgstr "Contenu"
 
 #: documents/models.py:139
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "De réien Textinhalt vum Dokument. Dëst Feld gëtt primär fir d'Sich benotzt."
 
 #: documents/models.py:144
 msgid "mime type"
@@ -160,23 +160,23 @@ msgstr "Fichiersnumm"
 
 #: documents/models.py:198
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Aktuellen Dateinumm am Späicher"
 
 #: documents/models.py:202
 msgid "archive filename"
-msgstr ""
+msgstr "Archiv-Dateinumm"
 
 #: documents/models.py:208
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Aktuellen Dateinumm am Archiv"
 
 #: documents/models.py:212
 msgid "archive serial number"
-msgstr ""
+msgstr "Archiv-Seriennummer"
 
 #: documents/models.py:217
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "D'Positioun vun dësem Dokument am physeschen Dokumentenarchiv."
 
 #: documents/models.py:223
 msgid "document"
