@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-14 08:42\n"
+"PO-Revision-Date: 2021-07-14 16:00\n"
 "Last-Translator: \n"
 "Language-Team: Luxembourgish\n"
 "Language: lb_LU\n"
@@ -248,11 +248,11 @@ msgstr "An der Säiteleescht uweisen"
 
 #: documents/models.py:361
 msgid "sort field"
-msgstr ""
+msgstr "Zortéierfeld"
 
 #: documents/models.py:367
 msgid "sort reverse"
-msgstr ""
+msgstr "ëmgedréint zortéieren"
 
 #: documents/models.py:373
 msgid "title contains"
@@ -308,47 +308,47 @@ msgstr "Erstellungsdag ass"
 
 #: documents/models.py:386
 msgid "added before"
-msgstr ""
+msgstr "dobäigesat virun"
 
 #: documents/models.py:387
 msgid "added after"
-msgstr ""
+msgstr "dobäigesat no"
 
 #: documents/models.py:388
 msgid "modified before"
-msgstr ""
+msgstr "verännert virun"
 
 #: documents/models.py:389
 msgid "modified after"
-msgstr ""
+msgstr "verännert no"
 
 #: documents/models.py:390
 msgid "does not have tag"
-msgstr ""
+msgstr "huet dës Etikett net"
 
 #: documents/models.py:391
 msgid "does not have ASN"
-msgstr ""
+msgstr "huet keng ASN"
 
 #: documents/models.py:392
 msgid "title or content contains"
-msgstr ""
+msgstr "Titel oder Inhalt enthalen"
 
 #: documents/models.py:393
 msgid "fulltext query"
-msgstr ""
+msgstr "Volltextsich"
 
 #: documents/models.py:394
 msgid "more like this"
-msgstr ""
+msgstr "ähnlech Dokumenter"
 
 #: documents/models.py:405
 msgid "rule type"
-msgstr ""
+msgstr "Reegeltyp"
 
 #: documents/models.py:409
 msgid "value"
-msgstr ""
+msgstr "Wäert"
 
 #: documents/models.py:415
 msgid "filter rule"
@@ -394,7 +394,7 @@ msgstr ""
 
 #: documents/templates/registration/login.html:47
 msgid "Please sign in."
-msgstr ""
+msgstr "W. e. g. umellen."
 
 #: documents/templates/registration/login.html:50
 msgid "Your username and password didn't match. Please try again."
@@ -486,7 +486,7 @@ msgstr "Paperless wäert nëmmen E-Maile veraarbechten, fir déi all déi hei de
 
 #: paperless_mail/admin.py:49
 msgid "Actions"
-msgstr ""
+msgstr "Aktiounen"
 
 #: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
@@ -542,15 +542,15 @@ msgstr "IMAP-Sécherheet"
 
 #: paperless_mail/models.py:46
 msgid "username"
-msgstr ""
+msgstr "Benotzernumm"
 
 #: paperless_mail/models.py:50
 msgid "password"
-msgstr ""
+msgstr "Passwuert"
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr ""
+msgstr "Zeechesaz"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
@@ -586,11 +586,11 @@ msgstr ""
 
 #: paperless_mail/models.py:89
 msgid "Delete"
-msgstr ""
+msgstr "Läschen"
 
 #: paperless_mail/models.py:96
 msgid "Use subject as title"
-msgstr ""
+msgstr "Sujet als TItel notzen"
 
 #: paperless_mail/models.py:97
 msgid "Use attachment filename as title"
