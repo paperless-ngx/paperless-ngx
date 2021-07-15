@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-15 07:42\n"
+"PO-Revision-Date: 2021-07-15 08:58\n"
 "Last-Translator: \n"
 "Language-Team: Luxembourgish\n"
 "Language: lb_LU\n"
@@ -112,7 +112,7 @@ msgstr "Titel"
 
 #: documents/models.py:137
 msgid "content"
-msgstr "Contenu"
+msgstr "Inhalt"
 
 #: documents/models.py:139
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
@@ -370,27 +370,27 @@ msgstr "Ongëlteg Faarf."
 #: documents/serialisers.py:451
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Fichierstyp %(type)s net ënnerstëtzt"
 
 #: documents/templates/index.html:22
 msgid "Paperless-ng is loading..."
-msgstr ""
+msgstr "Paperless-ng gëtt gelueden..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ng signed out"
-msgstr ""
+msgstr "Paperless-ng ofgemellt"
 
 #: documents/templates/registration/logged_out.html:45
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Dir hutt Iech erfollegräich ofgemellt. Bis geschwënn!"
 
 #: documents/templates/registration/logged_out.html:46
 msgid "Sign in again"
-msgstr ""
+msgstr "Nees umellen"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ng sign in"
-msgstr ""
+msgstr "Umeldung bei Paperless-ng"
 
 #: documents/templates/registration/login.html:47
 msgid "Please sign in."
@@ -398,7 +398,7 @@ msgstr "W. e. g. umellen."
 
 #: documents/templates/registration/login.html:50
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Äre Benotzernumm a Passwuert stëmmen net iwwereneen. Probéiert w. e. g. nach emol."
 
 #: documents/templates/registration/login.html:53
 msgid "Username"
@@ -438,7 +438,7 @@ msgstr "Portugisesch (Brasilien)"
 
 #: paperless/settings.py:309
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugisesch"
 
 #: paperless/settings.py:310
 msgid "Italian"
@@ -450,19 +450,19 @@ msgstr "Rumänesch"
 
 #: paperless/settings.py:312
 msgid "Russian"
-msgstr ""
+msgstr "Russesch"
 
 #: paperless/settings.py:313
 msgid "Spanish"
-msgstr ""
+msgstr "Spuenesch"
 
 #: paperless/settings.py:314
 msgid "Polish"
-msgstr ""
+msgstr "Polnesch"
 
 #: paperless/settings.py:315
 msgid "Swedish"
-msgstr ""
+msgstr "Schwedesch"
 
 #: paperless/urls.py:120
 msgid "Paperless-ng administration"
@@ -558,15 +558,15 @@ msgstr ""
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
-msgstr ""
+msgstr "E-Mail-Reegel"
 
 #: paperless_mail/models.py:69
 msgid "mail rules"
-msgstr ""
+msgstr "E-Mail-Reegelen"
 
 #: paperless_mail/models.py:75
 msgid "Only process attachments."
-msgstr ""
+msgstr "Just Unhäng veraarbechten."
 
 #: paperless_mail/models.py:76
 msgid "Process all files, including 'inline' attachments."
