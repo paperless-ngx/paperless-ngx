@@ -24,7 +24,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Open document</target>
+        <target state="translated">Dokument opmaachen</target>
       </trans-unit>
       <trans-unit id="8582620835547864448" datatype="html">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
@@ -40,7 +40,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">New document detected</target>
+        <target state="translated">Neit Dokument detektéiert</target>
       </trans-unit>
       <trans-unit id="587031278561344416" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
@@ -584,7 +584,7 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Logs</target>
+        <target state="translated">Protokoller</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -640,7 +640,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">General settings</target>
+        <target state="translated">Allgemeng Astellungen</target>
       </trans-unit>
       <trans-unit id="8bcabdf6b16cad0313a86c7e940c5e3ad7f9f8ab" datatype="html">
         <source>Notifications</source>
@@ -648,7 +648,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Notifications</target>
+        <target state="translated">Notifikatiounen</target>
       </trans-unit>
       <trans-unit id="99dee94e92dbd9e21a008d4569f9719ed206ae37" datatype="html">
         <source>Saved views</source>
@@ -664,7 +664,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Appearance</target>
+        <target state="translated">Ausgesinn</target>
       </trans-unit>
       <trans-unit id="75f8908d266f7cc9b9e68e0be906fd080a223606" datatype="html">
         <source>Display language</source>
@@ -672,7 +672,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Display language</target>
+        <target state="translated">Sprooch vum Interface</target>
       </trans-unit>
       <trans-unit id="1284a077dc18a2d1ff1b744f16f1797eea28ae37" datatype="html">
         <source>You need to reload the page after applying a new language.</source>
@@ -680,7 +680,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">You need to reload the page after applying a new language.</target>
+        <target state="translated">Nodeem s eng nei Sprooch gewielt gouf muss d'Säit nei geluede ginn.</target>
       </trans-unit>
       <trans-unit id="0cd55822928764cc82a62ee3e6f3adbc1c630479" datatype="html">
         <source>Date display</source>
@@ -1776,7 +1776,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Open document</target>
+        <target state="translated">Dokument opmaachen</target>
       </trans-unit>
       <trans-unit id="45854ddec74086b271e62be6a363f4fa5036f7fc" datatype="html">
         <source>First steps</source>
