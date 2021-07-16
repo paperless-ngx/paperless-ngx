@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-15 08:58\n"
+"PO-Revision-Date: 2021-07-16 11:47\n"
 "Last-Translator: \n"
 "Language-Team: Luxembourgish\n"
 "Language: lb_LU\n"
@@ -602,31 +602,31 @@ msgstr ""
 
 #: paperless_mail/models.py:109
 msgid "Use mail address"
-msgstr ""
+msgstr "E-Mail-Adress benotzen"
 
 #: paperless_mail/models.py:111
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Numm benotzen (oder E-Mail-Adress falls den Numm net disponibel ass)"
 
 #: paperless_mail/models.py:113
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Korrespondent benotzen deen hei drënner ausgewielt ass"
 
 #: paperless_mail/models.py:121
 msgid "order"
-msgstr ""
+msgstr "Reiefolleg"
 
 #: paperless_mail/models.py:128
 msgid "account"
-msgstr ""
+msgstr "Kont"
 
 #: paperless_mail/models.py:132
 msgid "folder"
-msgstr ""
+msgstr "Dossier"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Ënnerdossiere mussen duerch Punkte getrennt ginn."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
@@ -678,11 +678,11 @@ msgstr ""
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
-msgstr ""
+msgstr "Titel zouweisen aus"
 
 #: paperless_mail/models.py:194
 msgid "assign this tag"
-msgstr ""
+msgstr "dës Etikett zouweisen"
 
 #: paperless_mail/models.py:202
 msgid "assign this document type"
