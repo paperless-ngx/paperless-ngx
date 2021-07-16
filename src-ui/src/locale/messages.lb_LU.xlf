@@ -1824,7 +1824,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">You can configure paperless to read your mails and add documents from attached files.</target>
+        <target state="translated">Paperless ka konfiguréiert ginn, fir E-Mailen ze liesen an Dokumenter aus ugehaangene Fichieren anzeliesen.</target>
       </trans-unit>
       <trans-unit id="d282f6277cbf6704f697170d2ad19ce500790e20" datatype="html">
         <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
@@ -1832,7 +1832,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</target>
+        <target state="translated">Consultéiert d'Dokumentatioun fir méi Detailer zu der Verwendung vun dëse Funktiounen. De Beräich iwwer déi allgemeng Benotzung huet och e puer Informatiounen, wéi paperless am Allgemenge benotzt ka ginn.</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
@@ -1872,7 +1872,7 @@
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="translated">Dokument mat ASN <x id="INTERPOLATION" equiv-text="{{asn}}"/> gëtt gesicht</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
