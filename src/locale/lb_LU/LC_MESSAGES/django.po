@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-16 13:01\n"
+"PO-Revision-Date: 2021-07-16 14:22\n"
 "Last-Translator: \n"
 "Language-Team: Luxembourgish\n"
 "Language: lb_LU\n"
@@ -490,7 +490,7 @@ msgstr "Aktiounen"
 
 #: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr ""
+msgstr "D'Aktioun, déi op E-Mailen applizéiert sill ginn. Dës Aktioun gëtt just ausgefouert, wann Dokumenter aus der E-Mail veraarbecht goufen. E-Mailen ouni Unhank bleiwe komplett onberéiert."
 
 #: paperless_mail/admin.py:58
 msgid "Metadata"
@@ -498,7 +498,7 @@ msgstr "Metadaten"
 
 #: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Den Dokumenter, déi iwwer dës Reegel veraarbecht ginn, automatesch Metadaten zouweisen. Wann hei keng Etiketten, Typen oder Korrespondenten zougewise ginn, veraarbecht Paperless-ng trotzdeem all zoutreffend Reegelen déi definéiert sinn."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
@@ -534,7 +534,7 @@ msgstr "IMAP-Port"
 
 #: paperless_mail/models.py:36
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Dëst ass normalerweis 143 fir onverschësselt oder STARTTLS-Connectiounen an 993 fir SSL-Connectiounen."
 
 #: paperless_mail/models.py:40
 msgid "IMAP security"
@@ -554,7 +554,7 @@ msgstr "Zeechesaz"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Den Zeechesaz dee benotzt gëtt wa mam Mailserver kommunizéiert gëtt, wéi beispillsweis 'UTF-8' oder 'US-ASCII'."
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
@@ -570,15 +570,15 @@ msgstr "Just Unhäng veraarbechten."
 
 #: paperless_mail/models.py:76
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "All d'Fichiere veraarbechten, inklusiv \"inline\"-Unhäng."
 
 #: paperless_mail/models.py:86
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Als gelies markéieren, gelies Mailen net traitéieren"
 
 #: paperless_mail/models.py:87
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Als wichteg markéieren, markéiert E-Mailen net veraarbechten"
 
 #: paperless_mail/models.py:88
 msgid "Move to specified folder"
@@ -674,7 +674,7 @@ msgstr "Parameter fir Aktioun"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Zousätzleche Parameter fir d'Aktioun déi hei driwwer ausgewielt ass, zum Beispill den Numm vum Zildossier fir d'Aktioun \"An e virdefinéierten Dossier réckelen\". Ënnerdossiere musse mat Punkte getrennt ginn."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
