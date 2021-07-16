@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-16 11:47\n"
+"PO-Revision-Date: 2021-07-16 13:01\n"
 "Last-Translator: \n"
 "Language-Team: Luxembourgish\n"
 "Language: lb_LU\n"
@@ -502,7 +502,7 @@ msgstr ""
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless E-Mail"
 
 #: paperless_mail/models.py:11
 msgid "mail account"
@@ -582,7 +582,7 @@ msgstr ""
 
 #: paperless_mail/models.py:88
 msgid "Move to specified folder"
-msgstr ""
+msgstr "An e virdefinéierten Dossier réckelen"
 
 #: paperless_mail/models.py:89
 msgid "Delete"
@@ -594,11 +594,11 @@ msgstr "Sujet als TItel notzen"
 
 #: paperless_mail/models.py:97
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Numm vum Dateiunhank als Titel benotzen"
 
 #: paperless_mail/models.py:107
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Kee Korrespondent zouweisen"
 
 #: paperless_mail/models.py:109
 msgid "Use mail address"
@@ -646,7 +646,7 @@ msgstr "Filter fir den Numm vum Unhank"
 
 #: paperless_mail/models.py:150
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Just Dokumenter traitéieren, déi exakt dësen Dateinumm hunn (falls definéiert). Platzhalter wéi *.pdf oder *invoice* sinn erlaabt. D'Grouss-/Klengschreiwung gëtt ignoréiert."
 
 #: paperless_mail/models.py:156
 msgid "maximum age"
@@ -658,7 +658,7 @@ msgstr "An Deeg."
 
 #: paperless_mail/models.py:161
 msgid "attachment type"
-msgstr ""
+msgstr "Fichierstyp vum Unhank"
 
 #: paperless_mail/models.py:164
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
