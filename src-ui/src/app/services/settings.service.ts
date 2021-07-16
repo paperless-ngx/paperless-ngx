@@ -99,7 +99,8 @@ export class SettingsService {
       {code: "ru-ru", name: $localize`Russian`, englishName: "Russian", dateInputFormat: "dd.mm.yyyy"},
       {code: "es-es", name: $localize`Spanish`, englishName: "Spanish", dateInputFormat: "dd/mm/yyyy"},
       {code: "pl-pl", name: $localize`Polish`, englishName: "Polish", dateInputFormat: "dd.mm.yyyy"},
-      {code: "sv-se", name: $localize`Swedish`, englishName: "Swedish", dateInputFormat: "yyyy-mm-dd"}
+      {code: "sv-se", name: $localize`Swedish`, englishName: "Swedish", dateInputFormat: "yyyy-mm-dd"},
+      {code: "lb-lu", name: $localize`Luxembourgish`, englishName: "Luxembourgish", dateInputFormat: "dd.mm.yyyy"}
     ]
   }
 

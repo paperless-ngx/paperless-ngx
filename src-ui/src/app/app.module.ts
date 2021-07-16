@@ -76,6 +76,7 @@ import localeRu from '@angular/common/locales/ru';
 import localeEs from '@angular/common/locales/es';
 import localePl from '@angular/common/locales/pl';
 import localeSv from '@angular/common/locales/sv';
+import localeLb from '@angular/common/locales/lb';
 
 
 registerLocaleData(localeFr)
@@ -90,6 +91,7 @@ registerLocaleData(localeRu)
 registerLocaleData(localeEs)
 registerLocaleData(localePl)
 registerLocaleData(localeSv)
+registerLocaleData(localeLb)
 
 @NgModule({
   declarations: [
