@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2021-07-11 08:29\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -64,11 +64,11 @@ msgstr "es insensible"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr "Tipo de documento"
+msgstr "interlocutor"
 
 #: documents/models.py:75
 msgid "correspondents"
-msgstr "Tipos de documento"
+msgstr "interlocutores"
 
 #: documents/models.py:81
 msgid "color"
@@ -100,11 +100,11 @@ msgstr "tipos de documento"
 
 #: documents/models.py:110
 msgid "Unencrypted"
-msgstr "Sin encriptar"
+msgstr "Sin cifrar"
 
 #: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
-msgstr "Encriptado con GNU Privacy Guard"
+msgstr "Cifrado con GNU Privacy Guard"
 
 #: documents/models.py:124
 msgid "title"
@@ -268,7 +268,7 @@ msgstr "ASN es"
 
 #: documents/models.py:376
 msgid "correspondent is"
-msgstr "tipo de documento es"
+msgstr "interlocutor es"
 
 #: documents/models.py:377
 msgid "document type is"
@@ -336,7 +336,7 @@ msgstr "el título o cuerpo contiene"
 
 #: documents/models.py:393
 msgid "fulltext query"
-msgstr ""
+msgstr "consulta de texto completo"
 
 #: documents/models.py:394
 msgid "more like this"
@@ -438,7 +438,7 @@ msgstr "Portugués (Brasil)"
 
 #: paperless/settings.py:309
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugués"
 
 #: paperless/settings.py:310
 msgid "Italian"
@@ -458,11 +458,11 @@ msgstr "Español"
 
 #: paperless/settings.py:314
 msgid "Polish"
-msgstr ""
+msgstr "Polaco"
 
 #: paperless/settings.py:315
 msgid "Swedish"
-msgstr ""
+msgstr "Sueco"
 
 #: paperless/urls.py:120
 msgid "Paperless-ng administration"
@@ -470,11 +470,11 @@ msgstr "Paperless-ng Administración"
 
 #: paperless_mail/admin.py:15
 msgid "Authentication"
-msgstr ""
+msgstr "Autentificación"
 
 #: paperless_mail/admin.py:18
 msgid "Advanced settings"
-msgstr ""
+msgstr "Configuración avanzada"
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
@@ -498,7 +498,7 @@ msgstr "Metadatos"
 
 #: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "Asignar metadatos a documentos consumidos por esta regla automáticamente. Si no asigna etiquetas, o ipos aquí, paperless procesará igualmente todas las reglas que haya definido."
+msgstr "Asignar metadatos a documentos consumidos por esta regla automáticamente. Si no asigna etiquetas, tipos o interlocutores aquí, paperless procesará igualmente todas las reglas que haya definido."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
@@ -550,11 +550,11 @@ msgstr "contraseña"
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr ""
+msgstr "conjunto de caracteres"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "El conjunto de caracteres a usar al comunicarse con el servidor de correo, como 'UTF-8' o 'US-ASCII'."
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
@@ -598,7 +598,7 @@ msgstr "Usar nombre del fichero adjunto como título"
 
 #: paperless_mail/models.py:107
 msgid "Do not assign a correspondent"
-msgstr "No asignar un tipo de documento"
+msgstr "No asignar interlocutor"
 
 #: paperless_mail/models.py:109
 msgid "Use mail address"
@@ -610,7 +610,7 @@ msgstr "Usar nombre (o dirección de correo si no está disponible)"
 
 #: paperless_mail/models.py:113
 msgid "Use correspondent selected below"
-msgstr "Usar el tipo seleccionado debajo"
+msgstr "Usar el interlocutor seleccionado a continuación"
 
 #: paperless_mail/models.py:121
 msgid "order"
@@ -626,7 +626,7 @@ msgstr "carpeta"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Las subcarpetas deben estar separadas por puntos."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
@@ -674,7 +674,7 @@ msgstr "parámetro de acción"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Parámetro adicional para la acción seleccionada arriba. Ej. la carpeta de destino de la acción de mover a carpeta. Las subcarpetas deben estar separadas por puntos."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
@@ -690,9 +690,9 @@ msgstr "asignar este tipo de documento"
 
 #: paperless_mail/models.py:206
 msgid "assign correspondent from"
-msgstr "Asignar tipo de documento desde"
+msgstr "asignar interlocutor desde"
 
 #: paperless_mail/models.py:216
 msgid "assign this correspondent"
-msgstr "asignar este tipo de documento"
+msgstr "asignar este interlocutor"
 
