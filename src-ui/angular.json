@@ -27,7 +27,8 @@
 					"ru-RU": "src/locale/messages.ru_RU.xlf",
 					"es-ES": "src/locale/messages.es_ES.xlf",
 					"pl-PL": "src/locale/messages.pl_PL.xlf",
-					"sv-SE": "src/locale/messages.sv_SE.xlf"
+					"sv-SE": "src/locale/messages.sv_SE.xlf",
+					"lb-LU": "src/locale/messages.lb_LU.xlf"
 				}
 			},
 			"architect": {
