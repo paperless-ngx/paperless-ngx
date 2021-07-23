@@ -30,6 +30,8 @@ Physical scanners
 +---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `MFC-L5850DW`_ | yes |     |     | yes  |`holzhannes`_   |
 +---------+----------------+-----+-----+-----+------+----------------+
+| Brother | `MFC-L2750DW`_ | yes |     | yes | yes  |`muued`_        |
++---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `MFC-J5910DW`_ | yes |     |     |      |`bmsleight`_    |
 +---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `MFC-9142CDN`_ | yes |     | yes |      |`REOLDEV`_      |
@@ -42,6 +44,7 @@ Physical scanners
 +---------+----------------+-----+-----+-----+------+----------------+
 
 .. _MFC-L5850DW: https://www.brother-usa.com/products/mfcl5850dw
+.. _MFC-L2750DW: https://www.brother.de/drucker/laserdrucker/mfc-l2750dw
 .. _ADS-1700W: https://www.brother-usa.com/products/ads1700w
 .. _ADS-1600W: https://www.brother-usa.com/products/ads1600w
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
@@ -63,6 +66,7 @@ Physical scanners
 .. _jonaswinkler: https://github.com/jonaswinkler
 .. _holzhannes: https://github.com/holzhannes
 .. _ytzelf: https://github.com/ytzelf
+.. _muued: https://github.com/muued
 
 Mobile phone software
 =====================
