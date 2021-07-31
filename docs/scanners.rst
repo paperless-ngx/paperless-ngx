@@ -18,13 +18,13 @@ Physical scanners
 +---------+----------------+-----+-----+-----+------+----------------+
 |         |                | FTP | NFS | SMB | SMTP |                |
 +=========+================+=====+=====+=====+======+================+
-| Brother | `ADS-1700W`_   | yes | no  | yes | yes  |`holzhannes`_   |
+| Brother | `ADS-1700W`_   | yes |     | yes | yes  |`holzhannes`_   |
 +---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `ADS-1600W`_   | yes | no  | yes | yes  |`holzhannes`_   |
+| Brother | `ADS-1600W`_   | yes |     | yes | yes  |`holzhannes`_   |
 +---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `ADS-1500W`_   | yes | no  | yes | yes  |`danielquinn`_  |
+| Brother | `ADS-1500W`_   | yes |     | yes | yes  |`danielquinn`_  |
 +---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `ADS-1100W`_   | yes | no  | no  | no   |`ytzelf`_       |
+| Brother | `ADS-1100W`_   | yes |     |     |      |`ytzelf`_       |
 +---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `MFC-J6930DW`_ | yes |     |     |      |`ayounggun`_    |
 +---------+----------------+-----+-----+-----+------+----------------+
@@ -34,9 +34,11 @@ Physical scanners
 +---------+----------------+-----+-----+-----+------+----------------+
 | Brother | `MFC-9142CDN`_ | yes |     | yes |      |`REOLDEV`_      |
 +---------+----------------+-----+-----+-----+------+----------------+
-| Fujitsu | `ix500`_       | yes |     | yes |      |`eonist`_       |
+| Epson   | `ES-580W`_     | yes |     | yes | yes  |`fignew`_       |
 +---------+----------------+-----+-----+-----+------+----------------+
 | Epson   | `WF-7710DWF`_  | yes |     | yes |      |`Skylinar`_     |
++---------+----------------+-----+-----+-----+------+----------------+
+| Fujitsu | `ix500`_       | yes |     | yes |      |`eonist`_       |
 +---------+----------------+-----+-----+-----+------+----------------+
 | Fujitsu | `S1300i`_      | yes |     | yes |      |`jonaswinkler`_ |
 +---------+----------------+-----+-----+-----+------+----------------+
@@ -49,19 +51,21 @@ Physical scanners
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
 .. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
-.. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
+.. _ES-580W: https://epson.com/Support/Scanners/ES-Series/Epson-WorkForce-ES-580W/s/SPT_B11B258201
 .. _WF-7710DWF: https://www.epson.de/en/products/printers/inkjet-printers/for-home/workforce-wf-7710dwf
+.. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 .. _S1300i: https://www.fujitsu.com/global/products/computing/peripheral/scanners/soho/s1300i/
 
 
-.. _danielquinn: https://github.com/danielquinn
 .. _ayounggun: https://github.com/ayounggun
 .. _bmsleight: https://github.com/bmsleight
+.. _danielquinn: https://github.com/danielquinn
 .. _eonist: https://github.com/eonist
+.. _fignew: https://github.com/fignew
+.. _holzhannes: https://github.com/holzhannes
+.. _jonaswinkler: https://github.com/jonaswinkler
 .. _REOLDEV: https://github.com/REOLDEV
 .. _Skylinar: https://github.com/Skylinar
-.. _jonaswinkler: https://github.com/jonaswinkler
-.. _holzhannes: https://github.com/holzhannes
 .. _ytzelf: https://github.com/ytzelf
 
 Mobile phone software
