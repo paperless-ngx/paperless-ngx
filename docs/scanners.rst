@@ -13,33 +13,35 @@ that works right for you based on recommendations from other Paperless users.
 Physical scanners
 =================
 
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brand   | Model          | Supports               | Recommended By |
-+---------+----------------+-----+-----+-----+------+----------------+
-|         |                | FTP | NFS | SMB | SMTP |                |
-+=========+================+=====+=====+=====+======+================+
-| Brother | `ADS-1700W`_   | yes | no  | yes | yes  |`holzhannes`_   |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `ADS-1600W`_   | yes | no  | yes | yes  |`holzhannes`_   |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `ADS-1500W`_   | yes | no  | yes | yes  |`danielquinn`_  |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `ADS-1100W`_   | yes | no  | no  | no   |`ytzelf`_       |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `MFC-J6930DW`_ | yes |     |     |      |`ayounggun`_    |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `MFC-L5850DW`_ | yes |     |     | yes  |`holzhannes`_   |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `MFC-J5910DW`_ | yes |     |     |      |`bmsleight`_    |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Brother | `MFC-9142CDN`_ | yes |     | yes |      |`REOLDEV`_      |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Fujitsu | `ix500`_       | yes |     | yes |      |`eonist`_       |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Epson   | `WF-7710DWF`_  | yes |     | yes |      |`Skylinar`_     |
-+---------+----------------+-----+-----+-----+------+----------------+
-| Fujitsu | `S1300i`_      | yes |     | yes |      |`jonaswinkler`_ |
-+---------+----------------+-----+-----+-----+------+----------------+
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brand   | Model          | Supports                          | Recommended By |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+|         |                | FTP | NFS | SMB | SMTP | API [1]_ |                |
++=========+================+=====+=====+=====+======+==========+================+
+| Brother | `ADS-1700W`_   | yes | no  | yes | yes  |          |`holzhannes`_   |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `ADS-1600W`_   | yes | no  | yes | yes  |          |`holzhannes`_   |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `ADS-1500W`_   | yes | no  | yes | yes  |          |`danielquinn`_  |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `ADS-1100W`_   | yes | no  | no  | no   |          |`ytzelf`_       |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `MFC-J6930DW`_ | yes |     |     |      |          |`ayounggun`_    |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `MFC-L5850DW`_ | yes |     |     | yes  |          |`holzhannes`_   |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `MFC-J5910DW`_ | yes |     |     |      |          |`bmsleight`_    |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `MFC-9142CDN`_ | yes |     | yes |      |          |`REOLDEV`_      |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Fujitsu | `ix500`_       | yes |     | yes |      |          |`eonist`_       |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Epson   | `WF-7710DWF`_  | yes |     | yes |      |          |`Skylinar`_     |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Fujitsu | `S1300i`_      | yes |     | yes |      |          |`jonaswinkler`_ |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Doxie   | `Q2`_          | no  | no  | no  | no   | yes      |`Unkn0wnCat`_   |
++---------+----------------+-----+-----+-----+------+----------+----------------+
 
 .. _MFC-L5850DW: https://www.brother-usa.com/products/mfcl5850dw
 .. _ADS-1700W: https://www.brother-usa.com/products/ads1700w
@@ -52,6 +54,7 @@ Physical scanners
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 .. _WF-7710DWF: https://www.epson.de/en/products/printers/inkjet-printers/for-home/workforce-wf-7710dwf
 .. _S1300i: https://www.fujitsu.com/global/products/computing/peripheral/scanners/soho/s1300i/
+.. _Q2: https://www.getdoxie.com/product/doxie-q/
 
 
 .. _danielquinn: https://github.com/danielquinn
@@ -63,6 +66,9 @@ Physical scanners
 .. _jonaswinkler: https://github.com/jonaswinkler
 .. _holzhannes: https://github.com/holzhannes
 .. _ytzelf: https://github.com/ytzelf
+.. _Unkn0wnCat: https://github.com/Unkn0wnCat
+
+.. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
 
 Mobile phone software
 =====================
