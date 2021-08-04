@@ -183,6 +183,8 @@ CHANNEL_LAYERS = {
 # Security                                                                    #
 ###############################################################################
 
+AUTHENTICATION_BACKENDS = []
+
 AUTO_LOGIN_USERNAME = os.getenv("PAPERLESS_AUTO_LOGIN_USERNAME")
 
 if AUTO_LOGIN_USERNAME:
@@ -198,13 +200,38 @@ if ENABLE_HTTP_REMOTE_USER:
     MIDDLEWARE.append(
         'paperless.auth.HttpRemoteUserMiddleware'
     )
-    AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.RemoteUserBackend',
-        'django.contrib.auth.backends.ModelBackend'
-    ]
+    AUTHENTICATION_BACKENDS.append(
+        'django.contrib.auth.backends.RemoteUserBackend'
+    )
     REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
         'rest_framework.authentication.RemoteUserAuthentication'
     )
+
+ENABLE_LDAP_AUTH = __get_boolean("PAPERLESS_ENABLE_LDAP_AUTH")
+
+if ENABLE_LDAP_AUTH:
+    import ldap
+    from django_auth_ldap.config import LDAPSearch
+    AUTHENTICATION_BACKENDS.append(
+        'django_auth_ldap.backend.LDAPBackend'
+    )
+    AUTH_LDAP_SERVER_URI = os.getenv("PAPERLESS_LDAP_URI", "ldap://localhost")
+    AUTH_LDAP_BIND_DN = os.getenv("PAPERLESS_LDAP_BIND_DN", "")
+    AUTH_LDAP_BIND_PASSWORD = os.getenv("PAPERLESS_LDAP_BIND_PASSWORD", "")
+    AUTH_LDAP_USER_SEARCH = LDAPSearch(
+        os.getenv("PAPERLESS_LDAP_USER_BASE", "ou=users,dc=example,dc=com"),
+        ldap.SCOPE_SUBTREE, os.getenv("PAPERLESS_LDAP_USER_FILTER", "(uid=%(user)s)")
+    )
+    AUTH_LDAP_START_TLS = os.getenv("PAPERLESS_LDAP_START_TLS", True)
+    AUTH_LDAP_USER_ATTR_MAP = {
+        "first_name": os.getenv("PAPERLESS_LDAP_FIRSTNAME_ATTR", "givenName"),
+        "last_name": os.getenv("PAPERLESS_LDAP_LASTNAME_ATTR", "sn"),
+        "email": os.getenv("PAPERLESS_LDAP_EMAIL_ATTR", "mail")
+    }
+
+AUTHENTICATION_BACKENDS.append(
+    'django.contrib.auth.backends.ModelBackend'
+)
 
 # X-Frame options for embedded PDF display:
 if DEBUG:

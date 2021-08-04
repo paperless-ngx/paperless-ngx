@@ -281,12 +281,13 @@ writing. Windows is not and will never be supported.
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
     *   ``mime-support`` for mime type detection
+    *   ``libldap2-dev`` for LDAP auth support
 
     Use this list for your preferred package management:
 
     .. code::
 
-        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support
+        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support libldap2-dev
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
