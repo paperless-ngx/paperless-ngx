@@ -1,6 +1,6 @@
 import logging
 import os
-from pathlib import Path
+from pathlib import Path, PurePath
 from threading import Thread
 from time import sleep
 
@@ -36,15 +36,11 @@ def _tags_from_path(filepath):
     return tag_ids
 
 
-def _is_ignored(filepath):
-    # https://github.com/jonaswinkler/paperless-ng/discussions/1037
-    basename = os.path.basename(filepath)
-    if basename == ".DS_STORE":
-        return True
-    if basename.startswith("._"):
-        return True
-
-    return False
+def _is_ignored(filepath: str) -> bool:
+    filepath_relative = PurePath(filepath).relative_to(
+        settings.CONSUMPTION_DIR)
+    return any(
+        filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
 
 
 def _consume(filepath):

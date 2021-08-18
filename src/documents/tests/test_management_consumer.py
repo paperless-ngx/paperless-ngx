@@ -222,6 +222,22 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
         fnames = [os.path.basename(args[1]) for args, _ in self.task_mock.call_args_list]
         self.assertCountEqual(fnames, ["my_file.pdf", "my_second_file.pdf"])
 
+    def test_is_ignored(self):
+        test_paths = [
+            (os.path.join(self.dirs.consumption_dir, "foo.pdf"), False),
+            (os.path.join(self.dirs.consumption_dir, "foo","bar.pdf"), False),
+            (os.path.join(self.dirs.consumption_dir, ".DS_STORE", "foo.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, "foo", ".DS_STORE", "bar.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, ".stfolder", "foo.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, "._foo.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, "._foo", "bar.pdf"), False),
+        ]
+        for file_path, expected_ignored in test_paths:
+            self.assertEqual(
+                expected_ignored,
+                document_consumer._is_ignored(file_path),
+                f'_is_ignored("{file_path}") != {expected_ignored}')
+
 
 @override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
 class TestConsumerPolling(TestConsumer):
