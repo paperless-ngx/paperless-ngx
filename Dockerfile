@@ -8,7 +8,7 @@ RUN git clone https://github.com/agl/jbig2enc .
 RUN ./autogen.sh
 RUN ./configure && make
 
-FROM python:3.7-slim
+FROM python:3.9-slim-bullseye
 
 # Binary dependencies
 RUN apt-get update \
@@ -33,16 +33,11 @@ RUN apt-get update \
 		zlib1g \
 		ghostscript \
 		icc-profiles-free \
-  && echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list \
-  && apt-get update \
-  && apt-get -y --no-install-recommends install \
-		# fixes sudo / gosu issues
-		libseccomp2 \
-		# Mime type detection
+  	# Mime type detection
 		file \
 		libmagic-dev \
 		media-types \
-  		# OCRmyPDF dependencies
+		# OCRmyPDF dependencies
 		liblept5 \
 		qpdf \
 		tesseract-ocr \
