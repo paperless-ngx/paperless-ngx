@@ -70,7 +70,7 @@ class RasterisedDocumentParser(DocumentParser):
         try:
             with Image.open(image) as im:
                 x, y = im.info['dpi']
-                return x
+                return round(x)
         except Exception as e:
             self.log(
                 'warning',
