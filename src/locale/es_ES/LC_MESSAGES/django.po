@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-11 08:29\n"
+"PO-Revision-Date: 2021-07-29 20:57\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -108,7 +108,7 @@ msgstr "Cifrado con GNU Privacy Guard"
 
 #: documents/models.py:124
 msgid "title"
-msgstr "titulo"
+msgstr "título"
 
 #: documents/models.py:137
 msgid "content"
@@ -256,7 +256,7 @@ msgstr "ordenar al revés"
 
 #: documents/models.py:373
 msgid "title contains"
-msgstr "el titulo contiene"
+msgstr "el título contiene"
 
 #: documents/models.py:374
 msgid "content contains"
@@ -340,7 +340,7 @@ msgstr "consulta de texto completo"
 
 #: documents/models.py:394
 msgid "more like this"
-msgstr ""
+msgstr "más contenido similar"
 
 #: documents/models.py:405
 msgid "rule type"
@@ -490,7 +490,7 @@ msgstr "Acciones"
 
 #: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr "La acción aplicada al correo. Esta acción solo se realiza cuando los documentos se consumen del correo. Los correos sin archivos adjuntos permanecerán totalmente intactos."
+msgstr "La acción se aplicó al correo. Esta acción sólo se realiza cuando los documentos se consumen desde el correo. Los correos sin archivos adjuntos permanecerán totalmente intactos."
 
 #: paperless_mail/admin.py:58
 msgid "Metadata"
@@ -590,7 +590,7 @@ msgstr "Borrar"
 
 #: paperless_mail/models.py:96
 msgid "Use subject as title"
-msgstr "Usar asunto como titulo"
+msgstr "Usar asunto como título"
 
 #: paperless_mail/models.py:97
 msgid "Use attachment filename as title"
@@ -606,7 +606,7 @@ msgstr "Usar dirección de correo"
 
 #: paperless_mail/models.py:111
 msgid "Use name (or mail address if not available)"
-msgstr "Usar nombre (o dirección de correo si no está disponible)"
+msgstr "Usar nombre (o dirección de correo sino está disponible)"
 
 #: paperless_mail/models.py:113
 msgid "Use correspondent selected below"
@@ -674,11 +674,11 @@ msgstr "parámetro de acción"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "Parámetro adicional para la acción seleccionada arriba. Ej. la carpeta de destino de la acción de mover a carpeta. Las subcarpetas deben estar separadas por puntos."
+msgstr "Parámetro adicional para la acción seleccionada arriba. Ej. la carpeta de destino de la acción \"mover a carpeta\". Las subcarpetas deben estar separadas por puntos."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
-msgstr "asignar titulo desde"
+msgstr "asignar título desde"
 
 #: paperless_mail/models.py:194
 msgid "assign this tag"

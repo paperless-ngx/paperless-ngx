@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2021-08-16 09:06\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -470,11 +470,11 @@ msgstr "Administrare Paperless-ng"
 
 #: paperless_mail/admin.py:15
 msgid "Authentication"
-msgstr ""
+msgstr "Autentificare"
 
 #: paperless_mail/admin.py:18
 msgid "Advanced settings"
-msgstr ""
+msgstr "Setări avansate"
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
@@ -550,11 +550,11 @@ msgstr "parolă"
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr ""
+msgstr "Set de caractere"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Setul de caractere folosit la comunicarea cu serverul de e-mail, cum ar fi \"UTF-8\" sau \"US-ASCII\"."
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
@@ -626,7 +626,7 @@ msgstr "director"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Subdosarele trebuie separate prin puncte."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
@@ -674,7 +674,7 @@ msgstr "parametru acțiune"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Parametru adițional pentru acțiunea definită mai sus (ex. directorul în care să se realizeze o mutare). Subdosarele trebuie separate prin puncte."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
