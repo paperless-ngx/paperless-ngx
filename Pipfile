@@ -50,6 +50,7 @@ concurrent-log-handler = "*"
 uvloop = "~=0.15"
 cryptography = "~=3.4"
 "pdfminer.six" = "*"
+"backports.zoneinfo" = "*"
 
 [dev-packages]
 coveralls = "*"
