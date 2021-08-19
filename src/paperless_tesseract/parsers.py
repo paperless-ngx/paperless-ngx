@@ -214,8 +214,12 @@ class RasterisedDocumentParser(DocumentParser):
         # This forces tesseract to use one core per page.
         os.environ['OMP_THREAD_LIMIT'] = "1"
 
-        text_original = self.extract_text(None, document_path)
-        original_has_text = text_original and len(text_original) > 50
+        if mime_type == "application/pdf":
+            text_original = self.extract_text(None, document_path)
+            original_has_text = text_original and len(text_original) > 50
+        else:
+            text_original = None
+            original_has_text = False
 
         if settings.OCR_MODE == "skip_noarchive" and original_has_text:
             self.log("debug",

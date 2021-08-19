@@ -19,7 +19,7 @@ export class ApiVersionInterceptor implements HttpInterceptor {
           'Accept': `application/json; version=${environment.apiVersion}`
         }
       })
- 
+
     return next.handle(request);
   }
 }

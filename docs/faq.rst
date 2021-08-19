@@ -68,10 +68,10 @@ reuse the text. The web interface is a lot snappier, since it runs
 in your browser and paperless has to do much less work to serve the data.
 
 .. note::
-    
+
     You can adjust some of the settings so that paperless uses less processing
     power. See :ref:`setup-less_powerful_devices` for details.
-    
+
 
 **Q:** *How do I install paperless-ng on Raspberry Pi?*
 

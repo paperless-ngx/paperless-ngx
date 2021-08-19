@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-19 20:48\n"
+"PO-Revision-Date: 2021-05-22 10:12\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -674,7 +674,7 @@ msgstr "actie parameters"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "Extra parameter voor de hierboven geselecteerde actie, bijvoorbeeld: de doelmap voor de verplaats naar map actie. Submappen moeten gescheiden worden door punten."
+msgstr "Extra parameter voor de hierboven geselecteerde actie, bijvoorbeeld: de doelmap voor de \"verplaats naar map\"-actie. Submappen moeten gescheiden worden door punten."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"

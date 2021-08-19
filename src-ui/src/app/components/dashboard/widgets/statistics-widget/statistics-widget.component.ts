@@ -23,7 +23,7 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
   statistics: Statistics = {}
 
   subscription: Subscription
-  
+
   private getStatistics(): Observable<Statistics> {
     return this.http.get(`${environment.apiBaseUrl}statistics/`)
   }

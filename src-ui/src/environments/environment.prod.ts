@@ -5,7 +5,7 @@ export const environment = {
   apiBaseUrl: document.baseURI + "api/",
   apiVersion: "2",
   appTitle: "Paperless-ng",
-  version: "1.4.4",
+  version: "1.4.5",
   webSocketHost: window.location.host,
   webSocketProtocol: (window.location.protocol == "https:" ? "wss:" : "ws:"),
   webSocketBaseUrl: base_url.pathname + "ws/",
