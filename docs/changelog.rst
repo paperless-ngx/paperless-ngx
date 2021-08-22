@@ -8,8 +8,6 @@ Changelog
 paperless-ng 1.5.0
 ##################
 
-This is a maintenance release.
-
 Support for Python 3.6 was dropped.
 
 * Updated python dependencies.
@@ -110,17 +108,6 @@ paperless-ng 1.4.0
   *The docker image does this automatically, you don't need to do anything.*
   To do this, execute the ``document_index reindex`` management command
   (see :ref:`administration-index`).
-
-.. note::
-
-  Some packages that paperless depends on are slowly dropping Python 3.6
-  support one after another, including the web server. Supporting Python
-  3.6 means that I cannot update these packages anymore.
-
-  At some point, paperless will drop Python 3.6 support. If using a bare
-  metal installation and you're still on Python 3.6, upgrade to 3.7 or newer.
-
-  If using docker, this does not affect you.
 
 paperless-ng 1.3.2
 ##################
