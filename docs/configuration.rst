@@ -631,7 +631,13 @@ PAPERLESS_DATE_ORDER=<format>
     This option defaults to DMY which translates to day first, month second, and year
     last order. Characters D, M, or Y can be shuffled to meet the required order.
 
+PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>
+    By default, paperless ignores certain files and folders in the consumption
+    directory, such as system files created by the Mac OS.
 
+    This can be adjusted by configuring a custom json array with patterns to exclude.
+
+    Defautls to ``[".DS_STORE/*", "._*", ".stfolder/*"]``.
 
 Binaries
 ########

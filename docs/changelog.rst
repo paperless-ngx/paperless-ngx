@@ -16,6 +16,7 @@ Support for Python 3.6 was dropped.
 * Base image of the docker image changed from Debian Buster to Debian Bullseye due to its recent release.
 * The docker image now uses python 3.9.
 * Added the Luxembourgish locale. Thanks for translating!
+* `Daniel Albers`_ added support for making the files and folders ignored by the paperless consume folder scanner configurable. See ``PAPERLESS_CONSUMER_IGNORE_PATTERNS``.
 
 paperless-ng 1.4.5
 ##################
@@ -1494,6 +1495,7 @@ bulk of the work on this big change.
 .. _JOKer: https://github.com/MasterofJOKers
 .. _Brian Cribbs: https://github.com/cribbstechnolog
 .. _Brendan M. Sleight: https://github.com/bmsleight
+.. _Daniel Albers: https://github.com/AlD
 
 .. _#20: https://github.com/the-paperless-project/paperless/issues/20
 .. _#44: https://github.com/the-paperless-project/paperless/issues/44
