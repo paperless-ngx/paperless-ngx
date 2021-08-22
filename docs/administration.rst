@@ -240,6 +240,8 @@ Document exporter
 The document exporter exports all your data from paperless into a folder for
 backup or migration to another DMS.
 
+If you use the document exporter within a cronjob to backup your data you might use the ``-T`` flag behind exec to suppress "The input device is not a TTY" errors. For example: ``docker-compose exec -T webserver document_exporter ../export``
+
 .. code::
 
     document_exporter target [-c] [-f] [-d]
