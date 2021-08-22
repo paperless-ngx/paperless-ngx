@@ -257,6 +257,8 @@ PAPERLESS_OCR_LANGUAGE=<lang>
     languages enabled.
 
     Defaults to "eng".
+		
+		Note: If your language contains a '-' such as chi-sim, you must use chi_sim
 
 PAPERLESS_OCR_MODE=<mode>
     Tell paperless when and how to perform ocr on your documents. Four modes
