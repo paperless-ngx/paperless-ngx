@@ -252,9 +252,11 @@
     owner: "{{ paperlessng_system_user }}"
     group: "{{ paperlessng_system_group }}"
     mode: "750"
+  when: item
   with_items:
     - "{{ paperlessng_consumption_dir }}"
     - "{{ paperlessng_data_dir }}"
+    - "{{ paperlessng_trash_dir }}"
     - "{{ paperlessng_media_root }}"
     - "{{ paperlessng_staticdir }}"
 
@@ -277,6 +279,8 @@
       line: "PAPERLESS_CONSUMPTION_DIR={{ paperlessng_consumption_dir }}"
     - regexp: PAPERLESS_DATA_DIR
       line: "PAPERLESS_DATA_DIR={{ paperlessng_data_dir }}"
+    - regexp: PAPERLESS_TRASH_DIR
+      line: "PAPERLESS_TRASH_DIR={{ paperlessng_trash_dir }}"
     - regexp: PAPERLESS_MEDIA_ROOT
       line: "PAPERLESS_MEDIA_ROOT={{ paperlessng_media_root }}"
     - regexp: PAPERLESS_STATICDIR

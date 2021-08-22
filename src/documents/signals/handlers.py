@@ -225,6 +225,28 @@ def set_tags(sender,
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
+        if settings.TRASH_DIR:
+            counter = 0
+            old_filename = os.path.split(instance.source_path)[1]
+            (old_filebase, old_fileext) = os.path.splitext(old_filename)
+
+            while True:
+                new_file_path = os.path.join(
+                    settings.TRASH_DIR,
+                    old_filebase +
+                    (f"_{counter:02}" if counter else "") +
+                    old_fileext
+                )
+
+                if os.path.exists(new_file_path):
+                    counter += 1
+                else:
+                    break
+
+            logger.debug(
+                f"Moving {instance.source_path} to trash at {new_file_path}")
+            os.rename(instance.source_path, new_file_path)
+
         for filename in (instance.source_path,
                          instance.archive_path,
                          instance.thumbnail_path):

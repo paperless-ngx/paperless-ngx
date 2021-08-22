@@ -80,6 +80,15 @@ PAPERLESS_DATA_DIR=<path>
 
     Defaults to "../data/", relative to the "src" directory.
 
+PAPERLESS_TRASH_DIR=<path>
+    Instead of removing deleted documents, they are moved to this directory.
+
+    This must be writeable by the user running paperless. When running inside
+    docker, ensure that this path is within a permanent volume (such as
+    "../media/trash") so it won't get lost on upgrades.
+
+    Defaults to empty (i.e. really delete documents).
+
 PAPERLESS_MEDIA_ROOT=<path>
     This is where your documents and thumbnails are stored.
 
