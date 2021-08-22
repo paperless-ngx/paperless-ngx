@@ -5,6 +5,18 @@
 Changelog
 *********
 
+paperless-ng 1.5.0
+##################
+
+This is a maintenance release.
+
+Support for Python 3.6 was dropped.
+
+* Updated python dependencies.
+* Base image of the docker image changed from Debian Buster to Debian Bullseye due to its recent release.
+* The docker image now uses python 3.9.
+* Added the Luxembourgish locale. Thanks for translating!
+
 paperless-ng 1.4.5
 ##################
 
