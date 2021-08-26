@@ -63,6 +63,7 @@ RUN apt-get update \
 		build-essential \
 		libpq-dev \
 		libqpdf-dev \
+		libldap2-dev \
 	&& python3 -m pip install --upgrade --no-cache-dir supervisor \
   && python3 -m pip install --no-cache-dir -r ../requirements.txt \
 	&& apt-get -y purge build-essential libqpdf-dev \
