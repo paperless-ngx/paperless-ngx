@@ -144,6 +144,7 @@ ROOT_URLCONF = 'paperless.urls'
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 BASE_URL = (FORCE_SCRIPT_NAME or "") + "/"
 LOGIN_URL = BASE_URL + "accounts/login/"
+LOGOUT_REDIRECT_URL = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL")
 
 WSGI_APPLICATION = 'paperless.wsgi.application'
 ASGI_APPLICATION = "paperless.asgi.application"
