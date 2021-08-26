@@ -233,6 +233,13 @@ PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>
 
     Defaults to `HTTP_REMOTE_USER`.
 
+PAPERLESS_LOGOUT_REDIRECT_URL=<str>
+    URL to redirect the user to after a logout. This can be used together with
+    `PAPERLESS_ENABLE_HTTP_REMOTE_USER` to redirect the user back to the SSO
+    application's logout page.
+
+    Defaults to None, which disables this feature.
+
 .. _configuration-ocr:
 
 OCR settings
