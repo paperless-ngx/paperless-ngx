@@ -101,22 +101,22 @@ You may experience these errors when using the optional TIKA integration:
 
 .. code::
 
-    requests.exceptions.HTTPError: 504 Server Error: Gateway Timeout for url: http://gotenberg:3000/convert/office
+    requests.exceptions.HTTPError: 504 Server Error: Gateway Timeout for url: http://gotenberg:3000/forms/libreoffice/convert
 
-Gotenberg is a server that converts Office documents into PDF documents and has a default timeout of 10 seconds.
+Gotenberg is a server that converts Office documents into PDF documents and has a default timeout of 30 seconds.
 When conversion takes longer, Gotenberg raises this error.
 
-You can increase the timeout by configuring an environment variable for gotenberg (see also `here <https://thecodingmachine.github.io/gotenberg/#environment_variables.default_wait_timeout>`__).
+You can increase the timeout by configuring an environment variable for Gotenberg (see also `here <https://gotenberg.dev/docs/modules/api#properties>`__).
 If using docker-compose, this is achieved by the following configuration change in the ``docker-compose.yml`` file:
 
 .. code:: yaml
 
     gotenberg:
-        image: thecodingmachine/gotenberg
+        image: gotenberg/gotenberg:7
         restart: unless-stopped
         environment:
-            DISABLE_GOOGLE_CHROME: 1
-            DEFAULT_WAIT_TIMEOUT: 30
+            CHROMIUM_DISABLE_ROUTES: 1
+            API_PROCESS_TIMEOUT: 60
 
 Permission denied errors in the consumption directory
 #####################################################
