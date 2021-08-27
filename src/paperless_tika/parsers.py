@@ -67,7 +67,7 @@ class TikaDocumentParser(DocumentParser):
     def convert_to_pdf(self, document_path, file_name):
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
         gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-        url = gotenberg_server + "/convert/office"
+        url = gotenberg_server + "/forms/libreoffice/convert"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
         files = {"files": (file_name or os.path.basename(document_path),
