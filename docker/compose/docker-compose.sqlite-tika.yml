@@ -64,10 +64,10 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
   gotenberg:
-    image: thecodingmachine/gotenberg
+    image: gotenberg/gotenberg:7
     restart: unless-stopped
     environment:
-      DISABLE_GOOGLE_CHROME: 1
+      CHROMIUM_DISABLE_ROUTES: 1
 
   tika:
     image: apache/tika
