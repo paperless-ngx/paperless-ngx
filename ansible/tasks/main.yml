@@ -329,7 +329,7 @@
     - regexp: PAPERLESS_TIKA_ENDPOINT
       line: "PAPERLESS_TIKA_ENDPOINT={{ paperlessng_tika_endpoint }}"
     - regexp: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-      line: "PAPERLESS_TIKA_GOTENBERG_ENDPOINT={{ paperlessng_tika_endpoint }}"
+      line: "PAPERLESS_TIKA_GOTENBERG_ENDPOINT={{ paperlessng_tika_gotenberg_endpoint }}"
     # Software tweaks
     - regexp: PAPERLESS_TIME_ZONE
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
