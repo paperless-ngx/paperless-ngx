@@ -95,7 +95,7 @@ initialize
 
 if [[ "$1" != "/"* ]]; then
 	echo Executing management command "$@"
-	exec ${SUDO_CMD} python3 manage.py "$@"
+	exec "${SUDO_CMD}" python3 manage.py "$@"
 else
 	echo Executing "$@"
 	exec "$@"
