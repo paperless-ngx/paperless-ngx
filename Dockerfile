@@ -65,6 +65,8 @@ RUN apt-get update \
 		libqpdf-dev \
 		libldap2-dev \
 		libsasl2-dev \
+		python-dev \
+		libssl-dev \
 	&& python3 -m pip install --upgrade --no-cache-dir supervisor \
   && python3 -m pip install --no-cache-dir -r ../requirements.txt \
 	&& apt-get -y purge build-essential libqpdf-dev \
