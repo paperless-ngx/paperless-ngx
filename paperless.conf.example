@@ -5,6 +5,9 @@
 
 #PAPERLESS_DEBUG=false
 
+# Webserver configuration
+#PAPERLESS_PORT=8000
+
 # Required services
 
 #PAPERLESS_REDIS=redis://localhost:6379
