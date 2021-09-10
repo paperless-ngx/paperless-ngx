@@ -84,7 +84,7 @@
   <p>
     <ng-container *ngIf="list.isReloading">
       <div class="spinner-border spinner-border-sm mr-2" role="status"></div>
-      Loading...
+      <ng-container i18n>Loading...</ng-container>
     </ng-container>
     <span i18n *ngIf="list.selected.size > 0">{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
     <ng-container *ngIf="!list.isReloading">
