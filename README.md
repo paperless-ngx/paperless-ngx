@@ -62,7 +62,7 @@ If you want to see paperless-ng in action, [more screenshots are available in th
 
 # Getting started
 
-The recommended way to deploy paperless is docker-compose. The files in the /docker/hub directory are configured to pull the image from Docker Hub.
+The recommended way to deploy paperless is docker-compose. The files in the /docker/compose directory are configured to pull the image from Docker Hub.
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
