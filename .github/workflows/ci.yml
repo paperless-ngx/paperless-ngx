@@ -126,7 +126,7 @@ jobs:
         name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng
+          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng libldap2-dev libsasl2-dev
           pip install --upgrade pipenv
           pipenv install --system --dev --ignore-pipfile
       -
@@ -187,7 +187,7 @@ jobs:
         name: Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends gettext liblept5
+          sudo apt-get install -qq --no-install-recommends gettext liblept5 libldap2-dev libsasl2-dev
           pip3 install -r requirements.txt
       -
         name: Download frontend artifact
