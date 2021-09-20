@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2021-09-20 17:38\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -60,7 +60,7 @@ msgstr "配对算法"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "忽略大小写"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
