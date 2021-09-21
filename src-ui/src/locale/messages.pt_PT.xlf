@@ -216,7 +216,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">206</context>
         </context-group>
-        <target state="translated">Confirmar exclusão</target>
+        <target state="translated">Confirmar eliminação</target>
       </trans-unit>
       <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
@@ -224,7 +224,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="translated">Você realmente deseja excluir o documento "<x id="PH" equiv-text="this.document.title"/>"?</target>
+        <target state="translated">Deseja mesmo apagar o documento "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
       <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
@@ -232,7 +232,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">208</context>
         </context-group>
-        <target state="translated">Os arquivos desse documento serão excluídos permanentemente. Essa operação não pode ser revertida.</target>
+        <target state="translated">Os ficheiros deste documento serão excluídos permanentemente. Esta operação não pode ser revertida.</target>
       </trans-unit>
       <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
@@ -240,7 +240,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="translated">Excluir documento</target>
+        <target state="translated">Apagar documento</target>
       </trans-unit>
       <trans-unit id="1844801255494293730" datatype="html">
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
@@ -248,7 +248,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="translated">Erro ao excluir documento: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
+        <target state="translated">Erro ao apagar documento: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="826b25211922a1b46436589233cb6f1a163d89b7" datatype="html">
         <source>Delete</source>
@@ -264,7 +264,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Baixar</target>
+        <target state="translated">Descarregar</target>
       </trans-unit>
       <trans-unit id="4ea3c236bca3528318e3b3a411a20909e5fa8be4" datatype="html">
         <source>More like this</source>
@@ -384,7 +384,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="translated">Nome do arquivo</target>
+        <target state="translated">Nome do ficheiro</target>
       </trans-unit>
       <trans-unit id="74a894d2a8ae24a1eed4bc56e9afdc27dc2c31c8" datatype="html">
         <source>Original MD5 checksum</source>
@@ -392,7 +392,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Soma de verificação MD5 original</target>
+        <target state="translated">Checksum MD5 original</target>
       </trans-unit>
       <trans-unit id="e92ca184ea785769fb26138fc25ee9fa06fff6e5" datatype="html">
         <source>Original file size</source>
@@ -400,7 +400,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Tamanho do arquivo original</target>
+        <target state="translated">Tamanho do ficheiro original</target>
       </trans-unit>
       <trans-unit id="b5e93f30cc3411f20bd62025a6cc7394568f1bfd" datatype="html">
         <source>Original mime type</source>
@@ -416,7 +416,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="translated">Soma de verificação MD5 de arquivamento</target>
+        <target state="translated">Checksum MD5 do arquivo</target>
       </trans-unit>
       <trans-unit id="e6bf12eadecbfd80016eca15fa78651c6ca90c64" datatype="html">
         <source>Archive file size</source>
@@ -424,7 +424,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="translated">Tamanho arquivado</target>
+        <target state="translated">Tamanho do arquivo</target>
       </trans-unit>
       <trans-unit id="203c7adb5bd74ae18e84e1e3b66ddfe76bc0023f" datatype="html">
         <source>Original document metadata</source>
@@ -448,7 +448,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="translated">Salvar &amp; próximo</target>
+        <target state="translated">Guardar &amp; próximo</target>
       </trans-unit>
       <trans-unit id="8765497970646365998" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ng!</source>
@@ -472,7 +472,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">Painel de controle</target>
+        <target state="translated">Dashboard</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -480,7 +480,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Você realmente deseja excluir a etiqueta "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Deseja mesmo apagar a etiqueta "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="cafc87479686947e2590b9f588a88040aeaf660b" datatype="html">
         <source>Tags</source>
@@ -528,7 +528,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Detecção</target>
+        <target state="translated">Correspondência</target>
       </trans-unit>
       <trans-unit id="9bcf8d20d23c111eca1431abd2d2ce0de324499c" datatype="html">
         <source>Document count</source>
@@ -568,7 +568,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Você realmente deseja excluir o tipo de documento "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Deseja mesmo apagar o tipo de documento "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="bc000b39af12c0925c424f4cb85f0c31c0f8eca8" datatype="html">
         <source>Document types</source>
@@ -592,7 +592,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="translated">Visualização "<x id="PH" equiv-text="savedView.name"/>" excluída.</target>
+        <target state="translated">Visualização "<x id="PH" equiv-text="savedView.name"/>" apagada.</target>
       </trans-unit>
       <trans-unit id="5647210819299459618" datatype="html">
         <source>Settings saved successfully.</source>
@@ -600,7 +600,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">Configurações salvas com sucesso.</target>
+        <target state="translated">Configurações guardadas com sucesso.</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html">
         <source>Use system language</source>
@@ -624,7 +624,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="translated">Erro ao salvar configurações: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated">Erro ao guardar configurações: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
       <trans-unit id="121cc5391cd2a5115bc2b3160379ee5b36cd7716" datatype="html">
         <source>Settings</source>
@@ -680,7 +680,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">Você precisar recarregar a página depois de escolher uma nova linguagem.</target>
+        <target state="translated">Tem de recarregar a página depois de escolher uma nova linguagem.</target>
       </trans-unit>
       <trans-unit id="0cd55822928764cc82a62ee3e6f3adbc1c630479" datatype="html">
         <source>Date display</source>
@@ -848,7 +848,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="translated">Exibir notificações quando o processamento de um documento falhar</target>
+        <target state="translated">Mostrar notificações quando o processamento de um documento falhar</target>
       </trans-unit>
       <trans-unit id="af113f7c9f7e13145c3461f61a1aedf12d57bd71" datatype="html">
         <source>Suppress notifications on dashboard</source>
@@ -856,7 +856,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="translated">Não exibir notificações no painel de controle</target>
+        <target state="translated">Não mostrar notificações no dashboard</target>
       </trans-unit>
       <trans-unit id="e27bd3804d2936a6897e81c2e52e294490e5e5a8" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
