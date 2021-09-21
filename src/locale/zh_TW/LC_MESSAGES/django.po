@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-09-06 09:42\n"
+"PO-Revision-Date: 2021-09-21 04:54\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -19,23 +19,23 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "文檔"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "任何字串"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "所有字詞"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "精確匹配"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "正則表達式"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
