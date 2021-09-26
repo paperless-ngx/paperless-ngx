@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-09-20 18:35\n"
+"PO-Revision-Date: 2021-09-26 12:38\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -31,7 +31,7 @@ msgstr "所有词"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr "完全符合"
+msgstr "精确匹配"
 
 #: documents/models.py:35
 msgid "Regular expression"
