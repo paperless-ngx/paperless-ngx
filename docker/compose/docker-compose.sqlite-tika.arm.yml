@@ -12,6 +12,9 @@
 #
 # SQLite is used as the database. The SQLite file is stored in the data volume.
 #
+# iwishiwasaneagle/apache-tika-arm docker image is used to enable arm64 arch
+# which apache/tika does not currently support.
+#
 # In addition to that, this docker-compose file adds the following optional
 # configurations:
 #
