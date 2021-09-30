@@ -807,6 +807,8 @@ configuring some options in paperless can help improve performance immensely:
     times. Thumbnails will be about 20% larger.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
+*   Use the arm compatible docker-compose if you're wanting to use Tika on something like 
+		a raspberry pi. The official apache/tika image doesn not support the arm architecture.
 
 For details, refer to :ref:`configuration`.
 
