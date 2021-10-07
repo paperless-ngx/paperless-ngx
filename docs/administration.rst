@@ -406,6 +406,8 @@ the naming scheme.
 
 The command takes no arguments and processes all your documents at once.
 
+Learn how to Use :ref:`Management Utilities<Management utilities>`.
+
 
 .. _utilities-sanity-checker:
 
