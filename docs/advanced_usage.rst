@@ -221,14 +221,14 @@ Paperless provides the following placeholders withing filenames:
 * ``{document_type}``: The name of the document type, or "none".
 * ``{tag_list}``: A comma separated list of all tags assigned to the document.
 * ``{title}``: The title of the document.
-* ``{created}``: The full date and time the document was created.
+* ``{created}``: The full date (ISO format) the document was created.
 * ``{created_year}``: Year created only.
-* ``{created_month}``: Month created only (number 1-12).
-* ``{created_day}``: Day created only (number 1-31).
-* ``{added}``: The full date and time the document was added to paperless.
+* ``{created_month}``: Month created only (number 01-12).
+* ``{created_day}``: Day created only (number 01-31).
+* ``{added}``: The full date (ISO format) the document was added to paperless.
 * ``{added_year}``: Year added only.
-* ``{added_month}``: Month added only (number 1-12).
-* ``{added_day}``: Day added only (number 1-31).
+* ``{added_month}``: Month added only (number 01-12).
+* ``{added_day}``: Day added only (number 01-31).
 
 
 Paperless will try to conserve the information from your database as much as possible.
