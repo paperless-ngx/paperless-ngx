@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-10-31 21:48\n"
+"PO-Revision-Date: 2021-10-31 22:52\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -43,28 +43,28 @@ msgstr ""
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr ""
+msgstr "Αυτόματο"
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:117
 msgid "name"
-msgstr ""
+msgstr "όνομα"
 
 #: documents/models.py:45
 msgid "match"
-msgstr ""
+msgstr "αντιστοίχιση"
 
 #: documents/models.py:49
 msgid "matching algorithm"
-msgstr ""
+msgstr "αλγόριθμος αντιστοίχισης"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "χωρίς διάκριση πεζών - κεφαλαίων"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr ""
+msgstr "ανταποκριτής"
 
 #: documents/models.py:75
 msgid "correspondents"
