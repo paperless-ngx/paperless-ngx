@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-10-30 19:49\n"
+"PO-Revision-Date: 2021-10-31 21:48\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -19,23 +19,23 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "Έγγραφα"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "Οποιαδήποτε λέξη"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "Όλες οι λέξεις"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "Ακριβής ταύτιση"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "Regular expression"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
