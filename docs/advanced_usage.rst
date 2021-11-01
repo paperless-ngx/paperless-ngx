@@ -168,11 +168,11 @@ into paperless. It receives the following arguments:
 * Tags
 
 The script can be in any language you like, but for a simple shell script
-example, you can take a look at ``post-consumption-example.sh`` in the
-``scripts`` directory in this project.
+example, you can take a look at `post-consumption-example.sh`_ in this project.
 
 The post consumption script cannot cancel the consumption process.
 
+.. _post-consumption-example.sh: https://github.com/jonaswinkler/paperless-ng/blob/master/scripts/post-consumption-example.sh
 .. _advanced-file_name_handling:
 
 File name handling
