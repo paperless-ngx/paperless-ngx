@@ -172,7 +172,35 @@ example, you can take a look at `post-consumption-example.sh`_ in this project.
 
 The post consumption script cannot cancel the consumption process.
 
+Docker
+------
+Assumed you have ``/home/foo/paperless-ng/scripts/post-consumption-example.sh``.
+
+You can pass that script into the consumer container via a host mount in your ``docker-compose.yml``.
+
+.. code:: bash
+   ...
+   consumer:
+           ...
+           volumes:
+					     ...
+               - /home/paperless-ng/scripts:/path/in/container/scripts/
+   ...
+
+Example (docker-compose.yml): ``- /home/foo/paperless-ng/scripts:/usr/src/paperless/scripts``
+
+which in turn requires the variable ``PAPERLESS_POST_CONSUME_SCRIPT`` in ``docker-compose.env``  to point to ``/path/in/container/scripts/post-consumption-example.sh``.
+
+Example (docker-compose.env): ``PAPERLESS_POST_CONSUME_SCRIPT=/usr/src/paperless/scripts/post-consumption-example.sh``
+
+Troubleshooting:
+
+- Monitor the docker-compose log ``cd ~/paperless-ng; docker-compose logs -f``
+- Check your script's permission e.g. in case of permission error ``sudo chmod 755 post-consumption-example.sh``
+- Pipe your scripts's output to a log file e.g. ``echo "${DOCUMENT_ID}" | tee --append /usr/src/paperless/scripts/post-consumption-example.log``
+
 .. _post-consumption-example.sh: https://github.com/jonaswinkler/paperless-ng/blob/master/scripts/post-consumption-example.sh
+
 .. _advanced-file_name_handling:
 
 File name handling
