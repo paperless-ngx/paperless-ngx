@@ -104,7 +104,7 @@ you execute scripts of your own choosing just before or after a document is
 consumed using a couple simple hooks.
 
 Just write a script, put it somewhere that Paperless can read & execute, and
-then put the path to that script in ``paperless.conf`` with the variable name
+then put the path to that script in ``paperless.conf`` or ``docker-compose.env`` with the variable name
 of either ``PAPERLESS_PRE_CONSUME_SCRIPT`` or
 ``PAPERLESS_POST_CONSUME_SCRIPT``.
 
