@@ -446,8 +446,9 @@ requires are as follows:
         gotenberg:
             image: gotenberg/gotenberg:7
             restart: unless-stopped
-            environment:
-                CHROMIUM_DISABLE_ROUTES: 1
+            command:
+                - "gotenberg"
+                - "--chromium-disable-routes=true"
 
         tika:
             image: apache/tika
