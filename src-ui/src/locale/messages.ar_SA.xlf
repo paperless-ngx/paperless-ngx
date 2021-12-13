@@ -8,7 +8,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Document added</target>
+        <target state="translated">أُضيف المستند</target>
       </trans-unit>
       <trans-unit id="9204248378636247318" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
@@ -16,7 +16,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</target>
+        <target state="translated">أضيف المستند <x id="PH" equiv-text="status.filename"/> إلى paperless.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -24,7 +24,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Open document</target>
+        <target state="translated">فتح مستند</target>
       </trans-unit>
       <trans-unit id="8582620835547864448" datatype="html">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
@@ -40,7 +40,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">New document detected</target>
+        <target state="translated">عُثر على مستند جديد</target>
       </trans-unit>
       <trans-unit id="587031278561344416" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
@@ -80,7 +80,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Select</target>
+        <target state="translated">تحديد</target>
       </trans-unit>
       <trans-unit id="7e1f9a7054aff842832620c03dedae894787ba41" datatype="html">
         <source>Select none</source>
@@ -88,7 +88,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Select none</target>
+        <target state="translated">بدون تحديد</target>
       </trans-unit>
       <trans-unit id="2ed8a0c2ce4968f8614151eefed20a0aa3daeeb9" datatype="html">
         <source>Select page</source>
@@ -96,7 +96,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Select page</target>
+        <target state="translated">تحديد صفحة</target>
       </trans-unit>
       <trans-unit id="b463541a7e303aa4d0b1102eaff8afbaf34e7a74" datatype="html">
         <source>Select all</source>
@@ -104,7 +104,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Select all</target>
+        <target state="translated">تحديد الكل</target>
       </trans-unit>
       <trans-unit id="5d43539fc358c3a548b9d487be821db73e2702ff" datatype="html">
         <source>Sort</source>
@@ -112,7 +112,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Sort</target>
+        <target state="translated">ترتيب</target>
       </trans-unit>
       <trans-unit id="b7641aed03492978b4ec6843b1e53f30464294d9" datatype="html">
         <source>Views</source>
@@ -1776,7 +1776,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Open document</target>
+        <target state="translated">فتح مستند</target>
       </trans-unit>
       <trans-unit id="45854ddec74086b271e62be6a363f4fa5036f7fc" datatype="html">
         <source>First steps</source>
@@ -1848,7 +1848,7 @@
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Select</target>
+        <target state="translated">تحديد</target>
       </trans-unit>
       <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
