@@ -456,7 +456,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ng!</target>
+        <target state="translated">Ahoj <x id="PH" equiv-text="this.displayName"/>, vítejte na Paperless-ng!</target>
       </trans-unit>
       <trans-unit id="7016571167317583872" datatype="html">
         <source>Welcome to Paperless-ng!</source>
@@ -464,7 +464,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ng!</target>
+        <target state="translated">Vítejte v Paperless-ng!</target>
       </trans-unit>
       <trans-unit id="f65253954b66e929a8b4d5ecaf61f9129f8cec64" datatype="html">
         <source>Dashboard</source>
@@ -472,7 +472,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Dashboard</target>
+        <target state="translated">Přehled</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -480,7 +480,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the tag "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Opravdu chcete odstranit štítek "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="cafc87479686947e2590b9f588a88040aeaf660b" datatype="html">
         <source>Tags</source>
@@ -1024,7 +1024,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Inbox tags are automatically assigned to all consumed documents.</target>
+        <target state="translated">Štítky doručené pošty jsou automaticky přiřazeny ke všem importovaným dokumentům.</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html">
         <source>Create new document type</source>
@@ -1249,7 +1249,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Filter tags</target>
+        <target state="translated">Filtrovat štítky</target>
       </trans-unit>
       <trans-unit id="4b089ca12c472cf0b46167bb5afe4b527b301bbc" datatype="html">
         <source>Filter correspondents</source>
@@ -1257,7 +1257,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Filter correspondents</target>
+        <target state="translated">Filtrovat korespondenty</target>
       </trans-unit>
       <trans-unit id="0ad509732aaf702b7ea8c771c7809fa84bc85908" datatype="html">
         <source>Filter document types</source>
@@ -1265,7 +1265,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Filter document types</target>
+        <target state="translated">Filtrovat typy dokumentů</target>
       </trans-unit>
       <trans-unit id="2d9d55f1b70142ff4597ba32179d16888fd9c6b2" datatype="html">
         <source>Reset filters</source>
@@ -1273,7 +1273,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Reset filters</target>
+        <target state="translated">Zrušit filtry</target>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html">
         <source>Not assigned</source>
@@ -1282,7 +1282,7 @@
           <context context-type="linenumber">166</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
-        <target state="needs-translation">Not assigned</target>
+        <target state="translated">Nepřiřazeno</target>
       </trans-unit>
       <trans-unit id="c2d0ac9f528bbd5f53fd34269fde8b59e029621b" datatype="html">
         <source>Apply</source>
@@ -1290,7 +1290,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Apply</target>
+        <target state="translated">Použít</target>
       </trans-unit>
       <trans-unit id="4873149362496451858" datatype="html">
         <source>Last 7 days</source>
@@ -1298,7 +1298,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Last 7 days</target>
+        <target state="translated">Posledních 7 dní</target>
       </trans-unit>
       <trans-unit id="4463380307954693363" datatype="html">
         <source>Last month</source>
@@ -1306,7 +1306,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Last month</target>
+        <target state="translated">Minulý měsíc</target>
       </trans-unit>
       <trans-unit id="8697368973702409683" datatype="html">
         <source>Last 3 months</source>
@@ -1314,7 +1314,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Last 3 months</target>
+        <target state="translated">Poslední 3 měsíce</target>
       </trans-unit>
       <trans-unit id="3566342898065860218" datatype="html">
         <source>Last year</source>
@@ -1322,7 +1322,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Last year</target>
+        <target state="translated">Minulý rok</target>
       </trans-unit>
       <trans-unit id="be2add3a3d9e4e2556b8f9048a15a9c0f00bf1ad" datatype="html">
         <source>After</source>
