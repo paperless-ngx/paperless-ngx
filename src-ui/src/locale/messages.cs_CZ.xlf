@@ -432,7 +432,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">121</context>
         </context-group>
-        <target state="needs-translation">Original document metadata</target>
+        <target state="translated">Metadata původního dokumentu</target>
       </trans-unit>
       <trans-unit id="7174dcea4a3d0b743e7e4a78747e902230727f67" datatype="html">
         <source>Archived document metadata</source>
@@ -440,7 +440,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Archived document metadata</target>
+        <target state="translated">Metadata archivovaného dokumentu</target>
       </trans-unit>
       <trans-unit id="3fb9f1a31c3798173b2fea72638732c783b152fe" datatype="html">
         <source>Save &amp; next</source>
