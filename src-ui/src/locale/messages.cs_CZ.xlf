@@ -64,7 +64,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="translated">Pohled "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" úspěšně uložen.</target>
+        <target state="translated">Zobrazení "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" bylo úspěšně uloženo.</target>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
@@ -72,7 +72,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="translated">Pohled "<x id="PH" equiv-text="savedView.name"/>" úspěšně vytvořen.</target>
+        <target state="translated">Zobrazení "<x id="PH" equiv-text="savedView.name"/>" bylo úspěšně vytvořeno.</target>
       </trans-unit>
       <trans-unit id="9ca82952a6bc860b5391d5975322d8af8ceddfa4" datatype="html">
         <source>Select</source>
@@ -144,7 +144,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {} few {Vybráno <x id="INTERPOLATION"/> z <x id="INTERPOLATION_1"/> dokumentů} many {Vybráno <x id="INTERPOLATION"/> z <x id="INTERPOLATION_1"/> dokumentů} =1 {Vybráno <x id="INTERPOLATION"/> z <x id="INTERPOLATION_1"/> dokumentu} other {Vybráno <x id="INTERPOLATION"/> z <x id="INTERPOLATION_1"/> dokumentů}}</target>
       </trans-unit>
       <trans-unit id="bb773fdeaad5e7fb8e6cd77e1cc558e1b194a0c9" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
@@ -152,7 +152,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {} few {<x id="INTERPOLATION"/> dokumenty} many {<x id="INTERPOLATION"/> dokument} =1 {dokument} other {<x id="INTERPOLATION"/> dokumentů}}</target>
       </trans-unit>
       <trans-unit id="bb91083b44e3f77dd68de773ceab467ca3d57507" datatype="html">
         <source>(filtered)</source>
@@ -184,7 +184,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="translated">Titulek</target>
+        <target state="translated">Název</target>
       </trans-unit>
       <trans-unit id="2bd5919e8098513664a89d5b7b52d61e3063950f" datatype="html">
         <source>Document type</source>
@@ -760,7 +760,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="translated">Tmavý režim</target>
+        <target state="translated">Tmavý motiv</target>
       </trans-unit>
       <trans-unit id="f8cb5506e70fd71fddc9bb71cee18bfff7b29637" datatype="html">
         <source>Use system settings</source>
@@ -1193,7 +1193,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="translated">Nadpis: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">Název: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1872523635812236432" datatype="html">
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
@@ -1209,7 +1209,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="translated">Titulek</target>
+        <target state="translated">Název</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
@@ -1217,7 +1217,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">Nadpis &amp; Obsah</target>
+        <target state="translated">Název &amp; Obsah</target>
       </trans-unit>
       <trans-unit id="7517688192215738656" datatype="html">
         <source>ASN</source>
@@ -1800,7 +1800,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="needs-translation">You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they'll start showing up in the documents list. After you've added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as 'Recently added', 'Tagged TODO') and they will appear on the dashboard instead of this message.</target>
+        <target state="translated">Můžete začít nahrávat dokumenty tak, že je přetáhnete do pole pro nahrávání souborů vpravo nebo je vložíte do nakonfigurované konzumní složky. Poté se začnou zobrazovat v seznamu dokumentů. Po vyplnění některých metadat, využijte filtrační mechanismy Paperless-ng, abyste vytvořili vlastní zobrazení (například 'Nedávno přidané', 'Ke zpracování') a zobrazí se na přehledu na tomto místě.</target>
       </trans-unit>
       <trans-unit id="cf5f85690feaba6e29343f9881e57a6c0ea6e82b" datatype="html">
         <source>Paperless offers some more features that try to make your life easier:</source>
@@ -1808,7 +1808,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Paperless offers some more features that try to make your life easier:</target>
+        <target state="translated">Paperless-ng nabízí další funkce, které se snaží usnadnit váš život:</target>
       </trans-unit>
       <trans-unit id="edb41dc36af2e70789d8e3422325d930e783253e" datatype="html">
         <source>Once you&apos;ve got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</source>
@@ -1816,7 +1816,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Once you've got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</target>
+        <target state="translated">Jakmile máte nahraných několik dokumentů a přidali jste k nim metadata, Paperless-ng může přiřadit tato metadata automaticky i k nově nahraným dokumentům.</target>
       </trans-unit>
       <trans-unit id="9dca488928c0b7af46c3866f86a6c2c8548399aa" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
@@ -1824,7 +1824,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">You can configure paperless to read your mails and add documents from attached files.</target>
+        <target state="translated">Můžete nakonfigurovat Paperless-ng tak, aby kontroloval vaši emailovou schránku a automaticky nahrával dokumenty z příloh emailů.</target>
       </trans-unit>
       <trans-unit id="d282f6277cbf6704f697170d2ad19ce500790e20" datatype="html">
         <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
@@ -1832,7 +1832,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</target>
+        <target state="translated">Podívejte se na dokumentaci o používání těchto funkcí. V části o základním používání jsou také informace o tom, jak obecně používat Paperless-ng.</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
@@ -1896,7 +1896,7 @@
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">(bez nadpisu)</target>
+        <target state="translated">(bez názvu)</target>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
         <source>English (US)</source>
