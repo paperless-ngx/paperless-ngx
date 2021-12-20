@@ -71,7 +71,6 @@ Physical scanners
 .. _holzhannes: https://github.com/holzhannes
 .. _ytzelf: https://github.com/ytzelf
 .. _Unkn0wnCat: https://github.com/Unkn0wnCat
-.. _Unkn0wnCat: https://github.com/Unkn0wnCat
 .. _philpagel: https://github.com/philpagel
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
