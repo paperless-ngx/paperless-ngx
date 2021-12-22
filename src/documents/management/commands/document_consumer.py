@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 from pathlib import Path, PurePath
 from threading import Thread
 from time import sleep
@@ -99,6 +100,34 @@ def _consume_wait_unmodified(file):
         current_try += 1
 
     logger.error(f"Timeout while waiting on file {file} to remain unmodified.")
+
+
+def _consume_inotify_wait_unmodified(directory, file):
+    modified_delay = max(settings.CONSUMER_INOTIFY_WAIT_MODIFIED_DELAY, 0.1)
+
+    if _is_ignored(file):
+        return
+
+    logger.debug(
+        f"Waiting {modified_delay}s for file {file} to remain unmodified")
+
+    inotify = INotify()
+    inotify_flags = flags.MODIFY | flags.OPEN
+    descriptor = inotify.add_watch(directory, inotify_flags)
+
+    try:
+        for event in inotify.read(timeout=modified_delay*1000):
+            if file.endswith(event.name):
+                logger.info(
+                    f"File {file} has been modified. Cancelling consumption.")
+                return
+    except KeyboardInterrupt:
+        pass
+    finally:
+        inotify.rm_watch(descriptor)
+        inotify.close()
+
+    _consume(file)
 
 
 class Handler(FileSystemEventHandler):
@@ -204,7 +233,7 @@ class Command(BaseCommand):
                     else:
                         path = directory
                     filepath = os.path.join(path, event.name)
-                    _consume(filepath)
+                    _consume_inotify_wait_unmodified(path, filepath)
         except KeyboardInterrupt:
             pass
 
