@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-11-23 18:07\n"
+"PO-Revision-Date: 2022-01-16 17:11\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -19,23 +19,23 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "Dokumenti"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "Katerakoli beseda"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "Vse besede"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "Točno ujemanje"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "Regular expression"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
