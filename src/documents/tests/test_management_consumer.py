@@ -327,7 +327,7 @@ class TestConsumerInotifyWait(TestConsumer):
 
     @mock.patch("documents.management.commands.document_consumer.logger.error")
     def test_chunk_write_pdf_delay_write_3s(self, error_logger):
-        """Write delay is higher than wait time, errors should be raised when trying to consume"""
+        """Write delay is higher than wait time, errors should be raised when trying to consume!"""
         self.task_mock.side_effect = self.bogus_task
 
         self.t_start()
@@ -344,9 +344,6 @@ class TestConsumerInotifyWait(TestConsumer):
         # TestConsumer throws errors, but production one might not -> undefinable documents appear in paperless,
         # though they can be valid documents, just not complete.
         self.assertEqual(error_logger.call_count, 2)
-
-    # just do all the tests with waiting longer for file to be unmodified
-    pass
 
 
 @override_settings(CONSUMER_RECURSIVE=True)

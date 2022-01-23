@@ -1,6 +1,5 @@
 import logging
 import os
-from datetime import datetime
 from pathlib import Path, PurePath
 from threading import Thread
 from time import sleep
