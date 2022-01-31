@@ -222,7 +222,7 @@ Install Paperless from Docker Hub
 
     .. code-block:: shell-session
 
-        $ docker-compose run --rm webserver createsuperuser
+        $ docker exec -it webserver python manage.py createsuperuser
 
     This will prompt you to set a username, an optional e-mail address and
     finally a password (at least 8 characters).
