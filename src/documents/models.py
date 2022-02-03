@@ -17,7 +17,7 @@ from django.utils.timezone import is_aware
 from django.utils.translation import gettext_lazy as _
 
 from documents.parsers import get_default_file_extension
-
+from smart_open import open
 
 class MatchingModel(models.Model):
 

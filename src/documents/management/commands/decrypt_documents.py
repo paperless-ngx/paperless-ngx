@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from documents.models import Document
 from paperless.db import GnuPG
+from smart_open import open
 
 
 class Command(BaseCommand):

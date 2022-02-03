@@ -25,6 +25,7 @@ from .signals import (
     document_consumption_started
 )
 
+from smart_open import open
 
 class ConsumerError(Exception):
     pass

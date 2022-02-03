@@ -7,6 +7,7 @@ from django.conf import settings
 from documents.parsers import DocumentParser, ParseError, \
     make_thumbnail_from_pdf
 from tika import parser
+from smart_open import open
 
 
 class TikaDocumentParser(DocumentParser):

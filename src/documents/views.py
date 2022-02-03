@@ -62,6 +62,7 @@ from .serialisers import (
     BulkDownloadSerializer
 )
 
+from smart_open import open
 
 logger = logging.getLogger("paperless.api")
 

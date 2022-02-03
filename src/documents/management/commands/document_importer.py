@@ -16,6 +16,7 @@ from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
 from ...file_handling import create_source_path_directory
 from ...signals.handlers import update_filename_and_move_files
+from smart_open import open
 
 
 @contextmanager

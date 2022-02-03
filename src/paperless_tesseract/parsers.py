@@ -11,6 +11,7 @@ from documents.parsers import DocumentParser, ParseError, \
 
 class NoTextFoundException(Exception):
     pass
+from smart_open import open
 
 
 class RasterisedDocumentParser(DocumentParser):

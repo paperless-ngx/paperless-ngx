@@ -5,6 +5,7 @@ from django.conf import settings
 
 from documents.parsers import DocumentParser
 
+from smart_open import open
 
 class TextDocumentParser(DocumentParser):
     """

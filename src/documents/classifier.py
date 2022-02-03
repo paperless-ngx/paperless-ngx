@@ -16,6 +16,7 @@ class IncompatibleClassifierVersionError(Exception):
 
 class ClassifierModelCorruptError(Exception):
     pass
+from smart_open import open
 
 
 logger = logging.getLogger("paperless.classifier")

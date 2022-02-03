@@ -19,6 +19,7 @@ from ... import index
 from ...file_handling import create_source_path_directory, \
     generate_unique_filename
 from ...parsers import get_parser_class_for_mime_type
+from smart_open import open
 
 
 logger = logging.getLogger("paperless.management.archiver")

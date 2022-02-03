@@ -19,6 +19,7 @@ from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
 from paperless.db import GnuPG
 from paperless_mail.models import MailAccount, MailRule
 from ...file_handling import generate_filename, delete_empty_directories
+from smart_open import open
 
 
 class Command(BaseCommand):

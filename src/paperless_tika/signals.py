@@ -1,3 +1,4 @@
+
 def get_parser(*args, **kwargs):
     from .parsers import TikaDocumentParser
 

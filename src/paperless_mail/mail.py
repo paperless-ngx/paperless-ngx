@@ -16,6 +16,7 @@ from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
 from paperless_mail.models import MailAccount, MailRule
 
+from smart_open import open
 
 class MailError(Exception):
     pass

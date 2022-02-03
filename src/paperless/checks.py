@@ -5,6 +5,7 @@ import stat
 from django.conf import settings
 from django.core.checks import Error, Warning, register
 
+from smart_open import open
 exists_message = "{} is set but doesn't exist."
 exists_hint = "Create a directory at {}"
 writeable_message = "{} is not writeable"
@@ -16,7 +17,7 @@ writeable_hint = (
 
 def path_check(var, directory):
     messages = []
-    if directory:
+    if directory and not directory.startswith("s3"):
         if not os.path.isdir(directory):
             messages.append(Error(
                 exists_message.format(var),
