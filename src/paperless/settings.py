@@ -144,6 +144,7 @@ ROOT_URLCONF = 'paperless.urls'
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
 BASE_URL = (FORCE_SCRIPT_NAME or "") + "/"
 LOGIN_URL = BASE_URL + "accounts/login/"
+LOGOUT_REDIRECT_URL = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL")
 
 WSGI_APPLICATION = 'paperless.wsgi.application'
 ASGI_APPLICATION = "paperless.asgi.application"
@@ -313,6 +314,7 @@ LANGUAGES = [
     ("es-es", _("Spanish")),
     ("pl-pl", _("Polish")),
     ("sv-se", _("Swedish")),
+    ("lb-lu", _("Luxembourgish")),
 ]
 
 LOCALE_PATHS = [
@@ -456,6 +458,12 @@ CONSUMER_POLLING_RETRY_COUNT = int(
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
+
+# Ignore glob patterns, relative to PAPERLESS_CONSUMPTION_DIR
+CONSUMER_IGNORE_PATTERNS = list(
+    json.loads(
+        os.getenv("PAPERLESS_CONSUMER_IGNORE_PATTERNS",
+                  '[".DS_STORE/*", "._*", ".stfolder/*"]')))
 
 CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
 

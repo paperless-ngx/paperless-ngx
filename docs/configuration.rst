@@ -233,6 +233,13 @@ PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>
 
     Defaults to `HTTP_REMOTE_USER`.
 
+PAPERLESS_LOGOUT_REDIRECT_URL=<str>
+    URL to redirect the user to after a logout. This can be used together with
+    `PAPERLESS_ENABLE_HTTP_REMOTE_USER` to redirect the user back to the SSO
+    application's logout page.
+
+    Defaults to None, which disables this feature.
+
 .. _configuration-ocr:
 
 OCR settings
@@ -257,6 +264,8 @@ PAPERLESS_OCR_LANGUAGE=<lang>
     languages enabled.
 
     Defaults to "eng".
+
+		Note: If your language contains a '-' such as chi-sim, you must use chi_sim
 
 PAPERLESS_OCR_MODE=<mode>
     Tell paperless when and how to perform ocr on your documents. Four modes
@@ -629,7 +638,13 @@ PAPERLESS_DATE_ORDER=<format>
     This option defaults to DMY which translates to day first, month second, and year
     last order. Characters D, M, or Y can be shuffled to meet the required order.
 
+PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>
+    By default, paperless ignores certain files and folders in the consumption
+    directory, such as system files created by the Mac OS.
 
+    This can be adjusted by configuring a custom json array with patterns to exclude.
+
+    Defautls to ``[".DS_STORE/*", "._*", ".stfolder/*"]``.
 
 Binaries
 ########

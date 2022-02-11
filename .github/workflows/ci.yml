@@ -20,7 +20,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.9
       -
         name: Get pip cache dir
         id: pip-cache
@@ -59,7 +59,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.9
       -
         name: Get pip cache dir
         id: pip-cache
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9']
+        python-version: ['3.7', '3.8', '3.9']
       fail-fast: false
     steps:
       -
@@ -136,7 +136,7 @@ jobs:
           pytest
       -
         name: Publish coverage results
-        if: matrix.python-version == '3.8'
+        if: matrix.python-version == '3.9'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # https://github.com/coveralls-clients/coveralls-python/issues/251
@@ -182,7 +182,7 @@ jobs:
         name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.9
       -
         name: Install dependencies
         run: |

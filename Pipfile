@@ -21,8 +21,7 @@ fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
-# numpy 1.20.0 drops python 3.6 support
-numpy = "~=1.19.5"
+numpy = "~=1.20.0"
 pathvalidate = "*"
 pillow = "~=8.1"
 pikepdf = "~=2.5"
@@ -34,13 +33,11 @@ psycopg2-binary = "*"
 redis = "*"
 # Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
 scikit-learn="==0.24.0"
-# Prevent scipy updates because 1.6 is incompatible with python 3.6
-scipy="~=1.5.4"
-whitenoise = "~=5.2.0"
-watchdog = "~=1.0.0"
+whitenoise = "~=5.3.0"
+watchdog = "~=2.1.0"
 whoosh="~=2.7.4"
 inotifyrecursive = "~=0.3.4"
-ocrmypdf = "~=12.0"
+ocrmypdf = "~=12.3"
 tqdm = "*"
 tika = "*"
 # TODO: This will sadly also install daphne+dependencies,
@@ -50,9 +47,10 @@ channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 # uvloop 0.15+ incompatible with python 3.6
-uvloop = "~=0.14.0"
+uvloop = "~=0.15"
 cryptography = "~=3.4"
 "pdfminer.six" = "*"
+"backports.zoneinfo" = "*"
 
 [dev-packages]
 coveralls = "*"
