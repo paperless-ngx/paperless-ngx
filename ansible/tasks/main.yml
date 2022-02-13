@@ -335,6 +335,8 @@
       line: "PAPERLESS_TIME_ZONE={{ paperlessng_time_zone }}"
     - regexp: PAPERLESS_CONSUMER_POLLING
       line: "PAPERLESS_CONSUMER_POLLING={{ paperlessng_consumer_polling }}"
+    - regexp: PAPERLESS_CONSUMER_INOTIFY_WAIT_MODIFIED_DELAY
+      line: "PAPERLESS_CONSUMER_INOTIFY_WAIT_MODIFIED_DELAY={{ paperlessng_consumer_inotify_wait_modified_delay }}"
     - regexp: PAPERLESS_CONSUMER_DELETE_DUPLICATES
       line: "PAPERLESS_CONSUMER_DELETE_DUPLICATES={{ paperlessng_consumer_delete_duplicates }}"
     - regexp: PAPERLESS_CONSUMER_RECURSIVE

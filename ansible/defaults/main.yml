@@ -58,6 +58,7 @@ paperlessng_tika_gotenberg_endpoint: http://localhost:3000
 # Software tweaks
 paperlessng_time_zone: Europe/Berlin
 paperlessng_consumer_polling: 0
+paperlessng_consumer_inotify_wait_modified_delay: 0.1
 paperlessng_consumer_delete_duplicates: False
 paperlessng_consumer_recursive: False
 paperlessng_consumer_subdirs_as_tags: False

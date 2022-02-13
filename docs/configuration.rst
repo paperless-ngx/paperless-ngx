@@ -533,6 +533,13 @@ PAPERLESS_CONSUMER_POLLING=<num>
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
+PAPERLESS_CONSUMER_INOTIFY_WAIT_MODIFIED_DELAY=<float>
+		If paperless consumes a file and get a "finished" event with ``inotify``,
+		the file might get picked up by the scanner again to write additional content.
+		Specify a wait delay in seconds here to make paperless wait for changes to the file
+		so that it can continue consuming that same file.
+
+		Defaults to 0.1, waiting for 100 milliseconds.
 
 PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>
     When the consumer detects a duplicate document, it will not touch the
