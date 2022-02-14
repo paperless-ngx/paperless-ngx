@@ -29,6 +29,8 @@ Physical scanners
 | Brother | `MFC-J6930DW`_ | yes |     |     |      |          |`ayounggun`_    |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
 | Brother | `MFC-L5850DW`_ | yes |     |     | yes  |          |`holzhannes`_   |
++---------+----------------+-----+-----+-----+------+---------------------------+
+| Brother | `MFC-L2750DW`_ | yes |     | yes | yes  |          |`muued`_        |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
 | Brother | `MFC-J5910DW`_ | yes |     |     |      |          |`bmsleight`_    |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
@@ -44,6 +46,7 @@ Physical scanners
 +---------+----------------+-----+-----+-----+------+----------+----------------+
 
 .. _MFC-L5850DW: https://www.brother-usa.com/products/mfcl5850dw
+.. _MFC-L2750DW: https://www.brother.de/drucker/laserdrucker/mfc-l2750dw
 .. _ADS-1700W: https://www.brother-usa.com/products/ads1700w
 .. _ADS-1600W: https://www.brother-usa.com/products/ads1600w
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
@@ -67,6 +70,7 @@ Physical scanners
 .. _holzhannes: https://github.com/holzhannes
 .. _ytzelf: https://github.com/ytzelf
 .. _Unkn0wnCat: https://github.com/Unkn0wnCat
+.. _muued: https://github.com/muued
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
 
