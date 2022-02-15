@@ -58,12 +58,12 @@
 
                         <app-input-text #inputTitle i18n-title title="Title" formControlName="title" [error]="error?.title"></app-input-text>
                         <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
-                        <app-input-date-time i18n-titleDate titleDate="Date created" formControlName="created"></app-input-date-time>
+                        <app-input-date i18n-title title="Date created" formControlName="created" [error]="error?.created"></app-input-date>
                         <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
-                            (createNew)="createCorrespondent()"></app-input-select>
+                            (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents"></app-input-select>
                         <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
-                            (createNew)="createDocumentType()"></app-input-select>
-                        <app-input-tags formControlName="tags"></app-input-tags>
+                            (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types"></app-input-select>
+                        <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags"></app-input-tags>
 
                     </ng-template>
                 </li>
@@ -139,12 +139,12 @@
                 <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
             </div>
             <ng-template #nativePdfViewer>
-                <object [data]="previewUrl | safe" type="application/pdf" class="preview-sticky" width="100%"></object>
+                <object [data]="previewUrl | safe" class="preview-sticky" width="100%"></object>
             </ng-template>
         </ng-container>
         <ng-container *ngIf="getContentType() == 'text/plain'">
             <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky" width="100%"></object>
         </ng-container>
-          
+
     </div>
 </div>

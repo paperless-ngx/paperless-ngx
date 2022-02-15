@@ -50,6 +50,14 @@ class MailAccount(models.Model):
         _("password"),
         max_length=256)
 
+    character_set = models.CharField(
+        _("character set"),
+        max_length=256,
+        default="UTF-8",
+        help_text=_("The character set to use when communicating with the "
+                    "mail server, such as 'UTF-8' or 'US-ASCII'.")
+    )
+
     def __str__(self):
         return self.name
 
@@ -122,7 +130,9 @@ class MailRule(models.Model):
 
     folder = models.CharField(
         _("folder"),
-        default='INBOX', max_length=256)
+        default='INBOX', max_length=256,
+        help_text=_("Subfolders must be separated by dots.")
+    )
 
     filter_from = models.CharField(
         _("filter from"),
@@ -166,7 +176,8 @@ class MailRule(models.Model):
         max_length=256, blank=True, null=True,
         help_text=_("Additional parameter for the action selected above, "
                     "i.e., "
-                    "the target folder of the move to folder action.")
+                    "the target folder of the move to folder action. "
+                    "Subfolders must be separated by dots.")
     )
 
     assign_title_from = models.PositiveIntegerField(

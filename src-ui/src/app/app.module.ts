@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateAdapter, NgbDateParserFormatter, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DocumentListComponent } from './components/document-list/document-list.component';
 import { DocumentDetailComponent } from './components/document-detail/document-detail.component';
@@ -21,8 +21,6 @@ import { CorrespondentEditDialogComponent } from './components/manage/correspond
 import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
 import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component';
 import { TagComponent } from './components/common/tag/tag.component';
-import { SearchComponent } from './components/search/search.component';
-import { ResultHighlightComponent } from './components/search/result-highlight/result-highlight.component';
 import { PageHeaderComponent } from './components/common/page-header/page-header.component';
 import { AppFrameComponent } from './components/app-frame/app-frame.component';
 import { ToastsComponent } from './components/common/toasts/toasts.component';
@@ -39,7 +37,6 @@ import { SelectComponent } from './components/common/input/select/select.compone
 import { CheckComponent } from './components/common/input/check/check.component';
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { DateTimeComponent } from './components/common/input/date-time/date-time.component';
 import { TagsComponent } from './components/common/input/tags/tags.component';
 import { SortableDirective } from './directives/sortable.directive';
 import { CookieService } from 'ngx-cookie-service';
@@ -60,14 +57,41 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { NumberComponent } from './components/common/input/number/number.component';
 import { SafePipe } from './pipes/safe.pipe';
 import { CustomDatePipe } from './pipes/custom-date.pipe';
+import { DateComponent } from './components/common/input/date/date.component';
+import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter';
+import { LocalizedDateParserFormatter } from './utils/ngb-date-parser-formatter';
+import { ApiVersionInterceptor } from './interceptors/api-version.interceptor';
+import { ColorSliderModule } from 'ngx-color/slider';
+import { ColorComponent } from './components/common/input/color/color.component';
+import { DocumentAsnComponent } from './components/document-asn/document-asn.component';
 
 import localeFr from '@angular/common/locales/fr';
 import localeNl from '@angular/common/locales/nl';
 import localeDe from '@angular/common/locales/de';
+import localePt from '@angular/common/locales/pt';
+import localeIt from '@angular/common/locales/it';
+import localeEnGb from '@angular/common/locales/en-GB';
+import localeRo from '@angular/common/locales/ro';
+import localeRu from '@angular/common/locales/ru';
+import localeEs from '@angular/common/locales/es';
+import localePl from '@angular/common/locales/pl';
+import localeSv from '@angular/common/locales/sv';
+import localeLb from '@angular/common/locales/lb';
+
 
 registerLocaleData(localeFr)
 registerLocaleData(localeNl)
 registerLocaleData(localeDe)
+registerLocaleData(localePt, "pt-BR")
+registerLocaleData(localePt, "pt-PT")
+registerLocaleData(localeIt)
+registerLocaleData(localeEnGb)
+registerLocaleData(localeRo)
+registerLocaleData(localeRu)
+registerLocaleData(localeEs)
+registerLocaleData(localePl)
+registerLocaleData(localeSv)
+registerLocaleData(localeLb)
 
 @NgModule({
   declarations: [
@@ -86,8 +110,6 @@ registerLocaleData(localeDe)
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
     TagComponent,
-    SearchComponent,
-    ResultHighlightComponent,
     PageHeaderComponent,
     AppFrameComponent,
     ToastsComponent,
@@ -102,7 +124,6 @@ registerLocaleData(localeDe)
     SelectComponent,
     CheckComponent,
     SaveViewConfigDialogComponent,
-    DateTimeComponent,
     TagsComponent,
     SortableDirective,
     SavedViewWidgetComponent,
@@ -118,7 +139,10 @@ registerLocaleData(localeDe)
     SelectDialogComponent,
     NumberComponent,
     SafePipe,
-    CustomDatePipe
+    CustomDatePipe,
+    DateComponent,
+    ColorComponent,
+    DocumentAsnComponent
   ],
   imports: [
     BrowserModule,
@@ -130,7 +154,8 @@ registerLocaleData(localeDe)
     NgxFileDropModule,
     InfiniteScrollModule,
     PdfViewerModule,
-    NgSelectModule
+    NgSelectModule,
+    ColorSliderModule
   ],
   providers: [
     DatePipe,
@@ -138,9 +163,15 @@ registerLocaleData(localeDe)
       provide: HTTP_INTERCEPTORS,
       useClass: CsrfInterceptor,
       multi: true
+    },{
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiVersionInterceptor,
+      multi: true
     },
     FilterPipe,
-    DocumentTitlePipe
+    DocumentTitlePipe,
+    {provide: NgbDateAdapter, useClass: ISODateTimeAdapter},
+    {provide: NgbDateParserFormatter, useClass: LocalizedDateParserFormatter}
   ],
   bootstrap: [AppComponent]
 })

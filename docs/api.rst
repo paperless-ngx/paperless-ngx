@@ -147,93 +147,57 @@ The REST api provides three different forms of authentication.
 Searching for documents
 #######################
 
-Paperless-ng offers API endpoints for full text search. These are as follows:
+Full text searching is available on the ``/api/documents/`` endpoint. Two specific
+query parameters cause the API to return full text search results:
 
-``/api/search/``
-================
+*   ``/api/documents/?query=your%20search%20query``: Search for a document using a full text query.
+    For details on the syntax, see :ref:`basic-usage_searching`.
 
-Get search results based on a query.
+*   ``/api/documents/?more_like=1234``: Search for documents similar to the document with id 1234.
 
-Query parameters:
+Pagination works exactly the same as it does for normal requests on this endpoint.
 
-*   ``query``: The query string. See
-    `here <https://whoosh.readthedocs.io/en/latest/querylang.html>`_
-    for details on the syntax.
-*   ``page``: Specify the page you want to retrieve. Each page
-    contains 10 search results and the first page is ``page=1``, which
-    is the default if this is omitted.
+Certain limitations apply to full text queries:
 
-Result list object returned by the endpoint:
+*   Results are always sorted by search score. The results matching the query best will show up first.
 
-.. code:: json
+*   Only a small subset of filtering parameters are supported.
+
+Furthermore, each returned document has an additional ``__search_hit__`` attribute with various information
+about the search results:
+
+.. code::
 
     {
-        "count": 1,
-        "page": 1,
-        "page_count": 1,
-        "corrected_query": "",
+        "count": 31,
+        "next": "http://localhost:8000/api/documents/?page=2&query=test",
+        "previous": null,
         "results": [
 
+            ...
+
+            {
+                "id": 123,
+                "title": "title",
+                "content": "content",
+
+                ...
+
+                "__search_hit__": {
+                    "score": 0.343,
+                    "highlights": "text <span class=\"match\">Test</span> text",
+                    "rank": 23
+                }
+            },
+
+            ...
+
         ]
     }
 
-*   ``count``: The approximate total number of results.
-*   ``page``: The page returned to you. This might be different from
-    the page you requested, if you requested a page that is behind
-    the last page. In that case, the last page is returned.
-*   ``page_count``: The total number of pages.
-*   ``corrected_query``: Corrected version of the query string. Can be null.
-    If not null, can be used verbatim to start a new query.
-*   ``results``: A list of result objects on the current page.
-
-Result object:
-
-.. code:: json
-
-    {
-        "id": 1,
-        "highlights": [
-
-        ],
-        "score": 6.34234,
-        "rank": 23,
-        "document": {
-
-        }
-    }
-
-*   ``id``: the primary key of the found document
-*   ``highlights``: an object containing parsable highlights for the result.
-    See below.
-*   ``score``: The score assigned to the document. A higher score indicates a
-    better match with the query. Search results are sorted descending by score.
-*   ``rank``: the position of the document within the entire search results list.
-*   ``document``: The full json of the document, as returned by
-    ``/api/documents/<id>/``.
-
-Highlights object:
-
-Highlights are provided as a list of fragments. A fragment is a longer section of
-text from the original document.
-Each fragment contains a list of strings, and some of them are marked as a highlight.
-
-.. code:: json
-
-    [
-        [
-            {"text": "This is a sample text with a ", "highlight": false},
-            {"text": "highlighted", "highlight": true},
-            {"text": " word.", "highlight": false}
-        ],
-        [
-            {"text": "Another", "highlight": true},
-            {"text": " fragment with a highlight.", "highlight": false}
-        ]
-    ]
-
-A client may use this example to produce the following output:
-
-... This is a sample text with a **highlighted** word. ... **Another** fragment with a highlight. ...
+*   ``score`` is an indication how well this document matches the query relative to the other search results.
+*   ``highlights`` is an excerpt from the document content and highlights the search terms with ``<span>`` tags as shown above.
+*   ``rank`` is the index of the search results. The first result will have rank 0.
 
 ``/api/search/autocomplete/``
 =============================
@@ -284,3 +248,53 @@ The endpoint supports the following optional form fields:
 The endpoint will immediately return "OK" if the document consumption process
 was started successfully. No additional status information about the consumption
 process itself is available, since that happens in a different process.
+
+
+.. _api-versioning:
+
+API Versioning
+##############
+
+The REST API is versioned since Paperless-ng 1.3.0.
+
+* Versioning ensures that changes to the API don't break older clients.
+* Clients specify the specific version of the API they wish to use with every request and Paperless will handle the request using the specified API version.
+* Even if the underlying data model changes, older API versions will always serve compatible data.
+* If no version is specified, Paperless will serve version 1 to ensure compatibility with older clients that do not request a specific API version.
+
+API versions are specified by submitting an additional HTTP ``Accept`` header with every request:
+
+.. code::
+
+    Accept: application/json; version=6
+
+If an invalid version is specified, Paperless 1.3.0 will respond with "406 Not Acceptable" and an error message in the body.
+Earlier versions of Paperless will serve API version 1 regardless of whether a version is specified via the ``Accept`` header.
+
+If a client wishes to verify whether it is compatible with any given server, the following procedure should be performed:
+
+1.  Perform an *authenticated* request against any API endpoint. If the server is on version 1.3.0 or newer, the server will
+    add two custom headers to the response:
+
+    .. code::
+
+        X-Api-Version: 2
+        X-Version: 1.3.0
+
+2.  Determine whether the client is compatible with this server based on the presence/absence of these headers and their values if present.
+
+
+API Changelog
+=============
+
+Version 1
+---------
+
+Initial API version.
+
+Version 2
+---------
+
+* Added field ``Tag.color``. This read/write string field contains a hex color such as ``#a6cee3``.
+* Added read-only field ``Tag.text_color``. This field contains the text color to use for a specific tag, which is either black or white depending on the brightness of ``Tag.color``.
+* Removed field ``Tag.colour``.

@@ -1,13 +1,17 @@
-import { AfterViewInit, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
+import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
 import { SortableDirective, SortEvent } from 'src/app/directives/sortable.directive';
+import { ConsumerStatusService } from 'src/app/services/consumer-status.service';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { DOCUMENT_SORT_FIELDS } from 'src/app/services/rest/document.service';
+import { DOCUMENT_SORT_FIELDS, DOCUMENT_SORT_FIELDS_FULLTEXT } from 'src/app/services/rest/document.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
-import { Toast, ToastService } from 'src/app/services/toast.service';
+import { ToastService } from 'src/app/services/toast.service';
 import { FilterEditorComponent } from './filter-editor/filter-editor.component';
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component';
 
@@ -16,7 +20,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss']
 })
-export class DocumentListComponent implements OnInit {
+export class DocumentListComponent implements OnInit, OnDestroy {
 
   constructor(
     public list: DocumentListViewService,
@@ -24,7 +28,9 @@ export class DocumentListComponent implements OnInit {
     public route: ActivatedRoute,
     private router: Router,
     private toastService: ToastService,
-    private modalService: NgbModal) { }
+    private modalService: NgbModal,
+    private consumerStatusService: ConsumerStatusService
+  ) { }
 
   @ViewChild("filterEditor")
   private filterEditor: FilterEditorComponent
@@ -33,18 +39,20 @@ export class DocumentListComponent implements OnInit {
 
   displayMode = 'smallCards' // largeCards, smallCards, details
 
-  filterRulesModified: boolean = false
+  unmodifiedFilterRules: FilterRule[] = []
+
+  private consumptionFinishedSubscription: Subscription
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
   }
 
   getTitle() {
-    return this.list.savedViewTitle || $localize`Documents`
+    return this.list.activeSavedViewTitle || $localize`Documents`
   }
 
   getSortFields() {
-    return DOCUMENT_SORT_FIELDS
+    return isFullTextFilterRule(this.list.filterRules) ? DOCUMENT_SORT_FIELDS_FULLTEXT : DOCUMENT_SORT_FIELDS
   }
 
   onSort(event: SortEvent) {
@@ -63,37 +71,52 @@ export class DocumentListComponent implements OnInit {
     if (localStorage.getItem('document-list:displayMode') != null) {
       this.displayMode = localStorage.getItem('document-list:displayMode')
     }
+    this.consumptionFinishedSubscription = this.consumerStatusService.onDocumentConsumptionFinished().subscribe(() => {
+      this.list.reload()
+    })
     this.route.paramMap.subscribe(params => {
-      this.list.clear()
       if (params.has('id')) {
         this.savedViewService.getCached(+params.get('id')).subscribe(view => {
           if (!view) {
             this.router.navigate(["404"])
             return
           }
-          this.list.savedView = view
+          this.list.activateSavedView(view)
           this.list.reload()
-          this.rulesChanged()
+          this.unmodifiedFilterRules = view.filter_rules
         })
       } else {
-        this.list.savedView = null
+        this.list.activateSavedView(null)
         this.list.reload()
-        this.rulesChanged()
+        this.unmodifiedFilterRules = []
       }
     })
   }
 
+  ngOnDestroy() {
+    if (this.consumptionFinishedSubscription) {
+      this.consumptionFinishedSubscription.unsubscribe()
+    }
+  }
+
   loadViewConfig(view: PaperlessSavedView) {
-    this.list.load(view)
+    this.list.loadSavedView(view)
     this.list.reload()
-    this.rulesChanged()
   }
 
   saveViewConfig() {
-    this.savedViewService.update(this.list.savedView).subscribe(result => {
-      this.toastService.showInfo($localize`View "${this.list.savedView.name}" saved successfully.`)
-    })
-
+    if (this.list.activeSavedViewId != null) {
+      let savedView: PaperlessSavedView = {
+        id: this.list.activeSavedViewId,
+        filter_rules: this.list.filterRules,
+        sort_field: this.list.sortField,
+        sort_reverse: this.list.sortReverse
+      }
+      this.savedViewService.patch(savedView).subscribe(result => {
+        this.toastService.showInfo($localize`View "${this.list.activeSavedViewTitle}" saved successfully.`)
+        this.unmodifiedFilterRules = this.list.filterRules
+      })
+    }
   }
 
   saveViewConfigAs() {
@@ -101,7 +124,7 @@ export class DocumentListComponent implements OnInit {
     modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
     modal.componentInstance.saveClicked.subscribe(formValue => {
       modal.componentInstance.buttonsEnabled = false
-      let savedView = {
+      let savedView: PaperlessSavedView = {
         name: formValue.name,
         show_on_dashboard: formValue.showOnDashboard,
         show_in_sidebar: formValue.showInSideBar,
@@ -118,46 +141,6 @@ export class DocumentListComponent implements OnInit {
         modal.componentInstance.buttonsEnabled = true
       })
     })
-  }
-
-  resetFilters(): void {
-    this.filterRulesModified = false
-    if (this.list.savedViewId) {
-      this.savedViewService.getCached(this.list.savedViewId).subscribe(viewUntouched => {
-        this.list.filterRules = viewUntouched.filter_rules
-        this.list.reload()
-      })
-    } else {
-      this.list.filterRules = []
-      this.list.reload()
-    }
-  }
-
-  rulesChanged() {
-    let modified = false
-    if (this.list.savedView == null) {
-      modified = this.list.filterRules.length > 0 // documents list is modified if it has any filters
-    } else {
-      // compare savedView current filters vs original
-      this.savedViewService.getCached(this.list.savedViewId).subscribe(view => {
-        let filterRulesInitial = view.filter_rules
-
-        if (this.list.filterRules.length !== filterRulesInitial.length) modified = true
-        else {
-          modified = this.list.filterRules.some(rule => {
-            return (filterRulesInitial.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined)
-          })
-
-          if (!modified) {
-            // only check other direction if we havent already determined is modified
-            modified = filterRulesInitial.some(rule => {
-              this.list.filterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined
-            })
-          }
-        }
-      })
-    }
-    this.filterRulesModified = modified
   }
 
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
@@ -184,6 +167,10 @@ export class DocumentListComponent implements OnInit {
     setTimeout(() => {
       this.filterEditor.addDocumentType(documentTypeID)
     })
+  }
+
+  clickMoreLike(documentID: number) {
+    this.list.quickFilter([{rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString()}])
   }
 
   trackByDocumentId(index, item: PaperlessDocument) {

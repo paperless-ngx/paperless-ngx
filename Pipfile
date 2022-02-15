@@ -9,38 +9,48 @@ verify_ssl = true
 name = "piwheels"
 
 [packages]
-dateparser = "~=0.7.6"
-django = "~=3.1.3"
+dateparser = "~=1.0.0"
+django = "~=3.2"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=2.4.0"
 django-q = "~=1.3.4"
 djangorestframework = "~=3.12.2"
 filelock = "*"
-fuzzywuzzy = "*"
+fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
-pdftotext = "*"
+numpy = "~=1.20.0"
 pathvalidate = "*"
-# pinned to 8.1.0, since aarch64 wheels might not be available beyond that https://github.com/python-pillow/Pillow/issues/5202
-pillow = "==8.1.0"
-pikepdf = "~=2.2.5"
+pillow = "~=8.1"
+pikepdf = "~=2.5"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
-python-Levenshtein = "*"
 python-magic = "*"
 psycopg2-binary = "*"
 redis = "*"
-scikit-learn="~=0.24.0"
-whitenoise = "~=5.2.0"
-watchdog = "*"
+# Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
+scikit-learn="==0.24.0"
+whitenoise = "~=5.3.0"
+watchdog = "~=2.1.0"
 whoosh="~=2.7.4"
 inotifyrecursive = "~=0.3.4"
-ocrmypdf = "~=11.4.5"
+ocrmypdf = "~=12.3"
 tqdm = "*"
 tika = "*"
+# TODO: This will sadly also install daphne+dependencies,
+#  which an ASGI server we don't need. Adds about 15MB image size.
+channels = "~=3.0"
+channels-redis = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+concurrent-log-handler = "*"
+# uvloop 0.15+ incompatible with python 3.6
+uvloop = "~=0.15"
+cryptography = "~=3.4"
+"pdfminer.six" = "*"
+"backports.zoneinfo" = "*"
 
 [dev-packages]
 coveralls = "*"

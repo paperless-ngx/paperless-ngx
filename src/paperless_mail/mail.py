@@ -75,9 +75,9 @@ def get_rule_action(rule):
 
 def make_criterias(rule):
     maximum_age = date.today() - timedelta(days=rule.maximum_age)
-    criterias = {
-        "date_gte": maximum_age
-    }
+    criterias = {}
+    if rule.maximum_age > 0:
+        criterias["date_gte"] = maximum_age
     if rule.filter_from:
         criterias["from_"] = rule.filter_from
     if rule.filter_subject:
@@ -101,6 +101,8 @@ def get_mailbox(server, port, security):
 
 
 class MailAccountHandler(LoggingMixin):
+
+    logging_name = "paperless_mail"
 
     def _correspondent_from_name(self, name):
         try:
@@ -198,8 +200,10 @@ class MailAccountHandler(LoggingMixin):
             f"{str(AND(**criterias))}")
 
         try:
-            messages = M.fetch(criteria=AND(**criterias),
-                               mark_seen=False, charset='UTF-8')
+            messages = M.fetch(
+                criteria=AND(**criterias),
+                mark_seen=False,
+                charset=rule.account.character_set)
         except Exception:
             raise MailError(
                 f"Rule {rule}: Error while fetching folder {rule.folder}")

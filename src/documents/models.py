@@ -16,7 +16,6 @@ from django.utils.timezone import is_aware
 
 from django.utils.translation import gettext_lazy as _
 
-from documents.file_handling import archive_name_from_filename
 from documents.parsers import get_default_file_extension
 
 
@@ -66,10 +65,6 @@ class MatchingModel(models.Model):
 
 class Correspondent(MatchingModel):
 
-    # This regex is probably more restrictive than it needs to be, but it's
-    # better safe than sorry.
-    SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
-
     class Meta:
         ordering = ("name",)
         verbose_name = _("correspondent")
@@ -78,25 +73,11 @@ class Correspondent(MatchingModel):
 
 class Tag(MatchingModel):
 
-    COLOURS = (
-        (1, "#a6cee3"),
-        (2, "#1f78b4"),
-        (3, "#b2df8a"),
-        (4, "#33a02c"),
-        (5, "#fb9a99"),
-        (6, "#e31a1c"),
-        (7, "#fdbf6f"),
-        (8, "#ff7f00"),
-        (9, "#cab2d6"),
-        (10, "#6a3d9a"),
-        (11, "#b15928"),
-        (12, "#000000"),
-        (13, "#cccccc")
-    )
-
-    colour = models.PositiveIntegerField(
+    color = models.CharField(
         _("color"),
-        choices=COLOURS, default=1)
+        max_length=7,
+        default="#a6cee3"
+    )
 
     is_inbox_tag = models.BooleanField(
         _("is inbox tag"),
@@ -208,8 +189,19 @@ class Document(models.Model):
         max_length=1024,
         editable=False,
         default=None,
+        unique=True,
         null=True,
         help_text=_("Current filename in storage")
+    )
+
+    archive_filename = models.FilePathField(
+        _("archive filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current archive filename in storage")
     )
 
     archive_serial_number = models.IntegerField(
@@ -256,16 +248,18 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
-    def archive_path(self):
-        if self.filename:
-            fname = archive_name_from_filename(self.filename)
-        else:
-            fname = "{:07}.pdf".format(self.pk)
+    def has_archive_version(self):
+        return self.archive_filename is not None
 
-        return os.path.join(
-            settings.ARCHIVE_DIR,
-            fname
-        )
+    @property
+    def archive_path(self):
+        if self.has_archive_version:
+            return os.path.join(
+                settings.ARCHIVE_DIR,
+                str(self.archive_filename)
+            )
+        else:
+            return None
 
     @property
     def archive_file(self):
@@ -361,7 +355,10 @@ class SavedView(models.Model):
 
     sort_field = models.CharField(
         _("sort field"),
-        max_length=128)
+        max_length=128,
+        null=True,
+        blank=True
+    )
     sort_reverse = models.BooleanField(
         _("sort reverse"),
         default=False)
@@ -387,7 +384,11 @@ class SavedViewFilterRule(models.Model):
         (15, _("modified before")),
         (16, _("modified after")),
         (17, _("does not have tag")),
-        (19, _("has tags in")),
+        (18, _("does not have ASN")),
+        (19, _("title or content contains")),
+        (20, _("fulltext query")),
+        (21, _("more like this")),
+        (22, _("has tags in"))
     ]
 
     saved_view = models.ForeignKey(

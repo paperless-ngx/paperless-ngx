@@ -1,18 +1,52 @@
 <app-widget-frame title="Upload new documents" i18n-title>
-
+  <div header-buttons>
+    <a *ngIf="getStatusSuccess().length > 0" (click)="dismissCompleted()" [routerLink]="" >
+      <span i18n="This button dismisses all status messages about processed documents on the dashboard (failed and successful)">Dismiss completed</span>&nbsp;
+      <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
+        <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7l-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
+        <path d="M5.354 7.146l.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>
+      </svg>
+    </a>
+  </div>
   <div content>
     <form>
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
-        multiple="true" contentClassName="justify-content-center d-flex align-items-center p-5" [showBrowseBtn]=true
+        multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
         browseBtnClassName="btn btn-sm btn-outline-primary ml-2" i18n-dropZoneLabel i18n-browseBtnLabel>
-
       </ngx-file-drop>
     </form>
-    <div *ngIf="uploadVisible" class="mt-3">
-      <p i18n>{uploadStatus.length, plural, =1 {Uploading file...} =other {Uploading {{uploadStatus.length}} files...}}</p>
-      <ngb-progressbar [value]="loadedSum" [max]="totalSum" [striped]="true" [animated]="uploadStatus.length > 0">
-      </ngb-progressbar>
+    <p class="mt-3" *ngIf="getStatus().length > 0">{{getStatusSummary()}}</p>
+    <div *ngFor="let status of getStatus()">
+      <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
+    </div>
+    <div *ngIf="getStatusHidden().length" class="alerts-hidden">
+      <p *ngIf="!alertsExpanded" class="mt-3 mb-0 text-center">
+        <span i18n="This is shown as a summary line when there are more than 5 document in the processing pipeline.">{getStatusHidden().length, plural, =1 {One more document} other {{{getStatusHidden().length}} more documents}}</span>
+        &nbsp;&bull;&nbsp;
+        <a [routerLink]="" (click)="alertsExpanded = !alertsExpanded" aria-controls="hiddenAlerts" [attr.aria-expanded]="alertsExpanded" i18n>Show all</a>
+      </p>
+      <div #hiddenAlerts="ngbCollapse" [(ngbCollapse)]="!alertsExpanded">
+        <div *ngFor="let status of getStatusHidden()">
+          <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
+        </div>
+      </div>
     </div>
   </div>
 </app-widget-frame>
+
+<ng-template #consumerAlert let-status>
+  <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
+    <h6 class="alert-heading">{{status.filename}}</h6>
+    <p class="mb-0 pb-1" *ngIf="!isFinished(status) || (isFinished(status) && !status.documentId)">{{status.message}}</p>
+    <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
+    <div *ngIf="isFinished(status)">
+      <button *ngIf="status.documentId" class="btn btn-sm btn-outline-primary btn-open" routerLink="/documents/{{status.documentId}}" (click)="dismiss(status)">
+        <small i18n>Open document</small>
+        <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+        </svg>
+      </button>
+    </div>
+  </ngb-alert>
+</ng-template>

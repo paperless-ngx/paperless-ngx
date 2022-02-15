@@ -16,6 +16,7 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   constructor() {
     super()
+    this.addItemRef = this.addItem.bind(this)
    }
 
   @Input()
@@ -30,11 +31,51 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   allowNull: boolean = false
 
+  @Input()
+  suggestions: number[]
+
   @Output()
-  createNew = new EventEmitter()
-  
-  showPlusButton(): boolean {
+  createNew = new EventEmitter<string>()
+
+  public addItemRef: (name) => void
+
+  private _lastSearchTerm: string
+
+  get allowCreateNew(): boolean {
     return this.createNew.observers.length > 0
+  }
+
+  getSuggestions() {
+    if (this.suggestions && this.items) {
+      return this.suggestions.filter(id => id != this.value).map(id => this.items.find(item => item.id == id))
+    } else {
+      return []
+    }
+  }
+
+  addItem(name: string) {
+    if (name) this.createNew.next(name)
+    else this.createNew.next(this._lastSearchTerm)
+    this.clearLastSearchTerm()
+  }
+
+  clickNew() {
+    this.createNew.next(this._lastSearchTerm)
+    this.clearLastSearchTerm()
+  }
+
+  clearLastSearchTerm() {
+    this._lastSearchTerm = null
+  }
+
+  onSearch($event) {
+    this._lastSearchTerm = $event.term
+  }
+
+  onBlur() {
+    setTimeout(() => {
+      this.clearLastSearchTerm()
+    }, 3000);
   }
 
 }
