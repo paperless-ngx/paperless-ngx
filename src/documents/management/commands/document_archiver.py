@@ -16,12 +16,12 @@ from whoosh.writing import AsyncWriter
 
 from documents.models import Document
 from ... import index
-from ...file_handling import create_source_path_directory
-from ...mixins import Renderable
+from ...file_handling import create_source_path_directory, \
+    generate_unique_filename
 from ...parsers import get_parser_class_for_mime_type
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.management.archiver")
 
 
 def handle_document(document_id):
@@ -31,38 +31,57 @@ def handle_document(document_id):
 
     parser_class = get_parser_class_for_mime_type(mime_type)
 
+    if not parser_class:
+        logger.error(f"No parser found for mime type {mime_type}, cannot "
+                     f"archive document {document} (ID: {document_id})")
+        return
+
     parser = parser_class(logging_group=uuid.uuid4())
 
     try:
-        parser.parse(document.source_path, mime_type)
+        parser.parse(
+            document.source_path,
+            mime_type,
+            document.get_public_filename())
+
+        thumbnail = parser.get_optimised_thumbnail(
+            document.source_path,
+            mime_type,
+            document.get_public_filename()
+        )
 
         if parser.get_archive_path():
             with transaction.atomic():
                 with open(parser.get_archive_path(), 'rb') as f:
                     checksum = hashlib.md5(f.read()).hexdigest()
-                # i'm going to save first so that in case the file move
+                # I'm going to save first so that in case the file move
                 # fails, the database is rolled back.
-                # we also don't use save() since that triggers the filehandling
+                # We also don't use save() since that triggers the filehandling
                 # logic, and we don't want that yet (file not yet in place)
+                document.archive_filename = generate_unique_filename(
+                    document, archive_filename=True)
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
-                    content=parser.get_text()
+                    content=parser.get_text(),
+                    archive_filename=document.archive_filename
                 )
                 with FileLock(settings.MEDIA_LOCK):
                     create_source_path_directory(document.archive_path)
                     shutil.move(parser.get_archive_path(),
                                 document.archive_path)
+                    shutil.move(thumbnail, document.thumbnail_path)
 
-        with AsyncWriter(index.open_index()) as writer:
-            index.update_document(writer, document)
+            with index.open_index_writer() as writer:
+                index.update_document(writer, document)
 
     except Exception as e:
-        logger.error(f"Error while parsing document {document}: {str(e)}")
+        logger.exception(f"Error while parsing document {document} "
+                         f"(ID: {document_id})")
     finally:
         parser.cleanup()
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Using the current classification model, assigns correspondents, tags
@@ -70,10 +89,6 @@ class Command(Renderable, BaseCommand):
         back-tag all previously indexed documents with metadata created (or
         modified) after their initial import.
     """.replace("    ", "")
-
-    def __init__(self, *args, **kwargs):
-        self.verbosity = 0
-        BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -91,6 +106,12 @@ class Command(Renderable, BaseCommand):
             help="Specify the ID of a document, and this command will only "
                  "run on this specific document."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def handle(self, *args, **options):
 
@@ -106,7 +127,7 @@ class Command(Renderable, BaseCommand):
         document_ids = list(map(
             lambda doc: doc.id,
             filter(
-                lambda d: overwrite or not d.archive_checksum,
+                lambda d: overwrite or not d.has_archive_version,
                 documents
             )
         ))
@@ -125,7 +146,8 @@ class Command(Renderable, BaseCommand):
                         handle_document,
                         document_ids
                     ),
-                    total=len(document_ids)
+                    total=len(document_ids),
+                    disable=options['no_progress_bar']
                 ))
         except KeyboardInterrupt:
             print("Aborting...")

@@ -1,5 +1,6 @@
 import os
 import shutil
+import stat
 
 from django.conf import settings
 from django.core.checks import Error, Warning, register
@@ -16,16 +17,29 @@ writeable_hint = (
 def path_check(var, directory):
     messages = []
     if directory:
-        if not os.path.exists(directory):
+        if not os.path.isdir(directory):
             messages.append(Error(
                 exists_message.format(var),
                 exists_hint.format(directory)
             ))
-        elif not os.access(directory, os.W_OK | os.X_OK):
-            messages.append(Error(
-                writeable_message.format(var),
-                writeable_hint.format(directory)
-            ))
+        else:
+            test_file = os.path.join(
+                directory, f'__paperless_write_test_{os.getpid()}__'
+            )
+            try:
+                with open(test_file, 'w'):
+                    pass
+            except PermissionError:
+                messages.append(Error(
+                    writeable_message.format(var),
+                    writeable_hint.format(
+                        f'\n{stat.filemode(os.stat(directory).st_mode)} '
+                        f'{directory}\n')
+                ))
+            finally:
+                if os.path.isfile(test_file):
+                    os.remove(test_file)
+
     return messages
 
 

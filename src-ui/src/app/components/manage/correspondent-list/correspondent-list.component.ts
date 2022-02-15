@@ -18,7 +18,7 @@ export class CorrespondentListComponent extends GenericListComponent<PaperlessCo
   constructor(correspondentsService: CorrespondentService, modalService: NgbModal,
     private list: DocumentListViewService,
     toastService: ToastService
-  ) { 
+  ) {
     super(correspondentsService,modalService,CorrespondentEditDialogComponent, toastService)
   }
 

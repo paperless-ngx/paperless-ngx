@@ -8,19 +8,11 @@
     <div class="modal-body">
       <app-input-text i18n-title title="Name" formControlName="name" [error]="error?.name"></app-input-text>
 
-
-      <div class="form-group paperless-input-select">
-        <label for="colour" i18n>Color</label>
-        <ng-select name="colour" formControlName="colour" [items]="getColours()" bindValue="id" bindLabel="name" [clearable]="false">
-          <ng-template ng-option-tmp ng-label-tmp let-item="item">
-            <span class="badge" [style.background]="item.value" [style.color]="item.textColor">{{item.name}}</span>
-          </ng-template>
-        </ng-select>
-      </div>
+      <app-input-color i18n-title title="Color" formControlName="color" [error]="error?.color"></app-input-color>
 
       <app-input-check i18n-title title="Inbox tag" formControlName="is_inbox_tag" i18n-hint hint="Inbox tags are automatically assigned to all consumed documents."></app-input-check>
       <app-input-select i18n-title title="Matching algorithm" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></app-input-select>
-      <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match"></app-input-text>
+      <app-input-text *ngIf="patternRequired" i18n-title title="Matching pattern" formControlName="match" [error]="error?.match"></app-input-text>
       <app-input-check *ngIf="patternRequired" i18n-title title="Case insensitive" formControlName="is_insensitive"></app-input-check>
     </div>
     <div class="modal-footer">

@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { from, Observable, Subscription } from 'rxjs';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
@@ -10,13 +10,15 @@ import { SearchService } from 'src/app/services/rest/search.service';
 import { environment } from 'src/environments/environment';
 import { DocumentDetailComponent } from '../document-detail/document-detail.component';
 import { Meta } from '@angular/platform-browser';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type';
 
 @Component({
   selector: 'app-app-frame',
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss']
 })
-export class AppFrameComponent implements OnInit, OnDestroy {
+export class AppFrameComponent implements OnInit {
 
   constructor (
     public router: Router,
@@ -24,6 +26,7 @@ export class AppFrameComponent implements OnInit, OnDestroy {
     private openDocumentsService: OpenDocumentsService,
     private searchService: SearchService,
     public savedViewService: SavedViewService,
+    private list: DocumentListViewService,
     private meta: Meta
     ) { }
 
@@ -37,9 +40,9 @@ export class AppFrameComponent implements OnInit, OnDestroy {
 
   searchField = new FormControl('')
 
-  openDocuments: PaperlessDocument[] = []
-
-  openDocumentsSubscription: Subscription
+  get openDocuments(): PaperlessDocument[] {
+    return this.openDocumentsService.getOpenDocuments()
+  }
 
   searchAutoComplete = (text$: Observable<string>) =>
     text$.pipe(
@@ -72,7 +75,20 @@ export class AppFrameComponent implements OnInit, OnDestroy {
 
   search() {
     this.closeMenu()
-    this.router.navigate(['search'], {queryParams: {query: this.searchField.value}})
+    this.list.quickFilter([{rule_type: FILTER_FULLTEXT_QUERY, value: this.searchField.value}])
+  }
+
+  closeDocument(d: PaperlessDocument) {
+    this.closeMenu()
+    this.openDocumentsService.closeDocument(d)
+
+    let route = this.activatedRoute.snapshot
+    while (route.firstChild) {
+      route = route.firstChild
+    }
+    if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
+      this.router.navigate([""])
+    }
   }
 
   closeAll() {
@@ -94,13 +110,6 @@ export class AppFrameComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.openDocuments = this.openDocumentsService.getOpenDocuments()
-  }
-
-  ngOnDestroy() {
-    if (this.openDocumentsSubscription) {
-      this.openDocumentsSubscription.unsubscribe()
-    }
   }
 
   get displayName() {

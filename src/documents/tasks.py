@@ -6,11 +6,12 @@ from django.db.models.signals import post_save
 from whoosh.writing import AsyncWriter
 
 from documents import index, sanity_checker
-from documents.classifier import DocumentClassifier, \
-    IncompatibleClassifierVersionError
+from documents.classifier import DocumentClassifier, load_classifier
 from documents.consumer import Consumer, ConsumerError
-from documents.models import Document
-from documents.sanity_checker import SanityFailedError
+from documents.models import Document, Tag, DocumentType, Correspondent
+from documents.sanity_checker import SanityCheckFailedException
+
+logger = logging.getLogger("paperless.tasks")
 
 
 def index_optimize():
@@ -19,40 +20,45 @@ def index_optimize():
     writer.commit(optimize=True)
 
 
-def index_reindex():
+def index_reindex(progress_bar_disable=False):
     documents = Document.objects.all()
 
     ix = index.open_index(recreate=True)
 
     with AsyncWriter(ix) as writer:
-        for document in tqdm.tqdm(documents):
+        for document in tqdm.tqdm(documents, disable=progress_bar_disable):
             index.update_document(writer, document)
 
 
 def train_classifier():
-    classifier = DocumentClassifier()
+    if (not Tag.objects.filter(
+                matching_algorithm=Tag.MATCH_AUTO).exists() and
+        not DocumentType.objects.filter(
+            matching_algorithm=Tag.MATCH_AUTO).exists() and
+        not Correspondent.objects.filter(
+            matching_algorithm=Tag.MATCH_AUTO).exists()):
 
-    try:
-        # load the classifier, since we might not have to train it again.
-        classifier.reload()
-    except (OSError, EOFError, IncompatibleClassifierVersionError):
-        # This is what we're going to fix here.
+        return
+
+    classifier = load_classifier()
+
+    if not classifier:
         classifier = DocumentClassifier()
 
     try:
         if classifier.train():
-            logging.getLogger(__name__).info(
+            logger.info(
                 "Saving updated classifier model to {}...".format(
                     settings.MODEL_FILE)
             )
-            classifier.save_classifier()
+            classifier.save()
         else:
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "Training data unchanged."
             )
 
     except Exception as e:
-        logging.getLogger(__name__).error(
+        logger.warning(
             "Classifier error: " + str(e)
         )
 
@@ -62,7 +68,8 @@ def consume_file(path,
                  override_title=None,
                  override_correspondent_id=None,
                  override_document_type_id=None,
-                 override_tag_ids=None):
+                 override_tag_ids=None,
+                 task_id=None):
 
     document = Consumer().try_consume_file(
         path,
@@ -70,7 +77,9 @@ def consume_file(path,
         override_title=override_title,
         override_correspondent_id=override_correspondent_id,
         override_document_type_id=override_document_type_id,
-        override_tag_ids=override_tag_ids)
+        override_tag_ids=override_tag_ids,
+        task_id=task_id
+    )
 
     if document:
         return "Success. New document id {} created".format(
@@ -84,8 +93,15 @@ def consume_file(path,
 def sanity_check():
     messages = sanity_checker.check_sanity()
 
-    if len(messages) > 0:
-        raise SanityFailedError(messages)
+    messages.log_messages()
+
+    if messages.has_error():
+        raise SanityCheckFailedException(
+            "Sanity check failed with errors. See log.")
+    elif messages.has_warning():
+        return "Sanity check exited with warnings. See log."
+    elif len(messages) > 0:
+        return "Sanity check exited with infos. See log."
     else:
         return "No issues detected."
 

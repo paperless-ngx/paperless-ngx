@@ -10,6 +10,7 @@ import { LogsComponent } from './components/manage/logs/logs.component';
 import { SettingsComponent } from './components/manage/settings/settings.component';
 import { TagListComponent } from './components/manage/tag-list/tag-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import {DocumentAsnComponent} from "./components/document-asn/document-asn.component";
 import { SearchComponent } from './components/search/search.component';
 import { DirtyFormGuard } from './guards/dirty-form.guard';
 
@@ -19,8 +20,8 @@ const routes: Routes = [
     {path: 'dashboard', component: DashboardComponent },
     {path: 'documents', component: DocumentListComponent },
     {path: 'view/:id', component: DocumentListComponent },
-    {path: 'search', component: SearchComponent },
     {path: 'documents/:id', component: DocumentDetailComponent },
+    {path: 'asn/:id', component: DocumentAsnComponent },
     {path: 'tags', component: TagListComponent },
     {path: 'documenttypes', component: DocumentTypeListComponent },
     {path: 'correspondents', component: CorrespondentListComponent },
@@ -33,7 +34,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

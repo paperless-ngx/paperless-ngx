@@ -1,25 +1,38 @@
 <div class="form-group paperless-input-select">
   <label [for]="inputId">{{title}}</label>
-  <div [class.input-group]="showPlusButton()">
-    <ng-select name="inputId" [(ngModel)]="value"
-      [disabled]="disabled"
-      [style.color]="textColor"
-      [style.background]="backgroundColor"
-      [clearable]="allowNull"
-      [items]="items"
-      bindLabel="name"
-      bindValue="id"
-      (change)="onChange(value)"
-      (blur)="onTouched()">
-    </ng-select>
-
-    <div *ngIf="showPlusButton()" class="input-group-append">
-      <button class="btn btn-outline-secondary" type="button" (click)="createNew.emit()">
-        <svg class="buttonicon" fill="currentColor">
-          <use xlink:href="assets/bootstrap-icons.svg#plus" />
-        </svg>
-      </button>
+    <div [class.input-group]="allowCreateNew">
+      <ng-select name="inputId" [(ngModel)]="value"
+        [disabled]="disabled"
+        [style.color]="textColor"
+        [style.background]="backgroundColor"
+        [clearable]="allowNull"
+        [items]="items"
+        [addTag]="allowCreateNew && addItemRef"
+        addTagText="Add item"
+        i18n-addTagText="Used for both types and correspondents"
+        bindLabel="name"
+        bindValue="id"
+        (change)="onChange(value)"
+        (search)="onSearch($event)"
+        (focus)="clearLastSearchTerm()"
+        (clear)="clearLastSearchTerm()"
+        (blur)="onBlur()">
+      </ng-select>
+      <div *ngIf="allowCreateNew" class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" (click)="addItem()">
+          <svg class="buttonicon" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#plus" />
+          </svg>
+        </button>
+      </div>
     </div>
-  </div>
   <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+  <small *ngIf="getSuggestions().length > 0">
+    <span i18n>Suggestions:</span>&nbsp;
+    <ng-container *ngFor="let s of getSuggestions()">
+      <a (click)="value = s.id; onChange(value)" [routerLink]="">{{s.name}}</a>&nbsp;
+    </ng-container>
+
+
+  </small>
 </div>
