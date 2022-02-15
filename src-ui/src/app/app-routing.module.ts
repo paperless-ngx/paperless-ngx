@@ -11,7 +11,6 @@ import { SettingsComponent } from './components/manage/settings/settings.compone
 import { TagListComponent } from './components/manage/tag-list/tag-list.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import {DocumentAsnComponent} from "./components/document-asn/document-asn.component";
-import { SearchComponent } from './components/search/search.component';
 import { DirtyFormGuard } from './guards/dirty-form.guard';
 
 const routes: Routes = [
