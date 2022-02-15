@@ -179,6 +179,7 @@ echo "Specify the default language that most of your documents are written in."
 echo "Use ISO 639-2, (T) variant language codes: "
 echo "https://www.loc.gov/standards/iso639-2/php/code_list.php"
 echo "Common values: eng (English) deu (German) nld (Dutch) fra (French)"
+echo "This can be a combination of multiple languages such as deu+eng"
 echo ""
 
 ask "OCR language" "eng"
