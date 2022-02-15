@@ -24,7 +24,7 @@ Each document has a couple of fields that you can assign to them:
 * A *Document* is a piece of paper that sometimes contains valuable
   information.
 * The *correspondent* of a document is the person, institution or company that
-  a document either originates form, or is sent to.
+  a document either originates from, or is sent to.
 * A *tag* is a label that you can assign to documents. Think of labels as more
   powerful folders: Multiple documents can be grouped together with a single
   tag, however, a single document can also have multiple tags. This is not
