@@ -7,7 +7,7 @@ If you want to implement something big:
 * Please start a discussion about that in the issues! Maybe something similar is already in development and we can make it happen together.
 * When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
 * Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
-* Please see the [paperless-ngx merge process](#merging-non-trivial-prs) below.
+* Please see the [paperless-ngx merge process](#merging-prs) below.
 
 ## Python
 
