@@ -26,6 +26,8 @@ Physical scanners
 +---------+----------------+-----+-----+-----+------+----------+----------------+
 | Brother | `ADS-1100W`_   | yes |     |     |      |          |`ytzelf`_       |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `ADS-2800W`_   | yes | yes |     | yes  | yes      |`philpagel`_    |
++---------+----------------+-----+-----+-----+------+----------+----------------+
 | Brother | `MFC-J6930DW`_ | yes |     |     |      |          |`ayounggun`_    |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
 | Brother | `MFC-L5850DW`_ | yes |     |     | yes  |          |`holzhannes`_   |
@@ -33,6 +35,8 @@ Physical scanners
 | Brother | `MFC-L2750DW`_ | yes |     | yes | yes  |          |`muued`_        |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
 | Brother | `MFC-J5910DW`_ | yes |     |     |      |          |`bmsleight`_    |
++---------+----------------+-----+-----+-----+------+----------+----------------+
+| Brother | `MFC-8950DW`_  | yes |     |     | yes  | yes      |`philpagel`_    |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
 | Brother | `MFC-9142CDN`_ | yes |     | yes |      |          |`REOLDEV`_      |
 +---------+----------------+-----+-----+-----+------+----------+----------------+
@@ -53,15 +57,16 @@ Physical scanners
 .. _ADS-1600W: https://www.brother-usa.com/products/ads1600w
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
 .. _ADS-1100W: https://support.brother.com/g/b/downloadtop.aspx?c=fr&lang=fr&prod=ads1100w_eu_as_cn
+.. _ADS-2800W: https://www.brother-usa.com/products/ads2800w
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
+.. _MFC-8950DW: https://www.brother-usa.com/products/mfc8950dw
 .. _MFC-9142CDN: https://www.brother.co.uk/printers/laser-printers/mfc9140cdn
 .. _ES-580W: https://epson.com/Support/Scanners/ES-Series/Epson-WorkForce-ES-580W/s/SPT_B11B258201
 .. _WF-7710DWF: https://www.epson.de/en/products/printers/inkjet-printers/for-home/workforce-wf-7710dwf
 .. _ix500: http://www.fujitsu.com/us/products/computing/peripheral/scanners/scansnap/ix500/
 .. _S1300i: https://www.fujitsu.com/global/products/computing/peripheral/scanners/soho/s1300i/
 .. _Q2: https://www.getdoxie.com/product/doxie-q/
-
 
 .. _ayounggun: https://github.com/ayounggun
 .. _bmsleight: https://github.com/bmsleight
@@ -75,6 +80,7 @@ Physical scanners
 .. _ytzelf: https://github.com/ytzelf
 .. _Unkn0wnCat: https://github.com/Unkn0wnCat
 .. _muued: https://github.com/muued
+.. _philpagel: https://github.com/philpagel
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
 
