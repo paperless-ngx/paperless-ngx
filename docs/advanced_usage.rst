@@ -18,13 +18,13 @@ that had a ``match`` property of ``bc hydro`` and a ``matching_algorithm`` of
 your ``Home Utility`` tag so long as the text ``bc hydro`` appears in the body
 of the document somewhere.
 
-The matching logic is quite powerful, and supports searching the text of your
+The matching logic is quite powerful. It supports searching the text of your
 document with different algorithms, and as such, some experimentation may be
 necessary to get things right.
 
-In order to have a tag, correspondent or type assigned automatically to newly
+In order to have a tag, correspondent, or type assigned automatically to newly
 consumed documents, assign a match and matching algorithm using the web
-interface. These settings define when to assign correspondents, tags and types
+interface. These settings define when to assign correspondents, tags, and types
 to documents.
 
 The following algorithms are available:
@@ -34,16 +34,16 @@ The following algorithms are available:
   either of these terms.
 * **All:** Requires that every word provided appears in the PDF, albeit not in the
   order provided.
-* **Literal:** Matches only if the match appears exactly as provided in the PDF.
+* **Literal:** Matches only if the match appears exactly as provided (i.e. preserve ordering) in the PDF.
 * **Regular expression:** Parses the match as a regular expression and tries to
   find a match within the document.
 * **Fuzzy match:** I dont know. Look at the source.
 * **Auto:** Tries to automatically match new documents. This does not require you
   to set a match. See the notes below.
 
-When using the "any" or "all" matching algorithms, you can search for terms
+When using the *any* or *all* matching algorithms, you can search for terms
 that consist of multiple words by enclosing them in double quotes. For example,
-defining a match text of ``"Bank of America" BofA`` using the "any" algorithm,
+defining a match text of ``"Bank of America" BofA`` using the *any* algorithm,
 will match documents that contain either "Bank of America" or "BofA", but will
 not match documents containing "Bank of South America".
 
@@ -58,8 +58,8 @@ Automatic matching
 ==================
 
 Paperless-ng comes with a new matching algorithm called *Auto*. This matching
-algorithm tries to assign tags, correspondents and document types to your
-documents based on how you have assigned these on existing documents. It
+algorithm tries to assign tags, correspondents, and document types to your
+documents based on how you have already assigned these on existing documents. It
 uses a neural network under the hood.
 
 If, for example, all your bank statements of your account 123 at the Bank of
@@ -76,11 +76,11 @@ feature:
   changes. Paperless periodically (default: once each hour) checks for changes
   and does this automatically for you.
 * The Auto matching algorithm only takes documents into account which are NOT
-  placed in your inbox (i.e., have inbox tags assigned to them). This ensures
+  placed in your inbox (i.e. have any inbox tags assigned to them). This ensures
   that the neural network only learns from documents which you have correctly
   tagged before.
 * The matching algorithm can only work if there is a correlation between the
-  tag, correspondent or document type and the document itself. Your bank
+  tag, correspondent, or document type and the document itself. Your bank
   statements usually contain your bank account number and the name of the bank,
   so this works reasonably well, However, tags such as "TODO" cannot be
   automatically assigned.
@@ -167,7 +167,7 @@ into paperless. It receives the following arguments:
 * Correspondent
 * Tags
 
-The script can be in any language you like, but for a simple shell script
+The script can be written in any language, but for a simple shell script
 example, you can take a look at ``post-consumption-example.sh`` in the
 ``scripts`` directory in this project.
 
