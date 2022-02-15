@@ -2,7 +2,7 @@
 
 If you feel like contributing to the project, please do! Bug fixes and improvements are always welcome.
 
-If you want to implement something big: 
+If you want to implement something big:
 
 * Please start a discussion about that in the issues! Maybe something similar is already in development and we can make it happen together.
 * When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
