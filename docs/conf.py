@@ -28,7 +28,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Paperless-ngx'
-copyright = u'2021, Daniel Quinn, Jonas Winkler, and the paperless-ngx team'
+copyright = u'2015-2022, Daniel Quinn, Jonas Winkler, and the paperless-ngx team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
