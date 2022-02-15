@@ -1,16 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { DocumentService } from 'src/app/services/rest/document.service';
+import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
 @Component({
   selector: 'app-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: ['./document-card-large.component.scss']
+  styleUrls: ['./document-card-large.component.scss', '../popover-preview/popover-preview.scss']
 })
 export class DocumentCardLargeComponent implements OnInit {
 
-  constructor(private documentService: DocumentService, private sanitizer: DomSanitizer) { }
+  constructor(private documentService: DocumentService, private sanitizer: DomSanitizer, private settingsService: SettingsService) { }
 
   @Input()
   selected = false
@@ -23,13 +27,7 @@ export class DocumentCardLargeComponent implements OnInit {
   }
 
   @Input()
-  moreLikeThis: boolean = false
-
-  @Input()
   document: PaperlessDocument
-
-  @Input()
-  details: any
 
   @Output()
   clickTag = new EventEmitter<number>()
@@ -37,33 +35,34 @@ export class DocumentCardLargeComponent implements OnInit {
   @Output()
   clickCorrespondent = new EventEmitter<number>()
 
-  @Input()
-  searchScore: number
+  @Output()
+  clickDocumentType = new EventEmitter<number>()
+
+  @Output()
+  clickMoreLike= new EventEmitter()
+
+  @ViewChild('popover') popover: NgbPopover
+
+  mouseOnPreview = false
+  popoverHidden = true
 
   get searchScoreClass() {
-    if (this.searchScore > 0.7) {
-      return "success"
-    } else if (this.searchScore > 0.3) {
-      return "warning"
-    } else {
-      return "danger"
+    if (this.document.__search_hit__) {
+      if (this.document.__search_hit__.score > 0.7) {
+        return "success"
+      } else if (this.document.__search_hit__.score > 0.3) {
+        return "warning"
+      } else {
+        return "danger"
+      }
     }
   }
 
   ngOnInit(): void {
   }
 
-  getDetailsAsString() {
-    if (typeof this.details === 'string') {
-      return this.details.substring(0, 500)
-    }
-  }
-
-  getDetailsAsHighlight() {
-    //TODO: this is not an exact typecheck, can we do better
-    if (this.details instanceof Array) {
-      return this.details
-    }
+  getIsThumbInverted() {
+    return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
   }
 
   getThumbUrl() {
@@ -74,7 +73,36 @@ export class DocumentCardLargeComponent implements OnInit {
     return this.documentService.getDownloadUrl(this.document.id)
   }
 
-  getPreviewUrl() {
+  get previewUrl() {
     return this.documentService.getPreviewUrl(this.document.id)
+  }
+
+  mouseEnterPreview() {
+    this.mouseOnPreview = true
+    if (!this.popover.isOpen()) {
+      // we're going to open but hide to pre-load content during hover delay
+      this.popover.open()
+      this.popoverHidden = true
+      setTimeout(() => {
+        if (this.mouseOnPreview) {
+          // show popover
+          this.popoverHidden = false
+        } else {
+          this.popover.close()
+        }
+      }, 600);
+    }
+  }
+
+  mouseLeavePreview() {
+    this.mouseOnPreview = false
+  }
+
+  mouseLeaveCard() {
+    this.popover.close()
+  }
+
+  get contentTrimmed() {
+    return this.document.content.substr(0, 500)
   }
 }

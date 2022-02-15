@@ -1,9 +1,13 @@
-from .parsers import TextDocumentParser
+
+def get_parser(*args, **kwargs):
+    from .parsers import TextDocumentParser
+
+    return TextDocumentParser(*args, **kwargs)
 
 
 def text_consumer_declaration(sender, **kwargs):
     return {
-        "parser": TextDocumentParser,
+        "parser": get_parser,
         "weight": 10,
         "mime_types": {
             "text/plain": ".txt",

@@ -24,6 +24,7 @@
   padding-top: 0.5rem;
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  min-height: min-content;
 }
 @supports ((position: -webkit-sticky) or (position: sticky)) {
   .sidebar-sticky {
@@ -56,6 +57,49 @@
   font-size: 0.75rem;
   text-transform: uppercase;
 }
+
+.nav {
+  flex-wrap: nowrap;
+}
+
+.nav-item {
+  position: relative;
+
+  &:hover .close {
+    display: block;
+  }
+
+  .close {
+    display: none;
+    position: absolute;
+    cursor: pointer;
+    opacity: 1;
+    top: 0;
+    padding: .25rem .3rem 0;
+    right: .4rem;
+    width: 1.8rem;
+    height: 100%;
+
+    svg {
+      opacity: 0.5;
+    }
+
+    &:hover svg {
+      opacity: 1;
+    }
+  }
+
+  .nav-link-additional {
+    margin-top: 0.2rem;
+    margin-left: 0.25rem;
+    padding-top: 0.5rem;
+
+    svg {
+      margin-bottom: 2px;
+    }
+  }
+}
+
 
 /*
  * Navbar

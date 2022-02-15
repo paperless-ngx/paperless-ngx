@@ -1,7 +1,7 @@
 import logging
 import os
-from subprocess import Popen
 
+from django.utils import termcolors
 from django.conf import settings
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import User
@@ -9,18 +9,17 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models, DatabaseError
 from django.db.models import Q
 from django.dispatch import receiver
-from django.utils import timezone
+from django.utils import termcolors, timezone
 from filelock import FileLock
 
-from .. import index, matching
+from .. import matching
 from ..file_handling import delete_empty_directories, \
-    create_source_path_directory, archive_name_from_filename, \
+    create_source_path_directory, \
     generate_unique_filename
-from ..models import Document, Tag
+from ..models import Document, Tag, MatchingModel
 
 
-def logger(message, group):
-    logging.getLogger(__name__).debug(message, extra={"group": group})
+logger = logging.getLogger("paperless.handlers")
 
 
 def add_inbox_tags(sender, document=None, logging_group=None, **kwargs):
@@ -34,6 +33,9 @@ def set_correspondent(sender,
                       classifier=None,
                       replace=False,
                       use_first=True,
+                      suggest=False,
+                      base_url=None,
+                      color=False,
                       **kwargs):
     if document.correspondent and not replace:
         return
@@ -48,27 +50,45 @@ def set_correspondent(sender,
         selected = None
     if potential_count > 1:
         if use_first:
-            logger(
+            logger.debug(
                 f"Detected {potential_count} potential correspondents, "
                 f"so we've opted for {selected}",
-                logging_group
+                extra={'group': logging_group}
             )
         else:
-            logger(
+            logger.debug(
                 f"Detected {potential_count} potential correspondents, "
                 f"not assigning any correspondent",
-                logging_group
+                extra={'group': logging_group}
             )
             return
 
     if selected or replace:
-        logger(
-            f"Assigning correspondent {selected} to {document}",
-            logging_group
-        )
+        if suggest:
+            if base_url:
+                print(
+                    termcolors.colorize(str(document), fg='green')
+                    if color
+                    else str(document)
+                )
+                print(f"{base_url}/documents/{document.pk}")
+            else:
+                print(
+                    (
+                        termcolors.colorize(str(document), fg='green')
+                        if color
+                        else str(document)
+                    ) + f" [{document.pk}]"
+                )
+            print(f"Suggest correspondent {selected}")
+        else:
+            logger.info(
+                f"Assigning correspondent {selected} to {document}",
+                extra={'group': logging_group}
+            )
 
-        document.correspondent = selected
-        document.save(update_fields=("correspondent",))
+            document.correspondent = selected
+            document.save(update_fields=("correspondent",))
 
 
 def set_document_type(sender,
@@ -77,6 +97,9 @@ def set_document_type(sender,
                       classifier=None,
                       replace=False,
                       use_first=True,
+                      suggest=False,
+                      base_url=None,
+                      color=False,
                       **kwargs):
     if document.document_type and not replace:
         return
@@ -92,27 +115,45 @@ def set_document_type(sender,
 
     if potential_count > 1:
         if use_first:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential document types, "
                 f"so we've opted for {selected}",
-                logging_group
+                extra={'group': logging_group}
             )
         else:
-            logger(
+            logger.info(
                 f"Detected {potential_count} potential document types, "
                 f"not assigning any document type",
-                logging_group
+                extra={'group': logging_group}
             )
             return
 
     if selected or replace:
-        logger(
-            f"Assigning document type {selected} to {document}",
-            logging_group
-        )
+        if suggest:
+            if base_url:
+                print(
+                    termcolors.colorize(str(document), fg='green')
+                    if color
+                    else str(document)
+                )
+                print(f"{base_url}/documents/{document.pk}")
+            else:
+                print(
+                    (
+                        termcolors.colorize(str(document), fg='green')
+                        if color
+                        else str(document)
+                    ) + f" [{document.pk}]"
+                )
+            print(f"Sugest document type {selected}")
+        else:
+            logger.info(
+                f"Assigning document type {selected} to {document}",
+                extra={'group': logging_group}
+            )
 
-        document.document_type = selected
-        document.save(update_fields=("document_type",))
+            document.document_type = selected
+            document.save(update_fields=("document_type",))
 
 
 def set_tags(sender,
@@ -120,6 +161,9 @@ def set_tags(sender,
              logging_group=None,
              classifier=None,
              replace=False,
+             suggest=False,
+             base_url=None,
+             color=False,
              **kwargs):
 
     if replace:
@@ -134,33 +178,65 @@ def set_tags(sender,
 
     relevant_tags = set(matched_tags) - current_tags
 
-    if not relevant_tags:
-        return
+    if suggest:
+        extra_tags = current_tags - set(matched_tags)
+        extra_tags = [
+            t for t in extra_tags
+            if t.matching_algorithm == MatchingModel.MATCH_AUTO
+        ]
+        if not relevant_tags and not extra_tags:
+            return
+        if base_url:
+            print(
+                termcolors.colorize(str(document), fg='green')
+                if color
+                else str(document)
+            )
+            print(f"{base_url}/documents/{document.pk}")
+        else:
+            print(
+                (
+                    termcolors.colorize(str(document), fg='green')
+                    if color
+                    else str(document)
+                ) + f" [{document.pk}]"
+            )
+        if relevant_tags:
+            print(
+                "Suggest tags: " + ", ".join([t.name for t in relevant_tags])
+            )
+        if extra_tags:
+            print("Extra tags: " + ", ".join([t.name for t in extra_tags]))
+    else:
+        if not relevant_tags:
+            return
 
-    message = 'Tagging "{}" with "{}"'
-    logger(
-        message.format(document, ", ".join([t.name for t in relevant_tags])),
-        logging_group
-    )
+        message = 'Tagging "{}" with "{}"'
+        logger.info(
+            message.format(
+                document, ", ".join([t.name for t in relevant_tags])
+            ),
+            extra={'group': logging_group}
+        )
 
-    document.tags.add(*relevant_tags)
+        document.tags.add(*relevant_tags)
 
 
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
-        for f in (instance.source_path,
-                  instance.archive_path,
-                  instance.thumbnail_path):
-            if os.path.isfile(f):
+        for filename in (instance.source_path,
+                         instance.archive_path,
+                         instance.thumbnail_path):
+            if filename and os.path.isfile(filename):
                 try:
-                    os.unlink(f)
-                    logging.getLogger(__name__).debug(
-                        f"Deleted file {f}.")
+                    os.unlink(filename)
+                    logger.debug(
+                        f"Deleted file {filename}.")
                 except OSError as e:
-                    logging.getLogger(__name__).warning(
+                    logger.warning(
                         f"While deleting document {str(instance)}, the file "
-                        f"{f} could not be deleted: {e}"
+                        f"{filename} could not be deleted: {e}"
                     )
 
         delete_empty_directories(
@@ -168,27 +244,30 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
             root=settings.ORIGINALS_DIR
         )
 
-        delete_empty_directories(
-            os.path.dirname(instance.archive_path),
-            root=settings.ARCHIVE_DIR
-        )
+        if instance.has_archive_version:
+            delete_empty_directories(
+                os.path.dirname(instance.archive_path),
+                root=settings.ARCHIVE_DIR
+            )
+
+
+class CannotMoveFilesException(Exception):
+    pass
 
 
 def validate_move(instance, old_path, new_path):
     if not os.path.isfile(old_path):
         # Can't do anything if the old file does not exist anymore.
-        logging.getLogger(__name__).fatal(
+        logger.fatal(
             f"Document {str(instance)}: File {old_path} has gone.")
-        return False
+        raise CannotMoveFilesException()
 
     if os.path.isfile(new_path):
         # Can't do anything if the new file already exists. Skip updating file.
-        logging.getLogger(__name__).warning(
+        logger.warning(
             f"Document {str(instance)}: Cannot rename file "
             f"since target path {new_path} already exists.")
-        return False
-
-    return True
+        raise CannotMoveFilesException()
 
 
 @receiver(models.signals.m2m_changed, sender=Document.tags.through)
@@ -207,56 +286,61 @@ def update_filename_and_move_files(sender, instance, **kwargs):
         return
 
     with FileLock(settings.MEDIA_LOCK):
-        old_filename = instance.filename
-        new_filename = generate_unique_filename(
-            instance, settings.ORIGINALS_DIR)
+        try:
+            old_filename = instance.filename
+            old_source_path = instance.source_path
 
-        if new_filename == instance.filename:
-            # Don't do anything if its the same.
-            return
+            instance.filename = generate_unique_filename(instance)
+            move_original = old_filename != instance.filename
 
-        old_source_path = instance.source_path
-        new_source_path = os.path.join(settings.ORIGINALS_DIR, new_filename)
-
-        if not validate_move(instance, old_source_path, new_source_path):
-            return
-
-        # archive files are optional, archive checksum tells us if we have one,
-        # since this is None for documents without archived files.
-        if instance.archive_checksum:
-            new_archive_filename = archive_name_from_filename(new_filename)
+            old_archive_filename = instance.archive_filename
             old_archive_path = instance.archive_path
-            new_archive_path = os.path.join(settings.ARCHIVE_DIR,
-                                            new_archive_filename)
 
-            if not validate_move(instance, old_archive_path, new_archive_path):
+            if instance.has_archive_version:
+
+                instance.archive_filename = generate_unique_filename(
+                    instance, archive_filename=True
+                )
+
+                move_archive = old_archive_filename != instance.archive_filename  # NOQA: E501
+            else:
+                move_archive = False
+
+            if not move_original and not move_archive:
+                # Don't do anything if filenames did not change.
                 return
 
-            create_source_path_directory(new_archive_path)
-        else:
-            old_archive_path = None
-            new_archive_path = None
+            if move_original:
+                validate_move(instance, old_source_path, instance.source_path)
+                create_source_path_directory(instance.source_path)
+                os.rename(old_source_path, instance.source_path)
 
-        create_source_path_directory(new_source_path)
-
-        try:
-            os.rename(old_source_path, new_source_path)
-            if instance.archive_checksum:
-                os.rename(old_archive_path, new_archive_path)
-            instance.filename = new_filename
+            if move_archive:
+                validate_move(
+                    instance, old_archive_path, instance.archive_path)
+                create_source_path_directory(instance.archive_path)
+                os.rename(old_archive_path, instance.archive_path)
 
             # Don't save() here to prevent infinite recursion.
             Document.objects.filter(pk=instance.pk).update(
-                filename=new_filename)
+                filename=instance.filename,
+                archive_filename=instance.archive_filename,
+            )
 
-        except OSError as e:
-            instance.filename = old_filename
-            # this happens when we can't move a file. If that's the case for
-            # the archive file, we try our best to revert the changes.
-            # no need to save the instance, the update() has not happened yet.
+        except (OSError, DatabaseError, CannotMoveFilesException):
+            # This happens when either:
+            #  - moving the files failed due to file system errors
+            #  - saving to the database failed due to database errors
+            # In both cases, we need to revert to the original state.
+
+            # Try to move files to their original location.
             try:
-                os.rename(new_source_path, old_source_path)
-                os.rename(new_archive_path, old_archive_path)
+                if move_original and os.path.isfile(instance.source_path):
+                    os.rename(instance.source_path, old_source_path)
+
+                if move_archive and os.path.isfile(instance.archive_path):
+                    os.rename(instance.archive_path, old_archive_path)
+
             except Exception as e:
                 # This is fine, since:
                 # A: if we managed to move source from A to B, we will also
@@ -267,16 +351,10 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 # B: if moving the orignal file failed, nothing has changed
                 #  anyway.
                 pass
-        except DatabaseError as e:
-            # this happens after moving files, so move them back into place.
-            # since moving them once succeeded, it's very likely going to
-            # succeed again.
-            os.rename(new_source_path, old_source_path)
-            if instance.archive_checksum:
-                os.rename(new_archive_path, old_archive_path)
+
+            # restore old values on the instance
             instance.filename = old_filename
-            # again, no need to save the instance, since the actual update()
-            # operation failed.
+            instance.archive_filename = old_archive_filename
 
         # finally, remove any empty sub folders. This will do nothing if
         # something has failed above.
@@ -284,7 +362,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             delete_empty_directories(os.path.dirname(old_source_path),
                                      root=settings.ORIGINALS_DIR)
 
-        if old_archive_path and not os.path.isfile(old_archive_path):
+        if instance.has_archive_version and not os.path.isfile(old_archive_path):  # NOQA: E501
             delete_empty_directories(os.path.dirname(old_archive_path),
                                      root=settings.ARCHIVE_DIR)
 
@@ -305,4 +383,6 @@ def set_log_entry(sender, document=None, logging_group=None, **kwargs):
 
 
 def add_to_index(sender, document, **kwargs):
+    from documents import index
+
     index.add_or_update_document(document)

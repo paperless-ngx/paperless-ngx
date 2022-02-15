@@ -15,7 +15,7 @@ import { AbstractInputComponent } from '../abstract-input';
 })
 export class CheckComponent extends AbstractInputComponent<boolean> {
 
-  constructor() { 
+  constructor() {
     super()
   }
 

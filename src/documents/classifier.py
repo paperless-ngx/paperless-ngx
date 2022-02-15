@@ -3,12 +3,9 @@ import logging
 import os
 import pickle
 import re
+import shutil
 
 from django.conf import settings
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
-from sklearn.utils.multiclass import type_of_target
 
 from documents.models import Document, MatchingModel
 
@@ -17,7 +14,11 @@ class IncompatibleClassifierVersionError(Exception):
     pass
 
 
-logger = logging.getLogger(__name__)
+class ClassifierModelCorruptError(Exception):
+    pass
+
+
+logger = logging.getLogger("paperless.classifier")
 
 
 def preprocess_content(content):
@@ -26,15 +27,46 @@ def preprocess_content(content):
     return content
 
 
+def load_classifier():
+    if not os.path.isfile(settings.MODEL_FILE):
+        logger.debug(
+            f"Document classification model does not exist (yet), not "
+            f"performing automatic matching."
+        )
+        return None
+
+    classifier = DocumentClassifier()
+    try:
+        classifier.load()
+
+    except (ClassifierModelCorruptError,
+            IncompatibleClassifierVersionError):
+        # there's something wrong with the model file.
+        logger.exception(
+            f"Unrecoverable error while loading document "
+            f"classification model, deleting model file."
+        )
+        os.unlink(settings.MODEL_FILE)
+        classifier = None
+    except OSError:
+        logger.exception(
+            f"IO error while loading document classification model"
+        )
+        classifier = None
+    except Exception:
+        logger.exception(
+            f"Unknown error while loading document classification model"
+        )
+        classifier = None
+
+    return classifier
+
+
 class DocumentClassifier(object):
 
     FORMAT_VERSION = 6
 
     def __init__(self):
-        # mtime of the model file on disk. used to prevent reloading when
-        # nothing has changed.
-        self.classifier_version = 0
-
         # hash of the training data. used to prevent re-training when the
         # training data has not changed.
         self.data_hash = None
@@ -45,20 +77,15 @@ class DocumentClassifier(object):
         self.correspondent_classifier = None
         self.document_type_classifier = None
 
-    def reload(self):
-        if os.path.getmtime(settings.MODEL_FILE) > self.classifier_version:
-            with open(settings.MODEL_FILE, "rb") as f:
-                schema_version = pickle.load(f)
+    def load(self):
+        with open(settings.MODEL_FILE, "rb") as f:
+            schema_version = pickle.load(f)
 
-                if schema_version != self.FORMAT_VERSION:
-                    raise IncompatibleClassifierVersionError(
-                        "Cannor load classifier, incompatible versions.")
-                else:
-                    if self.classifier_version > 0:
-                        # Don't be confused by this check. It's simply here
-                        # so that we wont log anything on initial reload.
-                        logger.info("Classifier updated on disk, "
-                                    "reloading classifier models")
+            if schema_version != self.FORMAT_VERSION:
+                raise IncompatibleClassifierVersionError(
+                    "Cannor load classifier, incompatible versions.")
+            else:
+                try:
                     self.data_hash = pickle.load(f)
                     self.data_vectorizer = pickle.load(f)
                     self.tags_binarizer = pickle.load(f)
@@ -66,10 +93,14 @@ class DocumentClassifier(object):
                     self.tags_classifier = pickle.load(f)
                     self.correspondent_classifier = pickle.load(f)
                     self.document_type_classifier = pickle.load(f)
-            self.classifier_version = os.path.getmtime(settings.MODEL_FILE)
+                except Exception:
+                    raise ClassifierModelCorruptError()
 
-    def save_classifier(self):
-        with open(settings.MODEL_FILE, "wb") as f:
+    def save(self):
+        target_file = settings.MODEL_FILE
+        target_file_temp = settings.MODEL_FILE + ".part"
+
+        with open(target_file_temp, "wb") as f:
             pickle.dump(self.FORMAT_VERSION, f)
             pickle.dump(self.data_hash, f)
             pickle.dump(self.data_vectorizer, f)
@@ -80,14 +111,19 @@ class DocumentClassifier(object):
             pickle.dump(self.correspondent_classifier, f)
             pickle.dump(self.document_type_classifier, f)
 
+        if os.path.isfile(target_file):
+            os.unlink(target_file)
+        shutil.move(target_file_temp, target_file)
+
     def train(self):
+
         data = list()
         labels_tags = list()
         labels_correspondent = list()
         labels_document_type = list()
 
         # Step 1: Extract and preprocess training data from the database.
-        logging.getLogger(__name__).debug("Gathering data from database...")
+        logger.debug("Gathering data from database...")
         m = hashlib.sha1()
         for doc in Document.objects.order_by('pk').exclude(tags__is_inbox_tag=True):  # NOQA: E501
             preprocessed_content = preprocess_content(doc.content)
@@ -108,10 +144,11 @@ class DocumentClassifier(object):
             m.update(y.to_bytes(4, 'little', signed=True))
             labels_correspondent.append(y)
 
-            tags = [tag.pk for tag in doc.tags.filter(
+            tags = sorted([tag.pk for tag in doc.tags.filter(
                 matching_algorithm=MatchingModel.MATCH_AUTO
-            )]
-            m.update(bytearray(tags))
+            )])
+            for tag in tags:
+                m.update(tag.to_bytes(4, 'little', signed=True))
             labels_tags.append(tags)
 
         if not data:
@@ -134,7 +171,7 @@ class DocumentClassifier(object):
         num_correspondents = len(set(labels_correspondent) | {-1}) - 1
         num_document_types = len(set(labels_document_type) | {-1}) - 1
 
-        logging.getLogger(__name__).debug(
+        logger.debug(
             "{} documents, {} tag(s), {} correspondent(s), "
             "{} document type(s).".format(
                 len(data),
@@ -144,8 +181,12 @@ class DocumentClassifier(object):
             )
         )
 
+        from sklearn.feature_extraction.text import CountVectorizer
+        from sklearn.neural_network import MLPClassifier
+        from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer
+
         # Step 2: vectorize data
-        logging.getLogger(__name__).debug("Vectorizing data...")
+        logger.debug("Vectorizing data...")
         self.data_vectorizer = CountVectorizer(
             analyzer="word",
             ngram_range=(1, 2),
@@ -155,7 +196,7 @@ class DocumentClassifier(object):
 
         # Step 3: train the classifiers
         if num_tags > 0:
-            logging.getLogger(__name__).debug("Training tags classifier...")
+            logger.debug("Training tags classifier...")
 
             if num_tags == 1:
                 # Special case where only one tag has auto:
@@ -174,12 +215,12 @@ class DocumentClassifier(object):
             self.tags_classifier.fit(data_vectorized, labels_tags_vectorized)
         else:
             self.tags_classifier = None
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "There are no tags. Not training tags classifier."
             )
 
         if num_correspondents > 0:
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "Training correspondent classifier..."
             )
             self.correspondent_classifier = MLPClassifier(tol=0.01)
@@ -189,13 +230,13 @@ class DocumentClassifier(object):
             )
         else:
             self.correspondent_classifier = None
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "There are no correspondents. Not training correspondent "
                 "classifier."
             )
 
         if num_document_types > 0:
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "Training document type classifier..."
             )
             self.document_type_classifier = MLPClassifier(tol=0.01)
@@ -205,7 +246,7 @@ class DocumentClassifier(object):
             )
         else:
             self.document_type_classifier = None
-            logging.getLogger(__name__).debug(
+            logger.debug(
                 "There are no document types. Not training document type "
                 "classifier."
             )
@@ -237,6 +278,8 @@ class DocumentClassifier(object):
             return None
 
     def predict_tags(self, content):
+        from sklearn.utils.multiclass import type_of_target
+
         if self.tags_classifier:
             X = self.data_vectorizer.transform([preprocess_content(content)])
             y = self.tags_classifier.predict(X)

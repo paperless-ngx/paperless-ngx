@@ -6,20 +6,22 @@ import time
 
 import tqdm
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from filelock import FileLock
 
-from documents.models import Document, Correspondent, Tag, DocumentType
+from documents.models import Document, Correspondent, Tag, DocumentType, \
+    SavedView, SavedViewFilterRule
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
 from paperless.db import GnuPG
+from paperless_mail.models import MailAccount, MailRule
 from ...file_handling import generate_filename, delete_empty_directories
-from ...mixins import Renderable
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Decrypt and rename all files in our collection into a given target
@@ -55,6 +57,12 @@ class Command(Renderable, BaseCommand):
                  "do not belong to the current export, such as files from "
                  "deleted documents."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -79,9 +87,9 @@ class Command(Renderable, BaseCommand):
             raise CommandError("That path doesn't appear to be writable")
 
         with FileLock(settings.MEDIA_LOCK):
-            self.dump()
+            self.dump(options['no_progress_bar'])
 
-    def dump(self):
+    def dump(self, progress_bar_disable=False):
         # 1. Take a snapshot of what files exist in the current export folder
         for root, dirs, files in os.walk(self.target):
             self.files_in_export_dir.extend(
@@ -106,9 +114,27 @@ class Command(Renderable, BaseCommand):
                 serializers.serialize("json", documents))
             manifest += document_manifest
 
+            manifest += json.loads(serializers.serialize(
+                "json", MailAccount.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", MailRule.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", SavedView.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", SavedViewFilterRule.objects.all()))
+
+            manifest += json.loads(serializers.serialize(
+                "json", User.objects.all()))
+
         # 3. Export files from each document
-        for index, document_dict in tqdm.tqdm(enumerate(document_manifest),
-                                              total=len(document_manifest)):
+        for index, document_dict in tqdm.tqdm(
+            enumerate(document_manifest),
+            total=len(document_manifest),
+            disable=progress_bar_disable
+        ):
             # 3.1. store files unencrypted
             document_dict["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED  # NOQA: E501
 
@@ -140,7 +166,7 @@ class Command(Renderable, BaseCommand):
             thumbnail_target = os.path.join(self.target, thumbnail_name)
             document_dict[EXPORTER_THUMBNAIL_NAME] = thumbnail_name
 
-            if os.path.exists(document.archive_path):
+            if document.has_archive_version:
                 archive_name = base_name + "-archive.pdf"
                 archive_target = os.path.join(self.target, archive_name)
                 document_dict[EXPORTER_ARCHIVE_NAME] = archive_name

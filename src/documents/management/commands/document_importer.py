@@ -15,7 +15,6 @@ from documents.models import Document
 from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
     EXPORTER_ARCHIVE_NAME
 from ...file_handling import create_source_path_directory
-from ...mixins import Renderable
 from ...signals.handlers import update_filename_and_move_files
 
 
@@ -28,7 +27,7 @@ def disable_signal(sig, receiver, sender):
         sig.connect(receiver=receiver, sender=sender)
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         Using a manifest.json file, load the data from there, and import the
@@ -37,6 +36,12 @@ class Command(Renderable, BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("source")
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
@@ -71,7 +76,7 @@ class Command(Renderable, BaseCommand):
                 # Fill up the database with whatever is in the manifest
                 call_command("loaddata", manifest_path)
 
-                self._import_files_from_manifest()
+                self._import_files_from_manifest(options['no_progress_bar'])
 
         print("Updating search index...")
         call_command('document_index', 'reindex')
@@ -112,7 +117,7 @@ class Command(Renderable, BaseCommand):
                         f"does not appear to be in the source directory."
                     )
 
-    def _import_files_from_manifest(self):
+    def _import_files_from_manifest(self, progress_bar_disable):
 
         os.makedirs(settings.ORIGINALS_DIR, exist_ok=True)
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
@@ -124,7 +129,10 @@ class Command(Renderable, BaseCommand):
             lambda r: r["model"] == "documents.document",
             self.manifest))
 
-        for record in tqdm.tqdm(manifest_documents):
+        for record in tqdm.tqdm(
+            manifest_documents,
+            disable=progress_bar_disable
+        ):
 
             document = Document.objects.get(pk=record["pk"])
 
@@ -152,6 +160,9 @@ class Command(Renderable, BaseCommand):
                 shutil.copy2(thumbnail_path, document.thumbnail_path)
                 if archive_path:
                     create_source_path_directory(document.archive_path)
+                    # TODO: this assumes that the export is valid and
+                    #  archive_filename is present on all documents with
+                    #  archived files
                     shutil.copy2(archive_path, document.archive_path)
 
             document.save()

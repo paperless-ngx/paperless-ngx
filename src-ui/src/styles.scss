@@ -1,5 +1,6 @@
 @import "theme";
 @import "theme_dark";
+@import "print";
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 
@@ -110,4 +111,8 @@ body {
   textarea {
     font-size: 16px;
   }
+}
+
+.ngx-file-drop__drop-zone--over {
+  background-color: $primaryFaded !important;
 }
