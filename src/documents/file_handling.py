@@ -8,6 +8,15 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 
+logger = logging.getLogger("paperless.filehandling")
+
+
+class defaultdictNoStr(defaultdict):
+
+    def __str__(self):
+        raise ValueError("Don't use {tags} directly.")
+
+
 def create_source_path_directory(source_path):
     os.makedirs(os.path.dirname(source_path), exist_ok=True)
 
@@ -70,12 +79,40 @@ def many_to_dictionary(field):
     return mydictionary
 
 
-def generate_unique_filename(doc, root):
+def generate_unique_filename(doc,
+                             archive_filename=False):
+    """
+    Generates a unique filename for doc in settings.ORIGINALS_DIR.
+
+    The returned filename is guaranteed to be either the current filename
+    of the document if unchanged, or a new filename that does not correspondent
+    to any existing files. The function will append _01, _02, etc to the
+    filename before the extension to avoid conflicts.
+
+    If archive_filename is True, return a unique archive filename instead.
+
+    """
+    if archive_filename:
+        old_filename = doc.archive_filename
+        root = settings.ARCHIVE_DIR
+    else:
+        old_filename = doc.filename
+        root = settings.ORIGINALS_DIR
+
+    # If generating archive filenames, try to make a name that is similar to
+    # the original filename first.
+
+    if archive_filename and doc.filename:
+        new_filename = os.path.splitext(doc.filename)[0] + ".pdf"
+        if new_filename == old_filename or not os.path.exists(os.path.join(root, new_filename)):  # NOQA: E501
+            return new_filename
+
     counter = 0
 
     while True:
-        new_filename = generate_filename(doc, counter)
-        if new_filename == doc.filename:
+        new_filename = generate_filename(
+            doc, counter, archive_filename=archive_filename)
+        if new_filename == old_filename:
             # still the same as before.
             return new_filename
 
@@ -85,13 +122,20 @@ def generate_unique_filename(doc, root):
             return new_filename
 
 
-def generate_filename(doc, counter=0):
+def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     path = ""
 
     try:
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdict(lambda: slugify(None),
-                               many_to_dictionary(doc.tags))
+            tags = defaultdictNoStr(lambda: slugify(None),
+                                    many_to_dictionary(doc.tags))
+
+            tag_list = pathvalidate.sanitize_filename(
+                ",".join(sorted(
+                    [tag.name for tag in doc.tags.all()]
+                )),
+                replacement_text="-"
+            )
 
             if doc.correspondent:
                 correspondent = pathvalidate.sanitize_filename(
@@ -107,6 +151,11 @@ def generate_filename(doc, counter=0):
             else:
                 document_type = "none"
 
+            if doc.archive_serial_number:
+                asn = str(doc.archive_serial_number)
+            else:
+                asn = "none"
+
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
                 title=pathvalidate.sanitize_filename(
                     doc.title, replacement_text="-"),
@@ -114,32 +163,35 @@ def generate_filename(doc, counter=0):
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=doc.created.month if doc.created else "none",
-                created_day=doc.created.day if doc.created else "none",
+                created_month=f"{doc.created.month:02}" if doc.created else "none",  # NOQA: E501
+                created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
-                added_month=doc.added.month if doc.added else "none",
-                added_day=doc.added.day if doc.added else "none",
+                added_month=f"{doc.added.month:02}" if doc.added else "none",
+                added_day=f"{doc.added.day:02}" if doc.added else "none",
+                asn=asn,
                 tags=tags,
-            )
+                tag_list=tag_list
+            ).strip()
+
+            path = path.strip(os.sep)
+
     except (ValueError, KeyError, IndexError):
-        logging.getLogger(__name__).warning(
+        logger.warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
             f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default")
 
     counter_str = f"_{counter:02}" if counter else ""
+
+    filetype_str = ".pdf" if archive_filename else doc.file_type
+
     if len(path) > 0:
-        filename = f"{path}{counter_str}{doc.file_type}"
+        filename = f"{path}{counter_str}{filetype_str}"
     else:
-        filename = f"{doc.pk:07}{counter_str}{doc.file_type}"
+        filename = f"{doc.pk:07}{counter_str}{filetype_str}"
 
     # Append .gpg for encrypted files
-    if doc.storage_type == doc.STORAGE_TYPE_GPG:
+    if append_gpg and doc.storage_type == doc.STORAGE_TYPE_GPG:
         filename += ".gpg"
 
     return filename
-
-
-def archive_name_from_filename(filename):
-
-    return os.path.splitext(filename)[0] + ".pdf"

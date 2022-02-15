@@ -4,17 +4,17 @@ from paperless_mail.mail import MailAccountHandler, MailError
 from paperless_mail.models import MailAccount
 
 
+logger = logging.getLogger("paperless.mail.tasks")
+
+
 def process_mail_accounts():
     total_new_documents = 0
     for account in MailAccount.objects.all():
         try:
             total_new_documents += MailAccountHandler().handle_mail_account(
                 account)
-        except MailError as e:
-            logging.getLogger(__name__).error(
-                f"Error while processing mail account {account}: {e}",
-                exc_info=True
-            )
+        except MailError:
+            logger.exception(f"Error while processing mail account {account}")
 
     if total_new_documents > 0:
         return f"Added {total_new_documents} document(s)."
@@ -27,4 +27,4 @@ def process_mail_account(name):
         account = MailAccount.objects.get(name=name)
         MailAccountHandler().handle_mail_account(account)
     except MailAccount.DoesNotExist:
-        logging.getLogger(__name__).error(f"Unknown mail acccount: {name}")
+        logger.error(f"Unknown mail acccount: {name}")

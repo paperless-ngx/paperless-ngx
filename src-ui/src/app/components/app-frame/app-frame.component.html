@@ -1,159 +1,191 @@
 <nav class="navbar navbar-dark sticky-top bg-primary flex-md-nowrap p-0 shadow">
-  <span class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">
-    <img src="assets/logo-dark-notext.svg" height="18px" class="mr-2">
-    Paperless-ng
-  </span>
-  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
+  <button class="navbar-toggler d-md-none collapsed border-0" type="button" data-toggle="collapse"
     data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"
     (click)="isMenuCollapsed = !isMenuCollapsed">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <form (ngSubmit)="search()" class="w-100 m-1">
-    <input class="form-control form-control-dark" type="text" placeholder="Search" aria-label="Search"
-      [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)">
-  </form>
+  <a class="navbar-brand col-auto col-md-3 col-lg-2 mr-0 px-3 py-3 order-sm-0" routerLink="/dashboard">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 198.43 238.91" width="1em" class="mr-2" fill="currentColor">
+      <path d="M194.7,0C164.22,70.94,17.64,79.74,64.55,194.06c.58,1.47-10.85,17-18.47,29.9-1.76-6.45-3.81-13.48-3.52-14.07,38.11-45.14-27.26-70.65-30.78-107.58C-4.64,131.62-10.5,182.92,39,212.53c.3,0,2.64,11.14,3.81,16.71a58.55,58.55,0,0,0-2.93,6.45c-1.17,2.93,7.62,2.64,7.62,3.22.88-.29,21.7-36.93,22.28-37.23C187.67,174.72,208.48,68.6,194.7,0ZM134.61,74.75C79.5,124,70.12,160.64,71.88,178.53,53.41,134.85,107.64,86.77,134.61,74.75ZM28.2,145.11c10.55,9.67,28.14,39.28,13.19,56.57C44.91,193.77,46.08,175.89,28.2,145.11Z" transform="translate(0 0)"/>
+    </svg>
+    <ng-container i18n="app title">Paperless-ng</ng-container>
+  </a>
+  <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 pl-md-4 mr-sm-auto order-3 order-sm-1">
+    <form (ngSubmit)="search()" class="form-inline flex-grow-1">
+      <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
+        [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)" i18n-placeholder>
+      <svg width="1em" height="1em">
+        <use xlink:href="assets/bootstrap-icons.svg#search"/>
+      </svg>
+    </form>
+  </div>
+  <ul ngbNav class="order-sm-3">
+    <li ngbDropdown class="nav-item dropdown">
+      <button class="btn text-light" id="userDropdown" ngbDropdownToggle>
+        <span *ngIf="displayName" class="navbar-text small mr-2 text-light d-none d-sm-inline">
+          {{displayName}}
+        </span>
+        <svg width="1.3em" height="1.3em">
+          <use xlink:href="assets/bootstrap-icons.svg#person-circle"/>
+        </svg>
+      </button>
+      <div ngbDropdownMenu class="dropdown-menu-right shadow mr-2" aria-labelledby="userDropdown">
+        <div *ngIf="displayName" class="d-sm-none">
+          <p class="small mb-0 px-3 text-muted" i18n>Logged in as {{displayName}}</p>
+          <div class="dropdown-divider"></div>
+        </div>
+        <a ngbDropdownItem class="nav-link" routerLink="settings" (click)="closeMenu()">
+          <svg class="sidebaricon mr-2" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#gear"/>
+          </svg><ng-container i18n>Settings</ng-container>
+        </a>
+        <a ngbDropdownItem class="nav-link" href="accounts/logout/">
+          <svg class="sidebaricon mr-2" fill="currentColor">
+            <use xlink:href="assets/bootstrap-icons.svg#door-open"/>
+          </svg><ng-container i18n>Logout</ng-container>
+        </a>
+      </div>
+    </li>
+  </ul>
 </nav>
 
 <div class="container-fluid">
   <div class="row">
     <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" [ngbCollapse]="isMenuCollapsed">
-      <div class="sidebar-sticky pt-3">
+      <div class="sidebar-sticky pt-3 d-flex flex-column justify-space-around">
         <ul class="nav flex-column">
           <li class="nav-item">
             <a class="nav-link" routerLink="dashboard" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#house"/>
-              </svg>
-              Dashboard
+              </svg>&nbsp;<ng-container i18n>Dashboard</ng-container>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="documents" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#files"/>
-              </svg>
-              Documents
+              </svg>&nbsp;<ng-container i18n>Documents</ng-container>
             </a>
           </li>
         </ul>
 
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" *ngIf='viewConfigService.getSideBarConfigs().length > 0'>
-          <span>Saved views</span>
+        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.sidebarViews.length > 0'>
+          <ng-container i18n>Saved views</ng-container>
         </h6>
         <ul class="nav flex-column mb-2">
-          <li class="nav-item w-100" *ngFor='let config of viewConfigService.getSideBarConfigs()'>
-            <a class="nav-link text-truncate" routerLink="view/{{config.id}}" routerLinkActive="active" (click)="closeMenu()">
+          <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews">
+            <a class="nav-link text-truncate" routerLink="view/{{view.id}}" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#funnel"/>
-              </svg>
-              {{config.title}}
+              </svg>&nbsp;{{view.name}}
             </a>
           </li>
         </ul>
 
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
-          <span>Open documents</span>
+        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='openDocuments.length > 0'>
+          <ng-container i18n>Open documents</ng-container>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor='let d of openDocuments'>
             <a class="nav-link text-truncate" routerLink="documents/{{d.id}}" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#file-text"/>
-              </svg>
-              {{d.title}}
+              </svg>&nbsp;{{d.title | documentTitle}}
+              <span class="close bg-light" (click)="closeDocument(d); $event.preventDefault()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                  <use xlink:href="assets/bootstrap-icons.svg#x"/>
+                </svg>
+              </span>
             </a>
           </li>
-          <li class="nav-item w-100" *ngIf="openDocuments.length > 1">
+          <li class="nav-item w-100" *ngIf="openDocuments.length >= 1">
             <a class="nav-link text-truncate" [routerLink]="" (click)="closeAll()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#x"/>
-              </svg>
-              Close all
+              </svg>&nbsp;<ng-container i18n>Close all</ng-container>
             </a>
           </li>
         </ul>
 
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>Manage</span>
+        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
+          <ng-container i18n>Manage</ng-container>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
             <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#person"/>
-              </svg>
-              Correspondents
+              </svg>&nbsp;<ng-container i18n>Correspondents</ng-container>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="tags" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#tags"/>
-              </svg>
-              Tags
+              </svg>&nbsp;<ng-container i18n>Tags</ng-container>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="documenttypes" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#hash"/>
-              </svg>
-              Document types
+              </svg>&nbsp;<ng-container i18n>Document types</ng-container>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>
-              </svg>
-              Logs
+              </svg>&nbsp;<ng-container i18n>Logs</ng-container>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="settings" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#gear"/>
-              </svg>
-              Settings
+              </svg>&nbsp;<ng-container i18n>Settings</ng-container>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="admin/">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#toggles"/>
-              </svg>
-              Admin
+              </svg>&nbsp;<ng-container i18n>Admin</ng-container>
             </a>
           </li>
         </ul>
 
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>Misc</span>
+        <h6 class="sidebar-heading px-3 mt-auto pt-4 mb-1 text-muted">
+          <ng-container i18n>Info</ng-container>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" href="https://paperless-ng.readthedocs.io/en/latest/">
+            <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://paperless-ng.readthedocs.io/en/latest/">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#question-circle"/>
-              </svg>
-              Documentation
+              </svg>&nbsp;<ng-container i18n>Documentation</ng-container>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="https://github.com/jonaswinkler/paperless-ng">
-              <svg class="sidebaricon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#link"/>
-              </svg>
-              GitHub
-            </a>
+            <div class="d-flex w-100 flex-wrap">
+              <a class="nav-link pr-0 pb-0" target="_blank" rel="noopener noreferrer" href="https://github.com/jonaswinkler/paperless-ng">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="sidebaricon bi bi-github" viewBox="0 0 16 16">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>&nbsp;<ng-container i18n>GitHub</ng-container>
+              </a>
+              <a class="nav-link-additional small text-muted ml-3" target="_blank" rel="noopener noreferrer" href="https://github.com/jonaswinkler/paperless-ng/discussions/categories/feature-requests" title="Suggest an idea">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" fill="currentColor" class="bi bi-lightbulb pr-1" viewBox="0 0 16 16">
+                  <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z"/>
+                </svg>
+                <ng-container i18n>Suggest an idea</ng-container>
+              </a>
+            </div>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="accounts/logout/">
-              <svg class="sidebaricon" fill="currentColor">
-                <use xlink:href="assets/bootstrap-icons.svg#door-open"/>
-              </svg>
-              Logout
-            </a>
+          <li class="nav-item mt-2">
+            <div class="px-3 py-2 text-muted small">
+              {{versionString}}
+            </div>
           </li>
         </ul>
       </div>

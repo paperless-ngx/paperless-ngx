@@ -4,6 +4,15 @@ import { PaperlessTag } from './paperless-tag'
 import { PaperlessDocumentType } from './paperless-document-type'
 import { Observable } from 'rxjs'
 
+export interface SearchHit {
+
+  score?: number
+  rank?: number
+
+  highlights?: string
+
+}
+
 export interface PaperlessDocument extends ObjectWithId {
 
     correspondent$?: Observable<PaperlessCorrespondent>
@@ -39,5 +48,7 @@ export interface PaperlessDocument extends ObjectWithId {
     thumbnail_url?: string
 
     archive_serial_number?: number
+
+    __search_hit__?: SearchHit
 
 }

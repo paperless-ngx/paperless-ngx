@@ -1,7 +1,7 @@
 import subprocess
 
 from django.conf import settings
-from django.core.checks import Error, register
+from django.core.checks import Error, Warning, register
 
 
 def get_tesseract_langs():

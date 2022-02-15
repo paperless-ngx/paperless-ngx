@@ -5,11 +5,11 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class DocumentTitlePipe implements PipeTransform {
 
-  transform(value: string): unknown {
+  transform(value: string): string {
     if (value) {
       return value
     } else {
-      return "(no title)"
+      return $localize`(no title)`
     }
   }
 

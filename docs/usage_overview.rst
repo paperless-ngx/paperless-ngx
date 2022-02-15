@@ -57,9 +57,6 @@ Adding documents to paperless
 #############################
 
 Once you've got Paperless setup, you need to start feeding documents into it.
-Currently, there are four options: the consumption directory, the dashboard, IMAP (email), and
-HTTP POST.
-
 When adding documents to paperless, it will perform the following operations on
 your documents:
 
@@ -74,7 +71,7 @@ your documents:
 
     This process can be configured to fit your needs. If you don't want paperless
     to create archived versions for digital documents, you can configure that by
-    configuring ``PAPERLESS_OCR_MODE=skip_noarchive``. Please read the 
+    configuring ``PAPERLESS_OCR_MODE=skip_noarchive``. Please read the
     :ref:`relevant section in the documentation <configuration-ocr>`.
 
 .. note::
@@ -111,6 +108,19 @@ Dashboard upload
 
 The dashboard has a file drop field to upload documents to paperless. Simply drag a file
 onto this field or select a file with the file dialog. Multiple files are supported.
+
+
+.. _usage-mobile_upload:
+
+Mobile upload
+=============
+
+The mobile app over at `<https://github.com/qcasey/paperless_share>`_ allows Android users
+to share any documents with paperless. This can be combined with any of the mobile
+scanning apps out there, such as Office Lens.
+
+Furthermore, there is the  `Paperless App <https://github.com/bauerj/paperless_app>`_ as well,
+which not only has document upload, but also document browsing and download features.
 
 .. _usage-email:
 
@@ -245,6 +255,8 @@ Here are a couple examples of tags and types that you could use in your collecti
 * A tag ``missing_metadata`` when you still need to add some metadata to a document, but can't
   or don't want to do this right now.
 
+.. _basic-usage_searching:
+
 Searching
 #########
 
@@ -277,7 +289,7 @@ Matching specific tags, correspondents or types:
 Matching dates:
 
 .. code::
-  
+
   created:[2005 to 2009]
   added:yesterday
   modified:today
@@ -294,11 +306,11 @@ Matching inexact words:
   auto complete and query correction.
 
 All of these constructs can be combined as you see fit.
-If you want to learn more about the query language used by paperless, paperless uses Whoosh's default query language. 
+If you want to learn more about the query language used by paperless, paperless uses Whoosh's default query language.
 Head over to `Whoosh query language <https://whoosh.readthedocs.io/en/latest/querylang.html>`_.
 For details on what date parsing utilities are available, see
 `Date parsing <https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries>`_.
- 
+
 
 .. _usage-recommended_workflow:
 
@@ -373,7 +385,7 @@ Once you have scanned in a document, proceed in paperless as follows.
 6.  Remove inbox tags from the documents.
 
 .. hint::
-    
+
     You can setup manual matching rules for your correspondents and tags and
     paperless will assign them automatically. After consuming a couple documents,
     you can even ask paperless to *learn* when to assign tags and correspondents

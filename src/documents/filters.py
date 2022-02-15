@@ -1,10 +1,11 @@
+from django.db.models import Q
 from django_filters.rest_framework import BooleanFilter, FilterSet, Filter
 
 from .models import Correspondent, Document, Tag, DocumentType, Log
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
-INT_KWARGS = ["exact", "gt", "gte", "lt", "lte"]
+INT_KWARGS = ["exact", "gt", "gte", "lt", "lte", "isnull"]
 DATE_KWARGS = ["year", "month", "day", "date__gt", "gt", "date__lt", "lt"]
 
 
@@ -70,6 +71,16 @@ class InboxFilter(Filter):
             return qs
 
 
+class TitleContentFilter(Filter):
+
+    def filter(self, qs, value):
+        if value:
+            return qs.filter(Q(title__icontains=value) |
+                             Q(content__icontains=value))
+        else:
+            return qs
+
+
 class DocumentFilterSet(FilterSet):
 
     is_tagged = BooleanFilter(
@@ -85,6 +96,8 @@ class DocumentFilterSet(FilterSet):
 
     is_in_inbox = InboxFilter()
 
+    title_content = TitleContentFilter()
+
     class Meta:
         model = Document
         fields = {
@@ -98,12 +111,14 @@ class DocumentFilterSet(FilterSet):
             "added": DATE_KWARGS,
             "modified": DATE_KWARGS,
 
+            "correspondent": ["isnull"],
             "correspondent__id": ID_KWARGS,
             "correspondent__name": CHAR_KWARGS,
 
             "tags__id": ID_KWARGS,
             "tags__name": CHAR_KWARGS,
 
+            "document_type": ["isnull"],
             "document_type__id": ID_KWARGS,
             "document_type__name": CHAR_KWARGS,
 

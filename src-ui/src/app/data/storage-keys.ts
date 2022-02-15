@@ -5,8 +5,3 @@ export const OPEN_DOCUMENT_SERVICE = {
 export const DOCUMENT_LIST_SERVICE = {
   CURRENT_VIEW_CONFIG: 'document-list-service:currentViewConfig'
 }
-
-export const GENERAL_SETTINGS = {
-  DOCUMENT_LIST_SIZE: 'general-settings:documentListSize',
-  DOCUMENT_LIST_SIZE_DEFAULT: 50
-}

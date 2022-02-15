@@ -1,4 +1,4 @@
-<app-page-header title="Settings">
+<app-page-header title="Settings" i18n-title>
 
 </app-page-header>
 
@@ -7,57 +7,168 @@
 
   <ul ngbNav #nav="ngbNav" class="nav-tabs">
     <li [ngbNavItem]="1">
-      <a ngbNavLink>General settings</a>
+      <a ngbNavLink i18n>General settings</a>
       <ng-template ngbNavContent>
 
-        <h4>Document list</h4>
-        
+        <h4 i18n>Appearance</h4>
+
         <div class="form-row form-group">
           <div class="col-md-3 col-form-label">
-            <span>Items per page</span>
+            <span i18n>Display language</span>
           </div>
           <div class="col">
-        
+
+            <select class="form-control" formControlName="displayLanguage">
+              <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code && currentLocale != 'en-US'"> - {{lang.englishName}}</span></option>
+            </select>
+
+            <small class="form-text text-muted" i18n>You need to reload the page after applying a new language.</small>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Date display</span>
+          </div>
+          <div class="col">
+
+            <select class="form-control" formControlName="dateLocale">
+              <option *ngFor="let lang of dateLocaleOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> - {{today | customDate:'shortDate':null:lang.code}}</span></option>
+            </select>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Date format</span>
+          </div>
+          <div class="col">
+
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatShort" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="shortDate">
+              <label class="custom-control-label" for="dateFormatShort" i18n>Short: {{today | customDate:'shortDate':null:computedDateLocale}}</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatMedium" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="mediumDate">
+              <label class="custom-control-label" for="dateFormatMedium" i18n>Medium: {{today | customDate:'mediumDate':null:computedDateLocale}}</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input type="radio" id="dateFormatLong" name="dateFormat" class="custom-control-input" formControlName="dateFormat" value="longDate">
+              <label class="custom-control-label" for="dateFormatLong" i18n>Long: {{today | customDate:'longDate':null:computedDateLocale}}</label>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Items per page</span>
+          </div>
+          <div class="col">
+
             <select class="form-control" formControlName="documentListItemPerPage">
               <option [ngValue]="10">10</option>
               <option [ngValue]="25">25</option>
               <option [ngValue]="50">50</option>
               <option [ngValue]="100">100</option>
             </select>
-        
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Document editor</span>
+          </div>
+          <div class="col">
+
+            <app-input-check i18n-title title="Use PDF viewer provided by the browser" i18n-hint hint="This is usually faster for displaying large PDF documents, but it might not work on some browsers." formControlName="useNativePdfViewer"></app-input-check>
+
+          </div>
+        </div>
+
+        <div class="form-row form-group">
+          <div class="col-md-3 col-form-label">
+            <span i18n>Dark mode</span>
+          </div>
+          <div class="col">
+            <app-input-check i18n-title title="Use system settings" formControlName="darkModeUseSystem"></app-input-check>
+            <app-input-check [hidden]="settingsForm.value.darkModeUseSystem" i18n-title title="Enable dark mode" formControlName="darkModeEnabled"></app-input-check>
+            <app-input-check i18n-title title="Invert thumbnails in dark mode" formControlName="darkModeInvertThumbs"></app-input-check>
+          </div>
+        </div>
+
+        <h4 class="mt-4" i18n>Bulk editing</h4>
+
+        <div class="form-row form-group">
+          <div class="offset-md-3 col">
+            <app-input-check i18n-title title="Show confirmation dialogs" formControlName="bulkEditConfirmationDialogs" i18n-hint hint="Deleting documents will always ask for confirmation."></app-input-check>
+            <app-input-check i18n-title title="Apply on close" formControlName="bulkEditApplyOnClose"></app-input-check>
           </div>
         </div>
 
       </ng-template>
     </li>
+
     <li [ngbNavItem]="2">
-      <a ngbNavLink>Saved views</a>
+      <a ngbNavLink i18n>Notifications</a>
       <ng-template ngbNavContent>
 
-        <table class="table table-borderless table-sm">
-          <thead>
-            <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Show in dashboard</th>
-              <th scope="col">Show in sidebar</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let config of savedViewConfigService.getConfigs()">
-              <td>{{ config.title }}</td>
-              <td>{{ config.showInDashboard | yesno }}</td>
-              <td>{{ config.showInSideBar | yesno }}</td>
-              <td><button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteViewConfig(config)">Delete</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <h4 i18n>Document processing</h4>
+
+        <div class="form-row form-group">
+          <div class="offset-md-3 col">
+            <app-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></app-input-check>
+            <app-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></app-input-check>
+            <app-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></app-input-check>
+            <app-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></app-input-check>
+          </div>
+        </div>
+
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="3">
+      <a ngbNavLink i18n>Saved views</a>
+      <ng-template ngbNavContent>
+
+        <div formGroupName="savedViews">
+
+            <div *ngFor="let view of savedViews" [formGroupName]="view.id" class="form-row">
+              <div class="form-group col-4 mr-3">
+                <label for="name_{{view.id}}" i18n>Name</label>
+                <input type="text" class="form-control" formControlName="name" id="name_{{view.id}}">
+              </div>
+
+              <div class="form-group col-auto mr-3">
+                <label for="show_on_dashboard_{{view.id}}" i18n>Appears on</label>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
+                  <label class="custom-control-label" for="show_on_dashboard_{{view.id}}" i18n>Show on dashboard</label>
+                </div>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="show_in_sidebar_{{view.id}}" formControlName="show_in_sidebar">
+                  <label class="custom-control-label" for="show_in_sidebar_{{view.id}}" i18n>Show in sidebar</label>
+                </div>
+              </div>
+
+              <div class="form-group col-auto">
+                <label for="name_{{view.id}}" i18n>Actions</label>
+                <button type="button" class="btn btn-sm btn-outline-danger form-control" (click)="deleteSavedView(view)" i18n>Delete</button>
+              </div>
+            </div>
+
+            <div *ngIf="savedViews.length == 0" i18n>No saved views defined.</div>
+
+        </div>
 
       </ng-template>
     </li>
   </ul>
 
-  <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3 shadow"></div>
+  <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary">Save</button>
+  <button type="submit" class="btn btn-primary" i18n>Save</button>
 </form>

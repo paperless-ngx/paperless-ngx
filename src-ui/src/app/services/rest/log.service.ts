@@ -1,14 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PaperlessLog } from 'src/app/data/paperless-log';
-import { AbstractPaperlessService } from './abstract-paperless-service';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LogService extends AbstractPaperlessService<PaperlessLog> {
+export class LogService {
 
-  constructor(http: HttpClient) {
-    super(http, 'logs')
+  constructor(private http: HttpClient) {
+  }
+
+  list(): Observable<string[]> {
+    return this.http.get<string[]>(`${environment.apiBaseUrl}logs/`)
+  }
+
+  get(id: string): Observable<string[]> {
+    return this.http.get<string[]>(`${environment.apiBaseUrl}logs/${id}/`)
   }
 }

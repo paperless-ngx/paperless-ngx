@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component';
@@ -14,7 +14,15 @@ import { ToastService } from 'src/app/services/toast.service';
 export class CorrespondentEditDialogComponent extends EditDialogComponent<PaperlessCorrespondent> {
 
   constructor(service: CorrespondentService, activeModal: NgbActiveModal, toastService: ToastService) {
-    super(service, activeModal, toastService, 'correspondent')
+    super(service, activeModal, toastService)
+  }
+
+  getCreateTitle() {
+    return $localize`Create new correspondent`
+  }
+
+  getEditTitle() {
+    return $localize`Edit correspondent`
   }
 
   getForm(): FormGroup {
@@ -24,6 +32,6 @@ export class CorrespondentEditDialogComponent extends EditDialogComponent<Paperl
       match: new FormControl(""),
       is_insensitive: new FormControl(true)
     })
-  }  
+  }
 
 }
