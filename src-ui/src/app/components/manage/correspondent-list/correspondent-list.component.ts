@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
+import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
-import { environment } from 'src/environments/environment';
+import { ToastService } from 'src/app/services/toast.service';
 import { GenericListComponent } from '../generic-list/generic-list.component';
 import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/correspondent-edit-dialog.component';
 
@@ -12,19 +13,20 @@ import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/co
   templateUrl: './correspondent-list.component.html',
   styleUrls: ['./correspondent-list.component.scss']
 })
-export class CorrespondentListComponent extends GenericListComponent<PaperlessCorrespondent> implements OnInit {
+export class CorrespondentListComponent extends GenericListComponent<PaperlessCorrespondent> {
 
-  constructor(correspondentsService: CorrespondentService, modalService: NgbModal, private titleService: Title) { 
-    super(correspondentsService,modalService,CorrespondentEditDialogComponent)
+  constructor(correspondentsService: CorrespondentService, modalService: NgbModal,
+    private list: DocumentListViewService,
+    toastService: ToastService
+  ) {
+    super(correspondentsService,modalService,CorrespondentEditDialogComponent, toastService)
   }
 
-  getObjectName(object: PaperlessCorrespondent) {
-    return `correspondent '${object.name}'`
+  getDeleteMessage(object: PaperlessCorrespondent) {
+    return $localize`Do you really want to delete the correspondent "${object.name}"?`
   }
 
-  ngOnInit(): void {
-    super.ngOnInit()
-    this.titleService.setTitle(`Correspondents - ${environment.appTitle}`)
+  filterDocuments(object: PaperlessCorrespondent) {
+    this.list.quickFilter([{rule_type: FILTER_CORRESPONDENT, value: object.id.toString()}])
   }
-
 }

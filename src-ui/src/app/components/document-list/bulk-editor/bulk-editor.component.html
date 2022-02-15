@@ -1,0 +1,79 @@
+<div class="row">
+  <div class="col-auto mb-2 mb-xl-0" role="group" aria-label="Select">
+    <button class="btn btn-sm btn-outline-danger" (click)="list.selectNone()">
+      <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#slash-circle" />
+      </svg>&nbsp;<ng-container i18n>Cancel</ng-container>
+    </button>
+  </div>
+  <div class="col-auto mb-2 mb-xl-0 ml-auto ml-md-0" role="group" aria-label="Select">
+    <label class="mr-2 mb-0" i18n>Select:</label>
+    <div class="btn-group">
+      <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#file-earmark-check" />
+        </svg>&nbsp;<ng-container i18n>Page</ng-container>
+      </button>
+      <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#check-all" />
+        </svg>&nbsp;<ng-container i18n>All</ng-container>
+      </button>
+    </div>
+  </div>
+  <div class="w-100 d-xl-none"></div>
+  <div class="col-auto mb-2 mb-xl-0">
+    <div class="d-flex">
+      <label class="ml-auto mt-1 mb-0 mr-2" i18n>Edit:</label>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" i18n-title
+        filterPlaceholder="Filter tags" i18n-filterPlaceholder
+        [items]="tags"
+        [editing]="true"
+        [multiple]="true"
+        [applyOnClose]="applyOnClose"
+        (open)="openTagsDropdown()"
+        [(selectionModel)]="tagSelectionModel"
+        (apply)="setTags($event)">
+      </app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" i18n-title
+        filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
+        [items]="correspondents"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        (open)="openCorrespondentDropdown()"
+        [(selectionModel)]="correspondentSelectionModel"
+        (apply)="setCorrespondents($event)">
+      </app-filterable-dropdown>
+      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document type" icon="file-earmark-fill" i18n-title
+        filterPlaceholder="Filter document types" i18n-filterPlaceholder
+        [items]="documentTypes"
+        [editing]="true"
+        [applyOnClose]="applyOnClose"
+        (open)="openDocumentTypeDropdown()"
+        [(selectionModel)]="documentTypeSelectionModel"
+        (apply)="setDocumentTypes($event)">
+      </app-filterable-dropdown>
+    </div>
+  </div>
+  <div class="col-auto ml-auto mb-2 mb-xl-0 d-flex">
+    <div class="btn-group btn-group-sm mr-2">
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="downloadSelected()">
+        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#download" />
+        </svg>&nbsp;<ng-container i18n>Download</ng-container>
+      </button>
+      <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
+        <button class="btn btn-outline-primary btn-sm dropdown-toggle-split" ngbDropdownToggle></button>
+        <div class="dropdown-menu shadow" ngbDropdownMenu>
+          <button ngbDropdownItem i18n (click)="downloadSelected('originals')">Download originals</button>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="applyDelete()">
+      <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+        <use xlink:href="assets/bootstrap-icons.svg#trash" />
+      </svg>&nbsp;<ng-container i18n>Delete</ng-container>
+    </button>
+  </div>
+</div>

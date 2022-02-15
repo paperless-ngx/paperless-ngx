@@ -2,10 +2,11 @@ import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
-import { MATCHING_ALGORITHMS } from 'src/app/data/matching-model';
+import { map } from 'rxjs/operators';
+import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model';
 import { ObjectWithId } from 'src/app/data/object-with-id';
 import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
-import { Toast, ToastService } from 'src/app/services/toast.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Directive()
 export abstract class EditDialogComponent<T extends ObjectWithId> implements OnInit {
@@ -13,8 +14,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
   constructor(
     private service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
-    private toastService: ToastService,
-    private entityName: string) { }
+    private toastService: ToastService) { }
 
   @Input()
   dialogMode: string = 'create'
@@ -25,6 +25,12 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
   @Output()
   success = new EventEmitter()
 
+  networkActive = false
+
+  closeEnabled = false
+
+  error = null
+
   abstract getForm(): FormGroup
 
   objectForm: FormGroup = this.getForm()
@@ -33,14 +39,31 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
     if (this.object != null) {
       this.objectForm.patchValue(this.object)
     }
+
+    // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
+    setTimeout(() => {
+      this.closeEnabled = true
+    });
+  }
+
+  getCreateTitle() {
+    return $localize`Create new item`
+  }
+
+  getEditTitle() {
+    return $localize`Edit item`
+  }
+
+  getSaveErrorMessage(error: string) {
+    return $localize`Could not save element: ${error}`
   }
 
   getTitle() {
     switch (this.dialogMode) {
       case 'create':
-        return "Create new " + this.entityName
+        return this.getCreateTitle()
       case 'edit':
-        return "Edit " + this.entityName
+        return this.getEditTitle()
       default:
         break;
     }
@@ -48,6 +71,10 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
 
   getMatchingAlgorithms() {
     return MATCHING_ALGORITHMS
+  }
+
+  get patternRequired(): boolean {
+    return this.objectForm?.value.matching_algorithm !== MATCH_AUTO
   }
 
   save() {
@@ -62,11 +89,13 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       default:
         break;
     }
+    this.networkActive = true
     serverResponse.subscribe(result => {
       this.activeModal.close()
       this.success.emit(result)
     }, error => {
-      this.toastService.showToast(Toast.makeError(`Could not save ${this.entityName}: ${error.error.name}`))
+      this.error = error.error
+      this.networkActive = false
     })
   }
 

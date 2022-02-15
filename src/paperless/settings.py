@@ -4,7 +4,10 @@ import multiprocessing
 import os
 import re
 
+from concurrent_log_handler.queue import setup_logging_queues
 from dotenv import load_dotenv
+
+from django.utils.translation import gettext_lazy as _
 
 # Tap paperless.conf if it's available
 if os.path.exists("../paperless.conf"):
@@ -60,6 +63,8 @@ MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
 INDEX_DIR = os.path.join(DATA_DIR, "index")
 MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 
+LOGGING_DIR = os.getenv('PAPERLESS_LOGGING_DIR', os.path.join(DATA_DIR, "log"))
+
 CONSUMPTION_DIR = os.getenv("PAPERLESS_CONSUMPTION_DIR", os.path.join(BASE_DIR, "..", "consume"))
 
 # This will be created if it doesn't exist
@@ -68,6 +73,8 @@ SCRATCH_DIR = os.getenv("PAPERLESS_SCRATCH_DIR", "/tmp/paperless")
 ###############################################################################
 # Application Definition                                                      #
 ###############################################################################
+
+env_apps = os.getenv("PAPERLESS_APPS").split(",") if os.getenv("PAPERLESS_APPS") else []
 
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
@@ -95,14 +102,22 @@ INSTALLED_APPS = [
 
     "django_q",
 
-]
+] + env_apps
+
+if DEBUG:
+    INSTALLED_APPS.append("channels")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication'
-    ]
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
+    'DEFAULT_VERSION': '1',
+    # Make sure these are ordered and that the most recent version appears
+    # last
+    'ALLOWED_VERSIONS': ['1', '2']
 }
 
 if DEBUG:
@@ -115,8 +130,10 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'paperless.middleware.ApiVersionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -125,12 +142,17 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'paperless.urls'
 
 FORCE_SCRIPT_NAME = os.getenv("PAPERLESS_FORCE_SCRIPT_NAME")
+BASE_URL = (FORCE_SCRIPT_NAME or "") + "/"
+LOGIN_URL = BASE_URL + "accounts/login/"
+LOGOUT_REDIRECT_URL = os.getenv("PAPERLESS_LOGOUT_REDIRECT_URL")
 
 WSGI_APPLICATION = 'paperless.wsgi.application'
+ASGI_APPLICATION = "paperless.asgi.application"
 
-STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", "/static/")
+STATIC_URL = os.getenv("PAPERLESS_STATIC_URL", BASE_URL + "static/")
+WHITENOISE_STATIC_PREFIX = "/static/"
 
-# what is this used for?
+# TODO: what is this used for?
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -147,6 +169,17 @@ TEMPLATES = [
     },
 ]
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")],
+            "capacity": 2000,  # default 100
+            "expiry": 15,  # default 60
+        },
+    },
+}
+
 ###############################################################################
 # Security                                                                    #
 ###############################################################################
@@ -159,11 +192,24 @@ if AUTO_LOGIN_USERNAME:
     # regular login in case the provided user does not exist.
     MIDDLEWARE.insert(_index+1, 'paperless.auth.AutoLoginMiddleware')
 
+ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
+HTTP_REMOTE_USER_HEADER_NAME = os.getenv("PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME", "HTTP_REMOTE_USER")
 
+if ENABLE_HTTP_REMOTE_USER:
+    MIDDLEWARE.append(
+        'paperless.auth.HttpRemoteUserMiddleware'
+    )
+    AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.RemoteUserBackend',
+        'django.contrib.auth.backends.ModelBackend'
+    ]
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append(
+        'rest_framework.authentication.RemoteUserAuthentication'
+    )
+
+# X-Frame options for embedded PDF display:
 if DEBUG:
-    X_FRAME_OPTIONS = ''
-    # this should really be 'allow-from uri' but its not supported in any mayor
-    # browser.
+    X_FRAME_OPTIONS = 'ANY'
 else:
     X_FRAME_OPTIONS = 'SAMEORIGIN'
 
@@ -241,15 +287,39 @@ if os.getenv("PAPERLESS_DBHOST"):
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
         "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
+        'OPTIONS': {'sslmode': os.getenv("PAPERLESS_DBSSLMODE", "prefer")},
     }
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 ###############################################################################
 # Internationalization                                                        #
 ###############################################################################
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ("en-us", _("English (US)")),
+    ("en-gb", _("English (GB)")),
+    ("de-de", _("German")),
+    ("nl-nl", _("Dutch")),
+    ("fr-fr", _("French")),
+    ("pt-br", _("Portuguese (Brazil)")),
+    ("pt-pt", _("Portuguese")),
+    ("it-it", _("Italian")),
+    ("ro-ro", _("Romanian")),
+    ("ru-ru", _("Russian")),
+    ("es-es", _("Spanish")),
+    ("pl-pl", _("Polish")),
+    ("sv-se", _("Swedish")),
+    ("lb-lu", _("Luxembourgish")),
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, "locale")
+]
 
 TIME_ZONE = os.getenv("PAPERLESS_TIME_ZONE", "UTC")
 
@@ -263,14 +333,19 @@ USE_TZ = True
 # Logging                                                                     #
 ###############################################################################
 
-DISABLE_DBHANDLER = __get_boolean("PAPERLESS_DISABLE_DBHANDLER")
+setup_logging_queues()
+
+os.makedirs(LOGGING_DIR, exist_ok=True)
+
+LOGROTATE_MAX_SIZE = os.getenv("PAPERLESS_LOGROTATE_MAX_SIZE", 1024*1024)
+LOGROTATE_MAX_BACKUPS = os.getenv("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
+            'format': '[{asctime}] [{levelname}] [{name}] {message}',
             'style': '{',
         },
         'simple': {
@@ -279,34 +354,39 @@ LOGGING = {
         },
     },
     "handlers": {
-        "db": {
-            "level": "DEBUG",
-            "class": "documents.loggers.PaperlessHandler",
-        },
         "console": {
-            "level": "INFO",
+            "level": "DEBUG" if DEBUG else "INFO",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
+        },
+        "file_paperless": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "paperless.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS
+        },
+        "file_mail": {
+            "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOGGING_DIR, "mail.log"),
+            "maxBytes": LOGROTATE_MAX_SIZE,
+            "backupCount": LOGROTATE_MAX_BACKUPS
         }
     },
     "root": {
-        "handlers": ["console"],
-        "level": "DEBUG",
+        "handlers": ["console"]
     },
     "loggers": {
-        "documents": {
-            "handlers": ["db"],
-            "propagate": True,
+        "paperless": {
+            "handlers": ["file_paperless"],
+            "level": "DEBUG"
         },
         "paperless_mail": {
-            "handlers": ["db"],
-            "propagate": True,
-        },
-        "paperless_tesseract": {
-            "handlers": ["db"],
-            "propagate": True,
-        },
-    },
+            "handlers": ["file_mail"],
+            "level": "DEBUG"
+        }
+    }
 }
 
 ###############################################################################
@@ -321,10 +401,15 @@ LOGGING = {
 # Favors threads per worker on smaller systems and never exceeds cpu_count()
 # in total.
 
+
 def default_task_workers():
+    # always leave one core open
+    available_cores = max(multiprocessing.cpu_count(), 1)
     try:
+        if available_cores < 4:
+            return available_cores
         return max(
-            math.floor(math.sqrt(multiprocessing.cpu_count())),
+            math.floor(math.sqrt(available_cores)),
             1
         )
     except NotImplementedError:
@@ -336,22 +421,27 @@ TASK_WORKERS = int(os.getenv("PAPERLESS_TASK_WORKERS", default_task_workers()))
 Q_CLUSTER = {
     'name': 'paperless',
     'catch_up': False,
+    'recycle': 1,
+    'retry': 1800,
+    'timeout': 1800,
     'workers': TASK_WORKERS,
     'redis': os.getenv("PAPERLESS_REDIS", "redis://localhost:6379")
 }
 
 
-def default_threads_per_worker():
+def default_threads_per_worker(task_workers):
+    # always leave one core open
+    available_cores = max(multiprocessing.cpu_count(), 1)
     try:
         return max(
-            math.floor(multiprocessing.cpu_count() / TASK_WORKERS),
+            math.floor(available_cores / task_workers),
             1
         )
     except NotImplementedError:
         return 1
 
 
-THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker())
+THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker(TASK_WORKERS))
 
 ###############################################################################
 # Paperless Specific Settings                                                 #
@@ -359,9 +449,21 @@ THREADS_PER_WORKER = os.getenv("PAPERLESS_THREADS_PER_WORKER", default_threads_p
 
 CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 
+CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
+
+CONSUMER_POLLING_RETRY_COUNT = int(
+    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5)
+)
+
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
+
+# Ignore glob patterns, relative to PAPERLESS_CONSUMPTION_DIR
+CONSUMER_IGNORE_PATTERNS = list(
+    json.loads(
+        os.getenv("PAPERLESS_CONSUMER_IGNORE_PATTERNS",
+                  '[".DS_STORE/*", "._*", ".stfolder/*"]')))
 
 CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
 
@@ -382,6 +484,14 @@ OCR_OUTPUT_TYPE = os.getenv("PAPERLESS_OCR_OUTPUT_TYPE", "pdfa")
 OCR_MODE = os.getenv("PAPERLESS_OCR_MODE", "skip")
 
 OCR_IMAGE_DPI = os.getenv("PAPERLESS_OCR_IMAGE_DPI")
+
+OCR_CLEAN = os.getenv("PAPERLESS_OCR_CLEAN", "clean")
+
+OCR_DESKEW = __get_boolean("PAPERLESS_OCR_DESKEW", "true")
+
+OCR_ROTATE_PAGES = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES", "true")
+
+OCR_ROTATE_PAGES_THRESHOLD = float(os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0))
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
@@ -427,3 +537,26 @@ for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
 # TODO: this should not have a prefix.
 # Specify the filename format for out files
 PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+
+THUMBNAIL_FONT_NAME = os.getenv("PAPERLESS_THUMBNAIL_FONT_NAME", "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf")
+
+# Tika settings
+PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
+PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
+    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
+)
+
+if PAPERLESS_TIKA_ENABLED:
+    INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
+
+# List dates that should be ignored when trying to parse date from document text
+IGNORE_DATES = set()
+
+if os.getenv("PAPERLESS_IGNORE_DATES", ""):
+    import dateparser
+
+    for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
+        d = dateparser.parse(s)
+        if d:
+            IGNORE_DATES.add(d.date())

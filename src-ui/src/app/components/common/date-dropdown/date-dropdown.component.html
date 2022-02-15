@@ -1,0 +1,62 @@
+  <div class="btn-group w-100" ngbDropdown role="group">
+  <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="dateBefore || dateAfter ? 'btn-primary' : 'btn-outline-primary'">
+    {{title}}
+  </button>
+  <div class="dropdown-menu date-dropdown shadow pt-0" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
+    <div class="list-group list-group-flush">
+        <button *ngFor="let qf of quickFilters" class="list-group-item small list-goup list-group-item-action d-flex p-2 pl-3" role="menuitem" (click)="setDateQuickFilter(qf.id)">
+          {{qf.name}}
+        </button>
+        <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+
+          <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
+            <div i18n>After</div>
+            <a *ngIf="dateAfter" class="btn btn-link p-0 m-0" (click)="clearAfter()">
+              <svg width="0.8em" height="0.8em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+              </svg>
+              <small i18n>Clear</small>
+            </a>
+          </div>
+
+          <div class="input-group input-group-sm">
+            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
+                    [(ngModel)]="dateAfter" ngbDatepicker #dateAfterPicker="ngbDatepicker">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" (click)="dateAfterPicker.toggle()" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <div class="list-group-item d-flex flex-column align-items-start" role="menuitem">
+
+          <div class="mb-2 d-flex flex-row w-100 justify-content-between small">
+            <div i18n>Before</div>
+            <a *ngIf="dateBefore" class="btn btn-link p-0 m-0" (click)="clearBefore()">
+              <svg width="0.8em" height="0.8em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+              </svg>
+              <small i18n>Clear</small>
+            </a>
+          </div>
+
+          <div class="input-group input-group-sm">
+            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
+                    [(ngModel)]="dateBefore" ngbDatepicker #dateBeforePicker="ngbDatepicker">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" (click)="dateBeforePicker.toggle()" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+    </div>
+  </div>
+</div>

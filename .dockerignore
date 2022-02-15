@@ -1,3 +1,4 @@
+**/__pycache__
 /src-ui/.vscode
 /src-ui/node_modules
 /src-ui/dist
@@ -10,3 +11,9 @@
 .pytest_cache
 /dist
 /scripts
+/resources
+**/tests
+**/*.spec.ts
+**/htmlcov
+/src/.pytest_cache
+.idea

@@ -1,0 +1,83 @@
+---
+paperlessng_version: latest  # 'latest', release number, or github branch/tag/commit/ref
+
+# Required services
+paperlessng_redis_host: localhost
+paperlessng_redis_port: 6379
+paperlessng_db_type: sqlite # or postgresql
+# Below entries only apply for paperlessng_db_type=='postgresql'
+paperlessng_db_host: localhost
+paperlessng_db_port: 5432
+paperlessng_db_name: paperlessng
+paperlessng_db_user: paperlessng
+paperlessng_db_pass: paperlessng
+paperlessng_db_sslmode: prefer
+
+# Paths and folders
+paperlessng_directory: /opt/paperless-ng
+paperlessng_consumption_dir: "{{ paperlessng_directory }}/consumption"
+paperlessng_data_dir: "{{ paperlessng_directory }}/data"
+paperlessng_media_root: "{{ paperlessng_directory }}/media"
+paperlessng_staticdir: "{{ paperlessng_directory }}/static"
+paperlessng_filename_format:
+paperlessng_logging_dir: "{{ paperlessng_data_dir }}/log"
+paperlessng_virtualenv: "{{ paperlessng_directory }}/.venv"
+
+# Hosting & Security
+paperlessng_secret_key: PLEASECHANGETHISFORTHELOVEOFGOD
+paperlessng_allowed_hosts: "*"
+paperlessng_cors_allowed_hosts: http://localhost:8000
+paperlessng_force_script_name:
+paperlessng_static_url: /static/
+paperlessng_auto_login_username:
+paperlessng_cookie_prefix: ""
+paperlessng_enable_http_remote_user: False
+
+# OCR settings
+paperlessng_ocr_languages:
+  - eng
+paperlessng_ocr_mode: skip
+paperlessng_ocr_clean: clean
+paperlessng_ocr_deskew: True
+paperlessng_ocr_rotate_pages: True
+paperlessng_ocr_rotate_pages_threshold: 12
+paperlessng_ocr_output_type: pdfa
+paperlessng_ocr_pages: 0
+paperlessng_ocr_image_dpi:
+# see https://ocrmypdf.readthedocs.io/en/latest/api.html#ocrmypdf.ocr
+paperlessng_ocr_user_args:
+  - "optimize": 1
+paperlessng_use_jbig2enc: True
+paperlessng_big2enc_lossy: False
+
+# Tika settings
+paperlessng_tika_enabled: False
+paperlessng_tika_endpoint: http://localhost:9998
+paperlessng_tika_gotenberg_endpoint: http://localhost:3000
+
+# Software tweaks
+paperlessng_time_zone: Europe/Berlin
+paperlessng_consumer_polling: 0
+paperlessng_consumer_delete_duplicates: False
+paperlessng_consumer_recursive: False
+paperlessng_consumer_subdirs_as_tags: False
+paperlessng_convert_memory_limit: 0
+paperlessng_convert_tmpdir:
+paperlessng_optimize_thumbnails: True
+paperlessng_post_consume_script:
+paperlessng_filename_date_order:
+paperlessng_thumbnail_font_name: /usr/share/fonts/liberation/LiberationSerif-Regular.ttf
+paperlessng_ignore_dates: ""
+
+# Superuser settings
+paperlessng_superuser_name: paperlessng
+paperlessng_superuser_email: paperlessng@example.com
+paperlessng_superuser_password: paperlessng
+
+# System user settings
+paperlessng_system_user: paperlessng
+paperlessng_system_group: paperlessng
+
+# Webserver settings
+paperlessng_listen_address: 127.0.0.1
+paperlessng_listen_port: 8000

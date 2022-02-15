@@ -5,12 +5,14 @@ import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 
 from .utils import DirectoriesMixin
 from ..consumer import Consumer, ConsumerError
 from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
 from ..parsers import DocumentParser, ParseError
+from ..tasks import sanity_check
 
 
 class TestAttributes(TestCase):
@@ -29,81 +31,6 @@ class TestAttributes(TestCase):
 
         self.assertEqual(tuple([t.name for t in file_info.tags]), tags, filename)
 
-    def test_guess_attributes_from_name0(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Title.pdf", "Sender", "Title", ())
-
-    def test_guess_attributes_from_name1(self):
-        self._test_guess_attributes_from_name(
-            "Spaced Sender - Title.pdf", "Spaced Sender", "Title", ())
-
-    def test_guess_attributes_from_name2(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Spaced Title.pdf", "Sender", "Spaced Title", ())
-
-    def test_guess_attributes_from_name3(self):
-        self._test_guess_attributes_from_name(
-            "Dashed-Sender - Title.pdf", "Dashed-Sender", "Title", ())
-
-    def test_guess_attributes_from_name4(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Dashed-Title.pdf", "Sender", "Dashed-Title", ())
-
-    def test_guess_attributes_from_name5(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Title - tag1,tag2,tag3.pdf",
-            "Sender",
-            "Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name6(self):
-        self._test_guess_attributes_from_name(
-            "Spaced Sender - Title - tag1,tag2,tag3.pdf",
-            "Spaced Sender",
-            "Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name7(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Spaced Title - tag1,tag2,tag3.pdf",
-            "Sender",
-            "Spaced Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name8(self):
-        self._test_guess_attributes_from_name(
-            "Dashed-Sender - Title - tag1,tag2,tag3.pdf",
-            "Dashed-Sender",
-            "Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name9(self):
-        self._test_guess_attributes_from_name(
-            "Sender - Dashed-Title - tag1,tag2,tag3.pdf",
-            "Sender",
-            "Dashed-Title",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name10(self):
-        self._test_guess_attributes_from_name(
-            "Σενδερ - Τιτλε - tag1,tag2,tag3.pdf",
-            "Σενδερ",
-            "Τιτλε",
-            self.TAGS
-        )
-
-    def test_guess_attributes_from_name_when_correspondent_empty(self):
-        self._test_guess_attributes_from_name(
-            ' - weird empty correspondent but should not break.pdf',
-            None,
-            'weird empty correspondent but should not break',
-            ()
-        )
 
     def test_guess_attributes_from_name_when_title_starts_with_dash(self):
         self._test_guess_attributes_from_name(
@@ -120,28 +47,6 @@ class TestAttributes(TestCase):
             'weird but should not break -',
             ()
         )
-
-    def test_guess_attributes_from_name_when_title_is_empty(self):
-        self._test_guess_attributes_from_name(
-            'weird correspondent but should not break - .pdf',
-            'weird correspondent but should not break',
-            '',
-            ()
-        )
-
-    def test_case_insensitive_tag_creation(self):
-        """
-        Tags should be detected and created as lower case.
-        :return:
-        """
-
-        filename = "Title - Correspondent - tAg1,TAG2.pdf"
-        self.assertEqual(len(FileInfo.from_filename(filename).tags), 2)
-
-        path = "Title - Correspondent - tag1,tag2.pdf"
-        self.assertEqual(len(FileInfo.from_filename(filename).tags), 2)
-
-        self.assertEqual(Tag.objects.all().count(), 2)
 
 
 class TestFieldPermutations(TestCase):
@@ -199,69 +104,7 @@ class TestFieldPermutations(TestCase):
             filename = template.format(**spec)
             self._test_guessed_attributes(filename, **spec)
 
-    def test_title_and_correspondent(self):
-        template = '{correspondent} - {title}.pdf'
-        for correspondent in self.valid_correspondents:
-            for title in self.valid_titles:
-                spec = dict(correspondent=correspondent, title=title)
-                filename = template.format(**spec)
-                self._test_guessed_attributes(filename, **spec)
-
-    def test_title_and_correspondent_and_tags(self):
-        template = '{correspondent} - {title} - {tags}.pdf'
-        for correspondent in self.valid_correspondents:
-            for title in self.valid_titles:
-                for tags in self.valid_tags:
-                    spec = dict(correspondent=correspondent, title=title,
-                                tags=tags)
-                    filename = template.format(**spec)
-                    self._test_guessed_attributes(filename, **spec)
-
-    def test_created_and_correspondent_and_title_and_tags(self):
-
-        template = (
-            "{created} - "
-            "{correspondent} - "
-            "{title} - "
-            "{tags}.pdf"
-        )
-
-        for created in self.valid_dates:
-            for correspondent in self.valid_correspondents:
-                for title in self.valid_titles:
-                    for tags in self.valid_tags:
-                        spec = {
-                            "created": created,
-                            "correspondent": correspondent,
-                            "title": title,
-                            "tags": tags,
-                        }
-                        self._test_guessed_attributes(
-                            template.format(**spec), **spec)
-
-    def test_created_and_correspondent_and_title(self):
-
-        template = "{created} - {correspondent} - {title}.pdf"
-
-        for created in self.valid_dates:
-            for correspondent in self.valid_correspondents:
-                for title in self.valid_titles:
-
-                    # Skip cases where title looks like a tag as we can't
-                    # accommodate such cases.
-                    if title.lower() == title:
-                        continue
-
-                    spec = {
-                        "created": created,
-                        "correspondent": correspondent,
-                        "title": title
-                    }
-                    self._test_guessed_attributes(
-                        template.format(**spec), **spec)
-
     def test_created_and_title(self):
-
         template = "{created} - {title}.pdf"
 
         for created in self.valid_dates:
@@ -272,21 +115,6 @@ class TestFieldPermutations(TestCase):
                 }
                 self._test_guessed_attributes(
                     template.format(**spec), **spec)
-
-    def test_created_and_title_and_tags(self):
-
-        template = "{created} - {title} - {tags}.pdf"
-
-        for created in self.valid_dates:
-            for title in self.valid_titles:
-                for tags in self.valid_tags:
-                    spec = {
-                        "created": created,
-                        "title": title,
-                        "tags": tags
-                    }
-                    self._test_guessed_attributes(
-                        template.format(**spec), **spec)
 
     def test_invalid_date_format(self):
         info = FileInfo.from_filename("06112017Z - title.pdf")
@@ -336,54 +164,46 @@ class TestFieldPermutations(TestCase):
             info = FileInfo.from_filename(filename)
             self.assertEqual(info.title, "anotherall")
 
-        # Complex transformation without date in replacement string
-        with self.settings(
-                FILENAME_PARSE_TRANSFORMS=[(exact_patt, repl1)]):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "0001")
-            self.assertEqual(len(info.tags), 2)
-            self.assertEqual(info.tags[0].name, "tag1")
-            self.assertEqual(info.tags[1].name, "tag2")
-            self.assertIsNone(info.created)
-
-        # Complex transformation with date in replacement string
-        with self.settings(
-            FILENAME_PARSE_TRANSFORMS=[
-                (none_patt, "none.gif"),
-                (exact_patt, repl2),    # <-- matches
-                (exact_patt, repl1),
-                (all_patt, "all.gif")]):
-            info = FileInfo.from_filename(filename)
-            self.assertEqual(info.title, "0001")
-            self.assertEqual(len(info.tags), 2)
-            self.assertEqual(info.tags[0].name, "tag1")
-            self.assertEqual(info.tags[1].name, "tag2")
-            self.assertEqual(info.created.year, 2019)
-            self.assertEqual(info.created.month, 9)
-            self.assertEqual(info.created.day, 8)
-
 
 class DummyParser(DocumentParser):
 
-    def get_thumbnail(self, document_path, mime_type):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         # not important during tests
         raise NotImplementedError()
 
     def __init__(self, logging_group, scratch_dir, archive_path):
-        super(DummyParser, self).__init__(logging_group)
+        super(DummyParser, self).__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
         self.archive_path = archive_path
 
-    def get_optimised_thumbnail(self, document_path, mime_type):
+    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         self.text = "The Text"
+
+
+class CopyParser(DocumentParser):
+
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
+        return self.fake_thumb
+
+    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
+        return self.fake_thumb
+
+    def __init__(self, logging_group, progress_callback=None):
+        super(CopyParser, self).__init__(logging_group, progress_callback)
+        _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=self.tempdir)
+
+    def parse(self, document_path, mime_type, file_name=None):
+        self.text = "The text"
+        self.archive_path = os.path.join(self.tempdir, "archive.pdf")
+        shutil.copy(document_path, self.archive_path)
 
 
 class FaultyParser(DocumentParser):
 
-    def get_thumbnail(self, document_path, mime_type):
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         # not important during tests
         raise NotImplementedError()
 
@@ -391,10 +211,10 @@ class FaultyParser(DocumentParser):
         super(FaultyParser, self).__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
 
-    def get_optimised_thumbnail(self, document_path, mime_type):
+    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
         return self.fake_thumb
 
-    def parse(self, document_path, mime_type):
+    def parse(self, document_path, mime_type, file_name=None):
         raise ParseError("Does not compute.")
 
 
@@ -403,6 +223,8 @@ def fake_magic_from_file(file, mime=False):
     if mime:
         if os.path.splitext(file)[1] == ".pdf":
             return "application/pdf"
+        elif os.path.splitext(file)[1] == ".png":
+            return "image/png"
         else:
             return "unknown"
     else:
@@ -412,10 +234,24 @@ def fake_magic_from_file(file, mime=False):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumer(DirectoriesMixin, TestCase):
 
-    def make_dummy_parser(self, logging_group):
+    def _assert_first_last_send_progress(self, first_status="STARTING", last_status="SUCCESS", first_progress=0, first_progress_max=100, last_progress=100, last_progress_max=100):
+
+        self._send_progress.assert_called()
+
+        args, kwargs = self._send_progress.call_args_list[0]
+        self.assertEqual(args[0], first_progress)
+        self.assertEqual(args[1], first_progress_max)
+        self.assertEqual(args[2], first_status)
+
+        args, kwargs = self._send_progress.call_args_list[len(self._send_progress.call_args_list) - 1]
+        self.assertEqual(args[0], last_progress)
+        self.assertEqual(args[1], last_progress_max)
+        self.assertEqual(args[2], last_status)
+
+    def make_dummy_parser(self, logging_group, progress_callback=None):
         return DummyParser(logging_group, self.dirs.scratch_dir, self.get_test_archive_file())
 
-    def make_faulty_parser(self, logging_group):
+    def make_faulty_parser(self, logging_group, progress_callback=None):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
@@ -428,7 +264,11 @@ class TestConsumer(DirectoriesMixin, TestCase):
             "mime_types": {"application/pdf": ".pdf"},
             "weight": 0
         })]
+        self.addCleanup(patcher.stop)
 
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        self._send_progress = patcher.start()
         self.addCleanup(patcher.stop)
 
         self.consumer = Consumer()
@@ -456,6 +296,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIsNone(document.correspondent)
         self.assertIsNone(document.document_type)
         self.assertEqual(document.filename, "0000001.pdf")
+        self.assertEqual(document.archive_filename, "0000001.pdf")
 
         self.assertTrue(os.path.isfile(
             document.source_path
@@ -474,31 +315,57 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertFalse(os.path.isfile(filename))
 
+        self._assert_first_last_send_progress()
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT=None)
+    def testDeleteMacFiles(self):
+        # https://github.com/jonaswinkler/paperless-ng/discussions/1037
+
+        filename = self.get_test_file()
+        shadow_file = os.path.join(self.dirs.scratch_dir, "._sample.pdf")
+
+        shutil.copy(filename, shadow_file)
+
+        self.assertTrue(os.path.isfile(shadow_file))
+
+        document = self.consumer.try_consume_file(filename)
+
+        self.assertTrue(os.path.isfile(
+            document.source_path
+        ))
+
+        self.assertFalse(os.path.isfile(shadow_file))
+        self.assertFalse(os.path.isfile(filename))
+
+
     def testOverrideFilename(self):
         filename = self.get_test_file()
-        override_filename = "My Bank - Statement for November.pdf"
+        override_filename = "Statement for November.pdf"
 
         document = self.consumer.try_consume_file(filename, override_filename=override_filename)
 
-        self.assertEqual(document.correspondent.name, "My Bank")
         self.assertEqual(document.title, "Statement for November")
 
-    def testOverrideTitle(self):
+        self._assert_first_last_send_progress()
 
+    def testOverrideTitle(self):
         document = self.consumer.try_consume_file(self.get_test_file(), override_title="Override Title")
         self.assertEqual(document.title, "Override Title")
+        self._assert_first_last_send_progress()
 
     def testOverrideCorrespondent(self):
         c = Correspondent.objects.create(name="test")
 
         document = self.consumer.try_consume_file(self.get_test_file(), override_correspondent_id=c.pk)
         self.assertEqual(document.correspondent.id, c.id)
+        self._assert_first_last_send_progress()
 
     def testOverrideDocumentType(self):
         dt = DocumentType.objects.create(name="test")
 
         document = self.consumer.try_consume_file(self.get_test_file(), override_document_type_id=dt.pk)
         self.assertEqual(document.document_type.id, dt.id)
+        self._assert_first_last_send_progress()
 
     def testOverrideTags(self):
         t1 = Tag.objects.create(name="t1")
@@ -509,37 +376,42 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
         self.assertIn(t3, document.tags.all())
+        self._assert_first_last_send_progress()
 
     def testNotAFile(self):
-        try:
-            self.consumer.try_consume_file("non-existing-file")
-        except ConsumerError as e:
-            self.assertTrue(str(e).endswith('It is not a file'))
-            return
 
-        self.fail("Should throw exception")
+        self.assertRaisesMessage(
+            ConsumerError,
+            "File not found",
+            self.consumer.try_consume_file,
+            "non-existing-file"
+        )
+
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     def testDuplicates1(self):
         self.consumer.try_consume_file(self.get_test_file())
 
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertTrue(str(e).endswith("It is a duplicate."))
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "It is a duplicate",
+            self.consumer.try_consume_file,
+            self.get_test_file()
+        )
 
-        self.fail("Should throw exception")
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     def testDuplicates2(self):
         self.consumer.try_consume_file(self.get_test_file())
 
-        try:
-            self.consumer.try_consume_file(self.get_test_archive_file())
-        except ConsumerError as e:
-            self.assertTrue(str(e).endswith("It is a duplicate."))
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "It is a duplicate",
+            self.consumer.try_consume_file,
+            self.get_test_archive_file()
+        )
 
-        self.fail("Should throw exception")
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     def testDuplicates3(self):
         self.consumer.try_consume_file(self.get_test_archive_file())
@@ -549,13 +421,15 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def testNoParsers(self, m):
         m.return_value = []
 
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertTrue("No parsers abvailable for" in str(e))
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: Unsupported mime type application/pdf",
+            self.consumer.try_consume_file,
+            self.get_test_file()
+        )
 
-        self.fail("Should throw exception")
+        self._assert_first_last_send_progress(last_status="FAILED")
+
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def testFaultyParser(self, m):
@@ -565,24 +439,28 @@ class TestConsumer(DirectoriesMixin, TestCase):
             "weight": 0
         })]
 
-        try:
-            self.consumer.try_consume_file(self.get_test_file())
-        except ConsumerError as e:
-            self.assertEqual(str(e), "Does not compute.")
-            return
+        self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: Error while consuming document sample.pdf: Does not compute.",
+            self.consumer.try_consume_file,
+            self.get_test_file()
+        )
 
-        self.fail("Should throw exception.")
+        self._assert_first_last_send_progress(last_status="FAILED")
 
     @mock.patch("documents.consumer.Consumer._write")
     def testPostSaveError(self, m):
         filename = self.get_test_file()
         m.side_effect = OSError("NO.")
-        try:
-            self.consumer.try_consume_file(filename)
-        except ConsumerError as e:
-            self.assertEqual(str(e), "NO.")
-        else:
-            self.fail("Should raise exception")
+
+        self.assertRaisesMessage(
+            ConsumerError,
+            "sample.pdf: The following error occured while consuming sample.pdf: NO.",
+            self.consumer.try_consume_file,
+            filename
+        )
+
+        self._assert_first_last_send_progress(last_status="FAILED")
 
         # file not deleted
         self.assertTrue(os.path.isfile(filename))
@@ -594,11 +472,13 @@ class TestConsumer(DirectoriesMixin, TestCase):
     def testFilenameHandling(self):
         filename = self.get_test_file()
 
-        document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
+        document = self.consumer.try_consume_file(filename, override_title="new docs")
 
         self.assertEqual(document.title, "new docs")
-        self.assertEqual(document.correspondent.name, "Bank")
-        self.assertEqual(document.filename, "Bank/new docs.pdf")
+        self.assertEqual(document.filename, "none/new docs.pdf")
+        self.assertEqual(document.archive_filename, "none/new docs.pdf")
+
+        self._assert_first_last_send_progress()
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
     @mock.patch("documents.signals.handlers.generate_unique_filename")
@@ -611,20 +491,22 @@ class TestConsumer(DirectoriesMixin, TestCase):
             filenames.insert(0, f)
             return f
 
-        m.side_effect = lambda f, root: get_filename()
+        m.side_effect = lambda f, archive_filename = False: get_filename()
 
         filename = self.get_test_file()
 
         Tag.objects.create(name="test", is_inbox_tag=True)
 
-        document = self.consumer.try_consume_file(filename, override_filename="Bank - Test.pdf", override_title="new docs")
+        document = self.consumer.try_consume_file(filename, override_title="new docs")
 
         self.assertEqual(document.title, "new docs")
-        self.assertEqual(document.correspondent.name, "Bank")
         self.assertIsNotNone(os.path.isfile(document.title))
         self.assertTrue(os.path.isfile(document.source_path))
+        self.assertTrue(os.path.isfile(document.archive_path))
 
-    @mock.patch("documents.consumer.DocumentClassifier")
+        self._assert_first_last_send_progress()
+
+    @mock.patch("documents.consumer.load_classifier")
     def testClassifyDocument(self, m):
         correspondent = Correspondent.objects.create(name="test")
         dtype = DocumentType.objects.create(name="test")
@@ -642,3 +524,161 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertEqual(document.document_type, dtype)
         self.assertIn(t1, document.tags.all())
         self.assertNotIn(t2, document.tags.all())
+
+        self._assert_first_last_send_progress()
+
+    @override_settings(CONSUMER_DELETE_DUPLICATES=True)
+    def test_delete_duplicate(self):
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        doc = self.consumer.try_consume_file(dst)
+
+        self._assert_first_last_send_progress()
+
+        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotNone(doc)
+
+        self._send_progress.reset_mock()
+
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
+        self.assertFalse(os.path.isfile(dst))
+        self._assert_first_last_send_progress(last_status="FAILED")
+
+    @override_settings(CONSUMER_DELETE_DUPLICATES=False)
+    def test_no_delete_duplicate(self):
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        doc = self.consumer.try_consume_file(dst)
+
+        self.assertFalse(os.path.isfile(dst))
+        self.assertIsNotNone(doc)
+
+        dst = self.get_test_file()
+        self.assertTrue(os.path.isfile(dst))
+        self.assertRaises(ConsumerError, self.consumer.try_consume_file, dst)
+        self.assertTrue(os.path.isfile(dst))
+
+        self._assert_first_last_send_progress(last_status="FAILED")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    @mock.patch("documents.parsers.document_consumer_declaration.send")
+    def test_similar_filenames(self, m):
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"), os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple.png"), os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
+        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.png"), os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"))
+        m.return_value = [(None, {
+            "parser": CopyParser,
+            "mime_types": {"application/pdf": ".pdf", "image/png": ".png"},
+            "weight": 0
+        })]
+        doc1 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png"))
+        doc2 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"))
+        doc3 = self.consumer.try_consume_file(os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"))
+
+        self.assertEqual(doc1.filename, "simple.png")
+        self.assertEqual(doc1.archive_filename, "simple.pdf")
+        self.assertEqual(doc2.filename, "simple.pdf")
+        self.assertEqual(doc2.archive_filename, "simple_01.pdf")
+        self.assertEqual(doc3.filename, "simple.png.pdf")
+        self.assertEqual(doc3.archive_filename, "simple.png.pdf")
+
+        sanity_check()
+
+
+class PreConsumeTestCase(TestCase):
+
+    @mock.patch("documents.consumer.Popen")
+    @override_settings(PRE_CONSUME_SCRIPT=None)
+    def test_no_pre_consume_script(self, m):
+        c = Consumer()
+        c.path = "path-to-file"
+        c.run_pre_consume_script()
+        m.assert_not_called()
+
+    @mock.patch("documents.consumer.Popen")
+    @mock.patch("documents.consumer.Consumer._send_progress")
+    @override_settings(PRE_CONSUME_SCRIPT="does-not-exist")
+    def test_pre_consume_script_not_found(self, m, m2):
+        c = Consumer()
+        c.filename = "somefile.pdf"
+        c.path = "path-to-file"
+        self.assertRaises(ConsumerError, c.run_pre_consume_script)
+
+    @mock.patch("documents.consumer.Popen")
+    def test_pre_consume_script(self, m):
+        with tempfile.NamedTemporaryFile() as script:
+            with override_settings(PRE_CONSUME_SCRIPT=script.name):
+                c = Consumer()
+                c.path = "path-to-file"
+                c.run_pre_consume_script()
+
+                m.assert_called_once()
+
+                args, kwargs = m.call_args
+
+                command = args[0]
+
+                self.assertEqual(command[0], script.name)
+                self.assertEqual(command[1], "path-to-file")
+
+
+class PostConsumeTestCase(TestCase):
+
+    @mock.patch("documents.consumer.Popen")
+    @override_settings(POST_CONSUME_SCRIPT=None)
+    def test_no_post_consume_script(self, m):
+        doc = Document.objects.create(title="Test", mime_type="application/pdf")
+        tag1 = Tag.objects.create(name="a")
+        tag2 = Tag.objects.create(name="b")
+        doc.tags.add(tag1)
+        doc.tags.add(tag2)
+
+        Consumer().run_post_consume_script(doc)
+
+        m.assert_not_called()
+
+    @override_settings(POST_CONSUME_SCRIPT="does-not-exist")
+    @mock.patch("documents.consumer.Consumer._send_progress")
+    def test_post_consume_script_not_found(self, m):
+        doc = Document.objects.create(title="Test", mime_type="application/pdf")
+        c = Consumer()
+        c.filename = "somefile.pdf"
+        self.assertRaises(ConsumerError, c.run_post_consume_script, doc)
+
+    @mock.patch("documents.consumer.Popen")
+    def test_post_consume_script_simple(self, m):
+        with tempfile.NamedTemporaryFile() as script:
+            with override_settings(POST_CONSUME_SCRIPT=script.name):
+                doc = Document.objects.create(title="Test", mime_type="application/pdf")
+
+                Consumer().run_post_consume_script(doc)
+
+                m.assert_called_once()
+
+    @mock.patch("documents.consumer.Popen")
+    def test_post_consume_script_with_correspondent(self, m):
+        with tempfile.NamedTemporaryFile() as script:
+            with override_settings(POST_CONSUME_SCRIPT=script.name):
+                c = Correspondent.objects.create(name="my_bank")
+                doc = Document.objects.create(title="Test", mime_type="application/pdf", correspondent=c)
+                tag1 = Tag.objects.create(name="a")
+                tag2 = Tag.objects.create(name="b")
+                doc.tags.add(tag1)
+                doc.tags.add(tag2)
+
+                Consumer().run_post_consume_script(doc)
+
+                m.assert_called_once()
+
+                args, kwargs = m.call_args
+
+                command = args[0]
+
+                self.assertEqual(command[0], script.name)
+                self.assertEqual(command[1], str(doc.pk))
+                self.assertEqual(command[5], f"/api/documents/{doc.pk}/download/")
+                self.assertEqual(command[6], f"/api/documents/{doc.pk}/thumb/")
+                self.assertEqual(command[7], "my_bank")
+                self.assertCountEqual(command[8].split(","), ["a", "b"])

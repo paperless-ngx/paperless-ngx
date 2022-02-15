@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PaperlessDocument } from '../data/paperless-document';
 import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys';
+import { DocumentService } from './rest/document.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ export class OpenDocumentsService {
 
   private MAX_OPEN_DOCUMENTS = 5
 
-  constructor() { 
+  constructor(private documentService: DocumentService) {
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
       try {
         this.openDocuments = JSON.parse(sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS))
@@ -21,6 +22,18 @@ export class OpenDocumentsService {
   }
 
   private openDocuments: PaperlessDocument[] = []
+
+  refreshDocument(id: number) {
+    let index = this.openDocuments.findIndex(doc => doc.id == id)
+    if (index > -1) {
+      this.documentService.get(id).subscribe(doc => {
+        this.openDocuments[index] = doc
+      }, error => {
+        this.openDocuments.splice(index, 1)
+        this.save()
+      })
+    }
+  }
 
   getOpenDocuments(): PaperlessDocument[] {
     return this.openDocuments

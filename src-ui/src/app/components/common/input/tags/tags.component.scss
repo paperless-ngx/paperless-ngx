@@ -1,10 +1,12 @@
-.tags-form-control {
-  height: auto;
+.selected-icon {
+  min-width: 1em;
+  min-height: 1em;
 }
 
+.tag-wrap {
+  font-size: 1rem;
+}
 
-.scrollable-menu {
-  height: auto;
-  max-height: 300px;
-  overflow-x: hidden;
+.tag-wrap-delete {
+  cursor: pointer;
 }

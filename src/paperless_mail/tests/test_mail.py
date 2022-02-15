@@ -1,3 +1,4 @@
+import os
 import uuid
 from collections import namedtuple
 from typing import ContextManager
@@ -9,6 +10,7 @@ from django.test import TestCase
 from imap_tools import MailMessageFlags, MailboxFolderSelectError
 
 from documents.models import Correspondent
+from documents.tests.utils import DirectoriesMixin
 from paperless_mail import tasks
 from paperless_mail.mail import MailError, MailAccountHandler
 from paperless_mail.models import MailRule, MailAccount
@@ -41,7 +43,7 @@ class BogusMailBox(ContextManager):
 
     folder = BogusFolderManager()
 
-    def fetch(self, criteria, mark_seen):
+    def fetch(self, criteria, mark_seen, charset=""):
         msg = self.messages
 
         criteria = str(criteria).strip('()').split(" ")
@@ -130,7 +132,7 @@ def fake_magic_from_buffer(buffer, mime=False):
 
 
 @mock.patch('paperless_mail.mail.magic.from_buffer', fake_magic_from_buffer)
-class TestMail(TestCase):
+class TestMail(DirectoriesMixin, TestCase):
 
     def setUp(self):
         patcher = mock.patch('paperless_mail.mail.MailBox')
@@ -146,6 +148,7 @@ class TestMail(TestCase):
         self.reset_bogus_mailbox()
 
         self.mail_account_handler = MailAccountHandler()
+        super(TestMail, self).setUp()
 
     def reset_bogus_mailbox(self):
         self.bogus_mailbox.messages = []
@@ -220,8 +223,12 @@ class TestMail(TestCase):
         args1, kwargs1 = self.async_task.call_args_list[0]
         args2, kwargs2 = self.async_task.call_args_list[1]
 
+        self.assertTrue(os.path.isfile(kwargs1['path']), kwargs1['path'])
+
         self.assertEqual(kwargs1['override_title'], "file_0")
         self.assertEqual(kwargs1['override_filename'], "file_0.pdf")
+
+        self.assertTrue(os.path.isfile(kwargs2['path']), kwargs1['path'])
 
         self.assertEqual(kwargs2['override_title'], "file_1")
         self.assertEqual(kwargs2['override_filename'], "file_1.pdf")
@@ -253,6 +260,7 @@ class TestMail(TestCase):
         self.assertEqual(self.async_task.call_count, 1)
 
         args, kwargs = self.async_task.call_args
+        self.assertTrue(os.path.isfile(kwargs['path']), kwargs['path'])
         self.assertEqual(kwargs['override_filename'], "f1.pdf")
 
     def test_handle_disposition(self):
@@ -272,6 +280,49 @@ class TestMail(TestCase):
 
         args, kwargs = self.async_task.call_args
         self.assertEqual(kwargs['override_filename'], "f2.pdf")
+
+    def test_handle_inline_files(self):
+        message = create_message()
+        message.attachments = [
+            create_attachment(filename="f1.pdf", content_disposition='inline'),
+            create_attachment(filename="f2.pdf", content_disposition='attachment')
+        ]
+
+        account = MailAccount()
+        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account, attachment_type=MailRule.ATTACHMENT_TYPE_EVERYTHING)
+
+        result = self.mail_account_handler.handle_message(message, rule)
+
+        self.assertEqual(result, 2)
+        self.assertEqual(self.async_task.call_count, 2)
+
+    def test_filename_filter(self):
+        message = create_message()
+        message.attachments = [
+            create_attachment(filename="f1.pdf"),
+            create_attachment(filename="f2.pdf"),
+            create_attachment(filename="f3.pdf"),
+            create_attachment(filename="f2.png"),
+        ]
+
+        tests = [
+            ("*.pdf", ["f1.pdf", "f2.pdf", "f3.pdf"]),
+            ("f1.pdf", ["f1.pdf"]),
+            ("f1", []),
+            ("*", ["f1.pdf", "f2.pdf", "f3.pdf", "f2.png"]),
+            ("*.png", ["f2.png"]),
+        ]
+
+        for (pattern, matches) in tests:
+            self.async_task.reset_mock()
+            account = MailAccount()
+            rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account, filter_attachment_filename=pattern)
+
+            result = self.mail_account_handler.handle_message(message, rule)
+
+            self.assertEqual(result, len(matches))
+            filenames = [a[1]['override_filename'] for a in self.async_task.call_args_list]
+            self.assertCountEqual(filenames, matches)
 
     def test_handle_mail_account_mark_read(self):
 
@@ -399,7 +450,7 @@ class TestMail(TestCase):
 
         c = Correspondent.objects.get(name="amazon@amazon.de")
         # should work
-        self.assertEquals(kwargs['override_correspondent_id'], c.id)
+        self.assertEqual(kwargs['override_correspondent_id'], c.id)
 
         self.async_task.reset_mock()
         self.reset_bogus_mailbox()
@@ -411,7 +462,7 @@ class TestMail(TestCase):
 
         args, kwargs = self.async_task.call_args
         self.async_task.assert_called_once()
-        self.assertEquals(kwargs['override_correspondent_id'], None)
+        self.assertEqual(kwargs['override_correspondent_id'], None)
 
 
     def test_filters(self):

@@ -1,0 +1,698 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: paperless-ng\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-16 09:38+0000\n"
+"PO-Revision-Date: 2021-05-16 10:09\n"
+"Last-Translator: \n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Crowdin-Project: paperless-ng\n"
+"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
+"X-Crowdin-File-ID: 54\n"
+
+#: documents/apps.py:10
+msgid "Documents"
+msgstr "Документы"
+
+#: documents/models.py:32
+msgid "Any word"
+msgstr "Любые слова"
+
+#: documents/models.py:33
+msgid "All words"
+msgstr "Все слова"
+
+#: documents/models.py:34
+msgid "Exact match"
+msgstr "Точное соответствие"
+
+#: documents/models.py:35
+msgid "Regular expression"
+msgstr "Регулярное выражение"
+
+#: documents/models.py:36
+msgid "Fuzzy word"
+msgstr "\"Нечёткий\" режим"
+
+#: documents/models.py:37
+msgid "Automatic"
+msgstr "Автоматически"
+
+#: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
+#: paperless_mail/models.py:117
+msgid "name"
+msgstr "имя"
+
+#: documents/models.py:45
+msgid "match"
+msgstr "соответствие"
+
+#: documents/models.py:49
+msgid "matching algorithm"
+msgstr "алгоритм сопоставления"
+
+#: documents/models.py:55
+msgid "is insensitive"
+msgstr "без учёта регистра"
+
+#: documents/models.py:74 documents/models.py:120
+msgid "correspondent"
+msgstr "корреспондент"
+
+#: documents/models.py:75
+msgid "correspondents"
+msgstr "корреспонденты"
+
+#: documents/models.py:81
+msgid "color"
+msgstr "цвет"
+
+#: documents/models.py:87
+msgid "is inbox tag"
+msgstr "это входящий тег"
+
+#: documents/models.py:89
+msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
+msgstr "Отметить этот тег как «Входящий»: все вновь добавленные документы будут помечены тегами «Входящие»."
+
+#: documents/models.py:94
+msgid "tag"
+msgstr "тег"
+
+#: documents/models.py:95 documents/models.py:151
+msgid "tags"
+msgstr "теги"
+
+#: documents/models.py:101 documents/models.py:133
+msgid "document type"
+msgstr "тип документа"
+
+#: documents/models.py:102
+msgid "document types"
+msgstr "типы документов"
+
+#: documents/models.py:110
+msgid "Unencrypted"
+msgstr "не зашифровано"
+
+#: documents/models.py:111
+msgid "Encrypted with GNU Privacy Guard"
+msgstr "Зашифровано с помощью GNU Privacy Guard"
+
+#: documents/models.py:124
+msgid "title"
+msgstr "заголовок"
+
+#: documents/models.py:137
+msgid "content"
+msgstr "содержимое"
+
+#: documents/models.py:139
+msgid "The raw, text-only data of the document. This field is primarily used for searching."
+msgstr "Это поле используется в основном для поиска."
+
+#: documents/models.py:144
+msgid "mime type"
+msgstr "тип Mime"
+
+#: documents/models.py:155
+msgid "checksum"
+msgstr "контрольная сумма"
+
+#: documents/models.py:159
+msgid "The checksum of the original document."
+msgstr "Контрольная сумма оригинального документа."
+
+#: documents/models.py:163
+msgid "archive checksum"
+msgstr "контрольная сумма архива"
+
+#: documents/models.py:168
+msgid "The checksum of the archived document."
+msgstr "Контрольная сумма архивного документа."
+
+#: documents/models.py:172 documents/models.py:328
+msgid "created"
+msgstr "создано"
+
+#: documents/models.py:176
+msgid "modified"
+msgstr "изменено"
+
+#: documents/models.py:180
+msgid "storage type"
+msgstr "тип хранилища"
+
+#: documents/models.py:188
+msgid "added"
+msgstr "добавлено"
+
+#: documents/models.py:192
+msgid "filename"
+msgstr "имя файла"
+
+#: documents/models.py:198
+msgid "Current filename in storage"
+msgstr "Текущее имя файла в хранилище"
+
+#: documents/models.py:202
+msgid "archive filename"
+msgstr "имя файла архива"
+
+#: documents/models.py:208
+msgid "Current archive filename in storage"
+msgstr "Текущее имя файла архива в хранилище"
+
+#: documents/models.py:212
+msgid "archive serial number"
+msgstr "архивный номер (АН)"
+
+#: documents/models.py:217
+msgid "The position of this document in your physical document archive."
+msgstr "Позиция этого документа в вашем физическом архиве документов."
+
+#: documents/models.py:223
+msgid "document"
+msgstr "документ"
+
+#: documents/models.py:224
+msgid "documents"
+msgstr "документы"
+
+#: documents/models.py:311
+msgid "debug"
+msgstr "отладка"
+
+#: documents/models.py:312
+msgid "information"
+msgstr "информация"
+
+#: documents/models.py:313
+msgid "warning"
+msgstr "предупреждение"
+
+#: documents/models.py:314
+msgid "error"
+msgstr "ошибка"
+
+#: documents/models.py:315
+msgid "critical"
+msgstr "критическая"
+
+#: documents/models.py:319
+msgid "group"
+msgstr "группа"
+
+#: documents/models.py:322
+msgid "message"
+msgstr "сообщение"
+
+#: documents/models.py:325
+msgid "level"
+msgstr "уровень"
+
+#: documents/models.py:332
+msgid "log"
+msgstr "журнал"
+
+#: documents/models.py:333
+msgid "logs"
+msgstr "логи"
+
+#: documents/models.py:344 documents/models.py:401
+msgid "saved view"
+msgstr "сохранённое представление"
+
+#: documents/models.py:345
+msgid "saved views"
+msgstr "сохраненные представления"
+
+#: documents/models.py:348
+msgid "user"
+msgstr "пользователь"
+
+#: documents/models.py:354
+msgid "show on dashboard"
+msgstr "показать на панели"
+
+#: documents/models.py:357
+msgid "show in sidebar"
+msgstr "показать в боковой панели"
+
+#: documents/models.py:361
+msgid "sort field"
+msgstr "Поле сортировки"
+
+#: documents/models.py:367
+msgid "sort reverse"
+msgstr "обратная сортировка"
+
+#: documents/models.py:373
+msgid "title contains"
+msgstr "заголовок содержит"
+
+#: documents/models.py:374
+msgid "content contains"
+msgstr "содержимое содержит"
+
+#: documents/models.py:375
+msgid "ASN is"
+msgstr "АН"
+
+#: documents/models.py:376
+msgid "correspondent is"
+msgstr "корреспондент"
+
+#: documents/models.py:377
+msgid "document type is"
+msgstr "тип документа"
+
+#: documents/models.py:378
+msgid "is in inbox"
+msgstr "во входящих"
+
+#: documents/models.py:379
+msgid "has tag"
+msgstr "есть тег"
+
+#: documents/models.py:380
+msgid "has any tag"
+msgstr "есть любой тег"
+
+#: documents/models.py:381
+msgid "created before"
+msgstr "создан до"
+
+#: documents/models.py:382
+msgid "created after"
+msgstr "создан после"
+
+#: documents/models.py:383
+msgid "created year is"
+msgstr "год создания"
+
+#: documents/models.py:384
+msgid "created month is"
+msgstr "месяц создания"
+
+#: documents/models.py:385
+msgid "created day is"
+msgstr "день создания"
+
+#: documents/models.py:386
+msgid "added before"
+msgstr "добавлен до"
+
+#: documents/models.py:387
+msgid "added after"
+msgstr "добавлен после"
+
+#: documents/models.py:388
+msgid "modified before"
+msgstr "изменен до"
+
+#: documents/models.py:389
+msgid "modified after"
+msgstr "изменен после"
+
+#: documents/models.py:390
+msgid "does not have tag"
+msgstr "не имеет тега"
+
+#: documents/models.py:391
+msgid "does not have ASN"
+msgstr "не имеет архивного номера"
+
+#: documents/models.py:392
+msgid "title or content contains"
+msgstr "Название или содержимое включает"
+
+#: documents/models.py:393
+msgid "fulltext query"
+msgstr "полнотекстовый запрос"
+
+#: documents/models.py:394
+msgid "more like this"
+msgstr "больше похожих"
+
+#: documents/models.py:405
+msgid "rule type"
+msgstr "Тип правила"
+
+#: documents/models.py:409
+msgid "value"
+msgstr "значение"
+
+#: documents/models.py:415
+msgid "filter rule"
+msgstr "Правило фильтрации"
+
+#: documents/models.py:416
+msgid "filter rules"
+msgstr "правила фильтрации"
+
+#: documents/serialisers.py:53
+#, python-format
+msgid "Invalid regular expression: %(error)s"
+msgstr "неверное регулярное выражение: %(error)s"
+
+#: documents/serialisers.py:177
+msgid "Invalid color."
+msgstr "Неверный цвет."
+
+#: documents/serialisers.py:451
+#, python-format
+msgid "File type %(type)s not supported"
+msgstr "Тип файла %(type)s не поддерживается"
+
+#: documents/templates/index.html:22
+msgid "Paperless-ng is loading..."
+msgstr "Paperless-ng загружается..."
+
+#: documents/templates/registration/logged_out.html:14
+msgid "Paperless-ng signed out"
+msgstr "Выполнен выход из Paperless-ng"
+
+#: documents/templates/registration/logged_out.html:45
+msgid "You have been successfully logged out. Bye!"
+msgstr "Вы успешно вышли из системы. До свидания!"
+
+#: documents/templates/registration/logged_out.html:46
+msgid "Sign in again"
+msgstr "Войти снова"
+
+#: documents/templates/registration/login.html:15
+msgid "Paperless-ng sign in"
+msgstr "Выполнен выход в Paperless-ng"
+
+#: documents/templates/registration/login.html:47
+msgid "Please sign in."
+msgstr "Пожалуйста, войдите."
+
+#: documents/templates/registration/login.html:50
+msgid "Your username and password didn't match. Please try again."
+msgstr "Неправильные имя пользователя или пароль! Попробуйте еще раз."
+
+#: documents/templates/registration/login.html:53
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: documents/templates/registration/login.html:54
+msgid "Password"
+msgstr "Пароль"
+
+#: documents/templates/registration/login.html:59
+msgid "Sign in"
+msgstr "Вход"
+
+#: paperless/settings.py:303
+msgid "English (US)"
+msgstr "Английский (США)"
+
+#: paperless/settings.py:304
+msgid "English (GB)"
+msgstr "Английский (Великобритании)"
+
+#: paperless/settings.py:305
+msgid "German"
+msgstr "Немецкий"
+
+#: paperless/settings.py:306
+msgid "Dutch"
+msgstr "Датский"
+
+#: paperless/settings.py:307
+msgid "French"
+msgstr "Французский"
+
+#: paperless/settings.py:308
+msgid "Portuguese (Brazil)"
+msgstr "Portuguese (Brazil)"
+
+#: paperless/settings.py:309
+msgid "Portuguese"
+msgstr "Португальский"
+
+#: paperless/settings.py:310
+msgid "Italian"
+msgstr "Italian"
+
+#: paperless/settings.py:311
+msgid "Romanian"
+msgstr "Romanian"
+
+#: paperless/settings.py:312
+msgid "Russian"
+msgstr "Русский"
+
+#: paperless/settings.py:313
+msgid "Spanish"
+msgstr "Испанский"
+
+#: paperless/settings.py:314
+msgid "Polish"
+msgstr ""
+
+#: paperless/settings.py:315
+msgid "Swedish"
+msgstr ""
+
+#: paperless/urls.py:120
+msgid "Paperless-ng administration"
+msgstr "Администрирование Paperless-ng"
+
+#: paperless_mail/admin.py:15
+msgid "Authentication"
+msgstr ""
+
+#: paperless_mail/admin.py:18
+msgid "Advanced settings"
+msgstr ""
+
+#: paperless_mail/admin.py:37
+msgid "Filter"
+msgstr "Фильтр"
+
+#: paperless_mail/admin.py:39
+msgid "Paperless will only process mails that match ALL of the filters given below."
+msgstr "Paperless будет обрабатывать только те письма, которые соответствуют всем фильтрам, указанным ниже."
+
+#: paperless_mail/admin.py:49
+msgid "Actions"
+msgstr "Действия"
+
+#: paperless_mail/admin.py:51
+msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
+msgstr "Действие применено к письму. Это действие применяется только при обработке документов из почты. Сообщения без вложений не обрабатываются."
+
+#: paperless_mail/admin.py:58
+msgid "Metadata"
+msgstr "Метаданные"
+
+#: paperless_mail/admin.py:60
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgstr "Автоматически назначать метаданные документам, полученным из этого правила. Если вы не назначаете здесь теги, типы или корреспонденты, paperless все равно будут обрабатывать все соответствующие правила, которые вы определили."
+
+#: paperless_mail/apps.py:9
+msgid "Paperless mail"
+msgstr "Безбумажная почта"
+
+#: paperless_mail/models.py:11
+msgid "mail account"
+msgstr "почтовый ящик"
+
+#: paperless_mail/models.py:12
+msgid "mail accounts"
+msgstr "Почтовые ящики"
+
+#: paperless_mail/models.py:19
+msgid "No encryption"
+msgstr "Без шифрования"
+
+#: paperless_mail/models.py:20
+msgid "Use SSL"
+msgstr "Использовать SSL"
+
+#: paperless_mail/models.py:21
+msgid "Use STARTTLS"
+msgstr "Использовать STARTTLS"
+
+#: paperless_mail/models.py:29
+msgid "IMAP server"
+msgstr "Сервер IMAP"
+
+#: paperless_mail/models.py:33
+msgid "IMAP port"
+msgstr "Порт IMAP"
+
+#: paperless_mail/models.py:36
+msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgstr "Обычно это 143 для нешифрованных и STARTTLS соединений и 993 для SSL-соединений."
+
+#: paperless_mail/models.py:40
+msgid "IMAP security"
+msgstr "Безопасность IMAP"
+
+#: paperless_mail/models.py:46
+msgid "username"
+msgstr "Имя пользователя"
+
+#: paperless_mail/models.py:50
+msgid "password"
+msgstr "пароль"
+
+#: paperless_mail/models.py:54
+msgid "character set"
+msgstr ""
+
+#: paperless_mail/models.py:57
+msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
+msgstr ""
+
+#: paperless_mail/models.py:68
+msgid "mail rule"
+msgstr "правило почты"
+
+#: paperless_mail/models.py:69
+msgid "mail rules"
+msgstr "правила почты"
+
+#: paperless_mail/models.py:75
+msgid "Only process attachments."
+msgstr "Обрабатывать только вложения."
+
+#: paperless_mail/models.py:76
+msgid "Process all files, including 'inline' attachments."
+msgstr "Обрабатывать все файлы, включая 'встроенные' вложения."
+
+#: paperless_mail/models.py:86
+msgid "Mark as read, don't process read mails"
+msgstr "Пометить как прочитанное, не обрабатывать прочитанные письма"
+
+#: paperless_mail/models.py:87
+msgid "Flag the mail, don't process flagged mails"
+msgstr "Пометить почту, не обрабатывать помеченные письма"
+
+#: paperless_mail/models.py:88
+msgid "Move to specified folder"
+msgstr "Переместить в указанную папку"
+
+#: paperless_mail/models.py:89
+msgid "Delete"
+msgstr "Удалить"
+
+#: paperless_mail/models.py:96
+msgid "Use subject as title"
+msgstr "Тема в качестве заголовка"
+
+#: paperless_mail/models.py:97
+msgid "Use attachment filename as title"
+msgstr "Использовать имя вложенного файла как заголовок"
+
+#: paperless_mail/models.py:107
+msgid "Do not assign a correspondent"
+msgstr "Не назначать корреспондента"
+
+#: paperless_mail/models.py:109
+msgid "Use mail address"
+msgstr "Использовать email адрес"
+
+#: paperless_mail/models.py:111
+msgid "Use name (or mail address if not available)"
+msgstr "Использовать имя (или адрес электронной почты, если недоступно)"
+
+#: paperless_mail/models.py:113
+msgid "Use correspondent selected below"
+msgstr "Использовать корреспондента, выбранного ниже"
+
+#: paperless_mail/models.py:121
+msgid "order"
+msgstr "порядок"
+
+#: paperless_mail/models.py:128
+msgid "account"
+msgstr "Учётная запись"
+
+#: paperless_mail/models.py:132
+msgid "folder"
+msgstr "каталог"
+
+#: paperless_mail/models.py:134
+msgid "Subfolders must be separated by dots."
+msgstr ""
+
+#: paperless_mail/models.py:138
+msgid "filter from"
+msgstr "фильтр по отправителю"
+
+#: paperless_mail/models.py:141
+msgid "filter subject"
+msgstr "фильтр по теме"
+
+#: paperless_mail/models.py:144
+msgid "filter body"
+msgstr "фильтр по тексту сообщения"
+
+#: paperless_mail/models.py:148
+msgid "filter attachment filename"
+msgstr "фильтр по имени вложения"
+
+#: paperless_mail/models.py:150
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "Обрабатывать только документы, которые полностью совпадают с именем файла (если оно указано). Маски, например *.pdf или *счет*, разрешены. Без учёта регистра."
+
+#: paperless_mail/models.py:156
+msgid "maximum age"
+msgstr "Максимальный возраст"
+
+#: paperless_mail/models.py:158
+msgid "Specified in days."
+msgstr "Указывается в днях."
+
+#: paperless_mail/models.py:161
+msgid "attachment type"
+msgstr "Тип вложения"
+
+#: paperless_mail/models.py:164
+msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
+msgstr "Вложенные вложения включая встраиваемые изображения. Лучше совместить эту опцию с фильтром по имени вложения."
+
+#: paperless_mail/models.py:169
+msgid "action"
+msgstr "действие"
+
+#: paperless_mail/models.py:175
+msgid "action parameter"
+msgstr "параметр действия"
+
+#: paperless_mail/models.py:177
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
+msgstr ""
+
+#: paperless_mail/models.py:184
+msgid "assign title from"
+msgstr "назначить заголовок из"
+
+#: paperless_mail/models.py:194
+msgid "assign this tag"
+msgstr "назначить этот тег"
+
+#: paperless_mail/models.py:202
+msgid "assign this document type"
+msgstr "назначить этот тип документа"
+
+#: paperless_mail/models.py:206
+msgid "assign correspondent from"
+msgstr "назначить корреспондента из"
+
+#: paperless_mail/models.py:216
+msgid "assign this correspondent"
+msgstr "назначить этого корреспондента"
+

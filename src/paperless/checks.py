@@ -1,5 +1,6 @@
 import os
 import shutil
+import stat
 
 from django.conf import settings
 from django.core.checks import Error, Warning, register
@@ -13,20 +14,32 @@ writeable_hint = (
 )
 
 
-def path_check(env_var):
+def path_check(var, directory):
     messages = []
-    directory = os.getenv(env_var)
     if directory:
-        if not os.path.exists(directory):
+        if not os.path.isdir(directory):
             messages.append(Error(
-                exists_message.format(env_var),
+                exists_message.format(var),
                 exists_hint.format(directory)
             ))
-        elif not os.access(directory, os.W_OK | os.X_OK):
-            messages.append(Error(
-                writeable_message.format(env_var),
-                writeable_hint.format(directory)
-            ))
+        else:
+            test_file = os.path.join(
+                directory, f'__paperless_write_test_{os.getpid()}__'
+            )
+            try:
+                with open(test_file, 'w'):
+                    pass
+            except PermissionError:
+                messages.append(Error(
+                    writeable_message.format(var),
+                    writeable_hint.format(
+                        f'\n{stat.filemode(os.stat(directory).st_mode)} '
+                        f'{directory}\n')
+                ))
+            finally:
+                if os.path.isfile(test_file):
+                    os.remove(test_file)
+
     return messages
 
 
@@ -36,12 +49,9 @@ def paths_check(app_configs, **kwargs):
     Check the various paths for existence, readability and writeability
     """
 
-    check_messages = path_check("PAPERLESS_DATA_DIR") + \
-        path_check("PAPERLESS_MEDIA_ROOT") + \
-        path_check("PAPERLESS_CONSUMPTION_DIR") + \
-        path_check("PAPERLESS_STATICDIR")
-
-    return check_messages
+    return path_check("PAPERLESS_DATA_DIR", settings.DATA_DIR) + \
+        path_check("PAPERLESS_MEDIA_ROOT", settings.MEDIA_ROOT) + \
+        path_check("PAPERLESS_CONSUMPTION_DIR", settings.CONSUMPTION_DIR)
 
 
 @register()

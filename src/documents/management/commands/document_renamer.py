@@ -5,24 +5,28 @@ from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 
 from documents.models import Document
-from ...mixins import Renderable
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         This will rename all documents to match the latest filename format.
     """.replace("    ", "")
 
-    def __init__(self, *args, **kwargs):
-        self.verbosity = 0
-        BaseCommand.__init__(self, *args, **kwargs)
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def handle(self, *args, **options):
 
-        self.verbosity = options["verbosity"]
-
         logging.getLogger().handlers[0].level = logging.ERROR
 
-        for document in tqdm.tqdm(Document.objects.all()):
+        for document in tqdm.tqdm(
+            Document.objects.all(),
+            disable=options['no_progress_bar']
+        ):
             post_save.send(Document, instance=document)

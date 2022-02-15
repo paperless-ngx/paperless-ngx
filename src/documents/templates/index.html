@@ -1,19 +1,27 @@
 <!doctype html>
 
 {% load static %}
+{% load i18n %}
 
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>PaperlessUi</title>
-  <base href="/">
+  <title>Paperless-ng</title>
+  <base href="{% url 'base' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="username" content="{{username}}">
+	<meta name="full_name" content="{{full_name}}">
+	<meta name="cookie_prefix" content="{{cookie_prefix}}">
+	<meta name="robots" content="noindex,nofollow">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="stylesheet" href="{% static 'frontend/styles.css' %}"></head>
+  <link rel="manifest" href="{% static webmanifest %}">
+	<link rel="stylesheet" href="{% static styles_css %}">
+	<link rel="apple-touch-icon" href="{% static apple_touch_icon %}">
+</head>
 <body>
-  <app-root>Loading...</app-root>
-	<script src="{% static 'frontend/runtime.js' %}" defer></script>
-	<script src="{% static 'frontend/polyfills.js' %}" defer></script>
-	<script src="{% static 'frontend/main.js' %}" defer></script>
+  <app-root>{% translate "Paperless-ng is loading..." %}</app-root>
+	<script src="{% static runtime_js %}" defer></script>
+	<script src="{% static polyfills_js %}" defer></script>
+	<script src="{% static main_js %}" defer></script>
 </body>
 </html>
