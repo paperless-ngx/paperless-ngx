@@ -14,9 +14,11 @@ class TikaDocumentParser(DocumentParser):
     This parser sends documents to a local tika server
     """
 
-    def get_thumbnail(self, document_path, mime_type):
+    logging_name = "paperless.parsing.tika"
+
+    def get_thumbnail(self, document_path, mime_type, file_name=None):
         if not self.archive_path:
-            self.archive_path = self.convert_to_pdf(document_path)
+            self.archive_path = self.convert_to_pdf(document_path, file_name)
 
         return make_thumbnail_from_pdf(
             self.archive_path, self.tempdir, self.logging_group)
@@ -65,7 +67,7 @@ class TikaDocumentParser(DocumentParser):
     def convert_to_pdf(self, document_path, file_name):
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
         gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-        url = gotenberg_server + "/convert/office"
+        url = gotenberg_server + "/forms/libreoffice/convert"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
         files = {"files": (file_name or os.path.basename(document_path),

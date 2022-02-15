@@ -2,9 +2,7 @@ import itertools
 
 from django.db.models import Q
 from django_q.tasks import async_task
-from whoosh.writing import AsyncWriter
 
-from documents import index
 from documents.models import Document, Correspondent, DocumentType
 
 
@@ -99,8 +97,9 @@ def modify_tags(doc_ids, add_tags, remove_tags):
 def delete(doc_ids):
     Document.objects.filter(id__in=doc_ids).delete()
 
-    ix = index.open_index()
-    with AsyncWriter(ix) as writer:
+    from documents import index
+
+    with index.open_index_writer() as writer:
         for id in doc_ids:
             index.remove_document_by_id(writer, id)
 

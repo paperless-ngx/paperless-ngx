@@ -1,18 +1,31 @@
 ---
 name: Ansible Role
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'translations**'
+  pull_request:
+    branches-ignore:
+      - 'translations**'
 
 jobs:
   # https://molecule.readthedocs.io/en/latest/ci.html#github-actions
   test:
     runs-on: ubuntu-latest
-    # https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#github-context
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && contains(github.ref, 'refs/heads/'))
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v2
+        if: github.event_name != 'pull_request'
         with:
+          path: "${{ github.repository }}"
+      - name: Check out the codebase
+        uses: actions/checkout@v2
+        if: github.event_name == 'pull_request'
+        with:
+          # merge commit is not available from tree at this point in time
+          # https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
+          ref: "${{ github.event.pull_request.head.sha }}"
           path: "${{ github.repository }}"
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -21,21 +34,22 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install molecule[ansible,docker]
+          python3 -m pip install molecule[ansible,docker] jmespath
           ansible --version
           docker --version
           molecule --version
           python --version
-      - name: Test fresh installation with molecule
+      - name: Test installation/build/upgrade with molecule
         run: |
           cd ansible
-          molecule test -s fresh
+          molecule create
+          molecule verify
+          molecule converge
+          molecule idempotence
+          molecule verify
         working-directory: "${{ github.repository }}"
-      - name: Test release update with molecule
-        run: |
-          cd ansible
-          molecule test -s update
-        working-directory: "${{ github.repository }}"
+        env:
+          TARGET_GITHUB_SHA: "${{ github.event.pull_request.head.sha }}"
   # # https://galaxy.ansible.com/docs/contributing/importing.html
   # release:
   #   runs-on: ubuntu-latest

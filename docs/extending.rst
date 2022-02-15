@@ -5,29 +5,82 @@ Paperless development
 
 This section describes the steps you need to take to start development on paperless-ng.
 
-1.  Check out the source from github. The repository is organized in the following way:
+Check out the source from github. The repository is organized in the following way:
 
-    *   ``master`` always represents the latest release and will only see changes
-        when a new release is made.
-    *   ``dev`` contains the code that will be in the next release.
-    *   ``feature-X`` contain bigger changes that will be in some release, but not
-        necessarily the next one.
-    
-    Apart from that, the folder structure is as follows:
+*   ``master`` always represents the latest release and will only see changes
+    when a new release is made.
+*   ``dev`` contains the code that will be in the next release.
+*   ``feature-X`` contain bigger changes that will be in some release, but not
+    necessarily the next one.
 
-    *   ``docs/`` - Documentation.
-    *   ``src-ui/`` - Code of the front end.
-    *   ``src/`` - Code of the back end.
-    *   ``scripts/`` - Various scripts that help with different parts of development.
-    *   ``docker/`` - Files required to build the docker image.
+When making functional changes to paperless, *always* make your changes on the ``dev`` branch.
 
-2.  Install some dependencies.
+Apart from that, the folder structure is as follows:
 
-    *   Python 3.6.
-    *   All dependencies listed in the :ref:`Bare metal route <setup-bare_metal>`
-    *   redis. You can either install redis or use the included scritps/start-services.sh
-        to use docker to fire up a redis instance (and some other services such as tika,
-        gotenberg and a postgresql server).
+*   ``docs/`` - Documentation.
+*   ``src-ui/`` - Code of the front end.
+*   ``src/`` - Code of the back end.
+*   ``scripts/`` - Various scripts that help with different parts of development.
+*   ``docker/`` - Files required to build the docker image.
+
+Initial setup and first start
+=============================
+
+After you forked and cloned the code from github you need to perform a first-time setup.
+To do the setup you need to perform the steps from the following chapters in a certain order:
+
+1.  Install prerequisites + pipenv as mentioned in :ref:`Bare metal route <setup-bare_metal>`
+2.  Copy ``paperless.conf.example`` to ``paperless.conf`` and enable debug mode.
+3.  Install the Angular CLI interface:
+
+    .. code:: shell-session
+
+        $ npm install -g @angular/cli
+
+4.  Create ``consume`` and ``media`` folders in the cloned root folder.
+
+    .. code:: shell-session
+
+        mkdir -p consume media
+
+5.  You can now either ...
+
+    *  install redis or
+    *  use the included scripts/start-services.sh to use docker to fire up a redis instance (and some other services such as tika, gotenberg and a postgresql server) or
+    *  spin up a bare redis container
+
+        .. code:: shell-session
+
+            docker run -d -p 6379:6379 -restart unless-stopped redis:latest
+
+6.  Install the python dependencies by performing in the src/ directory.
+
+    .. code:: shell-session
+
+        pipenv install --dev
+
+7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From root folder:
+
+    .. code:: shell-session
+
+        compile-frontend.sh
+
+8.  Apply migrations and create a superuser for your dev instance:
+
+    .. code:: shell-session
+
+        python3 manage.py migrate
+        python3 manage.py createsuperuser
+
+9.  Now spin up the dev backend. Depending on which part of paperless you're developing for, you need to have some or all of them running.
+
+    .. code:: shell-session
+
+        python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
+
+10. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
+
+Backend development environment is now ready, to start Frontend development go to ``/src-ui`` and run ``ng serve``. From there you can use ``http://localhost:4200`` for a preview.
 
 Back end development
 ====================
@@ -35,21 +88,18 @@ Back end development
 The backend is a django application. I use PyCharm for development, but you can use whatever
 you want.
 
-Install the python dependencies by performing ``pipenv install --dev`` in the src/ directory.
-This will also create a virtual environment, which you can enter with ``pipenv shell`` or
-execute one-shot commands in with ``pipenv run``.
-
-Copy ``paperless.conf.example`` to ``paperless.conf`` and enable debug mode.
-
 Configure the IDE to use the src/ folder as the base source folder. Configure the following
 launch configurations in your IDE:
 
 *   python3 manage.py runserver
 *   python3 manage.py qcluster
-*   python3 manage.py consumer
+*   python3 manage.py document_consumer
 
-Depending on which part of paperless you're developing for, you need to have some or all of
-them running.
+To start them all:
+
+.. code:: shell-session
+
+    python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
 
 Testing and code style:
 
@@ -62,7 +112,7 @@ Testing and code style:
 
         The line length rule E501 is generally useful for getting multiple source files
         next to each other on the screen. However, in some cases, its just not possible
-        to make some lines fit, especially complicated IF cases. Append ``  # NOQA: E501``
+        to make some lines fit, especially complicated IF cases. Append ``# NOQA: E501``
         to disable this check for certain lines.
 
 Front end development
@@ -109,6 +159,133 @@ This will build the front end and put it in a location from which the Django ser
 it as static content. This way, you can verify that authentication is working.
 
 
+Localization
+============
+
+Paperless is available in many different languages. Since paperless consists both of a django
+application and an Angular front end, both these parts have to be translated separately.
+
+Front end localization
+----------------------
+
+*   The Angular front end does localization according to the `Angular documentation <https://angular.io/guide/i18n>`_.
+*   The source language of the project is "en_US".
+*   The source strings end up in the file "src-ui/messages.xlf".
+*   The translated strings need to be placed in the "src-ui/src/locale/" folder.
+*   In order to extract added or changed strings from the source files, call ``ng xi18n --ivy``.
+
+Adding new languages requires adding the translated files in the "src-ui/src/locale/" folder and adjusting a couple files.
+
+1.  Adjust "src-ui/angular.json":
+
+    .. code:: json
+
+        "i18n": {
+            "sourceLocale": "en-US",
+            "locales": {
+                "de": "src/locale/messages.de.xlf",
+                "nl-NL": "src/locale/messages.nl_NL.xlf",
+                "fr": "src/locale/messages.fr.xlf",
+                "en-GB": "src/locale/messages.en_GB.xlf",
+                "pt-BR": "src/locale/messages.pt_BR.xlf",
+                "language-code": "language-file"
+            }
+        }
+
+2.  Add the language to the available options in "src-ui/src/app/services/settings.service.ts":
+
+    .. code:: typescript
+
+        getLanguageOptions(): LanguageOption[] {
+            return [
+                {code: "en-us", name: $localize`English (US)`, englishName: "English (US)", dateInputFormat: "mm/dd/yyyy"},
+                {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)", dateInputFormat: "dd/mm/yyyy"},
+                {code: "de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
+                {code: "nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
+                {code: "fr", name: $localize`French`, englishName: "French", dateInputFormat: "dd/mm/yyyy"},
+                {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"}
+                // Add your new language here
+            ]
+        }
+
+    ``dateInputFormat`` is a special string that defines the behavior of the date input fields and absolutely needs to contain "dd", "mm" and "yyyy".
+
+3.  Import and register the Angular data for this locale in "src-ui/src/app/app.module.ts":
+
+    .. code:: typescript
+
+        import localeDe from '@angular/common/locales/de';
+        registerLocaleData(localeDe)
+
+Back end localization
+---------------------
+
+A majority of the strings that appear in the back end appear only when the admin is used. However,
+some of these are still shown on the front end (such as error messages).
+
+*   The django application does localization according to the `django documentation <https://docs.djangoproject.com/en/3.1/topics/i18n/translation/>`_.
+*   The source language of the project is "en_US".
+*   Localization files end up in the folder "src/locale/".
+*   In order to extract strings from the application, call ``python3 manage.py makemessages -l en_US``. This is important after making changes to translatable strings.
+*   The message files need to be compiled for them to show up in the application. Call ``python3 manage.py compilemessages`` to do this. The generated files don't get
+    committed into git, since these are derived artifacts. The build pipeline takes care of executing this command.
+
+Adding new languages requires adding the translated files in the "src/locale/" folder and adjusting the file "src/paperless/settings.py" to include the new language:
+
+.. code:: python
+
+    LANGUAGES = [
+        ("en-us", _("English (US)")),
+        ("en-gb", _("English (GB)")),
+        ("de", _("German")),
+        ("nl-nl", _("Dutch")),
+        ("fr", _("French")),
+        ("pt-br", _("Portuguese (Brazil)")),
+        # Add language here.
+    ]
+
+
+Building the documentation
+==========================
+
+The documentation is built using sphinx. I've configured ReadTheDocs to automatically build
+the documentation when changes are pushed. If you want to build the documentation locally,
+this is how you do it:
+
+1.  Install python dependencies.
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless
+        $ pipenv install --dev
+
+2.  Build the documentation
+
+    .. code:: shell-session
+
+        $ cd /path/to/paperless/docs
+        $ pipenv run make clean html
+
+This will build the HTML documentation, and put the resulting files in the ``_build/html``
+directory.
+
+Building the Docker image
+=========================
+
+Building the docker image from source requires the following two steps:
+
+1.  Build the front end.
+
+    .. code:: shell-session
+
+        ./compile-frontend.sh
+
+2.  Build the docker image.
+
+    .. code:: shell-session
+
+        docker build . -t <your-tag>
+
 Extending Paperless
 ===================
 
@@ -143,7 +320,7 @@ methods ``parse`` and ``get_thumbnail``. You can provide your own implementation
 
             # The content of the document.
             self.text = "content"
-            
+
             # Optional: path to a PDF document that you created from the original.
             self.archive_path = os.path.join(self.tempdir, "archived.pdf")
 

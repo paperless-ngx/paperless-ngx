@@ -11,6 +11,7 @@ import { CorrespondentService } from './correspondent.service';
 import { DocumentTypeService } from './document-type.service';
 import { TagService } from './tag.service';
 import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type';
+import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -20,6 +21,11 @@ export const DOCUMENT_SORT_FIELDS = [
   { field: 'created', name: $localize`Created` },
   { field: 'added', name: $localize`Added` },
   { field: 'modified', name: $localize`Modified` }
+]
+
+export const DOCUMENT_SORT_FIELDS_FULLTEXT = [
+  ...DOCUMENT_SORT_FIELDS,
+  { field: 'score', name: $localize`:Score is a value returned by the full text search engine and specifies how well a result matches the given query:Search score` }
 ]
 
 export interface SelectionDataItem {
@@ -37,6 +43,8 @@ export interface SelectionData {
   providedIn: 'root'
 })
 export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
+
+  private _searchQuery: string
 
   constructor(http: HttpClient, private correspondentService: CorrespondentService, private documentTypeService: DocumentTypeService, private tagService: TagService) {
     super(http, 'documents')
@@ -91,6 +99,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   getPreviewUrl(id: number, original: boolean = false): string {
     let url = this.getResourceUrl(id, 'preview')
+    if (this._searchQuery) url += `#search="${this._searchQuery}"`
     if (original) {
       url += "?original=true"
     }
@@ -127,6 +136,18 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
 
   getSelectionData(ids: number[]): Observable<SelectionData> {
     return this.http.post<SelectionData>(this.getResourceUrl(null, 'selection_data'), {"documents": ids})
+  }
+
+  getSuggestions(id: number): Observable<PaperlessDocumentSuggestions> {
+    return this.http.get<PaperlessDocumentSuggestions>(this.getResourceUrl(id, 'suggestions'))
+  }
+
+  bulkDownload(ids: number[], content="both") {
+    return this.http.post(this.getResourceUrl(null, 'bulk_download'), {"documents": ids, "content": content}, { responseType: 'blob' })
+  }
+
+  public set searchQuery(query: string) {
+    this._searchQuery = query
   }
 
 }

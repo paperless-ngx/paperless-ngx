@@ -201,6 +201,13 @@ class TestFileHandling(DirectoriesMixin, TestCase):
 
         self.assertEqual(generate_filename(d), "my_doc_type - the_doc.pdf")
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{asn} - {title}")
+    def test_asn(self):
+        d1 = Document.objects.create(title="the_doc", mime_type="application/pdf", archive_serial_number=652, checksum="A")
+        d2 = Document.objects.create(title="the_doc", mime_type="application/pdf", archive_serial_number=None, checksum="B")
+        self.assertEqual(generate_filename(d1), "652 - the_doc.pdf")
+        self.assertEqual(generate_filename(d2), "none - the_doc.pdf")
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="{tags[type]}")
     def test_tags_with_underscore(self):
         document = Document()
@@ -439,6 +446,18 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(document2.filename, "qwe.pdf")
 
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    @mock.patch("documents.signals.handlers.Document.objects.filter")
+    def test_no_update_without_change(self, m):
+        doc = Document.objects.create(title="document", filename="document.pdf", archive_filename="document.pdf", checksum="A", archive_checksum="B", mime_type="application/pdf")
+        Path(doc.source_path).touch()
+        Path(doc.archive_path).touch()
+
+        doc.save()
+
+        m.assert_not_called()
+
+
 
 class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
 
@@ -448,7 +467,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
         Path(archive).touch()
-        doc = Document.objects.create(mime_type="application/pdf", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document.objects.create(mime_type="application/pdf", filename="0000001.pdf", checksum="A", archive_filename="0000001.pdf", archive_checksum="B")
 
         self.assertTrue(os.path.isfile(original))
         self.assertTrue(os.path.isfile(archive))
@@ -461,7 +480,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
         Path(archive).touch()
-        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B", archive_filename="0000001.pdf")
 
         self.assertFalse(os.path.isfile(original))
         self.assertFalse(os.path.isfile(archive))
@@ -475,7 +494,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         original = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
-        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B", archive_filename="0000001.pdf")
 
         self.assertTrue(os.path.isfile(original))
         self.assertFalse(os.path.isfile(archive))
@@ -486,14 +505,49 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
     def test_move_archive_exists(self):
         original = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
+        existing_archive_file = os.path.join(settings.ARCHIVE_DIR, "none", "my_doc.pdf")
         Path(original).touch()
         Path(archive).touch()
         os.makedirs(os.path.join(settings.ARCHIVE_DIR, "none"))
-        Path(os.path.join(settings.ARCHIVE_DIR, "none", "my_doc.pdf")).touch()
-        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        Path(existing_archive_file).touch()
+        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B", archive_filename="0000001.pdf")
 
-        self.assertTrue(os.path.isfile(original))
-        self.assertTrue(os.path.isfile(archive))
+        self.assertFalse(os.path.isfile(original))
+        self.assertFalse(os.path.isfile(archive))
+        self.assertTrue(os.path.isfile(doc.source_path))
+        self.assertTrue(os.path.isfile(doc.archive_path))
+        self.assertTrue(os.path.isfile(existing_archive_file))
+        self.assertEqual(doc.archive_filename, "none/my_doc_01.pdf")
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    def test_move_original_only(self):
+        original = os.path.join(settings.ORIGINALS_DIR, "document_01.pdf")
+        archive = os.path.join(settings.ARCHIVE_DIR, "document.pdf")
+        Path(original).touch()
+        Path(archive).touch()
+
+        doc = Document.objects.create(mime_type="application/pdf", title="document", filename="document_01.pdf", checksum="A",
+                                      archive_checksum="B", archive_filename="document.pdf")
+
+        self.assertEqual(doc.filename, "document.pdf")
+        self.assertEqual(doc.archive_filename, "document.pdf")
+
+        self.assertTrue(os.path.isfile(doc.source_path))
+        self.assertTrue(os.path.isfile(doc.archive_path))
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    def test_move_archive_only(self):
+        original = os.path.join(settings.ORIGINALS_DIR, "document.pdf")
+        archive = os.path.join(settings.ARCHIVE_DIR, "document_01.pdf")
+        Path(original).touch()
+        Path(archive).touch()
+
+        doc = Document.objects.create(mime_type="application/pdf", title="document", filename="document.pdf", checksum="A",
+                                      archive_checksum="B", archive_filename="document_01.pdf")
+
+        self.assertEqual(doc.filename, "document.pdf")
+        self.assertEqual(doc.archive_filename, "document.pdf")
+
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(os.path.isfile(doc.archive_path))
 
@@ -514,8 +568,9 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
         Path(archive).touch()
-        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B", archive_filename="0000001.pdf")
 
+        m.assert_called()
         self.assertTrue(os.path.isfile(original))
         self.assertTrue(os.path.isfile(archive))
         self.assertTrue(os.path.isfile(doc.source_path))
@@ -527,7 +582,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         #Path(original).touch()
         Path(archive).touch()
-        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", archive_filename="0000001.pdf", checksum="A", archive_checksum="B")
 
         self.assertFalse(os.path.isfile(original))
         self.assertTrue(os.path.isfile(archive))
@@ -551,19 +606,21 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
         Path(archive).touch()
-        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", archive_filename="0000001.pdf", checksum="A", archive_checksum="B")
 
+        m.assert_called()
         self.assertTrue(os.path.isfile(original))
         self.assertTrue(os.path.isfile(archive))
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(os.path.isfile(doc.archive_path))
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_archive_deleted(self):
         original = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
         Path(archive).touch()
-        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document.objects.create(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B", archive_filename="0000001.pdf")
 
         self.assertTrue(os.path.isfile(original))
         self.assertTrue(os.path.isfile(archive))
@@ -577,6 +634,28 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertFalse(os.path.isfile(doc.source_path))
         self.assertFalse(os.path.isfile(doc.archive_path))
 
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
+    def test_archive_deleted2(self):
+        original = os.path.join(settings.ORIGINALS_DIR, "document.png")
+        original2 = os.path.join(settings.ORIGINALS_DIR, "0000001.pdf")
+        archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
+        Path(original).touch()
+        Path(original2).touch()
+        Path(archive).touch()
+
+        doc1 = Document.objects.create(mime_type="image/png", title="document", filename="document.png", checksum="A", archive_checksum="B", archive_filename="0000001.pdf")
+        doc2 = Document.objects.create(mime_type="application/pdf", title="0000001", filename="0000001.pdf", checksum="C")
+
+        self.assertTrue(os.path.isfile(doc1.source_path))
+        self.assertTrue(os.path.isfile(doc1.archive_path))
+        self.assertTrue(os.path.isfile(doc2.source_path))
+
+        doc2.delete()
+
+        self.assertTrue(os.path.isfile(doc1.source_path))
+        self.assertTrue(os.path.isfile(doc1.archive_path))
+        self.assertFalse(os.path.isfile(doc2.source_path))
+
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
     def test_database_error(self):
 
@@ -584,7 +663,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         archive = os.path.join(settings.ARCHIVE_DIR, "0000001.pdf")
         Path(original).touch()
         Path(archive).touch()
-        doc = Document(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_checksum="B")
+        doc = Document(mime_type="application/pdf", title="my_doc", filename="0000001.pdf", checksum="A", archive_filename="0000001.pdf", archive_checksum="B")
         with mock.patch("documents.signals.handlers.Document.objects.filter") as m:
             m.side_effect = DatabaseError()
             doc.save()
@@ -593,6 +672,7 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(archive))
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(os.path.isfile(doc.archive_path))
+
 
 class TestFilenameGeneration(TestCase):
 
@@ -617,7 +697,7 @@ class TestFilenameGeneration(TestCase):
 
 def run():
     doc = Document.objects.create(checksum=str(uuid.uuid4()), title=str(uuid.uuid4()), content="wow")
-    doc.filename = generate_unique_filename(doc, settings.ORIGINALS_DIR)
+    doc.filename = generate_unique_filename(doc)
     Path(doc.thumbnail_path).touch()
     with open(doc.source_path, "w") as f:
         f.write(str(uuid.uuid4()))

@@ -63,112 +63,127 @@
   <div class="btn-group ml-2 flex-fill" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" ngbDropdownToggle i18n>Views</button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
-      <ng-container *ngIf="!list.savedViewId">
+      <ng-container *ngIf="!list.activeSavedViewId">
         <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
-      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.savedViewId" i18n>Save "{{list.savedViewTitle}}"</button>
+      <button ngbDropdownItem (click)="saveViewConfig()" *ngIf="list.activeSavedViewId" i18n>Save "{{list.activeSavedViewTitle}}"</button>
       <button ngbDropdownItem (click)="saveViewConfigAs()" i18n>Save as...</button>
     </div>
   </div>
 
 </app-page-header>
 
-<div class="w-100 mb-2 mb-sm-4">
-  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [rulesModified]="filterRulesModified" (filterRulesChange)="rulesChanged()" (reset)="resetFilters()" #filterEditor></app-filter-editor>
+<div class="sticky-top py-2 mt-n2 mt-sm-n3 py-sm-4 bg-body mx-n3 px-3">
+  <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
 
 <div class="d-flex justify-content-between align-items-center">
   <p>
+    <ng-container *ngIf="list.isReloading">
+      <div class="spinner-border spinner-border-sm mr-2" role="status"></div>
+      <ng-container i18n>Loading...</ng-container>
+    </ng-container>
     <span i18n *ngIf="list.selected.size > 0">{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
-    <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
+    <ng-container *ngIf="!list.isReloading">
+      <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
+    </ng-container>
   </p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
-  [rotate]="true" (pageChange)="list.reload()" aria-label="Default pagination"></ngb-pagination>
+  [rotate]="true" aria-label="Default pagination"></ngb-pagination>
 </div>
 
-<div *ngIf="displayMode == 'largeCards'">
-  <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" [details]="d.content" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)">
-  </app-document-card-large>
-</div>
+<ng-container *ngIf="list.error ; else documentListNoError">
+  <div class="alert alert-danger" role="alert">Error while loading documents: {{list.error}}</div>
+</ng-container>
 
-<table class="table table-sm border shadow-sm" *ngIf="displayMode == 'details'">
-  <thead>
-    <th></th>
-    <th class="d-none d-lg-table-cell"
-      sortable="archive_serial_number"
-      [currentSortField]="list.sortField"
-      [currentSortReverse]="list.sortReverse"
-      (sort)="onSort($event)"
-      i18n>ASN</th>
-    <th class="d-none d-md-table-cell"
-      sortable="correspondent__name"
-      [currentSortField]="list.sortField"
-      [currentSortReverse]="list.sortReverse"
-      (sort)="onSort($event)"
-      i18n>Correspondent</th>
-    <th
-      sortable="title"
-      [currentSortField]="list.sortField"
-      [currentSortReverse]="list.sortReverse"
-      (sort)="onSort($event)"
-      i18n>Title</th>
-    <th class="d-none d-xl-table-cell"
-      sortable="document_type__name"
-      [currentSortField]="list.sortField"
-      [currentSortReverse]="list.sortReverse"
-      (sort)="onSort($event)"
-      i18n>Document type</th>
-    <th
-      sortable="created"
-      [currentSortField]="list.sortField"
-      [currentSortReverse]="list.sortReverse"
-      (sort)="onSort($event)"
-      i18n>Created</th>
-    <th class="d-none d-xl-table-cell"
-      sortable="added"
-      [currentSortField]="list.sortField"
-      [currentSortReverse]="list.sortReverse"
-      (sort)="onSort($event)"
-      i18n>Added</th>
-  </thead>
-  <tbody>
-    <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" (click)="toggleSelected(d, $event)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
-      <td>
-        <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (click)="toggleSelected(d, $event)">
-          <label class="custom-control-label" for="docCheck{{d.id}}"></label>
-        </div>
-      </td>
-      <td class="d-none d-lg-table-cell">
-        {{d.archive_serial_number}}
-      </td>
-      <td class="d-none d-md-table-cell">
-        <ng-container *ngIf="d.correspondent">
-          <a [routerLink]="" (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
-        </ng-container>
-      </td>
-      <td>
-        <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-        <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
-      </td>
-      <td class="d-none d-xl-table-cell">
-        <ng-container *ngIf="d.document_type">
-          <a [routerLink]="" (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
-        </ng-container>
-      </td>
-      <td>
-        {{d.created | customDate}}
-      </td>
-      <td class="d-none d-xl-table-cell">
-        {{d.added | customDate}}
-      </td>
-    </tr>
-  </tbody>
-</table>
+<ng-template #documentListNoError>
 
-<div class="m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
-  <app-document-card-small [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)"  [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)"></app-document-card-small>
-</div>
+  <div *ngIf="displayMode == 'largeCards'">
+    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickMoreLike)="clickMoreLike(d.id)">
+    </app-document-card-large>
+  </div>
+
+  <table class="table table-sm border shadow-sm" *ngIf="displayMode == 'details'">
+    <thead>
+      <th></th>
+      <th class="d-none d-lg-table-cell"
+        sortable="archive_serial_number"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>ASN</th>
+      <th class="d-none d-md-table-cell"
+        sortable="correspondent__name"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Correspondent</th>
+      <th
+        sortable="title"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Title</th>
+      <th class="d-none d-xl-table-cell"
+        sortable="document_type__name"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Document type</th>
+      <th
+        sortable="created"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Created</th>
+      <th class="d-none d-xl-table-cell"
+        sortable="added"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Added</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" (click)="toggleSelected(d, $event)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
+        <td>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (click)="toggleSelected(d, $event)">
+            <label class="custom-control-label" for="docCheck{{d.id}}"></label>
+          </div>
+        </td>
+        <td class="d-none d-lg-table-cell">
+          {{d.archive_serial_number}}
+        </td>
+        <td class="d-none d-md-table-cell">
+          <ng-container *ngIf="d.correspondent">
+            <a [routerLink]="" (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+          </ng-container>
+        </td>
+        <td>
+          <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+        </td>
+        <td class="d-none d-xl-table-cell">
+          <ng-container *ngIf="d.document_type">
+            <a [routerLink]="" (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+          </ng-container>
+        </td>
+        <td>
+          {{d.created | customDate}}
+        </td>
+        <td class="d-none d-xl-table-cell">
+          {{d.added | customDate}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="m-n2 row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
+    <app-document-card-small [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
+  </div>
+
+
+</ng-template>

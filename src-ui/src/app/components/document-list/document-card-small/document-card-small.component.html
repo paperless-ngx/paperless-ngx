@@ -1,7 +1,7 @@
 <div class="col p-2 h-100">
-  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected">
+  <div class="card h-100 shadow-sm document-card" [class.card-selected]="selected" [class.popover-hidden]="popoverHidden" (mouseleave)="mouseLeaveCard()">
     <div class="border-bottom doc-img-container" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
-      <img class="card-img doc-img rounded-top" [src]="getThumbUrl()">
+      <img class="card-img doc-img rounded-top" [class.inverted]="getIsThumbInverted()" [src]="getThumbUrl()">
 
       <div class="border-right border-bottom bg-light p-1 rounded document-card-check">
         <div class="custom-control custom-checkbox">
@@ -25,24 +25,60 @@
         <ng-container *ngIf="document.correspondent">
           <a [routerLink]="" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="font-weight-bold">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
-        {{document.title | documentTitle}} <span *ngIf="document.archive_serial_number">(#{{document.archive_serial_number}})</span>
+        {{document.title | documentTitle}}
       </p>
     </div>
-    <div class="card-footer">
+    <div class="card-footer pt-0 pb-2 px-2">
+      <div class="list-group list-group-flush border-0 pt-1 pb-2 card-info">
+        <button *ngIf="document.document_type" type="button" class="list-group-item list-group-item-action bg-transparent pl-0 p-1 border-0" title="Filter by document type"
+         (click)="clickDocumentType.emit(document.document_type);$event.stopPropagation()">
+          <svg class="metadata-icon mr-2 text-muted bi bi-file-earmark" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+          </svg>
+          <small>{{(document.document_type$ | async)?.name}}</small>
+        </button>
+        <div class="list-group-item bg-transparent p-0 border-0 d-flex flex-wrap-reverse justify-content-between">
+          <ng-template #dateTooltip>
+            <div class="d-flex flex-column">
+              <span i18n>Created: {{ document.created | customDate}}</span>
+              <span i18n>Added: {{ document.added | customDate}}</span>
+              <span i18n>Modified: {{ document.modified | customDate}}</span>
+            </div>
+          </ng-template>
 
-      <div class="d-flex justify-content-between align-items-center mx-n2">
-        <div class="btn-group">
+          <div class="pl-0 p-1" placement="top" [ngbTooltip]="dateTooltip">
+            <svg class="metadata-icon mr-2 text-muted bi bi-calendar-event" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+              <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+            </svg>
+            <small>{{document.created | customDate:'mediumDate'}}</small>
+          </div>
+          <div *ngIf="document.archive_serial_number" class="pl-0 p-1">
+            <svg class="metadata-icon mr-2 text-muted bi bi-upc-scan" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5zM3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>
+            </svg>
+            <small>#{{document.archive_serial_number}}</small>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="btn-group w-100">
           <a routerLink="/documents/{{document.id}}" class="btn btn-sm btn-outline-secondary" title="Edit" i18n-title>
             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
             </svg>
           </a>
-          <a [href]="getPreviewUrl()" class="btn btn-sm btn-outline-secondary" title="View in browser" i18n-title>
-            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
-              <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+          <a [href]="previewUrl" target="_blank" class="btn btn-sm btn-outline-secondary"
+          [ngbPopover]="previewContent" [popoverTitle]="document.title | documentTitle"
+          autoClose="true" popoverClass="shadow" (mouseenter)="mouseEnterPreview()" (mouseleave)="mouseLeavePreview()" #popover="ngbPopover">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+              <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
             </svg>
           </a>
+          <ng-template #previewContent>
+            <object [data]="previewUrl | safe" class="preview" width="100%"></object>
+          </ng-template>
           <a [href]="getDownloadUrl()" class="btn btn-sm btn-outline-secondary" title="Download" (click)="$event.stopPropagation()" i18n-title>
             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
@@ -50,9 +86,7 @@
             </svg>
           </a>
         </div>
-        <small class="text-muted pl-1">{{document.created | customDate:'shortDate'}}</small>
       </div>
-
     </div>
   </div>
 </div>

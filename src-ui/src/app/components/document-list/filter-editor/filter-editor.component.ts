@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type';
@@ -8,9 +8,17 @@ import { DocumentTypeService } from 'src/app/services/rest/document-type.service
 import { TagService } from 'src/app/services/rest/tag.service';
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service';
 import { FilterRule } from 'src/app/data/filter-rule';
-import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE } from 'src/app/data/filter-rule-type';
+import { FILTER_ADDED_AFTER, FILTER_ADDED_BEFORE, FILTER_ASN, FILTER_CORRESPONDENT, FILTER_CREATED_AFTER, FILTER_CREATED_BEFORE, FILTER_DOCUMENT_TYPE, FILTER_FULLTEXT_MORELIKE, FILTER_FULLTEXT_QUERY, FILTER_HAS_ANY_TAG, FILTER_HAS_TAG, FILTER_TITLE, FILTER_TITLE_CONTENT } from 'src/app/data/filter-rule-type';
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component';
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component';
+import { DocumentService } from 'src/app/services/rest/document.service';
+import { PaperlessDocument } from 'src/app/data/paperless-document';
+
+const TEXT_FILTER_TARGET_TITLE = "title"
+const TEXT_FILTER_TARGET_TITLE_CONTENT = "title-content"
+const TEXT_FILTER_TARGET_ASN = "asn"
+const TEXT_FILTER_TARGET_FULLTEXT_QUERY = "fulltext-query"
+const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = "fulltext-morelike"
 
 @Component({
   selector: 'app-filter-editor',
@@ -46,6 +54,11 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             return $localize`Without any tag`
           }
 
+        case FILTER_TITLE:
+          return $localize`Title: ${rule.value}`
+
+        case FILTER_ASN:
+          return $localize`ASN: ${rule.value}`
       }
     }
 
@@ -55,14 +68,40 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   constructor(
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
-    private correspondentService: CorrespondentService
+    private correspondentService: CorrespondentService,
+    private documentService: DocumentService
   ) { }
+
+  @ViewChild("textFilterInput")
+  textFilterInput: ElementRef
 
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
 
-  _titleFilter = ""
+  _textFilter = ""
+  _moreLikeId: number
+  _moreLikeDoc: PaperlessDocument
+
+  get textFilterTargets() {
+    let targets = [
+      {id: TEXT_FILTER_TARGET_TITLE, name: $localize`Title`},
+      {id: TEXT_FILTER_TARGET_TITLE_CONTENT, name: $localize`Title & content`},
+      {id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN`},
+      {id: TEXT_FILTER_TARGET_FULLTEXT_QUERY, name: $localize`Advanced search`}
+    ]
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
+      targets.push({id: TEXT_FILTER_TARGET_FULLTEXT_MORELIKE, name: $localize`More like`})
+    }
+    return targets
+  }
+
+  textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
+
+  get textFilterTargetName() {
+    return this.textFilterTargets.find(t => t.id == this.textFilterTarget)?.name
+  }
+
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -73,12 +112,28 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   dateAddedBefore: string
   dateAddedAfter: string
 
+  _unmodifiedFilterRules: FilterRule[] = []
+  _filterRules: FilterRule[] = []
+
+  @Input()
+  set unmodifiedFilterRules(value: FilterRule[]) {
+    this._unmodifiedFilterRules = value
+    this.checkIfRulesHaveChanged()
+  }
+
+  get unmodifiedFilterRules(): FilterRule[] {
+    return this._unmodifiedFilterRules
+  }
+
   @Input()
   set filterRules (value: FilterRule[]) {
+    this._filterRules = value
+
     this.documentTypeSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
-    this._titleFilter = null
+    this._textFilter = null
+    this._moreLikeId = null
     this.dateAddedBefore = null
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
@@ -87,7 +142,28 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     value.forEach(rule => {
       switch (rule.rule_type) {
         case FILTER_TITLE:
-          this._titleFilter = rule.value
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_TITLE
+          break
+        case FILTER_TITLE_CONTENT:
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
+          break
+        case FILTER_ASN:
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          break
+        case FILTER_FULLTEXT_QUERY:
+          this._textFilter = rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_QUERY
+          break
+        case FILTER_FULLTEXT_MORELIKE:
+          this._moreLikeId = +rule.value
+          this.textFilterTarget = TEXT_FILTER_TARGET_FULLTEXT_MORELIKE
+          this.documentService.get(this._moreLikeId).subscribe(result => {
+            this._moreLikeDoc = result
+            this._textFilter = result.title
+          })
           break
         case FILTER_CREATED_AFTER:
           this.dateCreatedAfter = rule.value
@@ -115,12 +191,25 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           break
       }
     })
+    this.checkIfRulesHaveChanged()
   }
 
-  get filterRules() {
+  get filterRules(): FilterRule[] {
     let filterRules: FilterRule[] = []
-    if (this._titleFilter) {
-      filterRules.push({rule_type: FILTER_TITLE, value: this._titleFilter})
+    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE_CONTENT) {
+      filterRules.push({rule_type: FILTER_TITLE_CONTENT, value: this._textFilter})
+    }
+    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
+      filterRules.push({rule_type: FILTER_TITLE, value: this._textFilter})
+    }
+    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
+      filterRules.push({rule_type: FILTER_ASN, value: this._textFilter})
+    }
+    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_QUERY) {
+      filterRules.push({rule_type: FILTER_FULLTEXT_QUERY, value: this._textFilter})
+    }
+    if (this._moreLikeId && this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
+      filterRules.push({rule_type: FILTER_FULLTEXT_MORELIKE, value: this._moreLikeId?.toString()})
     }
     if (this.tagSelectionModel.isNoneSelected()) {
       filterRules.push({rule_type: FILTER_HAS_ANY_TAG, value: "false"})
@@ -153,25 +242,40 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   @Output()
   filterRulesChange = new EventEmitter<FilterRule[]>()
 
-  @Output()
-  reset = new EventEmitter()
-
-  @Input()
   rulesModified: boolean = false
+
+  private checkIfRulesHaveChanged() {
+    let modified = false
+    if (this._unmodifiedFilterRules.length != this._filterRules.length) {
+      modified = true
+    } else {
+      modified = this._unmodifiedFilterRules.some(rule => {
+        return (this._filterRules.find(fri => fri.rule_type == rule.rule_type && fri.value == rule.value) == undefined)
+      })
+
+      if (!modified) {
+        // only check other direction if we havent already determined is modified
+        modified = this._filterRules.some(rule => {
+          this._unmodifiedFilterRules.find(fr => fr.rule_type == rule.rule_type && fr.value == rule.value) == undefined
+        })
+      }
+    }
+    this.rulesModified = modified
+  }
 
   updateRules() {
     this.filterRulesChange.next(this.filterRules)
   }
 
-  get titleFilter() {
-    return this._titleFilter
+  get textFilter() {
+    return this._textFilter
   }
 
-  set titleFilter(value) {
-    this.titleFilterDebounce.next(value)
+  set textFilter(value) {
+    this.textFilterDebounce.next(value)
   }
 
-  titleFilterDebounce: Subject<string>
+  textFilterDebounce: Subject<string>
   subscription: Subscription
 
   ngOnInit() {
@@ -179,23 +283,29 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
     this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
 
-    this.titleFilterDebounce = new Subject<string>()
+    this.textFilterDebounce = new Subject<string>()
 
-    this.subscription = this.titleFilterDebounce.pipe(
+    this.subscription = this.textFilterDebounce.pipe(
       debounceTime(400),
       distinctUntilChanged()
-    ).subscribe(title => {
-      this._titleFilter = title
+    ).subscribe(text => {
+      this._textFilter = text
+      this.documentService.searchQuery = text
       this.updateRules()
     })
+
+    if (this._textFilter) this.documentService.searchQuery = this._textFilter
+
   }
 
   ngOnDestroy() {
-    this.titleFilterDebounce.complete()
+    this.textFilterDebounce.complete()
   }
 
   resetSelected() {
-    this.reset.next()
+    this.textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
+    this.filterRules = this._unmodifiedFilterRules
+    this.updateRules()
   }
 
   toggleTag(tagId: number) {
@@ -220,5 +330,14 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   onDocumentTypeDropdownOpen() {
     this.documentTypeSelectionModel.apply()
+  }
+
+  changeTextFilterTarget(target) {
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_FULLTEXT_MORELIKE && target != TEXT_FILTER_TARGET_FULLTEXT_MORELIKE) {
+      this._textFilter = ""
+    }
+    this.textFilterTarget = target
+    this.textFilterInput.nativeElement.focus()
+    this.updateRules()
   }
 }

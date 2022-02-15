@@ -7,7 +7,7 @@ from django.test import TestCase, override_settings
 
 from documents.parsers import ParseError, run_convert
 from documents.tests.utils import DirectoriesMixin
-from paperless_tesseract.parsers import RasterisedDocumentParser, get_text_from_pdf, strip_excess_whitespace
+from paperless_tesseract.parsers import RasterisedDocumentParser, post_process_text
 
 image_to_string_calls = []
 
@@ -32,13 +32,16 @@ class FakeImageFile(ContextManager):
         return os.path.basename(self.fname)
 
 
-
-
 class TestParser(DirectoriesMixin, TestCase):
 
     def assertContainsStrings(self, content, strings):
         # Asserts that all strings appear in content, in the given order.
-        indices = [content.index(s) for s in strings]
+        indices = []
+        for s in strings:
+            if s in content:
+                indices.append(content.index(s))
+            else:
+                self.fail(f"'{s}' is not in '{content}'")
         self.assertListEqual(indices, sorted(indices))
 
     text_cases = [
@@ -53,9 +56,9 @@ class TestParser(DirectoriesMixin, TestCase):
         )
     ]
 
-    def test_strip_excess_whitespace(self):
+    def test_post_process_text(self):
         for source, result in self.text_cases:
-            actual_result = strip_excess_whitespace(source)
+            actual_result = post_process_text(source)
             self.assertEqual(
                 result,
                 actual_result,
@@ -69,14 +72,15 @@ class TestParser(DirectoriesMixin, TestCase):
     SAMPLE_FILES = os.path.join(os.path.dirname(__file__), "samples")
 
     def test_get_text_from_pdf(self):
-        text = get_text_from_pdf(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'))
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        text = parser.extract_text(None, os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'))
 
         self.assertContainsStrings(text.strip(), ["This is a test document."])
 
     def test_thumbnail(self):
         parser = RasterisedDocumentParser(uuid.uuid4())
-        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
-        # dont really know how to test it, just call it and assert that it does not raise anything.
+        thumb = parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
+        self.assertTrue(os.path.isfile(thumb))
 
     @mock.patch("documents.parsers.run_convert")
     def test_thumbnail_fallback(self, m):
@@ -90,8 +94,13 @@ class TestParser(DirectoriesMixin, TestCase):
         m.side_effect = call_convert
 
         parser = RasterisedDocumentParser(uuid.uuid4())
-        parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
-        # dont really know how to test it, just call it and assert that it does not raise anything.
+        thumb = parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'simple-digital.pdf'), "application/pdf")
+        self.assertTrue(os.path.isfile(thumb))
+
+    def test_thumbnail_encrypted(self):
+        parser = RasterisedDocumentParser(uuid.uuid4())
+        thumb = parser.get_thumbnail(os.path.join(self.SAMPLE_FILES, 'encrypted.pdf'), "application/pdf")
+        self.assertTrue(os.path.isfile(thumb))
 
     def test_get_dpi(self):
         parser = RasterisedDocumentParser(None)
@@ -129,15 +138,31 @@ class TestParser(DirectoriesMixin, TestCase):
         self.assertIsNone(parser.archive_path)
         self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
 
-    @override_settings(OCR_MODE="redo")
-    @mock.patch("paperless_tesseract.parsers.get_text_from_pdf", lambda _: None)
-    def test_with_form_error_notext(self):
+    @override_settings(OCR_MODE="skip")
+    def test_signed(self):
         parser = RasterisedDocumentParser(None)
 
-        def f():
-            parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
+        parser.parse(os.path.join(self.SAMPLE_FILES, "signed.pdf"), "application/pdf")
 
-        self.assertRaises(ParseError, f)
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(parser.get_text(), ["This is a digitally signed PDF, created with Acrobat Pro for the Paperless project to enable", "automated testing of signed/encrypted PDFs"])
+
+    @override_settings(OCR_MODE="skip")
+    def test_encrypted(self):
+        parser = RasterisedDocumentParser(None)
+
+        parser.parse(os.path.join(self.SAMPLE_FILES, "encrypted.pdf"), "application/pdf")
+
+        self.assertIsNone(parser.archive_path)
+        self.assertEqual(parser.get_text(), "")
+
+
+    @override_settings(OCR_MODE="redo")
+    def test_with_form_error_notext(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "with-form.pdf"), "application/pdf")
+
+        self.assertContainsStrings(parser.get_text(), ["Please enter your name in here:", "This is a PDF document with a form."])
 
     @override_settings(OCR_MODE="force")
     def test_with_form_force(self):
@@ -164,17 +189,12 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertRaises(ParseError, f)
 
-    @mock.patch("paperless_tesseract.parsers.ocrmypdf.ocr")
-    def test_image_calc_a4_dpi(self, m):
+    def test_image_calc_a4_dpi(self):
         parser = RasterisedDocumentParser(None)
 
-        parser.parse(os.path.join(self.SAMPLE_FILES, "simple-no-dpi.png"), "image/png")
+        dpi = parser.calculate_a4_dpi(os.path.join(self.SAMPLE_FILES, "simple-no-dpi.png"))
 
-        m.assert_called_once()
-
-        args, kwargs = m.call_args
-
-        self.assertEqual(kwargs['image_dpi'], 62)
+        self.assertEqual(dpi, 62)
 
     @mock.patch("paperless_tesseract.parsers.RasterisedDocumentParser.calculate_a4_dpi")
     def test_image_dpi_fail(self, m):
@@ -258,9 +278,80 @@ class TestParser(DirectoriesMixin, TestCase):
     def test_skip_noarchive_notext(self):
         parser = RasterisedDocumentParser(None)
         parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-images.pdf"), "application/pdf")
-        self.assertTrue(os.path.join(parser.archive_path))
+        self.assertTrue(os.path.isfile(parser.archive_path))
         self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3"])
 
+    @override_settings(OCR_MODE="skip")
+    def test_multi_page_mixed(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-mixed.pdf"), "application/pdf")
+        self.assertTrue(os.path.isfile(parser.archive_path))
+        self.assertContainsStrings(parser.get_text().lower(), ["page 1", "page 2", "page 3", "page 4", "page 5", "page 6"])
+
+        with open(os.path.join(parser.tempdir, "sidecar.txt")) as f:
+            sidecar = f.read()
+
+        self.assertIn("[OCR skipped on page(s) 4-6]", sidecar)
+
+    @override_settings(OCR_MODE="skip_noarchive")
+    def test_multi_page_mixed_no_archive(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "multi-page-mixed.pdf"), "application/pdf")
+        self.assertIsNone(parser.archive_path)
+        self.assertContainsStrings(parser.get_text().lower(), ["page 4", "page 5", "page 6"])
+
+    @override_settings(OCR_MODE="skip", OCR_ROTATE_PAGES=True)
+    def test_rotate(self):
+        parser = RasterisedDocumentParser(None)
+        parser.parse(os.path.join(self.SAMPLE_FILES, "rotated.pdf"), "application/pdf")
+        self.assertContainsStrings(parser.get_text(), [
+            "This is the text that appears on the first page. It’s a lot of text.",
+            "Even if the pages are rotated, OCRmyPDF still gets the job done.",
+            "This is a really weird file with lots of nonsense text.",
+            "If you read this, it’s your own fault. Also check your screen orientation."
+        ])
+
+    def test_ocrmypdf_parameters(self):
+        parser = RasterisedDocumentParser(None)
+        params = parser.construct_ocrmypdf_parameters(input_file="input.pdf", output_file="output.pdf",
+                                                      sidecar_file="sidecar.txt", mime_type="application/pdf",
+                                                      safe_fallback=False)
+
+        self.assertEqual(params['input_file'], "input.pdf")
+        self.assertEqual(params['output_file'], "output.pdf")
+        self.assertEqual(params['sidecar'], "sidecar.txt")
+
+        with override_settings(OCR_CLEAN="none"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertNotIn("clean", params)
+            self.assertNotIn("clean_final", params)
+
+        with override_settings(OCR_CLEAN="clean"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['clean'])
+            self.assertNotIn("clean_final", params)
+
+        with override_settings(OCR_CLEAN="clean-final", OCR_MODE="skip"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['clean_final'])
+            self.assertNotIn("clean", params)
+
+        with override_settings(OCR_CLEAN="clean-final", OCR_MODE="redo"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['clean'])
+            self.assertNotIn("clean_final", params)
+
+        with override_settings(OCR_DESKEW=True, OCR_MODE="skip"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertTrue(params['deskew'])
+
+        with override_settings(OCR_DESKEW=True, OCR_MODE="redo"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertNotIn('deskew', params)
+
+        with override_settings(OCR_DESKEW=False, OCR_MODE="skip"):
+            params = parser.construct_ocrmypdf_parameters("", "", "", "")
+            self.assertNotIn('deskew', params)
 
 class TestParserFileTypes(DirectoriesMixin, TestCase):
 

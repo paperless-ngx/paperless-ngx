@@ -1,9 +1,13 @@
-from .parsers import RasterisedDocumentParser
+
+def get_parser(*args, **kwargs):
+    from .parsers import RasterisedDocumentParser
+
+    return RasterisedDocumentParser(*args, **kwargs)
 
 
 def tesseract_consumer_declaration(sender, **kwargs):
     return {
-        "parser": RasterisedDocumentParser,
+        "parser": get_parser,
         "weight": 0,
         "mime_types": {
             "application/pdf": ".pdf",
