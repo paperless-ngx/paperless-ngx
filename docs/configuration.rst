@@ -510,7 +510,7 @@ PAPERLESS_THREADS_PER_WORKER=<num>
 PAPERLESS_WORKER_TIMEOUT=<num>
     Machines with few cores or weak ones might not be able to finish OCR on
     large documents within the default 1800 seconds. So extending this timeout
-    may prove be useful on weak hardware setups.
+    may prove to be useful on weak hardware setups.
 
 
 PAPERLESS_TIME_ZONE=<timezone>
