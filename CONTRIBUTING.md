@@ -23,7 +23,7 @@ Paperless supports python 3.6, 3.7, 3.8 and 3.9.
 
 ## Testing:
 
-Please test your code! I know its a hassle, but it makes sure that your code works now and will allow us to detect regressions easily.
+Please test your code! I know it's a hassle, but it makes sure that your code works now and will allow us to detect regressions easily.
 
 To test your code, execute `pytest` in the src/ directory. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
 
@@ -45,13 +45,13 @@ Examples of `non-trivial` PRs might include:
 * Large changes to many distinct files
 * Breaking or depreciation of existing features
 
-Our community review process for `non-trivial` prs is the following:
+Our community review process for `non-trivial` PRs is the following:
 
 1. Must pass usual automated code tests and formatting checks.
 2. The PR will be assigned and pinged to the appropriately experienced team (i.e. @paperless-ngx/backend for backend changes).
 3. Development team will check and test code manually (possibly over several days).
    - You may be asked to make changes or rebase.
    - The team may ask for additional testing done by @paperless-ngx/test
-4. **Two or three** members of the team will approve and finally merge the request into `dev` 🎉.
+4. **At least two** members of the team will approve and finally merge the request into `dev` 🎉.
 
 This process might be slow as community members have different schedules and time to dedicate to the Paperless project. However it ensures community code reviews are as brilliantly thorough as they once were with @jonaswinkler.
