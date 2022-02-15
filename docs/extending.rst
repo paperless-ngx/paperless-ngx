@@ -54,10 +54,11 @@ To do the setup you need to perform the steps from the following chapters in a c
             docker run -d -p 6379:6379 -restart unless-stopped redis:latest
 
 6.  Install the python dependencies by performing in the src/ directory.
-
     .. code:: shell-session
 
         pipenv install --dev
+
+  * Make sure you're using python 3.9.x or lower. Otherwise you might get issues with building dependencies. You can use `pyenv <https://github.com/pyenv/pyenv>`_ to install a specific python version.
 
 7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From root folder:
 
