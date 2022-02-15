@@ -5,6 +5,8 @@ import uuid
 import zipfile
 from datetime import datetime
 from time import mktime
+from urllib.parse import quote_plus
+from unicodedata import normalize
 
 from django.conf import settings
 from django.db.models import Count, Max, Case, When, IntegerField
@@ -61,7 +63,6 @@ from .serialisers import (
     DocumentListSerializer,
     BulkDownloadSerializer
 )
-
 
 logger = logging.getLogger("paperless.api")
 
@@ -220,8 +221,16 @@ class DocumentViewSet(RetrieveModelMixin,
             file_handle = GnuPG.decrypted(file_handle)
 
         response = HttpResponse(file_handle, content_type=mime_type)
-        response["Content-Disposition"] = '{}; filename="{}"'.format(
-            disposition, filename)
+        # Firefox is not able to handle unicode characters in filename field
+        # RFC 5987 addresses this issue
+        # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
+        filename_normalized = normalize("NFKD", filename)\
+            .encode('ascii', 'ignore')
+        filename_encoded = quote_plus(filename)
+        content_disposition = f'{disposition}; ' \
+                              f'filename="{filename_normalized}"; ' \
+                              f'filename*=utf-8\'\'{filename_encoded}'
+        response["Content-Disposition"] = content_disposition
         return response
 
     def get_metadata(self, file, mime_type):
