@@ -1,9 +1,12 @@
-from .parsers import TikaDocumentParser
+def get_parser(*args, **kwargs):
+    from .parsers import TikaDocumentParser
+
+    return TikaDocumentParser(*args, **kwargs)
 
 
 def tika_consumer_declaration(sender, **kwargs):
     return {
-        "parser": TikaDocumentParser,
+        "parser": get_parser,
         "weight": 10,
         "mime_types": {
             "application/msword": ".doc",
@@ -16,5 +19,6 @@ def tika_consumer_declaration(sender, **kwargs):
             "application/vnd.oasis.opendocument.presentation": ".odp",
             "application/vnd.oasis.opendocument.spreadsheet": ".ods",
             "application/vnd.oasis.opendocument.text": ".odt",
+            "text/rtf": ".rtf",
         },
     }

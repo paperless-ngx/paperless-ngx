@@ -1,8 +1,15 @@
 <div class="row">
    <div class="col mb-2 mb-xl-0">
      <div class="form-inline d-flex align-items-center">
-         <label class="text-muted mr-2 mb-0" i18n>Filter by:</label>
-         <input class="form-control form-control-sm flex-fill w-auto" type="text" [(ngModel)]="titleFilter" placeholder="Title" i18n-placeholder>
+         <div class="input-group input-group-sm flex-fill w-auto">
+           <div class="input-group-prepend" ngbDropdown>
+            <button class="btn btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
+            <div class="dropdown-menu shadow" ngbDropdownMenu>
+              <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget == t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
+            </div>
+          </div>
+          <input #textFilterInput class="form-control form-control-sm" type="text" [(ngModel)]="textFilter" [readonly]="textFilterTarget == 'fulltext-morelike'">
+         </div>
      </div>
   </div>
   <div class="w-100 d-xl-none"></div>

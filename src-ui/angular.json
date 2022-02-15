@@ -16,9 +16,19 @@
 			"i18n": {
 				"sourceLocale": "en-US",
 				"locales": {
-					"de": "src/locale/messages.de.xlf",
+					"de-DE": "src/locale/messages.de_DE.xlf",
 					"nl-NL": "src/locale/messages.nl_NL.xlf",
-					"fr": "src/locale/messages.fr.xlf"
+					"fr-FR": "src/locale/messages.fr_FR.xlf",
+					"en-GB": "src/locale/messages.en_GB.xlf",
+					"pt-BR": "src/locale/messages.pt_BR.xlf",
+					"pt-PT": "src/locale/messages.pt_PT.xlf",
+					"it-IT": "src/locale/messages.it_IT.xlf",
+					"ro-RO": "src/locale/messages.ro_RO.xlf",
+					"ru-RU": "src/locale/messages.ru_RU.xlf",
+					"es-ES": "src/locale/messages.es_ES.xlf",
+					"pl-PL": "src/locale/messages.pl_PL.xlf",
+					"sv-SE": "src/locale/messages.sv_SE.xlf",
+					"lb-LU": "src/locale/messages.lb_LU.xlf"
 				}
 			},
 			"architect": {
@@ -35,6 +45,7 @@
 						"aot": true,
 						"assets": [
 							"src/favicon.ico",
+							"src/apple-touch-icon.png",
 							"src/assets",
 							"src/manifest.webmanifest", {
 								"glob": "pdf.worker.min.js",
@@ -62,7 +73,6 @@
 							"optimization": true,
 							"outputHashing": "none",
 							"sourceMap": false,
-							"extractCss": true,
 							"namedChunks": false,
 							"extractLicenses": true,
 							"vendorChunk": false,
@@ -99,7 +109,8 @@
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
 					"options": {
-						"browserTarget": "paperless-ui:build"
+						"browserTarget": "paperless-ui:build",
+						"ivy": true
 					}
 				},
 				"test": {
@@ -111,6 +122,7 @@
 						"karmaConfig": "karma.conf.js",
 						"assets": [
 							"src/favicon.ico",
+							"src/apple-touch-icon.png",
 							"src/assets",
 							"src/manifest.webmanifest"
 						],

@@ -17,8 +17,9 @@ import { TagService } from 'src/app/services/rest/tag.service';
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
 
-  constructor(private tagService: TagService, private modalService: NgbModal) { }
-
+  constructor(private tagService: TagService, private modalService: NgbModal) {
+    this.createTagRef = this.createTag.bind(this)
+  }
 
   onChange = (newValue: number[]) => {};
 
@@ -26,9 +27,6 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   writeValue(newValue: number[]): void {
     this.value = newValue
-    if (this.tags) {
-      this.displayValue = newValue
-    }
   }
   registerOnChange(fn: any): void {
     this.onChange = fn;
@@ -43,7 +41,6 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     this.tagService.listAll().subscribe(result => {
       this.tags = result.results
-      this.displayValue = this.value
     })
   }
 
@@ -53,41 +50,74 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   @Input()
   hint
 
-  value: number[]
+  @Input()
+  suggestions: number[]
 
-  displayValue: number[] = []
+  value: number[]
 
   tags: PaperlessTag[]
 
-  getTag(id) {
-    return this.tags.find(tag => tag.id == id)
-  }
+  public createTagRef: (name) => void
 
-  removeTag(id) {
-    let index = this.displayValue.indexOf(id)
-    if (index > -1) {
-      let oldValue = this.displayValue
-      oldValue.splice(index, 1)
-      this.displayValue = [...oldValue]
-      this.onChange(this.displayValue)
+  private _lastSearchTerm: string
+
+  getTag(id) {
+    if (this.tags) {
+      return this.tags.find(tag => tag.id == id)
+    } else {
+      return null
     }
   }
 
-  createTag() {
+  removeTag(id) {
+    let index = this.value.indexOf(id)
+    if (index > -1) {
+      let oldValue = this.value
+      oldValue.splice(index, 1)
+      this.value = [...oldValue]
+      this.onChange(this.value)
+    }
+  }
+
+  createTag(name: string = null) {
     var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (name) modal.componentInstance.object = { name: name }
+    else if (this._lastSearchTerm) modal.componentInstance.object = { name: this._lastSearchTerm }
     modal.componentInstance.success.subscribe(newTag => {
       this.tagService.listAll().subscribe(tags => {
         this.tags = tags.results
-        this.displayValue = [...this.displayValue, newTag.id]
-        this.onChange(this.displayValue)
+        this.value = [...this.value, newTag.id]
+        this.onChange(this.value)
       })
     })
   }
 
-  ngSelectChange() {
-    this.value = this.displayValue
-    this.onChange(this.displayValue)
+  getSuggestions() {
+    if (this.suggestions && this.tags) {
+      return this.suggestions.filter(id => !this.value.includes(id)).map(id => this.tags.find(tag => tag.id == id))
+    } else {
+      return []
+    }
+  }
+
+  addTag(id) {
+    this.value = [...this.value, id]
+    this.onChange(this.value)
+  }
+
+  clearLastSearchTerm() {
+    this._lastSearchTerm = null
+  }
+
+  onSearch($event) {
+    this._lastSearchTerm = $event.term
+  }
+
+  onBlur() {
+    setTimeout(() => {
+      this.clearLastSearchTerm()
+    }, 3000);
   }
 
 }

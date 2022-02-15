@@ -1,7 +1,10 @@
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
+import { SettingsService } from 'src/app/services/settings.service';
+import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter';
 
 export interface DateSelection {
   before?: string
@@ -16,9 +19,16 @@ const LAST_YEAR = 3
 @Component({
   selector: 'app-date-dropdown',
   templateUrl: './date-dropdown.component.html',
-  styleUrls: ['./date-dropdown.component.scss']
+  styleUrls: ['./date-dropdown.component.scss'],
+  providers: [
+    {provide: NgbDateAdapter, useClass: ISODateAdapter},
+  ]
 })
 export class DateDropdownComponent implements OnInit, OnDestroy {
+
+  constructor(settings: SettingsService) {
+    this.datePlaceHolder = settings.getLocalizedDateInputFormat()
+  }
 
   quickFilters = [
     {id: LAST_7_DAYS, name: $localize`Last 7 days`},
@@ -26,6 +36,8 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     {id: LAST_3_MONTHS, name: $localize`Last 3 months`},
     {id: LAST_YEAR, name: $localize`Last year`}
   ]
+
+  datePlaceHolder: string
 
   @Input()
   dateBefore: string

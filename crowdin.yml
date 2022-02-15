@@ -1,5 +1,6 @@
+commit_message: '[ci skip]'
 files:
-  - source: /src/locale/en-us/LC_MESSAGES/django.po
-    translation: /src/locale/%two_letters_code%/LC_MESSAGES/django.po
+  - source: /src/locale/en_US/LC_MESSAGES/django.po
+    translation: /src/locale/%locale_with_underscore%/LC_MESSAGES/django.po
   - source: /src-ui/messages.xlf
-    translation: /src-ui/src/locale/messages.%two_letters_code%.xlf
+    translation: /src-ui/src/locale/messages.%locale_with_underscore%.xlf

@@ -2,30 +2,31 @@
   <label for="tags" i18n>Tags</label>
 
   <div class="input-group flex-nowrap">
-    <ng-select name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="displayValue"
+    <ng-select name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value"
       [multiple]="true"
       [closeOnSelect]="false"
       [clearSearchOnAdd]="true"
-      [disabled]="disabled"
       [hideSelected]="true"
-      (change)="ngSelectChange()">
+      [addTag]="createTagRef"
+      addTagText="Add tag"
+      i18n-addTagText
+      (change)="onChange(value)"
+      (search)="onSearch($event)"
+      (focus)="clearLastSearchTerm()"
+      (clear)="clearLastSearchTerm()"
+      (blur)="onBlur()">
 
       <ng-template ng-label-tmp let-item="item">
         <span class="tag-wrap tag-wrap-delete" (click)="removeTag(item.id)">
           <svg width="1.2em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <use xlink:href="assets/bootstrap-icons.svg#x"/>
           </svg>
-          <app-tag style="background-color: none;" [tag]="getTag(item.id)"></app-tag>
+          <app-tag *ngIf="item.id && tags" style="background-color: none;" [tag]="getTag(item.id)"></app-tag>
         </span>
       </ng-template>
       <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
         <div class="tag-wrap">
-          <div class="selected-icon d-inline-block mr-1">
-            <svg *ngIf="displayValue.includes(item.id)" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <use xlink:href="assets/bootstrap-icons.svg#check"/>
-            </svg>
-          </div>
-          <app-tag class="mr-2" [tag]="getTag(item.id)"></app-tag>
+          <app-tag *ngIf="item.id && tags" class="mr-2" [tag]="getTag(item.id)"></app-tag>
         </div>
       </ng-template>
     </ng-select>
@@ -39,5 +40,13 @@
     </div>
   </div>
   <small class="form-text text-muted" *ngIf="hint">{{hint}}</small>
+  <small *ngIf="getSuggestions().length > 0">
+    <span i18n>Suggestions:</span>&nbsp;
+    <ng-container *ngFor="let tag of getSuggestions()">
+      <a (click)="addTag(tag.id)" [routerLink]="">{{tag.name}}</a>&nbsp;
+    </ng-container>
+
+
+  </small>
 
 </div>

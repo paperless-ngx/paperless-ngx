@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Inject, Injectable, LOCALE_ID, Renderer2, RendererFactory2 } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -10,9 +10,14 @@ export interface PaperlessSettings {
 }
 
 export interface LanguageOption {
-  code: string,
-  name: string,
+  code: string
+  name: string
   englishName?: string
+
+  /**
+   * A date format string for use by the date selectors. MUST contain 'yyyy', 'mm' and 'dd'.
+   */
+  dateInputFormat?: string
 }
 
 export const SETTINGS_KEYS = {
@@ -21,9 +26,14 @@ export const SETTINGS_KEYS = {
   DOCUMENT_LIST_SIZE: 'general-settings:documentListSize',
   DARK_MODE_USE_SYSTEM: 'general-settings:dark-mode:use-system',
   DARK_MODE_ENABLED: 'general-settings:dark-mode:enabled',
+  DARK_MODE_THUMB_INVERTED: 'general-settings:dark-mode:thumb-inverted',
   USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer',
   DATE_LOCALE: 'general-settings:date-display:date-locale',
-  DATE_FORMAT: 'general-settings:date-display:date-format'
+  DATE_FORMAT: 'general-settings:date-display:date-format',
+  NOTIFICATIONS_CONSUMER_NEW_DOCUMENT: 'general-settings:notifications:consumer-new-documents',
+  NOTIFICATIONS_CONSUMER_SUCCESS: 'general-settings:notifications:consumer-success',
+  NOTIFICATIONS_CONSUMER_FAILED: 'general-settings:notifications:consumer-failed',
+  NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD: 'general-settings:notifications:consumer-suppress-on-dashboard',
 }
 
 const SETTINGS: PaperlessSettings[] = [
@@ -32,9 +42,14 @@ const SETTINGS: PaperlessSettings[] = [
   {key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE, type: "number", default: 50},
   {key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, type: "boolean", default: true},
   {key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: "boolean", default: false},
+  {key: SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED, type: "boolean", default: true},
   {key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: "boolean", default: false},
   {key: SETTINGS_KEYS.DATE_LOCALE, type: "string", default: ""},
-  {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"}
+  {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD, type: "boolean", default: true},
 ]
 
 @Injectable({
@@ -48,7 +63,8 @@ export class SettingsService {
     private rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
     private cookieService: CookieService,
-    private meta: Meta
+    private meta: Meta,
+    @Inject(LOCALE_ID) private localeId: string
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
 
@@ -71,11 +87,26 @@ export class SettingsService {
 
   getLanguageOptions(): LanguageOption[] {
     return [
-      {code: "en-us", name: $localize`English`, englishName: "English"},
-      {code: "de", name: $localize`German`, englishName: "German"},
-      {code: "nl", name: $localize`Dutch`, englishName: "Dutch"},
-      {code: "fr", name: $localize`French`, englishName: "French"}
+      {code: "en-us", name: $localize`English (US)`, englishName: "English (US)", dateInputFormat: "mm/dd/yyyy"},
+      {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)", dateInputFormat: "dd/mm/yyyy"},
+      {code: "de-de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
+      {code: "nl-nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
+      {code: "fr-fr", name: $localize`French`, englishName: "French", dateInputFormat: "dd/mm/yyyy"},
+      {code: "pt-pt", name: $localize`Portuguese`, englishName: "Portuguese", dateInputFormat: "dd/mm/yyyy"},
+      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"},
+      {code: "it-it", name: $localize`Italian`, englishName: "Italian", dateInputFormat: "dd/mm/yyyy"},
+      {code: "ro-ro", name: $localize`Romanian`, englishName: "Romanian", dateInputFormat: "dd.mm.yyyy"},
+      {code: "ru-ru", name: $localize`Russian`, englishName: "Russian", dateInputFormat: "dd.mm.yyyy"},
+      {code: "es-es", name: $localize`Spanish`, englishName: "Spanish", dateInputFormat: "dd/mm/yyyy"},
+      {code: "pl-pl", name: $localize`Polish`, englishName: "Polish", dateInputFormat: "dd.mm.yyyy"},
+      {code: "sv-se", name: $localize`Swedish`, englishName: "Swedish", dateInputFormat: "yyyy-mm-dd"},
+      {code: "lb-lu", name: $localize`Luxembourgish`, englishName: "Luxembourgish", dateInputFormat: "dd.mm.yyyy"}
     ]
+  }
+
+  getDateLocaleOptions(): LanguageOption[] {
+    let isoOption: LanguageOption = {code: "iso-8601", name: $localize`ISO 8601`, dateInputFormat: "yyyy-mm-dd"}
+    return [isoOption].concat(this.getLanguageOptions())
   }
 
   private getLanguageCookieName() {
@@ -96,6 +127,11 @@ export class SettingsService {
     } else {
       this.cookieService.delete(this.getLanguageCookieName())
     }
+  }
+
+  getLocalizedDateInputFormat(): string {
+    let dateLocale = this.get(SETTINGS_KEYS.DATE_LOCALE) || this.getLanguage() || this.localeId.toLowerCase()
+    return this.getDateLocaleOptions().find(o => o.code == dateLocale)?.dateInputFormat || "yyyy-mm-dd"
   }
 
   get(key: string): any {

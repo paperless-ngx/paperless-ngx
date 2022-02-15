@@ -10,14 +10,13 @@ easier.
 Matching tags, correspondents and document types
 ################################################
 
-After the consumer has tried to figure out what it could from the file name,
-it starts looking at the content of the document itself.  It will compare the
-matching algorithms defined by every tag and correspondent already set in your
-database to see if they apply to the text in that document.  In other words,
-if you defined a tag called ``Home Utility`` that had a ``match`` property of
-``bc hydro`` and a ``matching_algorithm`` of ``literal``, Paperless will
-automatically tag your newly-consumed document with your ``Home Utility`` tag
-so long as the text ``bc hydro`` appears in the body of the document somewhere.
+Paperless will compare the matching algorithms defined by every tag and
+correspondent already set in your database to see if they apply to the text in
+a document.  In other words, if you defined a tag called ``Home Utility``
+that had a ``match`` property of ``bc hydro`` and a ``matching_algorithm`` of
+``literal``, Paperless will automatically tag your newly-consumed document with
+your ``Home Utility`` tag so long as the text ``bc hydro`` appears in the body
+of the document somewhere.
 
 The matching logic is quite powerful, and supports searching the text of your
 document with different algorithms, and as such, some experimentation may be
@@ -217,6 +216,7 @@ will create a directory structure as follows:
 
 Paperless provides the following placeholders withing filenames:
 
+* ``{asn}``: The archive serial number of the document, or "none".
 * ``{correspondent}``: The name of the correspondent, or "none".
 * ``{document_type}``: The name of the document type, or "none".
 * ``{tag_list}``: A comma separated list of all tags assigned to the document.
