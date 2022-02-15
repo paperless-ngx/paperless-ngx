@@ -89,7 +89,7 @@ You can go multiple routes to setup and run Paperless:
 
 The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
 from the above automatically so that it just works and uses sensible defaults for all configuration options.
-Here you find a cheat-sheet for docker beginners: `CLI Basics <https://sehn.tech/post/devops-with-docker/>`_
+Here you find a cheat-sheet for docker beginners: `CLI Basics <https://www.sehn.tech/refs/devops-with-docker/>`_
 
 The bare metal route is complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
@@ -99,7 +99,7 @@ The ansible route combines benefits of both options:
 the setup process is fully automated, reproducible and `idempotent <https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency>`_,
 it includes the same sensible defaults, and it simultaneously provides the flexibility of a bare metal installation.
 
-.. _CLI Basics: https://sehn.tech/post/devops-with-docker/
+.. _CLI Basics: https://www.sehn.tech/refs/devops-with-docker/
 .. _idempotent: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency
 
 .. _setup-docker_script:
