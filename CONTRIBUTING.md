@@ -50,7 +50,7 @@ Our community review process for `non-trivial` prs is the following:
 1. Must pass usual automated code tests and formatting checks.
 2. The PR will be assigned and pinged to the appropriately experienced team (i.e. @paperless-ngx/backend for backend changes).
 3. Development team will check and test code manually (possibly over several days).
-   - You may be asked to make changes or rebase. 
+   - You may be asked to make changes or rebase.
    - The team may ask for additional testing done by @paperless-ngx/test
 4. **Two or three** members of the team will approve and finally merge the request into `dev` 🎉.
 
