@@ -123,6 +123,15 @@
 
                     </ng-template>
                 </li>
+
+                <li [ngbNavItem]="4" class="d-md-none">
+                  <a ngbNavLink>Preview</a>
+                  <ng-template ngbNavContent *ngIf="pdfPreview.offsetParent == undefined">
+                    <div class="pdf-viewer-container" *ngIf="getContentType() == 'application/pdf'">
+                      <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true"></pdf-viewer>
+                    </div>
+                  </ng-template>
+                </li>
             </ul>
 
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
@@ -133,7 +142,7 @@
         </form>
     </div>
 
-    <div class="col-md-6 col-xl-8 mb-3">
+    <div class="col-md-6 col-xl-8 mb-3 d-none d-md-block" #pdfPreview>
         <ng-container *ngIf="getContentType() == 'application/pdf'">
             <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
                 <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>

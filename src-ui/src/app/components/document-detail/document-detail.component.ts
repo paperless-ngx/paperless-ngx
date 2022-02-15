@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
@@ -64,6 +64,15 @@ export class DocumentDetailComponent implements OnInit {
 
   previewCurrentPage: number = 1
   previewNumPages: number = 1
+
+  @ViewChild('nav') nav: NgbNav
+  @ViewChild('pdfPreview') set pdfPreview(element) {
+    // this gets called when compontent added or removed from DOM
+    if (element && element.nativeElement.offsetParent !== null) { // its visible
+
+      setTimeout(()=> this.nav?.select(1));
+    }
+  }
 
   constructor(
     private documentsService: DocumentService,

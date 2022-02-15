@@ -171,6 +171,24 @@ Install Paperless from Docker Hub
 
     Don't change the part after the colon or paperless wont find your documents.
 
+    You may also need to change the default port that the webserver will use
+    from the default (8000):
+
+     .. code::
+
+        ports:
+          - 8000:8000
+
+    Replace the part BEFORE the colon with a port of your choice:
+
+     .. code::
+
+        ports:
+          - 8010:8000
+
+    Don't change the part after the colon or edit other lines that refer to
+    port 8000. Modifying the part before the colon will map requests on another
+    port to the webserver running on the default port.
 
 5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
