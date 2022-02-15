@@ -1,0 +1,61 @@
+<div class="row">
+   <div class="col mb-2 mb-xl-0">
+     <div class="form-inline d-flex align-items-center">
+         <div class="input-group input-group-sm flex-fill w-auto">
+           <div class="input-group-prepend" ngbDropdown>
+            <button class="btn btn-outline-primary" ngbDropdownToggle>{{textFilterTargetName}}</button>
+            <div class="dropdown-menu shadow" ngbDropdownMenu>
+              <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget == t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
+            </div>
+          </div>
+          <input #textFilterInput class="form-control form-control-sm" type="text" [(ngModel)]="textFilter" [readonly]="textFilterTarget == 'fulltext-morelike'">
+         </div>
+     </div>
+  </div>
+  <div class="w-100 d-xl-none"></div>
+    <div class="col col-xl-auto mb-2 mb-xl-0">
+      <div class="d-flex">
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Tags" icon="tag-fill" i18n-title
+          filterPlaceholder="Filter tags" i18n-filterPlaceholder
+          [items]="tags"
+          [(selectionModel)]="tagSelectionModel"
+          (selectionModelChange)="updateRules()"
+          [multiple]="true"
+          (open)="onTagsDropdownOpen()"
+          [allowSelectNone]="true"></app-filterable-dropdown>
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Correspondent" icon="person-fill" i18n-title
+          filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
+          [items]="correspondents"
+          [(selectionModel)]="correspondentSelectionModel"
+          (selectionModelChange)="updateRules()"
+          (open)="onCorrespondentDropdownOpen()"
+          [allowSelectNone]="true"></app-filterable-dropdown>
+        <app-filterable-dropdown class="mr-2 flex-fill" title="Document type" icon="file-earmark-fill" i18n-title
+          filterPlaceholder="Filter document types" i18n-filterPlaceholder
+          [items]="documentTypes"
+          [(selectionModel)]="documentTypeSelectionModel"
+          (open)="onDocumentTypeDropdownOpen()"
+          (selectionModelChange)="updateRules()"
+          [allowSelectNone]="true"></app-filterable-dropdown>
+        <app-date-dropdown class="mr-2"
+          title="Created" i18n-title
+          (datesSet)="updateRules()"
+          [(dateBefore)]="dateCreatedBefore"
+          [(dateAfter)]="dateCreatedAfter"></app-date-dropdown>
+        <app-date-dropdown
+          [(dateBefore)]="dateAddedBefore"
+          [(dateAfter)]="dateAddedAfter"
+          title="Added" i18n-title
+          (datesSet)="updateRules()"></app-date-dropdown>
+     </div>
+   </div>
+   <div class="w-100 d-xl-none"></div>
+   <div class="col col-xl-auto mb-2 mb-xl-0">
+     <button class="btn btn-link btn-sm px-0 mx-0 ml-xl-n4" [disabled]="!rulesModified" (click)="resetSelected()">
+       <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+         <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+       </svg>&nbsp;<ng-container i18n>Reset filters</ng-container>
+
+     </button>
+   </div>
+</div>

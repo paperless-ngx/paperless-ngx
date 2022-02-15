@@ -1,15 +1,30 @@
 from django.contrib import admin
 from paperless_mail.models import MailAccount, MailRule
 
+from django.utils.translation import gettext_lazy as _
+
 
 class MailAccountAdmin(admin.ModelAdmin):
 
     list_display = ("name", "imap_server", "username")
 
+    fieldsets = [
+        (None, {
+            'fields': ['name', 'imap_server', 'imap_port']
+        }),
+        (_("Authentication"), {
+            'fields': ['imap_security', 'username', 'password']
+        }),
+        (_("Advanced settings"), {
+            'fields': ['character_set']
+        })
+    ]
+
 
 class MailRuleAdmin(admin.ModelAdmin):
 
     radio_fields = {
+        "attachment_type": admin.VERTICAL,
         "action": admin.VERTICAL,
         "assign_title_from": admin.VERTICAL,
         "assign_correspondent_from": admin.VERTICAL
@@ -19,31 +34,33 @@ class MailRuleAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('name', 'order', 'account', 'folder')
         }),
-        ("Filter", {
+        (_("Filter"), {
             'description':
-                "Paperless will only process mails that match ALL of the "
-                "filters given below.",
+                _("Paperless will only process mails that match ALL of the "
+                  "filters given below."),
             'fields':
                 ('filter_from',
                  'filter_subject',
                  'filter_body',
-                 'maximum_age')
+                 'filter_attachment_filename',
+                 'maximum_age',
+                 'attachment_type')
         }),
-        ("Actions", {
+        (_("Actions"), {
             'description':
-                "The action applied to the mail. This action is only "
-                "performed when documents were consumed from the mail. Mails "
-                "without attachments will remain entirely untouched.",
+                _("The action applied to the mail. This action is only "
+                  "performed when documents were consumed from the mail. "
+                  "Mails without attachments will remain entirely untouched."),
             'fields': (
                 'action',
                 'action_parameter')
         }),
-        ("Metadata", {
+        (_("Metadata"), {
             'description':
-                "Assign metadata to documents consumed from this rule "
-                "automatically. If you do not assign tags, types or "
-                "correspondents here, paperless will still process all "
-                "matching rules that you have defined.",
+                _("Assign metadata to documents consumed from this rule "
+                  "automatically. If you do not assign tags, types or "
+                  "correspondents here, paperless will still process all "
+                  "matching rules that you have defined."),
             "fields": (
                 'assign_title_from',
                 'assign_tag',

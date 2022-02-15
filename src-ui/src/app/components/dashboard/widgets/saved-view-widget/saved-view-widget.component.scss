@@ -1,0 +1,8 @@
+table {
+  overflow-wrap: anywhere;
+  table-layout: fixed;
+}
+
+th:first-child {
+  width: 25%;
+}

@@ -1,10 +1,10 @@
 import shutil
 import tempfile
-from datetime import datetime
 from pathlib import Path
 from unittest import mock
 
 from django.test import TestCase, override_settings
+from django.utils import timezone
 
 from ..models import Document, Correspondent
 
@@ -47,20 +47,20 @@ class TestDocument(TestCase):
 
     def test_file_name(self):
 
-        doc = Document(mime_type="application/pdf", title="test", created=datetime(2020, 12, 25))
+        doc = Document(mime_type="application/pdf", title="test", created=timezone.datetime(2020, 12, 25))
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
 
     def test_file_name_jpg(self):
 
-        doc = Document(mime_type="image/jpeg", title="test", created=datetime(2020, 12, 25))
+        doc = Document(mime_type="image/jpeg", title="test", created=timezone.datetime(2020, 12, 25))
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.jpg")
 
     def test_file_name_unknown(self):
 
-        doc = Document(mime_type="application/zip", title="test", created=datetime(2020, 12, 25))
+        doc = Document(mime_type="application/zip", title="test", created=timezone.datetime(2020, 12, 25))
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.zip")
 
     def test_file_name_invalid_type(self):
 
-        doc = Document(mime_type="image/jpegasd", title="test", created=datetime(2020, 12, 25))
+        doc = Document(mime_type="image/jpegasd", title="test", created=timezone.datetime(2020, 12, 25))
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test")

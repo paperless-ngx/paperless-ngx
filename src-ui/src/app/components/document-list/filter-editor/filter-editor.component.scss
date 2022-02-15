@@ -1,0 +1,10 @@
+.quick-filter {
+  min-width: 250px;
+  max-height: 400px;
+  overflow-y: scroll;
+
+  .selected-icon {
+    min-width: 1em;
+    min-height: 1em;
+  }
+}

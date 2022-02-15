@@ -1,0 +1,17 @@
+dependencies: []
+
+galaxy_info:
+  author: C0nsultant
+  description: Bare-metal deployment of paperless-ng DMS
+  license: license (GPLv3)
+  min_ansible_version: 2.7
+
+  platforms:
+    - name: Debian
+      versions:
+        - buster
+    - name: Ubuntu
+      versions:
+        - focal
+
+  galaxy_tags: [EDMS, django, python, web]

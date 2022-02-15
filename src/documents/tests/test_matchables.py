@@ -21,13 +21,15 @@ class TestMatching(TestCase):
                 matching_algorithm=getattr(klass, algorithm)
             )
             for string in true:
+                doc = Document(content=string)
                 self.assertTrue(
-                    matching.matches(instance, string),
+                    matching.matches(instance, doc),
                     '"%s" should match "%s" but it does not' % (text, string)
                 )
             for string in false:
+                doc = Document(content=string)
                 self.assertFalse(
-                    matching.matches(instance, string),
+                    matching.matches(instance, doc),
                     '"%s" should not match "%s" but it does' % (text, string)
                 )
 
@@ -169,7 +171,7 @@ class TestMatching(TestCase):
     def test_match_regex(self):
 
         self._test_matching(
-            r"alpha\w+gamma",
+            "alpha\w+gamma",
             "MATCH_REGEX",
             (
                 "I have alpha_and_gamma in me",
@@ -185,6 +187,16 @@ class TestMatching(TestCase):
                 "I have alphas, charlie, and gamma in me",
                 "I have alphas in me",
             )
+        )
+
+    def test_tach_invalid_regex(self):
+        self._test_matching(
+            "[[",
+            "MATCH_REGEX",
+            [],
+            [
+                "Don't match this"
+            ]
         )
 
     def test_match_fuzzy(self):

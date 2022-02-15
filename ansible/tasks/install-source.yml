@@ -1,0 +1,112 @@
+---
+- name: install dev dependencies
+  apt:
+    pkg:
+      - git
+      - npm
+      - gettext
+
+- name: create output directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ paperlessng_system_user }}"
+    group: "{{ paperlessng_system_group }}"
+    mode: "750"
+  with_items:
+    - "{{ tempdir.path }}/paperless-ng"
+    - "{{ tempdir.path }}/paperless-ng/scripts"
+
+- block:
+    - name: create temporary git directory
+      tempfile:
+        state: directory
+        path: "{{ paperlessng_directory }}"
+      register: gitdir
+
+    - name: pull paperless-ng
+      git:
+        repo: https://github.com/jonaswinkler/paperless-ng.git
+        dest: "{{ gitdir.path }}"
+        version: "{{ paperlessng_version }}"
+        refspec: "+refs/pull/*:refs/pull/*"
+
+    - name: compile frontend
+      command:
+        cmd: "{{ item }}"
+      args:
+        chdir: "{{ gitdir.path }}/src-ui"
+      failed_when: false
+      with_items:
+        - npm install -g @angular/cli
+        - npm install
+        - ./node_modules/.bin/ng build --prod
+
+    - name: copy application into place
+      copy:
+        src: "{{ gitdir.path }}/{{ item.src }}"
+        remote_src: yes
+        dest: "{{ tempdir.path }}/paperless-ng/{{ item.dest | default('') }}"
+      with_items:
+        - src: CONTRIBUTING.md
+        - src: LICENSE
+        - src: Pipfile
+        - src: Pipfile.lock
+        - src: README.md
+        - src: requirements.txt
+        - src: gunicorn.conf.py
+        - src: paperless.conf.example
+          dest: "paperless.conf"
+
+    - name: glob all scripts
+      find:
+        paths: ["{{ gitdir.path }}/scripts/"]
+        patterns:
+          - "*.service"
+          - "*.sh"
+      register: glob
+
+    - name: copy scripts
+      copy:
+        src: "{{ item.path }}"
+        remote_src: yes
+        dest: "{{ tempdir.path }}/paperless-ng/scripts/"
+      with_items:
+        - "{{ glob.files }}"
+
+    - name: copy sources
+      command:
+        cmd: "cp -r src/ {{ tempdir.path }}/paperless-ng/src"
+      args:
+        chdir: "{{ gitdir.path }}"
+
+    - name: create paperlessng venv
+      command:
+        cmd: "python3 -m virtualenv {{ gitdir.path }}/.venv/ -p /usr/bin/python3"
+
+    - name: install paperlessng requirements
+      command:
+        cmd: "{{ gitdir.path }}/.venv/bin/python3 -m pip install -r {{ gitdir.path }}/requirements.txt"
+
+    - name: compile messages
+      command: "{{ gitdir.path }}/.venv/bin/python3 manage.py compilemessages"
+      args:
+        chdir: "{{ tempdir.path }}/paperless-ng/src/"
+
+    - name: collect static files
+      command: "{{ gitdir.path }}/.venv/bin/python3 manage.py collectstatic --no-input"
+      args:
+        chdir: "{{ tempdir.path }}/paperless-ng/src/"
+
+    - name: remove pycache directories
+      shell: find . -name __pycache__ | xargs rm -r
+      args:
+        chdir: "{{ tempdir.path }}"
+
+    - name: remove temporary git directory
+      file:
+        path: "{{ gitdir.path }}"
+        state: absent
+
+  become: yes
+  become_user: "{{ paperlessng_system_user }}"

@@ -6,13 +6,18 @@ import magic
 from django.conf import settings
 from django.db import migrations, models
 
+from paperless.db import GnuPG
+
+STORAGE_TYPE_UNENCRYPTED = "unencrypted"
+STORAGE_TYPE_GPG = "gpg"
+
 
 def source_path(self):
     if self.filename:
         fname = str(self.filename)
     else:
         fname = "{:07}.{}".format(self.pk, self.file_type)
-        if self.storage_type == self.STORAGE_TYPE_GPG:
+        if self.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"
 
     return os.path.join(
@@ -26,8 +31,17 @@ def add_mime_types(apps, schema_editor):
     documents = Document.objects.all()
 
     for d in documents:
-        d.mime_type = magic.from_file(source_path(d), mime=True)
+        f = open(source_path(d), "rb")
+        if d.storage_type == STORAGE_TYPE_GPG:
+
+            data = GnuPG.decrypted(f)
+        else:
+            data = f.read(1024)
+
+        d.mime_type = magic.from_buffer(data, mime=True)
         d.save()
+
+        f.close()
 
 
 def add_file_extensions(apps, schema_editor):

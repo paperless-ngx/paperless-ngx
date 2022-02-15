@@ -1,26 +1,18 @@
-<app-page-header title="Logs">
-
-  <div ngbDropdown class="btn-group">
-    <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle>
-      <svg class="toolbaricon" fill="currentColor">
-        <use xlink:href="assets/bootstrap-icons.svg#funnel" />
-      </svg>
-      Filter
-    </button>
-    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-      <button *ngFor="let f of getLevels()" ngbDropdownItem (click)="setLevel(f.id)"
-        [class.active]="level == f.id">{{f.name}}</button>
-    </div>
-  </div>
+<app-page-header title="Logs" i18n-title>
 
 </app-page-header>
 
-<div class="bg-dark p-3 mb-3" infiniteScroll (scrolled)="onScroll()">
+
+<ul ngbNav #nav="ngbNav" [(activeId)]="activeLog" (activeIdChange)="reloadLogs()" class="nav-tabs">
+  <li *ngFor="let logFile of logFiles" [ngbNavItem]="logFile">
+    <a ngbNavLink>{{logFile}}.log</a>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+<div class="bg-dark p-3 text-light text-monospace log-container" #logContainer>
   <p
-    class="text-light text-monospace m-0 p-0 log-entry-{{log.level}}"
-    *ngFor="let log of logs">
-      {{log.created | date:'short'}}
-      {{getLevelText(log.level)}}
-      {{log.message}}
-  </p>
+    class="m-0 p-0 log-entry-{{getLogLevel(log)}}"
+    *ngFor="let log of logs">{{log}}</p>
 </div>

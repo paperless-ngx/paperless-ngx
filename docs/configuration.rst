@@ -53,6 +53,12 @@ PAPERLESS_DBPASS=<password>
 
     Defaults to "paperless".
 
+PAPERLESS_DBSSLMODE=<mode>
+    SSL mode to use when connecting to PostgreSQL.
+
+    See `the official documentation about sslmode <https://www.postgresql.org/docs/current/libpq-ssl.html>`_.
+
+    Default is ``prefer``.
 
 Paths and folders
 #################
@@ -66,13 +72,13 @@ PAPERLESS_CONSUMPTION_DIR=<path>
     container. Change the local consumption directory in the docker-compose.yml
     file instead.
 
-    Defaults to "../consume", relative to the "src" directory.
+    Defaults to "../consume/", relative to the "src" directory.
 
 PAPERLESS_DATA_DIR=<path>
     This is where paperless stores all its data (search index, SQLite database,
     classification model, etc).
 
-    Defaults to "../data", relative to the "src" directory.
+    Defaults to "../data/", relative to the "src" directory.
 
 PAPERLESS_MEDIA_ROOT=<path>
     This is where your documents and thumbnails are stored.
@@ -80,7 +86,7 @@ PAPERLESS_MEDIA_ROOT=<path>
     You can set this and PAPERLESS_DATA_DIR to the same folder to have paperless
     store all its data within the same volume.
 
-    Defaults to "../media", relative to the "src" directory.
+    Defaults to "../media/", relative to the "src" directory.
 
 PAPERLESS_STATICDIR=<path>
     Override the default STATIC_ROOT here.  This is where all static files
@@ -88,13 +94,32 @@ PAPERLESS_STATICDIR=<path>
 
     Unless you're doing something fancy, there is no need to override this.
 
-    Defaults to "../static", relative to the "src" directory.
+    Defaults to "../static/", relative to the "src" directory.
 
 PAPERLESS_FILENAME_FORMAT=<format>
     Changes the filenames paperless uses to store documents in the media directory.
     See :ref:`advanced-file_name_handling` for details.
 
     Default is none, which disables this feature.
+
+PAPERLESS_LOGGING_DIR=<path>
+    This is where paperless will store log files.
+
+    Defaults to "``PAPERLESS_DATA_DIR``/log/".
+
+
+Logging
+#######
+
+PAPERLESS_LOGROTATE_MAX_SIZE=<num>
+    Maximum file size for log files before they are rotated, in bytes.
+
+    Defaults to 1 MiB.
+
+PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>
+    Number of rotated log files to keep.
+
+    Defaults to 20.
 
 Hosting & Security
 ##################
@@ -129,10 +154,6 @@ PAPERLESS_FORCE_SCRIPT_NAME=<path>
     To host paperless under a subpath url like example.com/paperless you set
     this value to /paperless. No trailing slash!
 
-    .. note::
-
-        I don't know if this works in paperless-ng. Probably not.
-
     Defaults to none, which hosts paperless at "/".
 
 PAPERLESS_STATIC_URL=<path>
@@ -152,6 +173,30 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 
     Defaults to none, which disables this feature.
 
+PAPERLESS_ADMIN_USER=<username>
+    If this environment variable is specified, Paperless automatically creates
+    a superuser with the provided username at start. This is useful in cases
+    where you can not run the `createsuperuser` command seperately, such as Kubernetes
+    or AWS ECS.
+
+    Requires `PAPERLESS_ADMIN_PASSWORD` to be set.
+
+    .. note::
+
+        This will not change an existing [super]user's password, nor will
+        it recreate a user that already exists. You can leave this throughout
+        the lifecycle of the containers.
+
+PAPERLESS_ADMIN_MAIL=<email>
+    (Optional) Specify superuser email address. Only used when
+    `PAPERLESS_ADMIN_USER` is set.
+
+    Defaults to ``root@localhost``.
+
+PAPERLESS_ADMIN_PASSWORD=<password>
+    Only used when `PAPERLESS_ADMIN_USER` is set.
+    This will be the password of the automatically created superuser.
+
 
 PAPERLESS_COOKIE_PREFIX=<str>
     Specify a prefix that is added to the cookies used by paperless to identify
@@ -162,6 +207,39 @@ PAPERLESS_COOKIE_PREFIX=<str>
 
     Defaults to ``""``, which does not alter the cookie names.
 
+PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>
+    Allows authentication via HTTP_REMOTE_USER which is used by some SSO
+    applications.
+
+    .. warning::
+
+        This will allow authentication by simply adding a ``Remote-User: <username>`` header
+        to a request. Use with care! You especially *must* ensure that any such header is not
+        passed from your proxy server to paperless.
+
+        If you're exposing paperless to the internet directly, do not use this.
+
+        Also see the warning `in the official documentation <https://docs.djangoproject.com/en/3.1/howto/auth-remote-user/#configuration>`.
+
+    Defaults to `false` which disables this feature.
+
+PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>
+    If `PAPERLESS_ENABLE_HTTP_REMOTE_USER` is enabled, this property allows to
+    customize the name of the HTTP header from which the authenticated username
+    is extracted. Values are in terms of
+    [HttpRequest.META](https://docs.djangoproject.com/en/3.1/ref/request-response/#django.http.HttpRequest.META).
+    Thus, the configured value must start with `HTTP_` followed by the
+    normalized actual header name.
+
+    Defaults to `HTTP_REMOTE_USER`.
+
+PAPERLESS_LOGOUT_REDIRECT_URL=<str>
+    URL to redirect the user to after a logout. This can be used together with
+    `PAPERLESS_ENABLE_HTTP_REMOTE_USER` to redirect the user back to the SSO
+    application's logout page.
+
+    Defaults to None, which disables this feature.
+
 .. _configuration-ocr:
 
 OCR settings
@@ -170,7 +248,6 @@ OCR settings
 Paperless uses `OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/>`_ for
 performing OCR on documents and images. Paperless uses sensible defaults for
 most settings, but all of them can be configured to your needs.
-
 
 PAPERLESS_OCR_LANGUAGE=<lang>
     Customize the language that paperless will attempt to use when
@@ -187,6 +264,8 @@ PAPERLESS_OCR_LANGUAGE=<lang>
     languages enabled.
 
     Defaults to "eng".
+
+		Note: If your language contains a '-' such as chi-sim, you must use chi_sim
 
 PAPERLESS_OCR_MODE=<mode>
     Tell paperless when and how to perform ocr on your documents. Four modes
@@ -210,20 +289,68 @@ PAPERLESS_OCR_MODE=<mode>
         into images and puts the OCRed text on top. This works for all documents,
         however, the resulting document may be significantly larger and text
         won't appear as sharp when zoomed in.
-    
+
     The default is ``skip``, which only performs OCR when necessary and always
     creates archived documents.
 
+    Read more about this in the `OCRmyPDF documentation <https://ocrmypdf.readthedocs.io/en/latest/advanced.html#when-ocr-is-skipped>`_.
+
+PAPERLESS_OCR_CLEAN=<mode>
+    Tells paperless to use ``unpaper`` to clean any input document before
+    sending it to tesseract. This uses more resources, but generally results
+    in better OCR results. The following modes are available:
+
+    *   ``clean``: Apply unpaper.
+    *   ``clean-final``: Apply unpaper, and use the cleaned images to build the
+        output file instead of the original images.
+    *   ``none``: Do not apply unpaper.
+
+    Defaults to ``clean``.
+
+    .. note::
+
+        ``clean-final`` is incompatible with ocr mode ``redo``. When both
+        ``clean-final`` and the ocr mode ``redo`` is configured, ``clean``
+        is used instead.
+
+PAPERLESS_OCR_DESKEW=<bool>
+    Tells paperless to correct skewing (slight rotation of input images mainly
+    due to improper scanning)
+
+    Defaults to ``true``, which enables this feature.
+
+    .. note::
+
+        Deskewing is incompatible with ocr mode ``redo``. Deskewing will get
+        disabled automatically if ``redo`` is used as the ocr mode.
+
+PAPERLESS_OCR_ROTATE_PAGES=<bool>
+    Tells paperless to correct page rotation (90°, 180° and 270° rotation).
+
+    If you notice that paperless is not rotating incorrectly rotated
+    pages (or vice versa), try adjusting the threshold up or down (see below).
+
+    Defaults to ``true``, which enables this feature.
+
+
+PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD=<num>
+    Adjust the threshold for automatic page rotation by ``PAPERLESS_OCR_ROTATE_PAGES``.
+    This is an arbitrary value reported by tesseract. "15" is a very conservative value,
+    whereas "2" is a very aggressive option and will often result in correctly rotated pages
+    being rotated as well.
+
+    Defaults to "12".
+
 PAPERLESS_OCR_OUTPUT_TYPE=<type>
     Specify the the type of PDF documents that paperless should produce.
-    
+
     *   ``pdf``: Modify the PDF document as little as possible.
     *   ``pdfa``: Convert PDF documents into PDF/A-2b documents, which is a
         subset of the entire PDF specification and meant for storing
         documents long term.
     *   ``pdfa-1``, ``pdfa-2``, ``pdfa-3`` to specify the exact version of
         PDF/A you wish to use.
-    
+
     If not specified, ``pdfa`` is used. Remember that paperless also keeps
     the original input file as well as the archived version.
 
@@ -240,7 +367,6 @@ PAPERLESS_OCR_PAGES=<num>
 
     Defaults to 0, which disables this feature and always uses all pages.
 
-
 PAPERLESS_OCR_IMAGE_DPI=<num>
     Paperless will OCR any images you put into the system and convert them
     into PDF documents. This is useful if your scanner produces images.
@@ -251,17 +377,17 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
 
     Set this to the DPI your scanner produces images at.
 
-    Default is none, which causes paperless to fail if no DPI information is
-    present in an image.
+    Default is none, which will automatically calculate image DPI so that
+    the produced PDF documents are A4 sized.
 
 
-PAPERLESS_OCR_USER_ARG=<json>
+PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
     additional arguments you wish to pass to OCRmyPDF. Since Paperless uses
     the API of OCRmyPDF, you have to specify these in a format that can be
     passed to the API. See `the API reference of OCRmyPDF <https://ocrmypdf.readthedocs.io/en/latest/api.html#reference>`_
     for valid parameters. All command line options are supported, but they
-    use underscores instead of dashed.
+    use underscores instead of dashes.
 
     .. caution::
 
@@ -275,9 +401,69 @@ PAPERLESS_OCR_USER_ARG=<json>
 
     .. code:: json
 
-        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}    
-    
-    
+        {"deskew": true, "optimize": 3, "unpaper_args": "--pre-rotate 90"}
+
+.. _configuration-tika:
+
+Tika settings
+#############
+
+Paperless can make use of `Tika <https://tika.apache.org/>`_ and
+`Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
+converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
+wish to use this, you must provide a Tika server and a Gotenberg server,
+configure their endpoints, and enable the feature.
+
+PAPERLESS_TIKA_ENABLED=<bool>
+    Enable (or disable) the Tika parser.
+
+    Defaults to false.
+
+PAPERLESS_TIKA_ENDPOINT=<url>
+    Set the endpoint URL were Paperless can reach your Tika server.
+
+    Defaults to "http://localhost:9998".
+
+PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
+    Set the endpoint URL were Paperless can reach your Gotenberg server.
+
+    Defaults to "http://localhost:3000".
+
+If you run paperless on docker, you can add those services to the docker-compose
+file (see the provided ``docker-compose.tika.yml`` file for reference). The changes
+requires are as follows:
+
+.. code:: yaml
+
+    services:
+        # ...
+
+        webserver:
+            # ...
+
+            environment:
+                # ...
+
+                PAPERLESS_TIKA_ENABLED: 1
+                PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+                PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+
+        # ...
+
+        gotenberg:
+            image: thecodingmachine/gotenberg
+            restart: unless-stopped
+            environment:
+                DISABLE_GOOGLE_CHROME: 1
+
+        tika:
+            image: apache/tika
+            restart: unless-stopped
+
+Add the configuration variables to the environment of the webserver (alternatively
+put the configuration in the ``docker-compose.env`` file) and add the additional
+services below the webserver service. Watch out for indentation.
+
 Software tweaks
 ###############
 
@@ -304,8 +490,25 @@ PAPERLESS_THREADS_PER_WORKER=<num>
         use a higher thread per worker count.
 
     The default is a balance between the two, according to your CPU core count,
-    with a slight favor towards threads per worker, and using as much cores as
-    possible.
+    with a slight favor towards threads per worker:
+
+    +----------------+---------+---------+
+    | CPU core count | Workers | Threads |
+    +----------------+---------+---------+
+    |              1 |       1 |       1 |
+    +----------------+---------+---------+
+    |              2 |       2 |       1 |
+    +----------------+---------+---------+
+    |              4 |       2 |       2 |
+    +----------------+---------+---------+
+    |              6 |       2 |       3 |
+    +----------------+---------+---------+
+    |              8 |       2 |       4 |
+    +----------------+---------+---------+
+    |             12 |       3 |       4 |
+    +----------------+---------+---------+
+    |             16 |       4 |       4 |
+    +----------------+---------+---------+
 
     If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
     PAPERLESS_THREADS_PER_WORKER automatically.
@@ -319,11 +522,14 @@ PAPERLESS_TIME_ZONE=<timezone>
     Defaults to UTC.
 
 
+.. _configuration-polling:
+
 PAPERLESS_CONSUMER_POLLING=<num>
     If paperless won't find documents added to your consume folder, it might
     not be able to automatically detect filesystem changes. In that case,
     specify a polling interval in seconds here, which will then cause paperless
-    to periodically check your consumption directory for changes.
+    to periodically check your consumption directory for changes. This will also
+    disable listening for file system changes with ``inotify``.
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
@@ -347,6 +553,9 @@ PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>
     Set the names of subdirectories as tags for consumed files.
     E.g. <CONSUMPTION_DIR>/foo/bar/file.pdf will add the tags "foo" and "bar" to
     the consumed file. Paperless will create any tags that don't exist yet.
+
+    This is useful for sorting documents with certain tags such as ``car`` or
+    ``todo`` prior to consumption. These folders won't be deleted.
 
     PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
 
@@ -400,11 +609,42 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
 
     Defaults to none, which disables this feature.
 
-PAPERLESS_FILENAME_PARSE_TRANSFORMS
-    Transforms filenames before they are processed by paperless. See
-    :ref:`advanced-transforming_filenames` for details.
+PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
+    Paperless creates thumbnails for plain text files by rendering the content
+    of the file on an image and uses a predefined font for that. This
+    font can be changed here.
 
-    Defaults to none, which disables this feature.
+    Note that this won't have any effect on already generated thumbnails.
+
+    Defaults to ``/usr/share/fonts/liberation/LiberationSerif-Regular.ttf``.
+
+PAPERLESS_IGNORE_DATES=<string>
+    Paperless parses a documents creation date from filename and file content.
+    You may specify a comma separated list of dates that should be ignored during
+    this process. This is useful for special dates (like date of birth) that appear
+    in documents regularly but are very unlikely to be the documents creation date.
+
+    You may specify dates in a multitude of formats supported by dateparser (see
+    https://dateparser.readthedocs.io/en/latest/#popular-formats) but as the dates
+    need to be comma separated, the options are limited.
+    Example: "2020-12-02,22.04.1999"
+
+    Defaults to an empty string to not ignore any dates.
+
+PAPERLESS_DATE_ORDER=<format>
+    Paperless will try to determine the document creation date from its contents.
+    Specify the date format Paperless should expect to see within your documents.
+
+    This option defaults to DMY which translates to day first, month second, and year
+    last order. Characters D, M, or Y can be shuffled to meet the required order.
+
+PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>
+    By default, paperless ignores certain files and folders in the consumption
+    directory, such as system files created by the Mac OS.
+
+    This can be adjusted by configuring a custom json array with patterns to exclude.
+
+    Defautls to ``[".DS_STORE/*", "._*", ".stfolder/*"]``.
 
 Binaries
 ########
@@ -424,3 +664,65 @@ PAPERLESS_GS_BINARY=<path>
 
 PAPERLESS_OPTIPNG_BINARY=<path>
     Defaults to "/usr/bin/optipng".
+
+
+.. _configuration-docker:
+
+Docker-specific options
+#######################
+
+These options don't have any effect in ``paperless.conf``. These options adjust
+the behavior of the docker container. Configure these in `docker-compose.env`.
+
+PAPERLESS_WEBSERVER_WORKERS=<num>
+    The number of worker processes the webserver should spawn. More worker processes
+    usually result in the front end to load data much quicker. However, each worker process
+    also loads the entire application into memory separately, so increasing this value
+    will increase RAM usage.
+
+    Consider configuring this to 1 on low power devices with limited amount of RAM.
+
+    Defaults to 2.
+
+USERMAP_UID=<uid>
+    The ID of the paperless user in the container. Set this to your actual user ID on the
+    host system, which you can get by executing
+
+    .. code:: shell-session
+
+        $ id -u
+
+    Paperless will change ownership on its folders to this user, so you need to get this right
+    in order to be able to write to the consumption directory.
+
+    Defaults to 1000.
+
+USERMAP_GID=<gid>
+    The ID of the paperless Group in the container. Set this to your actual group ID on the
+    host system, which you can get by executing
+
+    .. code:: shell-session
+
+        $ id -g
+
+    Paperless will change ownership on its folders to this group, so you need to get this right
+    in order to be able to write to the consumption directory.
+
+    Defaults to 1000.
+
+PAPERLESS_OCR_LANGUAGES=<list>
+    Additional OCR languages to install. By default, paperless comes with
+    English, German, Italian, Spanish and French. If your language is not in this list, install
+    additional languages with this configuration option:
+
+    .. code:: bash
+
+        PAPERLESS_OCR_LANGUAGES=tur ces
+
+    To actually use these languages, also set the default OCR language of paperless:
+
+    .. code:: bash
+
+        PAPERLESS_OCR_LANGUAGE=tur
+
+    Defaults to none, which does not install any additional languages.

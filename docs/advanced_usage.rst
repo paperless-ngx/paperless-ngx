@@ -5,98 +5,18 @@ Advanced topics
 Paperless offers a couple features that automate certain tasks and make your life
 easier.
 
-Guesswork
-#########
-
-
-Any document you put into the consumption directory will be consumed, but if
-you name the file right, it'll automatically set some values in the database
-for you.  This is is the logic the consumer follows:
-
-1. Try to find the correspondent, title, and tags in the file name following
-   the pattern: ``Date - Correspondent - Title - tag,tag,tag.pdf``.  Note that
-   the format of the date is **rigidly defined** as ``YYYYMMDDHHMMSSZ`` or
-   ``YYYYMMDDZ``.  The ``Z`` refers "Zulu time" AKA "UTC".
-   The tags are optional, so the format ``Date - Correspondent - Title.pdf``
-   works as well.
-2. If that doesn't work, we skip the date and try this pattern:
-   ``Correspondent - Title - tag,tag,tag.pdf``.
-3. If that doesn't work, we try to find the correspondent and title in the file
-   name following the pattern: ``Correspondent - Title.pdf``.
-4. If that doesn't work, just assume that the name of the file is the title.
-
-So given the above, the following examples would work as you'd expect:
-
-* ``20150314000700Z - Some Company Name - Invoice 2016-01-01 - money,invoices.pdf``
-* ``20150314Z - Some Company Name - Invoice 2016-01-01 - money,invoices.pdf``
-* ``Some Company Name - Invoice 2016-01-01 - money,invoices.pdf``
-* ``Another Company - Letter of Reference.jpg``
-* ``Dad's Recipe for Pancakes.png``
-
-These however wouldn't work:
-
-* ``2015-03-14 00:07:00 UTC - Some Company Name, Invoice 2016-01-01, money, invoices.pdf``
-* ``2015-03-14 - Some Company Name, Invoice 2016-01-01, money, invoices.pdf``
-* ``Some Company Name, Invoice 2016-01-01, money, invoices.pdf``
-* ``Another Company- Letter of Reference.jpg``
-
-Do I have to be so strict about naming?
-=======================================
-
-Rather than using the strict document naming rules, one can also set the option
-``PAPERLESS_FILENAME_DATE_ORDER`` in ``paperless.conf`` to any date order
-that is accepted by dateparser_. Doing so will cause ``paperless`` to default
-to any date format that is found in the title, instead of a date pulled from
-the document's text, without requiring the strict formatting of the document
-filename as described above.
-
-.. _dateparser: https://github.com/scrapinghub/dateparser/blob/v0.7.0/docs/usage.rst#settings
-
-.. _advanced-transforming_filenames:
-
-Transforming filenames for parsing
-==================================
-
-Some devices can't produce filenames that can be parsed by the default
-parser. By configuring the option ``PAPERLESS_FILENAME_PARSE_TRANSFORMS`` in
-``paperless.conf`` one can add transformations that are applied to the filename
-before it's parsed.
-
-The option contains a list of dictionaries of regular expressions (key:
-``pattern``) and replacements (key: ``repl``) in JSON format, which are
-applied in order by passing them to ``re.subn``. Transformation stops
-after the first match, so at most one transformation is applied. The general
-syntax is
-
-.. code:: python
-
-   [{"pattern":"pattern1", "repl":"repl1"}, {"pattern":"pattern2", "repl":"repl2"}, ..., {"pattern":"patternN", "repl":"replN"}]
-
-The example below is for a Brother ADS-2400N, a scanner that allows
-different names to different hardware buttons (useful for handling
-multiple entities in one instance), but insists on adding ``_<count>``
-to the filename.
-
-.. code:: python
-
-   # Brother profile configuration, support "Name_Date_Count" (the default
-   # setting) and "Name_Count" (use "Name" as tag and "Count" as title).
-   PAPERLESS_FILENAME_PARSE_TRANSFORMS=[{"pattern":"^([a-z]+)_(\\d{8})_(\\d{6})_([0-9]+)\\.", "repl":"\\2\\3Z - \\4 - \\1."}, {"pattern":"^([a-z]+)_([0-9]+)\\.", "repl":" - \\2 - \\1."}]
-
-
 .. _advanced-matching:
 
 Matching tags, correspondents and document types
 ################################################
 
-After the consumer has tried to figure out what it could from the file name,
-it starts looking at the content of the document itself.  It will compare the
-matching algorithms defined by every tag and correspondent already set in your
-database to see if they apply to the text in that document.  In other words,
-if you defined a tag called ``Home Utility`` that had a ``match`` property of
-``bc hydro`` and a ``matching_algorithm`` of ``literal``, Paperless will
-automatically tag your newly-consumed document with your ``Home Utility`` tag
-so long as the text ``bc hydro`` appears in the body of the document somewhere.
+Paperless will compare the matching algorithms defined by every tag and
+correspondent already set in your database to see if they apply to the text in
+a document.  In other words, if you defined a tag called ``Home Utility``
+that had a ``match`` property of ``bc hydro`` and a ``matching_algorithm`` of
+``literal``, Paperless will automatically tag your newly-consumed document with
+your ``Home Utility`` tag so long as the text ``bc hydro`` appears in the body
+of the document somewhere.
 
 The matching logic is quite powerful, and supports searching the text of your
 document with different algorithms, and as such, some experimentation may be
@@ -263,10 +183,10 @@ using the identifier which it has assigned to each document. You will end up get
 files like ``0000123.pdf`` in your media directory. This isn't necessarily a bad
 thing, because you normally don't have to access these files manually. However, if
 you wish to name your files differently, you can do that by adjusting the
-``PAPERLESS_FILENAME_FORMAT`` settings variable.
+``PAPERLESS_FILENAME_FORMAT`` configuration option.
 
-This variable allows you to configure the filename (folders are allowed!) using
-placeholders. For example, setting
+This variable allows you to configure the filename (folders are allowed) using
+placeholders. For example, configuring this to
 
 .. code:: bash
 
@@ -277,17 +197,16 @@ will create a directory structure as follows:
 .. code::
 
     2019/
-      my_bank/
-        statement-january-0000001.pdf
-        statement-february-0000002.pdf
+      My bank/
+        Statement January.pdf
+        Statement February.pdf
     2020/
-      my_bank/
-        statement-january-0000003.pdf
-      shoe_store/
-        my_new_shoes-0000004.pdf
-
-Paperless appends the unique identifier of each document to the filename. This
-avoids filename clashes.
+      My bank/
+        Statement January.pdf
+        Letter.pdf
+        Letter_01.pdf
+      Shoe store/
+        My new shoes.pdf
 
 .. danger::
 
@@ -297,8 +216,10 @@ avoids filename clashes.
 
 Paperless provides the following placeholders withing filenames:
 
+* ``{asn}``: The archive serial number of the document, or "none".
 * ``{correspondent}``: The name of the correspondent, or "none".
 * ``{document_type}``: The name of the document type, or "none".
+* ``{tag_list}``: A comma separated list of all tags assigned to the document.
 * ``{title}``: The title of the document.
 * ``{created}``: The full date and time the document was created.
 * ``{created_year}``: Year created only.
@@ -309,8 +230,14 @@ Paperless provides the following placeholders withing filenames:
 * ``{added_month}``: Month added only (number 1-12).
 * ``{added_day}``: Day added only (number 1-31).
 
-Paperless will convert all values for the placeholders into values which are safe
-for use in filenames.
+
+Paperless will try to conserve the information from your database as much as possible.
+However, some characters that you can use in document titles and correspondent names (such
+as ``: \ /`` and a couple more) are not allowed in filenames and will be replaced with dashes.
+
+If paperless detects that two documents share the same filename, paperless will automatically
+append ``_01``, ``_02``, etc to the filename. This happens if all the placeholders in a filename
+evaluate to the same value.
 
 .. hint::
 

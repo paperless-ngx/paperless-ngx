@@ -1,0 +1,698 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: paperless-ng\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-16 09:38+0000\n"
+"PO-Revision-Date: 2021-05-16 10:09\n"
+"Last-Translator: \n"
+"Language-Team: Xhosa\n"
+"Language: xh_ZA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: paperless-ng\n"
+"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Language: xh\n"
+"X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
+"X-Crowdin-File-ID: 54\n"
+
+#: documents/apps.py:10
+msgid "Documents"
+msgstr "crwdns2528:0crwdne2528:0"
+
+#: documents/models.py:32
+msgid "Any word"
+msgstr "crwdns2530:0crwdne2530:0"
+
+#: documents/models.py:33
+msgid "All words"
+msgstr "crwdns2532:0crwdne2532:0"
+
+#: documents/models.py:34
+msgid "Exact match"
+msgstr "crwdns2534:0crwdne2534:0"
+
+#: documents/models.py:35
+msgid "Regular expression"
+msgstr "crwdns2536:0crwdne2536:0"
+
+#: documents/models.py:36
+msgid "Fuzzy word"
+msgstr "crwdns2538:0crwdne2538:0"
+
+#: documents/models.py:37
+msgid "Automatic"
+msgstr "crwdns2540:0crwdne2540:0"
+
+#: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
+#: paperless_mail/models.py:117
+msgid "name"
+msgstr "crwdns2542:0crwdne2542:0"
+
+#: documents/models.py:45
+msgid "match"
+msgstr "crwdns2544:0crwdne2544:0"
+
+#: documents/models.py:49
+msgid "matching algorithm"
+msgstr "crwdns2546:0crwdne2546:0"
+
+#: documents/models.py:55
+msgid "is insensitive"
+msgstr "crwdns2548:0crwdne2548:0"
+
+#: documents/models.py:74 documents/models.py:120
+msgid "correspondent"
+msgstr "crwdns2550:0crwdne2550:0"
+
+#: documents/models.py:75
+msgid "correspondents"
+msgstr "crwdns2552:0crwdne2552:0"
+
+#: documents/models.py:81
+msgid "color"
+msgstr "crwdns2554:0crwdne2554:0"
+
+#: documents/models.py:87
+msgid "is inbox tag"
+msgstr "crwdns2556:0crwdne2556:0"
+
+#: documents/models.py:89
+msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
+msgstr "crwdns2558:0crwdne2558:0"
+
+#: documents/models.py:94
+msgid "tag"
+msgstr "crwdns2560:0crwdne2560:0"
+
+#: documents/models.py:95 documents/models.py:151
+msgid "tags"
+msgstr "crwdns2562:0crwdne2562:0"
+
+#: documents/models.py:101 documents/models.py:133
+msgid "document type"
+msgstr "crwdns2564:0crwdne2564:0"
+
+#: documents/models.py:102
+msgid "document types"
+msgstr "crwdns2566:0crwdne2566:0"
+
+#: documents/models.py:110
+msgid "Unencrypted"
+msgstr "crwdns2568:0crwdne2568:0"
+
+#: documents/models.py:111
+msgid "Encrypted with GNU Privacy Guard"
+msgstr "crwdns2570:0crwdne2570:0"
+
+#: documents/models.py:124
+msgid "title"
+msgstr "crwdns2572:0crwdne2572:0"
+
+#: documents/models.py:137
+msgid "content"
+msgstr "crwdns2574:0crwdne2574:0"
+
+#: documents/models.py:139
+msgid "The raw, text-only data of the document. This field is primarily used for searching."
+msgstr "crwdns2576:0crwdne2576:0"
+
+#: documents/models.py:144
+msgid "mime type"
+msgstr "crwdns2578:0crwdne2578:0"
+
+#: documents/models.py:155
+msgid "checksum"
+msgstr "crwdns2580:0crwdne2580:0"
+
+#: documents/models.py:159
+msgid "The checksum of the original document."
+msgstr "crwdns2582:0crwdne2582:0"
+
+#: documents/models.py:163
+msgid "archive checksum"
+msgstr "crwdns2584:0crwdne2584:0"
+
+#: documents/models.py:168
+msgid "The checksum of the archived document."
+msgstr "crwdns2586:0crwdne2586:0"
+
+#: documents/models.py:172 documents/models.py:328
+msgid "created"
+msgstr "crwdns2588:0crwdne2588:0"
+
+#: documents/models.py:176
+msgid "modified"
+msgstr "crwdns2590:0crwdne2590:0"
+
+#: documents/models.py:180
+msgid "storage type"
+msgstr "crwdns2592:0crwdne2592:0"
+
+#: documents/models.py:188
+msgid "added"
+msgstr "crwdns2594:0crwdne2594:0"
+
+#: documents/models.py:192
+msgid "filename"
+msgstr "crwdns2596:0crwdne2596:0"
+
+#: documents/models.py:198
+msgid "Current filename in storage"
+msgstr "crwdns2598:0crwdne2598:0"
+
+#: documents/models.py:202
+msgid "archive filename"
+msgstr "crwdns2600:0crwdne2600:0"
+
+#: documents/models.py:208
+msgid "Current archive filename in storage"
+msgstr "crwdns2602:0crwdne2602:0"
+
+#: documents/models.py:212
+msgid "archive serial number"
+msgstr "crwdns2604:0crwdne2604:0"
+
+#: documents/models.py:217
+msgid "The position of this document in your physical document archive."
+msgstr "crwdns2606:0crwdne2606:0"
+
+#: documents/models.py:223
+msgid "document"
+msgstr "crwdns2608:0crwdne2608:0"
+
+#: documents/models.py:224
+msgid "documents"
+msgstr "crwdns2610:0crwdne2610:0"
+
+#: documents/models.py:311
+msgid "debug"
+msgstr "crwdns2612:0crwdne2612:0"
+
+#: documents/models.py:312
+msgid "information"
+msgstr "crwdns2614:0crwdne2614:0"
+
+#: documents/models.py:313
+msgid "warning"
+msgstr "crwdns2616:0crwdne2616:0"
+
+#: documents/models.py:314
+msgid "error"
+msgstr "crwdns2618:0crwdne2618:0"
+
+#: documents/models.py:315
+msgid "critical"
+msgstr "crwdns2620:0crwdne2620:0"
+
+#: documents/models.py:319
+msgid "group"
+msgstr "crwdns2622:0crwdne2622:0"
+
+#: documents/models.py:322
+msgid "message"
+msgstr "crwdns2624:0crwdne2624:0"
+
+#: documents/models.py:325
+msgid "level"
+msgstr "crwdns2626:0crwdne2626:0"
+
+#: documents/models.py:332
+msgid "log"
+msgstr "crwdns2628:0crwdne2628:0"
+
+#: documents/models.py:333
+msgid "logs"
+msgstr "crwdns2630:0crwdne2630:0"
+
+#: documents/models.py:344 documents/models.py:401
+msgid "saved view"
+msgstr "crwdns2632:0crwdne2632:0"
+
+#: documents/models.py:345
+msgid "saved views"
+msgstr "crwdns2634:0crwdne2634:0"
+
+#: documents/models.py:348
+msgid "user"
+msgstr "crwdns2636:0crwdne2636:0"
+
+#: documents/models.py:354
+msgid "show on dashboard"
+msgstr "crwdns2638:0crwdne2638:0"
+
+#: documents/models.py:357
+msgid "show in sidebar"
+msgstr "crwdns2640:0crwdne2640:0"
+
+#: documents/models.py:361
+msgid "sort field"
+msgstr "crwdns2642:0crwdne2642:0"
+
+#: documents/models.py:367
+msgid "sort reverse"
+msgstr "crwdns2644:0crwdne2644:0"
+
+#: documents/models.py:373
+msgid "title contains"
+msgstr "crwdns2646:0crwdne2646:0"
+
+#: documents/models.py:374
+msgid "content contains"
+msgstr "crwdns2648:0crwdne2648:0"
+
+#: documents/models.py:375
+msgid "ASN is"
+msgstr "crwdns2650:0crwdne2650:0"
+
+#: documents/models.py:376
+msgid "correspondent is"
+msgstr "crwdns2652:0crwdne2652:0"
+
+#: documents/models.py:377
+msgid "document type is"
+msgstr "crwdns2654:0crwdne2654:0"
+
+#: documents/models.py:378
+msgid "is in inbox"
+msgstr "crwdns2656:0crwdne2656:0"
+
+#: documents/models.py:379
+msgid "has tag"
+msgstr "crwdns2658:0crwdne2658:0"
+
+#: documents/models.py:380
+msgid "has any tag"
+msgstr "crwdns2660:0crwdne2660:0"
+
+#: documents/models.py:381
+msgid "created before"
+msgstr "crwdns2662:0crwdne2662:0"
+
+#: documents/models.py:382
+msgid "created after"
+msgstr "crwdns2664:0crwdne2664:0"
+
+#: documents/models.py:383
+msgid "created year is"
+msgstr "crwdns2666:0crwdne2666:0"
+
+#: documents/models.py:384
+msgid "created month is"
+msgstr "crwdns2668:0crwdne2668:0"
+
+#: documents/models.py:385
+msgid "created day is"
+msgstr "crwdns2670:0crwdne2670:0"
+
+#: documents/models.py:386
+msgid "added before"
+msgstr "crwdns2672:0crwdne2672:0"
+
+#: documents/models.py:387
+msgid "added after"
+msgstr "crwdns2674:0crwdne2674:0"
+
+#: documents/models.py:388
+msgid "modified before"
+msgstr "crwdns2676:0crwdne2676:0"
+
+#: documents/models.py:389
+msgid "modified after"
+msgstr "crwdns2678:0crwdne2678:0"
+
+#: documents/models.py:390
+msgid "does not have tag"
+msgstr "crwdns2680:0crwdne2680:0"
+
+#: documents/models.py:391
+msgid "does not have ASN"
+msgstr "crwdns3408:0crwdne3408:0"
+
+#: documents/models.py:392
+msgid "title or content contains"
+msgstr "crwdns3410:0crwdne3410:0"
+
+#: documents/models.py:393
+msgid "fulltext query"
+msgstr "crwdns3438:0crwdne3438:0"
+
+#: documents/models.py:394
+msgid "more like this"
+msgstr "crwdns3440:0crwdne3440:0"
+
+#: documents/models.py:405
+msgid "rule type"
+msgstr "crwdns2682:0crwdne2682:0"
+
+#: documents/models.py:409
+msgid "value"
+msgstr "crwdns2684:0crwdne2684:0"
+
+#: documents/models.py:415
+msgid "filter rule"
+msgstr "crwdns2686:0crwdne2686:0"
+
+#: documents/models.py:416
+msgid "filter rules"
+msgstr "crwdns2688:0crwdne2688:0"
+
+#: documents/serialisers.py:53
+#, python-format
+msgid "Invalid regular expression: %(error)s"
+msgstr "crwdns3412:0%(error)scrwdne3412:0"
+
+#: documents/serialisers.py:177
+msgid "Invalid color."
+msgstr "crwdns2692:0crwdne2692:0"
+
+#: documents/serialisers.py:451
+#, python-format
+msgid "File type %(type)s not supported"
+msgstr "crwdns2694:0%(type)scrwdne2694:0"
+
+#: documents/templates/index.html:22
+msgid "Paperless-ng is loading..."
+msgstr "crwdns2696:0crwdne2696:0"
+
+#: documents/templates/registration/logged_out.html:14
+msgid "Paperless-ng signed out"
+msgstr "crwdns2698:0crwdne2698:0"
+
+#: documents/templates/registration/logged_out.html:45
+msgid "You have been successfully logged out. Bye!"
+msgstr "crwdns2700:0crwdne2700:0"
+
+#: documents/templates/registration/logged_out.html:46
+msgid "Sign in again"
+msgstr "crwdns2702:0crwdne2702:0"
+
+#: documents/templates/registration/login.html:15
+msgid "Paperless-ng sign in"
+msgstr "crwdns2704:0crwdne2704:0"
+
+#: documents/templates/registration/login.html:47
+msgid "Please sign in."
+msgstr "crwdns2706:0crwdne2706:0"
+
+#: documents/templates/registration/login.html:50
+msgid "Your username and password didn't match. Please try again."
+msgstr "crwdns2708:0crwdne2708:0"
+
+#: documents/templates/registration/login.html:53
+msgid "Username"
+msgstr "crwdns2710:0crwdne2710:0"
+
+#: documents/templates/registration/login.html:54
+msgid "Password"
+msgstr "crwdns2712:0crwdne2712:0"
+
+#: documents/templates/registration/login.html:59
+msgid "Sign in"
+msgstr "crwdns2714:0crwdne2714:0"
+
+#: paperless/settings.py:303
+msgid "English (US)"
+msgstr "crwdns2716:0crwdne2716:0"
+
+#: paperless/settings.py:304
+msgid "English (GB)"
+msgstr "crwdns2718:0crwdne2718:0"
+
+#: paperless/settings.py:305
+msgid "German"
+msgstr "crwdns2720:0crwdne2720:0"
+
+#: paperless/settings.py:306
+msgid "Dutch"
+msgstr "crwdns2722:0crwdne2722:0"
+
+#: paperless/settings.py:307
+msgid "French"
+msgstr "crwdns2724:0crwdne2724:0"
+
+#: paperless/settings.py:308
+msgid "Portuguese (Brazil)"
+msgstr "crwdns2726:0crwdne2726:0"
+
+#: paperless/settings.py:309
+msgid "Portuguese"
+msgstr "crwdns3424:0crwdne3424:0"
+
+#: paperless/settings.py:310
+msgid "Italian"
+msgstr "crwdns2728:0crwdne2728:0"
+
+#: paperless/settings.py:311
+msgid "Romanian"
+msgstr "crwdns2730:0crwdne2730:0"
+
+#: paperless/settings.py:312
+msgid "Russian"
+msgstr "crwdns3414:0crwdne3414:0"
+
+#: paperless/settings.py:313
+msgid "Spanish"
+msgstr "crwdns3420:0crwdne3420:0"
+
+#: paperless/settings.py:314
+msgid "Polish"
+msgstr "crwdns3444:0crwdne3444:0"
+
+#: paperless/settings.py:315
+msgid "Swedish"
+msgstr "crwdns3448:0crwdne3448:0"
+
+#: paperless/urls.py:120
+msgid "Paperless-ng administration"
+msgstr "crwdns2732:0crwdne2732:0"
+
+#: paperless_mail/admin.py:15
+msgid "Authentication"
+msgstr "crwdns3456:0crwdne3456:0"
+
+#: paperless_mail/admin.py:18
+msgid "Advanced settings"
+msgstr "crwdns3458:0crwdne3458:0"
+
+#: paperless_mail/admin.py:37
+msgid "Filter"
+msgstr "crwdns2734:0crwdne2734:0"
+
+#: paperless_mail/admin.py:39
+msgid "Paperless will only process mails that match ALL of the filters given below."
+msgstr "crwdns2736:0crwdne2736:0"
+
+#: paperless_mail/admin.py:49
+msgid "Actions"
+msgstr "crwdns2738:0crwdne2738:0"
+
+#: paperless_mail/admin.py:51
+msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
+msgstr "crwdns2740:0crwdne2740:0"
+
+#: paperless_mail/admin.py:58
+msgid "Metadata"
+msgstr "crwdns2742:0crwdne2742:0"
+
+#: paperless_mail/admin.py:60
+msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
+msgstr "crwdns2744:0crwdne2744:0"
+
+#: paperless_mail/apps.py:9
+msgid "Paperless mail"
+msgstr "crwdns2746:0crwdne2746:0"
+
+#: paperless_mail/models.py:11
+msgid "mail account"
+msgstr "crwdns2748:0crwdne2748:0"
+
+#: paperless_mail/models.py:12
+msgid "mail accounts"
+msgstr "crwdns2750:0crwdne2750:0"
+
+#: paperless_mail/models.py:19
+msgid "No encryption"
+msgstr "crwdns2752:0crwdne2752:0"
+
+#: paperless_mail/models.py:20
+msgid "Use SSL"
+msgstr "crwdns2754:0crwdne2754:0"
+
+#: paperless_mail/models.py:21
+msgid "Use STARTTLS"
+msgstr "crwdns2756:0crwdne2756:0"
+
+#: paperless_mail/models.py:29
+msgid "IMAP server"
+msgstr "crwdns2758:0crwdne2758:0"
+
+#: paperless_mail/models.py:33
+msgid "IMAP port"
+msgstr "crwdns2760:0crwdne2760:0"
+
+#: paperless_mail/models.py:36
+msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
+msgstr "crwdns2762:0crwdne2762:0"
+
+#: paperless_mail/models.py:40
+msgid "IMAP security"
+msgstr "crwdns2764:0crwdne2764:0"
+
+#: paperless_mail/models.py:46
+msgid "username"
+msgstr "crwdns2766:0crwdne2766:0"
+
+#: paperless_mail/models.py:50
+msgid "password"
+msgstr "crwdns2768:0crwdne2768:0"
+
+#: paperless_mail/models.py:54
+msgid "character set"
+msgstr "crwdns3460:0crwdne3460:0"
+
+#: paperless_mail/models.py:57
+msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
+msgstr "crwdns3462:0crwdne3462:0"
+
+#: paperless_mail/models.py:68
+msgid "mail rule"
+msgstr "crwdns2770:0crwdne2770:0"
+
+#: paperless_mail/models.py:69
+msgid "mail rules"
+msgstr "crwdns2772:0crwdne2772:0"
+
+#: paperless_mail/models.py:75
+msgid "Only process attachments."
+msgstr "crwdns2774:0crwdne2774:0"
+
+#: paperless_mail/models.py:76
+msgid "Process all files, including 'inline' attachments."
+msgstr "crwdns2776:0crwdne2776:0"
+
+#: paperless_mail/models.py:86
+msgid "Mark as read, don't process read mails"
+msgstr "crwdns2778:0crwdne2778:0"
+
+#: paperless_mail/models.py:87
+msgid "Flag the mail, don't process flagged mails"
+msgstr "crwdns2780:0crwdne2780:0"
+
+#: paperless_mail/models.py:88
+msgid "Move to specified folder"
+msgstr "crwdns2782:0crwdne2782:0"
+
+#: paperless_mail/models.py:89
+msgid "Delete"
+msgstr "crwdns2784:0crwdne2784:0"
+
+#: paperless_mail/models.py:96
+msgid "Use subject as title"
+msgstr "crwdns2786:0crwdne2786:0"
+
+#: paperless_mail/models.py:97
+msgid "Use attachment filename as title"
+msgstr "crwdns2788:0crwdne2788:0"
+
+#: paperless_mail/models.py:107
+msgid "Do not assign a correspondent"
+msgstr "crwdns2790:0crwdne2790:0"
+
+#: paperless_mail/models.py:109
+msgid "Use mail address"
+msgstr "crwdns2792:0crwdne2792:0"
+
+#: paperless_mail/models.py:111
+msgid "Use name (or mail address if not available)"
+msgstr "crwdns2794:0crwdne2794:0"
+
+#: paperless_mail/models.py:113
+msgid "Use correspondent selected below"
+msgstr "crwdns2796:0crwdne2796:0"
+
+#: paperless_mail/models.py:121
+msgid "order"
+msgstr "crwdns2798:0crwdne2798:0"
+
+#: paperless_mail/models.py:128
+msgid "account"
+msgstr "crwdns2800:0crwdne2800:0"
+
+#: paperless_mail/models.py:132
+msgid "folder"
+msgstr "crwdns2802:0crwdne2802:0"
+
+#: paperless_mail/models.py:134
+msgid "Subfolders must be separated by dots."
+msgstr "crwdns3464:0crwdne3464:0"
+
+#: paperless_mail/models.py:138
+msgid "filter from"
+msgstr "crwdns2804:0crwdne2804:0"
+
+#: paperless_mail/models.py:141
+msgid "filter subject"
+msgstr "crwdns2806:0crwdne2806:0"
+
+#: paperless_mail/models.py:144
+msgid "filter body"
+msgstr "crwdns2808:0crwdne2808:0"
+
+#: paperless_mail/models.py:148
+msgid "filter attachment filename"
+msgstr "crwdns2810:0crwdne2810:0"
+
+#: paperless_mail/models.py:150
+msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
+msgstr "crwdns2812:0crwdne2812:0"
+
+#: paperless_mail/models.py:156
+msgid "maximum age"
+msgstr "crwdns2814:0crwdne2814:0"
+
+#: paperless_mail/models.py:158
+msgid "Specified in days."
+msgstr "crwdns2816:0crwdne2816:0"
+
+#: paperless_mail/models.py:161
+msgid "attachment type"
+msgstr "crwdns2818:0crwdne2818:0"
+
+#: paperless_mail/models.py:164
+msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
+msgstr "crwdns2820:0crwdne2820:0"
+
+#: paperless_mail/models.py:169
+msgid "action"
+msgstr "crwdns2822:0crwdne2822:0"
+
+#: paperless_mail/models.py:175
+msgid "action parameter"
+msgstr "crwdns2824:0crwdne2824:0"
+
+#: paperless_mail/models.py:177
+msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
+msgstr "crwdns3466:0crwdne3466:0"
+
+#: paperless_mail/models.py:184
+msgid "assign title from"
+msgstr "crwdns2828:0crwdne2828:0"
+
+#: paperless_mail/models.py:194
+msgid "assign this tag"
+msgstr "crwdns2830:0crwdne2830:0"
+
+#: paperless_mail/models.py:202
+msgid "assign this document type"
+msgstr "crwdns2832:0crwdne2832:0"
+
+#: paperless_mail/models.py:206
+msgid "assign correspondent from"
+msgstr "crwdns2834:0crwdne2834:0"
+
+#: paperless_mail/models.py:216
+msgid "assign this correspondent"
+msgstr "crwdns2836:0crwdne2836:0"
+

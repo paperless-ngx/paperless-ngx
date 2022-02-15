@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
+import { ConsumerStatusService } from 'src/app/services/consumer-status.service';
 import { environment } from 'src/environments/environment';
 
 export interface Statistics {
@@ -14,20 +15,34 @@ export interface Statistics {
   templateUrl: './statistics-widget.component.html',
   styleUrls: ['./statistics-widget.component.scss']
 })
-export class StatisticsWidgetComponent implements OnInit {
+export class StatisticsWidgetComponent implements OnInit, OnDestroy {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private consumerStatusService: ConsumerStatusService) { }
 
   statistics: Statistics = {}
 
-  getStatistics(): Observable<Statistics> {
+  subscription: Subscription
+
+  private getStatistics(): Observable<Statistics> {
     return this.http.get(`${environment.apiBaseUrl}statistics/`)
   }
-  
-  ngOnInit(): void {
+
+  reload() {
     this.getStatistics().subscribe(statistics => {
       this.statistics = statistics
     })
+  }
+
+  ngOnInit(): void {
+    this.reload()
+    this.subscription = this.consumerStatusService.onDocumentConsumptionFinished().subscribe(status => {
+      this.reload()
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe()
   }
 
 }

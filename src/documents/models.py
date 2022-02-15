@@ -9,11 +9,13 @@ import pathvalidate
 
 import dateutil.parser
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.utils.text import slugify
+from django.utils.timezone import is_aware
 
-from documents.file_handling import archive_name_from_filename
+from django.utils.translation import gettext_lazy as _
+
 from documents.parsers import get_default_file_extension
 
 
@@ -27,36 +29,31 @@ class MatchingModel(models.Model):
     MATCH_AUTO = 6
 
     MATCHING_ALGORITHMS = (
-        (MATCH_ANY, "Any"),
-        (MATCH_ALL, "All"),
-        (MATCH_LITERAL, "Literal"),
-        (MATCH_REGEX, "Regular Expression"),
-        (MATCH_FUZZY, "Fuzzy Match"),
-        (MATCH_AUTO, "Automatic Classification"),
+        (MATCH_ANY, _("Any word")),
+        (MATCH_ALL, _("All words")),
+        (MATCH_LITERAL, _("Exact match")),
+        (MATCH_REGEX, _("Regular expression")),
+        (MATCH_FUZZY, _("Fuzzy word")),
+        (MATCH_AUTO, _("Automatic")),
     )
 
-    name = models.CharField(max_length=128, unique=True)
+    name = models.CharField(
+        _("name"),
+        max_length=128, unique=True)
 
-    match = models.CharField(max_length=256, blank=True)
+    match = models.CharField(
+        _("match"),
+        max_length=256, blank=True)
+
     matching_algorithm = models.PositiveIntegerField(
+        _("matching algorithm"),
         choices=MATCHING_ALGORITHMS,
-        default=MATCH_ANY,
-        help_text=(
-            "Which algorithm you want to use when matching text to the OCR'd "
-            "PDF.  Here, \"any\" looks for any occurrence of any word "
-            "provided in the PDF, while \"all\" requires that every word "
-            "provided appear in the PDF, albeit not in the order provided.  A "
-            "\"literal\" match means that the text you enter must appear in "
-            "the PDF exactly as you've entered it, and \"regular expression\" "
-            "uses a regex to match the PDF.  (If you don't know what a regex "
-            "is, you probably don't want this option.)  Finally, a \"fuzzy "
-            "match\" looks for words or phrases that are mostly—but not "
-            "exactly—the same, which can be useful for matching against "
-            "documents containg imperfections that foil accurate OCR."
-        )
+        default=MATCH_ANY
     )
 
-    is_insensitive = models.BooleanField(default=True)
+    is_insensitive = models.BooleanField(
+        _("is insensitive"),
+        default=True)
 
     class Meta:
         abstract = True
@@ -65,53 +62,40 @@ class MatchingModel(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-
-        self.match = self.match.lower()
-
-        models.Model.save(self, *args, **kwargs)
-
 
 class Correspondent(MatchingModel):
 
-    # This regex is probably more restrictive than it needs to be, but it's
-    # better safe than sorry.
-    SAFE_REGEX = re.compile(r"^[\w\- ,.']+$")
-
     class Meta:
         ordering = ("name",)
+        verbose_name = _("correspondent")
+        verbose_name_plural = _("correspondents")
 
 
 class Tag(MatchingModel):
 
-    COLOURS = (
-        (1, "#a6cee3"),
-        (2, "#1f78b4"),
-        (3, "#b2df8a"),
-        (4, "#33a02c"),
-        (5, "#fb9a99"),
-        (6, "#e31a1c"),
-        (7, "#fdbf6f"),
-        (8, "#ff7f00"),
-        (9, "#cab2d6"),
-        (10, "#6a3d9a"),
-        (11, "#b15928"),
-        (12, "#000000"),
-        (13, "#cccccc")
+    color = models.CharField(
+        _("color"),
+        max_length=7,
+        default="#a6cee3"
     )
-
-    colour = models.PositiveIntegerField(choices=COLOURS, default=1)
 
     is_inbox_tag = models.BooleanField(
+        _("is inbox tag"),
         default=False,
-        help_text="Marks this tag as an inbox tag: All newly consumed "
-                  "documents will be tagged with inbox tags."
+        help_text=_("Marks this tag as an inbox tag: All newly consumed "
+                    "documents will be tagged with inbox tags.")
     )
+
+    class Meta:
+        verbose_name = _("tag")
+        verbose_name_plural = _("tags")
 
 
 class DocumentType(MatchingModel):
 
-    pass
+    class Meta:
+        verbose_name = _("document type")
+        verbose_name_plural = _("document types")
 
 
 class Document(models.Model):
@@ -119,8 +103,8 @@ class Document(models.Model):
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
     STORAGE_TYPE_GPG = "gpg"
     STORAGE_TYPES = (
-        (STORAGE_TYPE_UNENCRYPTED, "Unencrypted"),
-        (STORAGE_TYPE_GPG, "Encrypted with GNU Privacy Guard")
+        (STORAGE_TYPE_UNENCRYPTED, _("Unencrypted")),
+        (STORAGE_TYPE_GPG, _("Encrypted with GNU Privacy Guard"))
     )
 
     correspondent = models.ForeignKey(
@@ -128,55 +112,68 @@ class Document(models.Model):
         blank=True,
         null=True,
         related_name="documents",
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        verbose_name=_("correspondent")
     )
 
-    title = models.CharField(max_length=128, blank=True, db_index=True)
+    title = models.CharField(
+        _("title"),
+        max_length=128, blank=True, db_index=True)
 
     document_type = models.ForeignKey(
         DocumentType,
         blank=True,
         null=True,
         related_name="documents",
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        verbose_name=_("document type")
     )
 
     content = models.TextField(
+        _("content"),
         blank=True,
-        help_text="The raw, text-only data of the document. This field is "
-                  "primarily used for searching."
+        help_text=_("The raw, text-only data of the document. This field is "
+                    "primarily used for searching.")
     )
 
     mime_type = models.CharField(
+        _("mime type"),
         max_length=256,
         editable=False
     )
 
     tags = models.ManyToManyField(
-        Tag, related_name="documents", blank=True)
+        Tag, related_name="documents", blank=True,
+        verbose_name=_("tags")
+    )
 
     checksum = models.CharField(
+        _("checksum"),
         max_length=32,
         editable=False,
         unique=True,
-        help_text="The checksum of the original document."
+        help_text=_("The checksum of the original document.")
     )
 
     archive_checksum = models.CharField(
+        _("archive checksum"),
         max_length=32,
         editable=False,
         blank=True,
         null=True,
-        help_text="The checksum of the archived document."
+        help_text=_("The checksum of the archived document.")
     )
 
     created = models.DateTimeField(
+        _("created"),
         default=timezone.now, db_index=True)
 
     modified = models.DateTimeField(
+        _("modified"),
         auto_now=True, editable=False, db_index=True)
 
     storage_type = models.CharField(
+        _("storage type"),
         max_length=11,
         choices=STORAGE_TYPES,
         default=STORAGE_TYPE_UNENCRYPTED,
@@ -184,30 +181,49 @@ class Document(models.Model):
     )
 
     added = models.DateTimeField(
+        _("added"),
         default=timezone.now, editable=False, db_index=True)
 
     filename = models.FilePathField(
+        _("filename"),
         max_length=1024,
         editable=False,
         default=None,
+        unique=True,
         null=True,
-        help_text="Current filename in storage"
+        help_text=_("Current filename in storage")
+    )
+
+    archive_filename = models.FilePathField(
+        _("archive filename"),
+        max_length=1024,
+        editable=False,
+        default=None,
+        unique=True,
+        null=True,
+        help_text=_("Current archive filename in storage")
     )
 
     archive_serial_number = models.IntegerField(
+        _("archive serial number"),
         blank=True,
         null=True,
         unique=True,
         db_index=True,
-        help_text="The position of this document in your physical document "
-                  "archive."
+        help_text=_("The position of this document in your physical document "
+                    "archive.")
     )
 
     class Meta:
-        ordering = ("correspondent", "title")
+        ordering = ("-created",)
+        verbose_name = _("document")
+        verbose_name_plural = _("documents")
 
     def __str__(self):
-        created = datetime.date.isoformat(self.created)
+        if is_aware(self.created):
+            created = timezone.localdate(self.created).isoformat()
+        else:
+            created = datetime.date.isoformat(self.created)
         if self.correspondent and self.title:
             return f"{created} {self.correspondent} {self.title}"
         else:
@@ -220,7 +236,7 @@ class Document(models.Model):
         else:
             fname = "{:07}{}".format(self.pk, self.file_type)
             if self.storage_type == self.STORAGE_TYPE_GPG:
-                fname += ".gpg"
+                fname += ".gpg"  # pragma: no cover
 
         return os.path.join(
             settings.ORIGINALS_DIR,
@@ -232,16 +248,18 @@ class Document(models.Model):
         return open(self.source_path, "rb")
 
     @property
-    def archive_path(self):
-        if self.filename:
-            fname = archive_name_from_filename(self.filename)
-        else:
-            fname = "{:07}.pdf".format(self.pk)
+    def has_archive_version(self):
+        return self.archive_filename is not None
 
-        return os.path.join(
-            settings.ARCHIVE_DIR,
-            fname
-        )
+    @property
+    def archive_path(self):
+        if self.has_archive_version:
+            return os.path.join(
+                settings.ARCHIVE_DIR,
+                str(self.archive_filename)
+            )
+        else:
+            return None
 
     @property
     def archive_file(self):
@@ -286,74 +304,121 @@ class Document(models.Model):
 class Log(models.Model):
 
     LEVELS = (
-        (logging.DEBUG, "Debugging"),
-        (logging.INFO, "Informational"),
-        (logging.WARNING, "Warning"),
-        (logging.ERROR, "Error"),
-        (logging.CRITICAL, "Critical"),
+        (logging.DEBUG, _("debug")),
+        (logging.INFO, _("information")),
+        (logging.WARNING, _("warning")),
+        (logging.ERROR, _("error")),
+        (logging.CRITICAL, _("critical")),
     )
 
-    group = models.UUIDField(blank=True, null=True)
-    message = models.TextField()
-    level = models.PositiveIntegerField(choices=LEVELS, default=logging.INFO)
-    created = models.DateTimeField(auto_now_add=True)
+    group = models.UUIDField(
+        _("group"),
+        blank=True, null=True)
+
+    message = models.TextField(_("message"))
+
+    level = models.PositiveIntegerField(
+        _("level"),
+        choices=LEVELS, default=logging.INFO)
+
+    created = models.DateTimeField(_("created"), auto_now_add=True)
 
     class Meta:
         ordering = ("-created",)
+        verbose_name = _("log")
+        verbose_name_plural = _("logs")
 
     def __str__(self):
         return self.message
 
 
+class SavedView(models.Model):
+
+    class Meta:
+
+        ordering = ("name",)
+        verbose_name = _("saved view")
+        verbose_name_plural = _("saved views")
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             verbose_name=_("user"))
+    name = models.CharField(
+        _("name"),
+        max_length=128)
+
+    show_on_dashboard = models.BooleanField(
+        _("show on dashboard"),
+    )
+    show_in_sidebar = models.BooleanField(
+        _("show in sidebar"),
+    )
+
+    sort_field = models.CharField(
+        _("sort field"),
+        max_length=128,
+        null=True,
+        blank=True
+    )
+    sort_reverse = models.BooleanField(
+        _("sort reverse"),
+        default=False)
+
+
+class SavedViewFilterRule(models.Model):
+    RULE_TYPES = [
+        (0, _("title contains")),
+        (1, _("content contains")),
+        (2, _("ASN is")),
+        (3, _("correspondent is")),
+        (4, _("document type is")),
+        (5, _("is in inbox")),
+        (6, _("has tag")),
+        (7, _("has any tag")),
+        (8, _("created before")),
+        (9, _("created after")),
+        (10, _("created year is")),
+        (11, _("created month is")),
+        (12, _("created day is")),
+        (13, _("added before")),
+        (14, _("added after")),
+        (15, _("modified before")),
+        (16, _("modified after")),
+        (17, _("does not have tag")),
+        (18, _("does not have ASN")),
+        (19, _("title or content contains")),
+        (20, _("fulltext query")),
+        (21, _("more like this"))
+    ]
+
+    saved_view = models.ForeignKey(
+        SavedView,
+        on_delete=models.CASCADE,
+        related_name="filter_rules",
+        verbose_name=_("saved view")
+    )
+
+    rule_type = models.PositiveIntegerField(
+        _("rule type"),
+        choices=RULE_TYPES)
+
+    value = models.CharField(
+        _("value"),
+        max_length=128,
+        blank=True,
+        null=True)
+
+    class Meta:
+        verbose_name = _("filter rule")
+        verbose_name_plural = _("filter rules")
+
+
 # TODO: why is this in the models file?
 class FileInfo:
 
-    # This epic regex *almost* worked for our needs, so I'm keeping it here for
-    # posterity, in the hopes that we might find a way to make it work one day.
-    ALMOST_REGEX = re.compile(
-        r"^((?P<date>\d\d\d\d\d\d\d\d\d\d\d\d\d\dZ){separator})?"
-        r"((?P<correspondent>{non_separated_word}+){separator})??"
-        r"(?P<title>{non_separated_word}+)"
-        r"({separator}(?P<tags>[a-z,0-9-]+))?"
-        r"\.(?P<extension>[a-zA-Z.-]+)$".format(
-            separator=r"\s+-\s+",
-            non_separated_word=r"([\w,. ]|([^\s]-))"
-        )
-    )
     REGEXES = OrderedDict([
-        ("created-correspondent-title-tags", re.compile(
-            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)$",
-            flags=re.IGNORECASE
-        )),
-        ("created-title-tags", re.compile(
-            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)$",
-            flags=re.IGNORECASE
-        )),
-        ("created-correspondent-title", re.compile(
-            r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*)$",
-            flags=re.IGNORECASE
-        )),
         ("created-title", re.compile(
             r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
             r"(?P<title>.*)$",
-            flags=re.IGNORECASE
-        )),
-        ("correspondent-title-tags", re.compile(
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*) - "
-            r"(?P<tags>[a-z0-9\-,]*)$",
-            flags=re.IGNORECASE
-        )),
-        ("correspondent-title", re.compile(
-            r"(?P<correspondent>.*) - "
-            r"(?P<title>.*)?$",
             flags=re.IGNORECASE
         )),
         ("title", re.compile(
@@ -379,21 +444,8 @@ class FileInfo:
             return None
 
     @classmethod
-    def _get_correspondent(cls, name):
-        if not name:
-            return None
-        return Correspondent.objects.get_or_create(name=name)[0]
-
-    @classmethod
     def _get_title(cls, title):
         return title
-
-    @classmethod
-    def _get_tags(cls, tags):
-        r = []
-        for t in tags.split(","):
-            r.append(Tag.objects.get_or_create(name=t)[0])
-        return tuple(r)
 
     @classmethod
     def _mangle_property(cls, properties, name):
@@ -404,15 +456,6 @@ class FileInfo:
 
     @classmethod
     def from_filename(cls, filename):
-        """
-        We use a crude naming convention to make handling the correspondent,
-        title, and tags easier:
-          "<date> - <correspondent> - <title> - <tags>"
-          "<correspondent> - <title> - <tags>"
-          "<correspondent> - <title>"
-          "<title>"
-        """
-
         # Mutate filename in-place before parsing its components
         # by applying at most one of the configured transformations.
         for (pattern, repl) in settings.FILENAME_PARSE_TRANSFORMS:
@@ -443,7 +486,5 @@ class FileInfo:
             if m:
                 properties = m.groupdict()
                 cls._mangle_property(properties, "created")
-                cls._mangle_property(properties, "correspondent")
                 cls._mangle_property(properties, "title")
-                cls._mangle_property(properties, "tags")
                 return cls(**properties)
