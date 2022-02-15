@@ -23,6 +23,12 @@ Options available to any installation of paperless:
 *   The document exporter is also able to update an already existing export.
     Therefore, incremental backups with ``rsync`` are entirely possible.
 
+.. caution::
+
+    You cannot import the export generated with one version of paperless in a
+    different version of paperless. The export contains an exact image of the
+    database, and migrations may change the database layout.
+
 Options available to docker installations:
 
 *   Backup the docker volumes. These usually reside within
@@ -101,17 +107,17 @@ Then you can start paperless-ng with ``-d`` to have it run in the background.
         update to newer versions. In order to enable updates as described above, either
         get the new ``docker-compose.yml`` file from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
         or edit the ``docker-compose.yml`` file, find the line that says
-        
+
             .. code::
 
                 image: jonaswinkler/paperless-ng:0.9.x
-        
+
         and replace the version with ``latest``:
 
             .. code::
 
                 image: jonaswinkler/paperless-ng:latest
-        
+
 Bare Metal Route
 ================
 
@@ -121,27 +127,19 @@ After grabbing the new release and unpacking the contents, do the following:
     dependencies. The dependencies required are listed in the section about
     :ref:`bare metal installations <setup-bare_metal>`.
 
-2.  Update python requirements. If you use Pipenv, this is done with the following steps.
+2.  Update python requirements. Keep in mind to activate your virtual environment
+    before that, if you use one.
 
     .. code:: shell-session
 
-        $ pip install --upgrade pipenv
-        $ cd /path/to/paperless
-        $ pipenv clean
-        $ pipenv install
-
-    This creates a new virtual environment (or uses your existing environment)
-    and installs all dependencies into it.
-
-    You can also use the included ``requirements.txt`` file instead and create the virtual
-    environment yourself. This file includes exactly the same dependencies.
+        $ pip install -r requirements.txt
 
 3.  Migrate the database.
 
     .. code:: shell-session
 
         $ cd src
-        $ pipenv run python3 manage.py migrate
+        $ python3 manage.py migrate
 
     This might not actually do anything. Not every new paperless version comes with new
     database migrations.
@@ -151,22 +149,15 @@ Ansible Route
 
 Most of the update process is automated when using the ansible role.
 
-1.  Backup your defined role variables file outside the paperless source-tree:
+1.  Update the role to the target release tag to make sure the ansible scripts are compatible:
 
     .. code:: shell-session
 
-        $ cp ansible/vars.yml ~/vars.yml.old
+        $ ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,master --force
 
-2.  Pull the release tag you want to update to:
+2.  Update the role variable definitions ``vars/paperless-ng.yml`` (where appropriate).
 
-    .. code:: shell-session
-
-        $ git fetch --all
-        $ git checkout ng-0.9.14
-
-3.  Update the role variable definitions ``ansible/vars.yml`` (where appropriate).
-
-4.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
+3.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
 
     .. note::
 
@@ -179,25 +170,64 @@ Most of the update process is automated when using the ansible role.
         $ ansible-playbook playbook.yml
 
 
+Downgrading Paperless
+#####################
+
+Downgrades are possible. However, some updates also contain database migrations (these change the layout of the database and may move data).
+In order to move back from a version that applied database migrations, you'll have to revert the database migration *before* downgrading,
+and then downgrade paperless.
+
+This table lists the compatible versions for each database migration number.
+
++------------------+-----------------+
+| Migration number | Version range   |
++------------------+-----------------+
+| 1011             | 1.0.0           |
++------------------+-----------------+
+| 1012             | 1.1.0 - 1.2.1   |
++------------------+-----------------+
+| 1014             | 1.3.0 - 1.3.1   |
++------------------+-----------------+
+| 1016             | 1.3.2 - current |
++------------------+-----------------+
+
+Execute the following management command to migrate your database:
+
+.. code:: shell-session
+
+    $ python3 manage.py migrate documents <migration number>
+
+.. note::
+
+    Some migrations cannot be undone. The command will issue errors if that happens.
+
+.. _utilities-management-commands:
+
 Management utilities
 ####################
 
 Paperless comes with some management commands that perform various maintenance
-tasks on your paperless instance. You can invoke these commands either by
+tasks on your paperless instance. You can invoke these commands in the following way:
+
+With docker-compose, while paperless is running:
 
 .. code:: shell-session
 
     $ cd /path/to/paperless
-    $ docker-compose run --rm webserver <command> <arguments>
+    $ docker-compose exec webserver <command> <arguments>
 
-or
+With docker, while paperless is running:
+
+.. code:: shell-session
+
+    $ docker exec -it <container-name> <command> <arguments>
+
+Bare metal:
 
 .. code:: shell-session
 
     $ cd /path/to/paperless/src
-    $ pipenv run python manage.py <command> <arguments>
-
-depending on whether you use docker or not.
+    $ python3 manage.py <command> <arguments>
 
 All commands have built-in help, which can be accessed by executing them with
 the argument ``--help``.
@@ -210,6 +240,8 @@ Document exporter
 The document exporter exports all your data from paperless into a folder for
 backup or migration to another DMS.
 
+If you use the document exporter within a cronjob to backup your data you might use the ``-T`` flag behind exec to suppress "The input device is not a TTY" errors. For example: ``docker-compose exec -T webserver document_exporter ../export``
+
 .. code::
 
     document_exporter target [-c] [-f] [-d]
@@ -218,7 +250,7 @@ backup or migration to another DMS.
     -c, --compare-checksums
     -f, --use-filename-format
     -d, --delete
-    
+
 ``target`` is a folder to which the data gets written. This includes documents,
 thumbnails and a ``manifest.json`` file. The manifest contains all metadata from
 the database (correspondents, tags, etc).
@@ -375,6 +407,34 @@ the naming scheme.
 The command takes no arguments and processes all your documents at once.
 
 
+.. _utilities-sanity-checker:
+
+Sanity checker
+==============
+
+Paperless has a built-in sanity checker that inspects your document collection for issues.
+
+The issues detected by the sanity checker are as follows:
+
+* Missing original files.
+* Missing archive files.
+* Inaccessible original files due to improper permissions.
+* Inaccessible archive files due to improper permissions.
+* Corrupted original documents by comparing their checksum against what is stored in the database.
+* Corrupted archive documents by comparing their checksum against what is stored in the database.
+* Missing thumbnails.
+* Inaccessible thumbnails due to improper permissions.
+* Documents without any content (warning).
+* Orphaned files in the media directory (warning). These are files that are not referenced by any document im paperless.
+
+
+.. code::
+
+    document_sanity_checker
+
+The command takes no arguments. Depending on the size of your document archive, this may take some time.
+
+
 Fetching e-mail
 ===============
 
@@ -462,6 +522,3 @@ Basic usage to disable encryption of your document store:
 .. code::
 
     decrypt_documents [--passphrase SECR3TP4SSPHRA$E]
-
-
-.. _Pipenv: https://pipenv.pypa.io/en/latest/

@@ -83,7 +83,7 @@ export class FilterableDropdownSelectionModel {
     if (fireEvent) {
       this.changed.next(this)
     }
-    
+
   }
 
   private getNonTemporary(id: number) {

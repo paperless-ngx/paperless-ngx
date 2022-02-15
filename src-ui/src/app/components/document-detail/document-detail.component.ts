@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap';
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { PaperlessDocumentMetadata } from 'src/app/data/paperless-document-metadata';
@@ -21,6 +21,8 @@ import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms';
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
 @Component({
   selector: 'app-document-detail',
@@ -42,6 +44,8 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   documentId: number
   document: PaperlessDocument
   metadata: PaperlessDocumentMetadata
+  suggestions: PaperlessDocumentSuggestions
+
   title: string
   previewUrl: string
   downloadUrl: string
@@ -66,6 +70,15 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   store: BehaviorSubject<any>
   storeSub: Subscription
   isDirty$: Observable<boolean>
+
+  @ViewChild('nav') nav: NgbNav
+  @ViewChild('pdfPreview') set pdfPreview(element) {
+    // this gets called when compontent added or removed from DOM
+    if (element && element.nativeElement.offsetParent !== null) { // its visible
+
+      setTimeout(()=> this.nav?.select(1));
+    }
+  }
 
   constructor(
     private documentsService: DocumentService,
@@ -101,6 +114,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
       this.downloadOriginalUrl = this.documentsService.getDownloadUrl(this.documentId, true)
+      this.suggestions = null
       if (this.openDocumentService.getOpenDocument(this.documentId)) {
         this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
       }
@@ -134,14 +148,22 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
     this.document = doc
     this.documentsService.getMetadata(doc.id).subscribe(result => {
       this.metadata = result
+    }, error => {
+      this.metadata = null
+    })
+    this.documentsService.getSuggestions(doc.id).subscribe(result => {
+      this.suggestions = result
+    }, error => {
+      this.suggestions = null
     })
     this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)
   }
 
-  createDocumentType() {
+  createDocumentType(newName: string) {
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.success.subscribe(newDocumentType => {
       this.documentTypeService.listAll().subscribe(documentTypes => {
         this.documentTypes = documentTypes.results
@@ -150,9 +172,10 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
     })
   }
 
-  createCorrespondent() {
+  createCorrespondent(newName: string) {
     var modal = this.modalService.open(CorrespondentEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
     modal.componentInstance.success.subscribe(newCorrespondent => {
       this.correspondentService.listAll().subscribe(correspondents => {
         this.correspondents = correspondents.results
@@ -225,8 +248,8 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
 
   close() {
     this.openDocumentService.closeDocument(this.document)
-    if (this.documentListViewService.savedViewId) {
-      this.router.navigate(['view', this.documentListViewService.savedViewId])
+    if (this.documentListViewService.activeSavedViewId) {
+      this.router.navigate(['view', this.documentListViewService.activeSavedViewId])
     } else {
       this.router.navigate(['documents'])
     }
@@ -253,7 +276,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   }
 
   moreLike() {
-    this.router.navigate(["search"], {queryParams: {more_like:this.document.id}})
+    this.documentListViewService.quickFilter([{rule_type: FILTER_FULLTEXT_MORELIKE, value: this.documentId.toString()}])
   }
 
   hasNext() {

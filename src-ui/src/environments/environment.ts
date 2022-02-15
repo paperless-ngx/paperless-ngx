@@ -5,8 +5,12 @@
 export const environment = {
   production: false,
   apiBaseUrl: "http://localhost:8000/api/",
+  apiVersion: "2",
   appTitle: "Paperless-ng",
-  version: "DEVELOPMENT"
+  version: "DEVELOPMENT",
+  webSocketHost: "localhost:8000",
+  webSocketProtocol: "ws:",
+  webSocketBaseUrl: "/ws/",
 };
 
 /*

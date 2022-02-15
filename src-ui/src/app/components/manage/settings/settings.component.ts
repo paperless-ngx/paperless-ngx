@@ -28,6 +28,10 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     'displayLanguage': new FormControl(null),
     'dateLocale': new FormControl(null),
     'dateFormat': new FormControl(null),
+    'notificationsConsumerNewDocument': new FormControl(null),
+    'notificationsConsumerSuccess': new FormControl(null),
+    'notificationsConsumerFailed': new FormControl(null),
+    'notificationsConsumerSuppressOnDashboard': new FormControl(null),
   })
 
   savedViews: PaperlessSavedView[]
@@ -37,7 +41,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
   isDirty$: Observable<boolean>
 
   get computedDateLocale(): string {
-    return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage
+    return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage || this.currentLocale
   }
 
   constructor(
@@ -62,6 +66,10 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
         'displayLanguage': this.settings.getLanguage(),
         'dateLocale': this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
         'dateFormat': this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
+        'notificationsConsumerNewDocument': this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT),
+        'notificationsConsumerSuccess': this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS),
+        'notificationsConsumerFailed': this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED),
+        'notificationsConsumerSuppressOnDashboard': this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD),
       }
 
       for (let view of this.savedViews) {
@@ -108,9 +116,14 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, this.settingsForm.value.documentListItemPerPage)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
+    this.settings.set(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED, (this.settingsForm.value.darkModeInvertThumbs == true).toString())
     this.settings.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, this.settingsForm.value.useNativePdfViewer)
     this.settings.set(SETTINGS_KEYS.DATE_LOCALE, this.settingsForm.value.dateLocale)
     this.settings.set(SETTINGS_KEYS.DATE_FORMAT, this.settingsForm.value.dateFormat)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT, this.settingsForm.value.notificationsConsumerNewDocument)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS, this.settingsForm.value.notificationsConsumerSuccess)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED, this.settingsForm.value.notificationsConsumerFailed)
+    this.settings.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD, this.settingsForm.value.notificationsConsumerSuppressOnDashboard)
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.store.next(this.settingsForm.value)
     this.documentListViewService.updatePageSize()
@@ -119,11 +132,15 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
   }
 
   get displayLanguageOptions(): LanguageOption[] {
-    return [{code: "", name: $localize`Use system language`}].concat(this.settings.getLanguageOptions())
+    return [
+      {code: "", name: $localize`Use system language`}
+    ].concat(this.settings.getLanguageOptions())
   }
 
   get dateLocaleOptions(): LanguageOption[] {
-    return [{code: "", name: $localize`Use date format of display language`}].concat(this.settings.getLanguageOptions())
+    return [
+      {code: "", name: $localize`Use date format of display language`}
+    ].concat(this.settings.getDateLocaleOptions())
   }
 
   get today() {

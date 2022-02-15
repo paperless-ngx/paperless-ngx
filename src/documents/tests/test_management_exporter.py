@@ -22,7 +22,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.target = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.target)
 
-        self.d1 = Document.objects.create(content="Content", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", title="wow1", filename="0000001.pdf", mime_type="application/pdf")
+        self.d1 = Document.objects.create(content="Content", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", title="wow1", filename="0000001.pdf", mime_type="application/pdf", archive_filename="0000001.pdf")
         self.d2 = Document.objects.create(content="Content", checksum="9c9691e51741c1f4f41a20896af31770", title="wow2", filename="0000002.pdf", mime_type="application/pdf")
         self.d3 = Document.objects.create(content="Content", checksum="d38d7ed02e988e072caf924e0f3fcb76", title="wow2", filename="0000003.pdf", mime_type="application/pdf")
         self.d4 = Document.objects.create(content="Content", checksum="82186aaa94f0b98697d704b90fd1c072", title="wow_dec", filename="0000004.pdf.gpg", mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
@@ -69,7 +69,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         manifest = self._do_export(use_filename_format=use_filename_format)
 
-        self.assertEqual(len(manifest), 7)
+        self.assertEqual(len(manifest), 8)
         self.assertEqual(len(list(filter(lambda e: e['model'] == 'documents.document', manifest))), 4)
 
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))

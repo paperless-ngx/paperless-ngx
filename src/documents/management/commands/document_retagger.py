@@ -1,15 +1,17 @@
 import logging
 
+import tqdm
 from django.core.management.base import BaseCommand
 
-from documents.classifier import DocumentClassifier, \
-    IncompatibleClassifierVersionError
+from documents.classifier import load_classifier
 from documents.models import Document
-from ...mixins import Renderable
 from ...signals.handlers import set_correspondent, set_document_type, set_tags
 
 
-class Command(Renderable, BaseCommand):
+logger = logging.getLogger("paperless.management.retagger")
+
+
+class Command(BaseCommand):
 
     help = """
         Using the current classification model, assigns correspondents, tags
@@ -17,10 +19,6 @@ class Command(Renderable, BaseCommand):
         back-tag all previously indexed documents with metadata created (or
         modified) after their initial import.
     """.replace("    ", "")
-
-    def __init__(self, *args, **kwargs):
-        self.verbosity = 0
-        BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -59,10 +57,26 @@ class Command(Renderable, BaseCommand):
                  "set correspondent, document and remove correspondents, types"
                  "and tags that do not match anymore due to changed rules."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
+        parser.add_argument(
+            "--suggest",
+            default=False,
+            action="store_true",
+            help="Return the suggestion, don't change anything."
+        )
+        parser.add_argument(
+            "--base-url",
+            help="The base URL to use to build the link to the documents."
+        )
 
     def handle(self, *args, **options):
-
-        self.verbosity = options["verbosity"]
+        # Detect if we support color
+        color = self.style.ERROR("test") != "test"
 
         if options["inbox_only"]:
             queryset = Document.objects.filter(tags__is_inbox_tag=True)
@@ -70,17 +84,12 @@ class Command(Renderable, BaseCommand):
             queryset = Document.objects.all()
         documents = queryset.distinct()
 
-        classifier = DocumentClassifier()
-        try:
-            classifier.reload()
-        except (OSError, EOFError, IncompatibleClassifierVersionError) as e:
-            logging.getLogger(__name__).warning(
-                f"Cannot classify documents: {e}.")
-            classifier = None
+        classifier = load_classifier()
 
-        for document in documents:
-            logging.getLogger(__name__).info(
-                f"Processing document {document.title}")
+        for document in tqdm.tqdm(
+            documents,
+            disable=options['no_progress_bar']
+        ):
 
             if options['correspondent']:
                 set_correspondent(
@@ -88,18 +97,27 @@ class Command(Renderable, BaseCommand):
                     document=document,
                     classifier=classifier,
                     replace=options['overwrite'],
-                    use_first=options['use_first'])
+                    use_first=options['use_first'],
+                    suggest=options['suggest'],
+                    base_url=options['base_url'],
+                    color=color)
 
             if options['document_type']:
                 set_document_type(sender=None,
                                   document=document,
                                   classifier=classifier,
                                   replace=options['overwrite'],
-                                  use_first=options['use_first'])
+                                  use_first=options['use_first'],
+                                  suggest=options['suggest'],
+                                  base_url=options['base_url'],
+                                  color=color)
 
             if options['tags']:
                 set_tags(
                     sender=None,
                     document=document,
                     classifier=classifier,
-                    replace=options['overwrite'])
+                    replace=options['overwrite'],
+                    suggest=options['suggest'],
+                    base_url=options['base_url'],
+                    color=color)

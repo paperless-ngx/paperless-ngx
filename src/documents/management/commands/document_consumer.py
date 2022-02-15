@@ -1,6 +1,7 @@
 import logging
 import os
-from pathlib import Path
+from pathlib import Path, PurePath
+from threading import Thread
 from time import sleep
 
 from django.conf import settings
@@ -17,11 +18,11 @@ try:
 except ImportError:
     INotify = flags = None
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.management.consumer")
 
 
 def _tags_from_path(filepath):
-    """Walk up the directory tree from filepath to CONSUMPTION_DIr
+    """Walk up the directory tree from filepath to CONSUMPTION_DIR
        and get or create Tag IDs for every directory.
     """
     tag_ids = set()
@@ -35,8 +36,15 @@ def _tags_from_path(filepath):
     return tag_ids
 
 
+def _is_ignored(filepath: str) -> bool:
+    filepath_relative = PurePath(filepath).relative_to(
+        settings.CONSUMPTION_DIR)
+    return any(
+        filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
+
+
 def _consume(filepath):
-    if os.path.isdir(filepath):
+    if os.path.isdir(filepath) or _is_ignored(filepath):
         return
 
     if not os.path.isfile(filepath):
@@ -54,10 +62,10 @@ def _consume(filepath):
         if settings.CONSUMER_SUBDIRS_AS_TAGS:
             tag_ids = _tags_from_path(filepath)
     except Exception as e:
-        logger.error(
-            "Error creating tags from path: {}".format(e))
+        logger.exception("Error creating tags from path")
 
     try:
+        logger.info(f"Adding {filepath} to the task queue.")
         async_task("documents.tasks.consume_file",
                    filepath,
                    override_tag_ids=tag_ids if tag_ids else None,
@@ -66,14 +74,17 @@ def _consume(filepath):
         # Catch all so that the consumer won't crash.
         # This is also what the test case is listening for to check for
         # errors.
-        logger.error(
-            "Error while consuming document: {}".format(e))
+        logger.exception("Error while consuming document")
 
 
-def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
+def _consume_wait_unmodified(file):
+    if _is_ignored(file):
+        return
+
+    logger.debug(f"Waiting for file {file} to remain unmodified")
     mtime = -1
     current_try = 0
-    while current_try < num_tries:
+    while current_try < settings.CONSUMER_POLLING_RETRY_COUNT:
         try:
             new_mtime = os.stat(file).st_mtime
         except FileNotFoundError:
@@ -84,7 +95,7 @@ def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
             _consume(file)
             return
         mtime = new_mtime
-        sleep(wait_time)
+        sleep(settings.CONSUMER_POLLING_DELAY)
         current_try += 1
 
     logger.error(f"Timeout while waiting on file {file} to remain unmodified.")
@@ -93,10 +104,14 @@ def _consume_wait_unmodified(file, num_tries=20, wait_time=1):
 class Handler(FileSystemEventHandler):
 
     def on_created(self, event):
-        _consume_wait_unmodified(event.src_path)
+        Thread(
+            target=_consume_wait_unmodified, args=(event.src_path,)
+        ).start()
 
     def on_moved(self, event):
-        _consume_wait_unmodified(event.dest_path)
+        Thread(
+            target=_consume_wait_unmodified, args=(event.dest_path,)
+        ).start()
 
 
 class Command(BaseCommand):
@@ -108,12 +123,7 @@ class Command(BaseCommand):
     # This is here primarily for the tests and is irrelevant in production.
     stop_flag = False
 
-    def __init__(self, *args, **kwargs):
-
-        self.logger = logging.getLogger(__name__)
-
-        BaseCommand.__init__(self, *args, **kwargs)
-        self.observer = None
+    observer = None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -161,7 +171,7 @@ class Command(BaseCommand):
         logger.debug("Consumer exiting.")
 
     def handle_polling(self, directory, recursive):
-        logging.getLogger(__name__).info(
+        logger.info(
             f"Polling directory for changes: {directory}")
         self.observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
         self.observer.schedule(Handler(), directory, recursive=recursive)
@@ -176,7 +186,7 @@ class Command(BaseCommand):
         self.observer.join()
 
     def handle_inotify(self, directory, recursive):
-        logging.getLogger(__name__).info(
+        logger.info(
             f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()

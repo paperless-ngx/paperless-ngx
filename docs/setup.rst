@@ -20,45 +20,45 @@ Paperless consists of the following components:
     .. code:: shell-session
 
         $ cd /path/to/paperless/src/
-        $ pipenv run gunicorn -c /usr/src/paperless/gunicorn.conf.py -b 0.0.0.0:8000 paperless.wsgi
+        $ gunicorn -c ../gunicorn.conf.py paperless.wsgi
 
     or by any other means such as Apache ``mod_wsgi``.
 
 *   **The consumer:** This is what watches your consumption folder for documents.
-    However, the consumer itself does not consume really consume your documents anymore.
-    It rather notifies a task processor that a new file is ready for consumption.
+    However, the consumer itself does not really consume your documents.
+    Now it notifies a task processor that a new file is ready for consumption.
     I suppose it should be named differently.
-    This also used to check your emails, but that's now gone elsewhere as well.
+    This was also used to check your emails, but that's now done elsewhere as well.
 
     Start the consumer with the management command ``document_consumer``:
 
     .. code:: shell-session
 
         $ cd /path/to/paperless/src/
-        $ pipenv run python3 manage.py document_consumer
+        $ python3 manage.py document_consumer
 
     .. _setup-task_processor:
 
 *   **The task processor:** Paperless relies on `Django Q <https://django-q.readthedocs.io/en/latest/>`_
-    for doing much of the heavy lifting. This is a task queue that accepts tasks from
-    multiple sources and processes tasks in parallel. It also comes with a scheduler that executes
+    for doing most of the heavy lifting. This is a task queue that accepts tasks from
+    multiple sources and processes these in parallel. It also comes with a scheduler that executes
     certain commands periodically.
 
     This task processor is responsible for:
 
     *   Consuming documents. When the consumer finds new documents, it notifies the task processor to
         start a consumption task.
-    *   Consuming emails. It periodically checks your configured accounts for new mails and
-        produces consumption tasks for any documents it finds.
     *   The task processor also performs the consumption of any documents you upload through
         the web interface.
-    *   Maintain the search index and the automatic matching algorithm. These are things that paperless
+    *   Consuming emails. It periodically checks your configured accounts for new emails and
+        notifies the task processor to consume the attachment of an email.
+    *   Maintaining the search index and the automatic matching algorithm. These are things that paperless
         needs to do from time to time in order to operate properly.
 
     This allows paperless to process multiple documents from your consumption folder in parallel! On
-    a modern multi core system, consumption with full ocr is blazing fast.
+    a modern multi core system, this makes the consumption process with full OCR blazingly fast.
 
-    The task processor comes with a built-in admin interface that you can use to see whenever any of the
+    The task processor comes with a built-in admin interface that you can use to check whenever any of the
     tasks fail and inspect the errors (i.e., wrong email credentials, errors during consuming a specific
     file, etc).
 
@@ -67,11 +67,11 @@ Paperless consists of the following components:
     .. code:: shell-session
 
         $ cd /path/to/paperless/src/
-        $ pipenv run python3 manage.py qcluster
+        $ python3 manage.py qcluster
 
 *   A `redis <https://redis.io/>`_ message broker: This is a really lightweight service that is responsible
-    for getting the tasks from the webserver and consumer to the task scheduler. These run in different
-    processes (maybe even on different machines!), and therefore, this is necessary.
+    for getting the tasks from the webserver and the consumer to the task scheduler. These run in a different
+    process (maybe even on different machines!), and therefore, this is necessary.
 
 *   Optional: A database server. Paperless supports both PostgreSQL and SQLite for storing its data.
 
@@ -79,34 +79,56 @@ Paperless consists of the following components:
 Installation
 ############
 
-You can go multiple routes with setting up and running Paperless:
+You can go multiple routes to setup and run Paperless:
 
+* :ref:`Use the easy install docker script <setup-docker_script>`
 * :ref:`Pull the image from Docker Hub <setup-docker_hub>`
 * :ref:`Build the Docker image yourself <setup-docker_build>`
 * :ref:`Install Paperless directly on your system manually (bare metal) <setup-bare_metal>`
 * :ref:`Use ansible to install Paperless on your system automatically (bare metal) <setup-ansible>`
 
 The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
-from above automatically so that it just works and uses sensible defaults for all configuration options.
+from the above automatically so that it just works and uses sensible defaults for all configuration options.
+Here you find a cheat-sheet for docker beginners: `CLI Basics <https://www.sehn.tech/refs/devops-with-docker/>`_
 
-The bare metal route is more complicated to setup but makes it easier
+The bare metal route is complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
-The ansible route cobines benefits from both options:
-the setup process is fully automated, reproducible and idempotent,
-it includes the same sensible defaults,
-and it simultaneously provides the flexibility of a bare metal installation.
+The ansible route combines benefits of both options:
+the setup process is fully automated, reproducible and `idempotent <https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency>`_,
+it includes the same sensible defaults, and it simultaneously provides the flexibility of a bare metal installation.
+
+.. _CLI Basics: https://www.sehn.tech/refs/devops-with-docker/
+.. _idempotent: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency
+
+.. _setup-docker_script:
+
+Install Paperless from Docker Hub using the installation script
+===============================================================
+
+Paperless provides an interactive installation script. This script will ask you
+for a couple configuration options, download and create the necessary configuration files, pull the docker image, start paperless and create your user account. This script essentially
+performs all the steps described in :ref:`setup-docker_hub` automatically.
+
+1.  Make sure that docker and docker-compose are installed.
+2.  Download and run the installation script:
+
+    .. code:: shell-session
+
+        $ bash <(curl -L https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/install-paperless-ng.sh)
 
 .. _setup-docker_hub:
 
 Install Paperless from Docker Hub
 =================================
 
-1.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
-    and download one of the ``docker-compose.*.yml`` files, depending on which database backend you
+1.  Login with your user and create a folder in your home-directory `mkdir -v ~/paperless-ng` to have a place for your configuration files and consumption directory.
+
+2.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+    and download one of the `docker-compose.*.yml` files, depending on which database backend you
     want to use. Rename this file to `docker-compose.yml`.
-    If you want to enable optional support for Office documents, download a file with ``-tika`` in its name.
+    If you want to enable optional support for Office documents, download a file with `-tika` in the file name.
     Download the ``docker-compose.env`` file and the ``.env`` file as well and store them
     in the same directory.
 
@@ -115,25 +137,26 @@ Install Paperless from Docker Hub
         For new installations, it is recommended to use PostgreSQL as the database
         backend.
 
-2.  Install `Docker`_ and `docker-compose`_.
+3.  Install `Docker`_ and `docker-compose`_.
 
     .. caution::
 
         If you want to use the included ``docker-compose.*.yml`` file, you
         need to have at least Docker version **17.09.0** and docker-compose
         version **1.17.0**.
+        To check do: `docker-compose -v` or `docker -v`
 
         See the `Docker installation guide`_ on how to install the current
         version of Docker for your operating system or Linux distribution of
-        choice. To get an up-to-date version of docker-compose, follow the
+        choice. To get the latest version of docker-compose, follow the
         `docker-compose installation guide`_ if your package repository doesn't
         include it.
 
         .. _Docker installation guide: https://docs.docker.com/engine/installation/
         .. _docker-compose installation guide: https://docs.docker.com/compose/install/
 
-3.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
-    to the consumption directory in this file. Find the line that specifies where
+4.  Modify ``docker-compose.yml`` to your preferences. You may want to change the path
+    to the consumption directory. Find the line that specifies where
     to mount the consumption directory:
 
     .. code::
@@ -148,32 +171,53 @@ Install Paperless from Docker Hub
 
     Don't change the part after the colon or paperless wont find your documents.
 
+    You may also need to change the default port that the webserver will use
+    from the default (8000):
 
-4.  Modify ``docker-compose.env``, following the comments in the file. The
+     .. code::
+
+        ports:
+          - 8000:8000
+
+    Replace the part BEFORE the colon with a port of your choice:
+
+     .. code::
+
+        ports:
+          - 8010:8000
+
+    Don't change the part after the colon or edit other lines that refer to
+    port 8000. Modifying the part before the colon will map requests on another
+    port to the webserver running on the default port.
+
+5.  Modify ``docker-compose.env``, following the comments in the file. The
     most important change is to set ``USERMAP_UID`` and ``USERMAP_GID``
-    to the uid and gid of your user on the host system. This ensures that
+    to the uid and gid of your user on the host system. Use ``id -u`` and
+    ``id -g`` to get these.
+
+    This ensures that
     both the docker container and you on the host machine have write access
     to the consumption directory. If your UID and GID on the host system is
     1000 (the default for the first normal user on most systems), it will
-    work out of the box without any modifications.
+    work out of the box without any modifications. `id "username"` to check.
 
     .. note::
 
-        You can use any settings from the file ``paperless.conf.example`` in this file.
-        Have a look at :ref:`configuration` to see whats available.
+        You can copy any setting from the file ``paperless.conf.example`` and paste it here.
+        Have a look at :ref:`configuration` to see what's available.
 
     .. caution::
 
-        Certain file systems such as NFS network shares don't support file system
+        Some file systems such as NFS network shares don't support file system
         notifications with ``inotify``. When storing the consumption directory
-        on such a file system, paperless will be unable to pick up new files
+        on such a file system, paperless will not pick up new files
         with the default configuration. You will need to use ``PAPERLESS_CONSUMER_POLLING``,
         which will disable inotify. See :ref:`here <configuration-polling>`.
 
-5.  Run ``docker-compose up -d``. This will create and start the necessary
-    containers.
+6.  Run ``docker-compose pull``, followed by ``docker-compose up -d``.
+    This will pull the image, create and start the necessary containers.
 
-6.  To be able to login, you will need a super user. To create it, execute the
+7.  To be able to login, you will need a super user. To create it, execute the
     following command:
 
     .. code-block:: shell-session
@@ -181,19 +225,19 @@ Install Paperless from Docker Hub
         $ docker-compose run --rm webserver createsuperuser
 
     This will prompt you to set a username, an optional e-mail address and
-    finally a password.
+    finally a password (at least 8 characters).
 
-7.  The default ``docker-compose.yml`` exports the webserver on your local port
-    8000. If you haven't adapted this, you should now be able to visit your
-    Paperless instance at ``http://127.0.0.1:8000``. You can login with the
-    user and password you just created.
+8.  The default ``docker-compose.yml`` exports the webserver on your local port
+    8000. If you did not change this, you should now be able to visit your
+    Paperless instance at ``http://127.0.0.1:8000`` or your servers IP-Address:8000.
+    Use the login credentials you have created with the previous step.
 
 .. _Docker: https://www.docker.com/
 .. _docker-compose: https://docs.docker.com/compose/install/
 
 .. _setup-docker_build:
 
-Build the docker image yourself
+Build the Docker image yourself
 ===============================
 
 1.  Clone the entire repository of paperless:
@@ -214,7 +258,7 @@ Build the docker image yourself
 
         webserver:
             image: jonaswinkler/paperless-ng:latest
-    
+
     and replace it with a line that instructs docker-compose to build the image from the current working directory instead:
 
     .. code:: yaml
@@ -224,14 +268,14 @@ Build the docker image yourself
 
 4.  Run the ``compile-frontend.sh`` script. This requires ``node`` and ``npm >= v15``.
 
-5.  Follow steps 2 to 7 of :ref:`setup-docker_hub`. When asked to run
-    ``docker-compose up -d`` to start the containers, do
+5.  Follow steps 3 to 8 of :ref:`setup-docker_hub`. When asked to run
+    ``docker-compose pull`` to pull the image, do
 
     .. code:: shell-session
 
         $ docker-compose build
 
-    before that to build the image.
+    instead to build the image.
 
 .. _setup-bare_metal:
 
@@ -244,18 +288,23 @@ writing. Windows is not and will never be supported.
 
 1.  Install dependencies. Paperless requires the following packages.
 
-    *   ``python3`` 3.6, 3.7, 3.8 (3.9 is untested).
-    *   ``python3-pip``, optionally ``pipenv`` for package installation
+    *   ``python3`` 3.6, 3.7, 3.8, 3.9
+    *   ``python3-pip``
     *   ``python3-dev``
 
     *   ``fonts-liberation`` for generating thumbnails for plain text files
     *   ``imagemagick`` >= 6 for PDF conversion
     *   ``optipng`` for optimizing thumbnails
     *   ``gnupg`` for handling encrypted documents
-    *   ``libpoppler-cpp-dev`` for PDF to text conversion
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
     *   ``mime-support`` for mime type detection
+
+    Use this list for your preferred package management:
+
+    .. code::
+
+        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -270,6 +319,12 @@ writing. Windows is not and will never be supported.
     *   ``tesseract-ocr`` >= 4.0.0 for OCR
     *   ``tesseract-ocr`` language packs (``tesseract-ocr-eng``, ``tesseract-ocr-deu``, etc)
 
+    Use this list for your preferred package management:
+
+    .. code::
+
+        unpaper ghostscript icc-profiles-free qpdf liblept5 libxml2 pngquant zlib1g tesseract-ocr
+
     On Raspberry Pi, these libraries are required as well:
 
     *   ``libatlas-base-dev``
@@ -281,7 +336,7 @@ writing. Windows is not and will never be supported.
 2.  Install ``redis`` >= 5.0 and configure it to start automatically.
 
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
-    to use PostgreSQL, SQLite is avialable as well.
+    to use PostgreSQL, SQLite is available as well.
 
 4.  Get the release archive from `<https://github.com/jonaswinkler/paperless-ng/releases>`_.
     If you clone the git repo as it is, you also have to compile the front end by yourself.
@@ -305,8 +360,14 @@ writing. Windows is not and will never be supported.
     *   Set ``PAPERLESS_OCR_LANGUAGE`` to the language most of your documents are written in.
     *   Set ``PAPERLESS_TIME_ZONE`` to your local time zone.
 
-6.  Setup permissions. Create a system users under which you wish to run paperless. Ensure that these directories exist
-    and that the user has write permissions to the following directories
+6.  Create a system user under which you wish to run paperless.
+
+    .. code:: shell-session
+
+        adduser paperless --system --home /opt/paperless --group
+
+7.  Ensure that these directories exist
+    and that the paperless user has write permissions to the following directories:
 
     *   ``/opt/paperless/media``
     *   ``/opt/paperless/data``
@@ -314,39 +375,51 @@ writing. Windows is not and will never be supported.
 
     Adjust as necessary if you configured different folders.
 
-7.  Install python requirements. Paperless comes with both Pipfiles for ``pipenv`` as well as with a ``requirements.txt``.
-    Both will install exactly the same requirements. It is up to you if you wish to use a virtual environment or not.
+8.  Install python requirements from the ``requirements.txt`` file.
+    It is up to you if you wish to use a virtual environment or not. First you should update your pip, so it gets the actual packages.
 
-8.  Go to ``/opt/paperless/src``, and execute the following commands:
+    .. code:: shell-session
+
+        sudo -Hu paperless pip3 install --upgrade pip
+
+    .. code:: shell-session
+
+        sudo -Hu paperless pip3 install -r requirements.txt
+
+    This will install all python dependencies in the home directory of
+    the new paperless user.
+
+9.  Go to ``/opt/paperless/src``, and execute the following commands:
 
     .. code:: bash
 
         # This creates the database schema.
-        python3 manage.py migrate
+        sudo -Hu paperless python3 manage.py migrate
 
         # This creates your first paperless user
-        python3 manage.py createsuperuser
+        sudo -Hu paperless python3 manage.py createsuperuser
 
-9.  Optional: Test that paperless is working by executing
+10. Optional: Test that paperless is working by executing
 
       .. code:: bash
 
         # This collects static files from paperless and django.
-        python3 manage.py runserver
+        sudo -Hu paperless python3 manage.py runserver
 
     and pointing your browser to http://localhost:8000/.
 
     .. warning::
 
         This is a development server which should not be used in
-        production.
+        production. It is not audited for security and performance
+        is inferior to production ready web servers.
 
     .. hint::
 
         This will not start the consumer. Paperless does this in a
         separate process.
 
-10. Setup systemd services to run paperless automatically. You may
+11. Setup systemd services to run paperless automatically. You may
     use the service definition files included in the ``scripts`` folder
     as a starting point.
 
@@ -354,17 +427,15 @@ writing. Windows is not and will never be supported.
     ``consumer`` script to watch the input folder, and the ``scheduler``
     script to run tasks such as email checking and document consumption.
 
+    You may need to adjust the path to the ``gunicorn`` executable. This
+    will be installed as part of the python dependencies, and is either located
+    in the ``bin`` folder of your virtual environment, or in ``~/.local/bin/`` if
+    no virtual environment is used.
+
     These services rely on redis and optionally the database server, but
     don't need to be started in any particular order. The example files
     depend on redis being started. If you use a database server, you should
-    add additinal dependencies.
-
-    .. hint::
-
-        You may optionally set up your preferred web server to serve
-        paperless as a wsgi application directly instead of running the
-        ``webserver`` service. The module containing the wsgi application
-        is named ``paperless.wsgi``.
+    add additional dependencies.
 
     .. caution::
 
@@ -373,10 +444,13 @@ writing. Windows is not and will never be supported.
         however, the documentation of GUnicorn states that you should
         use a proxy server in front of gunicorn instead.
 
-11. Optional: Install a samba server and make the consumption folder
+        For instructions on how to use nginx for that,
+        :ref:`see the instructions below <setup-nginx>`.
+
+12. Optional: Install a samba server and make the consumption folder
     available as a network share.
 
-12. Configure ImageMagick to allow processing of PDF documents. Most distributions have
+13. Configure ImageMagick to allow processing of PDF documents. Most distributions have
     this disabled by default, since PDF documents can contain malware. If
     you don't do this, paperless will fall back to ghostscript for certain steps
     such as thumbnail generation.
@@ -393,7 +467,7 @@ writing. Windows is not and will never be supported.
 
         <policy domain="coder" rights="read|write" pattern="PDF" />
 
-13. Optional: Install the `jbig2enc <https://ocrmypdf.readthedocs.io/en/latest/jbig2.html>`_
+14. Optional: Install the `jbig2enc <https://ocrmypdf.readthedocs.io/en/latest/jbig2.html>`_
     encoder. This will reduce the size of generated PDF documents. You'll most likely need
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
@@ -402,11 +476,13 @@ writing. Windows is not and will never be supported.
 
 Install Paperless using ansible
 ===============================
-    .. note::
 
-        This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
+.. note::
 
-1.  Install ansible 2.7+ on the management node. 
+    This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
+		Additionally, only i386 or amd64 based hosts are supported right now, i.e. installation on arm hosts will fail.
+
+1.  Install ansible 2.7+ on the management node.
     This may be the target host paperless-ng is being installed on or any remote host which can access the target host.
     For further details, check the ansible `inventory <https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html>`_ documentation.
 
@@ -430,29 +506,22 @@ Install Paperless using ansible
 
         ansible -m ping YourAnsibleTargetHostGoesHere
 
-2.  Clone the repository of paperless-ng:
+2.  Install the latest tag of the ansible role using ansible-galaxy
 
     .. code:: sh
 
-        git clone https://github.com/jonaswinkler/paperless-ng
+        ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,ng-1.4.2
 
-    Checkout the latest release tag:
-
-    .. code:: sh
-
-        cd paperless-ng
-        git checkout ng-0.9.14
-
-3.  Create an ansible ``playbook.yml`` in the paperless-ng root directory:
+3.  Create an ansible ``playbook.yml`` in a directory of your choice:
 
     .. code:: yaml
 
         - hosts: YourAnsibleTargetHostGoesHere
           become: yes
           vars_files:
-            - ansible/vars.yml
+            - vars/paperless-ng.yml
           roles:
-            - ansible
+            - paperless-ng
 
     Optional: If you also want to use PostgreSQL on the target system, install and add (for example) the `geerlingguy.postgresql <https://github.com/geerlingguy/ansible-role-postgresql>`_ role:
 
@@ -465,10 +534,10 @@ Install Paperless using ansible
         - hosts: YourAnsibleTargetHostGoesHere
           become: yes
           vars_files:
-            - ansible/vars.yml
+            - vars/paperless-ng.yml
           roles:
             - geerlingguy.postgresql
-            - ansible
+            - paperless-ng
 
     Optional: If you also want to use a reverse proxy on the target system, install and add (for example) the `geerlingguy.nginx <https://github.com/geerlingguy/ansible-role-nginx>`_ role:
 
@@ -481,17 +550,17 @@ Install Paperless using ansible
         - hosts: YourAnsibleTargetHostGoesHere
           become: yes
           vars_files:
-            - ansible/vars.yml
+            - vars/paperless-ng.yml
           roles:
             - geerlingguy.postgresql
-            - ansible
+            - paperless-ng
             - geerlingguy.nginx
 
-4.  Create ``ansible/vars.yml`` to configure your ansible deployment:
+4.  Create ``vars/paperless-ng.yml`` to configure your ansible deployment:
 
     .. code:: yaml
 
-        paperless_secret_key: PleaseGenerateAStrongKeyForThis
+        paperlessng_secret_key: PleaseGenerateAStrongKeyForThis
 
         paperlessng_superuser_name: YourUserName
         paperlessng_superuser_email: name@domain.tld
@@ -518,7 +587,10 @@ Migration to paperless-ng
 
 At its core, paperless-ng is still paperless and fully compatible. However, some
 things have changed under the hood, so you need to adapt your setup depending on
-how you installed paperless. The important things to keep in mind are as follows.
+how you installed paperless.
+
+This setup describes how to update an existing paperless Docker installation.
+The important things to keep in mind are as follows:
 
 * Read the :ref:`changelog <paperless_changelog>` and take note of breaking changes.
 * You should decide if you want to stick with SQLite or want to migrate your database
@@ -546,18 +618,25 @@ Migration to paperless-ng is then performed in a few simple steps:
     paperless.
 
 3.  Download the latest release of paperless-ng. You can either go with the
-    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`__
     or clone the repository to build the image yourself (see :ref:`above <setup-docker_build>`).
     You can either replace your current paperless folder or put paperless-ng
     in a different location.
 
     .. caution::
 
-        Paperless includes a ``.env`` file. This will set the
-        project name for docker compose to ``paperless`` so that paperless-ng will
-        automatically reuse your existing paperless volumes. When you start it, it
-        will migrate your existing data. After that, your old paperless installation
-        will be incompatible with the migrated volumes.
+        Paperless-ng includes a ``.env`` file. This will set the
+        project name for docker compose to ``paperless``, which will also define the name
+        of the volumes by paperless-ng. However, if you experience that paperless-ng
+        is not using your old paperless volumes, verify the names of your volumes with
+
+        .. code:: shell-session
+
+            $ docker volume ls | grep _data
+
+        and adjust the project name in the ``.env`` file so that it matches the name
+        of the volumes before the ``_data`` part.
+
 
 4.  Download the ``docker-compose.sqlite.yml`` file to ``docker-compose.yml``.
     If you want to switch to PostgreSQL, do that after you migrated your existing
@@ -638,14 +717,12 @@ management commands as below.
 
         This will launch the container and initialize the PostgreSQL database.
 
-    b)  Without docker, open a shell in your virtual environment, switch to
+    b)  Without docker, remember to activate any virtual environment, switch to
         the ``src`` directory and create the database schema:
 
         .. code:: shell-session
 
-            $ cd /path/to/paperless
-            $ pipenv shell
-            $ cd src
+            $ cd /path/to/paperless/src
             $ python3 manage.py migrate
 
         This will not copy any data yet.
@@ -662,7 +739,7 @@ management commands as below.
 
         $ python3 manage.py loaddata data.json
 
-6.  Exit the shell.
+6.  If operating inside Docker, you may exit the shell now.
 
     .. code:: shell-session
 
@@ -711,7 +788,8 @@ configuring some options in paperless can help improve performance immensely:
 
 *   Stick with SQLite to save some resources.
 *   Consider setting ``PAPERLESS_OCR_PAGES`` to 1, so that paperless will only OCR
-    the first page of your documents.
+    the first page of your documents. In most cases, this page contains enough
+    information to be able to find it.
 *   ``PAPERLESS_TASK_WORKERS`` and ``PAPERLESS_THREADS_PER_WORKER`` are configured
     to use all cores. The Raspberry Pi models 3 and up have 4 cores, meaning that
     paperless will use 2 workers and 2 threads per worker. This may result in
@@ -722,8 +800,13 @@ configuring some options in paperless can help improve performance immensely:
     your documents before feeding them into paperless. Some scanners are able to
     do this! You might want to even specify ``skip_noarchive`` to skip archive
     file generation for already ocr'ed documents entirely.
+*   If you want to perform OCR on the the device, consider using ``PAPERLESS_OCR_CLEAN=none``.
+    This will speed up OCR times and use less memory at the expense of slightly worse
+    OCR results.
 *   Set ``PAPERLESS_OPTIMIZE_THUMBNAILS`` to 'false' if you want faster consumption
     times. Thumbnails will be about 20% larger.
+*   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
+    1. This will save some memory.
 
 For details, refer to :ref:`configuration`.
 
@@ -740,3 +823,46 @@ For details, refer to :ref:`configuration`.
     well as on any other device.
 
 .. _redis: https://redis.io/
+
+
+.. _setup-nginx:
+
+Using nginx as a reverse proxy
+##############################
+
+If you want to expose paperless to the internet, you should hide it behind a
+reverse proxy with SSL enabled.
+
+In addition to the usual configuration for SSL,
+the following configuration is required for paperless to operate:
+
+.. code:: nginx
+
+    http {
+
+        # Adjust as required. This is the maximum size for file uploads.
+        # The default value 1M might be a little too small.
+        client_max_body_size 10M;
+
+        server {
+
+            location / {
+
+                # Adjust host and port as required.
+                proxy_pass http://localhost:8000/;
+
+                # These configuration options are required for WebSockets to work.
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+
+                proxy_redirect off;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+        }
+    }
+
+Also read `this <https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu>`__, towards the end of the section.

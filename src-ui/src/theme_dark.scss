@@ -1,6 +1,7 @@
 $primary-dark-mode: #45973a;
 $danger-dark-mode: #b71631;
 $bg-dark-mode: #161618;
+$bg-dark-mode-accent: #21262d;
 $bg-light-dark-mode: #1c1c1f;
 $text-color-dark-mode: #abb2bf;
 $text-color-dark-mode-accent: lighten($text-color-dark-mode, 10%);
@@ -36,6 +37,10 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .bg-body {
+    background-color: $bg-dark-mode !important;
+  }
+
   .text-light {
     color: $text-color-dark-mode !important;
   }
@@ -63,12 +68,20 @@ $border-color-dark-mode: #47494f;
       background-color: $bg-dark-mode;
       color: $text-color-dark-mode;
       border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+
+      .close {
+        background-color: inherit !important;
+      }
     }
 
     &:hover {
       color: $text-color-dark-mode-accent !important;
       border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
     }
+  }
+
+  .page-item.active .page-link {
+    background-color: darken($primary-dark-mode, 10%);
   }
 
   .nav-tabs {
@@ -139,13 +152,16 @@ $border-color-dark-mode: #47494f;
 
   .doc-img {
     mix-blend-mode: normal;
-    filter: invert(95%) hue-rotate(180deg);
     border-radius: 0;
     border-color: $bg-dark-mode;
-
+    filter: invert(10%);
     &.border-right {
       border-right: none !important;
     }
+  }
+
+  .doc-img.inverted {
+    filter: invert(95%) hue-rotate(180deg);
   }
 
   .card-selected .doc-img {
@@ -218,7 +234,7 @@ $border-color-dark-mode: #47494f;
   }
 
   .btn-outline-secondary {
-    border-color: $text-color-dark-mode;
+    border-color: darken($text-color-dark-mode, 30%);
     color: $text-color-dark-mode;
 
     &:not(:disabled):not(.disabled):hover {
@@ -246,6 +262,16 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .btn-light:not(:disabled):not(.disabled) {
+    background-color: $bg-dark-mode;
+    color: $text-color-dark-mode-accent;
+
+    &:hover {
+      background-color: $text-color-dark-mode;
+      color: $bg-dark-mode;
+    }
+  }
+
   .btn-link:not(:disabled):not(.disabled) {
     color: $primary-dark-mode;
   }
@@ -259,6 +285,10 @@ $border-color-dark-mode: #47494f;
 
   button.bg-light:hover {
     background-color: $bg-dark-mode !important;
+  }
+
+  .card-footer button:hover {
+    color: $primary-dark-mode !important;
   }
 
   .form-control:not(.is-invalid):not(.btn),
@@ -351,6 +381,48 @@ $border-color-dark-mode: #47494f;
 
   .bg-dark {
     background-color: $bg-light-dark-mode !important;
+  }
+
+  .ngx-file-drop__drop-zone--over {
+    background-color: darken($primary-dark-mode, 35%) !important;
+  }
+
+  .alert-secondary {
+    background-color: $bg-light-dark-mode;
+    border-color: darken($bg-light-dark-mode, 10%);
+    color: $text-color-dark-mode-accent;
+  }
+
+  .progress-bar.bg-primary {
+    background-color: darken($primary-dark-mode, 5%) !important;
+  }
+
+  .popover {
+    .popover-header,
+    .popover-body {
+      background-color: $bg-dark-mode-accent;
+      border-color: $border-color-dark-mode;
+    }
+  }
+
+  $placements: 'top', 'right', 'bottom', 'left';
+
+  @each $placement in $placements {
+    .bs-popover-#{$placement} > .arrow::after,
+    .bs-popover-auto[x-placement^=#{$placement}] > .arrow::after {
+      border-#{$placement}-color: $bg-dark-mode-accent;
+    }
+  }
+
+  .bs-popover-bottom .popover-header::before,
+  .bs-popover-auto[x-placement^=bottom] .popover-header::before {
+    border-bottom-color: $bg-dark-mode-accent;
+  }
+
+  .ngb-dp-header,
+  .ngb-dp-weekdays,
+  .ngb-dp-month {
+    background-color: $bg-light-dark-mode;
   }
 }
 

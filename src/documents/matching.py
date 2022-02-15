@@ -1,18 +1,17 @@
 import logging
 import re
 
-from fuzzywuzzy import fuzz
 
 from documents.models import MatchingModel, Correspondent, DocumentType, Tag
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("paperless.matching")
 
 
 def log_reason(matching_model, document, reason):
     class_name = type(matching_model).__name__
     logger.debug(
-        f"Assigning {class_name} {matching_model.name} to document "
+        f"{class_name} {matching_model.name} matched on document "
         f"{document} because {reason}")
 
 
@@ -91,7 +90,7 @@ def matches(matching_model, document):
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_LITERAL:
         result = bool(re.search(
-            rf"\b{matching_model.match}\b",
+            rf"\b{re.escape(matching_model.match)}\b",
             document_content,
             **search_kwargs
         ))
@@ -123,6 +122,8 @@ def matches(matching_model, document):
         return bool(match)
 
     elif matching_model.matching_algorithm == MatchingModel.MATCH_FUZZY:
+        from fuzzywuzzy import fuzz
+
         match = re.sub(r'[^\w\s]', '', matching_model.match)
         text = re.sub(r'[^\w\s]', '', document_content)
         if matching_model.is_insensitive:
@@ -160,6 +161,9 @@ def _split_match(matching_model):
     findterms = re.compile(r'"([^"]+)"|(\S+)').findall
     normspace = re.compile(r"\s+").sub
     return [
-        normspace(" ", (t[0] or t[1]).strip()).replace(" ", r"\s+")
+        # normspace(" ", (t[0] or t[1]).strip()).replace(" ", r"\s+")
+        re.escape(
+            normspace(" ", (t[0] or t[1]).strip())
+        ).replace(r"\ ", r"\s+")
         for t in findterms(matching_model.match)
     ]

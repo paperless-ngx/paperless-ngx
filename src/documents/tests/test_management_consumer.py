@@ -60,10 +60,10 @@ class ConsumerMixin:
 
         super(ConsumerMixin, self).tearDown()
 
-    def wait_for_task_mock_call(self):
+    def wait_for_task_mock_call(self, excpeted_call_count=1):
         n = 0
         while n < 100:
-            if self.task_mock.call_count > 0:
+            if self.task_mock.call_count >= excpeted_call_count:
                 # give task_mock some time to finish and raise errors
                 sleep(1)
                 return
@@ -202,8 +202,44 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
         self.assertRaises(CommandError, call_command, 'document_consumer', '--oneshot')
 
+    def test_mac_write(self):
+        self.task_mock.side_effect = self.bogus_task
 
-@override_settings(CONSUMER_POLLING=1)
+        self.t_start()
+
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, ".DS_STORE"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "my_file.pdf"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "._my_file.pdf"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "my_second_file.pdf"))
+        shutil.copy(self.sample_file, os.path.join(self.dirs.consumption_dir, "._my_second_file.pdf"))
+
+        sleep(5)
+
+        self.wait_for_task_mock_call(excpeted_call_count=2)
+
+        self.assertEqual(2, self.task_mock.call_count)
+
+        fnames = [os.path.basename(args[1]) for args, _ in self.task_mock.call_args_list]
+        self.assertCountEqual(fnames, ["my_file.pdf", "my_second_file.pdf"])
+
+    def test_is_ignored(self):
+        test_paths = [
+            (os.path.join(self.dirs.consumption_dir, "foo.pdf"), False),
+            (os.path.join(self.dirs.consumption_dir, "foo","bar.pdf"), False),
+            (os.path.join(self.dirs.consumption_dir, ".DS_STORE", "foo.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, "foo", ".DS_STORE", "bar.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, ".stfolder", "foo.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, "._foo.pdf"), True),
+            (os.path.join(self.dirs.consumption_dir, "._foo", "bar.pdf"), False),
+        ]
+        for file_path, expected_ignored in test_paths:
+            self.assertEqual(
+                expected_ignored,
+                document_consumer._is_ignored(file_path),
+                f'_is_ignored("{file_path}") != {expected_ignored}')
+
+
+@override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
 class TestConsumerPolling(TestConsumer):
     # just do all the tests with polling
     pass
@@ -215,8 +251,7 @@ class TestConsumerRecursive(TestConsumer):
     pass
 
 
-@override_settings(CONSUMER_RECURSIVE=True)
-@override_settings(CONSUMER_POLLING=1)
+@override_settings(CONSUMER_RECURSIVE=True, CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
 class TestConsumerRecursivePolling(TestConsumer):
     # just do all the tests with polling and recursive
     pass
@@ -257,6 +292,6 @@ class TestConsumerTags(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
         # their order.
         self.assertCountEqual(kwargs["override_tag_ids"], tag_ids)
 
-    @override_settings(CONSUMER_POLLING=1)
+    @override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
     def test_consume_file_with_path_tags_polling(self):
         self.test_consume_file_with_path_tags()

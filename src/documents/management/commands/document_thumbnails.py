@@ -7,7 +7,6 @@ from django import db
 from django.core.management.base import BaseCommand
 
 from documents.models import Document
-from ...mixins import Renderable
 from ...parsers import get_parser_class_for_mime_type
 
 
@@ -23,22 +22,21 @@ def _process_document(doc_in):
 
     try:
         thumb = parser.get_optimised_thumbnail(
-            document.source_path, document.mime_type)
+            document.source_path,
+            document.mime_type,
+            document.get_public_filename()
+        )
 
         shutil.move(thumb, document.thumbnail_path)
     finally:
         parser.cleanup()
 
 
-class Command(Renderable, BaseCommand):
+class Command(BaseCommand):
 
     help = """
         This will regenerate the thumbnails for all documents.
     """.replace("    ", "")
-
-    def __init__(self, *args, **kwargs):
-        self.verbosity = 0
-        BaseCommand.__init__(self, *args, **kwargs)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -49,11 +47,14 @@ class Command(Renderable, BaseCommand):
             help="Specify the ID of a document, and this command will only "
                  "run on this specific document."
         )
+        parser.add_argument(
+            "--no-progress-bar",
+            default=False,
+            action="store_true",
+            help="If set, the progress bar will not be shown"
+        )
 
     def handle(self, *args, **options):
-
-        self.verbosity = options["verbosity"]
-
         logging.getLogger().handlers[0].level = logging.ERROR
 
         if options['document']:
@@ -70,5 +71,7 @@ class Command(Renderable, BaseCommand):
 
         with multiprocessing.Pool() as pool:
             list(tqdm.tqdm(
-                pool.imap_unordered(_process_document, ids), total=len(ids)
+                pool.imap_unordered(_process_document, ids),
+                total=len(ids),
+                disable=options['no_progress_bar']
             ))
