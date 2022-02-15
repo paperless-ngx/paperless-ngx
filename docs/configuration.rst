@@ -514,6 +514,12 @@ PAPERLESS_THREADS_PER_WORKER=<num>
     PAPERLESS_THREADS_PER_WORKER automatically.
 
 
+PAPERLESS_WORKER_TIMEOUT=<num>
+    Machines with few cores or weak ones might not be able to finish OCR on
+    large documents within the default 1800 seconds. So extending this timeout
+    may prove to be useful on weak hardware setups.
+
+
 PAPERLESS_TIME_ZONE=<timezone>
     Set the time zone here.
     See https://docs.djangoproject.com/en/3.1/ref/settings/#std:setting-TIME_ZONE
