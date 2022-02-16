@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
@@ -18,7 +18,7 @@ import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type';
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss']
 })
-export class AppFrameComponent implements OnInit {
+export class AppFrameComponent {
 
   constructor (
     public router: Router,
@@ -102,14 +102,13 @@ export class AppFrameComponent implements OnInit {
         while (route.firstChild) {
           route = route.firstChild
         }
-        if (route.component == DocumentDetailComponent) {
+        if (route.component === DocumentDetailComponent) {
           this.router.navigate([""])
         }
       }
     })
   }
 
-  ngOnInit() {
   }
 
   get displayName() {
