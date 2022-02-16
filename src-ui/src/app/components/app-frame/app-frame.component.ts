@@ -1,8 +1,8 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, switchMap, first } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
@@ -18,7 +18,7 @@ import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type';
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss']
 })
-export class AppFrameComponent implements OnDestroy {
+export class AppFrameComponent {
 
   constructor (
     public router: Router,
@@ -39,8 +39,6 @@ export class AppFrameComponent implements OnDestroy {
   }
 
   searchField = new FormControl('')
-
-  closeAllSub: Subscription
 
   get openDocuments(): PaperlessDocument[] {
     return this.openDocumentsService.getOpenDocuments()
@@ -81,21 +79,23 @@ export class AppFrameComponent implements OnDestroy {
   }
 
   closeDocument(d: PaperlessDocument) {
-    this.closeMenu()
-    this.openDocumentsService.closeDocument(d)
-
-    let route = this.activatedRoute.snapshot
-    while (route.firstChild) {
-      route = route.firstChild
-    }
-    if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
-      this.router.navigate([""])
-    }
+    this.openDocumentsService.closeDocument(d).pipe(first()).subscribe(confirmed => {
+      if (confirmed) {
+        this.closeMenu()
+        let route = this.activatedRoute.snapshot
+        while (route.firstChild) {
+          route = route.firstChild
+        }
+        if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
+          this.router.navigate([""])
+        }
+      }
+    })
   }
 
   closeAll() {
     // user may need to confirm losing unsaved changes
-    this.closeAllSub = this.openDocumentsService.closeAll().subscribe(confirmed => {
+    this.openDocumentsService.closeAll().pipe(first()).subscribe(confirmed => {
       if (confirmed) {
         this.closeMenu()
 
@@ -109,10 +109,6 @@ export class AppFrameComponent implements OnDestroy {
         }
       }
     })
-  }
-
-  ngOnDestroy() {
-    this.closeAllSub && this.closeAllSub.unsubscribe();
   }
 
   get displayName() {

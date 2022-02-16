@@ -110,7 +110,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     this.correspondentService.listAll().pipe(first()).subscribe(result => this.correspondents = result.results)
     this.documentTypeService.listAll().pipe(first()).subscribe(result => this.documentTypes = result.results)
 
-    this.route.paramMap.pipe(first()).subscribe(paramMap => {
+    this.route.paramMap.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(paramMap => {
       this.documentId = +paramMap.get('id')
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
@@ -133,7 +133,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
 
         this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
         this.isDirty$.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(dirty => {
-          this.openDocumentService.setDirty(this.document.id, dirty)
+          this.openDocumentService.setDirty(this.documentId, dirty)
         })
 
         if (!this.openDocumentService.getOpenDocument(this.documentId)) {
@@ -216,12 +216,15 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     this.store.next(this.documentForm.value)
     this.documentsService.update(this.document).pipe(first()).subscribe(result => {
       this.error = null
-      this.documentListViewService.getNext(this.document.id).pipe(first()).subscribe(nextDocId => {
+      this.documentListViewService.getNext(this.documentId).pipe(first()).subscribe(nextDocId => {
         this.networkActive = false
         if (nextDocId) {
-          this.openDocumentService.closeDocument(this.document)
-          this.router.navigate(['documents', nextDocId])
-          this.titleInput.focus()
+          this.openDocumentService.closeDocument(this.document, true).pipe(first()).subscribe(closed => {
+            if (closed) {
+              this.router.navigate(['documents', nextDocId])
+              this.titleInput.focus()
+            }
+          })
         }
       }, error => {
         this.networkActive = false
@@ -232,33 +235,15 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     })
   }
 
-  maybeClose() {
-    this.isDirty$.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(dirty => {
-      if (dirty) {
-        let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
-        modal.componentInstance.title = $localize`Unsaved Changes`
-        modal.componentInstance.messageBold = $localize`You have unsaved changes.`
-        modal.componentInstance.message = $localize`Are you sure you want to leave?`
-        modal.componentInstance.btnClass = "btn-warning"
-        modal.componentInstance.btnCaption = $localize`Leave page`
-        modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
-          modal.componentInstance.buttonsEnabled = false
-          modal.close()
-          this.close()
-        })
+  close() {
+    this.openDocumentService.closeDocument(this.document).pipe(first()).subscribe(closed => {
+      if (!closed) return;
+      if (this.documentListViewService.activeSavedViewId) {
+        this.router.navigate(['view', this.documentListViewService.activeSavedViewId])
       } else {
-        this.close()
+        this.router.navigate(['documents'])
       }
     })
-  }
-
-  close() {
-    this.openDocumentService.closeDocument(this.document)
-    if (this.documentListViewService.activeSavedViewId) {
-      this.router.navigate(['view', this.documentListViewService.activeSavedViewId])
-    } else {
-      this.router.navigate(['documents'])
-    }
   }
 
   delete() {
