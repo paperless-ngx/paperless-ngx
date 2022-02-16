@@ -75,8 +75,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when compontent added or removed from DOM
-    if (element && element.nativeElement.offsetParent !== null) { // its visible
-
+    if (element && element.nativeElement.offsetParent !== null && this.nav?.activeId == 4) { // its visible
       setTimeout(()=> this.nav?.select(1));
     }
   }
