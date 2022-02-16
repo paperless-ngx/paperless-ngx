@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
@@ -18,7 +18,7 @@ import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type';
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss']
 })
-export class AppFrameComponent {
+export class AppFrameComponent implements OnDestroy {
 
   constructor (
     public router: Router,
@@ -39,6 +39,8 @@ export class AppFrameComponent {
   }
 
   searchField = new FormControl('')
+
+  closeAllSub: Subscription
 
   get openDocuments(): PaperlessDocument[] {
     return this.openDocumentsService.getOpenDocuments()
@@ -93,7 +95,7 @@ export class AppFrameComponent {
 
   closeAll() {
     // user may need to confirm losing unsaved changes
-    this.openDocumentsService.closeAll().subscribe(confirmed => {
+    this.closeAllSub = this.openDocumentsService.closeAll().subscribe(confirmed => {
       if (confirmed) {
         this.closeMenu()
 
@@ -109,6 +111,8 @@ export class AppFrameComponent {
     })
   }
 
+  ngOnDestroy() {
+    this.closeAllSub && this.closeAllSub.unsubscribe();
   }
 
   get displayName() {
