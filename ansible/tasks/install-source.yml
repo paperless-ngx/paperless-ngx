@@ -26,7 +26,7 @@
 
     - name: pull paperless-ng
       git:
-        repo: https://github.com/jonaswinkler/paperless-ng.git
+        repo: https://github.com/paperless-ngx/paperless-ngx.git
         dest: "{{ gitdir.path }}"
         version: "{{ paperlessng_version }}"
         refspec: "+refs/pull/*:refs/pull/*"
