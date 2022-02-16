@@ -159,7 +159,7 @@
         </td>
         <td class="d-none d-md-table-cell">
           <ng-container *ngIf="d.correspondent">
-            <a [routerLink]="" (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+            <a [routerLink]="[]" (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
@@ -168,7 +168,7 @@
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">
-            <a [routerLink]="" (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+            <a [routerLink]="[]" (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
