@@ -23,7 +23,7 @@ export class DirtyFormGuard extends DirtyCheckGuard {
       modal.close()
     })
     const subject = new Subject<boolean>()
-    modal.componentInstance.subject = subject
+    modal.componentInstance.confirmSubject = subject
     return subject.asObservable()
   }
 }
