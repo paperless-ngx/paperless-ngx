@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="he">
+  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="km">
     <body>
       <trans-unit id="9103526311244275943" datatype="html">
         <source>Document added</source>
@@ -8,7 +8,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">מסמך התווסף</target>
+        <target state="needs-translation">Document added</target>
       </trans-unit>
       <trans-unit id="9204248378636247318" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
@@ -16,7 +16,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">המסמך <x id="PH" equiv-text="status.filename"/> התווסף ל - paperless-ng.</target>
+        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -24,7 +24,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">פתח מסמך</target>
+        <target state="needs-translation">Open document</target>
       </trans-unit>
       <trans-unit id="8582620835547864448" datatype="html">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
@@ -32,7 +32,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">לא יכול להוסיף את <x id="PH_1" equiv-text="status.message"/>:<x id="PH" equiv-text="status.filename"/></target>
+        <target state="needs-translation">Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
       <trans-unit id="1710712016675379662" datatype="html">
         <source>New document detected</source>
@@ -40,7 +40,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">זוהה מסמך חדש</target>
+        <target state="needs-translation">New document detected</target>
       </trans-unit>
       <trans-unit id="587031278561344416" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
@@ -48,7 +48,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">מסמך <x id="PH" equiv-text="status.filename"/> נמצא בעיבוד ע"י Paperless-NG.</target>
+        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -80,7 +80,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">בחר</target>
+        <target state="needs-translation">Select</target>
       </trans-unit>
       <trans-unit id="7e1f9a7054aff842832620c03dedae894787ba41" datatype="html">
         <source>Select none</source>
@@ -112,7 +112,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">מיין</target>
+        <target state="needs-translation">Sort</target>
       </trans-unit>
       <trans-unit id="b7641aed03492978b4ec6843b1e53f30464294d9" datatype="html">
         <source>Views</source>
@@ -128,7 +128,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="translated">שמור כ...</target>
+        <target state="needs-translation">Save as...</target>
       </trans-unit>
       <trans-unit id="5f5ce787c428d917c30c9bd70789a618e09743a7" datatype="html">
         <source>Save &quot;<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>&quot;</source>
@@ -184,7 +184,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="translated">כותרת</target>
+        <target state="needs-translation">Title</target>
       </trans-unit>
       <trans-unit id="2bd5919e8098513664a89d5b7b52d61e3063950f" datatype="html">
         <source>Document type</source>
@@ -192,7 +192,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">129</context>
         </context-group>
-        <target state="translated">סוג מסמך</target>
+        <target state="needs-translation">Document type</target>
       </trans-unit>
       <trans-unit id="1b051734b0ee9021991c91b3ed4e81c244322462" datatype="html">
         <source>Created</source>
@@ -264,7 +264,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">הורד</target>
+        <target state="needs-translation">Download</target>
       </trans-unit>
       <trans-unit id="4ea3c236bca3528318e3b3a411a20909e5fa8be4" datatype="html">
         <source>More like this</source>
@@ -280,7 +280,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">סגור</target>
+        <target state="needs-translation">Close</target>
       </trans-unit>
       <trans-unit id="4f8b2bb476981727ab34ed40fde1218361f92c45" datatype="html">
         <source>Details</source>
@@ -320,7 +320,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="translated">שמור</target>
+        <target state="needs-translation">Save</target>
       </trans-unit>
       <trans-unit id="8380d9eff8613c0bc58edc7cebc2aa72e17b11e3" datatype="html">
         <source>Page</source>
@@ -328,7 +328,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">דף</target>
+        <target state="needs-translation">Page</target>
       </trans-unit>
       <trans-unit id="c972a8e7d09f86e0c408a80349990fb213b32c08" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></source>
@@ -376,7 +376,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="translated">תאריך הוספה</target>
+        <target state="needs-translation">Date added</target>
       </trans-unit>
       <trans-unit id="c7ea641c3a61a12a3599ce5a75c6d0dbba409ad3" datatype="html">
         <source>Media filename</source>
@@ -472,7 +472,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">לוח בקרה</target>
+        <target state="needs-translation">Dashboard</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -488,7 +488,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">תגיות</target>
+        <target state="needs-translation">Tags</target>
       </trans-unit>
       <trans-unit id="70a67e04629f6d412db0a12d51820b480788d795" datatype="html">
         <source>Create</source>
@@ -496,7 +496,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="translated">צור</target>
+        <target state="needs-translation">Create</target>
       </trans-unit>
       <trans-unit id="ddb40946e790522301687ecddb9ce1cb8ad40dd1" datatype="html">
         <source>Filter by:</source>
@@ -1065,7 +1065,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">התנתק/י</target>
+        <target state="needs-translation">Logout</target>
       </trans-unit>
       <trans-unit id="68949525c4d9a901e0cd15a94e3fc8d2711e9918" datatype="html">
         <source>Manage</source>
@@ -1081,7 +1081,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="translated">מנהל</target>
+        <target state="needs-translation">Admin</target>
       </trans-unit>
       <trans-unit id="321e4419a943044e674beb55b8039f42a9761ca5" datatype="html">
         <source>Info</source>
@@ -1089,7 +1089,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">160</context>
         </context-group>
-        <target state="translated">מידע</target>
+        <target state="needs-translation">Info</target>
       </trans-unit>
       <trans-unit id="fcfd4675b4c90f08d18d3abede9a9a4dff4cfdc7" datatype="html">
         <source>Documentation</source>
@@ -1105,7 +1105,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="translated">GitHub</target>
+        <target state="needs-translation">GitHub</target>
       </trans-unit>
       <trans-unit id="ea3a452c5238897cabc5781308cceb2d37dcf258" datatype="html">
         <source>Suggest an idea</source>
@@ -1137,7 +1137,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="translated">סגור הכל</target>
+        <target state="needs-translation">Close all</target>
       </trans-unit>
       <trans-unit id="5195932016807797291" datatype="html">
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></source>
@@ -1209,7 +1209,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="translated">כותרת</target>
+        <target state="needs-translation">Title</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
@@ -1330,7 +1330,7 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">אחרי</target>
+        <target state="needs-translation">After</target>
       </trans-unit>
       <trans-unit id="8785188e6c678b842fcb93b7392faf86db7ec676" datatype="html">
         <source>Before</source>
@@ -1776,7 +1776,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">פתח מסמך</target>
+        <target state="needs-translation">Open document</target>
       </trans-unit>
       <trans-unit id="45854ddec74086b271e62be6a363f4fa5036f7fc" datatype="html">
         <source>First steps</source>
@@ -1848,7 +1848,7 @@
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">בחר</target>
+        <target state="needs-translation">Select</target>
       </trans-unit>
       <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
@@ -2148,7 +2148,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">סוג מסמך</target>
+        <target state="needs-translation">Document type</target>
       </trans-unit>
       <trans-unit id="4207916966377787111" datatype="html">
         <source>Created</source>
@@ -2197,7 +2197,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="translated">עריכת פריט</target>
+        <target state="needs-translation">Edit item</target>
       </trans-unit>
       <trans-unit id="1699589597032579396" datatype="html">
         <source>Could not save element: <x id="PH" equiv-text="error"/></source>
