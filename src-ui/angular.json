@@ -117,8 +117,7 @@
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
 					"options": {
-						"browserTarget": "paperless-ui:build",
-						"ivy": true
+						"browserTarget": "paperless-ui:build"
 					}
 				},
 				"test": {
