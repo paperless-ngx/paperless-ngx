@@ -21,7 +21,7 @@ import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { first, takeUntil, switchMap, map } from 'rxjs/operators';
+import { first, takeUntil, switchMap, map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
@@ -48,6 +48,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
   suggestions: PaperlessDocumentSuggestions
 
   title: string
+  titleSubject: Subject<string> = new Subject()
   previewUrl: string
   downloadUrl: string
   downloadOriginalUrl: string
@@ -91,7 +92,19 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     private documentListViewService: DocumentListViewService,
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
-    private settings: SettingsService) { }
+    private settings: SettingsService) {
+      this.titleSubject.pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+        takeUntil(this.unsubscribeNotifier)
+      ).subscribe(titleValue => {
+        this.documentForm.patchValue({'title': titleValue})
+      })
+    }
+
+  titleKeyUp(event) {
+    this.titleSubject.next(event.target?.value)
+  }
 
   get useNativePdfViewer(): boolean {
     return this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER)
