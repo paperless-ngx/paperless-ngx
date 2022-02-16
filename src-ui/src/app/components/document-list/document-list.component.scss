@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "/src/theme";
 
 tr {
@@ -24,7 +25,7 @@ $paperless-card-breakpoints: (
     @media(min-width: $width) {
       > * {
         flex: 0 0 auto;
-        width: 100% / $n_cols;
+        width: math.div(100%, $n-cols);
       }
     }
   }
