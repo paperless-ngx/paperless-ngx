@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-05 11:17\n"
+"PO-Revision-Date: 2022-01-26 19:53\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -35,7 +35,7 @@ msgstr "Exakte Übereinstimmung"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr "Regular expression / Reguläre Ausdrücke"
+msgstr "Regulärer Ausdruck"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
@@ -104,7 +104,7 @@ msgstr "Nicht verschlüsselt"
 
 #: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
-msgstr "Verschlüsselt mit GNU Privacy Guard"
+msgstr "Durch GNU Privacy Guard verschlüsselt"
 
 #: documents/models.py:124
 msgid "title"
@@ -140,7 +140,7 @@ msgstr "Die Prüfsumme des archivierten Dokuments."
 
 #: documents/models.py:172 documents/models.py:328
 msgid "created"
-msgstr "Ausgestellt"
+msgstr "Erstellt"
 
 #: documents/models.py:176
 msgid "modified"

@@ -3,39 +3,39 @@ msgstr ""
 "Project-Id-Version: paperless-ng\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-09-21 04:54\n"
+"PO-Revision-Date: 2021-11-01 18:47\n"
 "Last-Translator: \n"
-"Language-Team: Chinese Traditional\n"
-"Language: zh_TW\n"
+"Language-Team: Khmer\n"
+"Language: km_KH\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: paperless-ng\n"
 "X-Crowdin-Project-ID: 434940\n"
-"X-Crowdin-Language: zh-TW\n"
+"X-Crowdin-Language: km\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
 "X-Crowdin-File-ID: 54\n"
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr "文檔"
+msgstr ""
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr "任何字串"
+msgstr ""
 
 #: documents/models.py:33
 msgid "All words"
-msgstr "所有字詞"
+msgstr ""
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr "精確匹配"
+msgstr ""
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr "正則表達式"
+msgstr ""
 
 #: documents/models.py:36
 msgid "Fuzzy word"
