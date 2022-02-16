@@ -43,7 +43,7 @@
   <small *ngIf="getSuggestions().length > 0">
     <span i18n>Suggestions:</span>&nbsp;
     <ng-container *ngFor="let tag of getSuggestions()">
-      <a (click)="addTag(tag.id)" [routerLink]="">{{tag.name}}</a>&nbsp;
+      <a (click)="addTag(tag.id)" [routerLink]="[]">{{tag.name}}</a>&nbsp;
     </ng-container>
 
 
