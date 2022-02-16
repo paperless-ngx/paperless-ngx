@@ -53,7 +53,7 @@
 			{% translate "Username" as i18n_username %}
 			{% translate "Password" as i18n_password %}
 			<label for="inputUsername" class="sr-only">{{ i18n_username }}</label>
-			<input type="text" name="username" id="inputUsername" class="form-control" placeholder="{{ i18n_username }}" required autofocus>
+			<input type="text" name="username" id="inputUsername" class="form-control" placeholder="{{ i18n_username }}" autocorrect="off" autocapitalize="none" required autofocus>
 			<label for="inputPassword" class="sr-only">{{ i18n_password }}</label>
 			<input type="password" name="password" id="inputPassword" class="form-control" placeholder="{{ i18n_password }}" required>
 			<button class="btn btn-lg btn-primary btn-block" type="submit">{% translate "Sign in" %}</button>
