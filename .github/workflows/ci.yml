@@ -288,7 +288,7 @@ jobs:
         name: Prepare
         id: prepare
         run: |
-          IMAGE_NAME=paperless-ngx/paperless-ngx
+          IMAGE_NAME=ghcr.io/${{ github.repository }}
           if [[ $GITHUB_REF == refs/tags/ng-* ]]; then
             TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/tags/ng-},${IMAGE_NAME}:latest
             INSPECT_TAG=${IMAGE_NAME}:latest
