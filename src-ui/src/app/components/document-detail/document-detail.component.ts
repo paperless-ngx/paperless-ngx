@@ -232,7 +232,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     .subscribe(({updateResult, nextDocId, closeResult}) => {
       if (closeResult) {
         this.router.navigate(['documents', nextDocId])
-        this.titleInput.focus()
+        this.titleInput?.focus()
       }
     }, error => {
       this.networkActive = false
