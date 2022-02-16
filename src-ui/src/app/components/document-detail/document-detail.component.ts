@@ -222,13 +222,14 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     this.networkActive = true
     this.store.next(this.documentForm.value)
     this.documentsService.update(this.document).pipe(switchMap(updateResult => {
-      this.error = null
       return this.documentListViewService.getNext(this.documentId).pipe(map(nextDocId => ({nextDocId, updateResult})))
     })).pipe(switchMap(({nextDocId, updateResult}) => {
       if (nextDocId) return this.openDocumentService.closeDocument(this.document, true).pipe(map(closeResult => ({updateResult, nextDocId, closeResult})))
     }))
     .pipe(takeUntil(this.unsubscribeNotifier))
     .subscribe(({updateResult, nextDocId, closeResult}) => {
+      this.error = null
+      this.networkActive = false
       if (closeResult) {
         this.router.navigate(['documents', nextDocId])
         this.titleInput?.focus()
