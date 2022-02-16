@@ -64,6 +64,7 @@ paperlessng_consumer_subdirs_as_tags: False
 paperlessng_convert_memory_limit: 0
 paperlessng_convert_tmpdir:
 paperlessng_optimize_thumbnails: True
+paperlessng_pre_consume_script:
 paperlessng_post_consume_script:
 paperlessng_filename_date_order:
 paperlessng_thumbnail_font_name: /usr/share/fonts/liberation/LiberationSerif-Regular.ttf
