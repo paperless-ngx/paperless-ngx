@@ -30,7 +30,7 @@
     "ngx-color": "^7.3.3",
     "ngx-cookie-service": "^13.1.2",
     "ngx-file-drop": "^13.0.0",
-    "ngx-infinite-scroll": "^9.1.0",
+    "ngx-infinite-scroll": "^10.0.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "uuid": "^8.3.1",
