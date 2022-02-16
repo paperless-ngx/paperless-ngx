@@ -5,7 +5,7 @@ import { DocumentService } from './rest/document.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component';
 import { Observable, Subject, of } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -63,11 +63,30 @@ export class OpenDocumentsService {
     else this.dirtyDocuments.delete(documentId)
   }
 
-  closeDocument(doc: PaperlessDocument) {
+  closeDocument(doc: PaperlessDocument, force: boolean = false): Observable<boolean> {
     let index = this.openDocuments.findIndex(d => d.id == doc.id)
-    if (index > -1) {
+    if (index == -1) return of(true);
+    if (force || !this.dirtyDocuments.has(doc.id)) {
       this.openDocuments.splice(index, 1)
       this.save()
+      return of(true)
+    } else {
+      let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+      modal.componentInstance.title = $localize`Unsaved Changes`
+      modal.componentInstance.messageBold = $localize`You have unsaved changes.`
+      modal.componentInstance.message = $localize`Are you sure you want to close this document?`
+      modal.componentInstance.btnClass = "btn-warning"
+      modal.componentInstance.btnCaption = $localize`Close document`
+      modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+        modal.componentInstance.buttonsEnabled = false
+        modal.close()
+        this.openDocuments.splice(index, 1)
+        this.dirtyDocuments.delete(doc.id)
+        this.save()
+      })
+      const subject = new Subject<boolean>()
+      modal.componentInstance.confirmSubject = subject
+      return subject.asObservable()
     }
   }
 
@@ -79,14 +98,14 @@ export class OpenDocumentsService {
       modal.componentInstance.message = $localize`Are you sure you want to close all documents?`
       modal.componentInstance.btnClass = "btn-warning"
       modal.componentInstance.btnCaption = $localize`Close documents`
-      modal.componentInstance.confirmClicked.pipe(take(1)).subscribe(() => {
+      modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
         modal.close()
         this.openDocuments.splice(0, this.openDocuments.length)
         this.save()
       })
       const subject = new Subject<boolean>()
-      modal.componentInstance.subject = subject
+      modal.componentInstance.confirmSubject = subject
       return subject.asObservable()
     } else {
       this.openDocuments.splice(0, this.openDocuments.length)
