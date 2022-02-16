@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap';
@@ -20,7 +20,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms';
-import { Observable, Subscription, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { first, takeUntil } from 'rxjs/operators';
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
@@ -29,7 +30,7 @@ import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
   templateUrl: './document-detail.component.html',
   styleUrls: ['./document-detail.component.scss']
 })
-export class DocumentDetailComponent implements OnInit, DirtyComponent {
+export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponent {
 
   @ViewChild("inputTitle")
   titleInput: TextComponent
@@ -68,8 +69,8 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   previewNumPages: number = 1
 
   store: BehaviorSubject<any>
-  storeSub: Subscription
   isDirty$: Observable<boolean>
+  unsubscribeNotifier: Subject<any> = new Subject()
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -102,14 +103,14 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   }
 
   ngOnInit(): void {
-    this.documentForm.valueChanges.subscribe(wow => {
+    this.documentForm.valueChanges.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(wow => {
       Object.assign(this.document, this.documentForm.value)
     })
 
-    this.correspondentService.listAll().subscribe(result => this.correspondents = result.results)
-    this.documentTypeService.listAll().subscribe(result => this.documentTypes = result.results)
+    this.correspondentService.listAll().pipe(first()).subscribe(result => this.correspondents = result.results)
+    this.documentTypeService.listAll().pipe(first()).subscribe(result => this.documentTypes = result.results)
 
-    this.route.paramMap.subscribe(paramMap => {
+    this.route.paramMap.pipe(first()).subscribe(paramMap => {
       this.documentId = +paramMap.get('id')
       this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
       this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
@@ -118,7 +119,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
       if (this.openDocumentService.getOpenDocument(this.documentId)) {
         this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
       }
-      this.documentsService.get(this.documentId).subscribe(doc => {
+      this.documentsService.get(this.documentId).pipe(first()).subscribe(doc => {
         // Initialize dirtyCheck
         this.store = new BehaviorSubject({
           title: doc.title,
@@ -131,10 +132,10 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
         })
 
         this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
-        this.isDirty$.subscribe(dirty => {
+        this.isDirty$.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(dirty => {
           this.openDocumentService.setDirty(this.document.id, dirty)
         })
-        
+
         if (!this.openDocumentService.getOpenDocument(this.documentId)) {
           this.openDocumentService.openDocument(doc)
           this.updateComponent(doc)
@@ -144,14 +145,19 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
 
   }
 
+  ngOnDestroy() : void {
+    this.unsubscribeNotifier.next();
+    this.unsubscribeNotifier.complete();
+  }
+
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
-    this.documentsService.getMetadata(doc.id).subscribe(result => {
+    this.documentsService.getMetadata(doc.id).pipe(first()).subscribe(result => {
       this.metadata = result
     }, error => {
       this.metadata = null
     })
-    this.documentsService.getSuggestions(doc.id).subscribe(result => {
+    this.documentsService.getSuggestions(doc.id).pipe(first()).subscribe(result => {
       this.suggestions = result
     }, error => {
       this.suggestions = null
@@ -164,8 +170,8 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success.subscribe(newDocumentType => {
-      this.documentTypeService.listAll().subscribe(documentTypes => {
+    modal.componentInstance.success.pipe(first()).subscribe(newDocumentType => {
+      this.documentTypeService.listAll().pipe(first()).subscribe(documentTypes => {
         this.documentTypes = documentTypes.results
         this.documentForm.get('document_type').setValue(newDocumentType.id)
       })
@@ -176,8 +182,8 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
     var modal = this.modalService.open(CorrespondentEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success.subscribe(newCorrespondent => {
-      this.correspondentService.listAll().subscribe(correspondents => {
+    modal.componentInstance.success.pipe(first()).subscribe(newCorrespondent => {
+      this.correspondentService.listAll().pipe(first()).subscribe(correspondents => {
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
       })
@@ -185,7 +191,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   }
 
   discard() {
-    this.documentsService.get(this.documentId).subscribe(doc => {
+    this.documentsService.get(this.documentId).pipe(first()).subscribe(doc => {
       Object.assign(this.document, doc)
       this.title = doc.title
       this.documentForm.patchValue(doc)
@@ -195,7 +201,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   save() {
     this.networkActive = true
     this.store.next(this.documentForm.value)
-    this.documentsService.update(this.document).subscribe(result => {
+    this.documentsService.update(this.document).pipe(first()).subscribe(result => {
       this.close()
       this.networkActive = false
       this.error = null
@@ -208,9 +214,9 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   saveEditNext() {
     this.networkActive = true
     this.store.next(this.documentForm.value)
-    this.documentsService.update(this.document).subscribe(result => {
+    this.documentsService.update(this.document).pipe(first()).subscribe(result => {
       this.error = null
-      this.documentListViewService.getNext(this.document.id).subscribe(nextDocId => {
+      this.documentListViewService.getNext(this.document.id).pipe(first()).subscribe(nextDocId => {
         this.networkActive = false
         if (nextDocId) {
           this.openDocumentService.closeDocument(this.document)
@@ -227,7 +233,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
   }
 
   maybeClose() {
-    this.isDirty$.subscribe(dirty => {
+    this.isDirty$.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(dirty => {
       if (dirty) {
         let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
         modal.componentInstance.title = $localize`Unsaved Changes`
@@ -235,7 +241,7 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
         modal.componentInstance.message = $localize`Are you sure you want to leave?`
         modal.componentInstance.btnClass = "btn-warning"
         modal.componentInstance.btnCaption = $localize`Leave page`
-        modal.componentInstance.confirmClicked.subscribe(() => {
+        modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
           modal.componentInstance.buttonsEnabled = false
           modal.close()
           this.close()
@@ -262,9 +268,9 @@ export class DocumentDetailComponent implements OnInit, DirtyComponent {
     modal.componentInstance.message = $localize`The files for this document will be deleted permanently. This operation cannot be undone.`
     modal.componentInstance.btnClass = "btn-danger"
     modal.componentInstance.btnCaption = $localize`Delete document`
-    modal.componentInstance.confirmClicked.subscribe(() => {
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.documentsService.delete(this.document).subscribe(() => {
+      this.documentsService.delete(this.document).pipe(first()).subscribe(() => {
         modal.close()
         this.close()
       }, error => {
