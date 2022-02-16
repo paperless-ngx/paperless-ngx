@@ -21,7 +21,7 @@ import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { first, takeUntil } from 'rxjs/operators';
+import { first, takeUntil, switchMap, map } from 'rxjs/operators';
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
 
@@ -110,39 +110,43 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     this.correspondentService.listAll().pipe(first()).subscribe(result => this.correspondents = result.results)
     this.documentTypeService.listAll().pipe(first()).subscribe(result => this.documentTypes = result.results)
 
-    this.route.paramMap.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(paramMap => {
-      this.documentId = +paramMap.get('id')
-      this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
-      this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
-      this.downloadOriginalUrl = this.documentsService.getDownloadUrl(this.documentId, true)
+    this.route.paramMap.pipe(switchMap(paramMap => {
+      const documentId = +paramMap.get('id')
+      return this.documentsService.get(documentId).pipe(map(doc => ({doc, documentId})))
+    })).pipe(switchMap(({doc, documentId}) => {
+      this.previewUrl = this.documentsService.getPreviewUrl(documentId)
+      this.downloadUrl = this.documentsService.getDownloadUrl(documentId)
+      this.downloadOriginalUrl = this.documentsService.getDownloadUrl(documentId, true)
       this.suggestions = null
-      if (this.openDocumentService.getOpenDocument(this.documentId)) {
-        this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
+      if (this.openDocumentService.getOpenDocument(documentId)) {
+        this.updateComponent(this.openDocumentService.getOpenDocument(documentId))
       }
-      this.documentsService.get(this.documentId).pipe(first()).subscribe(doc => {
-        // Initialize dirtyCheck
-        this.store = new BehaviorSubject({
-          title: doc.title,
-          content: doc.content,
-          created: doc.created,
-          correspondent: doc.correspondent,
-          document_type: doc.document_type,
-          archive_serial_number: doc.archive_serial_number,
-          tags: doc.tags
-        })
 
-        this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
-        this.isDirty$.pipe(takeUntil(this.unsubscribeNotifier)).subscribe(dirty => {
-          this.openDocumentService.setDirty(this.documentId, dirty)
-        })
+      // Initialize dirtyCheck
+      this.store = new BehaviorSubject({
+        title: doc.title,
+        content: doc.content,
+        created: doc.created,
+        correspondent: doc.correspondent,
+        document_type: doc.document_type,
+        archive_serial_number: doc.archive_serial_number,
+        tags: doc.tags
+      })
 
-        if (!this.openDocumentService.getOpenDocument(this.documentId)) {
-          this.openDocumentService.openDocument(doc)
-          this.updateComponent(doc)
-        }
-      }, error => {this.router.navigate(['404'])})
-    })
+      this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
 
+      return this.isDirty$.pipe(map(dirty => ({doc, documentId, dirty})))
+    }))
+    .pipe(takeUntil(this.unsubscribeNotifier))
+    .subscribe(({doc, documentId, dirty}) => {
+      this.documentId = documentId
+      this.openDocumentService.setDirty(documentId, dirty)
+
+      if (!this.openDocumentService.getOpenDocument(documentId)) {
+        this.openDocumentService.openDocument(doc)
+        this.updateComponent(doc)
+      }
+    }, error => {this.router.navigate(['404'])})
   }
 
   ngOnDestroy() : void {
@@ -170,11 +174,13 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     var modal = this.modalService.open(DocumentTypeEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success.pipe(first()).subscribe(newDocumentType => {
-      this.documentTypeService.listAll().pipe(first()).subscribe(documentTypes => {
-        this.documentTypes = documentTypes.results
-        this.documentForm.get('document_type').setValue(newDocumentType.id)
-      })
+    modal.componentInstance.success.pipe(switchMap(newDocumentType => {
+      return this.documentTypeService.listAll().pipe(map(documentTypes => ({newDocumentType, documentTypes})))
+    }))
+    .pipe(takeUntil(this.unsubscribeNotifier))
+    .subscribe(({newDocumentType, documentTypes}) => {
+      this.documentTypes = documentTypes.results
+      this.documentForm.get('document_type').setValue(newDocumentType.id)
     })
   }
 
@@ -182,11 +188,13 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     var modal = this.modalService.open(CorrespondentEditDialogComponent, {backdrop: 'static'})
     modal.componentInstance.dialogMode = 'create'
     if (newName) modal.componentInstance.object = { name: newName }
-    modal.componentInstance.success.pipe(first()).subscribe(newCorrespondent => {
-      this.correspondentService.listAll().pipe(first()).subscribe(correspondents => {
-        this.correspondents = correspondents.results
-        this.documentForm.get('correspondent').setValue(newCorrespondent.id)
-      })
+    modal.componentInstance.success.pipe(switchMap(newCorrespondent => {
+      return this.correspondentService.listAll().pipe(map(correspondents => ({newCorrespondent, correspondents})))
+    }))
+    .pipe(takeUntil(this.unsubscribeNotifier))
+    .subscribe(({newCorrespondent, correspondents}) => {
+      this.correspondents = correspondents.results
+      this.documentForm.get('correspondent').setValue(newCorrespondent.id)
     })
   }
 
@@ -214,21 +222,18 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
   saveEditNext() {
     this.networkActive = true
     this.store.next(this.documentForm.value)
-    this.documentsService.update(this.document).pipe(first()).subscribe(result => {
+    this.documentsService.update(this.document).pipe(switchMap(updateResult => {
       this.error = null
-      this.documentListViewService.getNext(this.documentId).pipe(first()).subscribe(nextDocId => {
-        this.networkActive = false
-        if (nextDocId) {
-          this.openDocumentService.closeDocument(this.document, true).pipe(first()).subscribe(closed => {
-            if (closed) {
-              this.router.navigate(['documents', nextDocId])
-              this.titleInput.focus()
-            }
-          })
-        }
-      }, error => {
-        this.networkActive = false
-      })
+      return this.documentListViewService.getNext(this.documentId).pipe(map(nextDocId => ({nextDocId, updateResult})))
+    })).pipe(switchMap(({nextDocId, updateResult}) => {
+      if (nextDocId) return this.openDocumentService.closeDocument(this.document, true).pipe(map(closeResult => ({updateResult, nextDocId, closeResult})))
+    }))
+    .pipe(takeUntil(this.unsubscribeNotifier))
+    .subscribe(({updateResult, nextDocId, closeResult}) => {
+      if (closeResult) {
+        this.router.navigate(['documents', nextDocId])
+        this.titleInput.focus()
+      }
     }, error => {
       this.networkActive = false
       this.error = error.error
@@ -253,17 +258,18 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     modal.componentInstance.message = $localize`The files for this document will be deleted permanently. This operation cannot be undone.`
     modal.componentInstance.btnClass = "btn-danger"
     modal.componentInstance.btnCaption = $localize`Delete document`
-    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+    modal.componentInstance.confirmClicked.pipe(switchMap(() => {
       modal.componentInstance.buttonsEnabled = false
-      this.documentsService.delete(this.document).pipe(first()).subscribe(() => {
-        modal.close()
-        this.close()
-      }, error => {
-        this.toastService.showError($localize`Error deleting document: ${JSON.stringify(error)}`)
-        modal.componentInstance.buttonsEnabled = true
-      })
+      return this.documentsService.delete(this.document)
+    }))
+    .pipe(takeUntil(this.unsubscribeNotifier))
+    .subscribe(() => {
+      modal.close()
+      this.close()
+    }, error => {
+      this.toastService.showError($localize`Error deleting document: ${JSON.stringify(error)}`)
+      modal.componentInstance.buttonsEnabled = true
     })
-
   }
 
   moreLike() {
