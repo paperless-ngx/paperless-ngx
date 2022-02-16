@@ -40,7 +40,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Novo documento detectado</target>
+        <target state="translated">Novo documento detetado</target>
       </trans-unit>
       <trans-unit id="587031278561344416" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
@@ -48,7 +48,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Documento <x id="PH" equiv-text="status.filename"/> está sendo processado pelo paperless.</target>
+        <target state="translated">Documento <x id="PH" equiv-text="status.filename"/> está a ser processado pelo paperless.</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -64,7 +64,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="translated">Visualização "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" salva com sucesso.</target>
+        <target state="translated">Visualização "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" guardado com sucesso.</target>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
@@ -128,7 +128,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="translated">Salvar como...</target>
+        <target state="translated">Guardar como...</target>
       </trans-unit>
       <trans-unit id="5f5ce787c428d917c30c9bd70789a618e09743a7" datatype="html">
         <source>Save &quot;<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>&quot;</source>
@@ -136,7 +136,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="translated">Salvar "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
+        <target state="translated">Guardar "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
       </trans-unit>
       <trans-unit id="439e7cc3c1ecefded167ed4d37f7d22dad6a9159" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
@@ -216,7 +216,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">206</context>
         </context-group>
-        <target state="translated">Confirmar exclusão</target>
+        <target state="translated">Confirmar eliminação</target>
       </trans-unit>
       <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
@@ -224,7 +224,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="translated">Você realmente deseja excluir o documento "<x id="PH" equiv-text="this.document.title"/>"?</target>
+        <target state="translated">Tem a certeza que quer apagar o documento "<x id="PH" equiv-text="this.document.title"/>"?</target>
       </trans-unit>
       <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
@@ -232,7 +232,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">208</context>
         </context-group>
-        <target state="translated">Os arquivos desse documento serão excluídos permanentemente. Essa operação não pode ser revertida.</target>
+        <target state="translated">Os ficheiros deste documento serão excluídos permanentemente. Esta operação não pode ser revertida.</target>
       </trans-unit>
       <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
@@ -240,7 +240,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="translated">Excluir documento</target>
+        <target state="translated">Apagar documento</target>
       </trans-unit>
       <trans-unit id="1844801255494293730" datatype="html">
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
@@ -248,7 +248,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="translated">Erro ao excluir documento: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
+        <target state="translated">Erro ao apagar documento: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
       </trans-unit>
       <trans-unit id="826b25211922a1b46436589233cb6f1a163d89b7" datatype="html">
         <source>Delete</source>
@@ -264,7 +264,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Baixar</target>
+        <target state="translated">Descarregar</target>
       </trans-unit>
       <trans-unit id="4ea3c236bca3528318e3b3a411a20909e5fa8be4" datatype="html">
         <source>More like this</source>
@@ -384,7 +384,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="translated">Nome do arquivo</target>
+        <target state="translated">Nome do ficheiro</target>
       </trans-unit>
       <trans-unit id="74a894d2a8ae24a1eed4bc56e9afdc27dc2c31c8" datatype="html">
         <source>Original MD5 checksum</source>
@@ -392,7 +392,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">Soma de verificação MD5 original</target>
+        <target state="translated">Checksum MD5 original</target>
       </trans-unit>
       <trans-unit id="e92ca184ea785769fb26138fc25ee9fa06fff6e5" datatype="html">
         <source>Original file size</source>
@@ -400,7 +400,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Tamanho do arquivo original</target>
+        <target state="translated">Tamanho do ficheiro original</target>
       </trans-unit>
       <trans-unit id="b5e93f30cc3411f20bd62025a6cc7394568f1bfd" datatype="html">
         <source>Original mime type</source>
@@ -416,7 +416,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="translated">Soma de verificação MD5 de arquivamento</target>
+        <target state="translated">Checksum MD5 do arquivo</target>
       </trans-unit>
       <trans-unit id="e6bf12eadecbfd80016eca15fa78651c6ca90c64" datatype="html">
         <source>Archive file size</source>
@@ -424,7 +424,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="translated">Tamanho arquivado</target>
+        <target state="translated">Tamanho do arquivo</target>
       </trans-unit>
       <trans-unit id="203c7adb5bd74ae18e84e1e3b66ddfe76bc0023f" datatype="html">
         <source>Original document metadata</source>
@@ -448,7 +448,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="translated">Salvar &amp; próximo</target>
+        <target state="translated">Guardar &amp; próximo</target>
       </trans-unit>
       <trans-unit id="8765497970646365998" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ng!</source>
@@ -472,7 +472,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">Painel de controle</target>
+        <target state="translated">Dashboard</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -480,7 +480,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Você realmente deseja excluir a etiqueta "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Tem a certeza que quer apagar a etiqueta "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="cafc87479686947e2590b9f588a88040aeaf660b" datatype="html">
         <source>Tags</source>
@@ -528,7 +528,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Detecção</target>
+        <target state="translated">Correspondência</target>
       </trans-unit>
       <trans-unit id="9bcf8d20d23c111eca1431abd2d2ce0de324499c" datatype="html">
         <source>Document count</source>
@@ -568,7 +568,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Você realmente deseja excluir o tipo de documento "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Tem a certeza que quer apagar o tipo de documento "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="bc000b39af12c0925c424f4cb85f0c31c0f8eca8" datatype="html">
         <source>Document types</source>
@@ -592,7 +592,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="translated">Visualização "<x id="PH" equiv-text="savedView.name"/>" excluída.</target>
+        <target state="translated">Visualização "<x id="PH" equiv-text="savedView.name"/>" apagada.</target>
       </trans-unit>
       <trans-unit id="5647210819299459618" datatype="html">
         <source>Settings saved successfully.</source>
@@ -600,7 +600,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">Configurações salvas com sucesso.</target>
+        <target state="translated">Configurações guardadas com sucesso.</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html">
         <source>Use system language</source>
@@ -624,7 +624,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="translated">Erro ao salvar configurações: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated">Erro ao guardar configurações: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
       <trans-unit id="121cc5391cd2a5115bc2b3160379ee5b36cd7716" datatype="html">
         <source>Settings</source>
@@ -680,7 +680,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">Você precisar recarregar a página depois de escolher uma nova linguagem.</target>
+        <target state="translated">Tem de recarregar a página depois de escolher uma nova linguagem.</target>
       </trans-unit>
       <trans-unit id="0cd55822928764cc82a62ee3e6f3adbc1c630479" datatype="html">
         <source>Date display</source>
@@ -848,7 +848,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="translated">Exibir notificações quando o processamento de um documento falhar</target>
+        <target state="translated">Mostrar notificações quando o processamento de um documento falhar</target>
       </trans-unit>
       <trans-unit id="af113f7c9f7e13145c3461f61a1aedf12d57bd71" datatype="html">
         <source>Suppress notifications on dashboard</source>
@@ -856,7 +856,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="translated">Não exibir notificações no painel de controle</target>
+        <target state="translated">Não mostrar notificações no dashboard</target>
       </trans-unit>
       <trans-unit id="e27bd3804d2936a6897e81c2e52e294490e5e5a8" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
@@ -880,7 +880,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">149</context>
         </context-group>
-        <target state="translated">Exibir no painel de controle</target>
+        <target state="translated">Exibir no dashboard</target>
       </trans-unit>
       <trans-unit id="541bfc5b123b3f8867fd681eaceefb663a811973" datatype="html">
         <source>Show in sidebar</source>
@@ -888,7 +888,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="translated">Mostrar na navegação lateral</target>
+        <target state="translated">Mostrar na barra lateral</target>
       </trans-unit>
       <trans-unit id="abba764a7a595d04dc8c3b26e04b3780d4fdb540" datatype="html">
         <source>No saved views defined.</source>
@@ -912,7 +912,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Tem a certeza que deseja eliminar a correspondência "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Tem a certeza que quer eliminar a correspondência "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="c3f3334de899327bf3ec8999236e10798ff76e72" datatype="html">
         <source>Correspondents</source>
@@ -960,7 +960,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Criar nova correspondência</target>
+        <target state="translated">Criar novo correspondente</target>
       </trans-unit>
       <trans-unit id="2059822531169388684" datatype="html">
         <source>Edit correspondent</source>
@@ -976,7 +976,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Algoritmo correspondente</target>
+        <target state="translated">Algoritmo de correspondência</target>
       </trans-unit>
       <trans-unit id="eab7fc7cf2d663e54de934b779fce4275a303f0f" datatype="html">
         <source>Matching pattern</source>
@@ -984,7 +984,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">Padrão correspondente</target>
+        <target state="translated">Padrão de correspondência</target>
       </trans-unit>
       <trans-unit id="632e529f49cf3d367dfbd15bd055e9b53aef30fb" datatype="html">
         <source>Case insensitive</source>
@@ -992,7 +992,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Não distingue maiúsculas de minúsculas</target>
+        <target state="translated">Não distinguir entre maiúsculas e minúsculas</target>
       </trans-unit>
       <trans-unit id="9153094873118985366" datatype="html">
         <source>Create new tag</source>
@@ -1016,7 +1016,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Etiqueta de novo</target>
+        <target state="translated">Etiqueta de caixa de entrada</target>
       </trans-unit>
       <trans-unit id="5e2f1a4ea12a1b8606ee3f0548d0ba64bf266077" datatype="html">
         <source>Inbox tags are automatically assigned to all consumed documents.</source>
@@ -1024,7 +1024,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">As etiquetas de novo são automaticamente adicionadas a todos os documentos consumidos.</target>
+        <target state="translated">As etiquetas de caixa de entrada são automaticamente adicionadas a todos os documentos consumidos.</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html">
         <source>Create new document type</source>
@@ -1057,7 +1057,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Procurar documentos</target>
+        <target state="translated">Pesquisar documentos</target>
       </trans-unit>
       <trans-unit id="bb694b49d408265c91c62799c2b3a7e3151c824d" datatype="html">
         <source>Logout</source>
@@ -1241,7 +1241,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="translated">Mais semelhante</target>
+        <target state="translated">Semelhantes a</target>
       </trans-unit>
       <trans-unit id="02d184c288f567825a1fcbf83bcd3099a10853d5" datatype="html">
         <source>Filter tags</source>
@@ -1386,7 +1386,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="translated">Criado em: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></target>
+        <target state="translated">Criado a: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></target>
       </trans-unit>
       <trans-unit id="0f5d856cb63c69fde44fbfc653ec0655f9040865" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></source>
@@ -1501,7 +1501,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="translated">Confirmar atribuição correspondente</target>
+        <target state="translated">Confirmar atribuição de correspondente</target>
       </trans-unit>
       <trans-unit id="6900893559485781849" datatype="html">
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1509,7 +1509,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="translated">Esta operação irá adicionar a correspondência <x id="PH" equiv-text="correspondent.name"/> aos <x id="PH_1" equiv-text="this.list.selected.size"/> documento(s) selecionado(s).</target>
+        <target state="translated">Esta operação irá atribuir o correspondente <x id="PH" equiv-text="correspondent.name"/> ao(s) <x id="PH_1" equiv-text="this.list.selected.size"/> documento(s) selecionado(s).</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1517,7 +1517,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="translated">Esta operação irá remover a correspondência do(s) <x id="PH" equiv-text="this.list.selected.size"/> documento(s) selecionado(s).</target>
+        <target state="translated">Esta operação irá remover o correspondente do(s) <x id="PH" equiv-text="this.list.selected.size"/> documento(s) selecionado(s).</target>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html">
         <source>Confirm document type assignment</source>
@@ -1533,7 +1533,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="translated">A operação irá associar o tipo de documento "<x id="PH" equiv-text="documentType.name"/>" ao(s) <x id="PH_1" equiv-text="this.list.selected.size"/> documento(s) selecionado(s).</target>
+        <target state="translated">A operação irá atribuir o tipo de documento "<x id="PH" equiv-text="documentType.name"/>" ao(s) <x id="PH_1" equiv-text="this.list.selected.size"/> documento(s) selecionado(s).</target>
       </trans-unit>
       <trans-unit id="2236642492594872779" datatype="html">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1565,7 +1565,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="translated">Esta operação não pode ser desfeita.</target>
+        <target state="translated">Esta operação não pode ser revertida.</target>
       </trans-unit>
       <trans-unit id="6734339521247847366" datatype="html">
         <source>Delete document(s)</source>
@@ -1670,7 +1670,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="translated">Documentos novos: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
+        <target state="translated">Documentos na caixa de entrada: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
       </trans-unit>
       <trans-unit id="6443586946875325554" datatype="html">
         <source>Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></source>
@@ -1678,7 +1678,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Processando: <x id="PH" equiv-text="countUploadingAndProcessing"/></target>
+        <target state="translated">A processar: <x id="PH" equiv-text="countUploadingAndProcessing"/></target>
       </trans-unit>
       <trans-unit id="9182918211699394982" datatype="html">
         <source>Failed: <x id="PH" equiv-text="countFailed"/></source>
@@ -1686,7 +1686,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="translated">Falha: <x id="PH" equiv-text="countFailed"/></target>
+        <target state="translated">Falharam: <x id="PH" equiv-text="countFailed"/></target>
       </trans-unit>
       <trans-unit id="534116346205124059" datatype="html">
         <source>Added: <x id="PH" equiv-text="countSuccess"/></source>
@@ -1759,7 +1759,7 @@
           <context context-type="linenumber">4</context>
         </context-group>
         <note priority="1" from="description">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
-        <target state="translated">Descartar concluído</target>
+        <target state="translated">Descartar concluídos</target>
       </trans-unit>
       <trans-unit id="90917e1a0a7bb59e9d11bdde9183e9391963e17b" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
@@ -1792,7 +1792,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">O Paperless está a correr! :)</target>
+        <target state="translated">O Paperless está em execução! :)</target>
       </trans-unit>
       <trans-unit id="ea8d9a9486d5639d1c38c012900b8d34d5e4135d" datatype="html">
         <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
@@ -1800,7 +1800,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="translated">Pode começar a carregar documentos deixando-os na caixa de carregamento de ficheiros à direita, ou deixando-os na pasta de consumo pré-configurada, que eles depois aparecem na lista de documentos. Depois de ter adicionado alguns meta-dados aos seus documentos, utilize os mecanismos de filtragem do Paperless para criar visualizações personalizadas (tais como 'Adicionados recentemente', 'Etiquetados com PARAFAZER'). Posteriormente estes aparecerão no painel em vez desta mensagem.</target>
+        <target state="translated">Pode começar a carregar documentos arrastando-os para a caixa de carregamento de ficheiros à direita, ou deixando-os na pasta de consumo pré-configurada e eles irão aparecer na lista de documentos. Depois de ter adicionado alguns meta-dados aos seus documentos, utilize os mecanismos de filtragem do Paperless para criar visualizações personalizadas (tais como 'Adicionados recentemente', 'TODO'). Posteriormente estes irão aparecer no dashboard em vez desta mensagem.</target>
       </trans-unit>
       <trans-unit id="cf5f85690feaba6e29343f9881e57a6c0ea6e82b" datatype="html">
         <source>Paperless offers some more features that try to make your life easier:</source>
@@ -1816,7 +1816,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Assim que já tenha alguns documentos previamente adicionados com os respetivos meta-dados, o Paperless consegue adicionar automaticamente meta-dados aos novos documentos.</target>
+        <target state="translated">Assim que tenha alguns documentos previamente adicionados com os respetivos meta-dados, o Paperless consegue adicionar automaticamente meta-dados aos novos documentos.</target>
       </trans-unit>
       <trans-unit id="9dca488928c0b7af46c3866f86a6c2c8548399aa" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
@@ -1832,7 +1832,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Consulte a documentação para saber como utilizar estas funcionalidades. A secção sobre utilização básica têm informação para o ajudar a utilizar a plataforma de uma forma geral.</target>
+        <target state="translated">Consulte a documentação para saber como utilizar estas funcionalidades. A secção sobre utilização básica tem informação para o ajudar a utilizar a plataforma de uma forma geral.</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
@@ -1872,7 +1872,7 @@
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="translated">À procura do documento com nsa <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="translated">A pesquisar documento com nsa <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
@@ -2016,7 +2016,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Documento já existente.</target>
+        <target state="translated">Documento já existe.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
@@ -2024,7 +2024,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Arquivo não encontrado.</target>
+        <target state="translated">Ficheiro não encontrado.</target>
       </trans-unit>
       <trans-unit id="1520671543092565667" datatype="html">
         <source>Pre-consume script does not exist.</source>
@@ -2033,7 +2033,7 @@
           <context context-type="linenumber">17</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Script pré-consumo não existe.</target>
+        <target state="translated">Script de pré-consumo não existe.</target>
       </trans-unit>
       <trans-unit id="7742915911032564889" datatype="html">
         <source>Error while executing pre-consume script.</source>
@@ -2042,7 +2042,7 @@
           <context context-type="linenumber">18</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Erro ao executar script pré-consumo.</target>
+        <target state="translated">Erro ao executar script de pré-consumo.</target>
       </trans-unit>
       <trans-unit id="8995193730018060346" datatype="html">
         <source>Post-consume script does not exist.</source>
@@ -2051,7 +2051,7 @@
           <context context-type="linenumber">19</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Script pós-consumo não existe.</target>
+        <target state="translated">Script de pós-consumo não existe.</target>
       </trans-unit>
       <trans-unit id="256773668518189604" datatype="html">
         <source>Error while executing post-consume script.</source>
@@ -2060,7 +2060,7 @@
           <context context-type="linenumber">20</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="translated">Erro ao executar script pós-consumo.</target>
+        <target state="translated">Erro ao executar script de pós-consumo.</target>
       </trans-unit>
       <trans-unit id="6252258095055634191" datatype="html">
         <source>Received new file.</source>
@@ -2068,7 +2068,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="translated">Novo arquivo recebido.</target>
+        <target state="translated">Recebido novo ficheiro.</target>
       </trans-unit>
       <trans-unit id="7337565919209746135" datatype="html">
         <source>File type not supported.</source>
@@ -2076,7 +2076,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Tipo de arquivo não suportado.</target>
+        <target state="translated">Tipo de ficheiro não suportado.</target>
       </trans-unit>
       <trans-unit id="5002399167376099234" datatype="html">
         <source>Processing document...</source>
@@ -2084,7 +2084,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Processando documento...</target>
+        <target state="translated">A processar documento...</target>
       </trans-unit>
       <trans-unit id="1085975194762600381" datatype="html">
         <source>Generating thumbnail...</source>
@@ -2092,7 +2092,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Gerando imagem...</target>
+        <target state="translated">A gerar miniatura...</target>
       </trans-unit>
       <trans-unit id="3280851677698431426" datatype="html">
         <source>Retrieving date from document...</source>
@@ -2100,7 +2100,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">Buscando data do documento...</target>
+        <target state="translated">A obter data do documento...</target>
       </trans-unit>
       <trans-unit id="7162102384876037296" datatype="html">
         <source>Saving document...</source>
@@ -2108,7 +2108,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="translated">Salvando documento...</target>
+        <target state="translated">A guardar documento...</target>
       </trans-unit>
       <trans-unit id="4550450765009165976" datatype="html">
         <source>Finished.</source>
@@ -2116,7 +2116,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Encerrado.</target>
+        <target state="translated">Concluído.</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
@@ -2205,7 +2205,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="translated">Não podemos salvar elemento: <x id="PH" equiv-text="error"/></target>
+        <target state="translated">Não foi possível guardar elemento: <x id="PH" equiv-text="error"/></target>
       </trans-unit>
       <trans-unit id="810888510148304696" datatype="html">
         <source>Automatic</source>
@@ -2221,7 +2221,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">Você realmente quer excluir esse elemento?</target>
+        <target state="translated">Tem a certeza que quer apagar este elemento?</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
@@ -2229,7 +2229,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="translated">Documentos associados não serão excluidos.</target>
+        <target state="translated">Documentos associados não serão apagados.</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
@@ -2245,7 +2245,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="translated">Erro ao excluir elemento: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated">Erro ao apagar elemento: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
       <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
@@ -2261,7 +2261,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Qualquer: Documento contém qualquer uma dessas palavras (separadas por espaço)</target>
+        <target state="translated">Qualquer: Documento contém qualquer uma destas palavras (separadas por espaço)</target>
       </trans-unit>
       <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>
@@ -2277,7 +2277,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Todas: Documento contém todas essas palavras (separadas por espaço)</target>
+        <target state="translated">Todas: Documento contém todas estas palavras (separadas por espaço)</target>
       </trans-unit>
       <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
@@ -2293,7 +2293,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Exata: Documento contém essa palavra</target>
+        <target state="translated">Exata: Documento contém esta palavra</target>
       </trans-unit>
       <trans-unit id="1338733395833138319" datatype="html">
         <source>Regular expression</source>
@@ -2309,7 +2309,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Expressão regular: Documento condiz com essa expressão regular</target>
+        <target state="translated">Expressão regular: Documento condiz com esta expressão regular</target>
       </trans-unit>
       <trans-unit id="1856513373880048959" datatype="html">
         <source>Fuzzy word</source>
@@ -2325,7 +2325,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Fuzzy: Documento contém uma palavra similar à essa.</target>
+        <target state="translated">Fuzzy: Documento contém uma palavra similar à esta</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
@@ -2333,7 +2333,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Auto: Aprender detecção automaticamente</target>
+        <target state="translated">Auto: Aprender correspondência automaticamente</target>
       </trans-unit>
     </body>
   </file>
