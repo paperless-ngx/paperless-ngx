@@ -44,7 +44,6 @@
 						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.app.json",
 						"localize": true,
-						"aot": true,
 						"assets": [
 							"src/favicon.ico",
 							"src/apple-touch-icon.png",
@@ -61,7 +60,13 @@
 						"scripts": [],
 						"allowedCommonJsDependencies": [
 							"ng2-pdf-viewer"
-						]
+						],
+						"vendorChunk": true,
+						"extractLicenses": false,
+						"buildOptimizer": false,
+						"sourceMap": true,
+						"optimization": false,
+						"namedChunks": true
 					},
 					"configurations": {
 						"production": {
@@ -95,7 +100,8 @@
 						"en-US": {
 							"localize": ["en-US"]
 						}
-					}
+					},
+					"defaultConfiguration": ""
 				},
 				"serve": {
 					"builder": "@angular-devkit/build-angular:dev-server",
