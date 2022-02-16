@@ -116,7 +116,7 @@ performs all the steps described in :ref:`setup-docker_hub` automatically.
 
     .. code:: shell-session
 
-        $ curl -L https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/install-paperless-ng.sh | bash
+        $ curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/install-paperless-ng.sh | bash
 
 .. _setup-docker_hub:
 
