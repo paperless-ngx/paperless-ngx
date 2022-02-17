@@ -239,7 +239,7 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
                 f'_is_ignored("{file_path}") != {expected_ignored}')
 
 
-@override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
+@override_settings(CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=3, CONSUMER_POLLING_RETRY_COUNT=20)
 class TestConsumerPolling(TestConsumer):
     # just do all the tests with polling
     pass
@@ -251,7 +251,7 @@ class TestConsumerRecursive(TestConsumer):
     pass
 
 
-@override_settings(CONSUMER_RECURSIVE=True, CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20)
+@override_settings(CONSUMER_RECURSIVE=True, CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=3, CONSUMER_POLLING_RETRY_COUNT=20)
 class TestConsumerRecursivePolling(TestConsumer):
     # just do all the tests with polling and recursive
     pass
