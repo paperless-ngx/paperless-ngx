@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-22 10:12\n"
+"PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -11,11 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: nl\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
@@ -64,7 +64,7 @@ msgstr "is niet hoofdlettergevoelig"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr "correspondent"
+msgstr ""
 
 #: documents/models.py:75
 msgid "correspondents"
@@ -124,7 +124,7 @@ msgstr "mimetype"
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr "checksum"
+msgstr ""
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
@@ -180,7 +180,7 @@ msgstr "De positie van dit document in je fysieke documentenarchief."
 
 #: documents/models.py:223
 msgid "document"
-msgstr "document"
+msgstr ""
 
 #: documents/models.py:224
 msgid "documents"
@@ -188,7 +188,7 @@ msgstr "documenten"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr "debug"
+msgstr ""
 
 #: documents/models.py:312
 msgid "information"
@@ -264,11 +264,11 @@ msgstr "inhoud bevat"
 
 #: documents/models.py:375
 msgid "ASN is"
-msgstr "ASN is"
+msgstr ""
 
 #: documents/models.py:376
 msgid "correspondent is"
-msgstr "correspondent is"
+msgstr ""
 
 #: documents/models.py:377
 msgid "document type is"
@@ -478,7 +478,7 @@ msgstr "Geavanceerde instellingen"
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
-msgstr "Filter"
+msgstr ""
 
 #: paperless_mail/admin.py:39
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -494,7 +494,7 @@ msgstr "De actie die wordt toegepast op de mail. Deze actie wordt alleen uitgevo
 
 #: paperless_mail/admin.py:58
 msgid "Metadata"
-msgstr "Metadata"
+msgstr ""
 
 #: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -618,7 +618,7 @@ msgstr "volgorde"
 
 #: paperless_mail/models.py:128
 msgid "account"
-msgstr "account"
+msgstr ""
 
 #: paperless_mail/models.py:132
 msgid "folder"
