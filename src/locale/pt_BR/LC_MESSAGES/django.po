@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2022-01-30 09:10\n"
+"PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -11,11 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: pt-BR\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
@@ -188,7 +188,7 @@ msgstr "documentos"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr "debug"
+msgstr ""
 
 #: documents/models.py:312
 msgid "information"
@@ -220,11 +220,11 @@ msgstr "nível"
 
 #: documents/models.py:332
 msgid "log"
-msgstr "log"
+msgstr ""
 
 #: documents/models.py:333
 msgid "logs"
-msgstr "logs"
+msgstr ""
 
 #: documents/models.py:344 documents/models.py:401
 msgid "saved view"
@@ -502,7 +502,7 @@ msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamen
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr "Paperless mail"
+msgstr ""
 
 #: paperless_mail/models.py:11
 msgid "mail account"
