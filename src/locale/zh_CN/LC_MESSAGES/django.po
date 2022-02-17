@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-09-26 12:38\n"
+"PO-Revision-Date: 2022-02-17 04:18\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -11,688 +11,688 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: zh-CN\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr "文档"
+msgstr ""
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr "任何词"
+msgstr ""
 
 #: documents/models.py:33
 msgid "All words"
-msgstr "所有词"
+msgstr ""
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr "精确匹配"
+msgstr ""
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr "正则表达式"
+msgstr ""
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr "模糊词汇"
+msgstr ""
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr "自动"
+msgstr ""
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:117
 msgid "name"
-msgstr "名字"
+msgstr ""
 
 #: documents/models.py:45
 msgid "match"
-msgstr "配对"
+msgstr ""
 
 #: documents/models.py:49
 msgid "matching algorithm"
-msgstr "配对算法"
+msgstr ""
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr "忽略大小写"
+msgstr ""
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr "通讯录"
+msgstr ""
 
 #: documents/models.py:75
 msgid "correspondents"
-msgstr "通讯录"
+msgstr ""
 
 #: documents/models.py:81
 msgid "color"
-msgstr "颜色"
+msgstr ""
 
 #: documents/models.py:87
 msgid "is inbox tag"
-msgstr "为收件箱标签"
+msgstr ""
 
 #: documents/models.py:89
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr "标记此标签为收件箱标签：所有新消费的文档都将被标记为收件箱标签。"
+msgstr ""
 
 #: documents/models.py:94
 msgid "tag"
-msgstr "标签"
+msgstr ""
 
 #: documents/models.py:95 documents/models.py:151
 msgid "tags"
-msgstr "标签"
+msgstr ""
 
 #: documents/models.py:101 documents/models.py:133
 msgid "document type"
-msgstr "文档类型"
+msgstr ""
 
 #: documents/models.py:102
 msgid "document types"
-msgstr "文档类型"
+msgstr ""
 
 #: documents/models.py:110
 msgid "Unencrypted"
-msgstr "未加密"
+msgstr ""
 
 #: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
-msgstr "使用 GNU 隐私防护加密"
+msgstr ""
 
 #: documents/models.py:124
 msgid "title"
-msgstr "标题"
+msgstr ""
 
 #: documents/models.py:137
 msgid "content"
-msgstr "内容"
+msgstr ""
 
 #: documents/models.py:139
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr "文档中只有文本的数值。此字段主要用于搜索。"
+msgstr ""
 
 #: documents/models.py:144
 msgid "mime type"
-msgstr "Mime类型"
+msgstr ""
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr "校验码"
+msgstr ""
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
-msgstr "存档文档的校验和。"
+msgstr ""
 
 #: documents/models.py:163
 msgid "archive checksum"
-msgstr "存档校验和"
+msgstr ""
 
 #: documents/models.py:168
 msgid "The checksum of the archived document."
-msgstr "存档文档的校验和。"
+msgstr ""
 
 #: documents/models.py:172 documents/models.py:328
 msgid "created"
-msgstr "已创建"
+msgstr ""
 
 #: documents/models.py:176
 msgid "modified"
-msgstr "已修改"
+msgstr ""
 
 #: documents/models.py:180
 msgid "storage type"
-msgstr "存储类型"
+msgstr ""
 
 #: documents/models.py:188
 msgid "added"
-msgstr "已添加"
+msgstr ""
 
 #: documents/models.py:192
 msgid "filename"
-msgstr "文件名"
+msgstr ""
 
 #: documents/models.py:198
 msgid "Current filename in storage"
-msgstr "当前存储文件名称"
+msgstr ""
 
 #: documents/models.py:202
 msgid "archive filename"
-msgstr "归档文件名"
+msgstr ""
 
 #: documents/models.py:208
 msgid "Current archive filename in storage"
-msgstr "当前存储中的归档文件名"
+msgstr ""
 
 #: documents/models.py:212
 msgid "archive serial number"
-msgstr "归档序列号"
+msgstr ""
 
 #: documents/models.py:217
 msgid "The position of this document in your physical document archive."
-msgstr "此文档在您的实体文档归档中的位置。"
+msgstr ""
 
 #: documents/models.py:223
 msgid "document"
-msgstr "文档"
+msgstr ""
 
 #: documents/models.py:224
 msgid "documents"
-msgstr "文档"
+msgstr ""
 
 #: documents/models.py:311
 msgid "debug"
-msgstr "调试"
+msgstr ""
 
 #: documents/models.py:312
 msgid "information"
-msgstr "信息"
+msgstr ""
 
 #: documents/models.py:313
 msgid "warning"
-msgstr "警告"
+msgstr ""
 
 #: documents/models.py:314
 msgid "error"
-msgstr "错误"
+msgstr ""
 
 #: documents/models.py:315
 msgid "critical"
-msgstr "危急"
+msgstr ""
 
 #: documents/models.py:319
 msgid "group"
-msgstr "组"
+msgstr ""
 
 #: documents/models.py:322
 msgid "message"
-msgstr "消息"
+msgstr ""
 
 #: documents/models.py:325
 msgid "level"
-msgstr "级别"
+msgstr ""
 
 #: documents/models.py:332
 msgid "log"
-msgstr "日志"
+msgstr ""
 
 #: documents/models.py:333
 msgid "logs"
-msgstr "日志"
+msgstr ""
 
 #: documents/models.py:344 documents/models.py:401
 msgid "saved view"
-msgstr "保存视图"
+msgstr ""
 
 #: documents/models.py:345
 msgid "saved views"
-msgstr "保存视图"
+msgstr ""
 
 #: documents/models.py:348
 msgid "user"
-msgstr "用户"
+msgstr ""
 
 #: documents/models.py:354
 msgid "show on dashboard"
-msgstr "显示此仪器面板"
+msgstr ""
 
 #: documents/models.py:357
 msgid "show in sidebar"
-msgstr "在侧边栏显示"
+msgstr ""
 
 #: documents/models.py:361
 msgid "sort field"
-msgstr "排序字段"
+msgstr ""
 
 #: documents/models.py:367
 msgid "sort reverse"
-msgstr "逆序排序"
+msgstr ""
 
 #: documents/models.py:373
 msgid "title contains"
-msgstr "标题包含"
+msgstr ""
 
 #: documents/models.py:374
 msgid "content contains"
-msgstr "内容包含"
+msgstr ""
 
 #: documents/models.py:375
 msgid "ASN is"
-msgstr "ASN 是"
+msgstr ""
 
 #: documents/models.py:376
 msgid "correspondent is"
-msgstr "通讯者是"
+msgstr ""
 
 #: documents/models.py:377
 msgid "document type is"
-msgstr "文档类型是"
+msgstr ""
 
 #: documents/models.py:378
 msgid "is in inbox"
-msgstr "在收件箱中"
+msgstr ""
 
 #: documents/models.py:379
 msgid "has tag"
-msgstr "有标签"
+msgstr ""
 
 #: documents/models.py:380
 msgid "has any tag"
-msgstr "含有任何标签"
+msgstr ""
 
 #: documents/models.py:381
 msgid "created before"
-msgstr "在之前创建"
+msgstr ""
 
 #: documents/models.py:382
 msgid "created after"
-msgstr "在此时间之后创建"
+msgstr ""
 
 #: documents/models.py:383
 msgid "created year is"
-msgstr "创建年份是"
+msgstr ""
 
 #: documents/models.py:384
 msgid "created month is"
-msgstr "创建月份是"
+msgstr ""
 
 #: documents/models.py:385
 msgid "created day is"
-msgstr "创建日期是"
+msgstr ""
 
 #: documents/models.py:386
 msgid "added before"
-msgstr "添加在前"
+msgstr ""
 
 #: documents/models.py:387
 msgid "added after"
-msgstr "添加后"
+msgstr ""
 
 #: documents/models.py:388
 msgid "modified before"
-msgstr "在此之前修改"
+msgstr ""
 
 #: documents/models.py:389
 msgid "modified after"
-msgstr "修改于"
+msgstr ""
 
 #: documents/models.py:390
 msgid "does not have tag"
-msgstr "没有标签"
+msgstr ""
 
 #: documents/models.py:391
 msgid "does not have ASN"
-msgstr "没有 ASN"
+msgstr ""
 
 #: documents/models.py:392
 msgid "title or content contains"
-msgstr "标题或内容包含"
+msgstr ""
 
 #: documents/models.py:393
 msgid "fulltext query"
-msgstr "全文查询"
+msgstr ""
 
 #: documents/models.py:394
 msgid "more like this"
-msgstr "相似检索"
+msgstr ""
 
 #: documents/models.py:405
 msgid "rule type"
-msgstr "规则类型"
+msgstr ""
 
 #: documents/models.py:409
 msgid "value"
-msgstr "值"
+msgstr ""
 
 #: documents/models.py:415
 msgid "filter rule"
-msgstr "过滤规则"
+msgstr ""
 
 #: documents/models.py:416
 msgid "filter rules"
-msgstr "筛选规则"
+msgstr ""
 
 #: documents/serialisers.py:53
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr "无效的正则表达式： %(error)s"
+msgstr ""
 
 #: documents/serialisers.py:177
 msgid "Invalid color."
-msgstr "无效颜色。"
+msgstr ""
 
 #: documents/serialisers.py:451
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr "不支持导出类型 %(type)s"
+msgstr ""
 
 #: documents/templates/index.html:22
 msgid "Paperless-ng is loading..."
-msgstr "正在加载应用..."
+msgstr ""
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ng signed out"
-msgstr "登录已退出"
+msgstr ""
 
 #: documents/templates/registration/logged_out.html:45
 msgid "You have been successfully logged out. Bye!"
-msgstr "您已成功注销。"
+msgstr ""
 
 #: documents/templates/registration/logged_out.html:46
 msgid "Sign in again"
-msgstr "再次登录"
+msgstr ""
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ng sign in"
-msgstr "登录"
+msgstr ""
 
 #: documents/templates/registration/login.html:47
 msgid "Please sign in."
-msgstr "请登录。"
+msgstr ""
 
 #: documents/templates/registration/login.html:50
 msgid "Your username and password didn't match. Please try again."
-msgstr "您的用户名和密码组合不正确。请重试。"
+msgstr ""
 
 #: documents/templates/registration/login.html:53
 msgid "Username"
-msgstr "用户名"
+msgstr ""
 
 #: documents/templates/registration/login.html:54
 msgid "Password"
-msgstr "密码"
+msgstr ""
 
 #: documents/templates/registration/login.html:59
 msgid "Sign in"
-msgstr "登录"
+msgstr ""
 
 #: paperless/settings.py:303
 msgid "English (US)"
-msgstr "英语(美国)"
+msgstr ""
 
 #: paperless/settings.py:304
 msgid "English (GB)"
-msgstr "英语(英国)"
+msgstr ""
 
 #: paperless/settings.py:305
 msgid "German"
-msgstr "德语"
+msgstr ""
 
 #: paperless/settings.py:306
 msgid "Dutch"
-msgstr "荷兰语"
+msgstr ""
 
 #: paperless/settings.py:307
 msgid "French"
-msgstr "法语"
+msgstr ""
 
 #: paperless/settings.py:308
 msgid "Portuguese (Brazil)"
-msgstr "葡萄牙语 (巴西)"
+msgstr ""
 
 #: paperless/settings.py:309
 msgid "Portuguese"
-msgstr "葡萄牙语"
+msgstr ""
 
 #: paperless/settings.py:310
 msgid "Italian"
-msgstr "意大利语"
+msgstr ""
 
 #: paperless/settings.py:311
 msgid "Romanian"
-msgstr "罗马尼亚语"
+msgstr ""
 
 #: paperless/settings.py:312
 msgid "Russian"
-msgstr "俄语"
+msgstr ""
 
 #: paperless/settings.py:313
 msgid "Spanish"
-msgstr "西班牙语"
+msgstr ""
 
 #: paperless/settings.py:314
 msgid "Polish"
-msgstr "波兰语"
+msgstr ""
 
 #: paperless/settings.py:315
 msgid "Swedish"
-msgstr "瑞典语"
+msgstr ""
 
 #: paperless/urls.py:120
 msgid "Paperless-ng administration"
-msgstr "管理"
+msgstr ""
 
 #: paperless_mail/admin.py:15
 msgid "Authentication"
-msgstr "身份验证"
+msgstr ""
 
 #: paperless_mail/admin.py:18
 msgid "Advanced settings"
-msgstr "高级设置"
+msgstr ""
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
-msgstr "筛选"
+msgstr ""
 
 #: paperless_mail/admin.py:39
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr "只能处理符合以下所有过滤规则的邮件。"
+msgstr ""
 
 #: paperless_mail/admin.py:49
 msgid "Actions"
-msgstr "操作"
+msgstr ""
 
 #: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr "适用于邮件的动作。此动作仅在从邮件中消耗文档时执行。没有附件的邮件将保持完全未触及。"
+msgstr ""
 
 #: paperless_mail/admin.py:58
 msgid "Metadata"
-msgstr "元数据"
+msgstr ""
 
 #: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "将元数据自动分配到此规则消耗的文档。 如果您不在这里指派标签、类型或通讯录，无纸状态仍将处理您所定义的所有匹配规则。"
+msgstr ""
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr "Paperless-NG 邮件"
+msgstr ""
 
 #: paperless_mail/models.py:11
 msgid "mail account"
-msgstr "邮件账号"
+msgstr ""
 
 #: paperless_mail/models.py:12
 msgid "mail accounts"
-msgstr "邮件账号"
+msgstr ""
 
 #: paperless_mail/models.py:19
 msgid "No encryption"
-msgstr "未加密"
+msgstr ""
 
 #: paperless_mail/models.py:20
 msgid "Use SSL"
-msgstr "启用 SSL"
+msgstr ""
 
 #: paperless_mail/models.py:21
 msgid "Use STARTTLS"
-msgstr "使用STARTTLS"
+msgstr ""
 
 #: paperless_mail/models.py:29
 msgid "IMAP server"
-msgstr "IMAP服务器"
+msgstr ""
 
 #: paperless_mail/models.py:33
 msgid "IMAP port"
-msgstr "IMAP 端口"
+msgstr ""
 
 #: paperless_mail/models.py:36
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr "对于未加密的连接和STARTTLS连接，通常为143端口，SSL连接为993端口。"
+msgstr ""
 
 #: paperless_mail/models.py:40
 msgid "IMAP security"
-msgstr "IMAP安全"
+msgstr ""
 
 #: paperless_mail/models.py:46
 msgid "username"
-msgstr "用户名"
+msgstr ""
 
 #: paperless_mail/models.py:50
 msgid "password"
-msgstr "密码"
+msgstr ""
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr "字符集"
+msgstr ""
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr "与邮件服务器通信时使用的字符集，如“UTF-8”或“US-ASCII”。"
+msgstr ""
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
-msgstr "邮件规则"
+msgstr ""
 
 #: paperless_mail/models.py:69
 msgid "mail rules"
-msgstr "邮件规则"
+msgstr ""
 
 #: paperless_mail/models.py:75
 msgid "Only process attachments."
-msgstr "仅处理附件。"
+msgstr ""
 
 #: paperless_mail/models.py:76
 msgid "Process all files, including 'inline' attachments."
-msgstr "处理所有文件，包括“内联”附件。"
+msgstr ""
 
 #: paperless_mail/models.py:86
 msgid "Mark as read, don't process read mails"
-msgstr "标记为已读，不处理已读邮件"
+msgstr ""
 
 #: paperless_mail/models.py:87
 msgid "Flag the mail, don't process flagged mails"
-msgstr "标记邮件，不处理标记的邮件"
+msgstr ""
 
 #: paperless_mail/models.py:88
 msgid "Move to specified folder"
-msgstr "移动到指定文件夹"
+msgstr ""
 
 #: paperless_mail/models.py:89
 msgid "Delete"
-msgstr "删除"
+msgstr ""
 
 #: paperless_mail/models.py:96
 msgid "Use subject as title"
-msgstr "使用主题作为标题"
+msgstr ""
 
 #: paperless_mail/models.py:97
 msgid "Use attachment filename as title"
-msgstr "使用附件文件名作为标题"
+msgstr ""
 
 #: paperless_mail/models.py:107
 msgid "Do not assign a correspondent"
-msgstr "不指派通讯员"
+msgstr ""
 
 #: paperless_mail/models.py:109
 msgid "Use mail address"
-msgstr "使用邮件地址"
+msgstr ""
 
 #: paperless_mail/models.py:111
 msgid "Use name (or mail address if not available)"
-msgstr "使用名称 (如果不可用则使用邮件地址)"
+msgstr ""
 
 #: paperless_mail/models.py:113
 msgid "Use correspondent selected below"
-msgstr "使用下面选中的通讯录"
+msgstr ""
 
 #: paperless_mail/models.py:121
 msgid "order"
-msgstr "序号"
+msgstr ""
 
 #: paperless_mail/models.py:128
 msgid "account"
-msgstr "帐户"
+msgstr ""
 
 #: paperless_mail/models.py:132
 msgid "folder"
-msgstr "文件夹"
+msgstr ""
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr "子文件夹必须用点分隔。"
+msgstr ""
 
 #: paperless_mail/models.py:138
 msgid "filter from"
-msgstr "过滤自"
+msgstr ""
 
 #: paperless_mail/models.py:141
 msgid "filter subject"
-msgstr "过滤主题"
+msgstr ""
 
 #: paperless_mail/models.py:144
 msgid "filter body"
-msgstr "过滤内容"
+msgstr ""
 
 #: paperless_mail/models.py:148
 msgid "filter attachment filename"
-msgstr "过滤附件文件名"
+msgstr ""
 
 #: paperless_mail/models.py:150
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "如果指定的话，只消耗完全匹配此文件名的文档。允许通用卡片，如*.pdf或*发票*。不敏感。"
+msgstr ""
 
 #: paperless_mail/models.py:156
 msgid "maximum age"
-msgstr "存活期"
+msgstr ""
 
 #: paperless_mail/models.py:158
 msgid "Specified in days."
-msgstr "指定为日数。"
+msgstr ""
 
 #: paperless_mail/models.py:161
 msgid "attachment type"
-msgstr "附件類型"
+msgstr ""
 
 #: paperless_mail/models.py:164
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr "内嵌附件包含嵌入图像，所以最好将此选项与文件名过滤器结合起来。"
+msgstr ""
 
 #: paperless_mail/models.py:169
 msgid "action"
-msgstr "操作"
+msgstr ""
 
 #: paperless_mail/models.py:175
 msgid "action parameter"
-msgstr "操作参数"
+msgstr ""
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "上面选择的动作的附加参数，即移动到文件夹操作的目标文件夹。子文件夹必须用点分隔。"
+msgstr ""
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
-msgstr "分配标题从"
+msgstr ""
 
 #: paperless_mail/models.py:194
 msgid "assign this tag"
-msgstr "指定此标签"
+msgstr ""
 
 #: paperless_mail/models.py:202
 msgid "assign this document type"
-msgstr "指定此文档类型"
+msgstr ""
 
 #: paperless_mail/models.py:206
 msgid "assign correspondent from"
-msgstr "指定配通讯录来自"
+msgstr ""
 
 #: paperless_mail/models.py:216
 msgid "assign this correspondent"
-msgstr "指定这个通讯录"
+msgstr ""
 
