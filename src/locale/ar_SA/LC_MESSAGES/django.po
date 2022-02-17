@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2022-02-17 04:33\n"
+"PO-Revision-Date: 2022-02-17 06:54\n"
 "Last-Translator: \n"
 "Language-Team: Arabic, Saudi Arabia\n"
 "Language: ar_SA\n"
@@ -438,7 +438,7 @@ msgstr ""
 
 #: paperless/settings.py:309
 msgid "Portuguese"
-msgstr ""
+msgstr "البرتغالية"
 
 #: paperless/settings.py:310
 msgid "Italian"
@@ -450,19 +450,19 @@ msgstr ""
 
 #: paperless/settings.py:312
 msgid "Russian"
-msgstr ""
+msgstr "الروسية"
 
 #: paperless/settings.py:313
 msgid "Spanish"
-msgstr ""
+msgstr "الإسبانية"
 
 #: paperless/settings.py:314
 msgid "Polish"
-msgstr ""
+msgstr "البولندية"
 
 #: paperless/settings.py:315
 msgid "Swedish"
-msgstr ""
+msgstr "السويدية"
 
 #: paperless/urls.py:120
 msgid "Paperless-ng administration"
