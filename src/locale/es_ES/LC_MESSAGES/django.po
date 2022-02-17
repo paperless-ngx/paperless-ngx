@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-07-29 20:57\n"
+"PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -11,11 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: es-ES\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
@@ -72,7 +72,7 @@ msgstr "interlocutores"
 
 #: documents/models.py:81
 msgid "color"
-msgstr "color"
+msgstr ""
 
 #: documents/models.py:87
 msgid "is inbox tag"
@@ -200,7 +200,7 @@ msgstr "alerta"
 
 #: documents/models.py:314
 msgid "error"
-msgstr "error"
+msgstr ""
 
 #: documents/models.py:315
 msgid "critical"
@@ -220,11 +220,11 @@ msgstr "nivel"
 
 #: documents/models.py:332
 msgid "log"
-msgstr "log"
+msgstr ""
 
 #: documents/models.py:333
 msgid "logs"
-msgstr "logs"
+msgstr ""
 
 #: documents/models.py:344 documents/models.py:401
 msgid "saved view"
