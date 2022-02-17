@@ -86,7 +86,7 @@ export class SettingsService {
   }
 
   getLanguageOptions(): LanguageOption[] {
-    return [
+    const languages = [
       {code: "en-us", name: $localize`English (US)`, englishName: "English (US)", dateInputFormat: "mm/dd/yyyy"},
       {code: "de-de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
       {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)", dateInputFormat: "dd/mm/yyyy"},
@@ -102,6 +102,11 @@ export class SettingsService {
       {code: "ru-ru", name: $localize`Russian`, englishName: "Russian", dateInputFormat: "dd.mm.yyyy"},
       {code: "sv-se", name: $localize`Swedish`, englishName: "Swedish", dateInputFormat: "yyyy-mm-dd"}
     ]
+
+    // Sort languages by localized name at runtime
+    languages.sort((a, b) => { return a.name < b.name ? -1 : 1 })
+
+    return languages
   }
 
   getDateLocaleOptions(): LanguageOption[] {
