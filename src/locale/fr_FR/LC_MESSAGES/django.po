@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-17 13:13\n"
+"PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -11,15 +11,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: fr\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr "Documents"
+msgstr ""
 
 #: documents/models.py:32
 msgid "Any word"
@@ -180,11 +180,11 @@ msgstr "Le classement de ce document dans votre archive de documents physiques."
 
 #: documents/models.py:223
 msgid "document"
-msgstr "document"
+msgstr ""
 
 #: documents/models.py:224
 msgid "documents"
-msgstr "documents"
+msgstr ""
 
 #: documents/models.py:311
 msgid "debug"
@@ -192,7 +192,7 @@ msgstr "débogage"
 
 #: documents/models.py:312
 msgid "information"
-msgstr "information"
+msgstr ""
 
 #: documents/models.py:313
 msgid "warning"
@@ -212,7 +212,7 @@ msgstr "groupe"
 
 #: documents/models.py:322
 msgid "message"
-msgstr "message"
+msgstr ""
 
 #: documents/models.py:325
 msgid "level"
@@ -486,7 +486,7 @@ msgstr "Paperless-ng ne traitera que les courriers qui correspondent à TOUS les
 
 #: paperless_mail/admin.py:49
 msgid "Actions"
-msgstr "Actions"
+msgstr ""
 
 #: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
@@ -666,7 +666,7 @@ msgstr "Les pièces jointes en ligne comprennent les images intégrées, il est 
 
 #: paperless_mail/models.py:169
 msgid "action"
-msgstr "action"
+msgstr ""
 
 #: paperless_mail/models.py:175
 msgid "action parameter"
