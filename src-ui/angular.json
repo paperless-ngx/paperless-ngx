@@ -17,19 +17,19 @@
 				"sourceLocale": "en-US",
 				"locales": {
 					"de-DE": "src/locale/messages.de_DE.xlf",
-					"nl-NL": "src/locale/messages.nl_NL.xlf",
-					"fr-FR": "src/locale/messages.fr_FR.xlf",
 					"en-GB": "src/locale/messages.en_GB.xlf",
+					"es-ES": "src/locale/messages.es_ES.xlf",
+					"fr-FR": "src/locale/messages.fr_FR.xlf",
+					"it-IT": "src/locale/messages.it_IT.xlf",
+					"lb-LU": "src/locale/messages.lb_LU.xlf",
+					"nl-NL": "src/locale/messages.nl_NL.xlf",
+					"pl-PL": "src/locale/messages.pl_PL.xlf",
 					"pt-BR": "src/locale/messages.pt_BR.xlf",
 					"pt-PT": "src/locale/messages.pt_PT.xlf",
-					"it-IT": "src/locale/messages.it_IT.xlf",
 					"ro-RO": "src/locale/messages.ro_RO.xlf",
 					"ru-RU": "src/locale/messages.ru_RU.xlf",
-					"es-ES": "src/locale/messages.es_ES.xlf",
-					"pl-PL": "src/locale/messages.pl_PL.xlf",
-					"sv-SE": "src/locale/messages.sv_SE.xlf",
-					"lb-LU": "src/locale/messages.lb_LU.xlf"
-				}
+					"sv-SE": "src/locale/messages.sv_SE.xlf"
+        }
 			},
 			"architect": {
 				"build": {
