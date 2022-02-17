@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2022-02-17 13:26\n"
+"PO-Revision-Date: 2022-02-17 13:44\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -39,7 +39,7 @@ msgstr "Regulær udtryk"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Tilnærmet ord"
 
 #: documents/models.py:37
 msgid "Automatic"
@@ -490,7 +490,7 @@ msgstr "Handlinger"
 
 #: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr ""
+msgstr "Handlingen blev anvendt på emailen. Denne handling udføres kun når dokumenter blev bearbejdet fra emailen. Emails uden vedhæftede filer forbliver helt uberørte."
 
 #: paperless_mail/admin.py:58
 msgid "Metadata"
@@ -498,7 +498,7 @@ msgstr "Metadata"
 
 #: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Tildel automatisk metadata til dokumenter, der bearbejdes fra denne regel. Hvis du ikke tildeler etiketter, typer eller korrespondenter her, vil paperless stadig behandle alle matchende regler, som du har defineret."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
@@ -646,7 +646,7 @@ msgstr "filtrér for vedhæftningens filnavn"
 
 #: paperless_mail/models.py:150
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Bearbejd kun dokumenter, der helt matcher dette filnavn, hvis angivet. Wildcards såsom *.pdf eller *faktura * er tilladt."
 
 #: paperless_mail/models.py:156
 msgid "maximum age"
@@ -674,7 +674,7 @@ msgstr "parameter for handling"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Yderligere parameter for handlingen der er valgt ovenfor, dvs. destinationsmappen for \"flyt til mappe\"-handlingen. Undermapper skal adskilles af prikker."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
