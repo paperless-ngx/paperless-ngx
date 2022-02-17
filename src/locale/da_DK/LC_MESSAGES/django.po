@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2022-02-17 11:32\n"
+"PO-Revision-Date: 2022-02-17 12:31\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -414,55 +414,55 @@ msgstr "Log ind"
 
 #: paperless/settings.py:303
 msgid "English (US)"
-msgstr ""
+msgstr "Engelsk (USA)"
 
 #: paperless/settings.py:304
 msgid "English (GB)"
-msgstr ""
+msgstr "Engelsk (GB)"
 
 #: paperless/settings.py:305
 msgid "German"
-msgstr ""
+msgstr "Tysk"
 
 #: paperless/settings.py:306
 msgid "Dutch"
-msgstr ""
+msgstr "Hollandsk"
 
 #: paperless/settings.py:307
 msgid "French"
-msgstr ""
+msgstr "Fransk"
 
 #: paperless/settings.py:308
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugisisk (Brasilien)"
 
 #: paperless/settings.py:309
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugisisk"
 
 #: paperless/settings.py:310
 msgid "Italian"
-msgstr ""
+msgstr "Italiensk"
 
 #: paperless/settings.py:311
 msgid "Romanian"
-msgstr ""
+msgstr "Romansk"
 
 #: paperless/settings.py:312
 msgid "Russian"
-msgstr ""
+msgstr "Russisk"
 
 #: paperless/settings.py:313
 msgid "Spanish"
-msgstr ""
+msgstr "Spansk"
 
 #: paperless/settings.py:314
 msgid "Polish"
-msgstr ""
+msgstr "Polsk"
 
 #: paperless/settings.py:315
 msgid "Swedish"
-msgstr ""
+msgstr "Svensk"
 
 #: paperless/urls.py:120
 msgid "Paperless-ng administration"
@@ -486,7 +486,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:49
 msgid "Actions"
-msgstr ""
+msgstr "Handlinger"
 
 #: paperless_mail/admin.py:51
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
@@ -494,7 +494,7 @@ msgstr ""
 
 #: paperless_mail/admin.py:58
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:60
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -502,79 +502,79 @@ msgstr ""
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless email"
 
 #: paperless_mail/models.py:11
 msgid "mail account"
-msgstr ""
+msgstr "email-konto"
 
 #: paperless_mail/models.py:12
 msgid "mail accounts"
-msgstr ""
+msgstr "email-konti"
 
 #: paperless_mail/models.py:19
 msgid "No encryption"
-msgstr ""
+msgstr "Ingen kryptering"
 
 #: paperless_mail/models.py:20
 msgid "Use SSL"
-msgstr ""
+msgstr "Benyt SSL"
 
 #: paperless_mail/models.py:21
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Benyt STARTTLS"
 
 #: paperless_mail/models.py:29
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP server"
 
 #: paperless_mail/models.py:33
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP port"
 
 #: paperless_mail/models.py:36
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Dette er normalt 143 for ukrypterede og STARTTLS-forbindelser, og 993 for SSL-forbindelser."
 
 #: paperless_mail/models.py:40
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP sikkerhed"
 
 #: paperless_mail/models.py:46
 msgid "username"
-msgstr ""
+msgstr "brugernavn"
 
 #: paperless_mail/models.py:50
 msgid "password"
-msgstr ""
+msgstr "adgangskode"
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr ""
+msgstr "tegnsæt"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Tegnsættet der skal bruges, når du kommunikerer med e- mail- serveren, såsom 'UTF- 8' eller 'US- ASCII'."
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
-msgstr ""
+msgstr "email regel"
 
 #: paperless_mail/models.py:69
 msgid "mail rules"
-msgstr ""
+msgstr "email regler"
 
 #: paperless_mail/models.py:75
 msgid "Only process attachments."
-msgstr ""
+msgstr "Behandl kun vedhæftede filer."
 
 #: paperless_mail/models.py:76
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Behandl alle filer, også 'inline'-vedhæftede filer."
 
 #: paperless_mail/models.py:86
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Markér som læst, behandl ikke læste emails"
 
 #: paperless_mail/models.py:87
 msgid "Flag the mail, don't process flagged mails"
@@ -586,11 +586,11 @@ msgstr ""
 
 #: paperless_mail/models.py:89
 msgid "Delete"
-msgstr ""
+msgstr "Slet"
 
 #: paperless_mail/models.py:96
 msgid "Use subject as title"
-msgstr ""
+msgstr "Brug emnet som titel"
 
 #: paperless_mail/models.py:97
 msgid "Use attachment filename as title"
@@ -602,7 +602,7 @@ msgstr ""
 
 #: paperless_mail/models.py:109
 msgid "Use mail address"
-msgstr ""
+msgstr "Brug emailadresse"
 
 #: paperless_mail/models.py:111
 msgid "Use name (or mail address if not available)"
@@ -614,7 +614,7 @@ msgstr ""
 
 #: paperless_mail/models.py:121
 msgid "order"
-msgstr ""
+msgstr "rækkefølge"
 
 #: paperless_mail/models.py:128
 msgid "account"
@@ -630,19 +630,19 @@ msgstr "Undermapper skal adskilles med prikker."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
-msgstr ""
+msgstr "filtrér fra"
 
 #: paperless_mail/models.py:141
 msgid "filter subject"
-msgstr ""
+msgstr "filtrér emne"
 
 #: paperless_mail/models.py:144
 msgid "filter body"
-msgstr ""
+msgstr "filtrér krop"
 
 #: paperless_mail/models.py:148
 msgid "filter attachment filename"
-msgstr ""
+msgstr "filtrér for vedhæftningens filnavn"
 
 #: paperless_mail/models.py:150
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
@@ -650,15 +650,15 @@ msgstr ""
 
 #: paperless_mail/models.py:156
 msgid "maximum age"
-msgstr ""
+msgstr "maksimal alder"
 
 #: paperless_mail/models.py:158
 msgid "Specified in days."
-msgstr ""
+msgstr "Specificeret i dage."
 
 #: paperless_mail/models.py:161
 msgid "attachment type"
-msgstr ""
+msgstr "vedhæftningstype"
 
 #: paperless_mail/models.py:164
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
@@ -666,11 +666,11 @@ msgstr ""
 
 #: paperless_mail/models.py:169
 msgid "action"
-msgstr ""
+msgstr "handling"
 
 #: paperless_mail/models.py:175
 msgid "action parameter"
-msgstr ""
+msgstr "parameter for handling"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
@@ -678,21 +678,21 @@ msgstr ""
 
 #: paperless_mail/models.py:184
 msgid "assign title from"
-msgstr ""
+msgstr "tildel titel fra"
 
 #: paperless_mail/models.py:194
 msgid "assign this tag"
-msgstr ""
+msgstr "tildel denne etiket"
 
 #: paperless_mail/models.py:202
 msgid "assign this document type"
-msgstr ""
+msgstr "tildel denne dokumenttype"
 
 #: paperless_mail/models.py:206
 msgid "assign correspondent from"
-msgstr ""
+msgstr "tildel korrespondent fra"
 
 #: paperless_mail/models.py:216
 msgid "assign this correspondent"
-msgstr ""
+msgstr "tildel denne korrespondent"
 
