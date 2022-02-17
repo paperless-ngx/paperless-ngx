@@ -6,7 +6,7 @@
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
 [![Coverage Status](https://coveralls.io/repos/github/jonaswinkler/paperless-ng/badge.svg?branch=master)](https://coveralls.io/github/jonaswinkler/paperless-ng?branch=master)
 
-# Paperless-ng
+# Paperless-ngx
 
 [Paperless (click me)](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
@@ -17,7 +17,17 @@ Paperless-ng is a fork of the original project, adding a new interface and many 
 * Resource usage: Paperless-ng does use a bit more resources than Paperless. Running the web server requires about 300MB of RAM or more, depending on the configuration. While adding documents, it requires about 300MB additional RAM, depending on the document. It still runs on Raspberry Pi (many users do that), but it has been generally geared to better use the resources of more powerful systems.
 * API changes: If you rely on the REST API of paperless, some of its functionality has been changed.
 
-For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation, especially the section about the [0.9.0 release](https://paperless-ng.readthedocs.io/en/latest/changelog.html#paperless-ng-0-9-0).
+For a detailed list of changes done in paperless-ng, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation, especially the section about the [0.9.0 release](https://paperless-ng.readthedocs.io/en/latest/changelog.html#paperless-ng-0-9-0).
+
+Paperless-ngx forked from paperless-ng to continue the great work already done and distribute responsibility among a team of people.
+
+Discussion around that can be found in the issues in the paperless-ng repository:
+[1599](https://github.com/jonaswinkler/paperless-ng/issues/1599)
+[1632](https://github.com/jonaswinkler/paperless-ng/issues/1632)
+## Get in Touch
+
+People interested in continuing the work on paperless-ng(x) and form the organisation connected here on github and created a
+[Matrix Room](https://matrix.to/#/#paperless:adnidor.de) for realtime communication.
 
 # How it Works
 
