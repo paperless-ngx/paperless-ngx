@@ -78,7 +78,7 @@ The documentation for Paperless-ng is available on [ReadTheDocs](https://paperle
 
 # Translation
 
-Paperless is available in many different languages. Translation is coordinated at crowdin. If you want to help out by translating paperless into your language, please head over to https://github.com/jonaswinkler/paperless-ng/issues/212 for details!
+Paperless is available in many different languages. Translation is coordinated at crowdin. If you want to help out by translating paperless into your language, please head over to https://crwd.in/paperless-ngx for details!
 
 # Feature Requests
 
