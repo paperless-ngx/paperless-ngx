@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2022-02-17 06:54\n"
+"PO-Revision-Date: 2022-02-17 07:58\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -11,11 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: el\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
@@ -35,7 +35,7 @@ msgstr "Ακριβής ταύτιση"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr "Regular expression"
+msgstr ""
 
 #: documents/models.py:36
 msgid "Fuzzy word"
