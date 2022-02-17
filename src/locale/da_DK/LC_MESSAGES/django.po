@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2022-02-17 09:38\n"
+"PO-Revision-Date: 2022-02-17 10:35\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -23,19 +23,19 @@ msgstr "Dokumenter"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "Ethvert ord"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "Alle ord"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "Præcis match"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "Regulær udtryk"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
@@ -43,136 +43,136 @@ msgstr ""
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisk"
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:117
 msgid "name"
-msgstr ""
+msgstr "navn"
 
 #: documents/models.py:45
 msgid "match"
-msgstr ""
+msgstr "match"
 
 #: documents/models.py:49
 msgid "matching algorithm"
-msgstr ""
+msgstr "matching algoritme"
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr ""
+msgstr "er usensitiv"
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr ""
+msgstr "korrespondent"
 
 #: documents/models.py:75
 msgid "correspondents"
-msgstr ""
+msgstr "korrespondenter"
 
 #: documents/models.py:81
 msgid "color"
-msgstr ""
+msgstr "farve"
 
 #: documents/models.py:87
 msgid "is inbox tag"
-msgstr ""
+msgstr "er indbakkeetiket"
 
 #: documents/models.py:89
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Markerer denne etiket som en indbakkeetiket: Alle ny-bearbejdede dokumenter vil blive mærket med indbakkeetiketter."
 
 #: documents/models.py:94
 msgid "tag"
-msgstr ""
+msgstr "etiket"
 
 #: documents/models.py:95 documents/models.py:151
 msgid "tags"
-msgstr ""
+msgstr "etiketter"
 
 #: documents/models.py:101 documents/models.py:133
 msgid "document type"
-msgstr ""
+msgstr "dokumenttype"
 
 #: documents/models.py:102
 msgid "document types"
-msgstr ""
+msgstr "dokumenttyper"
 
 #: documents/models.py:110
 msgid "Unencrypted"
-msgstr ""
+msgstr "Ukrypteret"
 
 #: documents/models.py:111
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Krypteret med GNU Privacy Guard"
 
 #: documents/models.py:124
 msgid "title"
-msgstr ""
+msgstr "titel"
 
 #: documents/models.py:137
 msgid "content"
-msgstr ""
+msgstr "indhold"
 
 #: documents/models.py:139
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Dokumentets rå tekstdata. Dette felt bruges primært til søgning."
 
 #: documents/models.py:144
 msgid "mime type"
-msgstr ""
+msgstr "MIME-type"
 
 #: documents/models.py:155
 msgid "checksum"
-msgstr ""
+msgstr "kontrolsum"
 
 #: documents/models.py:159
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Kontrolsummen af det oprindelige dokument."
 
 #: documents/models.py:163
 msgid "archive checksum"
-msgstr ""
+msgstr "arkiv kontrolsum"
 
 #: documents/models.py:168
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Kontrolsummen af det arkiverede dokument."
 
 #: documents/models.py:172 documents/models.py:328
 msgid "created"
-msgstr ""
+msgstr "oprettet"
 
 #: documents/models.py:176
 msgid "modified"
-msgstr ""
+msgstr "ændret"
 
 #: documents/models.py:180
 msgid "storage type"
-msgstr ""
+msgstr "lagringstype"
 
 #: documents/models.py:188
 msgid "added"
-msgstr ""
+msgstr "tilføjet"
 
 #: documents/models.py:192
 msgid "filename"
-msgstr ""
+msgstr "filnavn"
 
 #: documents/models.py:198
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Nuværende filnavn lagret"
 
 #: documents/models.py:202
 msgid "archive filename"
-msgstr ""
+msgstr "arkiv filnavn"
 
 #: documents/models.py:208
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Nuværende arkivfilnavn lagret"
 
 #: documents/models.py:212
 msgid "archive serial number"
-msgstr ""
+msgstr "arkiv serienummer"
 
 #: documents/models.py:217
 msgid "The position of this document in your physical document archive."
@@ -180,237 +180,237 @@ msgstr ""
 
 #: documents/models.py:223
 msgid "document"
-msgstr ""
+msgstr "dokument"
 
 #: documents/models.py:224
 msgid "documents"
-msgstr ""
+msgstr "dokumenter"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr ""
+msgstr "fejlfinding"
 
 #: documents/models.py:312
 msgid "information"
-msgstr ""
+msgstr "information"
 
 #: documents/models.py:313
 msgid "warning"
-msgstr ""
+msgstr "advarsel"
 
 #: documents/models.py:314
 msgid "error"
-msgstr ""
+msgstr "fejl"
 
 #: documents/models.py:315
 msgid "critical"
-msgstr ""
+msgstr "kritisk"
 
 #: documents/models.py:319
 msgid "group"
-msgstr ""
+msgstr "gruppe"
 
 #: documents/models.py:322
 msgid "message"
-msgstr ""
+msgstr "besked"
 
 #: documents/models.py:325
 msgid "level"
-msgstr ""
+msgstr "niveau"
 
 #: documents/models.py:332
 msgid "log"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:333
 msgid "logs"
-msgstr ""
+msgstr "logninger"
 
 #: documents/models.py:344 documents/models.py:401
 msgid "saved view"
-msgstr ""
+msgstr "gemt visning"
 
 #: documents/models.py:345
 msgid "saved views"
-msgstr ""
+msgstr "gemte visninger"
 
 #: documents/models.py:348
 msgid "user"
-msgstr ""
+msgstr "bruger"
 
 #: documents/models.py:354
 msgid "show on dashboard"
-msgstr ""
+msgstr "vis på dashboard"
 
 #: documents/models.py:357
 msgid "show in sidebar"
-msgstr ""
+msgstr "vis i sidepanelet"
 
 #: documents/models.py:361
 msgid "sort field"
-msgstr ""
+msgstr "sortér felt"
 
 #: documents/models.py:367
 msgid "sort reverse"
-msgstr ""
+msgstr "sortér omvendt"
 
 #: documents/models.py:373
 msgid "title contains"
-msgstr ""
+msgstr "titel indeholder"
 
 #: documents/models.py:374
 msgid "content contains"
-msgstr ""
+msgstr "indhold indeholder"
 
 #: documents/models.py:375
 msgid "ASN is"
-msgstr ""
+msgstr "ASN er"
 
 #: documents/models.py:376
 msgid "correspondent is"
-msgstr ""
+msgstr "korrespondent er"
 
 #: documents/models.py:377
 msgid "document type is"
-msgstr ""
+msgstr "dokumenttype er"
 
 #: documents/models.py:378
 msgid "is in inbox"
-msgstr ""
+msgstr "er i indbakke"
 
 #: documents/models.py:379
 msgid "has tag"
-msgstr ""
+msgstr "har etiket"
 
 #: documents/models.py:380
 msgid "has any tag"
-msgstr ""
+msgstr "har en etiket"
 
 #: documents/models.py:381
 msgid "created before"
-msgstr ""
+msgstr "oprettet før"
 
 #: documents/models.py:382
 msgid "created after"
-msgstr ""
+msgstr "oprettet efter"
 
 #: documents/models.py:383
 msgid "created year is"
-msgstr ""
+msgstr "oprettet år er"
 
 #: documents/models.py:384
 msgid "created month is"
-msgstr ""
+msgstr "oprettet måned er"
 
 #: documents/models.py:385
 msgid "created day is"
-msgstr ""
+msgstr "oprettet dag er"
 
 #: documents/models.py:386
 msgid "added before"
-msgstr ""
+msgstr "tilføjet før"
 
 #: documents/models.py:387
 msgid "added after"
-msgstr ""
+msgstr "tilføjet efter"
 
 #: documents/models.py:388
 msgid "modified before"
-msgstr ""
+msgstr "ændret før"
 
 #: documents/models.py:389
 msgid "modified after"
-msgstr ""
+msgstr "ændret efter"
 
 #: documents/models.py:390
 msgid "does not have tag"
-msgstr ""
+msgstr "har ikke nogen etiket"
 
 #: documents/models.py:391
 msgid "does not have ASN"
-msgstr ""
+msgstr "har ikke ASN"
 
 #: documents/models.py:392
 msgid "title or content contains"
-msgstr ""
+msgstr "titel eller indhold indeholder"
 
 #: documents/models.py:393
 msgid "fulltext query"
-msgstr ""
+msgstr "fuldtekst forespørgsel"
 
 #: documents/models.py:394
 msgid "more like this"
-msgstr ""
+msgstr "mere som dette"
 
 #: documents/models.py:405
 msgid "rule type"
-msgstr ""
+msgstr "regeltype"
 
 #: documents/models.py:409
 msgid "value"
-msgstr ""
+msgstr "værdi"
 
 #: documents/models.py:415
 msgid "filter rule"
-msgstr ""
+msgstr "filtreringsregel"
 
 #: documents/models.py:416
 msgid "filter rules"
-msgstr ""
+msgstr "filtreringsregler"
 
 #: documents/serialisers.py:53
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Ugyldigt regulært udtryk: %(error)s"
 
 #: documents/serialisers.py:177
 msgid "Invalid color."
-msgstr ""
+msgstr "Ugyldig farve."
 
 #: documents/serialisers.py:451
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Filtype %(type)s understøttes ikke"
 
 #: documents/templates/index.html:22
 msgid "Paperless-ng is loading..."
-msgstr ""
+msgstr "Paperless-ng indlæses..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ng signed out"
-msgstr ""
+msgstr "Paperless-ng logget ud"
 
 #: documents/templates/registration/logged_out.html:45
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Du er blevet logget ud. Farvel!"
 
 #: documents/templates/registration/logged_out.html:46
 msgid "Sign in again"
-msgstr ""
+msgstr "Log ind igen"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ng sign in"
-msgstr ""
+msgstr "Paperless-ng log ind"
 
 #: documents/templates/registration/login.html:47
 msgid "Please sign in."
-msgstr ""
+msgstr "Log venligst ind."
 
 #: documents/templates/registration/login.html:50
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Dit brugernavn og adgangskode stemte ikke overens. Prøv venligst igen."
 
 #: documents/templates/registration/login.html:53
 msgid "Username"
-msgstr ""
+msgstr "Brugernavn"
 
 #: documents/templates/registration/login.html:54
 msgid "Password"
-msgstr ""
+msgstr "Adgangskode"
 
 #: documents/templates/registration/login.html:59
 msgid "Sign in"
-msgstr ""
+msgstr "Log ind"
 
 #: paperless/settings.py:303
 msgid "English (US)"
@@ -470,15 +470,15 @@ msgstr ""
 
 #: paperless_mail/admin.py:15
 msgid "Authentication"
-msgstr ""
+msgstr "Autentificering"
 
 #: paperless_mail/admin.py:18
 msgid "Advanced settings"
-msgstr ""
+msgstr "Avancerede indstillinger"
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:39
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -618,11 +618,11 @@ msgstr ""
 
 #: paperless_mail/models.py:128
 msgid "account"
-msgstr ""
+msgstr "konto"
 
 #: paperless_mail/models.py:132
 msgid "folder"
-msgstr ""
+msgstr "mappe"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
