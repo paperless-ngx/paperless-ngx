@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2022-02-17 10:35\n"
+"PO-Revision-Date: 2022-02-17 11:32\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -626,7 +626,7 @@ msgstr "mappe"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Undermapper skal adskilles med prikker."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
