@@ -32,9 +32,9 @@ repository right away.
 
 NG stands for both Angular (the framework used for the
 Frontend) and next-gen. Publishing this project under a different name also
-avoids confusion between paperless and paperless-ng.
+avoids confusion between paperless and paperless-ngx.
 
-If you want to learn about what's different in paperless-ng, check out these
+If you want to learn about what's different in paperless-ngx, check out these
 resources in the documentation:
 
 *   :ref:`Some screenshots <screenshots>` of the new UI are available.
@@ -46,12 +46,12 @@ resources in the documentation:
     the consumption directory. This means that you can select text in
     image-only documents coming from your scanner.
 *   See :ref:`this note <utilities-encyption>` about GnuPG encryption in
-    paperless-ng.
+    paperless-ngx.
 *   Paperless is now integrated with a
     :ref:`task processing queue <setup-task_processor>` that tells you
     at a glance when and why something is not working.
 *   The :ref:`changelog <paperless_changelog>` contains a detailed list of all changes
-    in paperless-ng.
+    in paperless-ngx.
 
 It would be great if this project could eventually merge back into the main
 repository, but it needs a lot more work before that can happen.
