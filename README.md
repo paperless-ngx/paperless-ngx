@@ -78,7 +78,13 @@ The documentation for Paperless-ng is available on [ReadTheDocs](https://paperle
 
 # Translation
 
-Paperless is available in many different languages. Translation is coordinated at crowdin. If you want to help out by translating paperless into your language, please head over to https://crwd.in/paperless-ngx for details!
+Paperless is available in many different languages and coordinated at Crowdin. If you want to help out by translating paperless into your language, please head over to https://crwd.in/paperless-ngx, and thank you! Some notes about translation:
+
+- There are two resources. "src-ui/messages.xlf" is what contains the translation strings for the front end. This is important. "django.po" contains strings for the administration section of paperless, which is nice to have translated.
+- Most of the front-end strings are used on buttons, menu items, etc. so ideally the translated string should not be much longer than the English original.
+- Translation units may contain placeholders. These usually mean that there's a name of a tag or document or something in the string. You can click on the placeholders to copy them.
+- Translation units may contain plural expressions such as `{PLURAL_VAR, plural, =1 {one result} =0 {no results} other {<placeholder> results}}`. Copy these verbatim and translate only the content in the inner `{}` brackets. Example: `{PLURAL_VAR, plural, =1 {Ein Ergebnis} =0 {Keine Ergebnisse} other {<placeholder> Ergebnisse}}`
+- Changes to translations in crowdin will get pushed into the repository automatically.
 
 # Feature Requests
 
