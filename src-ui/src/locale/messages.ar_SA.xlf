@@ -168,7 +168,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="translated">ASN</target>
+        <target state="needs-translation">ASN</target>
       </trans-unit>
       <trans-unit id="7b5c6286aaded63fb279d6deb8aa8c704e085ced" datatype="html">
         <source>Correspondent</source>
@@ -1049,7 +1049,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="translated">Paperless-ng</target>
+        <target state="needs-translation">Paperless-ng</target>
       </trans-unit>
       <trans-unit id="069566c6ed4f051b5b5617ef1935837226585dad" datatype="html">
         <source>Search documents</source>
@@ -1105,7 +1105,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="translated">GitHub</target>
+        <target state="needs-translation">GitHub</target>
       </trans-unit>
       <trans-unit id="ea3a452c5238897cabc5781308cceb2d37dcf258" datatype="html">
         <source>Suggest an idea</source>
@@ -1225,7 +1225,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">ASN</target>
+        <target state="needs-translation">ASN</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
@@ -2008,7 +2008,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="translated">ISO 8601</target>
+        <target state="needs-translation">ISO 8601</target>
       </trans-unit>
       <trans-unit id="2119857572761283468" datatype="html">
         <source>Document already exists.</source>
