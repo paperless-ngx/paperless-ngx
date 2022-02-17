@@ -88,19 +88,19 @@ export class SettingsService {
   getLanguageOptions(): LanguageOption[] {
     return [
       {code: "en-us", name: $localize`English (US)`, englishName: "English (US)", dateInputFormat: "mm/dd/yyyy"},
-      {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)", dateInputFormat: "dd/mm/yyyy"},
       {code: "de-de", name: $localize`German`, englishName: "German", dateInputFormat: "dd.mm.yyyy"},
-      {code: "nl-nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
+      {code: "en-gb", name: $localize`English (GB)`, englishName: "English (GB)", dateInputFormat: "dd/mm/yyyy"},
+      {code: "es-es", name: $localize`Spanish`, englishName: "Spanish", dateInputFormat: "dd/mm/yyyy"},
       {code: "fr-fr", name: $localize`French`, englishName: "French", dateInputFormat: "dd/mm/yyyy"},
-      {code: "pt-pt", name: $localize`Portuguese`, englishName: "Portuguese", dateInputFormat: "dd/mm/yyyy"},
-      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"},
       {code: "it-it", name: $localize`Italian`, englishName: "Italian", dateInputFormat: "dd/mm/yyyy"},
+      {code: "lb-lu", name: $localize`Luxembourgish`, englishName: "Luxembourgish", dateInputFormat: "dd.mm.yyyy"},
+      {code: "nl-nl", name: $localize`Dutch`, englishName: "Dutch", dateInputFormat: "dd-mm-yyyy"},
+      {code: "pl-pl", name: $localize`Polish`, englishName: "Polish", dateInputFormat: "dd.mm.yyyy"},
+      {code: "pt-br", name: $localize`Portuguese (Brazil)`, englishName: "Portuguese (Brazil)", dateInputFormat: "dd/mm/yyyy"},
+      {code: "pt-pt", name: $localize`Portuguese`, englishName: "Portuguese", dateInputFormat: "dd/mm/yyyy"},
       {code: "ro-ro", name: $localize`Romanian`, englishName: "Romanian", dateInputFormat: "dd.mm.yyyy"},
       {code: "ru-ru", name: $localize`Russian`, englishName: "Russian", dateInputFormat: "dd.mm.yyyy"},
-      {code: "es-es", name: $localize`Spanish`, englishName: "Spanish", dateInputFormat: "dd/mm/yyyy"},
-      {code: "pl-pl", name: $localize`Polish`, englishName: "Polish", dateInputFormat: "dd.mm.yyyy"},
-      {code: "sv-se", name: $localize`Swedish`, englishName: "Swedish", dateInputFormat: "yyyy-mm-dd"},
-      {code: "lb-lu", name: $localize`Luxembourgish`, englishName: "Luxembourgish", dateInputFormat: "dd.mm.yyyy"}
+      {code: "sv-se", name: $localize`Swedish`, englishName: "Swedish", dateInputFormat: "yyyy-mm-dd"}
     ]
   }
 
