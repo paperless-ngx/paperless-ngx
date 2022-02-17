@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-10-31 22:52\n"
+"PO-Revision-Date: 2022-02-17 04:33\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -11,31 +11,31 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: el\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr "Έγγραφα"
+msgstr ""
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr "Οποιαδήποτε λέξη"
+msgstr ""
 
 #: documents/models.py:33
 msgid "All words"
-msgstr "Όλες οι λέξεις"
+msgstr ""
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr "Ακριβής ταύτιση"
+msgstr ""
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr "Regular expression"
+msgstr ""
 
 #: documents/models.py:36
 msgid "Fuzzy word"
@@ -43,28 +43,28 @@ msgstr ""
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr "Αυτόματο"
+msgstr ""
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:117
 msgid "name"
-msgstr "όνομα"
+msgstr ""
 
 #: documents/models.py:45
 msgid "match"
-msgstr "αντιστοίχιση"
+msgstr ""
 
 #: documents/models.py:49
 msgid "matching algorithm"
-msgstr "αλγόριθμος αντιστοίχισης"
+msgstr ""
 
 #: documents/models.py:55
 msgid "is insensitive"
-msgstr "χωρίς διάκριση πεζών - κεφαλαίων"
+msgstr ""
 
 #: documents/models.py:74 documents/models.py:120
 msgid "correspondent"
-msgstr "ανταποκριτής"
+msgstr ""
 
 #: documents/models.py:75
 msgid "correspondents"
