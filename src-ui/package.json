@@ -23,7 +23,7 @@
     "@ng-bootstrap/ng-bootstrap": "^12.0.0",
     "@ng-select/ng-select": "^8.1.1",
     "@ngneat/dirty-check-forms": "^1.1.0",
-    "bootstrap": "^4.5.0",
+    "bootstrap": "^5.1.3",
     "file-saver": "^2.0.5",
     "ng2-pdf-viewer": "^7.0.2",
     "ngx-bootstrap": "^8.0.0",
