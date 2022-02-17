@@ -24,7 +24,7 @@ Each document has a couple of fields that you can assign to them:
 * A *Document* is a piece of paper that sometimes contains valuable
   information.
 * The *correspondent* of a document is the person, institution or company that
-  a document either originates form, or is sent to.
+  a document either originates from, or is sent to.
 * A *tag* is a label that you can assign to documents. Think of labels as more
   powerful folders: Multiple documents can be grouped together with a single
   tag, however, a single document can also have multiple tags. This is not
@@ -86,10 +86,9 @@ The consumption directory
 =========================
 
 The primary method of getting documents into your database is by putting them in
-the consumption directory.  The consumer runs in an infinite
-loop looking for new additions to this directory and when it finds them, it goes
-about the process of parsing them with the OCR, indexing what it finds, and storing
-it in the media directory.
+the consumption directory.  The consumer runs in an infinite loop, looking for new
+additions to this directory. When it finds them, the consumer goes about the process
+of parsing them with the OCR, indexing what it finds, and storing it in the media directory.
 
 Getting stuff into this directory is up to you.  If you're running Paperless
 on your local computer, you might just want to drag and drop files there, but if
@@ -128,7 +127,7 @@ IMAP (Email)
 ============
 
 You can tell paperless-ng to consume documents from your email accounts.
-This is a very flexible and powerful feature, if you regularly received documents
+This is a very flexible and powerful feature if you regularly received documents
 via mail that you need to archive. The mail consumer can be configured by using the
 admin interface in the following manner:
 
@@ -396,7 +395,7 @@ Task management
 
 Some documents require attention and require you to act on the document. You
 may take two different approaches to handle these documents based on how
-regularly you intent to use paperless and scan documents.
+regularly you intend to scan documents and use paperless.
 
 * If you scan and process your documents in paperless regularly, assign a
   TODO tag to all scanned documents that you need to process. Create a saved

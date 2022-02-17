@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -11,11 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: pt-BR\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
@@ -188,7 +188,7 @@ msgstr "documentos"
 
 #: documents/models.py:311
 msgid "debug"
-msgstr "debug"
+msgstr ""
 
 #: documents/models.py:312
 msgid "information"
@@ -220,11 +220,11 @@ msgstr "nível"
 
 #: documents/models.py:332
 msgid "log"
-msgstr "log"
+msgstr ""
 
 #: documents/models.py:333
 msgid "logs"
-msgstr "logs"
+msgstr ""
 
 #: documents/models.py:344 documents/models.py:401
 msgid "saved view"
@@ -340,7 +340,7 @@ msgstr ""
 
 #: documents/models.py:394
 msgid "more like this"
-msgstr ""
+msgstr "mais como este"
 
 #: documents/models.py:405
 msgid "rule type"
@@ -438,7 +438,7 @@ msgstr "Português (Brasil)"
 
 #: paperless/settings.py:309
 msgid "Portuguese"
-msgstr ""
+msgstr "Português"
 
 #: paperless/settings.py:310
 msgid "Italian"
@@ -450,19 +450,19 @@ msgstr "Romeno"
 
 #: paperless/settings.py:312
 msgid "Russian"
-msgstr ""
+msgstr "Russo"
 
 #: paperless/settings.py:313
 msgid "Spanish"
-msgstr ""
+msgstr "Espanhol"
 
 #: paperless/settings.py:314
 msgid "Polish"
-msgstr ""
+msgstr "Polonês"
 
 #: paperless/settings.py:315
 msgid "Swedish"
-msgstr ""
+msgstr "Sueco"
 
 #: paperless/urls.py:120
 msgid "Paperless-ng administration"
@@ -470,11 +470,11 @@ msgstr "Administração do Paperless-ng"
 
 #: paperless_mail/admin.py:15
 msgid "Authentication"
-msgstr ""
+msgstr "Autenticação"
 
 #: paperless_mail/admin.py:18
 msgid "Advanced settings"
-msgstr ""
+msgstr "Configurações avançadas"
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
@@ -502,7 +502,7 @@ msgstr "Atribua metadados aos documentos consumidos por esta regra automaticamen
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr "Paperless mail"
+msgstr ""
 
 #: paperless_mail/models.py:11
 msgid "mail account"
@@ -550,11 +550,11 @@ msgstr "senha"
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr ""
+msgstr "Conjunto de caracteres"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "O conjunto de caracteres usado ao se comunicar com o servidor de email, como 'UTF-8' ou 'US-ASCII'."
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
@@ -626,7 +626,7 @@ msgstr "pasta"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Subpastas devem ser separadas por pontos."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
@@ -675,7 +675,7 @@ msgstr "parâmetro da ação"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Parâmetro adicional para a ação selecionada acima, por exemplo: a pasta de destino da ação de mover pasta. Subpastas devem ser separadas por pontos."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"

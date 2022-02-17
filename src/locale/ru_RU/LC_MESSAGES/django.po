@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -11,11 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: ru\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
@@ -434,7 +434,7 @@ msgstr "Французский"
 
 #: paperless/settings.py:308
 msgid "Portuguese (Brazil)"
-msgstr "Portuguese (Brazil)"
+msgstr ""
 
 #: paperless/settings.py:309
 msgid "Portuguese"
@@ -442,11 +442,11 @@ msgstr "Португальский"
 
 #: paperless/settings.py:310
 msgid "Italian"
-msgstr "Italian"
+msgstr ""
 
 #: paperless/settings.py:311
 msgid "Romanian"
-msgstr "Romanian"
+msgstr ""
 
 #: paperless/settings.py:312
 msgid "Russian"
@@ -458,11 +458,11 @@ msgstr "Испанский"
 
 #: paperless/settings.py:314
 msgid "Polish"
-msgstr ""
+msgstr "Польский"
 
 #: paperless/settings.py:315
 msgid "Swedish"
-msgstr ""
+msgstr "Шведский"
 
 #: paperless/urls.py:120
 msgid "Paperless-ng administration"
@@ -470,11 +470,11 @@ msgstr "Администрирование Paperless-ng"
 
 #: paperless_mail/admin.py:15
 msgid "Authentication"
-msgstr ""
+msgstr "Аутентификация"
 
 #: paperless_mail/admin.py:18
 msgid "Advanced settings"
-msgstr ""
+msgstr "Продвинутые настройки"
 
 #: paperless_mail/admin.py:37
 msgid "Filter"
@@ -550,11 +550,11 @@ msgstr "пароль"
 
 #: paperless_mail/models.py:54
 msgid "character set"
-msgstr ""
+msgstr "Кодировка"
 
 #: paperless_mail/models.py:57
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Кодировка, используемая при общении с почтовым сервером, например 'UTF-8' или 'US-ASCII'."
 
 #: paperless_mail/models.py:68
 msgid "mail rule"
@@ -626,7 +626,7 @@ msgstr "каталог"
 
 #: paperless_mail/models.py:134
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Подпапки должны быть разделены точками."
 
 #: paperless_mail/models.py:138
 msgid "filter from"
@@ -674,7 +674,7 @@ msgstr "параметр действия"
 
 #: paperless_mail/models.py:177
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Дополнительный параметр для указанного выше действия, то есть целевая папка операции перемещения в папку. Вложенные папки должны быть разделены точками."
 
 #: paperless_mail/models.py:184
 msgid "assign title from"

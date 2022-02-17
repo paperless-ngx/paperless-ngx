@@ -78,11 +78,11 @@ default_time_zone=$(timedatectl show -p Timezone --value)
 set -e
 
 echo ""
-echo "############################################"
-echo "###   Paperless-ng docker installation   ###"
-echo "############################################"
+echo "#############################################"
+echo "###   paperless-ngx docker installation   ###"
+echo "#############################################"
 echo ""
-echo "This script will download, configure and start paperless-ng."
+echo "This script will download, configure and start paperless-ngx."
 
 echo ""
 echo "1. Folder configuration"
@@ -94,7 +94,7 @@ echo "You will need this folder whenever you want to start, stop, update or "
 echo "maintain your paperless instance."
 echo ""
 
-ask "Target folder" "$(pwd)/paperless-ng"
+ask "Target folder" "$(pwd)/paperless-ngx"
 TARGET_FOLDER=$ask_result
 
 echo ""
@@ -179,6 +179,7 @@ echo "Specify the default language that most of your documents are written in."
 echo "Use ISO 639-2, (T) variant language codes: "
 echo "https://www.loc.gov/standards/iso639-2/php/code_list.php"
 echo "Common values: eng (English) deu (German) nld (Dutch) fra (French)"
+echo "This can be a combination of multiple languages such as deu+eng"
 echo ""
 
 ask "OCR language" "eng"
@@ -277,8 +278,8 @@ if [[ $TIKA_ENABLED == "yes" ]] ; then
 	DOCKER_COMPOSE_VERSION="$DOCKER_COMPOSE_VERSION-tika"
 fi
 
-wget "https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
-wget "https://raw.githubusercontent.com/jonaswinkler/paperless-ng/master/docker/compose/.env" -O .env
+wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
+wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docker/compose/.env" -O .env
 
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 

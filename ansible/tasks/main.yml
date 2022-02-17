@@ -347,6 +347,8 @@
       line: "PAPERLESS_CONVERT_TMPDIR={{ paperlessng_convert_tmpdir }}"
     - regexp: PAPERLESS_OPTIMIZE_THUMBNAILS
       line: "PAPERLESS_OPTIMIZE_THUMBNAILS={{ paperlessng_optimize_thumbnails }}"
+    - regexp: PAPERLESS_PRE_CONSUME_SCRIPT
+      line: "PAPERLESS_PRE_CONSUME_SCRIPT={{ paperlessng_pre_consume_script }}"
     - regexp: PAPERLESS_POST_CONSUME_SCRIPT
       line: "PAPERLESS_POST_CONSUME_SCRIPT={{ paperlessng_post_consume_script }}"
     - regexp: PAPERLESS_FILENAME_DATE_ORDER

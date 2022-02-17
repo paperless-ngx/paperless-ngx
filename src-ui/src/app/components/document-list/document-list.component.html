@@ -82,8 +82,14 @@
 
 <div class="d-flex justify-content-between align-items-center">
   <p>
+    <ng-container *ngIf="list.isReloading">
+      <div class="spinner-border spinner-border-sm mr-2" role="status"></div>
+      <ng-container i18n>Loading...</ng-container>
+    </ng-container>
     <span i18n *ngIf="list.selected.size > 0">{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
-    <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
+    <ng-container *ngIf="!list.isReloading">
+      <span i18n *ngIf="list.selected.size == 0">{list.collectionSize, plural, =1 {One document} other {{{list.collectionSize || 0}} documents}}</span>&nbsp;<span i18n *ngIf="isFiltered">(filtered)</span>
+    </ng-container>
   </p>
   <ngb-pagination [pageSize]="list.currentPageSize" [collectionSize]="list.collectionSize" [(page)]="list.currentPage" [maxSize]="5"
   [rotate]="true" aria-label="Default pagination"></ngb-pagination>
