@@ -1105,7 +1105,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="needs-translation">GitHub</target>
+        <target state="translated">GitHub</target>
       </trans-unit>
       <trans-unit id="ea3a452c5238897cabc5781308cceb2d37dcf258" datatype="html">
         <source>Suggest an idea</source>
