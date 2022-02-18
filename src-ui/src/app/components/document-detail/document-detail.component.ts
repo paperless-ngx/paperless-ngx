@@ -124,14 +124,18 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
 
     this.route.paramMap.pipe(switchMap(paramMap => {
       const documentId = +paramMap.get('id')
-      return this.documentsService.get(documentId).pipe(map(doc => ({doc, documentId})))
-    })).pipe(switchMap(({doc, documentId}) => {
-      this.previewUrl = this.documentsService.getPreviewUrl(documentId)
-      this.downloadUrl = this.documentsService.getDownloadUrl(documentId)
-      this.downloadOriginalUrl = this.documentsService.getDownloadUrl(documentId, true)
+      return this.documentsService.get(documentId)
+    })).pipe(switchMap((doc) => {
+      this.documentId = doc.id
+      this.previewUrl = this.documentsService.getPreviewUrl(this.documentId)
+      this.downloadUrl = this.documentsService.getDownloadUrl(this.documentId)
+      this.downloadOriginalUrl = this.documentsService.getDownloadUrl(this.documentId, true)
       this.suggestions = null
-      if (this.openDocumentService.getOpenDocument(documentId)) {
-        this.updateComponent(this.openDocumentService.getOpenDocument(documentId))
+      if (this.openDocumentService.getOpenDocument(this.documentId)) {
+        this.updateComponent(this.openDocumentService.getOpenDocument(this.documentId))
+      } else {
+        this.openDocumentService.openDocument(doc)
+        this.updateComponent(doc)
       }
 
       // Initialize dirtyCheck
@@ -147,17 +151,11 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
 
       this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
 
-      return this.isDirty$.pipe(map(dirty => ({doc, documentId, dirty})))
+      return this.isDirty$.pipe(map(dirty => ({doc, dirty})))
     }))
     .pipe(takeUntil(this.unsubscribeNotifier))
-    .subscribe(({doc, documentId, dirty}) => {
-      this.documentId = documentId
-      this.openDocumentService.setDirty(documentId, dirty)
-
-      if (!this.openDocumentService.getOpenDocument(documentId)) {
-        this.openDocumentService.openDocument(doc)
-        this.updateComponent(doc)
-      }
+    .subscribe(({doc, dirty}) => {
+      this.openDocumentService.setDirty(doc.id, dirty)
     }, error => {this.router.navigate(['404'])})
   }
 
@@ -237,13 +235,13 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     this.documentsService.update(this.document).pipe(switchMap(updateResult => {
       return this.documentListViewService.getNext(this.documentId).pipe(map(nextDocId => ({nextDocId, updateResult})))
     })).pipe(switchMap(({nextDocId, updateResult}) => {
-      if (nextDocId) return this.openDocumentService.closeDocument(this.document, true).pipe(map(closeResult => ({updateResult, nextDocId, closeResult})))
+      if (nextDocId && updateResult) return this.openDocumentService.closeDocument(this.document).pipe(map(closeResult => ({updateResult, nextDocId, closeResult})))
     }))
-    .pipe(takeUntil(this.unsubscribeNotifier))
+    .pipe(first())
     .subscribe(({updateResult, nextDocId, closeResult}) => {
       this.error = null
       this.networkActive = false
-      if (closeResult) {
+      if (closeResult && updateResult && nextDocId) {
         this.router.navigate(['documents', nextDocId])
         this.titleInput?.focus()
       }
