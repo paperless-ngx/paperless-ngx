@@ -302,6 +302,7 @@ LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = [
     ("en-us", _("English (US)")), # needs to be first to act as fallback language
+    ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
     ("de-de", _("German")),
     ("en-gb", _("English (GB)")),
