@@ -1,6 +1,6 @@
     <div class="modal-header">
       <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
-      <button type="button" class="close" aria-label="Close" (click)="cancelClicked()">
+      <button type="button" class="close" aria-label="Close" (click)="cancel()">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -9,8 +9,8 @@
       <p *ngIf="message">{{message}}</p>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-dark" (click)="cancelClicked()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
-      <button type="button" class="btn" [class]="btnClass" (click)="confirmClicked.emit()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+      <button type="button" class="btn btn-outline-dark" (click)="cancel()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
+      <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
         {{btnCaption}}
         <span *ngIf="!confirmButtonEnabled"> ({{seconds}})</span>
       </button>

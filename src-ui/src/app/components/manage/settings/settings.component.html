@@ -170,5 +170,5 @@
 
   <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3 shadow-sm"></div>
 
-  <button type="submit" class="btn btn-primary" i18n>Save</button>
+  <button type="submit" class="btn btn-primary" [disabled]="!(isDirty$ | async)" i18n>Save</button>
 </form>
