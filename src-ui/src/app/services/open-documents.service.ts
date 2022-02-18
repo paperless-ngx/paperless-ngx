@@ -63,10 +63,10 @@ export class OpenDocumentsService {
     else this.dirtyDocuments.delete(documentId)
   }
 
-  closeDocument(doc: PaperlessDocument, force: boolean = false): Observable<boolean> {
+  closeDocument(doc: PaperlessDocument): Observable<boolean> {
     let index = this.openDocuments.findIndex(d => d.id == doc.id)
     if (index == -1) return of(true);
-    if (force || !this.dirtyDocuments.has(doc.id)) {
+    if (!this.dirtyDocuments.has(doc.id)) {
       this.openDocuments.splice(index, 1)
       this.save()
       return of(true)
