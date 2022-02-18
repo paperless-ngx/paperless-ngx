@@ -45,7 +45,7 @@ out of that folder to use them elsewhere. Here are a couple notes about that.
     :ref:`configuring the filename format <advanced-file_name_handling>`.
 *   :ref:`The exporter <utilities-exporter>` is another easy way to get your files out of paperless with reasonable file names.
 
-**Q:** *What file types does paperless-ng support?*
+**Q:** *What file types does paperless-ngx support?*
 
 **A:** Currently, the following files are supported:
 
@@ -58,7 +58,7 @@ out of that folder to use them elsewhere. Here are a couple notes about that.
 Paperless determines the type of a file by inspecting its content. The
 file extensions do not matter.
 
-**Q:** *Will paperless-ng run on Raspberry Pi?*
+**Q:** *Will paperless-ngx run on Raspberry Pi?*
 
 **A:** The short answer is yes. I've tested it on a Raspberry Pi 3 B.
 The long answer is that certain parts of
@@ -73,7 +73,7 @@ in your browser and paperless has to do much less work to serve the data.
     power. See :ref:`setup-less_powerful_devices` for details.
 
 
-**Q:** *How do I install paperless-ng on Raspberry Pi?*
+**Q:** *How do I install paperless-ngx on Raspberry Pi?*
 
 **A:** Docker images are available for arm and arm64 hardware, so just follow
 the docker-compose instructions. Apart from more required disk space compared to

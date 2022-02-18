@@ -3,7 +3,7 @@
 Paperless development
 #####################
 
-This section describes the steps you need to take to start development on paperless-ng.
+This section describes the steps you need to take to start development on paperless-ngx.
 
 Check out the source from github. The repository is organized in the following way:
 
