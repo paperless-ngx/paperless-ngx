@@ -102,6 +102,7 @@ export class OpenDocumentsService {
         modal.componentInstance.buttonsEnabled = false
         modal.close()
         this.openDocuments.splice(0, this.openDocuments.length)
+        this.dirtyDocuments.clear()
         this.save()
       })
       const subject = new Subject<boolean>()
@@ -109,6 +110,7 @@ export class OpenDocumentsService {
       return subject.asObservable()
     } else {
       this.openDocuments.splice(0, this.openDocuments.length)
+      this.dirtyDocuments.clear()
       this.save()
       return of(true)
     }
