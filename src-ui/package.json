@@ -31,7 +31,7 @@
     "ngx-cookie-service": "^10.1.1",
     "ngx-file-drop": "^11.1.0",
     "ngx-infinite-scroll": "^9.1.0",
-    "rxjs": "~6.6.0",
+    "rxjs": "~6.6.7",
     "tslib": "^2.0.0",
     "uuid": "^8.3.1",
     "zone.js": "~0.11.4"
