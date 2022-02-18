@@ -233,6 +233,94 @@ PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME=<str>
 
     Defaults to `HTTP_REMOTE_USER`.
 
+LDAP Auth settings
+############
+
+PAPERLESS_LDAP_ENABLE=<bool>
+    Enable LDAP authentication.
+
+    Defaults to `false`.
+PAPERLESS_LDAP_USE_TLS=<bool>
+    Enable TLS for LDAP connections.
+    If set to `true`, the LDAP server must support TLS.
+
+    Defaults to `true`.
+PAPERLESS_LDAP_IGNORE_CERT=<bool>
+    Ignore certificate errors when connecting to LDAP.
+    Attention, this is a dangerous setting and should only be used in case of problems with LDAPS or self-signed certificates. 
+
+    Defaults to `false`.
+PAPERLESS_LDAP_CACERTFILE=<path>
+    Path to the CA certificate file which is used in the LDAPS configuration.
+    If set, the certificate is used for the LDAPS connection.
+    Mandatory if `PAPERLESS_LDAP_USE_TLS` is set to `true`.
+
+    This config is only used if `PAPERLESS_LDAP_START_TLS` is set to `true`.
+
+    Defaults to `""`.
+PAPERLESS_LDAP_OPT_PROTOCOL_VERSION=<num>
+    LDAP protocol version. 
+    For more information visit `offical Microsoft docs <https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ldap/differences-between-ldap-2-and-ldap-3>`_.
+    
+    Versions available:
+    * ``2``: LDAP 2
+    * ``3``: LDAP 3
+
+    Defaults to `3`.
+PAPERLESS_LDAP_URI=<url>
+    LDAP server URI.
+
+    Defaults to `ldap://localhost`.
+PAPERLESS_LDAP_BIND_DN=<str>
+    LDAP bind DN.
+    Sets the user and location of the user in the LDAP directory tree
+
+    Defaults to `""`.
+PAPERLESS_LDAP_BIND_PASSWORD=<str>
+    LDAP bind password.
+
+    Defaults to `""`.
+PAPERLESS_LDAP_GROUP_LIMIT_ENABLE=<bool>
+    Enable LDAP group access control.
+    This will limit access to paperless to users who are members of the specified LDAP group.
+
+    Defaults to `false`.
+PAPERLESS_LDAP_GROUP_BASE=<str>
+    LDAP group base.
+    The base DN of groups in the LDAP directory tree.
+
+    Defaults to `ou=groups,dc=example,dc=com`.
+PAPERLESS_LDAP_REQUIRE_GROUP=<str>
+    LDAP group required.
+    The group name which is required to access paperless.
+
+    Defaults to `""`.
+PAPERLESS_LDAP_USER_BASE=<str>
+    LDAP user base.
+    The base DN of users in the LDAP directory tree.
+
+    Defaults to `ou=users,dc=example,dc=com`.
+PAPERLESS_LDAP_USER_FILTER=<str>
+    LDAP user filter.
+    The filter used to find the user in the LDAP directory tree.
+
+    Defaults to `(uid=%(user)s)`.
+PAPERLESS_LDAP_FIRSTNAME_ATTR=<str>
+    LDAP firstname attribute.
+    The attribute used to find the user's firstname in the LDAP directory tree.
+
+    Defaults to `givenName`.
+PAPERLESS_LDAP_LASTNAME_ATTR=<str>
+    LDAP lastname attribute.
+    The attribute used to find the user's lastname in the LDAP directory tree.
+
+    Defaults to `sn`.
+PAPERLESS_LDAP_EMAIL_ATTR=<str>
+    LDAP email attribute.
+    The attribute used to find the user's email in the LDAP directory tree.
+
+    Defaults to `mail`.
+
 .. _configuration-ocr:
 
 OCR settings

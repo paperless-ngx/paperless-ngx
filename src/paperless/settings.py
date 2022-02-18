@@ -207,11 +207,11 @@ if ENABLE_HTTP_REMOTE_USER:
         'rest_framework.authentication.RemoteUserAuthentication'
     )
 
-ENABLE_LDAP_AUTH = __get_boolean("PAPERLESS_ENABLE_LDAP_AUTH")
+ENABLE_LDAP_AUTH = __get_boolean("PAPERLESS_LDAP_ENABLE")
 
 if ENABLE_LDAP_AUTH:
     import ldap
-    from django_auth_ldap.config import LDAPSearch
+    from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
     AUTHENTICATION_BACKENDS.append(
         'django_auth_ldap.backend.LDAPBackend'
     )
@@ -222,12 +222,37 @@ if ENABLE_LDAP_AUTH:
         os.getenv("PAPERLESS_LDAP_USER_BASE", "ou=users,dc=example,dc=com"),
         ldap.SCOPE_SUBTREE, os.getenv("PAPERLESS_LDAP_USER_FILTER", "(uid=%(user)s)")
     )
-    AUTH_LDAP_START_TLS = os.getenv("PAPERLESS_LDAP_START_TLS", True)
+    if __get_boolean("PAPERLESS_LDAP_GROUP_LIMIT_ENABLE"):
+        AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+            os.getenv("PAPERLESS_LDAP_GROUP_BASE", "ou=groups,dc=example,dc=com"), ldap.SCOPE_SUBTREE, "(objectClass=groupOfNames)"
+        )
+        AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+        AUTH_LDAP_REQUIRE_GROUP = os.getenv("PAPERLESS_LDAP_REQUIRE_GROUP", "")
+
+    if __get_boolean("PAPERLESS_LDAP_USE_TLS"):
+        AUTH_LDAP_START_TLS = os.getenv("PAPERLESS_LDAP_USE_TLS", True)
+        ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_DEMAND)
+
+        AUTH_LDAP_CONNECTION_OPTIONS = {
+            ldap.OPT_PROTOCOL_VERSION: os.getenv("PAPERLESS_LDAP_OPT_PROTOCOL_VERSION", 3),
+            ldap.OPT_X_TLS_REQUIRE_CERT: ldap.OPT_X_TLS_ALLOW,
+            ldap.OPT_X_TLS_CACERTFILE: os.getenv("PAPERLESS_LDAP_CACERTFILE", ""),
+            ldap.OPT_X_TLS_NEWCTX: 0,
+        }
+    else:
+        AUTH_LDAP_START_TLS = os.getenv("PAPERLESS_LDAP_USE_TLS", False)
+        
     AUTH_LDAP_USER_ATTR_MAP = {
         "first_name": os.getenv("PAPERLESS_LDAP_FIRSTNAME_ATTR", "givenName"),
         "last_name": os.getenv("PAPERLESS_LDAP_LASTNAME_ATTR", "sn"),
         "email": os.getenv("PAPERLESS_LDAP_EMAIL_ATTR", "mail")
     }
+    if __get_boolean("PAPERLESS_LDAP_IGNORE_CERT"):
+        ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
+        
+
+
+
 
 AUTHENTICATION_BACKENDS.append(
     'django.contrib.auth.backends.ModelBackend'
