@@ -301,20 +301,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = [
-    ("en-us", _("English (US)")),
-    ("en-gb", _("English (GB)")),
+    ("en-us", _("English (US)")), # needs to be first to act as fallback language
     ("de-de", _("German")),
-    ("nl-nl", _("Dutch")),
+    ("en-gb", _("English (GB)")),
+    ("es-es", _("Spanish")),
     ("fr-fr", _("French")),
+    ("it-it", _("Italian")),
+    ("lb-lu", _("Luxembourgish")),
+    ("nl-nl", _("Dutch")),
+    ("pl-pl", _("Polish")),
     ("pt-br", _("Portuguese (Brazil)")),
     ("pt-pt", _("Portuguese")),
-    ("it-it", _("Italian")),
     ("ro-ro", _("Romanian")),
     ("ru-ru", _("Russian")),
-    ("es-es", _("Spanish")),
-    ("pl-pl", _("Polish")),
     ("sv-se", _("Swedish")),
-    ("lb-lu", _("Luxembourgish")),
 ]
 
 LOCALE_PATHS = [
