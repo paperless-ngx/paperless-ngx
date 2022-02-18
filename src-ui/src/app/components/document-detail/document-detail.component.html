@@ -56,7 +56,7 @@
                     <a ngbNavLink i18n>Details</a>
                     <ng-template ngbNavContent>
 
-                        <app-input-text #inputTitle i18n-title title="Title" formControlName="title" [error]="error?.title"></app-input-text>
+                        <app-input-text #inputTitle i18n-title title="Title" formControlName="title" (keyup)="titleKeyUp($event)" [error]="error?.title"></app-input-text>
                         <app-input-number i18n-title title="Archive serial number" [error]="error?.archive_serial_number" formControlName='archive_serial_number'></app-input-number>
                         <app-input-date i18n-title title="Date created" formControlName="created" [error]="error?.created"></app-input-date>
                         <app-input-select [items]="correspondents" i18n-title title="Correspondent" formControlName="correspondent" [allowNull]="true"
@@ -127,18 +127,26 @@
                 <li [ngbNavItem]="4" class="d-md-none">
                   <a ngbNavLink>Preview</a>
                   <ng-template ngbNavContent *ngIf="pdfPreview.offsetParent == undefined">
-                    <div class="pdf-viewer-container" *ngIf="getContentType() == 'application/pdf'">
-                      <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true"></pdf-viewer>
-                    </div>
+                    <ng-container *ngIf="getContentType() == 'application/pdf'">
+                        <div class="preview-sticky pdf-viewer-container" *ngIf="!useNativePdfViewer ; else nativePdfViewer">
+                            <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [render-text-mode]="2"></pdf-viewer>
+                        </div>
+                        <ng-template #nativePdfViewer>
+                            <object [data]="previewUrl | safe" class="preview-sticky" width="100%"></object>
+                        </ng-template>
+                    </ng-container>
+                    <ng-container *ngIf="getContentType() == 'text/plain'">
+                        <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
+                    </ng-container>
                   </ng-template>
                 </li>
             </ul>
 
             <div [ngbNavOutlet]="nav" class="mt-2"></div>
 
-            <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive">Discard</button>&nbsp;
-            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive">Save & next</button>&nbsp;
-            <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive">Save</button>&nbsp;
+            <button type="button" class="btn btn-outline-secondary" (click)="discard()" i18n [disabled]="networkActive || !(isDirty$ | async)">Discard</button>&nbsp;
+            <button type="button" class="btn btn-outline-primary" (click)="saveEditNext()" *ngIf="hasNext()" i18n [disabled]="networkActive || !(isDirty$ | async)">Save & next</button>&nbsp;
+            <button type="submit" class="btn btn-primary" i18n [disabled]="networkActive || !(isDirty$ | async)">Save</button>&nbsp;
         </form>
     </div>
 
@@ -154,6 +162,5 @@
         <ng-container *ngIf="getContentType() == 'text/plain'">
             <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
         </ng-container>
-
     </div>
 </div>
