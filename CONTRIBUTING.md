@@ -55,3 +55,29 @@ Our community review process for `non-trivial` PRs is the following:
 4. **At least two** members of the team will approve and finally merge the request into `dev` 🎉.
 
 This process might be slow as community members have different schedules and time to dedicate to the Paperless project. However it ensures community code reviews are as brilliantly thorough as they once were with @jonaswinkler.
+
+# Adding a new language
+
+This section describes how new languages can be added to the code.
+If a language has already been added, and you would like to contribute new translations or change existing translations, please read the "Translation" section in the README.md file for further details on that.
+
+If you would like the project to be translated to another language, first head over to https://crwd.in/paperless-ngx to check if that language has already been enabled for translation.
+If not, please request the language to be added by creating an issue on GitHub. The issue should contain:
+
+* English name of the language (the localized name can be added on Crowdin).
+* ISO language code. A list of those can be found here: https://support.crowdin.com/enterprise/language-codes/
+* Date format commonly used for the language, e.g. dd/mm/yyyy, mm/dd/yyyy, etc.
+
+After the language has been added and some translations have been made on Crowdin, the language needs to be enabled in the code.
+Note that there is no need to manually add a .po of .xlf file as those will be automatically generated and imported from Crowdin.
+The following files need to be changed:
+
+* src-ui/angular.json (under the _projects/paperless-ui/i18n/locales_ JSON key)
+* src/paperless/settings.py (in the _LANGUAGES_ array)
+* src-ui/src/app/services/settings.service.ts (inside the _getLanguageOptions_ method)
+
+Please add the language in the correct order, alphabetically by locale.
+Note that _en-us_ needs to stay on top of the list, as it is the default project language
+
+If you are familiar with Git, feel free to send a Pull Request with those changes.
+If not, let us know in the issue you created for the language, so that another developer can make these changes.
