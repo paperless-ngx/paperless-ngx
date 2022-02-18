@@ -126,8 +126,8 @@ which not only has document upload, but also document browsing and download feat
 IMAP (Email)
 ============
 
-You can tell paperless-ng to consume documents from your email accounts.
-This is a very flexible and powerful feature if you regularly received documents
+You can tell paperless-ngx to consume documents from your email accounts.
+This is a very flexible and powerful feature, if you regularly received documents
 via mail that you need to archive. The mail consumer can be configured by using the
 admin interface in the following manner:
 
