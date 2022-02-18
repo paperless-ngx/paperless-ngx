@@ -88,7 +88,7 @@ The documentation for Paperless-ng is available on [ReadTheDocs](https://paperle
 
 # Translation
 
-Paperless-ngx is available in many languages that are coordinated on Crowdin. If you want to help out by translating paperless-ngx into your language, please head over to https://crwd.in/paperless-ngx, and thank you! Some notes about translation:
+Paperless-ngx is available in many languages that are coordinated on Crowdin. If you want to help out by translating paperless-ngx into your language, please head over to https://crwd.in/paperless-ngx, and thank you! More details about adding new languages to the code can be found in [CONTRIBUTING.md](https://github.com/paperless-ngx/paperless-ngx/blob/master/CONTRIBUTING.md#adding-a-new-language). Some notes about translation:
 
 - There are two resources:
   - "src-ui/messages.xlf" contains the translation strings for the front end. This is the most important.
