@@ -1,0 +1,22 @@
+# https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/configuration-options-for-dependency-updates#package-ecosystem
+
+version: 2
+updates:
+
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    target-branch: "dev"
+    # Look for `package.json` and `lock` files in the `root` directory
+    directory: "/src-ui"
+    # Check the npm registry for updates every week
+    schedule:
+      interval: "weekly"
+
+  # Enable version updates for Python
+  - package-ecosystem: "pip"
+    target-branch: "dev"
+    # Look for a `Pipfile` in the `root` directory
+    directory: "/"
+    # Check for updates once a week
+    schedule:
+      interval: "weekly"
