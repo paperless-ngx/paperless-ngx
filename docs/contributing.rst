@@ -5,7 +5,7 @@ Contributing to Paperless
 
 .. warning::
 
-    This section is not updated to paperless-ng yet.
+    This section is not updated to paperless-ngx yet.
 
 Maybe you've been using Paperless for a while and want to add a feature or two,
 or maybe you've come across a bug that you have some ideas how to solve.  The

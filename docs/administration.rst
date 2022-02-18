@@ -64,9 +64,9 @@ Updating Paperless
 Docker Route
 ============
 
-If a new release of paperless-ng is available, upgrading depends on how you
-installed paperless-ng in the first place. The releases are available at the
-`release page <https://github.com/jonaswinkler/paperless-ng/releases>`_.
+If a new release of paperless-ngx is available, upgrading depends on how you
+installed paperless-ngx in the first place. The releases are available at the
+`release page <https://github.com/paperless-ngx/paperless-ngx/releases>`_.
 
 First of all, ensure that paperless is stopped.
 
@@ -98,14 +98,14 @@ B.  If you built the image yourself, do the following:
 
 Running ``docker-compose up`` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop paperless.
-Then you can start paperless-ng with ``-d`` to have it run in the background.
+Then you can start paperless-ngx with ``-d`` to have it run in the background.
 
     .. note::
 
         In version 0.9.14, the update process was changed. In 0.9.13 and earlier, the
         docker-compose files specified exact versions and pull won't automatically
         update to newer versions. In order to enable updates as described above, either
-        get the new ``docker-compose.yml`` file from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+        get the new ``docker-compose.yml`` file from `here <https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose>`_
         or edit the ``docker-compose.yml`` file, find the line that says
 
             .. code::
