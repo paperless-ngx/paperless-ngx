@@ -278,9 +278,9 @@ jobs:
           asset_name: paperless-ng-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
 
-  # build and push image to ghcr.
+  # build and push image to docker hub.
   build-docker-image:
-    if: startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/ng-') || startsWith(github.ref, 'refs/pull/')
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/ng-'))
     runs-on: ubuntu-latest
     needs: [frontend, tests, whitespace, codestyle]
     steps:
@@ -294,9 +294,6 @@ jobs:
             INSPECT_TAG=${IMAGE_NAME}:latest
           elif [[ $GITHUB_REF == refs/heads/* ]]; then
             TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/heads/}
-            INSPECT_TAG=${TAGS}
-          elif [[ $GITHUB_REF == refs/pull/* ]]; then
-            TAGS=${IMAGE_NAME}:pr-${{ github.event.number }}
             INSPECT_TAG=${TAGS}
           else
             exit 1
