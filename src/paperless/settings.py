@@ -241,7 +241,7 @@ if ENABLE_LDAP_AUTH:
         }
     else:
         AUTH_LDAP_START_TLS = os.getenv("PAPERLESS_LDAP_USE_TLS", False)
-        
+
     AUTH_LDAP_USER_ATTR_MAP = {
         "first_name": os.getenv("PAPERLESS_LDAP_FIRSTNAME_ATTR", "givenName"),
         "last_name": os.getenv("PAPERLESS_LDAP_LASTNAME_ATTR", "sn"),
@@ -249,7 +249,7 @@ if ENABLE_LDAP_AUTH:
     }
     if __get_boolean("PAPERLESS_LDAP_IGNORE_CERT"):
         ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-        
+
 
 
 

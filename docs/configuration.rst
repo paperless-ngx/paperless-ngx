@@ -247,7 +247,7 @@ PAPERLESS_LDAP_USE_TLS=<bool>
     Defaults to `true`.
 PAPERLESS_LDAP_IGNORE_CERT=<bool>
     Ignore certificate errors when connecting to LDAP.
-    Attention, this is a dangerous setting and should only be used in case of problems with LDAPS or self-signed certificates. 
+    Attention, this is a dangerous setting and should only be used in case of problems with LDAPS or self-signed certificates.
 
     Defaults to `false`.
 PAPERLESS_LDAP_CACERTFILE=<path>
@@ -259,9 +259,8 @@ PAPERLESS_LDAP_CACERTFILE=<path>
 
     Defaults to `""`.
 PAPERLESS_LDAP_OPT_PROTOCOL_VERSION=<num>
-    LDAP protocol version. 
+    LDAP protocol version.
     For more information visit `offical Microsoft docs <https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ldap/differences-between-ldap-2-and-ldap-3>`_.
-    
     Versions available:
     * ``2``: LDAP 2
     * ``3``: LDAP 3
