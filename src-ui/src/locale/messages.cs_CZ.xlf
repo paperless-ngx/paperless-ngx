@@ -16,7 +16,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> byl přidán do Paperless-ng.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> byl přidán do Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -48,7 +48,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> je zpracováván Paperless-ng.</target>
+        <target state="translated">Dokument <x id="PH" equiv-text="status.filename"/> je zpracováván Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -1049,7 +1049,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="needs-translation">Paperless-ngx</target>
+        <target state="translated">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="069566c6ed4f051b5b5617ef1935837226585dad" datatype="html">
         <source>Search documents</source>
@@ -1808,7 +1808,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="translated">Paperless-ng nabízí další funkce, které se snaží usnadnit váš život:</target>
+        <target state="translated">Paperless-ngx nabízí další funkce, které se snaží usnadnit váš život:</target>
       </trans-unit>
       <trans-unit id="edb41dc36af2e70789d8e3422325d930e783253e" datatype="html">
         <source>Once you&apos;ve got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</source>
@@ -1816,7 +1816,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Jakmile máte nahraných několik dokumentů a přidali jste k nim metadata, Paperless-ng může přiřadit tato metadata automaticky i k nově nahraným dokumentům.</target>
+        <target state="translated">Jakmile máte nahraných několik dokumentů a přidali jste k nim metadata, Paperless-ngx může přiřadit tato metadata automaticky i k nově nahraným dokumentům.</target>
       </trans-unit>
       <trans-unit id="9dca488928c0b7af46c3866f86a6c2c8548399aa" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
