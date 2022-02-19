@@ -1,7 +1,23 @@
 from django.contrib import admin
+from django import forms
 from paperless_mail.models import MailAccount, MailRule
 
 from django.utils.translation import gettext_lazy as _
+
+
+class MailAccountAdminForm(forms.ModelForm):
+
+    """Metadata classes used by Django admin to display the form."""
+
+    class Meta:
+
+        """Metadata class used by Django admin to display the form."""
+
+        model = MailAccount
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+        fields = '__all__'
 
 
 class MailAccountAdmin(admin.ModelAdmin):
@@ -19,6 +35,7 @@ class MailAccountAdmin(admin.ModelAdmin):
             'fields': ['character_set']
         })
     ]
+    form = MailAccountAdminForm
 
 
 class MailRuleAdmin(admin.ModelAdmin):
