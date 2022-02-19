@@ -450,13 +450,13 @@
         </context-group>
         <target state="translated">Gem &amp; næste</target>
       </trans-unit>
-      <trans-unit id="8765497970646365998" datatype="html">
+      <trans-unit id="8765497970646365998" datatype="html" approved="yes">
         <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Hej <x id="PH" equiv-text="this.displayName"/>, velkommen til Paperless-ngx!</target>
+        <target state="final">Hej <x id="PH" equiv-text="this.displayName"/>, velkommen til Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="7016571167317583872" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
