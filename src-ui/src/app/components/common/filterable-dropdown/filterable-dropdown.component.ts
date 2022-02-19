@@ -15,6 +15,8 @@ export class FilterableDropdownSelectionModel {
   changed = new Subject<FilterableDropdownSelectionModel>()
 
   multiple = false
+  private _logicalOperator = 'and'
+  temporaryLogicalOperator = this._logicalOperator
 
   items: MatchingModel[] = []
 
@@ -43,6 +45,10 @@ export class FilterableDropdownSelectionModel {
     return this.items.filter(i => this.temporarySelectionStates.get(i.id) == ToggleableItemState.Selected)
   }
 
+  getExcludedItems() {
+    return this.items.filter(i => this.temporarySelectionStates.get(i.id) == ToggleableItemState.Excluded)
+  }
+
   set(id: number, state: ToggleableItemState, fireEvent = true) {
     if (state == ToggleableItemState.NotSelected) {
       this.temporarySelectionStates.delete(id)
@@ -56,9 +62,9 @@ export class FilterableDropdownSelectionModel {
 
   toggle(id: number, fireEvent = true) {
     let state = this.temporarySelectionStates.get(id)
-    if (state == null || state != ToggleableItemState.Selected) {
+    if (state == null || (state != ToggleableItemState.Selected && state != ToggleableItemState.Excluded)) {
       this.temporarySelectionStates.set(id, ToggleableItemState.Selected)
-    } else if (state == ToggleableItemState.Selected) {
+    } else if (state == ToggleableItemState.Selected || state == ToggleableItemState.Excluded) {
       this.temporarySelectionStates.delete(id)
     }
 
@@ -83,11 +89,44 @@ export class FilterableDropdownSelectionModel {
     if (fireEvent) {
       this.changed.next(this)
     }
+  }
 
+  exclude(id: number, fireEvent:boolean = true) {
+    let state = this.temporarySelectionStates.get(id)
+    if (state == null || state != ToggleableItemState.Excluded) {
+      this.temporarySelectionStates.set(id, ToggleableItemState.Excluded)
+      this.temporaryLogicalOperator = this._logicalOperator = 'and'
+    } else if (state == ToggleableItemState.Excluded) {
+      this.temporarySelectionStates.delete(id)
+    }
+
+    if (!this.multiple) {
+      for (let key of this.temporarySelectionStates.keys()) {
+        if (key != id) {
+          this.temporarySelectionStates.delete(key)
+        }
+      }
+    }
+
+    if (fireEvent) {
+      this.changed.next(this)
+    }
   }
 
   private getNonTemporary(id: number) {
     return this.selectionStates.get(id) || ToggleableItemState.NotSelected
+  }
+
+  get logicalOperator(): string {
+    return this.temporaryLogicalOperator
+  }
+
+  set logicalOperator(operator: string) {
+    this.temporaryLogicalOperator = operator
+  }
+
+  toggleOperator() {
+    this.changed.next(this)
   }
 
   get(id: number) {
@@ -100,6 +139,7 @@ export class FilterableDropdownSelectionModel {
 
   clear(fireEvent = true) {
     this.temporarySelectionStates.clear()
+    this.temporaryLogicalOperator = this._logicalOperator = 'and'
     if (fireEvent) {
       this.changed.next(this)
     }
@@ -109,6 +149,8 @@ export class FilterableDropdownSelectionModel {
     if (!Array.from(this.temporarySelectionStates.keys()).every(id => this.temporarySelectionStates.get(id) == this.selectionStates.get(id))) {
       return true
     } else if (!Array.from(this.selectionStates.keys()).every(id => this.selectionStates.get(id) == this.temporarySelectionStates.get(id))) {
+      return true
+    } else if (this.temporaryLogicalOperator !== this._logicalOperator) {
       return true
     } else {
       return false
@@ -129,6 +171,7 @@ export class FilterableDropdownSelectionModel {
     this.temporarySelectionStates.forEach((value, key) => {
       this.selectionStates.set(key, value)
     })
+    this._logicalOperator = this.temporaryLogicalOperator
   }
 
   reset() {
@@ -228,6 +271,10 @@ export class FilterableDropdownComponent {
   @Output()
   open = new EventEmitter()
 
+  get operatorToggleEnabled(): boolean {
+    return this.selectionModel.selectionSize() > 1 && this.selectionModel.getExcludedItems().length == 0
+  }
+
   constructor(private filterPipe: FilterPipe) {
     this.selectionModel = new FilterableDropdownSelectionModel()
   }
@@ -267,6 +314,14 @@ export class FilterableDropdownComponent {
       } else {
         this.dropdown.close()
       }
+    }
+  }
+
+  excludeClicked(itemID: number) {
+    if (this.editing) {
+      this.selectionModel.toggle(itemID)
+    } else {
+      this.selectionModel.exclude(itemID)
     }
   }
 }

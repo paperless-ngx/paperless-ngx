@@ -12,6 +12,16 @@
   </button>
   <div class="dropdown-menu py-0 shadow" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
     <div class="list-group list-group-flush">
+      <div *ngIf="!editing && multiple" class="list-group-item d-flex">
+        <div class="btn-group btn-group-xs btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="selectionModel.logicalOperator" (change)="selectionModel.toggleOperator()" [disabled]="!operatorToggleEnabled">
+          <label ngbButtonLabel class="btn btn-outline-primary">
+            <input ngbButton type="radio" name="logicalOperator" value="and"> All
+          </label>
+          <label ngbButtonLabel class="btn btn-outline-primary">
+            <input ngbButton type="radio" name="logicalOperator" value="or"> Any
+          </label>
+        </div>
+      </div>
       <div class="list-group-item">
         <div class="input-group input-group-sm">
           <input class="form-control" type="text" [(ngModel)]="filterText" [placeholder]="filterPlaceholder" (keyup.enter)="listFilterEnter()" #listFilterTextInput>
@@ -19,15 +29,18 @@
       </div>
       <div *ngIf="selectionModel.items" class="items">
         <ng-container *ngFor="let item of selectionModel.itemsSorted | filter: filterText">
-          <app-toggleable-dropdown-button *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" (toggle)="selectionModel.toggle(item.id)"></app-toggleable-dropdown-button>
+          <app-toggleable-dropdown-button *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)"></app-toggleable-dropdown-button>
         </ng-container>
       </div>
       <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!selectionModel.isDirty()">
-        <small class="ml-1" [ngClass]="{'font-weight-bold': selectionModel.isDirty()}" i18n>Apply</small>
+        <small class="ml-2" [ngClass]="{'font-weight-bold': selectionModel.isDirty()}" i18n>Apply</small>
         <svg width="1.5em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
         </svg>
       </button>
+      <div *ngIf="!editing && multiple" class="list-group-item list-group-item-note pt-1 pb-2">
+        <small i18n>Click again to exclude items.</small>
+      </div>
     </div>
   </div>
 </div>
