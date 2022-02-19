@@ -451,20 +451,20 @@
         <target state="translated">Speichern &amp; weiter</target>
       </trans-unit>
       <trans-unit id="8765497970646365998" datatype="html">
-        <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ng!</source>
+        <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Hallo <x id="PH" equiv-text="this.displayName"/>, willkommen zu Paperless-ng!</target>
+        <target state="translated">Hallo <x id="PH" equiv-text="this.displayName"/>, willkommen zu Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="7016571167317583872" datatype="html">
-        <source>Welcome to Paperless-ng!</source>
+        <source>Welcome to Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="translated">Willkommen zu Paperless-ng!</target>
+        <target state="translated">Willkommen zu Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="f65253954b66e929a8b4d5ecaf61f9129f8cec64" datatype="html">
         <source>Dashboard</source>
@@ -1043,13 +1043,13 @@
         <target state="translated">Dokumenttyp bearbeiten</target>
       </trans-unit>
       <trans-unit id="41147374f427980a9f1a8cd5e3f4b1666e6f2418" datatype="html">
-        <source>Paperless-ng</source>
+        <source>Paperless-ngx</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="needs-translation">Paperless-ng</target>
+        <target state="needs-translation">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="069566c6ed4f051b5b5617ef1935837226585dad" datatype="html">
         <source>Search documents</source>
@@ -1816,7 +1816,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Nachdem Sie einige Dokumente hochgeladen und diesen Korrespondenten, Tags und Dokumenttypen zugewiesen haben, kann Paperless-ng diese Metadaten automatisch passenden neuen Dokumenten zuweisen.</target>
+        <target state="translated">Nachdem Sie einige Dokumente hochgeladen und diesen Korrespondenten, Tags und Dokumenttypen zugewiesen haben, kann Paperless-ngx diese Metadaten automatisch passenden neuen Dokumenten zuweisen.</target>
       </trans-unit>
       <trans-unit id="9dca488928c0b7af46c3866f86a6c2c8548399aa" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
