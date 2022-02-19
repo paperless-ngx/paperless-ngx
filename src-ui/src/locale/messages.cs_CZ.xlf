@@ -456,7 +456,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</target>
+        <target state="translated">Ahoj <x id="PH" equiv-text="this.displayName"/>, vítejte na Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="7016571167317583872" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
@@ -464,7 +464,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx!</target>
+        <target state="translated">Vítejte v Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="f65253954b66e929a8b4d5ecaf61f9129f8cec64" datatype="html">
         <source>Dashboard</source>
@@ -1792,7 +1792,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">Paperless-ng běží! :)</target>
+        <target state="translated">Paperless-ngx běží! :)</target>
       </trans-unit>
       <trans-unit id="ea8d9a9486d5639d1c38c012900b8d34d5e4135d" datatype="html">
         <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
@@ -1800,7 +1800,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="translated">Můžete začít nahrávat dokumenty tak, že je přetáhnete do pole pro nahrávání souborů vpravo nebo je vložíte do nakonfigurované konzumní složky. Poté se začnou zobrazovat v seznamu dokumentů. Po vyplnění některých metadat, využijte filtrační mechanismy Paperless-ng, abyste vytvořili vlastní zobrazení (například 'Nedávno přidané', 'Ke zpracování') a zobrazí se na přehledu na tomto místě.</target>
+        <target state="translated">Můžete začít nahrávat dokumenty tak, že je přetáhnete do pole pro nahrávání souborů vpravo nebo je vložíte do nakonfigurované konzumní složky. Poté se začnou zobrazovat v seznamu dokumentů. Po vyplnění některých metadat, využijte filtrační mechanismy Paperless-ngx, abyste vytvořili vlastní zobrazení (například 'Nedávno přidané', 'Ke zpracování') a zobrazí se na přehledu na tomto místě.</target>
       </trans-unit>
       <trans-unit id="cf5f85690feaba6e29343f9881e57a6c0ea6e82b" datatype="html">
         <source>Paperless offers some more features that try to make your life easier:</source>
@@ -1824,7 +1824,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">Můžete nakonfigurovat Paperless-ng tak, aby kontroloval vaši emailovou schránku a automaticky nahrával dokumenty z příloh emailů.</target>
+        <target state="translated">Můžete nakonfigurovat Paperless-ngx tak, aby kontroloval vaši emailovou schránku a automaticky nahrával dokumenty z příloh emailů.</target>
       </trans-unit>
       <trans-unit id="d282f6277cbf6704f697170d2ad19ce500790e20" datatype="html">
         <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
@@ -1832,7 +1832,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Podívejte se na dokumentaci o používání těchto funkcí. V části o základním používání jsou také informace o tom, jak obecně používat Paperless-ng.</target>
+        <target state="translated">Podívejte se na dokumentaci o používání těchto funkcí. V části o základním používání jsou také informace o tom, jak obecně používat Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
