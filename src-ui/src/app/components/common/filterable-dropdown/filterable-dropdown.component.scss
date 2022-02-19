@@ -1,3 +1,5 @@
+@import "/src/theme";
+
 .badge-corner {
   position: absolute;
   top: -8px;
@@ -34,7 +36,12 @@
 
 .btn-group > label.disabled {
   filter: brightness(0.5);
+
+  &.active {
+    background-color: lighten($primary, 30%);
+  }
 }
+
 
 small > svg {
   margin-top: -2px;
