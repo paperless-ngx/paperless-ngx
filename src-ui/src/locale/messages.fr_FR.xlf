@@ -1816,7 +1816,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Une fois que vous avez quelques documents dans Paperless-ngx et que vous y avez ajouté des métadonnées, Paperless-ng peut attribuer automatiquement ces métadonnées à de nouveaux documents.</target>
+        <target state="translated">Une fois que vous avez quelques documents dans Paperless-ngx et que vous y avez ajouté des métadonnées, Paperless-ngx peut attribuer automatiquement ces métadonnées à de nouveaux documents.</target>
       </trans-unit>
       <trans-unit id="9dca488928c0b7af46c3866f86a6c2c8548399aa" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
