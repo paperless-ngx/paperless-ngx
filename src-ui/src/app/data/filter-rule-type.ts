@@ -4,8 +4,9 @@ export const FILTER_ASN = 2
 export const FILTER_CORRESPONDENT = 3
 export const FILTER_DOCUMENT_TYPE = 4
 export const FILTER_IS_IN_INBOX = 5
-export const FILTER_HAS_TAG = 6
+export const FILTER_HAS_TAGS_ALL = 6
 export const FILTER_HAS_ANY_TAG = 7
+export const FILTER_HAS_TAGS_ANY = 22
 export const FILTER_CREATED_BEFORE = 8
 export const FILTER_CREATED_AFTER = 9
 export const FILTER_CREATED_YEAR = 10
@@ -36,7 +37,8 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {id: FILTER_DOCUMENT_TYPE, filtervar: "document_type__id", isnull_filtervar: "document_type__isnull", datatype: "document_type", multi: false},
 
   {id: FILTER_IS_IN_INBOX, filtervar: "is_in_inbox", datatype: "boolean", multi: false, default: true},
-  {id: FILTER_HAS_TAG, filtervar: "tags__id__all", datatype: "tag", multi: true},
+  {id: FILTER_HAS_TAGS_ALL, filtervar: "tags__id__all", datatype: "tag", multi: true},
+  {id: FILTER_HAS_TAGS_ANY, filtervar: "tags__id__in", datatype: "tag", multi: true},
   {id: FILTER_DOES_NOT_HAVE_TAG, filtervar: "tags__id__none", datatype: "tag", multi: true},
   {id: FILTER_HAS_ANY_TAG, filtervar: "is_tagged", datatype: "boolean", multi: false, default: true},
 

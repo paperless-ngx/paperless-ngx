@@ -1,3 +1,5 @@
+@import "/src/theme";
+
 .badge-corner {
   position: absolute;
   top: -8px;
@@ -10,5 +12,45 @@
   .items {
     max-height: 400px;
     overflow-y: scroll;
+  }
+}
+
+.btn-group-xs {
+  > .btn {
+    padding: 0.2rem 0.25rem;
+    font-size: 0.675rem;
+    line-height: 1.2;
+    border-radius: 0.15rem;
+  }
+
+  > .btn:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  > .btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.btn-group > label.disabled {
+  filter: brightness(0.5);
+
+  &.active {
+    background-color: lighten($primary, 30%);
+  }
+}
+
+
+small > svg {
+  margin-top: -2px;
+}
+
+.list-group-item-note {
+  line-height: 1;
+
+  small {
+    font-size: 65%;
   }
 }
