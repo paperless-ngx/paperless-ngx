@@ -16,7 +16,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">Le document <x id="PH" equiv-text="status.filename"/> a été ajouté à Paperless-ngx.</target>
+        <target state="translated">Le document <x id="PH" equiv-text="status.filename"/> a été ajouté à Paperless-ng.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -48,7 +48,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">Le document <x id="PH" equiv-text="status.filename"/> est en cours de traitement par Paperless-ngx.</target>
+        <target state="translated">Le document <x id="PH" equiv-text="status.filename"/> est en cours de traitement par Paperless-ng.</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -456,7 +456,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Bonjour <x id="PH" equiv-text="this.displayName"/>, bienvenue dans Paperless-ngx !</target>
+        <target state="needs-translation">Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="7016571167317583872" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
@@ -464,7 +464,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="translated">Bienvenue dans Paperless-ngx !</target>
+        <target state="needs-translation">Welcome to Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="f65253954b66e929a8b4d5ecaf61f9129f8cec64" datatype="html">
         <source>Dashboard</source>
@@ -1049,7 +1049,7 @@
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="translated">Paperless-ngx</target>
+        <target state="needs-translation">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="069566c6ed4f051b5b5617ef1935837226585dad" datatype="html">
         <source>Search documents</source>
@@ -1792,7 +1792,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">Paperless-ngx fonctionne ! :)</target>
+        <target state="translated">Paperless-ng fonctionne ! :)</target>
       </trans-unit>
       <trans-unit id="ea8d9a9486d5639d1c38c012900b8d34d5e4135d" datatype="html">
         <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
@@ -1800,7 +1800,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="translated">Vous pouvez commencer par télécharger des documents en les déposant dans la boîte de téléchargement de fichiers à droite ou en les déposant dans le dossier de traitement configuré, et ils commenceront à apparaître dans la liste des documents. Une fois que vous avez ajouté des métadonnées à vos documents, utilisez les mécanismes de filtrage de Paperless-ngx pour créer des vues personnalisées (telles que "Récemment ajouté", "Marqué À FAIRE") et elles apparaîtront sur le tableau de bord à la place de ce message.</target>
+        <target state="translated">Vous pouvez commencer par télécharger des documents en les déposant dans la boîte de téléchargement de fichiers à droite ou en les déposant dans le dossier de traitement configuré, et ils commenceront à apparaître dans la liste des documents. Une fois que vous avez ajouté des métadonnées à vos documents, utilisez les mécanismes de filtrage de Paperless-ng pour créer des vues personnalisées (telles que "Récemment ajouté", "Marqué À FAIRE") et elles apparaîtront sur le tableau de bord à la place de ce message.</target>
       </trans-unit>
       <trans-unit id="cf5f85690feaba6e29343f9881e57a6c0ea6e82b" datatype="html">
         <source>Paperless offers some more features that try to make your life easier:</source>
@@ -1808,7 +1808,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="translated">Paperless-ngx offre quelques fonctionnalités supplémentaires qui tendent à vous faciliter la vie :</target>
+        <target state="translated">Paperless-ng offre quelques fonctionnalités supplémentaires qui tendent à vous faciliter la vie :</target>
       </trans-unit>
       <trans-unit id="edb41dc36af2e70789d8e3422325d930e783253e" datatype="html">
         <source>Once you&apos;ve got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</source>
@@ -1816,7 +1816,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Une fois que vous avez quelques documents dans Paperless-ngx et que vous y avez ajouté des métadonnées, Paperless-ngx peut attribuer automatiquement ces métadonnées à de nouveaux documents.</target>
+        <target state="translated">Une fois que vous avez quelques documents dans Paperless-ng et que vous y avez ajouté des métadonnées, Paperless-ng peut attribuer automatiquement ces métadonnées à de nouveaux documents.</target>
       </trans-unit>
       <trans-unit id="9dca488928c0b7af46c3866f86a6c2c8548399aa" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
@@ -1824,7 +1824,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">Vous pouvez configurer Paperless-ngx pour lire vos courriels et ajouter des documents à partir des pièces jointes.</target>
+        <target state="translated">Vous pouvez configurer Paperless-ng pour lire vos courriels et ajouter des documents à partir des pièces jointes.</target>
       </trans-unit>
       <trans-unit id="d282f6277cbf6704f697170d2ad19ce500790e20" datatype="html">
         <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
@@ -1832,7 +1832,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Consultez la documentation sur l'utilisation de ces fonctionnalités. La section sur l'utilisation de base contient également des informations sur la manière d'utiliser Paperless-ngx en général.</target>
+        <target state="translated">Consultez la documentation sur l'utilisation de ces fonctionnalités. La section sur l'utilisation de base contient également des informations sur la manière d'utiliser Paperless-ng en général.</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
