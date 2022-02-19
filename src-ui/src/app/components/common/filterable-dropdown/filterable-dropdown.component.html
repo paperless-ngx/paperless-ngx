@@ -38,7 +38,7 @@
           <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
         </svg>
       </button>
-      <div *ngIf="!editing" class="list-group-item list-group-item-note pt-1 pb-2">
+      <div *ngIf="!editing && multiple" class="list-group-item list-group-item-note pt-1 pb-2">
         <small i18n>Click again to exclude items.</small>
       </div>
     </div>
