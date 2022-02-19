@@ -451,7 +451,7 @@
         <target>crwdns2948:0crwdne2948:0</target>
       </trans-unit>
       <trans-unit id="8765497970646365998" datatype="html">
-        <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ng!</source>
+        <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
@@ -459,7 +459,7 @@
         <target>crwdns2950:0crwdne2950:0</target>
       </trans-unit>
       <trans-unit id="7016571167317583872" datatype="html">
-        <source>Welcome to Paperless-ng!</source>
+        <source>Welcome to Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
@@ -1043,7 +1043,7 @@
         <target>crwdns3096:0crwdne3096:0</target>
       </trans-unit>
       <trans-unit id="41147374f427980a9f1a8cd5e3f4b1666e6f2418" datatype="html">
-        <source>Paperless-ng</source>
+        <source>Paperless-ngx</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">11</context>
