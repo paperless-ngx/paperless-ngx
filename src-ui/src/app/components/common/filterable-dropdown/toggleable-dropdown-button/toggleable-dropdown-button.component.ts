@@ -35,7 +35,7 @@ export class ToggleableDropdownButtonComponent {
   }
 
   toggleItem(event: MouseEvent): void {
-    if (event.altKey) {
+    if (this.state == ToggleableItemState.Selected) {
       this.exclude.emit()
     } else {
       this.toggle.emit()
