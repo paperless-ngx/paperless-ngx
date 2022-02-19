@@ -231,6 +231,10 @@ $border-color-dark-mode: #47494f;
       border-color: darken($primary-dark-mode, 10%);
       color: $text-color-dark-mode-accent;
     }
+
+    &.disabled.active {
+      background-color: darken($primary-dark-mode, 10%);
+    }
   }
 
   .btn-outline-secondary {
