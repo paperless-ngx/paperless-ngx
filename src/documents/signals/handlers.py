@@ -247,7 +247,14 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
 
             logger.debug(
                 f"Moving {instance.source_path} to trash at {new_file_path}")
-            os.rename(instance.source_path, new_file_path)
+            try:
+                os.rename(instance.source_path, new_file_path)
+            except OSError as e:
+                logger.error(
+                    f"Failed to move {instance.source_path} to trash at "
+                    f"{new_file_path}: {e}. Skipping cleanup!"
+                )
+                return
 
         for filename in (instance.source_path,
                          instance.archive_path,
