@@ -189,7 +189,6 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         document.delete()
         self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none_01.pdf"), True)
 
-
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete_nofile(self):
         document = Document()
