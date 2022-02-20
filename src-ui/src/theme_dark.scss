@@ -340,15 +340,6 @@ $border-color-dark-mode: #47494f;
     background-color: $bg-light-dark-mode;
   }
 
-  .custom-control-label:before {
-    background-color: $bg-dark-mode;
-    color: $text-color-dark-mode;
-  }
-
-  .custom-control-input:checked ~ .custom-control-label::before {
-    color: $text-color-dark-mode-accent;
-  }
-
   .input-group-text {
     color: $text-color-dark-mode;
     background-color: $bg-light-dark-mode;
