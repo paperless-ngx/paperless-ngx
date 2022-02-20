@@ -44,3 +44,13 @@ $paperless-card-breakpoints: (
     top: 3.5rem; // height of navbar
   }
 }
+
+.table .form-check {
+  padding: 0.2rem;
+  min-height: 0;
+  margin-bottom: 0;
+
+  .form-check-input {
+    margin-left: 0;
+  }
+}
