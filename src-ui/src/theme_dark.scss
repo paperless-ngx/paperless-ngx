@@ -143,6 +143,10 @@ $border-color-dark-mode: #47494f;
     color: $text-color-dark-mode-accent;
   }
 
+  .badge.border-light {
+    border-color: $bg-dark-mode !important;
+  }
+
   .doc-img-container {
     border: none !important;
     border-top-left-radius: .25rem;
