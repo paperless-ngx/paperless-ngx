@@ -49,11 +49,11 @@ $border-color-dark-mode: #47494f;
     border-color: $border-color-dark-mode !important;
   }
 
-  .border-start {
+  .border-end {
     border-right: 1px solid $border-color-dark-mode !important;
   }
 
-  .border-end {
+  .border-start {
     border-left: 1px solid $border-color-dark-mode !important;
   }
 
