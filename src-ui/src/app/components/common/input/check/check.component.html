@@ -1,5 +1,5 @@
 <div class="mb-3 form-check">
   <input type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
   <label class="form-check-label" [for]="inputId">{{title}}</label>
-  <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
+  <div *ngIf="hint" class="form-text text-muted">{{hint}}</div>
 </div>
