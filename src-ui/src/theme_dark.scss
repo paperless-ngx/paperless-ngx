@@ -220,6 +220,10 @@ $border-color-dark-mode: #47494f;
     background-color: $bg-light-dark-mode;
   }
 
+  .table-striped > tbody > tr:nth-of-type(odd) > * {
+    color: $text-color-dark-mode-accent;
+  }
+
   .close {
     color: $text-color-dark-mode;
     text-shadow: 0 1px 0 #666;

@@ -13,7 +13,7 @@
   <ngb-pagination class="col-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" (pageChange)="reloadData()" aria-label="Default pagination"></ngb-pagination>
 </div>
 
-<table class="table table-striped border shadow-sm">
+<table class="table table-striped align-middle border shadow-sm">
     <thead>
     <tr>
       <th scope="col" sortable="name" [currentSortField]="sortField" [currentSortReverse]="sortReverse" (sort)="onSort($event)" i18n>Name</th>
