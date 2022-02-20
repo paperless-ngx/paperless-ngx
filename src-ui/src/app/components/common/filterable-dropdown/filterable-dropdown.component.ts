@@ -275,8 +275,13 @@ export class FilterableDropdownComponent {
     return this.selectionModel.selectionSize() > 1 && this.selectionModel.getExcludedItems().length == 0
   }
 
+  modelIsDirty: boolean = false
+
   constructor(private filterPipe: FilterPipe) {
     this.selectionModel = new FilterableDropdownSelectionModel()
+    this.selectionModelChange.subscribe(updatedModel => {
+      this.modelIsDirty = updatedModel.isDirty()
+    })
   }
 
   applyClicked() {
