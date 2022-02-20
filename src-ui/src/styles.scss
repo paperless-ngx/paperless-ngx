@@ -117,6 +117,7 @@ body {
   background-color: $primaryFaded !important;
 }
 
+// Bootstrap 5 tweaks
 a.badge {
   text-decoration: none;
 }
@@ -126,4 +127,9 @@ a.badge {
   &:hover {
     text-decoration: underline;
   }
+}
+
+.btn-outline-primary:not(:disabled):not(.disabled).active,.btn-outline-primary:not(:disabled):not(.disabled):active,.show>.btn-outline-primary.dropdown-toggle {
+    background-color: $paperless-green;
+    border-color: $paperless-green;
 }
