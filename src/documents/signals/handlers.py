@@ -226,6 +226,8 @@ def set_tags(sender,
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
         if settings.TRASH_DIR:
+            # Find a non-conflicting filename in case a document with the same
+            # name was moved to trash earlier
             counter = 0
             old_filename = os.path.split(instance.source_path)[1]
             (old_filebase, old_fileext) = os.path.splitext(old_filename)
