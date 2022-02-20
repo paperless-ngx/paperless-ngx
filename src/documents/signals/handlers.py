@@ -145,7 +145,7 @@ def set_document_type(sender,
                         else str(document)
                     ) + f" [{document.pk}]"
                 )
-            print(f"Sugest document type {selected}")
+            print(f"Suggest document type {selected}")
         else:
             logger.info(
                 f"Assigning document type {selected} to {document}",
