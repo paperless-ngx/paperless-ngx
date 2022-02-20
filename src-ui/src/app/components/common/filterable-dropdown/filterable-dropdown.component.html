@@ -5,7 +5,7 @@
     </svg>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <ng-container *ngIf="!editing && selectionModel.selectionSize() > 0">
-      <div class="badge bg-secondary text-light rounded-pill badge-corner">
+      <div class="position-absolute top-0 start-100 translate-middle badge bg-secondary border border-light text-light rounded-pill">
         {{selectionModel.selectionSize()}}
       </div>
     </ng-container>
