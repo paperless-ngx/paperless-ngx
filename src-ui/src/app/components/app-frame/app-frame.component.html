@@ -12,11 +12,11 @@
   </a>
   <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1">
     <form (ngSubmit)="search()" class="form-inline flex-grow-1">
-      <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
-        [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)" i18n-placeholder>
       <svg width="1em" height="1em">
         <use xlink:href="assets/bootstrap-icons.svg#search"/>
       </svg>
+      <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
+        [formControl]="searchField" [ngbTypeahead]="searchAutoComplete" (selectItem)="itemSelected($event)" i18n-placeholder>
     </form>
   </div>
   <ul ngbNav class="order-sm-3">
