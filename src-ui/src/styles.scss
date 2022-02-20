@@ -116,3 +116,14 @@ body {
 .ngx-file-drop__drop-zone--over {
   background-color: $primaryFaded !important;
 }
+
+a.badge {
+  text-decoration: none;
+}
+
+.btn-link {
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
