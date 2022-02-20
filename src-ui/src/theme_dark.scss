@@ -228,6 +228,12 @@ $border-color-dark-mode: #47494f;
     color: $text-color-dark-mode;
     text-shadow: 0 1px 0 #666;
   }
+  
+  .modal .btn-close {
+    color: $text-color-dark-mode;
+    text-shadow: 0 1px 0 #666;
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }
 
   .btn-outline-primary {
     border-color: $primary-dark-mode;
