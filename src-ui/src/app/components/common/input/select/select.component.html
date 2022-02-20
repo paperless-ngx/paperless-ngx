@@ -1,5 +1,5 @@
-<div class="form-group paperless-input-select">
-  <label [for]="inputId">{{title}}</label>
+<div class="mb-3 paperless-input-select">
+  <label class="form-label" [for]="inputId">{{title}}</label>
     <div [class.input-group]="allowCreateNew">
       <ng-select name="inputId" [(ngModel)]="value"
         [disabled]="disabled"
@@ -18,13 +18,11 @@
         (clear)="clearLastSearchTerm()"
         (blur)="onBlur()">
       </ng-select>
-      <div *ngIf="allowCreateNew" class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" (click)="addItem()">
-          <svg class="buttonicon" fill="currentColor">
-            <use xlink:href="assets/bootstrap-icons.svg#plus" />
-          </svg>
-        </button>
-      </div>
+      <button *ngIf="allowCreateNew" class="btn btn-outline-secondary" type="button" (click)="addItem()">
+        <svg class="buttonicon" fill="currentColor">
+          <use xlink:href="assets/bootstrap-icons.svg#plus" />
+        </svg>
+      </button>
     </div>
   <small *ngIf="hint" class="form-text text-muted">{{hint}}</small>
   <small *ngIf="getSuggestions().length > 0">
