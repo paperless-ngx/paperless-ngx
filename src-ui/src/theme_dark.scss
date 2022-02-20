@@ -205,7 +205,7 @@ $border-color-dark-mode: #47494f;
       }
     }
 
-    tr:hover {
+    &.table-hover > tbody > tr:hover > * {
       background-color: $bg-light-dark-mode;
       color: $text-color-dark-mode-accent;
     }
@@ -228,7 +228,7 @@ $border-color-dark-mode: #47494f;
     color: $text-color-dark-mode;
     text-shadow: 0 1px 0 #666;
   }
-  
+
   .modal .btn-close {
     color: $text-color-dark-mode;
     text-shadow: 0 1px 0 #666;
