@@ -32,7 +32,7 @@ services:
       - redisdata:/data
 
   webserver:
-    image: jonaswinkler/paperless-ng:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
       - broker

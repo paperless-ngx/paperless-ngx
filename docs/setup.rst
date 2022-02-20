@@ -251,7 +251,7 @@ Build the Docker image yourself
     .. code:: yaml
 
         webserver:
-            image: jonaswinkler/paperless-ng:latest
+            image: ghcr.io/paperless-ngx/paperless-ngx:latest
 
     and replace it with a line that instructs docker-compose to build the image from the current working directory instead:
 
