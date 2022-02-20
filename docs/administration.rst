@@ -144,32 +144,6 @@ After grabbing the new release and unpacking the contents, do the following:
     This might not actually do anything. Not every new paperless version comes with new
     database migrations.
 
-Ansible Route
-=============
-
-Most of the update process is automated when using the ansible role.
-
-1.  Update the role to the target release tag to make sure the ansible scripts are compatible:
-
-    .. code:: shell-session
-
-        $ ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,master --force
-
-2.  Update the role variable definitions ``vars/paperless-ng.yml`` (where appropriate).
-
-3.  Run the ansible playbook you created created during :ref:`installation <setup-ansible>` again:
-
-    .. note::
-
-        When ansible detects that an update run is in progress, it backs up the entire ``paperlessng_directory`` to ``paperlessng_directory-TIMESTAMP``.
-        Updates can be rolled back by simply moving the timestamped folder back to the original location.
-        If the update succeeds and you want to continue using the new release, please don't forget to delete the backup folder.
-
-    .. code:: shell-session
-
-        $ ansible-playbook playbook.yml
-
-
 Downgrading Paperless
 #####################
 
