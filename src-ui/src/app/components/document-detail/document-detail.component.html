@@ -1,12 +1,8 @@
 <app-page-header [(title)]="title">
     <div class="input-group input-group-sm me-5 d-none d-md-flex" *ngIf="getContentType() == 'application/pdf' && !useNativePdfViewer">
-      <div class="input-group-prepend">
-        <div class="input-group-text" i18n>Page</div>
-      </div>
+      <div class="input-group-text" i18n>Page</div>
       <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages" [(ngModel)]="previewCurrentPage" />
-      <div class="input-group-append">
-        <div class="input-group-text" i18n>of {{previewNumPages}}</div>
-      </div>
+      <div class="input-group-text" i18n>of {{previewNumPages}}</div>
     </div>
 
     <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
