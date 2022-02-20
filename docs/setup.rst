@@ -85,7 +85,6 @@ You can go multiple routes to setup and run Paperless:
 * :ref:`Pull the image from Docker Hub <setup-docker_hub>`
 * :ref:`Build the Docker image yourself <setup-docker_build>`
 * :ref:`Install Paperless directly on your system manually (bare metal) <setup-bare_metal>`
-* :ref:`Use ansible to install Paperless on your system automatically (bare metal) <setup-ansible>`
 
 The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
 from the above automatically so that it just works and uses sensible defaults for all configuration options.
@@ -95,12 +94,7 @@ The bare metal route is complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
-The ansible route combines benefits of both options:
-the setup process is fully automated, reproducible and `idempotent <https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency>`_,
-it includes the same sensible defaults, and it simultaneously provides the flexibility of a bare metal installation.
-
 .. _CLI Basics: https://www.sehn.tech/refs/devops-with-docker/
-.. _idempotent: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency
 
 .. _setup-docker_script:
 
@@ -471,116 +465,6 @@ writing. Windows is not and will never be supported.
     encoder. This will reduce the size of generated PDF documents. You'll most likely need
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
-
-.. _setup-ansible:
-
-Install Paperless using ansible
-===============================
-
-.. note::
-
-    This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
-		Additionally, only i386 or amd64 based hosts are supported right now, i.e. installation on arm hosts will fail.
-
-1.  Install ansible 2.7+ on the management node.
-    This may be the target host paperless-ngx is being installed on or any remote host which can access the target host.
-    For further details, check the ansible `inventory <https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html>`_ documentation.
-
-    On Debian and Ubuntu, the official repositories should provide a suitable version:
-
-    .. code:: bash
-
-        apt install ansible
-        ansible --version
-
-    Alternatively, you can install the most recent ansible release using PyPI:
-
-    .. code:: bash
-
-        python3 -m pip install ansible
-        ansible --version
-
-    Make sure your taget hosts are accessible:
-
-    .. code:: sh
-
-        ansible -m ping YourAnsibleTargetHostGoesHere
-
-2.  Install the latest tag of the ansible role using ansible-galaxy
-
-    .. code:: sh
-
-        ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,ng-1.4.2
-
-3.  Create an ansible ``playbook.yml`` in a directory of your choice:
-
-    .. code:: yaml
-
-        - hosts: YourAnsibleTargetHostGoesHere
-          become: yes
-          vars_files:
-            - vars/paperless-ng.yml
-          roles:
-            - paperless-ng
-
-    Optional: If you also want to use PostgreSQL on the target system, install and add (for example) the `geerlingguy.postgresql <https://github.com/geerlingguy/ansible-role-postgresql>`_ role:
-
-    .. code:: sh
-
-        ansible-galaxy install geerlingguy.postgresql
-
-    .. code:: yaml
-
-        - hosts: YourAnsibleTargetHostGoesHere
-          become: yes
-          vars_files:
-            - vars/paperless-ng.yml
-          roles:
-            - geerlingguy.postgresql
-            - paperless-ng
-
-    Optional: If you also want to use a reverse proxy on the target system, install and add (for example) the `geerlingguy.nginx <https://github.com/geerlingguy/ansible-role-nginx>`_ role:
-
-    .. code:: sh
-
-        ansible-galaxy install geerlingguy.nginx
-
-    .. code:: yaml
-
-        - hosts: YourAnsibleTargetHostGoesHere
-          become: yes
-          vars_files:
-            - vars/paperless-ng.yml
-          roles:
-            - geerlingguy.postgresql
-            - paperless-ng
-            - geerlingguy.nginx
-
-4.  Create ``vars/paperless-ng.yml`` to configure your ansible deployment:
-
-    .. code:: yaml
-
-        paperlessng_secret_key: PleaseGenerateAStrongKeyForThis
-
-        paperlessng_superuser_name: YourUserName
-        paperlessng_superuser_email: name@domain.tld
-        paperlessng_superuser_password: YourDesiredPasswordUsedForFirstLogin
-
-        paperlessng_ocr_languages:
-            - eng
-            - deu
-
-    For all of the available options, please check ``ansible/README.md`` and :ref:`configuration`.
-
-    Optional configurations for the above-mentioned PostgreSQL and nginx roles would also go here.
-
-5. Run the ansible playbook from the management node:
-
-    .. code:: sh
-
-        ansible-playbook playbook.yml
-
-    When this step completes successfully, paperless-ngx will be available on the target host at ``http://127.0.0.1:8000`` (or the address you configured).
 
 Migration to paperless-ngx
 #########################
