@@ -106,7 +106,7 @@
     </app-document-card-large>
   </div>
 
-  <table class="table table-sm border shadow-sm" *ngIf="displayMode == 'details'">
+  <table class="table table-sm align-middle border shadow-sm" *ngIf="displayMode == 'details'">
     <thead>
       <th></th>
       <th class="d-none d-lg-table-cell"
@@ -149,9 +149,9 @@
     <tbody>
       <tr *ngFor="let d of list.documents; trackBy: trackByDocumentId" (click)="toggleSelected(d, $event)" [ngClass]="list.isSelected(d) ? 'table-row-selected' : ''">
         <td>
-          <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (click)="toggleSelected(d, $event)">
-            <label class="custom-control-label" for="docCheck{{d.id}}"></label>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="docCheck{{d.id}}" [checked]="list.isSelected(d)" (click)="toggleSelected(d, $event)">
+            <label class="form-check-label" for="docCheck{{d.id}}"></label>
           </div>
         </td>
         <td class="d-none d-lg-table-cell">
