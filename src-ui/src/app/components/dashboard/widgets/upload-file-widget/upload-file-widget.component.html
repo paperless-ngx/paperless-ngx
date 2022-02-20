@@ -13,7 +13,7 @@
       <ngx-file-drop dropZoneLabel="Drop documents here or" browseBtnLabel="Browse files" (onFileDrop)="dropped($event)"
         (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="bg-light card"
         multiple="true" contentClassName="justify-content-center d-flex align-items-center py-5 px-2" [showBrowseBtn]=true
-        browseBtnClassName="btn btn-sm btn-outline-primary ml-2" i18n-dropZoneLabel i18n-browseBtnLabel>
+        browseBtnClassName="btn btn-sm btn-outline-primary ms-2" i18n-dropZoneLabel i18n-browseBtnLabel>
       </ngx-file-drop>
     </form>
     <p class="mt-3" *ngIf="getStatus().length > 0">{{getStatusSummary()}}</p>

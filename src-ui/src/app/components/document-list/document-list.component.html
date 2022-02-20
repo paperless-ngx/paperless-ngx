@@ -1,6 +1,6 @@
 <app-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="mr-2 flex-fill d-flex">
+  <div ngbDropdown class="me-2 flex-fill d-flex">
     <button class="btn btn-sm btn-outline-primary flex-fill" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
@@ -35,7 +35,7 @@
     </label>
   </div>
 
-  <div ngbDropdown class="btn-group ml-2 flex-fill">
+  <div ngbDropdown class="btn-group ms-2 flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
       <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="list.sortReverse">
@@ -45,7 +45,7 @@
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
           </svg>
         </label>
-        <label ngbButtonLabel class="btn-outline-primary btn-sm mr-2 flex-fill">
+        <label ngbButtonLabel class="btn-outline-primary btn-sm me-2 flex-fill">
           <input ngbButton type="radio" class="btn btn-sm" [value]="true">
           <svg class="toolbaricon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
@@ -60,7 +60,7 @@
     </div>
   </div>
 
-  <div class="btn-group ml-2 flex-fill" ngbDropdown role="group">
+  <div class="btn-group ms-2 flex-fill" ngbDropdown role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" ngbDropdownToggle i18n>Views</button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
       <ng-container *ngIf="!list.activeSavedViewId">
@@ -83,7 +83,7 @@
 <div class="d-flex justify-content-between align-items-center">
   <p>
     <ng-container *ngIf="list.isReloading">
-      <div class="spinner-border spinner-border-sm mr-2" role="status"></div>
+      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>
     </ng-container>
     <span i18n *ngIf="list.selected.size > 0">{list.collectionSize, plural, =1 {Selected {{list.selected.size}} of one document} other {Selected {{list.selected.size}} of {{list.collectionSize || 0}} documents}}</span>
@@ -164,7 +164,7 @@
         </td>
         <td>
           <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ml-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">
