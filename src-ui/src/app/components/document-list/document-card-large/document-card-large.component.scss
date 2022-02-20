@@ -4,6 +4,10 @@
   overflow-wrap: anywhere;
 }
 
+.doc-img-background {
+  position: relative;
+}
+
 .doc-img {
   object-fit: cover;
   object-position: top left;
