@@ -414,13 +414,18 @@ $border-color-dark-mode: #47494f;
     }
   }
 
-  $placements: 'top', 'right', 'bottom', 'left';
-
-  @each $placement in $placements {
-    .bs-popover-#{$placement} > .arrow::after,
-    .bs-popover-auto[x-placement^=#{$placement}] > .arrow::after {
-      border-#{$placement}-color: $bg-dark-mode-accent;
-    }
+  // fix popover carat colors
+  .bs-popover-start > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="left"] {
+    border-left-color: $bg-dark-mode-accent;
+  }
+  .bs-popover-end > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="right"] {
+    border-right-color: $bg-dark-mode-accent;
+  }
+  .bs-popover-top > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="top"] {
+    border-top-color: $bg-dark-mode-accent;
+  }
+  .bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="bottom"] {
+    border-bottom-color: $bg-dark-mode-accent;
   }
 
   .bs-popover-bottom .popover-header::before,
