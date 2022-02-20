@@ -109,13 +109,13 @@ Then you can start paperless-ngx with ``-d`` to have it run in the background.
 
             .. code::
 
-                image: jonaswinkler/paperless-ng:0.9.x
+                image: ghcr.io/paperless-ngx/paperless-ngx:0.9.x
 
         and replace the version with ``latest``:
 
             .. code::
 
-                image: jonaswinkler/paperless-ng:latest
+                image: ghcr.io/paperless-ngx/paperless-ngx:latest
 
 Bare Metal Route
 ================
