@@ -3,7 +3,7 @@
   <a header-buttons [routerLink]="[]" (click)="showAll()" i18n>Show all</a>
 
 
-  <table content class="table table-sm table-hover table-borderless">
+  <table content class="table table-sm bg-light table-hover table-borderless mb-0">
     <thead>
       <tr>
         <th i18n>Created</th>
@@ -13,7 +13,7 @@
     <tbody>
       <tr *ngFor="let doc of documents" routerLink="/documents/{{doc.id}}">
         <td>{{doc.created | customDate}}</td>
-        <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1"></app-tag>
+        <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1"></app-tag></td>
       </tr>
     </tbody>
   </table>
