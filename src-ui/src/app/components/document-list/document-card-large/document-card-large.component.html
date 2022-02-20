@@ -3,10 +3,10 @@
     <div class="col-md-2 doc-img-background rounded-start" [class.doc-img-background-selected]="selected" (click)="this.toggleSelected.emit($event)">
       <img [src]="getThumbUrl()" class="card-img doc-img border-end rounded-start" [class.inverted]="getIsThumbInverted()">
 
-      <div style="top: 0; left: 0" class="position-absolute border-end border-bottom bg-light py-1 px-2" [class.document-card-check]="!selected">
-        <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="smallCardCheck{{document.id}}" [checked]="selected" (click)="this.toggleSelected.emit($event)">
-          <label class="custom-control-label" for="smallCardCheck{{document.id}}"></label>
+      <div class="border-end border-bottom bg-light document-card-check">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="smallCardCheck{{document.id}}" [checked]="selected" (click)="this.toggleSelected.emit($event)">
+          <label class="form-check-label" for="smallCardCheck{{document.id}}"></label>
         </div>
       </div>
 
