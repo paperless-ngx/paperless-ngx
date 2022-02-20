@@ -49,11 +49,11 @@ $border-color-dark-mode: #47494f;
     border-color: $border-color-dark-mode !important;
   }
 
-  .border-right {
+  .border-start {
     border-right: 1px solid $border-color-dark-mode !important;
   }
 
-  .border-left {
+  .border-end {
     border-left: 1px solid $border-color-dark-mode !important;
   }
 
@@ -155,7 +155,7 @@ $border-color-dark-mode: #47494f;
     border-radius: 0;
     border-color: $bg-dark-mode;
     filter: invert(10%);
-    &.border-right {
+    &.border-end {
       border-right: none !important;
     }
   }

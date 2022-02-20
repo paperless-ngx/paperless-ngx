@@ -137,12 +137,12 @@
         <div formGroupName="savedViews">
 
             <div *ngFor="let view of savedViews" [formGroupName]="view.id" class="form-row">
-              <div class="form-group col-4 mr-3">
+              <div class="form-group col-4 me-3">
                 <label for="name_{{view.id}}" i18n>Name</label>
                 <input type="text" class="form-control" formControlName="name" id="name_{{view.id}}">
               </div>
 
-              <div class="form-group col-auto mr-3">
+              <div class="form-group col-auto me-3">
                 <label for="show_on_dashboard_{{view.id}}" i18n>Appears on</label>
                 <div class="custom-control custom-switch">
                   <input type="checkbox" class="custom-control-input" id="show_on_dashboard_{{view.id}}" formControlName="show_on_dashboard">
@@ -168,7 +168,7 @@
     </li>
   </ul>
 
-  <div [ngbNavOutlet]="nav" class="border-left border-right border-bottom p-3 mb-3 shadow-sm"></div>
+  <div [ngbNavOutlet]="nav" class="border-start border-end border-bottom p-3 mb-3 shadow-sm"></div>
 
   <button type="submit" class="btn btn-primary" [disabled]="!(isDirty$ | async)" i18n>Save</button>
 </form>

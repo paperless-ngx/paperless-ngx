@@ -1,5 +1,5 @@
 <app-page-header [(title)]="title">
-    <div class="input-group input-group-sm mr-5 d-none d-md-flex" *ngIf="getContentType() == 'application/pdf' && !useNativePdfViewer">
+    <div class="input-group input-group-sm me-5 d-none d-md-flex" *ngIf="getContentType() == 'application/pdf' && !useNativePdfViewer">
       <div class="input-group-prepend">
         <div class="input-group-text" i18n>Page</div>
       </div>
@@ -9,13 +9,13 @@
       </div>
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-danger mr-2 ml-auto" (click)="delete()">
+    <button type="button" class="btn btn-sm btn-outline-danger me-2 ms-auto" (click)="delete()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#trash" />
         </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Delete</span>
     </button>
 
-    <div class="btn-group mr-2">
+    <div class="btn-group me-2">
 
         <a [href]="downloadUrl" class="btn btn-sm btn-outline-primary">
             <svg class="buttonicon" fill="currentColor">
@@ -32,7 +32,7 @@
 
     </div>
 
-    <button type="button" class="btn btn-sm btn-outline-primary mr-2" (click)="moreLike()">
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="moreLike()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#three-dots" />
         </svg>&nbsp;<span class="d-none d-lg-inline" i18n>More like this</span>
