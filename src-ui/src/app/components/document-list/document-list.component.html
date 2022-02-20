@@ -40,13 +40,13 @@
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
       <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="list.sortReverse">
         <label ngbButtonLabel class="btn-outline-primary btn-sm mx-2 flex-fill">
-          <input ngbButton type="radio" class="btn btn-sm" [value]="false">
+          <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="false">
           <svg class="toolbaricon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-down" />
           </svg>
         </label>
         <label ngbButtonLabel class="btn-outline-primary btn-sm me-2 flex-fill">
-          <input ngbButton type="radio" class="btn btn-sm" [value]="true">
+          <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="true">
           <svg class="toolbaricon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#sort-alpha-up-alt" />
           </svg>
