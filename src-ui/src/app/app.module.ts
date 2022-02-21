@@ -65,33 +65,37 @@ import { ColorSliderModule } from 'ngx-color/slider';
 import { ColorComponent } from './components/common/input/color/color.component';
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component';
 
-import localeFr from '@angular/common/locales/fr';
-import localeNl from '@angular/common/locales/nl';
+import localeCs from '@angular/common/locales/cs';
+import localeDa from '@angular/common/locales/da';
 import localeDe from '@angular/common/locales/de';
-import localePt from '@angular/common/locales/pt';
-import localeIt from '@angular/common/locales/it';
 import localeEnGb from '@angular/common/locales/en-GB';
+import localeEs from '@angular/common/locales/es';
+import localeFr from '@angular/common/locales/fr';
+import localeIt from '@angular/common/locales/it';
+import localeLb from '@angular/common/locales/lb';
+import localeNl from '@angular/common/locales/nl';
+import localePl from '@angular/common/locales/pl';
+import localePt from '@angular/common/locales/pt';
+import localeSv from '@angular/common/locales/sv';
 import localeRo from '@angular/common/locales/ro';
 import localeRu from '@angular/common/locales/ru';
-import localeEs from '@angular/common/locales/es';
-import localePl from '@angular/common/locales/pl';
-import localeSv from '@angular/common/locales/sv';
-import localeLb from '@angular/common/locales/lb';
 
 
-registerLocaleData(localeFr)
-registerLocaleData(localeNl)
+registerLocaleData(localeCs)
+registerLocaleData(localeDa)
 registerLocaleData(localeDe)
+registerLocaleData(localeEnGb)
+registerLocaleData(localeEs)
+registerLocaleData(localeFr)
+registerLocaleData(localeIt)
+registerLocaleData(localeLb)
+registerLocaleData(localeNl)
+registerLocaleData(localePl)
 registerLocaleData(localePt, "pt-BR")
 registerLocaleData(localePt, "pt-PT")
-registerLocaleData(localeIt)
-registerLocaleData(localeEnGb)
 registerLocaleData(localeRo)
 registerLocaleData(localeRu)
-registerLocaleData(localeEs)
-registerLocaleData(localePl)
 registerLocaleData(localeSv)
-registerLocaleData(localeLb)
 
 @NgModule({
   declarations: [

@@ -6,8 +6,8 @@
       </svg>&nbsp;<ng-container i18n>Cancel</ng-container>
     </button>
   </div>
-  <div class="col-auto mb-2 mb-xl-0 ml-auto ml-md-0" role="group" aria-label="Select">
-    <label class="mr-2 mb-0" i18n>Select:</label>
+  <div class="col-auto mb-2 mb-xl-0 ms-auto ms-md-0" role="group" aria-label="Select">
+    <label class="me-2 mb-0" i18n>Select:</label>
     <div class="btn-group">
       <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
         <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
@@ -24,8 +24,8 @@
   <div class="w-100 d-xl-none"></div>
   <div class="col-auto mb-2 mb-xl-0">
     <div class="d-flex">
-      <label class="ml-auto mt-1 mb-0 mr-2" i18n>Edit:</label>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Tags" icon="tag-fill" i18n-title
+      <label class="ms-auto mt-1 mb-0 me-2" i18n>Edit:</label>
+      <app-filterable-dropdown class="me-2 me-md-3" title="Tags" icon="tag-fill" i18n-title
         filterPlaceholder="Filter tags" i18n-filterPlaceholder
         [items]="tags"
         [editing]="true"
@@ -35,7 +35,7 @@
         [(selectionModel)]="tagSelectionModel"
         (apply)="setTags($event)">
       </app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Correspondent" icon="person-fill" i18n-title
+      <app-filterable-dropdown class="me-2 me-md-3" title="Correspondent" icon="person-fill" i18n-title
         filterPlaceholder="Filter correspondents" i18n-filterPlaceholder
         [items]="correspondents"
         [editing]="true"
@@ -44,7 +44,7 @@
         [(selectionModel)]="correspondentSelectionModel"
         (apply)="setCorrespondents($event)">
       </app-filterable-dropdown>
-      <app-filterable-dropdown class="mr-2 mr-md-3" title="Document type" icon="file-earmark-fill" i18n-title
+      <app-filterable-dropdown class="me-2 me-md-3" title="Document type" icon="file-earmark-fill" i18n-title
         filterPlaceholder="Filter document types" i18n-filterPlaceholder
         [items]="documentTypes"
         [editing]="true"
@@ -55,8 +55,8 @@
       </app-filterable-dropdown>
     </div>
   </div>
-  <div class="col-auto ml-auto mb-2 mb-xl-0 d-flex">
-    <div class="btn-group btn-group-sm mr-2">
+  <div class="col-auto ms-auto mb-2 mb-xl-0 d-flex">
+    <div class="btn-group btn-group-sm me-2">
       <button type="button" class="btn btn-outline-primary btn-sm" (click)="downloadSelected()">
         <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#download" />
