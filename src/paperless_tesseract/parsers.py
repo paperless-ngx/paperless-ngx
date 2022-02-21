@@ -196,7 +196,8 @@ class RasterisedDocumentParser(DocumentParser):
             if self.has_alpha(input_file):
                 self.log(
                     "info",
-                    f"Removing alpha layer from {input_file} for compatibility with img2pdf"
+                    f"Removing alpha layer from {input_file} "
+                    "for compatibility with img2pdf"
                 )
                 with Image.open(input_file) as im:
                     background = Image.new('RGBA', im.size, (255, 255, 255))
