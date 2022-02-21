@@ -4,6 +4,10 @@
   overflow-wrap: anywhere;
 }
 
+.doc-img-background {
+  position: relative;
+}
+
 .doc-img {
   object-fit: cover;
   object-position: top left;
@@ -23,7 +27,23 @@
 }
 
 .document-card-check {
-  display: none
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+
+  .form-check {
+    padding: 0;
+    min-height: 0;
+    margin-bottom: 0;
+
+    .form-check-input {
+      margin-left: 0;
+    }
+  }
 }
 
 .document-card:hover .document-card-check {
@@ -32,6 +52,10 @@
 
 .card-selected {
   border-color: $primary;
+
+  .document-card-check {
+    display: block;
+  }
 }
 
 .doc-img-background-selected {
