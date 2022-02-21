@@ -5,8 +5,11 @@
     </svg>
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <ng-container *ngIf="!editing && selectionModel.selectionSize() > 0">
-      <div class="badge bg-secondary text-light rounded-pill badge-corner">
-        {{selectionModel.selectionSize()}}
+      <div *ngIf="multiple" class="position-absolute top-0 start-100 translate-middle badge bg-secondary border border-light text-light rounded-pill">
+        {{selectionModel.selectionSize()}}<span class="visually-hidden">selected</span>
+      </div>
+      <div *ngIf="!multiple" class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
+        <span class="visually-hidden">selected</span>
       </div>
     </ng-container>
   </button>
@@ -15,10 +18,10 @@
       <div *ngIf="!editing && multiple" class="list-group-item d-flex">
         <div class="btn-group btn-group-xs btn-group-toggle flex-fill" ngbRadioGroup [(ngModel)]="selectionModel.logicalOperator" (change)="selectionModel.toggleOperator()" [disabled]="!operatorToggleEnabled">
           <label ngbButtonLabel class="btn btn-outline-primary">
-            <input ngbButton type="radio" name="logicalOperator" value="and"> All
+            <input ngbButton type="radio" class="btn-check" name="logicalOperator" value="and"> All
           </label>
           <label ngbButtonLabel class="btn btn-outline-primary">
-            <input ngbButton type="radio" name="logicalOperator" value="or"> Any
+            <input ngbButton type="radio" class="btn-check" name="logicalOperator" value="or"> Any
           </label>
         </div>
       </div>
@@ -32,8 +35,8 @@
           <app-toggleable-dropdown-button *ngIf="allowSelectNone || item.id" [item]="item" [state]="selectionModel.get(item.id)" (toggle)="selectionModel.toggle(item.id)" (exclude)="excludeClicked(item.id)"></app-toggleable-dropdown-button>
         </ng-container>
       </div>
-      <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!selectionModel.isDirty()">
-        <small class="ml-2" [ngClass]="{'font-weight-bold': selectionModel.isDirty()}" i18n>Apply</small>
+      <button *ngIf="editing" class="list-group-item list-group-item-action bg-light" (click)="applyClicked()" [disabled]="!modelIsDirty">
+        <small class="ms-2" [ngClass]="{'fw-bold': modelIsDirty}" i18n>Apply</small>
         <svg width="1.5em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
         </svg>
