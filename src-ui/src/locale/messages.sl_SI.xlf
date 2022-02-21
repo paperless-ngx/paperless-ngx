@@ -50,13 +50,13 @@
         </context-group>
         <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</target>
       </trans-unit>
-      <trans-unit id="4733307402565258070" datatype="html">
+      <trans-unit id="4733307402565258070" datatype="html" approved="yes">
         <source>Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">Dokumenti</target>
+        <target state="final">Dokumenti</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -2247,13 +2247,13 @@
         </context-group>
         <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
-      <trans-unit id="5851669019930456395" datatype="html">
+      <trans-unit id="5851669019930456395" datatype="html" approved="yes">
         <source>Any word</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Katerakoli beseda</target>
+        <target state="final">Katerakoli beseda</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -2263,13 +2263,13 @@
         </context-group>
         <target state="needs-translation">Any: Document contains any of these words (space separated)</target>
       </trans-unit>
-      <trans-unit id="700315718208181326" datatype="html">
+      <trans-unit id="700315718208181326" datatype="html" approved="yes">
         <source>All words</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Vse besede</target>
+        <target state="final">Vse besede</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -2279,13 +2279,13 @@
         </context-group>
         <target state="needs-translation">All: Document contains all of these words (space separated)</target>
       </trans-unit>
-      <trans-unit id="9180173992399180575" datatype="html">
+      <trans-unit id="9180173992399180575" datatype="html" approved="yes">
         <source>Exact match</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Točno ujemanje</target>
+        <target state="final">Točno ujemanje</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
