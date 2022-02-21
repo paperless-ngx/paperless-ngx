@@ -57,6 +57,8 @@ THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
 
+TRASH_DIR = os.getenv('PAPERLESS_TRASH_DIR')
+
 # Lock file for synchronizing changes to the MEDIA directory across multiple
 # threads.
 MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
