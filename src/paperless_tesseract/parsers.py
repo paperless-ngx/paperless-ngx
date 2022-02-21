@@ -67,14 +67,8 @@ class RasterisedDocumentParser(DocumentParser):
         ]
 
     def has_alpha(self, image):
-        try:
-            with Image.open(image) as im:
-                return im.mode in ('RGBA', 'LA')
-        except Exception as e:
-            self.log(
-                'warning',
-                f"Error while check for alpha channel in image {image}: {e}")
-            return None
+        with Image.open(image) as im:
+            return im.mode in ('RGBA', 'LA')
 
     def get_dpi(self, image):
         try:
