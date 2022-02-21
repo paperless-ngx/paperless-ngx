@@ -8,3 +8,12 @@
     min-height: 1em;
   }
 }
+
+.input-group .dropdown .btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.me-2 {
+  margin-right: 0.7rem !important; // tweak to make room for badges
+}

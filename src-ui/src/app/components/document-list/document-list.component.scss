@@ -24,7 +24,7 @@ $paperless-card-breakpoints: (
     @media(min-width: $width) {
       > * {
         flex: 0 0 auto;
-        width: 100% / $n_cols;
+        width: calc(100% / $n-cols);
       }
     }
   }
@@ -41,5 +41,15 @@ $paperless-card-breakpoints: (
 
   @media (min-width: 580px) {
     top: 3.5rem; // height of navbar
+  }
+}
+
+.table .form-check {
+  padding: 0.2rem;
+  min-height: 0;
+  margin-bottom: 0;
+
+  .form-check-input {
+    margin-left: 0;
   }
 }
