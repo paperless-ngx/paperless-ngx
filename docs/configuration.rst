@@ -699,6 +699,12 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
 
     Defaults to 2.
 
+PAPERLESS_PORT=<port>
+    The port number the webserver will listen on. Change the port if it collides
+    with other services in your setup.
+
+    Defaults to 8000.
+
 USERMAP_UID=<uid>
     The ID of the paperless user in the container. Set this to your actual user ID on the
     host system, which you can get by executing
