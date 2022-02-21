@@ -17,6 +17,7 @@ paperlessng_db_sslmode: prefer
 paperlessng_directory: /opt/paperless-ng
 paperlessng_consumption_dir: "{{ paperlessng_directory }}/consumption"
 paperlessng_data_dir: "{{ paperlessng_directory }}/data"
+paperlessng_trash_dir:
 paperlessng_media_root: "{{ paperlessng_directory }}/media"
 paperlessng_staticdir: "{{ paperlessng_directory }}/static"
 paperlessng_filename_format:
