@@ -66,6 +66,16 @@ class RasterisedDocumentParser(DocumentParser):
             "image/gif",
         ]
 
+    def has_alpha(self, image):
+        try:
+            with Image.open(image) as im:
+                return im.mode in ('RGBA', 'LA')
+        except Exception as e:
+            self.log(
+                'warning',
+                f"Error while check for alpha channel in image {image}: {e}")
+            return None
+
     def get_dpi(self, image):
         try:
             with Image.open(image) as im:
@@ -182,6 +192,18 @@ class RasterisedDocumentParser(DocumentParser):
         if self.is_image(mime_type):
             dpi = self.get_dpi(input_file)
             a4_dpi = self.calculate_a4_dpi(input_file)
+
+            if self.has_alpha(input_file):
+                self.log(
+                    "info",
+                    f"Removing alpha layer from {input_file} for compatibility with img2pdf"
+                )
+                with Image.open(input_file) as im:
+                    background = Image.new('RGBA', im.size, (255, 255, 255))
+                    background.alpha_composite(im)
+                    background = background.convert('RGB')
+                    background.save(input_file, format=im.format)
+
             if dpi:
                 self.log(
                     "debug",
