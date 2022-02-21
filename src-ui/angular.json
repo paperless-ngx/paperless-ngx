@@ -44,7 +44,6 @@
 						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.app.json",
 						"localize": true,
-						"aot": true,
 						"assets": [
 							"src/favicon.ico",
 							"src/apple-touch-icon.png",
@@ -61,7 +60,13 @@
 						"scripts": [],
 						"allowedCommonJsDependencies": [
 							"ng2-pdf-viewer"
-						]
+						],
+						"vendorChunk": true,
+						"extractLicenses": false,
+						"buildOptimizer": false,
+						"sourceMap": true,
+						"optimization": false,
+						"namedChunks": true
 					},
 					"configurations": {
 						"production": {
@@ -95,7 +100,8 @@
 						"en-US": {
 							"localize": ["en-US"]
 						}
-					}
+					},
+					"defaultConfiguration": ""
 				},
 				"serve": {
 					"builder": "@angular-devkit/build-angular:dev-server",
@@ -111,8 +117,7 @@
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
 					"options": {
-						"browserTarget": "paperless-ui:build",
-						"ivy": true
+						"browserTarget": "paperless-ui:build"
 					}
 				},
 				"test": {
@@ -132,19 +137,6 @@
 							"src/styles.scss"
 						],
 						"scripts": []
-					}
-				},
-				"lint": {
-					"builder": "@angular-devkit/build-angular:tslint",
-					"options": {
-						"tsConfig": [
-							"tsconfig.app.json",
-							"tsconfig.spec.json",
-							"e2e/tsconfig.json"
-						],
-						"exclude": [
-							"**/node_modules/**"
-						]
 					}
 				},
 				"e2e": {

@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import os
 import random
+import tempfile
 import uuid
 from pathlib import Path
 from unittest import mock
@@ -153,6 +154,40 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         document.delete()
         self.assertEqual(os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"), False)
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
+
+    @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}", TRASH_DIR=tempfile.mkdtemp())
+    def test_document_delete_trash(self):
+        document = Document()
+        document.mime_type = "application/pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+
+        # Ensure that filename is properly generated
+        document.filename = generate_filename(document)
+        self.assertEqual(document.filename,
+                         "none/none.pdf")
+
+        create_source_path_directory(document.source_path)
+        Path(document.source_path).touch()
+
+        # Ensure file was moved to trash after delete
+        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none/none.pdf"), False)
+        document.delete()
+        self.assertEqual(os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"), False)
+        self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
+        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none.pdf"), True)
+        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none_01.pdf"), False)
+
+        # Create an identical document and ensure it is trashed under a new name
+        document = Document()
+        document.mime_type = "application/pdf"
+        document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
+        document.save()
+        document.filename = generate_filename(document)
+        create_source_path_directory(document.source_path)
+        Path(document.source_path).touch()
+        document.delete()
+        self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none_01.pdf"), True)
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
     def test_document_delete_nofile(self):
