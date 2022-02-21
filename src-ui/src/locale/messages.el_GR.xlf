@@ -50,13 +50,13 @@
         </context-group>
         <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</target>
       </trans-unit>
-      <trans-unit id="4733307402565258070" datatype="html">
+      <trans-unit id="4733307402565258070" datatype="html" approved="yes">
         <source>Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">Έγγραφα</target>
+        <target state="final">Έγγραφα</target>
       </trans-unit>
       <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
@@ -2207,13 +2207,13 @@
         </context-group>
         <target state="needs-translation">Could not save element: <x id="PH" equiv-text="error"/></target>
       </trans-unit>
-      <trans-unit id="810888510148304696" datatype="html">
+      <trans-unit id="810888510148304696" datatype="html" approved="yes">
         <source>Automatic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Αυτόματο</target>
+        <target state="final">Αυτόματο</target>
       </trans-unit>
       <trans-unit id="5044611416737085530" datatype="html">
         <source>Do you really want to delete this element?</source>
@@ -2247,13 +2247,13 @@
         </context-group>
         <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
-      <trans-unit id="5851669019930456395" datatype="html">
+      <trans-unit id="5851669019930456395" datatype="html" approved="yes">
         <source>Any word</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Οποιαδήποτε λέξη</target>
+        <target state="final">Οποιαδήποτε λέξη</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -2263,13 +2263,13 @@
         </context-group>
         <target state="needs-translation">Any: Document contains any of these words (space separated)</target>
       </trans-unit>
-      <trans-unit id="700315718208181326" datatype="html">
+      <trans-unit id="700315718208181326" datatype="html" approved="yes">
         <source>All words</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Όλες οι λέξεις</target>
+        <target state="final">Όλες οι λέξεις</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -2279,13 +2279,13 @@
         </context-group>
         <target state="needs-translation">All: Document contains all of these words (space separated)</target>
       </trans-unit>
-      <trans-unit id="9180173992399180575" datatype="html">
+      <trans-unit id="9180173992399180575" datatype="html" approved="yes">
         <source>Exact match</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Ακριβής ταύτιση</target>
+        <target state="final">Ακριβής ταύτιση</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>

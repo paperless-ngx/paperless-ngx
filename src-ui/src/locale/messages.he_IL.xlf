@@ -2,53 +2,53 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="en" datatype="plaintext" original="ng2.template" target-language="he">
     <body>
-      <trans-unit id="9103526311244275943" datatype="html">
+      <trans-unit id="9103526311244275943" datatype="html" approved="yes">
         <source>Document added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">מסמך התווסף</target>
+        <target state="final">מסמך התווסף</target>
       </trans-unit>
-      <trans-unit id="9204248378636247318" datatype="html">
+      <trans-unit id="9204248378636247318" datatype="html" approved="yes">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">המסמך <x id="PH" equiv-text="status.filename"/> התווסף ל - paperless-ng.</target>
+        <target state="final">המסמך <x id="PH" equiv-text="status.filename"/> התווסף ל - paperless-ng.</target>
       </trans-unit>
-      <trans-unit id="1931214133925051574" datatype="html">
+      <trans-unit id="1931214133925051574" datatype="html" approved="yes">
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">פתח מסמך</target>
+        <target state="final">פתח מסמך</target>
       </trans-unit>
-      <trans-unit id="8582620835547864448" datatype="html">
+      <trans-unit id="8582620835547864448" datatype="html" approved="yes">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">לא יכול להוסיף את <x id="PH_1" equiv-text="status.message"/>:<x id="PH" equiv-text="status.filename"/></target>
+        <target state="final">לא יכול להוסיף את <x id="PH_1" equiv-text="status.message"/>:<x id="PH" equiv-text="status.filename"/></target>
       </trans-unit>
-      <trans-unit id="1710712016675379662" datatype="html">
+      <trans-unit id="1710712016675379662" datatype="html" approved="yes">
         <source>New document detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">זוהה מסמך חדש</target>
+        <target state="final">זוהה מסמך חדש</target>
       </trans-unit>
-      <trans-unit id="587031278561344416" datatype="html">
+      <trans-unit id="587031278561344416" datatype="html" approved="yes">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="translated">מסמך <x id="PH" equiv-text="status.filename"/> נמצא בעיבוד ע"י Paperless-NG.</target>
+        <target state="final">מסמך <x id="PH" equiv-text="status.filename"/> נמצא בעיבוד ע"י Paperless-NG.</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -1203,13 +1203,13 @@
         </context-group>
         <target state="needs-translation">ASN: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
-      <trans-unit id="5701618810648052610" datatype="html">
+      <trans-unit id="5701618810648052610" datatype="html" approved="yes">
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="translated">כותרת</target>
+        <target state="final">כותרת</target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
@@ -1842,13 +1842,13 @@
         </context-group>
         <target state="needs-translation">Metadata</target>
       </trans-unit>
-      <trans-unit id="3797570084942068182" datatype="html">
+      <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">בחר</target>
+        <target state="final">בחר</target>
       </trans-unit>
       <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
@@ -2142,13 +2142,13 @@
         </context-group>
         <target state="needs-translation">Correspondent</target>
       </trans-unit>
-      <trans-unit id="5066119607229701477" datatype="html">
+      <trans-unit id="5066119607229701477" datatype="html" approved="yes">
         <source>Document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">סוג מסמך</target>
+        <target state="final">סוג מסמך</target>
       </trans-unit>
       <trans-unit id="4207916966377787111" datatype="html">
         <source>Created</source>
@@ -2191,13 +2191,13 @@
         </context-group>
         <target state="needs-translation">Create new item</target>
       </trans-unit>
-      <trans-unit id="5324147361912094446" datatype="html">
+      <trans-unit id="5324147361912094446" datatype="html" approved="yes">
         <source>Edit item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="translated">עריכת פריט</target>
+        <target state="final">עריכת פריט</target>
       </trans-unit>
       <trans-unit id="1699589597032579396" datatype="html">
         <source>Could not save element: <x id="PH" equiv-text="error"/></source>
