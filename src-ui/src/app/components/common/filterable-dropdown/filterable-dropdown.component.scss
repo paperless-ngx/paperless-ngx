@@ -13,6 +13,10 @@
     max-height: 400px;
     overflow-y: scroll;
   }
+
+  button:disabled {
+    opacity: 0.2;
+  }
 }
 
 .btn-group-xs {
