@@ -25,7 +25,7 @@
     "@ngneat/dirty-check-forms": "^1.1.0",
     "bootstrap": "^5.1.3",
     "file-saver": "^2.0.5",
-    "ng2-pdf-viewer": "^8.0.0",
+    "ng2-pdf-viewer": "^8.0.1",
     "ngx-color": "^7.3.3",
     "ngx-cookie-service": "^13.1.2",
     "ngx-file-drop": "^13.0.0",
