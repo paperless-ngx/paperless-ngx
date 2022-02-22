@@ -31,6 +31,8 @@ services:
   broker:
     image: redis:6.0
     restart: unless-stopped
+    volumes:
+      - redisdata:/data
 
   db:
     image: postgres:13
@@ -70,3 +72,4 @@ volumes:
   data:
   media:
   pgdata:
+  redisdata:
