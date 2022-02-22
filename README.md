@@ -1,5 +1,4 @@
 [![ci](https://github.com/paperless-ngx/paperless-ngx/workflows/ci/badge.svg)](https://github.com/paperless-ngx/paperless-ngx/actions)
-[![Ansible Role](https://github.com/paperless-ngx/paperless-ngx/workflows/Ansible%20Role/badge.svg)](https://github.com/paperless-ngx/paperless-ngx/actions/workflows/ansible.yml)
 [![Crowdin](https://badges.crowdin.net/paperless-ngx/localized.svg)](https://crowdin.com/project/paperless-ngx)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ngx/badge/?version=latest)](https://paperless-ngx.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/paperless-ngx/paperless-ngx/badge.svg?branch=master)](https://coveralls.io/github/paperless-ngx/paperless-ngx?branch=master)
