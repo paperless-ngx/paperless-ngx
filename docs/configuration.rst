@@ -700,8 +700,13 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     Defaults to 2.
 
 PAPERLESS_PORT=<port>
-    The port number the webserver will listen on. Change the port if it collides
-    with other services in your setup.
+    The port number the webserver will listen on inside the container. There are
+    special setups where you may need this to avoid collisions with other
+    services (like using podman with multiple containers in one pod).
+
+    Don't change this when using Docker. To change the port the webserver is
+    reachable outside of the container, instead refer to the "ports" key in
+    ``docker-compose.yml``.
 
     Defaults to 8000.
 
