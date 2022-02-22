@@ -28,7 +28,8 @@ services:
   broker:
     image: redis:6.0
     restart: unless-stopped
-
+    volumes:
+      - redisdata:/data
   webserver:
     image: jonaswinkler/paperless-ng:latest
     restart: unless-stopped
@@ -54,3 +55,4 @@ services:
 volumes:
   data:
   media:
+  redisdata:
