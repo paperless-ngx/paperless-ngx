@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, switchMap, first } from 'rxjs/operators';
 import { PaperlessDocument } from 'src/app/data/paperless-document';
 import { OpenDocumentsService } from 'src/app/services/open-documents.service';
 import { SavedViewService } from 'src/app/services/rest/saved-view.service';
@@ -18,7 +18,7 @@ import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type';
   templateUrl: './app-frame.component.html',
   styleUrls: ['./app-frame.component.scss']
 })
-export class AppFrameComponent implements OnInit {
+export class AppFrameComponent {
 
   constructor (
     public router: Router,
@@ -28,9 +28,7 @@ export class AppFrameComponent implements OnInit {
     public savedViewService: SavedViewService,
     private list: DocumentListViewService,
     private meta: Meta
-    ) {
-
-  }
+    ) { }
 
   versionString = `${environment.appTitle} ${environment.version}`
 
@@ -81,32 +79,36 @@ export class AppFrameComponent implements OnInit {
   }
 
   closeDocument(d: PaperlessDocument) {
-    this.closeMenu()
-    this.openDocumentsService.closeDocument(d)
-
-    let route = this.activatedRoute.snapshot
-    while (route.firstChild) {
-      route = route.firstChild
-    }
-    if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
-      this.router.navigate([""])
-    }
+    this.openDocumentsService.closeDocument(d).pipe(first()).subscribe(confirmed => {
+      if (confirmed) {
+        this.closeMenu()
+        let route = this.activatedRoute.snapshot
+        while (route.firstChild) {
+          route = route.firstChild
+        }
+        if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
+          this.router.navigate([""])
+        }
+      }
+    })
   }
 
   closeAll() {
-    this.closeMenu()
-    this.openDocumentsService.closeAll()
+    // user may need to confirm losing unsaved changes
+    this.openDocumentsService.closeAll().pipe(first()).subscribe(confirmed => {
+      if (confirmed) {
+        this.closeMenu()
 
-    let route = this.activatedRoute.snapshot
-    while (route.firstChild) {
-      route = route.firstChild
-    }
-    if (route.component == DocumentDetailComponent) {
-      this.router.navigate([""])
-    }
-  }
-
-  ngOnInit() {
+        // TODO: is there a better way to do this?
+        let route = this.activatedRoute
+        while (route.firstChild) {
+          route = route.firstChild
+        }
+        if (route.component === DocumentDetailComponent) {
+          this.router.navigate([""])
+        }
+      }
+    })
   }
 
   get displayName() {

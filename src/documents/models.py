@@ -387,7 +387,8 @@ class SavedViewFilterRule(models.Model):
         (18, _("does not have ASN")),
         (19, _("title or content contains")),
         (20, _("fulltext query")),
-        (21, _("more like this"))
+        (21, _("more like this")),
+        (22, _("has tags in"))
     ]
 
     saved_view = models.ForeignKey(

@@ -153,7 +153,7 @@ jobs:
     -
       uses: actions/setup-node@v2
       with:
-        node-version: '15'
+        node-version: '16'
     -
       name: Configure version on dev branches
       if: startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev'

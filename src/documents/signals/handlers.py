@@ -145,7 +145,7 @@ def set_document_type(sender,
                         else str(document)
                     ) + f" [{document.pk}]"
                 )
-            print(f"Sugest document type {selected}")
+            print(f"Suggest document type {selected}")
         else:
             logger.info(
                 f"Assigning document type {selected} to {document}",
@@ -225,6 +225,37 @@ def set_tags(sender,
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):
+        if settings.TRASH_DIR:
+            # Find a non-conflicting filename in case a document with the same
+            # name was moved to trash earlier
+            counter = 0
+            old_filename = os.path.split(instance.source_path)[1]
+            (old_filebase, old_fileext) = os.path.splitext(old_filename)
+
+            while True:
+                new_file_path = os.path.join(
+                    settings.TRASH_DIR,
+                    old_filebase +
+                    (f"_{counter:02}" if counter else "") +
+                    old_fileext
+                )
+
+                if os.path.exists(new_file_path):
+                    counter += 1
+                else:
+                    break
+
+            logger.debug(
+                f"Moving {instance.source_path} to trash at {new_file_path}")
+            try:
+                os.rename(instance.source_path, new_file_path)
+            except OSError as e:
+                logger.error(
+                    f"Failed to move {instance.source_path} to trash at "
+                    f"{new_file_path}: {e}. Skipping cleanup!"
+                )
+                return
+
         for filename in (instance.source_path,
                          instance.archive_path,
                          instance.thumbnail_path):

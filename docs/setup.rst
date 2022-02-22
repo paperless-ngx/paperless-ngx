@@ -6,7 +6,7 @@ Setup
 Overview of Paperless-ng
 ########################
 
-Compared to paperless, paperless-ng works a little different under the hood and has
+Compared to paperless, paperless-ngx works a little different under the hood and has
 more moving parts that work together. While this increases the complexity of
 the system, it also brings many benefits.
 
@@ -85,7 +85,6 @@ You can go multiple routes to setup and run Paperless:
 * :ref:`Pull the image from Docker Hub <setup-docker_hub>`
 * :ref:`Build the Docker image yourself <setup-docker_build>`
 * :ref:`Install Paperless directly on your system manually (bare metal) <setup-bare_metal>`
-* :ref:`Use ansible to install Paperless on your system automatically (bare metal) <setup-ansible>`
 
 The Docker routes are quick & easy. These are the recommended routes. This configures all the stuff
 from the above automatically so that it just works and uses sensible defaults for all configuration options.
@@ -95,12 +94,7 @@ The bare metal route is complicated to setup but makes it easier
 should you want to contribute some code back. You need to configure and
 run the above mentioned components yourself.
 
-The ansible route combines benefits of both options:
-the setup process is fully automated, reproducible and `idempotent <https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency>`_,
-it includes the same sensible defaults, and it simultaneously provides the flexibility of a bare metal installation.
-
 .. _CLI Basics: https://www.sehn.tech/refs/devops-with-docker/
-.. _idempotent: https://docs.ansible.com/ansible/latest/reference_appendices/glossary.html#Idempotency
 
 .. _setup-docker_script:
 
@@ -125,7 +119,7 @@ Install Paperless from Docker Hub
 
 1.  Login with your user and create a folder in your home-directory `mkdir -v ~/paperless-ng` to have a place for your configuration files and consumption directory.
 
-2.  Go to the `/docker/compose directory on the project page <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`_
+2.  Go to the `/docker/compose directory on the project page <https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose>`_
     and download one of the `docker-compose.*.yml` files, depending on which database backend you
     want to use. Rename this file to `docker-compose.yml`.
     If you want to enable optional support for Office documents, download a file with `-tika` in the file name.
@@ -244,7 +238,7 @@ Build the Docker image yourself
 
     .. code:: shell-session
 
-        git clone https://github.com/jonaswinkler/paperless-ng
+        git clone https://github.com/paperless-ngx/paperless-ngx
 
     The master branch always reflects the latest stable version.
 
@@ -338,7 +332,7 @@ writing. Windows is not and will never be supported.
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
     to use PostgreSQL, SQLite is available as well.
 
-4.  Get the release archive from `<https://github.com/jonaswinkler/paperless-ng/releases>`_.
+4.  Get the release archive from `<https://github.com/paperless-ngx/paperless-ngx/releases>`_.
     If you clone the git repo as it is, you also have to compile the front end by yourself.
     Extract the archive to a place from where you wish to execute it, such as ``/opt/paperless``.
 
@@ -472,120 +466,10 @@ writing. Windows is not and will never be supported.
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
 
-.. _setup-ansible:
-
-Install Paperless using ansible
-===============================
-
-.. note::
-
-    This role currently only supports Debian 10 Buster and Ubuntu 20.04 Focal or later as target hosts.
-		Additionally, only i386 or amd64 based hosts are supported right now, i.e. installation on arm hosts will fail.
-
-1.  Install ansible 2.7+ on the management node.
-    This may be the target host paperless-ng is being installed on or any remote host which can access the target host.
-    For further details, check the ansible `inventory <https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html>`_ documentation.
-
-    On Debian and Ubuntu, the official repositories should provide a suitable version:
-
-    .. code:: bash
-
-        apt install ansible
-        ansible --version
-
-    Alternatively, you can install the most recent ansible release using PyPI:
-
-    .. code:: bash
-
-        python3 -m pip install ansible
-        ansible --version
-
-    Make sure your taget hosts are accessible:
-
-    .. code:: sh
-
-        ansible -m ping YourAnsibleTargetHostGoesHere
-
-2.  Install the latest tag of the ansible role using ansible-galaxy
-
-    .. code:: sh
-
-        ansible-galaxy install git+https://github.com/jonaswinkler/paperless-ng.git,ng-1.4.2
-
-3.  Create an ansible ``playbook.yml`` in a directory of your choice:
-
-    .. code:: yaml
-
-        - hosts: YourAnsibleTargetHostGoesHere
-          become: yes
-          vars_files:
-            - vars/paperless-ng.yml
-          roles:
-            - paperless-ng
-
-    Optional: If you also want to use PostgreSQL on the target system, install and add (for example) the `geerlingguy.postgresql <https://github.com/geerlingguy/ansible-role-postgresql>`_ role:
-
-    .. code:: sh
-
-        ansible-galaxy install geerlingguy.postgresql
-
-    .. code:: yaml
-
-        - hosts: YourAnsibleTargetHostGoesHere
-          become: yes
-          vars_files:
-            - vars/paperless-ng.yml
-          roles:
-            - geerlingguy.postgresql
-            - paperless-ng
-
-    Optional: If you also want to use a reverse proxy on the target system, install and add (for example) the `geerlingguy.nginx <https://github.com/geerlingguy/ansible-role-nginx>`_ role:
-
-    .. code:: sh
-
-        ansible-galaxy install geerlingguy.nginx
-
-    .. code:: yaml
-
-        - hosts: YourAnsibleTargetHostGoesHere
-          become: yes
-          vars_files:
-            - vars/paperless-ng.yml
-          roles:
-            - geerlingguy.postgresql
-            - paperless-ng
-            - geerlingguy.nginx
-
-4.  Create ``vars/paperless-ng.yml`` to configure your ansible deployment:
-
-    .. code:: yaml
-
-        paperlessng_secret_key: PleaseGenerateAStrongKeyForThis
-
-        paperlessng_superuser_name: YourUserName
-        paperlessng_superuser_email: name@domain.tld
-        paperlessng_superuser_password: YourDesiredPasswordUsedForFirstLogin
-
-        paperlessng_ocr_languages:
-            - eng
-            - deu
-
-    For all of the available options, please check ``ansible/README.md`` and :ref:`configuration`.
-
-    Optional configurations for the above-mentioned PostgreSQL and nginx roles would also go here.
-
-5. Run the ansible playbook from the management node:
-
-    .. code:: sh
-
-        ansible-playbook playbook.yml
-
-    When this step completes successfully, paperless-ng will be available on the target host at ``http://127.0.0.1:8000`` (or the address you configured).
-
-Migration to paperless-ng
+Migration to paperless-ngx
 #########################
 
-At its core, paperless-ng is still paperless and fully compatible. However, some
+At its core, paperless-ngx is still paperless and fully compatible. However, some
 things have changed under the hood, so you need to adapt your setup depending on
 how you installed paperless.
 
@@ -601,10 +485,10 @@ The important things to keep in mind are as follows:
   such as email checking and maintenance, requires a `redis`_ message broker
   instance. The docker-compose route takes care of that.
 * The layout of the folder structure for your documents and data remains the
-  same, so you can just plug your old docker volumes into paperless-ng and
+  same, so you can just plug your old docker volumes into paperless-ngx and
   expect it to find everything where it should be.
 
-Migration to paperless-ng is then performed in a few simple steps:
+Migration to paperless-ngx is then performed in a few simple steps:
 
 1.  Stop paperless.
 
@@ -614,20 +498,20 @@ Migration to paperless-ng is then performed in a few simple steps:
         $ docker-compose down
 
 2.  Do a backup for two purposes: If something goes wrong, you still have your
-    data. Second, if you don't like paperless-ng, you can switch back to
+    data. Second, if you don't like paperless-ngx, you can switch back to
     paperless.
 
-3.  Download the latest release of paperless-ng. You can either go with the
-    docker-compose files from `here <https://github.com/jonaswinkler/paperless-ng/tree/master/docker/compose>`__
+3.  Download the latest release of paperless-ngx. You can either go with the
+    docker-compose files from `here <https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose>`__
     or clone the repository to build the image yourself (see :ref:`above <setup-docker_build>`).
-    You can either replace your current paperless folder or put paperless-ng
+    You can either replace your current paperless folder or put paperless-ngx
     in a different location.
 
     .. caution::
 
         Paperless-ng includes a ``.env`` file. This will set the
         project name for docker compose to ``paperless``, which will also define the name
-        of the volumes by paperless-ng. However, if you experience that paperless-ng
+        of the volumes by paperless-ngx. However, if you experience that paperless-ngx
         is not using your old paperless volumes, verify the names of your volumes with
 
         .. code:: shell-session
@@ -657,7 +541,7 @@ Migration to paperless-ng is then performed in a few simple steps:
     This will migrate your database and create the search index. After that,
     paperless will take care of maintaining the index by itself.
 
-8.  Start paperless-ng.
+8.  Start paperless-ngx.
 
     .. code:: bash
 

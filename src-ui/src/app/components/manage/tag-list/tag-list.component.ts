@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FILTER_HAS_TAG } from 'src/app/data/filter-rule-type';
+import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type';
 import { PaperlessTag } from 'src/app/data/paperless-tag';
 import { DocumentListViewService } from 'src/app/services/document-list-view.service';
 import { TagService } from 'src/app/services/rest/tag.service';
@@ -27,7 +27,7 @@ export class TagListComponent extends GenericListComponent<PaperlessTag> {
   }
 
   filterDocuments(object: PaperlessTag) {
-    this.list.quickFilter([{rule_type: FILTER_HAS_TAG, value: object.id.toString()}])
+    this.list.quickFilter([{rule_type: FILTER_HAS_TAGS_ALL, value: object.id.toString()}])
 
   }
 }

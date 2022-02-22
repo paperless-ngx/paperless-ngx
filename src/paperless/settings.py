@@ -57,6 +57,8 @@ THUMBNAIL_DIR = os.path.join(MEDIA_ROOT, "documents", "thumbnails")
 
 DATA_DIR = os.getenv('PAPERLESS_DATA_DIR', os.path.join(BASE_DIR, "..", "data"))
 
+TRASH_DIR = os.getenv('PAPERLESS_TRASH_DIR')
+
 # Lock file for synchronizing changes to the MEDIA directory across multiple
 # threads.
 MEDIA_LOCK = os.path.join(MEDIA_ROOT, "media.lock")
@@ -301,20 +303,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 LANGUAGE_CODE = 'en-us'
 
 LANGUAGES = [
-    ("en-us", _("English (US)")),
-    ("en-gb", _("English (GB)")),
+    ("en-us", _("English (US)")), # needs to be first to act as fallback language
+    ("cs-cz", _("Czech")),
+    ("da-dk", _("Danish")),
     ("de-de", _("German")),
-    ("nl-nl", _("Dutch")),
+    ("en-gb", _("English (GB)")),
+    ("es-es", _("Spanish")),
     ("fr-fr", _("French")),
+    ("it-it", _("Italian")),
+    ("lb-lu", _("Luxembourgish")),
+    ("nl-nl", _("Dutch")),
+    ("pl-pl", _("Polish")),
     ("pt-br", _("Portuguese (Brazil)")),
     ("pt-pt", _("Portuguese")),
-    ("it-it", _("Italian")),
     ("ro-ro", _("Romanian")),
     ("ru-ru", _("Russian")),
-    ("es-es", _("Spanish")),
-    ("pl-pl", _("Polish")),
     ("sv-se", _("Swedish")),
-    ("lb-lu", _("Luxembourgish")),
 ]
 
 LOCALE_PATHS = [

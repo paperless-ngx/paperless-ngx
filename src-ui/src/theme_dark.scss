@@ -49,11 +49,11 @@ $border-color-dark-mode: #47494f;
     border-color: $border-color-dark-mode !important;
   }
 
-  .border-right {
+  .border-end {
     border-right: 1px solid $border-color-dark-mode !important;
   }
 
-  .border-left {
+  .border-start {
     border-left: 1px solid $border-color-dark-mode !important;
   }
 
@@ -143,6 +143,10 @@ $border-color-dark-mode: #47494f;
     color: $text-color-dark-mode-accent;
   }
 
+  .badge.border-light {
+    border-color: $bg-dark-mode !important;
+  }
+
   .doc-img-container {
     border: none !important;
     border-top-left-radius: .25rem;
@@ -155,7 +159,7 @@ $border-color-dark-mode: #47494f;
     border-radius: 0;
     border-color: $bg-dark-mode;
     filter: invert(10%);
-    &.border-right {
+    &.border-end {
       border-right: none !important;
     }
   }
@@ -201,7 +205,7 @@ $border-color-dark-mode: #47494f;
       }
     }
 
-    tr:hover {
+    &.table-hover > tbody > tr:hover > * {
       background-color: $bg-light-dark-mode;
       color: $text-color-dark-mode-accent;
     }
@@ -216,9 +220,19 @@ $border-color-dark-mode: #47494f;
     background-color: $bg-light-dark-mode;
   }
 
+  .table-striped > tbody > tr:nth-of-type(odd) > * {
+    color: $text-color-dark-mode-accent;
+  }
+
   .close {
     color: $text-color-dark-mode;
     text-shadow: 0 1px 0 #666;
+  }
+
+  .modal .btn-close {
+    color: $text-color-dark-mode;
+    text-shadow: 0 1px 0 #666;
+    filter: invert(1) grayscale(100%) brightness(200%);
   }
 
   .btn-outline-primary {
@@ -230,6 +244,10 @@ $border-color-dark-mode: #47494f;
       background-color: darken($primary-dark-mode, 10%);
       border-color: darken($primary-dark-mode, 10%);
       color: $text-color-dark-mode-accent;
+    }
+
+    &.disabled.active {
+      background-color: darken($primary-dark-mode, 10%);
     }
   }
 
@@ -332,15 +350,6 @@ $border-color-dark-mode: #47494f;
     background-color: $bg-light-dark-mode;
   }
 
-  .custom-control-label:before {
-    background-color: $bg-dark-mode;
-    color: $text-color-dark-mode;
-  }
-
-  .custom-control-input:checked ~ .custom-control-label::before {
-    color: $text-color-dark-mode-accent;
-  }
-
   .input-group-text {
     color: $text-color-dark-mode;
     background-color: $bg-light-dark-mode;
@@ -405,13 +414,18 @@ $border-color-dark-mode: #47494f;
     }
   }
 
-  $placements: 'top', 'right', 'bottom', 'left';
-
-  @each $placement in $placements {
-    .bs-popover-#{$placement} > .arrow::after,
-    .bs-popover-auto[x-placement^=#{$placement}] > .arrow::after {
-      border-#{$placement}-color: $bg-dark-mode-accent;
-    }
+  // fix popover carat colors
+  .bs-popover-start > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="left"] {
+    border-left-color: $bg-dark-mode-accent;
+  }
+  .bs-popover-end > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="right"] {
+    border-right-color: $bg-dark-mode-accent;
+  }
+  .bs-popover-top > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="top"] {
+    border-top-color: $bg-dark-mode-accent;
+  }
+  .bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="bottom"] {
+    border-bottom-color: $bg-dark-mode-accent;
   }
 
   .bs-popover-bottom .popover-header::before,
