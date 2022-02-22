@@ -43,7 +43,7 @@ Here's what you get:
 
 ![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docs/_static/screenshots/dashboard.png)
 
-If you want to see paperless-ng in action, [more screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
+If you want to see paperless-ngx in action, [more screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
 
 # Features
 
@@ -112,7 +112,7 @@ If you want to implement something big: Please start a discussion about that! Ma
 
 Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
 
-* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless. Updated to work with paperless-ngx.
+* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless-ngx. Also works with the original Paperless and Paperless-ng.
 * [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
 * [Scan to Paperless](https://github.com/sbrunner/scan-to-paperless): Scan and prepare (crop, deskew, OCR, ...) your documents for Paperless.
 
