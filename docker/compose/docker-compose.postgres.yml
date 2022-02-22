@@ -33,6 +33,7 @@ services:
     restart: unless-stopped
     volumes:
       - redisdata:/data
+
   db:
     image: postgres:13
     restart: unless-stopped

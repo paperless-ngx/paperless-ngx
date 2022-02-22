@@ -30,6 +30,7 @@ services:
     restart: unless-stopped
     volumes:
       - redisdata:/data
+
   webserver:
     image: jonaswinkler/paperless-ng:latest
     restart: unless-stopped
