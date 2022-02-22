@@ -1,5 +1,4 @@
 [![ci](https://github.com/jonaswinkler/paperless-ng/workflows/ci/badge.svg)](https://github.com/jonaswinkler/paperless-ng/actions)
-![Ansible Role](https://github.com/jonaswinkler/paperless-ng/workflows/Ansible%20Role/badge.svg)
 [![Crowdin](https://badges.crowdin.net/paperless-ngx/localized.svg)](https://crwd.in/paperless-ngx)
 [![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/paperless-ng/community.svg)](https://gitter.im/paperless-ng/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -76,7 +75,7 @@ The recommended way to deploy paperless is docker-compose. The files in the /doc
 
 Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
-Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has a step by step guide on how to do it. Consider giving the Ansible role a shot, this essentially automates the entire bare metal installation process.
+Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has a step by step guide on how to do it.
 
 # Migrating from Paperless to Paperless-ng
 
