@@ -181,13 +181,14 @@ class TestParser(DirectoriesMixin, TestCase):
 
         self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
-    def test_image_simple_alpha_fail(self):
+    def test_image_simple_alpha(self):
         parser = RasterisedDocumentParser(None)
 
-        def f():
-            parser.parse(os.path.join(self.SAMPLE_FILES, "simple-alpha.png"), "image/png")
+        parser.parse(os.path.join(self.SAMPLE_FILES, "simple-alpha.png"), "image/png")
 
-        self.assertRaises(ParseError, f)
+        self.assertTrue(os.path.isfile(parser.archive_path))
+
+        self.assertContainsStrings(parser.get_text(), ["This is a test document."])
 
     def test_image_calc_a4_dpi(self):
         parser = RasterisedDocumentParser(None)
