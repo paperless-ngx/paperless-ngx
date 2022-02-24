@@ -282,7 +282,7 @@ writing. Windows is not and will never be supported.
 
 1.  Install dependencies. Paperless requires the following packages.
 
-    *   ``python3`` 3.6, 3.7, 3.8, 3.9
+    *   ``python3`` 3.8, 3.9
     *   ``python3-pip``
     *   ``python3-dev``
 
