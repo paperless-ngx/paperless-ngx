@@ -188,6 +188,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends gettext liblept5
+          pip3 install --upgrade pip setuptools wheel
           pip3 install -r requirements.txt
       -
         name: Download frontend artifact
