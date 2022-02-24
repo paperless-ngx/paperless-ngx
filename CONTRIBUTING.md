@@ -11,7 +11,7 @@ If you want to implement something big:
 
 ## Python
 
-Paperless supports python 3.6, 3.7, 3.8 and 3.9.
+Paperless supports python 3.8 and 3.9.
 
 ## Branches
 
