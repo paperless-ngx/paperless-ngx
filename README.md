@@ -62,6 +62,7 @@ The recommended way to deploy paperless is docker-compose. The files in the `/do
 Please read the [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.
+
 # How it Works
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces.
