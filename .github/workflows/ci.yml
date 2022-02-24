@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    tags: ng-*
+    tags: ngx-*
     branches-ignore:
       - 'translations**'
   pull_request:
@@ -241,7 +241,7 @@ jobs:
   publish-release:
     runs-on: ubuntu-latest
     needs: build-release
-    if: contains(github.ref, 'refs/tags/ng-')
+    if: contains(github.ref, 'refs/tags/ngx-')
     steps:
       -
         name: Download release artifact
