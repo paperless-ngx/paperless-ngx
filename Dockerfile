@@ -63,6 +63,7 @@ RUN apt-get update \
 		build-essential \
 		libpq-dev \
 		libqpdf-dev \
+	&& python3 -m pip install --upgrade pip setuptools wheel \
 	&& python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor \
   && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
 	&& apt-get -y purge build-essential libqpdf-dev \
