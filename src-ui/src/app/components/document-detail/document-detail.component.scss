@@ -13,6 +13,7 @@
   }
 }
 
-::ng-deep .ng2-pdf-viewer-container {
+::ng-deep .ng2-pdf-viewer-container .page {
   --page-margin: 1px 0 -8px;
+  width: 100% !important;
 }
