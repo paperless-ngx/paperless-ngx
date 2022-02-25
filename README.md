@@ -19,8 +19,6 @@ and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 - [Features](#features)
 - [Getting started](#getting-started)
 - [How it Works](#how-it-works)
-- [Paperless-ngx vs Paperless](#paperless-ngx-vs-paperless)
-	- [Migrating from Paperless to Paperless-ngx](#migrating-from-paperless-to-paperless-ngx)
 - [Contributing](#contributing)
 	- [Documentation](#documentation)
 	- [Translation](#translation)
@@ -77,23 +75,6 @@ Paperless does not control your scanner, it only helps you deal with what your s
 4. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
 
 If you want to see paperless-ngx in action, [more screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
-
-# Paperless-ngx vs Paperless
-
-[Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
-
-Paperless-ngx is a fork of the original project, adding a new interface and many other changes under the hood, including:
-
-* Interface: The new front end is the main interface for Paperless-ng, the old interface still exists but most customizations (such as thumbnails for the document list) have been removed.
-* Encryption: Paperless-ng does not support GnuPG anymore, since storing your data on encrypted file systems (that you optionally mount on demand) achieves about the same result.
-* Resource usage: Paperless-ng does use a bit more resources than Paperless. Running the web server requires about 300MB of RAM or more, depending on the configuration. While adding documents, it requires about 300MB additional RAM, depending on the document. It still runs on Raspberry Pi (many users do that), but it has been generally geared to better use the resources of more powerful systems.
-* API changes: If you rely on the REST API of paperless, some of its functionality has been changed.
-
-For a detailed list of changes done in paperless-ng, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation, especially the section about the [0.9.0 release](https://paperless-ng.readthedocs.io/en/latest/changelog.html#paperless-ng-0-9-0).
-
-## Migrating from Paperless to Paperless-ngx
-
-Read the section about [migration](https://paperless-ngx.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation. Its also entirely possible to go back to Paperless by reverting the database migrations.
 
 # Contributing
 
