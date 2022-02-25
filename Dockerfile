@@ -8,6 +8,7 @@ RUN git clone https://github.com/agl/jbig2enc .
 RUN ./autogen.sh
 RUN ./configure && make
 
+
 FROM python:3.9-slim-bullseye
 
 # Binary dependencies
@@ -39,7 +40,6 @@ RUN apt-get update \
 		media-types \
 		# OCRmyPDF dependencies
 		liblept5 \
-		qpdf \
 		tesseract-ocr \
 		tesseract-ocr-eng \
 		tesseract-ocr-deu \
@@ -62,11 +62,26 @@ RUN apt-get update \
   && apt-get -y --no-install-recommends install \
 		build-essential \
 		libpq-dev \
-		libqpdf-dev \
-	&& python3 -m pip install --upgrade pip setuptools wheel \
+		git \
+		zlib1g-dev \
+		libjpeg62-turbo-dev \
+	&& if [ "$(uname -m)" = "armv7l" ]; \
+	  then echo "Building qpdf" \
+	  && mkdir -p /usr/src/qpdf \
+	  && cd /usr/src/qpdf \
+	  && git clone https://github.com/qpdf/qpdf.git . \
+	  && git checkout --quiet release-qpdf-10.6.2 \
+	  && ./configure \
+	  && make \
+	  && make install \
+	  && cd /usr/src/paperless/src/ \
+	  && rm -rf /usr/src/qpdf; \
+	else \
+	  echo "Skipping qpdf build because pikepdf binary wheels are available."; \
+	fi \
 	&& python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor \
   && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
-	&& apt-get -y purge build-essential libqpdf-dev \
+	&& apt-get -y purge build-essential git zlib1g-dev libjpeg62-turbo-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/*
 
