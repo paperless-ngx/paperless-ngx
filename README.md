@@ -10,7 +10,7 @@
 <!-- omit in toc -->
 # Paperless-ngx
 
-Paperless-ngx is a document management system that transforms your wieldy physical document binders into an searchable online archive.
+Paperless-ngx is a document management system that transforms your physical documents into a searchable online archive so you can keep, well, *less paper*.
 
 Paperless-ngx forked from [paperless-ng](https://github.com/jonaswinkler/paperless-ng) to continue the great work and distribute responsibility among a team of people. That discussion can be found in issues
 [#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599)
@@ -82,9 +82,9 @@ If you want to see paperless-ngx in action, [more screenshots are available in t
 
 [Paperless](https://github.com/the-paperless-project/paperless) is an application by Daniel Quinn and contributors that indexes your scanned documents and allows you to easily search for documents and store metadata alongside your documents.
 
-Paperless-ng is a fork of the original project, adding a new interface and many other changes under the hood. These key points should help you decide whether Paperless-ng is something you would prefer over Paperless:
+Paperless-ngx is a fork of the original project, adding a new interface and many other changes under the hood, including:
 
-* Interface: The new front end is the main interface for Paperless-ng, the old interface still exists but most customizations (such as thumbnails for the document list) have been removed.0
+* Interface: The new front end is the main interface for Paperless-ng, the old interface still exists but most customizations (such as thumbnails for the document list) have been removed.
 * Encryption: Paperless-ng does not support GnuPG anymore, since storing your data on encrypted file systems (that you optionally mount on demand) achieves about the same result.
 * Resource usage: Paperless-ng does use a bit more resources than Paperless. Running the web server requires about 300MB of RAM or more, depending on the configuration. While adding documents, it requires about 300MB additional RAM, depending on the document. It still runs on Raspberry Pi (many users do that), but it has been generally geared to better use the resources of more powerful systems.
 * API changes: If you rely on the REST API of paperless, some of its functionality has been changed.
@@ -97,9 +97,7 @@ Read the section about [migration](https://paperless-ngx.readthedocs.io/en/lates
 
 # Contributing
 
-If you feel like contributing to the project, please do! Bug fixes and improvements to the front end (I just can't seem to get some of these CSS things right) are always welcome. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html) has some basic information on how to get started.
-
-If you want to implement something big: Please start a discussion about that! Maybe I've already had something similar in mind and we can make it happen together. However, keep in mind that the general roadmap is to make the existing features stable and get them tested.
+If you feel like contributing to the project, please do! Bug fixes, enhancements, visual fixes etc. are always welcome. If you want to implement something big: Please start a discussion about that! The [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html) has some basic information on how to get started.
 
 ## Documentation
 
