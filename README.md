@@ -16,11 +16,14 @@ Paperless-ngx forked from [paperless-ng](https://github.com/jonaswinkler/paperle
 [#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599)
 and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
+#### Demo
+A demo is available at [http://demo.paperless-ngx.com](http://demo.paperless-ngx.com) using login `demo` / `demo` (content is reset frequently).
+
+
 - [Features](#features)
 - [Getting started](#getting-started)
 - [How it Works](#how-it-works)
 - [Contributing](#contributing)
-	- [Documentation](#documentation)
 	- [Translation](#translation)
 	- [Feature Requests](#feature-requests)
 	- [Questions? Something not working?](#questions-something-not-working)
@@ -54,36 +57,21 @@ and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 * Optimized for multi core systems: Paperless-ng consumes multiple documents in parallel.
 * The integrated sanity checker makes sure that your document archive is in good health.
+* [More screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
 
 # Getting started
 
 The recommended way to deploy paperless is docker-compose. The files in the `/docker/compose` directory are configured to pull the image from GHCR.io.
 
-Please read the [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) on how to get started.
-
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.
 
-# How it Works
+### Documentation
 
-Paperless does not control your scanner, it only helps you deal with what your scanner produces.
-
-1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ngx.readthedocs.io/en/latest/scanners.html) page. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
-
-	- Alternatively, you can use any of the mobile scanning apps out there. We have an app that allows you to share documents with paperless, if you're on Android. See the section on affiliated projects below.
-
-2. Wait for paperless to process your files. OCR is expensive, and depending on the power of your machine, this might take a bit of time.
-3. Use the web frontend to sift through the database and find what you want.
-4. Download the PDF you need/want via the web interface and do whatever you like with it.  You can even print it and send it as if it's the original. In most cases, no one will care or notice.
-
-If you want to see paperless-ngx in action, [more screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
+The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperless-ngx.readthedocs.io/).
 
 # Contributing
 
 If you feel like contributing to the project, please do! Bug fixes, enhancements, visual fixes etc. are always welcome. If you want to implement something big: Please start a discussion about that! The [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html) has some basic information on how to get started.
-
-## Documentation
-
-The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperless-ngx.readthedocs.io/).
 
 ## Translation
 
