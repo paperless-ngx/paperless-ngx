@@ -90,9 +90,14 @@
   }
 
   .nav-link-additional {
-    margin-top: 0.2rem;
+    margin-top: 0.1rem;
     margin-left: 0.25rem;
     padding-top: 0.5rem;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
 
     svg {
       margin-bottom: 2px;
