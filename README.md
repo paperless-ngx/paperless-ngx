@@ -17,7 +17,7 @@ Paperless-ngx forked from [paperless-ng](https://github.com/jonaswinkler/paperle
 and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
 #### Demo
-A demo is available at [http://demo.paperless-ngx.com](http://demo.paperless-ngx.com) using login `demo` / `demo` (content is reset frequently).
+A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) using login `demo` / `demo` (content is reset frequently).
 
 
 - [Features](#features)
