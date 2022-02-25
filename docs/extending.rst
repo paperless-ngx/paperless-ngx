@@ -59,10 +59,12 @@ To do the setup you need to perform the steps from the following chapters in a c
         pipenv install --dev
 
   * Make sure you're using python 3.9.x or lower. Otherwise you might get issues with building dependencies. You can use `pyenv <https://github.com/pyenv/pyenv>`_ to install a specific python version.
+
 7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
 
     .. code:: shell-session
 
+        npm install .
         ./node_modules/.bin/ng build --prod
 
 8.  Apply migrations and create a superuser for your dev instance:
