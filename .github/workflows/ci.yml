@@ -317,14 +317,6 @@ jobs:
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       -
-        name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      -
         name: Login to Github Container Registry
         uses: docker/login-action@v1
         with:
@@ -340,8 +332,8 @@ jobs:
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
           tags: ${{ steps.prepare.outputs.tags }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       -
         name: Inspect image
         run: |
