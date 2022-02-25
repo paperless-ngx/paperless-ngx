@@ -30,7 +30,8 @@ and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
 # Features
 
-![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docs/_static/screenshots/documents-largecards.png)
+![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/_static/screenshots/documents-wchrome.png#gh-light-mode-only)
+![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/_static/screenshots/documents-wchrome-dark.png#gh-dark-mode-only)
 
 * Organize and index your scanned documents with tags, correspondents, types, and more.
 * Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
