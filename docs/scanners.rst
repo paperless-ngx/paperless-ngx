@@ -89,26 +89,26 @@ Mobile phone software
 
 You can use your phone to "scan" documents. The regular camera app will work, but may have too low contrast for OCR to work well. Apps specifically for scanning are recommended.
 
-+-------------------+----------------+-----+-----+-----+-------+--------+------------------+
-| Name              | OS             | Supports                         | Recommended By   |
-+-------------------+----------------+-----+-----+-----+-------+--------+------------------+
-|                   |                | FTP | NFS | SMB | Email | WebDav |                  |
-+===================+================+=====+=====+=====+=======+========+==================+
-| `Office Lens`_    | Android        | ?   | ?   | ?   | ?     | ?      | `jonaswinkler`_  |
-+-------------------+----------------+-----+-----+-----+-------+--------+------------------+
-| `Genius Scan`_    | Android        | yes | no  | yes | yes   | yes    | `hannahswain`_   |
-+-------------------+----------------+-----+-----+-----+-------+--------+------------------+
-| `OpenScan`_       | Android        | no  | no  | no  | no    | no     | `benjaminfrank`_ |
-+-------------------+----------------+-----+-----+-----+-------+--------+------------------+
-| `Quick Scan`_     | iOS            | no  | no  | no  | no    | no     | `holzhannes`_    |
-+-------------------+----------------+-----+-----+-----+-------+--------+------------------+
++-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
+| Name                        | OS             | Supports                         | Recommended By   |
++-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
+|                             |                | FTP | NFS | SMB | Email | WebDAV |                  |
++=============================+================+=====+=====+=====+=======+========+==================+
+| `Office Lens`_              | Android        | ?   | ?   | ?   | ?     | ?      | `jonaswinkler`_  |
++-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
+| `Genius Scan`_              | Android        | yes | no  | yes | yes   | yes    | `hannahswain`_   |
++-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
+| `OpenScan`_                 | Android        | no  | no  | no  | no    | no     | `benjaminfrank`_ |
++-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
+| `OCR Scanner - QuickScan`_  | iOS            | no  | no  | no  | no    | yes    | `holzhannes`_    |
++-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
 
 On Android, you can use these applications in combination with one of the :ref:`Paperless-ng compatible apps <usage-mobile_upload>` to "Share" the documents produced by these scanner apps with paperless. On iOS, you can share the scanned documents via iOS-Sharing to other mail, WebDav or FTP apps.
 
 .. _Office Lens: https://play.google.com/store/apps/details?id=com.microsoft.office.officelens
 .. _Genius Scan: https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free
-.. _Quick Scan: https://apps.apple.com/us/app/quickscan-scanner-text-ocr/id1513790291
+.. _OCR Scanner - QuickScan: https://apps.apple.com/us/app/quickscan-scanner-text-ocr/id1513790291
 .. _OpenScan: https://github.com/Ethereal-Developers-Inc/OpenScan
 
 .. _hannahswain: https://github.com/hannahswain
-.. _benjaminfrank: https://github.com/benjaminfrank
+.. _benjaminfrank: https://github.com/benjaminfrank	
