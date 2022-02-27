@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = """
         Creates a Django superuser based on env variables.
         PAPERLESS_ADMIN_USER name of admin user (Default: admin)
-        PAPERLESS_ADMIN_MAIL admin users email address (Default: root@localhost)
+        PAPERLESS_ADMIN_MAIL admin email address (Default: root@localhost)
         PAPERLESS_ADMIN_PASSWORD (NODEFAULT)
 
         Logic:
@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Get info from env
-        username = os.getenv('PAPERLESS_ADMIN_USER','admin')
+        username = os.getenv('PAPERLESS_ADMIN_USER', 'admin')
         mail = os.getenv('PAPERLESS_ADMIN_MAIL', 'root@localhost')
         password = os.getenv('PAPERLESS_ADMIN_PASSWORD')
 
