@@ -4,9 +4,11 @@
 [![Coverage Status](https://coveralls.io/repos/github/paperless-ngx/paperless-ngx/badge.svg?branch=master)](https://coveralls.io/github/paperless-ngx/paperless-ngx?branch=master)
 [![Chat on Matrix](https://matrix.to/img/matrix-badge.svg)](https://matrix.to/#/#paperless:adnidor.de)
 
-![Paperless logo](https://github.com/paperless-ngx/paperless-ngx/raw/main/resources/logo/web/png/Black%20logo%20-%20no%20background.png#gh-light-mode-only)
-![Paperless logo](https://github.com/paperless-ngx/paperless-ngx/raw/main/resources/logo/web/png/White%20logo%20-%20no%20background.png#gh-dark-mode-only)
-
+<p align="center">
+<img src="https://github.com/paperless-ngx/paperless-ngx/raw/main/resources/logo/web/png/Black%20logo%20-%20no%20background.png#gh-light-mode-only" width="50%" />
+<img src="https://github.com/paperless-ngx/paperless-ngx/raw/main/resources/logo/web/png/White%20logo%20-%20no%20background.png#gh-dark-mode-only" width="50%" />
+</p>
+	
 <!-- omit in toc -->
 # Paperless-ngx
 
