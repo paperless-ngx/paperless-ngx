@@ -17,12 +17,11 @@ Paperless-ngx forked from [paperless-ng](https://github.com/jonaswinkler/paperle
 and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
 #### Demo
-A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) using login `demo` / `demo` (content is reset frequently).
+A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) using login `demo` / `demo`. *Note: demo content is reset frequently and confidential information should not be uploaded.*
 
 
 - [Features](#features)
 - [Getting started](#getting-started)
-- [How it Works](#how-it-works)
 - [Contributing](#contributing)
 	- [Translation](#translation)
 	- [Feature Requests](#feature-requests)
@@ -54,7 +53,7 @@ A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) u
 	* Configure multiple accounts and filters for each account.
 	* When adding documents from mail, paperless can move these mail to a new folder, mark them as read, flag them as important or delete them.
 * Machine learning powered document matching.
-	* Paperless learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
+	* Paperless-ngx learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
 * Optimized for multi core systems: Paperless-ng consumes multiple documents in parallel.
 * The integrated sanity checker makes sure that your document archive is in good health.
 * [More screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
