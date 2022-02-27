@@ -55,7 +55,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         call_command("manage_superuser")
 
         user: User = User.objects.get_by_natural_key("new_user")
-        self.assertTrue(user.check_password("more_secure_pwd_7645"))
+        self.assertTrue(user.check_password("123456"))
 
     def test_no_password(self):
         os.environ["PAPERLESS_ADMIN_USER"] = "new_user"
