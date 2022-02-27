@@ -18,7 +18,7 @@ max_line_length = off
 indent_size = 4
 indent_style = space
 
-[*.yml]
+[*.{yml,yaml}]
 indent_style = space
 
 [*.rst]
