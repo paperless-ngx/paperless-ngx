@@ -29,7 +29,7 @@ class Command(BaseCommand):
         password = os.getenv('PAPERLESS_ADMIN_PASSWORD')
 
         # Return if email address does not pass basic validation
-        if not re.fullmatch(r"[^@]+@[^@]+", email):
+        if not re.fullmatch(r"[^@]+@[^@]+", mail):
             self.stdout.write(
                 'Given email address failed '
                 'validation.')
