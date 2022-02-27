@@ -1,0 +1,75 @@
+# This file configures pre-commit hooks.
+# See https://pre-commit.com/ for general information
+# See https://pre-commit.com/hooks.html for a listing of possible hooks
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: check-docstring-first
+      - id: check-json
+        exclude: "tsconfig.*json"
+      - id: check-yaml
+      - id: check-toml
+      - id: check-executables-have-shebangs
+      - id: end-of-file-fixer
+        exclude_types:
+          - svg
+          - pofile
+        exclude: "(^LICENSE$)"
+      - id: mixed-line-ending
+        args:
+          - "--fix=lf"
+      - id: trailing-whitespace
+        exclude_types:
+          - svg
+      - id: check-case-conflict
+      - id: detect-private-key
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v2.5.1"
+    hooks:
+      - id: prettier
+        types_or:
+          - javascript
+          - ts
+          - markdown
+        exclude: "(^Pipfile\\.lock$)"
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v2.7.1
+    hooks:
+      - id: reorder-python-imports
+        exclude: "(migrations)"
+  - repo: https://github.com/asottile/yesqa
+    rev: "v1.3.0"
+    hooks:
+      - id: yesqa
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        files: ^src/
+        exclude: "(migrations)|(paperless/settings.py)|(.*\\.tox)|(.*/tests/.*)"
+        args:
+          - --max-line-length=88
+          - "--ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203"
+  - repo: https://github.com/lovesegfault/beautysh
+    rev: v6.2.1
+    hooks:
+      - id: beautysh
+  - repo: https://github.com/psf/black
+    rev: 22.1.0
+    hooks:
+      - id: black
+  - repo: https://github.com/awebdeveloper/pre-commit-tslint
+    rev: "0.0.2"
+    hooks:
+      - id: tslint
+        additional_dependencies: ["tslint@5.0.0"]
+  - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
+    rev: "v0.1.0"
+    hooks:
+      - id: dockerfilelint
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: "v0.8.0.4"
+    hooks:
+      - id: shellcheck
