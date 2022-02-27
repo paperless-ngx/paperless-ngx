@@ -24,7 +24,7 @@ A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) u
 - [Features](#features)
 - [Getting started](#getting-started)
 - [Contributing](#contributing)
-	- [Community Supported](#community-supported)
+	- [Community Support](#community-support)
 	- [Translation](#translation)
 	- [Feature Requests](#feature-requests-issues)
 	- [Bugs](#bugs)
@@ -73,9 +73,9 @@ The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperl
 
 If you feel like contributing to the project, please do! Bug fixes, enhancements, visual fixes etc. are always welcome. If you want to implement something big: Please start a discussion about that! The [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html) has some basic information on how to get started.
 
-## Community Supported
+## Community Support
 
-People interested in continuing the work on paperless-ngx are encouraged to reach out here on github and in the [Matrix Room](https://matrix.to/#/#paperless:adnidor.de).
+People interested in continuing the work on paperless-ngx are encouraged to reach out here on github and in the [Matrix Room](https://matrix.to/#/#paperless:adnidor.de). If you would like to contribute to the project on an ongoing basis there are multiple [teams](https://github.com/orgs/paperless-ngx/people) (frontend, ci/cd, etc) that could use your help so please reach out!
 
 ## Translation
 
