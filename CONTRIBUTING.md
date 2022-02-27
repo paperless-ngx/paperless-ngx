@@ -11,7 +11,7 @@ If you want to implement something big:
 
 ## Python
 
-Paperless supports python 3.8 and 3.9.
+Paperless supports python 3.8 and 3.9. We format Python code with [Black](https://github.com/psf/black).
 
 ## Branches
 
@@ -23,7 +23,7 @@ Paperless supports python 3.8 and 3.9.
 
 ## Testing:
 
-Please test your code! I know it's a hassle, but it makes sure that your code works now and will allow us to detect regressions easily.
+Please format and test your code! I know it's a hassle, but it makes sure that your code works now and will allow us to detect regressions easily.
 
 To test your code, execute `pytest` in the src/ directory. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
 
