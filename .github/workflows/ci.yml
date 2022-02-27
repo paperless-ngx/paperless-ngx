@@ -92,7 +92,6 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --diff"
-          src: "./src"
           version: "22.1.0"
 
   tests:
