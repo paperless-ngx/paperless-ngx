@@ -26,7 +26,7 @@ A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) 
 - [Contributing](#contributing)
 	- [Community Support](#community-support)
 	- [Translation](#translation)
-	- [Feature Requests](#feature-requests-issues)
+	- [Feature Requests](#feature-requests)
 	- [Bugs](#bugs)
 - [Affiliated Projects](#affiliated-projects)
 - [Important Note](#important-note)
@@ -65,6 +65,7 @@ The easiest way to deploy paperless is docker-compose. The files in the [`/docke
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.
 
+<!-- omit in toc -->
 ### Documentation
 
 The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperless-ngx.readthedocs.io/).
