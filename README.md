@@ -61,7 +61,7 @@ A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) 
 
 # Getting started
 
-The easiest way to deploy paperless is docker-compose. The files in the [`/docker/compose` directory](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose) are configured to pull the image from GHCR.io.
+The easiest way to deploy paperless is docker-compose. The files in the [`/docker/compose` directory](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose) are configured to pull the image from Github Packages.
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.
 
