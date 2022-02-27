@@ -80,7 +80,7 @@ jobs:
         name: Codestyle
         run: |
           cd src/
-          pycodestyle
+          pycodestyle --max-line-length=88
   codeformatting:
     runs-on: ubuntu-20.04
     steps:
