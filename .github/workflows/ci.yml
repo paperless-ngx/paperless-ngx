@@ -80,7 +80,7 @@ jobs:
         name: Codestyle
         run: |
           cd src/
-          pycodestyle --max-line-length=88
+          pycodestyle --max-line-length=88 --ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203
   codeformatting:
     runs-on: ubuntu-20.04
     steps:
