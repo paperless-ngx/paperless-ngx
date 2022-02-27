@@ -12,15 +12,14 @@ class Command(BaseCommand):
 
     help = """
         Creates a Django superuser based on env variables.
-        PAPERLESS_ADMIN_USER sets the name oof the admin user ( Default: admin )
-        PAPERLESS_ADMIN_MAIL sets the admin users email address ( Deafult; root@localhost )
-        PAPERLESS_ADMIN_PASSWORD ( NODEFAULT: command will do nothing if not set )
+        PAPERLESS_ADMIN_USER name of admin user (Default: admin)
+        PAPERLESS_ADMIN_MAIL admin users email address (Default: root@localhost)
+        PAPERLESS_ADMIN_PASSWORD (NODEFAULT)
 
         Logic:
               Check if password is set, if not exit
               Check is admin user exists, if exists exit
                                           else create
-
     """.replace("    ", "")
 
     def handle(self, *args, **options):
