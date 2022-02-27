@@ -91,7 +91,7 @@ jobs:
         name: Run black
         uses: psf/black@stable
         with:
-          options: "--check --diff --verbose"
+          options: "--check --diff"
           src: "./src"
           version: "22.1.0"
 
