@@ -27,11 +27,11 @@ from documents.signals import document_consumer_declaration
 # TODO: isnt there a date parsing library for this?
 
 DATE_REGEX = re.compile(
-    r'(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|'   # NOQA: E501
-    r'(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|'   # NOQA: E501
-    r'(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|'   # NOQA: E501
-    r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|'
-    r'(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))'
+    r"(\b|(?!=([_-])))([0-9]{1,2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{4}|[0-9]{2})(\b|(?=([_-])))|"  # NOQA: E501
+    r"(\b|(?!=([_-])))([0-9]{4}|[0-9]{2})[\.\/-]([0-9]{1,2})[\.\/-]([0-9]{1,2})(\b|(?=([_-])))|"  # NOQA: E501
+    r"(\b|(?!=([_-])))([0-9]{1,2}[\. ]+[^ ]{3,9} ([0-9]{4}|[0-9]{2}))(\b|(?=([_-])))|"  # NOQA: E501
+    r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{1,2}, ([0-9]{4}))(\b|(?=([_-])))|"
+    r"(\b|(?!=([_-])))([^\W\d_]{3,9} [0-9]{4})(\b|(?=([_-])))"
 )
 
 
@@ -93,8 +93,7 @@ def get_parser_class_for_mime_type(mime_type):
         return None
 
     # Return the parser with the highest weight.
-    return sorted(
-        options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
+    return sorted(options, key=lambda _: _["weight"], reverse=True)[0]["parser"]
 
 
 def get_parser_class(path):
@@ -107,18 +106,20 @@ def get_parser_class(path):
     return get_parser_class_for_mime_type(mime_type)
 
 
-def run_convert(input_file,
-                output_file,
-                density=None,
-                scale=None,
-                alpha=None,
-                strip=False,
-                trim=False,
-                type=None,
-                depth=None,
-                auto_orient=False,
-                extra=None,
-                logging_group=None):
+def run_convert(
+    input_file,
+    output_file,
+    density=None,
+    scale=None,
+    alpha=None,
+    strip=False,
+    trim=False,
+    type=None,
+    depth=None,
+    auto_orient=False,
+    extra=None,
+    logging_group=None,
+):
 
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
@@ -127,17 +128,17 @@ def run_convert(input_file,
         environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
 
     args = [settings.CONVERT_BINARY]
-    args += ['-density', str(density)] if density else []
-    args += ['-scale', str(scale)] if scale else []
-    args += ['-alpha', str(alpha)] if alpha else []
-    args += ['-strip'] if strip else []
-    args += ['-trim'] if trim else []
-    args += ['-type', str(type)] if type else []
-    args += ['-depth', str(depth)] if depth else []
-    args += ['-auto-orient'] if auto_orient else []
+    args += ["-density", str(density)] if density else []
+    args += ["-scale", str(scale)] if scale else []
+    args += ["-alpha", str(alpha)] if alpha else []
+    args += ["-strip"] if strip else []
+    args += ["-trim"] if trim else []
+    args += ["-type", str(type)] if type else []
+    args += ["-depth", str(depth)] if depth else []
+    args += ["-auto-orient"] if auto_orient else []
     args += [input_file, output_file]
 
-    logger.debug("Execute: " + " ".join(args), extra={'group': logging_group})
+    logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
 
     if not subprocess.Popen(args, env=environment).wait() == 0:
         raise ParseError("Convert failed at {}".format(args))
@@ -155,27 +156,25 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None):
     logger.warning(
         "Thumbnail generation with ImageMagick failed, falling back "
         "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!",
-        extra={'group': logging_group}
+        extra={"group": logging_group},
     )
     gs_out_path = os.path.join(temp_dir, "gs_out.png")
-    cmd = [settings.GS_BINARY,
-           "-q",
-           "-sDEVICE=pngalpha",
-           "-o", gs_out_path,
-           in_path]
+    cmd = [settings.GS_BINARY, "-q", "-sDEVICE=pngalpha", "-o", gs_out_path, in_path]
     try:
         if not subprocess.Popen(cmd).wait() == 0:
             raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
         # then run convert on the output from gs
-        run_convert(density=300,
-                    scale="500x5000>",
-                    alpha="remove",
-                    strip=True,
-                    trim=False,
-                    auto_orient=True,
-                    input_file=gs_out_path,
-                    output_file=out_path,
-                    logging_group=logging_group)
+        run_convert(
+            density=300,
+            scale="500x5000>",
+            alpha="remove",
+            strip=True,
+            trim=False,
+            auto_orient=True,
+            input_file=gs_out_path,
+            output_file=out_path,
+            logging_group=logging_group,
+        )
 
         return out_path
 
@@ -191,18 +190,19 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
 
     # Run convert to get a decent thumbnail
     try:
-        run_convert(density=300,
-                    scale="500x5000>",
-                    alpha="remove",
-                    strip=True,
-                    trim=False,
-                    auto_orient=True,
-                    input_file="{}[0]".format(in_path),
-                    output_file=out_path,
-                    logging_group=logging_group)
+        run_convert(
+            density=300,
+            scale="500x5000>",
+            alpha="remove",
+            strip=True,
+            trim=False,
+            auto_orient=True,
+            input_file="{}[0]".format(in_path),
+            output_file=out_path,
+            logging_group=logging_group,
+        )
     except ParseError:
-        out_path = make_thumbnail_from_pdf_gs_fallback(
-            in_path, temp_dir, logging_group)
+        out_path = make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group)
 
     return out_path
 
@@ -223,15 +223,17 @@ def parse_date(filename, text):
             settings={
                 "DATE_ORDER": date_order,
                 "PREFER_DAY_OF_MONTH": "first",
-                "RETURN_AS_TIMEZONE_AWARE":
-                True
-            }
+                "RETURN_AS_TIMEZONE_AWARE": True,
+            },
         )
 
     def __filter(date):
-        if date and date.year > 1900 and \
-                date <= timezone.now() and \
-                date.date() not in settings.IGNORE_DATES:
+        if (
+            date
+            and date.year > 1900
+            and date <= timezone.now()
+            and date.date() not in settings.IGNORE_DATES
+        ):
             return date
         return None
 
@@ -285,8 +287,7 @@ class DocumentParser(LoggingMixin):
         super().__init__()
         self.logging_group = logging_group
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
-        self.tempdir = tempfile.mkdtemp(
-            prefix="paperless-", dir=settings.SCRATCH_DIR)
+        self.tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
 
         self.archive_path = None
         self.text = None
@@ -312,18 +313,21 @@ class DocumentParser(LoggingMixin):
         """
         raise NotImplementedError()
 
-    def get_optimised_thumbnail(self,
-                                document_path,
-                                mime_type,
-                                file_name=None):
+    def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
         thumbnail = self.get_thumbnail(document_path, mime_type, file_name)
         if settings.OPTIMIZE_THUMBNAILS:
             out_path = os.path.join(self.tempdir, "thumb_optipng.png")
 
-            args = (settings.OPTIPNG_BINARY,
-                    "-silent", "-o5", thumbnail, "-out", out_path)
+            args = (
+                settings.OPTIPNG_BINARY,
+                "-silent",
+                "-o5",
+                thumbnail,
+                "-out",
+                out_path,
+            )
 
-            self.log('debug', f"Execute: {' '.join(args)}")
+            self.log("debug", f"Execute: {' '.join(args)}")
 
             if not subprocess.Popen(args).wait() == 0:
                 raise ParseError("Optipng failed at {}".format(args))

@@ -8,23 +8,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0009_auto_20160214_0040'),
+        ("documents", "0009_auto_20160214_0040"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Log',
+            name="Log",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('group', models.UUIDField(blank=True)),
-                ('message', models.TextField()),
-                ('level', models.PositiveIntegerField(choices=[(10, 'Debugging'), (20, 'Informational'), (30, 'Warning'), (40, 'Error'), (50, 'Critical')], default=20)),
-                ('component', models.PositiveIntegerField(choices=[(1, 'Consumer'), (2, 'Mail Fetcher')])),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("group", models.UUIDField(blank=True)),
+                ("message", models.TextField()),
+                (
+                    "level",
+                    models.PositiveIntegerField(
+                        choices=[
+                            (10, "Debugging"),
+                            (20, "Informational"),
+                            (30, "Warning"),
+                            (40, "Error"),
+                            (50, "Critical"),
+                        ],
+                        default=20,
+                    ),
+                ),
+                (
+                    "component",
+                    models.PositiveIntegerField(
+                        choices=[(1, "Consumer"), (2, "Mail Fetcher")]
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'ordering': ('-modified',),
+                "ordering": ("-modified",),
             },
         ),
     ]
