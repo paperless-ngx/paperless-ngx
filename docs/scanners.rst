@@ -111,4 +111,4 @@ On Android, you can use these applications in combination with one of the :ref:`
 .. _OpenScan: https://github.com/Ethereal-Developers-Inc/OpenScan
 
 .. _hannahswain: https://github.com/hannahswain
-.. _benjaminfrank: https://github.com/benjaminfrank	
+.. _benjaminfrank: https://github.com/benjaminfrank
