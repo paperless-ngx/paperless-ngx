@@ -14,9 +14,8 @@
 
 Paperless-ngx is a document management system that transforms your physical documents into a searchable online archive so you can keep, well, *less paper*.
 
-Paperless-ngx forked from [paperless-ng](https://github.com/jonaswinkler/paperless-ng) to continue the great work and distribute responsibility among a team of people. That discussion can be found in issues
-[#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599)
-and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
+Paperless-ngx forked from [paperless-ng](https://github.com/jonaswinkler/paperless-ng) to continue the great work and distribute responsibility of supporting and advancing the project among a team of people. [Consider joining us!](#community-support) Discussion of this transition can be found in issues
+[#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599) and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
 #### Demo
 A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) using login `demo` / `demo`. *Note: demo content is reset frequently and confidential information should not be uploaded.*
@@ -25,10 +24,10 @@ A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) u
 - [Features](#features)
 - [Getting started](#getting-started)
 - [Contributing](#contributing)
+	- [Community Supported](#community-supported)
 	- [Translation](#translation)
-	- [Feature Requests](#feature-requests)
-	- [Questions? Something not working?](#questions-something-not-working)
-- [Get in Touch](#get-in-touch)
+	- [Feature Requests](#feature-requests-issues)
+	- [Bugs](#bugs)
 - [Affiliated Projects](#affiliated-projects)
 - [Important Note](#important-note)
 
@@ -62,7 +61,7 @@ A demo is available at [demo.paperless-ngx.com](http://demo.paperless-ngx.com) u
 
 # Getting started
 
-The recommended way to deploy paperless is docker-compose. The files in the `/docker/compose` directory are configured to pull the image from GHCR.io.
+The easiest way to deploy paperless is docker-compose. The files in the [`/docker/compose` directory](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose) are configured to pull the image from GHCR.io.
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.
 
@@ -74,33 +73,25 @@ The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperl
 
 If you feel like contributing to the project, please do! Bug fixes, enhancements, visual fixes etc. are always welcome. If you want to implement something big: Please start a discussion about that! The [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html) has some basic information on how to get started.
 
+## Community Supported
+
+People interested in continuing the work on paperless-ngx are encouraged to reach out here on github and in the [Matrix Room](https://matrix.to/#/#paperless:adnidor.de).
+
 ## Translation
 
-Paperless-ngx is available in many languages that are coordinated on Crowdin. If you want to help out by translating paperless-ngx into your language, please head over to https://crwd.in/paperless-ngx, and thank you! More details about adding new languages to the code can be found in [CONTRIBUTING.md](https://github.com/paperless-ngx/paperless-ngx/blob/master/CONTRIBUTING.md#adding-a-new-language). Some notes about translation:
-
-- There are two resources:
-  - `src-ui/messages.xlf` contains the translation strings for the front end. This is the most important.
-  - `django.po` contains strings for the administration section of paperless, which is nice to have translated.
-- Most of the front-end strings are used on buttons, menu items, etc., so ideally the translated string should not be much longer than the English original.
-- Translation units may contain placeholders. These usually mean that there's a name of a tag or document or something in the string. You can click on the placeholders to copy them.
-- Translation units may contain plural expressions such as `{PLURAL_VAR, plural, =1 {one result} =0 {no results} other {<placeholder> results}}`. Copy these verbatim and translate only the content in the inner `{}` brackets. Example: `{PLURAL_VAR, plural, =1 {Ein Ergebnis} =0 {Keine Ergebnisse} other {<placeholder> Ergebnisse}}`
-- Changes to translations on Crowdin will get pushed into the repository automatically.
+Paperless-ngx is available in many languages that are coordinated on Crowdin. If you want to help out by translating paperless-ngx into your language, please head over to https://crwd.in/paperless-ngx, and thank you! More details can be found in [CONTRIBUTING.md](https://github.com/paperless-ngx/paperless-ngx/blob/main/CONTRIBUTING.md#translating-paperless-ngx).
 
 ## Feature Requests
 
-Feature requests can be submitted via [GitHub Discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests), you can search for existing ideas, add your own and vote for the ones you care about! Note that some older feature requests can also be found under [issues](https://github.com/paperless-ngx/paperless-ngx/issues).
+Feature requests can be submitted via [GitHub Discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests), you can search for existing ideas, add your own and vote for the ones you care about.
 
-## Questions? Something not working?
+## Bugs
 
 For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/issues) or [start a discussion](https://github.com/paperless-ngx/paperless-ngx/discussions) if you have questions.
 
-# Get in Touch
-
-People interested in continuing the work on paperless-ngx are connecting here on github and in a [Matrix Room](https://matrix.to/#/#paperless:adnidor.de) for realtime communication.
-
 # Affiliated Projects
 
-Paperless has been around a while now, and people are starting to build stuff on top of it.  If you're one of those people, we can add your project to this list:
+Paperless has been around a while now, and people are starting to build stuff on top of it. If you're one of those people, we can add your project to this list:
 
 * [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless-ngx. Also works with the original Paperless and Paperless-ng.
 * [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
@@ -112,9 +103,9 @@ These projects also exist, but their status and compatibility with paperless-ngx
 
 This project also exists, but needs updates to be compatible with paperless-ngx.
 
-* [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation.  Runs on Mac, Linux, and Windows.
+* [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation. Runs on Mac, Linux, and Windows.
 	Known issues on Mac: (Could not load reminders and documents)
 
 # Important Note
 
-Document scanners are typically used to scan sensitive documents.  Things like your social insurance number, tax records, invoices, etc.  Everything is stored in the clear without encryption. This means that Paperless should never be run on an untrusted host.  Instead, I recommend that if you do want to use it, run it locally on a server in your own home.
+Document scanners are typically used to scan sensitive documents. Things like your social insurance number, tax records, invoices, etc. Everything is stored in the clear without encryption. This means that Paperless should never be run on an untrusted host. Instead, I recommend that if you do want to use it, run it locally on a server in your own home.
