@@ -12,14 +12,27 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestTasks(DirectoriesMixin, TestCase):
-
     def test_index_reindex(self):
-        Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(), created=timezone.now(), modified=timezone.now())
+        Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            added=timezone.now(),
+            created=timezone.now(),
+            modified=timezone.now(),
+        )
 
         tasks.index_reindex()
 
     def test_index_optimize(self):
-        Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(), created=timezone.now(), modified=timezone.now())
+        Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            added=timezone.now(),
+            created=timezone.now(),
+            modified=timezone.now(),
+        )
 
         tasks.index_optimize()
 
@@ -92,7 +105,9 @@ class TestTasks(DirectoriesMixin, TestCase):
         messages = SanityCheckMessages()
         messages.warning("Some warning")
         m.return_value = messages
-        self.assertEqual(tasks.sanity_check(), "Sanity check exited with warnings. See log.")
+        self.assertEqual(
+            tasks.sanity_check(), "Sanity check exited with warnings. See log."
+        )
         m.assert_called_once()
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
@@ -100,11 +115,19 @@ class TestTasks(DirectoriesMixin, TestCase):
         messages = SanityCheckMessages()
         messages.info("Some info")
         m.return_value = messages
-        self.assertEqual(tasks.sanity_check(), "Sanity check exited with infos. See log.")
+        self.assertEqual(
+            tasks.sanity_check(), "Sanity check exited with infos. See log."
+        )
         m.assert_called_once()
 
     def test_bulk_update_documents(self):
-        doc1 = Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(),
-                                created=timezone.now(), modified=timezone.now())
+        doc1 = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            added=timezone.now(),
+            created=timezone.now(),
+            modified=timezone.now(),
+        )
 
         tasks.bulk_update_documents([doc1.pk])

@@ -11,8 +11,7 @@ def process_mail_accounts():
     total_new_documents = 0
     for account in MailAccount.objects.all():
         try:
-            total_new_documents += MailAccountHandler().handle_mail_account(
-                account)
+            total_new_documents += MailAccountHandler().handle_mail_account(account)
         except MailError:
             logger.exception(f"Error while processing mail account {account}")
 

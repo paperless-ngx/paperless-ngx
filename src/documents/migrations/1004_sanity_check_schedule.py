@@ -7,20 +7,22 @@ from django_q.tasks import schedule
 
 
 def add_schedules(apps, schema_editor):
-    schedule('documents.tasks.sanity_check', name="Perform sanity check", schedule_type=Schedule.WEEKLY)
+    schedule(
+        "documents.tasks.sanity_check",
+        name="Perform sanity check",
+        schedule_type=Schedule.WEEKLY,
+    )
 
 
 def remove_schedules(apps, schema_editor):
-    Schedule.objects.filter(func='documents.tasks.sanity_check').delete()
+    Schedule.objects.filter(func="documents.tasks.sanity_check").delete()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1003_mime_types'),
-        ('django_q', '0013_task_attempt_count'),
+        ("documents", "1003_mime_types"),
+        ("django_q", "0013_task_attempt_count"),
     ]
 
-    operations = [
-        RunPython(add_schedules, remove_schedules)
-    ]
+    operations = [RunPython(add_schedules, remove_schedules)]

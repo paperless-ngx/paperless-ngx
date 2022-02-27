@@ -12,7 +12,6 @@ logger = logging.getLogger("paperless.filehandling")
 
 
 class defaultdictNoStr(defaultdict):
-
     def __str__(self):
         raise ValueError("Don't use {tags} directly.")
 
@@ -63,24 +62,23 @@ def many_to_dictionary(field):
         mydictionary[index] = slugify(t.name)
 
         # Find delimiter
-        delimiter = t.name.find('_')
+        delimiter = t.name.find("_")
 
         if delimiter == -1:
-            delimiter = t.name.find('-')
+            delimiter = t.name.find("-")
 
         if delimiter == -1:
             continue
 
         key = t.name[:delimiter]
-        value = t.name[delimiter + 1:]
+        value = t.name[delimiter + 1 :]
 
         mydictionary[slugify(key)] = slugify(value)
 
     return mydictionary
 
 
-def generate_unique_filename(doc,
-                             archive_filename=False):
+def generate_unique_filename(doc, archive_filename=False):
     """
     Generates a unique filename for doc in settings.ORIGINALS_DIR.
 
@@ -104,14 +102,17 @@ def generate_unique_filename(doc,
 
     if archive_filename and doc.filename:
         new_filename = os.path.splitext(doc.filename)[0] + ".pdf"
-        if new_filename == old_filename or not os.path.exists(os.path.join(root, new_filename)):  # NOQA: E501
+        if new_filename == old_filename or not os.path.exists(
+            os.path.join(root, new_filename)
+        ):  # NOQA: E501
             return new_filename
 
     counter = 0
 
     while True:
         new_filename = generate_filename(
-            doc, counter, archive_filename=archive_filename)
+            doc, counter, archive_filename=archive_filename
+        )
         if new_filename == old_filename:
             # still the same as before.
             return new_filename
@@ -127,14 +128,11 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 
     try:
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdictNoStr(lambda: slugify(None),
-                                    many_to_dictionary(doc.tags))
+            tags = defaultdictNoStr(lambda: slugify(None), many_to_dictionary(doc.tags))
 
             tag_list = pathvalidate.sanitize_filename(
-                ",".join(sorted(
-                    [tag.name for tag in doc.tags.all()]
-                )),
-                replacement_text="-"
+                ",".join(sorted([tag.name for tag in doc.tags.all()])),
+                replacement_text="-",
             )
 
             if doc.correspondent:
@@ -157,13 +155,14 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 asn = "none"
 
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
-                title=pathvalidate.sanitize_filename(
-                    doc.title, replacement_text="-"),
+                title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=f"{doc.created.month:02}" if doc.created else "none",  # NOQA: E501
+                created_month=f"{doc.created.month:02}"
+                if doc.created
+                else "none",  # NOQA: E501
                 created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
@@ -171,7 +170,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 added_day=f"{doc.added.day:02}" if doc.added else "none",
                 asn=asn,
                 tags=tags,
-                tag_list=tag_list
+                tag_list=tag_list,
             ).strip()
 
             path = path.strip(os.sep)
@@ -179,7 +178,8 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     except (ValueError, KeyError, IndexError):
         logger.warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
-            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default")
+            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default"
+        )
 
     counter_str = f"_{counter:02}" if counter else ""
 
