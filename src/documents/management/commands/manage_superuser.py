@@ -15,12 +15,12 @@ class Command(BaseCommand):
         PAPERLESS_ADMIN_USER sets the name oof the admin user ( Default: admin )
         PAPERLESS_ADMIN_MAIL sets the admin users email address ( Deafult; root@localhost )
         PAPERLESS_ADMIN_PASSWORD ( NODEFAULT: command will do nothing if not set )
-        
+
         Logic:
               Check if password is set, if not exit
               Check is admin user exists, if exists exit
                                           else create
-        
+
     """.replace("    ", "")
 
     def handle(self, *args, **options):
@@ -28,21 +28,21 @@ class Command(BaseCommand):
         username = os.getenv('PAPERLESS_ADMIN_USER','admin')
         mail = os.getenv('PAPERLESS_ADMIN_MAIL', 'root@localhost')
         password = os.getenv('PAPERLESS_ADMIN_PASSWORD')
-        
+
         # Return if email address does not pass basic validation
         if not re.fullmatch(r"[^@]+@[^@]+", email):
             self.stdout.write(
                 'Given email address failed '
                 'validation.')
             return
-        
+
         # Return if password is not set
         if not password:
             self.stdout.write(
                 'Make sure you specified "PAPERLESS_ADMIN_PASSWORD" in your '
                 '"docker-compose.env" file.')
             return
-        
+
         # Check if user exists already, leave as is if it does
         if not User.objects.filter(username=username).exists():
             # Create superuser based on env variables
