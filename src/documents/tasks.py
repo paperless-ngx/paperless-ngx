@@ -31,12 +31,11 @@ def index_reindex(progress_bar_disable=False):
 
 
 def train_classifier():
-    if (not Tag.objects.filter(
-                matching_algorithm=Tag.MATCH_AUTO).exists() and
-        not DocumentType.objects.filter(
-            matching_algorithm=Tag.MATCH_AUTO).exists() and
-        not Correspondent.objects.filter(
-            matching_algorithm=Tag.MATCH_AUTO).exists()):
+    if (
+        not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+        and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+        and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+    ):
 
         return
 
@@ -48,28 +47,25 @@ def train_classifier():
     try:
         if classifier.train():
             logger.info(
-                "Saving updated classifier model to {}...".format(
-                    settings.MODEL_FILE)
+                "Saving updated classifier model to {}...".format(settings.MODEL_FILE)
             )
             classifier.save()
         else:
-            logger.debug(
-                "Training data unchanged."
-            )
+            logger.debug("Training data unchanged.")
 
     except Exception as e:
-        logger.warning(
-            "Classifier error: " + str(e)
-        )
+        logger.warning("Classifier error: " + str(e))
 
 
-def consume_file(path,
-                 override_filename=None,
-                 override_title=None,
-                 override_correspondent_id=None,
-                 override_document_type_id=None,
-                 override_tag_ids=None,
-                 task_id=None):
+def consume_file(
+    path,
+    override_filename=None,
+    override_title=None,
+    override_correspondent_id=None,
+    override_document_type_id=None,
+    override_tag_ids=None,
+    task_id=None,
+):
 
     document = Consumer().try_consume_file(
         path,
@@ -78,16 +74,16 @@ def consume_file(path,
         override_correspondent_id=override_correspondent_id,
         override_document_type_id=override_document_type_id,
         override_tag_ids=override_tag_ids,
-        task_id=task_id
+        task_id=task_id,
     )
 
     if document:
-        return "Success. New document id {} created".format(
-            document.pk
-        )
+        return "Success. New document id {} created".format(document.pk)
     else:
-        raise ConsumerError("Unknown error: Returned document was null, but "
-                            "no error message was given.")
+        raise ConsumerError(
+            "Unknown error: Returned document was null, but "
+            "no error message was given."
+        )
 
 
 def sanity_check():
@@ -96,8 +92,7 @@ def sanity_check():
     messages.log_messages()
 
     if messages.has_error():
-        raise SanityCheckFailedException(
-            "Sanity check failed with errors. See log.")
+        raise SanityCheckFailedException("Sanity check failed with errors. See log.")
     elif messages.has_warning():
         return "Sanity check exited with warnings. See log."
     elif len(messages) > 0:
