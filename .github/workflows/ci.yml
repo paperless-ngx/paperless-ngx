@@ -81,20 +81,19 @@ jobs:
         run: |
           cd src/
           pycodestyle
-  whitespace:
+  formatting:
     runs-on: ubuntu-20.04
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Ensure there are no trailing spaces
-        run: |
-          .github/workflow-scripts/check-trailing-whitespace
-      -
-        name: Ensure all text files end with a trailing newline
-        run: |
-          .github/workflow-scripts/check-trailing-whitespace
+        name: Run black
+        uses: psf/black@stable
+        with:
+          options: "--check --diff --verbose"
+          src: "./src"
+          version: "22.1.0"
 
   tests:
     runs-on: ubuntu-20.04
