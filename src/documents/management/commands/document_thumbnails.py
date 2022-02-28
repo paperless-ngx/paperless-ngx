@@ -22,9 +22,7 @@ def _process_document(doc_in):
 
     try:
         thumb = parser.get_optimised_thumbnail(
-            document.source_path,
-            document.mime_type,
-            document.get_public_filename()
+            document.source_path, document.mime_type, document.get_public_filename()
         )
 
         shutil.move(thumb, document.thumbnail_path)
@@ -36,29 +34,32 @@ class Command(BaseCommand):
 
     help = """
         This will regenerate the thumbnails for all documents.
-    """.replace("    ", "")
+    """.replace(
+        "    ", ""
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "-d", "--document",
+            "-d",
+            "--document",
             default=None,
             type=int,
             required=False,
             help="Specify the ID of a document, and this command will only "
-                 "run on this specific document."
+            "run on this specific document.",
         )
         parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
-            help="If set, the progress bar will not be shown"
+            help="If set, the progress bar will not be shown",
         )
 
     def handle(self, *args, **options):
         logging.getLogger().handlers[0].level = logging.ERROR
 
-        if options['document']:
-            documents = Document.objects.filter(pk=options['document'])
+        if options["document"]:
+            documents = Document.objects.filter(pk=options["document"])
         else:
             documents = Document.objects.all()
 
@@ -70,8 +71,10 @@ class Command(BaseCommand):
         db.connections.close_all()
 
         with multiprocessing.Pool() as pool:
-            list(tqdm.tqdm(
-                pool.imap_unordered(_process_document, ids),
-                total=len(ids),
-                disable=options['no_progress_bar']
-            ))
+            list(
+                tqdm.tqdm(
+                    pool.imap_unordered(_process_document, ids),
+                    total=len(ids),
+                    disable=options["no_progress_bar"],
+                )
+            )

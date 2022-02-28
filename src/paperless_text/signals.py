@@ -1,4 +1,3 @@
-
 def get_parser(*args, **kwargs):
     from .parsers import TextDocumentParser
 
@@ -12,5 +11,5 @@ def text_consumer_declaration(sender, **kwargs):
         "mime_types": {
             "text/plain": ".txt",
             "text/csv": ".csv",
-        }
+        },
     }

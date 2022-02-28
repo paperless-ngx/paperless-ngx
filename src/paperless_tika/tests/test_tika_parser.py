@@ -10,7 +10,6 @@ from paperless_tika.parsers import TikaDocumentParser
 
 
 class TestTikaParser(TestCase):
-
     def setUp(self) -> None:
         self.parser = TikaDocumentParser(logging_group=None)
 
@@ -22,9 +21,7 @@ class TestTikaParser(TestCase):
     def test_parse(self, post, from_file):
         from_file.return_value = {
             "content": "the content",
-            "metadata": {
-                "Creation-Date": "2020-11-21"
-            }
+            "metadata": {"Creation-Date": "2020-11-21"},
         }
         response = Response()
         response._content = b"PDF document"
@@ -45,16 +42,15 @@ class TestTikaParser(TestCase):
     @mock.patch("paperless_tika.parsers.parser.from_file")
     def test_metadata(self, from_file):
         from_file.return_value = {
-            "metadata": {
-                "Creation-Date": "2020-11-21",
-                "Some-key": "value"
-            }
+            "metadata": {"Creation-Date": "2020-11-21", "Some-key": "value"}
         }
 
         file = os.path.join(self.parser.tempdir, "input.odt")
         Path(file).touch()
 
-        metadata = self.parser.extract_metadata(file, "application/vnd.oasis.opendocument.text")
+        metadata = self.parser.extract_metadata(
+            file, "application/vnd.oasis.opendocument.text"
+        )
 
-        self.assertTrue("Creation-Date" in [m['key'] for m in metadata])
-        self.assertTrue("Some-key" in [m['key'] for m in metadata])
+        self.assertTrue("Creation-Date" in [m["key"] for m in metadata])
+        self.assertTrue("Some-key" in [m["key"] for m in metadata])

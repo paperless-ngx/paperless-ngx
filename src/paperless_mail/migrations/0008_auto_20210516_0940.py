@@ -6,23 +6,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('paperless_mail', '0007_auto_20210106_0138'),
+        ("paperless_mail", "0007_auto_20210106_0138"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mailaccount',
-            name='character_set',
-            field=models.CharField(default='UTF-8', help_text="The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'.", max_length=256, verbose_name='character set'),
+            model_name="mailaccount",
+            name="character_set",
+            field=models.CharField(
+                default="UTF-8",
+                help_text="The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'.",
+                max_length=256,
+                verbose_name="character set",
+            ),
         ),
         migrations.AlterField(
-            model_name='mailrule',
-            name='action_parameter',
-            field=models.CharField(blank=True, help_text='Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots.', max_length=256, null=True, verbose_name='action parameter'),
+            model_name="mailrule",
+            name="action_parameter",
+            field=models.CharField(
+                blank=True,
+                help_text="Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots.",
+                max_length=256,
+                null=True,
+                verbose_name="action parameter",
+            ),
         ),
         migrations.AlterField(
-            model_name='mailrule',
-            name='folder',
-            field=models.CharField(default='INBOX', help_text='Subfolders must be separated by dots.', max_length=256, verbose_name='folder'),
+            model_name="mailrule",
+            name="folder",
+            field=models.CharField(
+                default="INBOX",
+                help_text="Subfolders must be separated by dots.",
+                max_length=256,
+                verbose_name="folder",
+            ),
         ),
     ]
