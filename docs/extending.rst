@@ -65,7 +65,7 @@ To do the setup you need to perform the steps from the following chapters in a c
     .. code:: shell-session
 
         npm install .
-        ./node_modules/.bin/ng build --prod
+        ./node_modules/.bin/ng build --configuration production
 
 8.  Apply migrations and create a superuser for your dev instance:
 

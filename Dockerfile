@@ -4,7 +4,7 @@ COPY . /src
 
 WORKDIR /src/src-ui
 RUN npm install
-RUN ./node_modules/.bin/ng build --prod
+RUN ./node_modules/.bin/ng build --configuration production
 
 
 FROM ubuntu:20.04 AS jbig2enc
