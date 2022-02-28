@@ -189,7 +189,7 @@ MEDIA_FOLDER=$ask_result
 
 echo ""
 echo "The data folder is where paperless stores other data, such as your"
-if [[ "$DATABASE_BACKEND" == "sqlite" ]]
+if [[ "$DATABASE_BACKEND" == "sqlite" ]] ; then
 	echo -n "SQLite database, the "
 fi
 echo "search index and other data."
@@ -201,6 +201,19 @@ echo ""
 
 ask_docker_folder "Data folder" ""
 DATA_FOLDER=$ask_result
+
+if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
+	echo ""
+	echo "The database folder, where postgres stores its data."
+	echo "Leave empty to have this managed by docker."
+	echo ""
+	echo "CAUTION: If specified, you must specify an absolute path starting with /"
+	echo "or a relative path starting with ./ here."
+	echo ""
+
+	ask_docker_folder "Database folder" ""
+	POSTGRES_FOLDER=$ask_result
+fi
 
 echo ""
 echo "3. Login credentials"
@@ -252,6 +265,13 @@ if [[ -z $DATA_FOLDER ]] ; then
 	echo "Data folder: Managed by docker"
 else
 	echo "Data folder: $DATA_FOLDER"
+fi
+if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
+	if [[ -z $POSTGRES_FOLDER ]] ; then
+		echo "Database (postgres) folder: Managed by docker"
+	else
+		echo "Database (postgres) folder: $POSTGRES_FOLDER"
+	fi
 fi
 echo ""
 echo "Port: $PORT"
@@ -315,8 +335,12 @@ if [[ -n $DATA_FOLDER ]] ; then
 	sed -i "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
 fi
 
-docker-compose pull
+if [[ -n $POSTGRES_FOLDER ]] ; then
+	sed -i "s#- pgdata:/var/lib/postgresql/data#- $POSTGRES_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
+fi
 
-docker-compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
+# docker-compose pull
 
-docker-compose up -d
+# docker-compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
+
+# docker-compose up -d
