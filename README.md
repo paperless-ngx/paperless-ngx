@@ -1,7 +1,7 @@
 [![ci](https://github.com/jonaswinkler/paperless-ng/workflows/ci/badge.svg)](https://github.com/jonaswinkler/paperless-ng/actions)
 ![Ansible Role](https://github.com/jonaswinkler/paperless-ng/workflows/Ansible%20Role/badge.svg)
 [![Crowdin](https://badges.crowdin.net/paperless-ng/localized.svg)](https://crowdin.com/project/paperless-ng)
-[![Documentation Status](https://readthedocs.org/projects/paperless-ng/badge/?version=latest)](https://paperless-ng.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/paperless-ngx/badge/?version=latest)](https://paperless-ngx.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/paperless-ng/community.svg)](https://gitter.im/paperless-ng/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/jonaswinkler/paperless-ng.svg)](https://hub.docker.com/r/jonaswinkler/paperless-ng)
 [![Coverage Status](https://coveralls.io/repos/github/jonaswinkler/paperless-ng/badge.svg?branch=master)](https://coveralls.io/github/jonaswinkler/paperless-ng?branch=master)
@@ -17,13 +17,13 @@ Paperless-ng is a fork of the original project, adding a new interface and many 
 * Resource usage: Paperless-ng does use a bit more resources than Paperless. Running the web server requires about 300MB of RAM or more, depending on the configuration. While adding documents, it requires about 300MB additional RAM, depending on the document. It still runs on Raspberry Pi (many users do that), but it has been generally geared to better use the resources of more powerful systems.
 * API changes: If you rely on the REST API of paperless, some of its functionality has been changed.
 
-For a detailed list of changes, have a look at the [change log](https://paperless-ng.readthedocs.io/en/latest/changelog.html) in the documentation, especially the section about the [0.9.0 release](https://paperless-ng.readthedocs.io/en/latest/changelog.html#paperless-ng-0-9-0).
+For a detailed list of changes, have a look at the [change log](https://paperless-ngx.readthedocs.io/en/latest/changelog.html) in the documentation, especially the section about the [0.9.0 release](https://paperless-ngx.readthedocs.io/en/latest/changelog.html#paperless-ng-0-9-0).
 
 # How it Works
 
 Paperless does not control your scanner, it only helps you deal with what your scanner produces.
 
-1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ng.readthedocs.io/en/latest/scanners.html) page. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
+1. Buy a document scanner that can write to a place on your network.  If you need some inspiration, have a look at the [scanner recommendations](https://paperless-ngx.readthedocs.io/en/latest/scanners.html) page. Set it up to "scan to FTP" or something similar. It should be able to push scanned images to a server without you having to do anything.  Of course if your scanner doesn't know how to automatically upload the file somewhere, you can always do that manually. Paperless doesn't care how the documents get into its local consumption directory.
 
 	- Alternatively, you can use any of the mobile scanning apps out there. We have an app that allows you to share documents with paperless, if you're on Android. See the section on affiliated projects below.
 
@@ -35,13 +35,13 @@ Here's what you get:
 
 ![Dashboard](https://github.com/jonaswinkler/paperless-ng/raw/master/docs/_static/screenshots/dashboard.png)
 
-If you want to see paperless-ng in action, [more screenshots are available in the documentation](https://paperless-ng.readthedocs.io/en/latest/screenshots.html).
+If you want to see paperless-ng in action, [more screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
 
 # Features
 
 * Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
 * Supports PDF documents, images, plain text files, and Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents).
-	* Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ng.readthedocs.io/en/latest/configuration.html#tika-settings))
+	* Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ngx.readthedocs.io/en/latest/configuration.html#tika-settings))
 * Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely.
 * Single page application front end.
 	* Includes a dashboard that shows basic statistics and has document upload.
@@ -64,17 +64,17 @@ If you want to see paperless-ng in action, [more screenshots are available in th
 
 The recommended way to deploy paperless is docker-compose. The files in the /docker/compose directory are configured to pull the image from Docker Hub.
 
-Read the [documentation](https://paperless-ng.readthedocs.io/en/latest/setup.html#installation) on how to get started.
+Read the [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) on how to get started.
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The documenation has a step by step guide on how to do it. Consider giving the Ansible role a shot, this essentially automates the entire bare metal installation process.
 
 # Migrating from Paperless to Paperless-ng
 
-Read the section about [migration](https://paperless-ng.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation. Its also entirely possible to go back to Paperless by reverting the database migrations.
+Read the section about [migration](https://paperless-ngx.readthedocs.io/en/latest/setup.html#migration-to-paperless-ng) in the documentation. Its also entirely possible to go back to Paperless by reverting the database migrations.
 
 # Documentation
 
-The documentation for Paperless-ng is available on [ReadTheDocs](https://paperless-ng.readthedocs.io/).
+The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperless-ngx.readthedocs.io/).
 
 # Translation
 
