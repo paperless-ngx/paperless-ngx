@@ -51,7 +51,7 @@ To do the setup you need to perform the steps from the following chapters in a c
 
         .. code:: shell-session
 
-            docker run -d -p 6379:6379 -restart unless-stopped redis:latest
+            docker run -d -p 6379:6379 --restart unless-stopped redis:latest
 
 6.  Install the python dependencies by performing in the src/ directory.
     .. code:: shell-session
@@ -60,11 +60,12 @@ To do the setup you need to perform the steps from the following chapters in a c
 
   * Make sure you're using python 3.9.x or lower. Otherwise you might get issues with building dependencies. You can use `pyenv <https://github.com/pyenv/pyenv>`_ to install a specific python version.
 
-7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From root folder:
+7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
 
     .. code:: shell-session
 
-        compile-frontend.sh
+        npm install .
+        ./node_modules/.bin/ng build --prod
 
 8.  Apply migrations and create a superuser for your dev instance:
 
@@ -274,15 +275,7 @@ directory.
 Building the Docker image
 =========================
 
-Building the docker image from source requires the following two steps:
-
-1.  Build the front end.
-
-    .. code:: shell-session
-
-        ./compile-frontend.sh
-
-2.  Build the docker image.
+Building the docker image from source:
 
     .. code:: shell-session
 
