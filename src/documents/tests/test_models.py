@@ -5,7 +5,6 @@ from ..models import Document, Correspondent
 
 
 class CorrespondentTestCase(TestCase):
-
     def test___str__(self):
         for s in ("test", "οχι", "test with fun_charÅc'\"terß"):
             correspondent = CorrespondentFactory.create(name=s)
@@ -13,7 +12,6 @@ class CorrespondentTestCase(TestCase):
 
 
 class DocumentTestCase(TestCase):
-
     def test_correspondent_deletion_does_not_cascade(self):
 
         self.assertEqual(Correspondent.objects.all().count(), 0)

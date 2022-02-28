@@ -20,7 +20,7 @@ COLOURS_OLD = {
 
 
 def forward(apps, schema_editor):
-    Tag = apps.get_model('documents', 'Tag')
+    Tag = apps.get_model("documents", "Tag")
 
     for tag in Tag.objects.all():
         colour_old_id = tag.colour_old
@@ -30,7 +30,7 @@ def forward(apps, schema_editor):
 
 
 def reverse(apps, schema_editor):
-    Tag = apps.get_model('documents', 'Tag')
+    Tag = apps.get_model("documents", "Tag")
 
     def _get_colour_id(rdb):
         for idx, rdbx in COLOURS_OLD.items():
@@ -48,23 +48,25 @@ def reverse(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1012_fix_archive_files'),
+        ("documents", "1012_fix_archive_files"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='tag',
-            old_name='colour',
-            new_name='colour_old',
+            model_name="tag",
+            old_name="colour",
+            new_name="colour_old",
         ),
         migrations.AddField(
-            model_name='tag',
-            name='color',
-            field=models.CharField(default='#a6cee3', max_length=7, verbose_name='color'),
+            model_name="tag",
+            name="color",
+            field=models.CharField(
+                default="#a6cee3", max_length=7, verbose_name="color"
+            ),
         ),
         migrations.RunPython(forward, reverse),
         migrations.RemoveField(
-            model_name='tag',
-            name='colour_old',
-        )
+            model_name="tag",
+            name="colour_old",
+        ),
     ]

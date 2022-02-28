@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 class MailAccount(models.Model):
-
     class Meta:
         verbose_name = _("mail account")
         verbose_name_plural = _("mail accounts")
@@ -21,41 +20,36 @@ class MailAccount(models.Model):
         (IMAP_SECURITY_STARTTLS, _("Use STARTTLS")),
     )
 
-    name = models.CharField(
-        _("name"),
-        max_length=256, unique=True)
+    name = models.CharField(_("name"), max_length=256, unique=True)
 
-    imap_server = models.CharField(
-        _("IMAP server"),
-        max_length=256)
+    imap_server = models.CharField(_("IMAP server"), max_length=256)
 
     imap_port = models.IntegerField(
         _("IMAP port"),
         blank=True,
         null=True,
-        help_text=_("This is usually 143 for unencrypted and STARTTLS "
-                    "connections, and 993 for SSL connections."))
-
-    imap_security = models.PositiveIntegerField(
-        _("IMAP security"),
-        choices=IMAP_SECURITY_OPTIONS,
-        default=IMAP_SECURITY_SSL
+        help_text=_(
+            "This is usually 143 for unencrypted and STARTTLS "
+            "connections, and 993 for SSL connections."
+        ),
     )
 
-    username = models.CharField(
-        _("username"),
-        max_length=256)
+    imap_security = models.PositiveIntegerField(
+        _("IMAP security"), choices=IMAP_SECURITY_OPTIONS, default=IMAP_SECURITY_SSL
+    )
 
-    password = models.CharField(
-        _("password"),
-        max_length=256)
+    username = models.CharField(_("username"), max_length=256)
+
+    password = models.CharField(_("password"), max_length=256)
 
     character_set = models.CharField(
         _("character set"),
         max_length=256,
         default="UTF-8",
-        help_text=_("The character set to use when communicating with the "
-                    "mail server, such as 'UTF-8' or 'US-ASCII'.")
+        help_text=_(
+            "The character set to use when communicating with the "
+            "mail server, such as 'UTF-8' or 'US-ASCII'."
+        ),
     )
 
     def __str__(self):
@@ -63,7 +57,6 @@ class MailAccount(models.Model):
 
 
 class MailRule(models.Model):
-
     class Meta:
         verbose_name = _("mail rule")
         verbose_name_plural = _("mail rules")
@@ -73,8 +66,10 @@ class MailRule(models.Model):
 
     ATTACHMENT_TYPES = (
         (ATTACHMENT_TYPE_ATTACHMENTS_ONLY, _("Only process attachments.")),
-        (ATTACHMENT_TYPE_EVERYTHING, _("Process all files, including 'inline' "
-                                       "attachments."))
+        (
+            ATTACHMENT_TYPE_EVERYTHING,
+            _("Process all files, including 'inline' " "attachments."),
+        ),
     )
 
     ACTION_DELETE = 1
@@ -94,7 +89,7 @@ class MailRule(models.Model):
 
     TITLE_SELECTOR = (
         (TITLE_FROM_SUBJECT, _("Use subject as title")),
-        (TITLE_FROM_FILENAME, _("Use attachment filename as title"))
+        (TITLE_FROM_FILENAME, _("Use attachment filename as title")),
     )
 
     CORRESPONDENT_FROM_NOTHING = 1
@@ -103,66 +98,64 @@ class MailRule(models.Model):
     CORRESPONDENT_FROM_CUSTOM = 4
 
     CORRESPONDENT_SELECTOR = (
-        (CORRESPONDENT_FROM_NOTHING,
-         _("Do not assign a correspondent")),
-        (CORRESPONDENT_FROM_EMAIL,
-         _("Use mail address")),
-        (CORRESPONDENT_FROM_NAME,
-         _("Use name (or mail address if not available)")),
-        (CORRESPONDENT_FROM_CUSTOM,
-         _("Use correspondent selected below"))
+        (CORRESPONDENT_FROM_NOTHING, _("Do not assign a correspondent")),
+        (CORRESPONDENT_FROM_EMAIL, _("Use mail address")),
+        (CORRESPONDENT_FROM_NAME, _("Use name (or mail address if not available)")),
+        (CORRESPONDENT_FROM_CUSTOM, _("Use correspondent selected below")),
     )
 
-    name = models.CharField(
-        _("name"),
-        max_length=256, unique=True)
+    name = models.CharField(_("name"), max_length=256, unique=True)
 
-    order = models.IntegerField(
-        _("order"),
-        default=0)
+    order = models.IntegerField(_("order"), default=0)
 
     account = models.ForeignKey(
         MailAccount,
         related_name="rules",
         on_delete=models.CASCADE,
-        verbose_name=_("account")
+        verbose_name=_("account"),
     )
 
     folder = models.CharField(
         _("folder"),
-        default='INBOX', max_length=256,
-        help_text=_("Subfolders must be separated by dots.")
+        default="INBOX",
+        max_length=256,
+        help_text=_("Subfolders must be separated by dots."),
     )
 
     filter_from = models.CharField(
-        _("filter from"),
-        max_length=256, null=True, blank=True)
+        _("filter from"), max_length=256, null=True, blank=True
+    )
     filter_subject = models.CharField(
-        _("filter subject"),
-        max_length=256, null=True, blank=True)
+        _("filter subject"), max_length=256, null=True, blank=True
+    )
     filter_body = models.CharField(
-        _("filter body"),
-        max_length=256, null=True, blank=True)
+        _("filter body"), max_length=256, null=True, blank=True
+    )
 
     filter_attachment_filename = models.CharField(
         _("filter attachment filename"),
-        max_length=256, null=True, blank=True,
-        help_text=_("Only consume documents which entirely match this "
-                    "filename if specified. Wildcards such as *.pdf or "
-                    "*invoice* are allowed. Case insensitive.")
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Only consume documents which entirely match this "
+            "filename if specified. Wildcards such as *.pdf or "
+            "*invoice* are allowed. Case insensitive."
+        ),
     )
 
     maximum_age = models.PositiveIntegerField(
-        _("maximum age"),
-        default=30,
-        help_text=_("Specified in days."))
+        _("maximum age"), default=30, help_text=_("Specified in days.")
+    )
 
     attachment_type = models.PositiveIntegerField(
         _("attachment type"),
         choices=ATTACHMENT_TYPES,
         default=ATTACHMENT_TYPE_ATTACHMENTS_ONLY,
-        help_text=_("Inline attachments include embedded images, so it's best "
-                    "to combine this option with a filename filter.")
+        help_text=_(
+            "Inline attachments include embedded images, so it's best "
+            "to combine this option with a filename filter."
+        ),
     )
 
     action = models.PositiveIntegerField(
@@ -173,17 +166,19 @@ class MailRule(models.Model):
 
     action_parameter = models.CharField(
         _("action parameter"),
-        max_length=256, blank=True, null=True,
-        help_text=_("Additional parameter for the action selected above, "
-                    "i.e., "
-                    "the target folder of the move to folder action. "
-                    "Subfolders must be separated by dots.")
+        max_length=256,
+        blank=True,
+        null=True,
+        help_text=_(
+            "Additional parameter for the action selected above, "
+            "i.e., "
+            "the target folder of the move to folder action. "
+            "Subfolders must be separated by dots."
+        ),
     )
 
     assign_title_from = models.PositiveIntegerField(
-        _("assign title from"),
-        choices=TITLE_SELECTOR,
-        default=TITLE_FROM_SUBJECT
+        _("assign title from"), choices=TITLE_SELECTOR, default=TITLE_FROM_SUBJECT
     )
 
     assign_tag = models.ForeignKey(
@@ -205,7 +200,7 @@ class MailRule(models.Model):
     assign_correspondent_from = models.PositiveIntegerField(
         _("assign correspondent from"),
         choices=CORRESPONDENT_SELECTOR,
-        default=CORRESPONDENT_FROM_NOTHING
+        default=CORRESPONDENT_FROM_NOTHING,
     )
 
     assign_correspondent = models.ForeignKey(
@@ -213,7 +208,7 @@ class MailRule(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        verbose_name=_("assign this correspondent")
+        verbose_name=_("assign this correspondent"),
     )
 
     def __str__(self):

@@ -20,18 +20,20 @@ def set_filename(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0022_auto_20181007_1420'),
+        ("documents", "0022_auto_20181007_1420"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='filename',
-            field=models.FilePathField(default=None,
-                                       null=True,
-                                       editable=False,
-                                       help_text='Current filename in storage',
-                                       max_length=256),
+            model_name="document",
+            name="filename",
+            field=models.FilePathField(
+                default=None,
+                null=True,
+                editable=False,
+                help_text="Current filename in storage",
+                max_length=256,
+            ),
         ),
-        migrations.RunPython(set_filename)
+        migrations.RunPython(set_filename),
     ]
