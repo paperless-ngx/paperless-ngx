@@ -88,6 +88,7 @@ RUN apt-get update \
 	else \
 	  echo "Skipping qpdf build because pikepdf binary wheels are available."; \
 	fi \
+        && python3 -m pip install --update pip wheel \
 	&& python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor \
   && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
 	&& apt-get -y purge build-essential git zlib1g-dev libjpeg62-turbo-dev \
