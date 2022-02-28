@@ -9,13 +9,17 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0015_add_insensitive_to_match'),
+        ("documents", "0015_add_insensitive_to_match"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='content',
-            field=models.TextField(blank=True, db_index=("mysql" not in settings.DATABASES["default"]["ENGINE"]), help_text='The raw, text-only data of the document.  This field is primarily used for searching.'),
+            model_name="document",
+            name="content",
+            field=models.TextField(
+                blank=True,
+                db_index=("mysql" not in settings.DATABASES["default"]["ENGINE"]),
+                help_text="The raw, text-only data of the document.  This field is primarily used for searching.",
+            ),
         ),
     ]
