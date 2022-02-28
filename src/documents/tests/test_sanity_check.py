@@ -13,7 +13,6 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestSanityCheckMessages(TestCase):
-
     def test_no_messages(self):
         messages = SanityCheckMessages()
         self.assertEqual(len(messages), 0)
@@ -23,7 +22,9 @@ class TestSanityCheckMessages(TestCase):
             messages.log_messages()
             self.assertEqual(len(capture.output), 1)
             self.assertEqual(capture.records[0].levelno, logging.INFO)
-            self.assertEqual(capture.records[0].message, "Sanity checker detected no issues.")
+            self.assertEqual(
+                capture.records[0].message, "Sanity checker detected no issues."
+            )
 
     def test_info(self):
         messages = SanityCheckMessages()
@@ -61,22 +62,58 @@ class TestSanityCheckMessages(TestCase):
             self.assertEqual(capture.records[0].levelno, logging.ERROR)
             self.assertEqual(capture.records[0].message, "Something is seriously wrong")
 
-class TestSanityCheck(DirectoriesMixin, TestCase):
 
+class TestSanityCheck(DirectoriesMixin, TestCase):
     def make_test_data(self):
 
         with filelock.FileLock(settings.MEDIA_LOCK):
             # just make sure that the lockfile is present.
-            shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000001.pdf"), os.path.join(self.dirs.originals_dir, "0000001.pdf"))
-            shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "archive", "0000001.pdf"), os.path.join(self.dirs.archive_dir, "0000001.pdf"))
-            shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", "0000001.png"), os.path.join(self.dirs.thumbnail_dir, "0000001.png"))
+            shutil.copy(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "samples",
+                    "documents",
+                    "originals",
+                    "0000001.pdf",
+                ),
+                os.path.join(self.dirs.originals_dir, "0000001.pdf"),
+            )
+            shutil.copy(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "samples",
+                    "documents",
+                    "archive",
+                    "0000001.pdf",
+                ),
+                os.path.join(self.dirs.archive_dir, "0000001.pdf"),
+            )
+            shutil.copy(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "samples",
+                    "documents",
+                    "thumbnails",
+                    "0000001.png",
+                ),
+                os.path.join(self.dirs.thumbnail_dir, "0000001.png"),
+            )
 
-        return Document.objects.create(title="test", checksum="42995833e01aea9b3edee44bbfdd7ce1", archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b", content="test", pk=1, filename="0000001.pdf", mime_type="application/pdf", archive_filename="0000001.pdf")
+        return Document.objects.create(
+            title="test",
+            checksum="42995833e01aea9b3edee44bbfdd7ce1",
+            archive_checksum="62acb0bcbfbcaa62ca6ad3668e4e404b",
+            content="test",
+            pk=1,
+            filename="0000001.pdf",
+            mime_type="application/pdf",
+            archive_filename="0000001.pdf",
+        )
 
     def assertSanityError(self, messageRegex):
         messages = check_sanity()
         self.assertTrue(messages.has_error())
-        self.assertRegex(messages[0]['message'], messageRegex)
+        self.assertRegex(messages[0]["message"], messageRegex)
 
     def test_no_docs(self):
         self.assertEqual(len(check_sanity()), 0)
@@ -138,7 +175,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         self.assertFalse(messages.has_error())
         self.assertFalse(messages.has_warning())
         self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Document .* has no content.")
+        self.assertRegex(messages[0]["message"], "Document .* has no content.")
 
     def test_orphaned_file(self):
         doc = self.make_test_data()
@@ -147,7 +184,7 @@ class TestSanityCheck(DirectoriesMixin, TestCase):
         self.assertFalse(messages.has_error())
         self.assertTrue(messages.has_warning())
         self.assertEqual(len(messages), 1)
-        self.assertRegex(messages[0]['message'], "Orphaned file in media dir")
+        self.assertRegex(messages[0]["message"], "Orphaned file in media dir")
 
     def test_archive_filename_no_checksum(self):
         doc = self.make_test_data()

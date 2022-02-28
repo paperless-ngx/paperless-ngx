@@ -25,7 +25,7 @@ from documents.views import (
     SavedViewViewSet,
     BulkEditView,
     SelectionDataView,
-    BulkDownloadView
+    BulkDownloadView,
 )
 from paperless.views import FaviconView
 
@@ -39,82 +39,101 @@ api_router.register(r"saved_views", SavedViewViewSet)
 
 
 urlpatterns = [
-    re_path(r"^api/", include([
-        re_path(r"^auth/",
-                include(('rest_framework.urls', 'rest_framework'),
-                        namespace="rest_framework")),
-
-        re_path(r"^search/autocomplete/",
-                SearchAutoCompleteView.as_view(),
-                name="autocomplete"),
-
-        re_path(r"^statistics/",
-                StatisticsView.as_view(),
-                name="statistics"),
-
-        re_path(r"^documents/post_document/", PostDocumentView.as_view(),
-                name="post_document"),
-
-        re_path(r"^documents/bulk_edit/", BulkEditView.as_view(),
-                name="bulk_edit"),
-
-        re_path(r"^documents/selection_data/", SelectionDataView.as_view(),
-                name="selection_data"),
-
-        re_path(r"^documents/bulk_download/", BulkDownloadView.as_view(),
-                name="bulk_download"),
-
-        path('token/', views.obtain_auth_token)
-
-    ] + api_router.urls)),
-
+    re_path(
+        r"^api/",
+        include(
+            [
+                re_path(
+                    r"^auth/",
+                    include(
+                        ("rest_framework.urls", "rest_framework"),
+                        namespace="rest_framework",
+                    ),
+                ),
+                re_path(
+                    r"^search/autocomplete/",
+                    SearchAutoCompleteView.as_view(),
+                    name="autocomplete",
+                ),
+                re_path(r"^statistics/", StatisticsView.as_view(), name="statistics"),
+                re_path(
+                    r"^documents/post_document/",
+                    PostDocumentView.as_view(),
+                    name="post_document",
+                ),
+                re_path(
+                    r"^documents/bulk_edit/", BulkEditView.as_view(), name="bulk_edit"
+                ),
+                re_path(
+                    r"^documents/selection_data/",
+                    SelectionDataView.as_view(),
+                    name="selection_data",
+                ),
+                re_path(
+                    r"^documents/bulk_download/",
+                    BulkDownloadView.as_view(),
+                    name="bulk_download",
+                ),
+                path("token/", views.obtain_auth_token),
+            ]
+            + api_router.urls
+        ),
+    ),
     re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
-
     re_path(r"admin/", admin.site.urls),
-
-    re_path(r"^fetch/", include([
-        re_path(
-            r"^doc/(?P<pk>\d+)$",
-            RedirectView.as_view(url=settings.BASE_URL +
-                                 'api/documents/%(pk)s/download/'),
+    re_path(
+        r"^fetch/",
+        include(
+            [
+                re_path(
+                    r"^doc/(?P<pk>\d+)$",
+                    RedirectView.as_view(
+                        url=settings.BASE_URL + "api/documents/%(pk)s/download/"
+                    ),
+                ),
+                re_path(
+                    r"^thumb/(?P<pk>\d+)$",
+                    RedirectView.as_view(
+                        url=settings.BASE_URL + "api/documents/%(pk)s/thumb/"
+                    ),
+                ),
+                re_path(
+                    r"^preview/(?P<pk>\d+)$",
+                    RedirectView.as_view(
+                        url=settings.BASE_URL + "api/documents/%(pk)s/preview/"
+                    ),
+                ),
+            ]
         ),
-        re_path(
-            r"^thumb/(?P<pk>\d+)$",
-            RedirectView.as_view(url=settings.BASE_URL +
-                                 'api/documents/%(pk)s/thumb/'),
+    ),
+    re_path(
+        r"^push$",
+        csrf_exempt(
+            RedirectView.as_view(url=settings.BASE_URL + "api/documents/post_document/")
         ),
-        re_path(
-            r"^preview/(?P<pk>\d+)$",
-            RedirectView.as_view(url=settings.BASE_URL +
-                                 'api/documents/%(pk)s/preview/'),
-        ),
-    ])),
-
-    re_path(r"^push$", csrf_exempt(
-        RedirectView.as_view(url=settings.BASE_URL +
-                             'api/documents/post_document/'))),
-
+    ),
     # Frontend assets TODO: this is pretty bad, but it works.
-    path('assets/<path:path>',
-         RedirectView.as_view(url=settings.STATIC_URL +
-                              'frontend/en-US/assets/%(path)s')),
+    path(
+        "assets/<path:path>",
+        RedirectView.as_view(
+            url=settings.STATIC_URL + "frontend/en-US/assets/%(path)s"
+        ),
+    ),
     # TODO: with localization, this is even worse! :/
-
     # login, logout
-    path('accounts/', include('django.contrib.auth.urls')),
-
+    path("accounts/", include("django.contrib.auth.urls")),
     # Root of the Frontent
-    re_path(r".*", login_required(IndexView.as_view()), name='base'),
+    re_path(r".*", login_required(IndexView.as_view()), name="base"),
 ]
 
 
 websocket_urlpatterns = [
-    re_path(r'ws/status/$', StatusConsumer.as_asgi()),
+    re_path(r"ws/status/$", StatusConsumer.as_asgi()),
 ]
 
 # Text in each page's <h1> (and above login form).
-admin.site.site_header = 'Paperless-ng'
+admin.site.site_header = "Paperless-ng"
 # Text at the end of each page's <title>.
-admin.site.site_title = 'Paperless-ng'
+admin.site.site_title = "Paperless-ng"
 # Text at the top of the admin index page.
-admin.site.index_title = _('Paperless-ng administration')
+admin.site.index_title = _("Paperless-ng administration")

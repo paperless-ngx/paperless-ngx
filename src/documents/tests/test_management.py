@@ -22,21 +22,29 @@ sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
 @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
 class TestArchiver(DirectoriesMixin, TestCase):
-
     def make_models(self):
-        return Document.objects.create(checksum="A", title="A", content="first document", mime_type="application/pdf")
+        return Document.objects.create(
+            checksum="A",
+            title="A",
+            content="first document",
+            mime_type="application/pdf",
+        )
 
     def test_archiver(self):
 
         doc = self.make_models()
-        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"))
+        shutil.copy(
+            sample_file, os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf")
+        )
 
-        call_command('document_archiver')
+        call_command("document_archiver")
 
     def test_handle_document(self):
 
         doc = self.make_models()
-        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"))
+        shutil.copy(
+            sample_file, os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf")
+        )
 
         handle_document(doc.pk)
 
@@ -66,10 +74,24 @@ class TestArchiver(DirectoriesMixin, TestCase):
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
     def test_naming_priorities(self):
-        doc1 = Document.objects.create(checksum="A", title="document", content="first document", mime_type="application/pdf", filename="document.pdf")
-        doc2 = Document.objects.create(checksum="B", title="document", content="second document", mime_type="application/pdf", filename="document_01.pdf")
+        doc1 = Document.objects.create(
+            checksum="A",
+            title="document",
+            content="first document",
+            mime_type="application/pdf",
+            filename="document.pdf",
+        )
+        doc2 = Document.objects.create(
+            checksum="B",
+            title="document",
+            content="second document",
+            mime_type="application/pdf",
+            filename="document_01.pdf",
+        )
         shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"document.pdf"))
-        shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"document_01.pdf"))
+        shutil.copy(
+            sample_file, os.path.join(self.dirs.originals_dir, f"document_01.pdf")
+        )
 
         handle_document(doc2.pk)
         handle_document(doc1.pk)
@@ -82,12 +104,11 @@ class TestArchiver(DirectoriesMixin, TestCase):
 
 
 class TestDecryptDocuments(TestCase):
-
     @override_settings(
         ORIGINALS_DIR=os.path.join(os.path.dirname(__file__), "samples", "originals"),
         THUMBNAIL_DIR=os.path.join(os.path.dirname(__file__), "samples", "thumb"),
         PASSPHRASE="test",
-        PAPERLESS_FILENAME_FORMAT=None
+        PAPERLESS_FILENAME_FORMAT=None,
     )
     @mock.patch("documents.management.commands.decrypt_documents.input")
     def test_decrypt(self, m):
@@ -99,17 +120,39 @@ class TestDecryptDocuments(TestCase):
         os.makedirs(thumb_dir, exist_ok=True)
 
         override_settings(
-            ORIGINALS_DIR=originals_dir,
-            THUMBNAIL_DIR=thumb_dir,
-            PASSPHRASE="test"
+            ORIGINALS_DIR=originals_dir, THUMBNAIL_DIR=thumb_dir, PASSPHRASE="test"
         ).enable()
 
-        doc = Document.objects.create(checksum="82186aaa94f0b98697d704b90fd1c072", title="wow", filename="0000004.pdf.gpg",  mime_type="application/pdf", storage_type=Document.STORAGE_TYPE_GPG)
+        doc = Document.objects.create(
+            checksum="82186aaa94f0b98697d704b90fd1c072",
+            title="wow",
+            filename="0000004.pdf.gpg",
+            mime_type="application/pdf",
+            storage_type=Document.STORAGE_TYPE_GPG,
+        )
 
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "originals", "0000004.pdf.gpg"), os.path.join(originals_dir, "0000004.pdf.gpg"))
-        shutil.copy(os.path.join(os.path.dirname(__file__), "samples", "documents", "thumbnails", f"0000004.png.gpg"), os.path.join(thumb_dir, f"{doc.id:07}.png.gpg"))
+        shutil.copy(
+            os.path.join(
+                os.path.dirname(__file__),
+                "samples",
+                "documents",
+                "originals",
+                "0000004.pdf.gpg",
+            ),
+            os.path.join(originals_dir, "0000004.pdf.gpg"),
+        )
+        shutil.copy(
+            os.path.join(
+                os.path.dirname(__file__),
+                "samples",
+                "documents",
+                "thumbnails",
+                f"0000004.png.gpg",
+            ),
+            os.path.join(thumb_dir, f"{doc.id:07}.png.gpg"),
+        )
 
-        call_command('decrypt_documents')
+        call_command("decrypt_documents")
 
         doc.refresh_from_db()
 
@@ -126,7 +169,6 @@ class TestDecryptDocuments(TestCase):
 
 
 class TestMakeIndex(TestCase):
-
     @mock.patch("documents.management.commands.document_index.index_reindex")
     def test_reindex(self, m):
         call_command("document_index", "reindex")
@@ -139,7 +181,6 @@ class TestMakeIndex(TestCase):
 
 
 class TestRenamer(DirectoriesMixin, TestCase):
-
     @override_settings(PAPERLESS_FILENAME_FORMAT="")
     def test_rename(self):
         doc = Document.objects.create(title="test", mime_type="image/jpeg")
@@ -164,8 +205,9 @@ class TestRenamer(DirectoriesMixin, TestCase):
 
 
 class TestCreateClassifier(TestCase):
-
-    @mock.patch("documents.management.commands.document_create_classifier.train_classifier")
+    @mock.patch(
+        "documents.management.commands.document_create_classifier.train_classifier"
+    )
     def test_create_classifier(self, m):
         call_command("document_create_classifier")
 
@@ -173,7 +215,6 @@ class TestCreateClassifier(TestCase):
 
 
 class TestSanityChecker(DirectoriesMixin, TestCase):
-
     def test_no_issues(self):
         with self.assertLogs() as capture:
             call_command("document_sanity_checker")
@@ -182,7 +223,9 @@ class TestSanityChecker(DirectoriesMixin, TestCase):
         self.assertIn("Sanity checker detected no issues.", capture.output[0])
 
     def test_errors(self):
-        doc = Document.objects.create(title="test", content="test", filename="test.pdf", checksum="abc")
+        doc = Document.objects.create(
+            title="test", content="test", filename="test.pdf", checksum="abc"
+        )
         Path(doc.source_path).touch()
         Path(doc.thumbnail_path).touch()
 

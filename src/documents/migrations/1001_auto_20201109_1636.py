@@ -7,22 +7,28 @@ from django_q.tasks import schedule
 
 
 def add_schedules(apps, schema_editor):
-    schedule('documents.tasks.train_classifier', name="Train the classifier", schedule_type=Schedule.HOURLY)
-    schedule('documents.tasks.index_optimize', name="Optimize the index", schedule_type=Schedule.DAILY)
+    schedule(
+        "documents.tasks.train_classifier",
+        name="Train the classifier",
+        schedule_type=Schedule.HOURLY,
+    )
+    schedule(
+        "documents.tasks.index_optimize",
+        name="Optimize the index",
+        schedule_type=Schedule.DAILY,
+    )
 
 
 def remove_schedules(apps, schema_editor):
-    Schedule.objects.filter(func='documents.tasks.train_classifier').delete()
-    Schedule.objects.filter(func='documents.tasks.index_optimize').delete()
+    Schedule.objects.filter(func="documents.tasks.train_classifier").delete()
+    Schedule.objects.filter(func="documents.tasks.index_optimize").delete()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1000_update_paperless_all'),
-        ('django_q', '0013_task_attempt_count'),
+        ("documents", "1000_update_paperless_all"),
+        ("django_q", "0013_task_attempt_count"),
     ]
 
-    operations = [
-        RunPython(add_schedules, remove_schedules)
-    ]
+    operations = [RunPython(add_schedules, remove_schedules)]
