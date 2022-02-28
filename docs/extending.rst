@@ -51,7 +51,7 @@ To do the setup you need to perform the steps from the following chapters in a c
 
         .. code:: shell-session
 
-            docker run -d -p 6379:6379 -restart unless-stopped redis:latest
+            docker run -d -p 6379:6379 --restart unless-stopped redis:latest
 
 6.  Install the python dependencies by performing in the src/ directory.
     .. code:: shell-session
