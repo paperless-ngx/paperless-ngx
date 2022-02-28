@@ -56,9 +56,20 @@ Our community review process for `non-trivial` PRs is the following:
 
 This process might be slow as community members have different schedules and time to dedicate to the Paperless project. However it ensures community code reviews are as brilliantly thorough as they once were with @jonaswinkler.
 
-# Adding a new language
+# Translating Paperless-ngx
 
-This section describes how new languages can be added to the code.
+Some notes about translation:
+
+- There are two resources:
+  - `src-ui/messages.xlf` contains the translation strings for the front end. This is the most important.
+  - `django.po` contains strings for the administration section of paperless, which is nice to have translated.
+- Most of the front-end strings are used on buttons, menu items, etc., so ideally the translated string should not be much longer than the English original.
+- Translation units may contain placeholders. These usually mean that there's a name of a tag or document or something in the string. You can click on the placeholders to copy them.
+- Translation units may contain plural expressions such as `{PLURAL_VAR, plural, =1 {one result} =0 {no results} other {<placeholder> results}}`. Copy these verbatim and translate only the content in the inner `{}` brackets. Example: `{PLURAL_VAR, plural, =1 {Ein Ergebnis} =0 {Keine Ergebnisse} other {<placeholder> Ergebnisse}}`
+- Changes to translations on Crowdin will get pushed into the repository automatically.
+
+## Adding new languages to the codebase
+
 If a language has already been added, and you would like to contribute new translations or change existing translations, please read the "Translation" section in the README.md file for further details on that.
 
 If you would like the project to be translated to another language, first head over to https://crwd.in/paperless-ngx to check if that language has already been enabled for translation.
