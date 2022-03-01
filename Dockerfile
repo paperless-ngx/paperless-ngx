@@ -88,9 +88,9 @@ RUN apt-get update \
 	else \
 	  echo "Skipping qpdf build because pikepdf binary wheels are available."; \
 	fi \
-        && python3 -m pip install --upgrade pip wheel \
+    && python3 -m pip install --upgrade pip wheel \
 	&& python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor \
-  && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
+  	&& python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
 	&& apt-get -y purge build-essential git zlib1g-dev libjpeg62-turbo-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/*
@@ -99,7 +99,7 @@ RUN apt-get update \
 COPY docker/ ./docker/
 
 RUN cd docker \
-  && cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
+  	&& cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
 	&& mkdir /var/log/supervisord /var/run/supervisord \
 	&& cp supervisord.conf /etc/supervisord.conf \
 	&& cp docker-entrypoint.sh /sbin/docker-entrypoint.sh \
