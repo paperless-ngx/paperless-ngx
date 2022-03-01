@@ -74,7 +74,7 @@ install_languages() {
 	done
 }
 
-echo "Paperless-ng docker container starting..."
+echo "Paperless-ngx docker container starting..."
 
 # Install additional languages if specified
 if [[ ! -z "$PAPERLESS_OCR_LANGUAGES" ]]; then

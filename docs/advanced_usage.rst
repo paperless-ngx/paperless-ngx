@@ -57,7 +57,7 @@ automatically tagged with the appropriate data.
 Automatic matching
 ==================
 
-Paperless-ng comes with a new matching algorithm called *Auto*. This matching
+Paperless-ngx comes with a new matching algorithm called *Auto*. This matching
 algorithm tries to assign tags, correspondents, and document types to your
 documents based on how you have already assigned these on existing documents. It
 uses a neural network under the hood.

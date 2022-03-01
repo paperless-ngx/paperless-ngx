@@ -5,7 +5,7 @@ Frequently asked questions
 
 **Q:** *What's the general plan for Paperless-ng?*
 
-**A:** Paperless-ng is already almost feature-complete. This project will remain
+**A:** Paperless-ngx is already almost feature-complete. This project will remain
 as simple as it is right now. It will see improvements to features that are already there.
 If you need advanced features such as document versions,
 workflows or multi-user with customizable access to individual files, this is
