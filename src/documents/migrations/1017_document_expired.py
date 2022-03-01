@@ -7,9 +7,11 @@ from django_q.tasks import schedule
 
 class Migration(migrations.Migration):
 
+    @classmethod
     def add_schedules(apps, schema_editor):
         schedule('documents.tasks.remove_expired_documents', name="Remove Expired Documents", schedule_type=Schedule.DAILY)
 
+    @classmethod
     def remove_schedules(apps, schema_editor):
         Schedule.objects.filter(func='documents.tasks.remove_expired_documents').delete()
 
