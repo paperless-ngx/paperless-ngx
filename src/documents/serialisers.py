@@ -222,6 +222,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             "content",
             "tags",
             "created",
+            "expired",
             "modified",
             "added",
             "archive_serial_number",

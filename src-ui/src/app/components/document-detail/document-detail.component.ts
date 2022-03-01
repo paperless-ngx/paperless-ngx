@@ -21,6 +21,7 @@ import { TextComponent } from '../common/input/text/text.component';
 import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions';
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
+import { expiryDateValidator } from 'src/app/directives/expiryDate.directive';
 
 @Component({
   selector: 'app-document-detail',
@@ -56,11 +57,12 @@ export class DocumentDetailComponent implements OnInit {
     title: new FormControl(''),
     content: new FormControl(''),
     created: new FormControl(),
+    expired: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([])
-  })
+  }, { validators: expiryDateValidator })
 
   previewCurrentPage: number = 1
   previewNumPages: number = 1

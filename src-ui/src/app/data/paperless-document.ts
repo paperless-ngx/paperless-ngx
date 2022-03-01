@@ -37,6 +37,8 @@ export interface PaperlessDocument extends ObjectWithId {
 
     created?: Date
 
+    expired?: Date
+
     modified?: Date
 
     added?: Date

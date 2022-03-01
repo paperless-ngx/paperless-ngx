@@ -3,6 +3,8 @@ import logging
 import tqdm
 from django.conf import settings
 from django.db.models.signals import post_save
+from django.db.models.signals import post_delete
+from django.db.models.functions import Now
 from whoosh.writing import AsyncWriter
 
 from documents import index, sanity_checker
@@ -104,6 +106,22 @@ def sanity_check():
         return "Sanity check exited with infos. See log."
     else:
         return "No issues detected."
+
+
+def remove_expired_documents():
+    try:
+        expiredDocuments = Document.objects.filter(expired__lte=Now())
+
+        for doc in expiredDocuments:
+            logger.info("Delete expired document {}...".format(doc.title))
+            doc.delete()
+
+    except Exception as e:
+        logger.warning(
+            "remove_expired_documents error: " + str(e)
+        )
+
+    return ""
 
 
 def bulk_update_documents(document_ids):

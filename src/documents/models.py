@@ -168,6 +168,13 @@ class Document(models.Model):
         _("created"),
         default=timezone.now, db_index=True)
 
+    expired = models.DateTimeField(
+        _("expired"),
+        blank=True, editable=True,
+        null=True, db_index=True,
+        help_text=_("The expire date of the archived document.")
+    )
+
     modified = models.DateTimeField(
         _("modified"),
         auto_now=True, editable=False, db_index=True)
