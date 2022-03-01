@@ -108,13 +108,13 @@ def sanity_check():
 
 
 def remove_expired_documents():
-    i=0
+    i = 0
     expiredDocuments = Document.objects.filter(expired__lte=Now())
 
     for doc in expiredDocuments:
         logger.info("Delete expired document {}...".format(doc.title))
         doc.delete()
-        i+=1
+        i += 1
 
     return "{} expired documents deleted.".format(i)
 
