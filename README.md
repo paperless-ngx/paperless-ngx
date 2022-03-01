@@ -54,7 +54,7 @@ A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) 
 	* When adding documents from mail, paperless can move these mail to a new folder, mark them as read, flag them as important or delete them.
 * Machine learning powered document matching.
 	* Paperless-ngx learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
-* Optimized for multi core systems: Paperless-ng consumes multiple documents in parallel.
+* Optimized for multi core systems: Paperless-ngx consumes multiple documents in parallel.
 * The integrated sanity checker makes sure that your document archive is in good health.
 * [More screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
 
@@ -65,7 +65,7 @@ The easiest way to deploy paperless is docker-compose. The files in the [`/docke
 If you'd like to jump right in, you can configure a docker-compose environment with our install script:
 
 ```bash
-bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/install-paperless-ng.sh)"
+bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/install-paperless-ngx.sh)"
 ```
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.

@@ -103,7 +103,7 @@ You can use your phone to "scan" documents. The regular camera app will work, bu
 | `OCR Scanner - QuickScan`_  | iOS            | no  | no  | no  | no    | yes    | `holzhannes`_    |
 +-----------------------------+----------------+-----+-----+-----+-------+--------+------------------+
 
-On Android, you can use these applications in combination with one of the :ref:`Paperless-ng compatible apps <usage-mobile_upload>` to "Share" the documents produced by these scanner apps with paperless. On iOS, you can share the scanned documents via iOS-Sharing to other mail, WebDav or FTP apps.
+On Android, you can use these applications in combination with one of the :ref:`Paperless-ngx compatible apps <usage-mobile_upload>` to "Share" the documents produced by these scanner apps with paperless. On iOS, you can share the scanned documents via iOS-Sharing to other mail, WebDav or FTP apps.
 
 .. _Office Lens: https://play.google.com/store/apps/details?id=com.microsoft.office.officelens
 .. _Genius Scan: https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free
