@@ -74,6 +74,7 @@ RUN apt-get update \
 		git \
 		zlib1g-dev \
 		libjpeg62-turbo-dev \
+		libqpdf-dev \
 	&& if [ "$(uname -m)" = "armv7l" ]; \
 	  then echo "Building qpdf" \
 	  && mkdir -p /usr/src/qpdf \
@@ -91,7 +92,7 @@ RUN apt-get update \
     && python3 -m pip install --upgrade pip wheel \
 	&& python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor \
   	&& python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
-	&& apt-get -y purge build-essential git zlib1g-dev libjpeg62-turbo-dev \
+	&& apt-get -y purge build-essential git zlib1g-dev libjpeg62-turbo-dev libqpdf-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/*
 
