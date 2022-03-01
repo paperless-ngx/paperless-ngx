@@ -332,6 +332,10 @@ $border-color-dark-mode: #47494f;
     }
   }
 
+  .form-select:not(.is-invalid):not(:disabled) {
+    border-color: $border-color-dark-mode;
+  }
+
   .ng-select-container,
   .ng-select.ng-select-opened > .ng-select-container,
   .ng-dropdown-panel,
