@@ -10,6 +10,9 @@ class Migration(migrations.Migration):
     def add_schedules(apps, schema_editor):
         schedule('documents.tasks.remove_expired_documents', name="Remove Expired Documents", schedule_type=Schedule.DAILY)
 
+    def remove_schedules(apps, schema_editor):
+        schedule.objects.filter(func='documents.tasks.remove_expired_documents').delete()
+
     dependencies = [
         ('documents', '1016_auto_20210317_1351'),
     ]
@@ -20,5 +23,5 @@ class Migration(migrations.Migration):
             name='expired',
             field=models.DateTimeField(blank=True, db_index=True, help_text='The expire date of the archived document.', null=True, verbose_name='expired'),
         ),
-        RunPython(add_schedules)
+        RunPython(add_schedules, remove_schedules)
     ]
