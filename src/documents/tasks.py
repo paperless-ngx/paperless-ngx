@@ -108,19 +108,15 @@ def sanity_check():
 
 
 def remove_expired_documents():
-    try:
-        expiredDocuments = Document.objects.filter(expired__lte=Now())
+    i=0
+    expiredDocuments = Document.objects.filter(expired__lte=Now())
 
-        for doc in expiredDocuments:
-            logger.info("Delete expired document {}...".format(doc.title))
-            doc.delete()
+    for doc in expiredDocuments:
+        logger.info("Delete expired document {}...".format(doc.title))
+        doc.delete()
+        i+=1
 
-    except Exception as e:
-        logger.warning(
-            "remove_expired_documents error: " + str(e)
-        )
-
-    return ""
+    return "{} expired documents deleted.".format(i)
 
 
 def bulk_update_documents(document_ids):
