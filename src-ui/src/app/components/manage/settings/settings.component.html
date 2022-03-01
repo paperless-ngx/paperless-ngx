@@ -18,7 +18,7 @@
           </div>
           <div class="col">
 
-            <select class="form-control" formControlName="displayLanguage">
+            <select class="form-select" formControlName="displayLanguage">
               <option *ngFor="let lang of displayLanguageOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code && currentLocale != 'en-US'"> - {{lang.englishName}}</span></option>
             </select>
 
@@ -33,7 +33,7 @@
           </div>
           <div class="col">
 
-            <select class="form-control" formControlName="dateLocale">
+            <select class="form-select" formControlName="dateLocale">
               <option *ngFor="let lang of dateLocaleOptions" [ngValue]="lang.code">{{lang.name}}<span *ngIf="lang.code"> - {{today | customDate:'shortDate':null:lang.code}}</span></option>
             </select>
 
@@ -68,7 +68,7 @@
           </div>
           <div class="col">
 
-            <select class="form-control" formControlName="documentListItemPerPage">
+            <select class="form-select" formControlName="documentListItemPerPage">
               <option [ngValue]="10">10</option>
               <option [ngValue]="25">25</option>
               <option [ngValue]="50">50</option>
