@@ -103,7 +103,6 @@ class TestTasks(DirectoriesMixin, TestCase):
         self.assertEqual(tasks.sanity_check(), "Sanity check exited with infos. See log.")
         m.assert_called_once()
 
-    
     def test_remove_expired_documents(self):
         self.assertEqual(tasks.remove_expired_documents(), "0 expired documents deleted.")
 
@@ -116,7 +115,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         doc1 = Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(),
                                 created=timezone.now(), modified=timezone.now(), expired=timezone.now()+timezone.timedelta(days=1))
         self.assertEqual(tasks.remove_expired_documents(), "0 expired documents deleted.")
-        
+
     def test_remove_expired_one_from_three(self):
         doc1 = Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(),
                                 created=timezone.now(), modified=timezone.now(), expired=timezone.now()+timezone.timedelta(days=-1))
@@ -125,8 +124,6 @@ class TestTasks(DirectoriesMixin, TestCase):
         doc3= Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(),
                                 created=timezone.now(), modified=timezone.now())
         self.assertEqual(tasks.remove_expired_documents(), "0 expired documents deleted.")
-
-
 
     def test_bulk_update_documents(self):
         doc1 = Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(),
