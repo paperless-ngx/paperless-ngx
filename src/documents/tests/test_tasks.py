@@ -123,7 +123,7 @@ class TestTasks(DirectoriesMixin, TestCase):
                                 created=timezone.now(), modified=timezone.now(), expired=timezone.now()+timezone.timedelta(days=1))
         doc3= Document.objects.create(title="test", content="my document", checksum="wow3", added=timezone.now(),
                                 created=timezone.now(), modified=timezone.now())
-        self.assertEqual(tasks.remove_expired_documents(), "0 expired documents deleted.")
+        self.assertEqual(tasks.remove_expired_documents(), "1 expired documents deleted.")
 
     def test_bulk_update_documents(self):
         doc1 = Document.objects.create(title="test", content="my document", checksum="wow", added=timezone.now(),
