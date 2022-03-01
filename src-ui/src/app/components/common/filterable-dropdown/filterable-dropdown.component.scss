@@ -46,7 +46,6 @@
   }
 }
 
-
 small > svg {
   margin-top: -2px;
 }
@@ -57,4 +56,8 @@ small > svg {
   small {
     font-size: 65%;
   }
+}
+
+.show .btn-outline-primary {
+  color: #fff;
 }
