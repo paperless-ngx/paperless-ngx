@@ -74,7 +74,7 @@ RUN apt-get update \
 		git \
 		zlib1g-dev \
 		libjpeg62-turbo-dev \
-	&& if [ "$(uname -m)" = "armv7l" ]; \
+	&& if [ "$(uname -m)" = "armv7l" ] || [ "$(uname -m)" = "aarch64" ]; \
 	  then echo "Building qpdf" \
 	  && mkdir -p /usr/src/qpdf \
 	  && cd /usr/src/qpdf \
@@ -86,13 +86,12 @@ RUN apt-get update \
 	  && cd /usr/src/paperless/src/ \
 	  && rm -rf /usr/src/qpdf; \
 	else \
-	  apt-get -y install libqpdf-dev \
-	  && echo "Skipping qpdf build because pikepdf binary wheels are available."; \
+	  echo "Skipping qpdf build because pikepdf binary wheels are available."; \
 	fi \
     && python3 -m pip install --upgrade pip wheel \
 	&& python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor \
   	&& python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
-	&& apt-get -y purge build-essential git zlib1g-dev libjpeg62-turbo-dev libqpdf-dev \
+	&& apt-get -y purge build-essential git zlib1g-dev libjpeg62-turbo-dev \
 	&& apt-get -y autoremove --purge \
 	&& rm -rf /var/lib/apt/lists/*
 
