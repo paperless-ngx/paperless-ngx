@@ -317,6 +317,13 @@
           <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="5Cfc9ab90d19d79c71a60644be816f1b4e974a1b" datatype="html">
+        <source>Expiry Date</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="6e58f1baf7acb6a0cfe3636b9c2a61b4d1183720" datatype="html">
         <source>Date modified</source>
         <context-group purpose="location">
