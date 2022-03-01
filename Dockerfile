@@ -74,7 +74,7 @@ RUN apt-get update \
 		git \
 		zlib1g-dev \
 		libjpeg62-turbo-dev \
-	&& if [ "$(uname -m)" = "armv7l" ] || [ "$(uname -m)" = "arm64" ]; \
+	&& if [ "$(uname -m)" = "armv7l" ]; \
 	  then echo "Building qpdf" \
 	  && mkdir -p /usr/src/qpdf \
 	  && cd /usr/src/qpdf \
