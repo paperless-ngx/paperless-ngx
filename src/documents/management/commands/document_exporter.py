@@ -6,7 +6,7 @@ import time
 
 import tqdm
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -143,6 +143,8 @@ class Command(BaseCommand):
             manifest += json.loads(
                 serializers.serialize("json", SavedViewFilterRule.objects.all())
             )
+
+            manifest += json.loads(serializers.serialize("json", Group.objects.all()))
 
             manifest += json.loads(serializers.serialize("json", User.objects.all()))
 
