@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
         schedule('documents.tasks.remove_expired_documents', name="Remove Expired Documents", schedule_type=Schedule.DAILY)
 
     def remove_schedules(apps, schema_editor):
-        schedule.objects.filter(func='documents.tasks.remove_expired_documents').delete()
+        Schedule.objects.filter(func='documents.tasks.remove_expired_documents').delete()
 
     dependencies = [
         ('documents', '1016_auto_20210317_1351'),
