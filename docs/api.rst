@@ -255,7 +255,7 @@ process itself is available, since that happens in a different process.
 API Versioning
 ##############
 
-The REST API is versioned since Paperless-ng 1.3.0.
+The REST API is versioned since Paperless-ngx 1.3.0.
 
 * Versioning ensures that changes to the API don't break older clients.
 * Clients specify the specific version of the API they wish to use with every request and Paperless will handle the request using the specified API version.

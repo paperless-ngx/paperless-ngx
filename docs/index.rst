@@ -36,7 +36,7 @@ NG stands for both Angular (the framework used for the
 Frontend) and next-gen. Publishing this project under a different name also
 avoids confusion between paperless and paperless-ngx.
 
-If you want to learn about what's different in paperless-ng from Paperless, check out these
+If you want to learn about what's different in paperless-ngx from Paperless, check out these
 resources in the documentation:
 
 *   :ref:`Some screenshots <screenshots>` of the new UI are available.

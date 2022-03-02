@@ -117,7 +117,7 @@ performs all the steps described in :ref:`setup-docker_hub` automatically.
 Install Paperless from Docker Hub
 =================================
 
-1.  Login with your user and create a folder in your home-directory `mkdir -v ~/paperless-ng` to have a place for your configuration files and consumption directory.
+1.  Login with your user and create a folder in your home-directory `mkdir -v ~/paperless-ngx` to have a place for your configuration files and consumption directory.
 
 2.  Go to the `/docker/compose directory on the project page <https://github.com/paperless-ngx/paperless-ngx/tree/master/docker/compose>`_
     and download one of the `docker-compose.*.yml` files, depending on which database backend you
