@@ -177,37 +177,37 @@ jobs:
         name: Move files
         run: |
           mkdir dist
-          mkdir dist/paperless-ng
-          mkdir dist/paperless-ng/scripts
-          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ng/
-          cp paperless.conf.example dist/paperless-ng/paperless.conf
-          cp gunicorn.conf.py dist/paperless-ng/gunicorn.conf.py
-          cp docker/ dist/paperless-ng/docker -r
-          cp scripts/*.service scripts/*.sh dist/paperless-ng/scripts/
-          cp src/ dist/paperless-ng/src -r
-          cp docs/_build/html/ dist/paperless-ng/docs -r
+          mkdir dist/paperless-ngx
+          mkdir dist/paperless-ngx/scripts
+          cp .dockerignore .env Dockerfile Pipfile Pipfile.lock LICENSE README.md requirements.txt dist/paperless-ngx/
+          cp paperless.conf.example dist/paperless-ngx/paperless.conf
+          cp gunicorn.conf.py dist/paperless-ngx/gunicorn.conf.py
+          cp docker/ dist/paperless-ngx/docker -r
+          cp scripts/*.service scripts/*.sh dist/paperless-ngx/scripts/
+          cp src/ dist/paperless-ngx/src -r
+          cp docs/_build/html/ dist/paperless-ngx/docs -r
       -
         name: Compile messages
         run: |
-          cd dist/paperless-ng/src
+          cd dist/paperless-ngx/src
           python3 manage.py compilemessages
       -
         name: Collect static files
         run: |
-          cd dist/paperless-ng/src
+          cd dist/paperless-ngx/src
           python3 manage.py collectstatic --no-input
       -
         name: Make release package
         run: |
           cd dist
           find . -name __pycache__ | xargs rm -r
-          tar -cJf paperless-ng.tar.xz paperless-ng/
+          tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
         name: Upload release artifact
         uses: actions/upload-artifact@v2
         with:
           name: release
-          path: dist/paperless-ng.tar.xz
+          path: dist/paperless-ngx.tar.xz
 
   publish-release:
     runs-on: ubuntu-latest
@@ -233,11 +233,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ng-${{ steps.get_version.outputs.version }}
-          release_name: Paperless-ng ${{ steps.get_version.outputs.version }}
+          release_name: Paperless-ngx ${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
           body: |
-            For a complete list of changes, see the changelog at https://paperless-ng.readthedocs.io/en/latest/changelog.html.
+            For a complete list of changes, see the changelog at https://paperless-ngx.readthedocs.io/en/latest/changelog.html.
       -
         name: Upload release archive
         id: upload-release-asset
@@ -246,8 +246,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./paperless-ng.tar.xz
-          asset_name: paperless-ng-${{ steps.get_version.outputs.version }}.tar.xz
+          asset_path: ./paperless-ngx.tar.xz
+          asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
 
   # build and push image to docker hub.
