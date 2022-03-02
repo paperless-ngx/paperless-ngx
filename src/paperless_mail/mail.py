@@ -44,7 +44,7 @@ class MarkReadMailAction(BaseMailAction):
         return {"seen": False}
 
     def post_consume(self, M, message_uids, parameter):
-        M.seen(message_uids, True)
+        M.flag(message_uids, [MailMessageFlags.SEEN], True)
 
 
 class MoveMailAction(BaseMailAction):
