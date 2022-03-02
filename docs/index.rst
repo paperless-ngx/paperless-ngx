@@ -22,19 +22,21 @@ finding stuff again. I feed documents right from the post box into the scanner
 and then shred them.  Perhaps you might find it useful too.
 
 
-Paperless-ng
-============
+Paperless-ngx
+=============
 
-Paperless-ng is a fork of the original paperless project. It changes many
-things both on the surface and under the hood. Paperless-ng was created
-because I feel that these changes are too big to be pushed into the main
-repository right away.
+Paperless-ngx is a document management system that transforms your physical
+documents into a searchable online archive so you can keep, well, *less paper*.
+
+Paperless-ngx forked from paperless-ng to continue the great work and
+distribute responsibility of supporting and advancing the project among a team
+of people.
 
 NG stands for both Angular (the framework used for the
 Frontend) and next-gen. Publishing this project under a different name also
 avoids confusion between paperless and paperless-ngx.
 
-If you want to learn about what's different in paperless-ngx, check out these
+If you want to learn about what's different in paperless-ngx from Paperless, check out these
 resources in the documentation:
 
 *   :ref:`Some screenshots <screenshots>` of the new UI are available.
@@ -52,10 +54,6 @@ resources in the documentation:
     at a glance when and why something is not working.
 *   The :ref:`changelog <paperless_changelog>` contains a detailed list of all changes
     in paperless-ngx.
-
-It would be great if this project could eventually merge back into the main
-repository, but it needs a lot more work before that can happen.
-
 
 Contents
 ========

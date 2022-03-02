@@ -57,7 +57,7 @@ automatically tagged with the appropriate data.
 Automatic matching
 ==================
 
-Paperless-ng comes with a new matching algorithm called *Auto*. This matching
+Paperless-ngx comes with a new matching algorithm called *Auto*. This matching
 algorithm tries to assign tags, correspondents, and document types to your
 documents based on how you have already assigned these on existing documents. It
 uses a neural network under the hood.
@@ -174,7 +174,7 @@ The post consumption script cannot cancel the consumption process.
 
 Docker
 ------
-Assumed you have ``/home/foo/paperless-ng/scripts/post-consumption-example.sh``.
+Assumed you have ``/home/foo/paperless-ngx/scripts/post-consumption-example.sh``.
 
 You can pass that script into the consumer container via a host mount in your ``docker-compose.yml``.
 
@@ -184,10 +184,10 @@ You can pass that script into the consumer container via a host mount in your ``
            ...
            volumes:
 					     ...
-               - /home/paperless-ng/scripts:/path/in/container/scripts/
+               - /home/paperless-ngx/scripts:/path/in/container/scripts/
    ...
 
-Example (docker-compose.yml): ``- /home/foo/paperless-ng/scripts:/usr/src/paperless/scripts``
+Example (docker-compose.yml): ``- /home/foo/paperless-ngx/scripts:/usr/src/paperless/scripts``
 
 which in turn requires the variable ``PAPERLESS_POST_CONSUME_SCRIPT`` in ``docker-compose.env``  to point to ``/path/in/container/scripts/post-consumption-example.sh``.
 
@@ -195,11 +195,11 @@ Example (docker-compose.env): ``PAPERLESS_POST_CONSUME_SCRIPT=/usr/src/paperless
 
 Troubleshooting:
 
-- Monitor the docker-compose log ``cd ~/paperless-ng; docker-compose logs -f``
+- Monitor the docker-compose log ``cd ~/paperless-ngx; docker-compose logs -f``
 - Check your script's permission e.g. in case of permission error ``sudo chmod 755 post-consumption-example.sh``
 - Pipe your scripts's output to a log file e.g. ``echo "${DOCUMENT_ID}" | tee --append /usr/src/paperless/scripts/post-consumption-example.log``
 
-.. _post-consumption-example.sh: https://github.com/jonaswinkler/paperless-ng/blob/master/scripts/post-consumption-example.sh
+.. _post-consumption-example.sh: https://github.com/jonaswinkler/paperless-ngx/blob/master/scripts/post-consumption-example.sh
 
 .. _advanced-file_name_handling:
 
