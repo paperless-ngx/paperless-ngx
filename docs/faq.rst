@@ -3,17 +3,13 @@
 Frequently asked questions
 **************************
 
-**Q:** *What's the general plan for Paperless-ng?*
+**Q:** *What's the general plan for Paperless-ngx?*
 
-**A:** Paperless-ng is already almost feature-complete. This project will remain
-as simple as it is right now. It will see improvements to features that are already there.
-If you need advanced features such as document versions,
-workflows or multi-user with customizable access to individual files, this is
-not the tool for you.
-
-Features that *are* planned are some more quality of life extensions for the searching
-(i.e., search for similar documents, group results by correspondents with "more from this"
-links, etc), bulk editing and hierarchical tags.
+**A:** While Paperless-ngx is already considered largely "feature-complete" it is a community-driven 
+project and development will be guided in this way. New features can be submitted via
+GitHub discussions and "up-voted" by the community but this is not a garauntee the feature
+will be implemented. This project will always be open to collaboration in the form of PRs,
+ideas etc. 
 
 **Q:** *I'm using docker. Where are my documents?*
 
@@ -33,12 +29,12 @@ is
     files around manually. This folder is meant to be entirely managed by docker
     and paperless.
 
-**Q:** *Let's say you don't support this project anymore in a year. Can I easily move to other systems?*
+**Q:** *Let's say I want to switch tools in a year. Can I easily move to other systems?*
 
 **A:** Your documents are stored as plain files inside the media folder. You can always drag those files
 out of that folder to use them elsewhere. Here are a couple notes about that.
 
-*   Paperless never modifies your original documents. It keeps checksums of all documents and uses a
+*   Paperless-ngx never modifies your original documents. It keeps checksums of all documents and uses a
     scheduled sanity checker to check that they remain the same.
 *   By default, paperless uses the internal ID of each document as its filename. This might not be very
     convenient for export. However, you can adjust the way files are stored in paperless by
@@ -55,7 +51,7 @@ out of that folder to use them elsewhere. Here are a couple notes about that.
 *   With the optional Tika integration enabled (see :ref:`Configuration <configuration-tika>`), Paperless also supports various
     Office documents (.docx, .doc, odt, .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
-Paperless determines the type of a file by inspecting its content. The
+Paperless-ngx determines the type of a file by inspecting its content. The
 file extensions do not matter.
 
 **Q:** *Will paperless-ngx run on Raspberry Pi?*
