@@ -2,7 +2,8 @@ name: ci
 
 on:
   push:
-    tags: ngx-*
+    tags:
+      - ngx-*
     branches-ignore:
       - 'translations**'
   pull_request:
