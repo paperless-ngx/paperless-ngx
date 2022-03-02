@@ -68,11 +68,6 @@ class BogusMailBox(ContextManager):
 
         return list(msg)
 
-    def seen(self, uid_list, seen_val):
-        for message in self.messages:
-            if message.uid in uid_list:
-                message.seen = seen_val
-
     def delete(self, uid_list):
         self.messages = list(filter(lambda m: m.uid not in uid_list, self.messages))
 
@@ -82,6 +77,8 @@ class BogusMailBox(ContextManager):
                 for flag in flag_set:
                     if flag == MailMessageFlags.FLAGGED:
                         message.flagged = value
+                    if flag == MailMessageFlags.SEEN:
+                        message.seen = value
 
     def move(self, uid_list, folder):
         if folder == "spam":
