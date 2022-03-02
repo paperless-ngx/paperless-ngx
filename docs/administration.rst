@@ -468,7 +468,7 @@ Documents can be stored in Paperless using GnuPG encryption.
 
 .. danger::
 
-    Encryption is deprecated since paperless-ng 0.9 and doesn't really provide any
+    Encryption is deprecated since paperless-ngx 0.9 and doesn't really provide any
     additional security, since you have to store the passphrase in a configuration
     file on the same system as the encrypted documents for paperless to work.
     Furthermore, the entire text content of the documents is stored plain in the

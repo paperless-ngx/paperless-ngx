@@ -29,7 +29,7 @@ To test your code, execute `pytest` in the src/ directory. This also generates a
 
 ## More info:
 
-... is available in the documentation. https://paperless-ng.readthedocs.io/en/latest/extending.html
+... is available in the documentation. https://paperless-ngx.readthedocs.io/en/latest/extending.html
 
 # Merging PRs
 
