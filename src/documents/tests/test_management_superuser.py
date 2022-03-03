@@ -29,7 +29,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
 
         call_command("manage_superuser")
- 
+
         self.assertEqual(User.objects.count(), 1)
         with self.assertRaises(User.DoesNotExist):
             User.objects.get_by_natural_key("admin")
