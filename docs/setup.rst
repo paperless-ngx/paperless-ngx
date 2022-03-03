@@ -468,8 +468,39 @@ writing. Windows is not and will never be supported.
     to compile this by yourself, because this software has been patented until around 2017 and
     binary packages are not available for most distributions.
 
-Migration to paperless-ngx
-#########################
+Migrating to Paperless-ngx
+##########################
+
+Migration is possible both from Paperless-ng or directly from the 'original' Paperless.
+
+Migrating from Paperless-ng
+===========================
+
+Paperless-ngx is meant to be a drop-in replacement for Paperless-ng and thus upgrading should be
+trivial for most users, especially when using docker. However, as with any major change, it is 
+recommended to take a full backup first. Once you are ready, simply change the docker image to
+point to the new source. E.g. if using Docker Compose, edit ``docker-compose.yml`` and change:
+
+.. code::
+
+  image: jonaswinkler/paperless-ng:latest
+
+to
+
+.. code::
+
+  image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    
+and then run ``docker-compose up -d`` which will pull the new image recreate the container.
+That's it!
+
+Users who installed with the bare-metal route should also update their Git clone to point to 
+``https://github.com/paperless-ngx/paperless-ngx``, e.g. using the command 
+``git remote set-url origin https://github.com/paperless-ngx/paperless-ngx`` and then pull the
+lastest version.
+
+Migrating from Paperless
+========================
 
 At its core, paperless-ngx is still paperless and fully compatible. However, some
 things have changed under the hood, so you need to adapt your setup depending on
@@ -634,7 +665,7 @@ management commands as below.
 7.  Start paperless.
 
 
-Moving back to paperless
+Moving back to Paperless
 ========================
 
 Lets say you migrated to Paperless-ngx and used it for a while, but decided that
