@@ -70,6 +70,8 @@ bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx
 
 Alternatively, you can install the dependencies and setup apache and a database server yourself. The [documentation](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation) has a step by step guide on how to do it.
 
+Migrating from Paperless-ng is easy, just drop in the new docker image! See the [documentation on migrating](https://paperless-ngx.readthedocs.io/en/latest/setup.html#migrating-from-paperless-ng) for more details.
+
 <!-- omit in toc -->
 ### Documentation
 
