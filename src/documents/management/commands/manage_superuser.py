@@ -3,7 +3,15 @@ import os
 import re
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+from django.forms import EmailField
+from django.core.exceptions import ValidationError
 
+def isEmailAddressValid( email ):
+    try:
+        EmailField().clean(email)
+        return True
+    except ValidationError:
+        return False
 
 logger = logging.getLogger("paperless.management.superuser")
 
@@ -17,6 +25,7 @@ class Command(BaseCommand):
         PAPERLESS_ADMIN_PASSWORD (NODEFAULT)
 
         Logic:
+              Check if email is valid, if not exit
               Check if password is set, if not exit
               Check is admin user exists, if exists exit
                                           else create
@@ -29,7 +38,7 @@ class Command(BaseCommand):
         password = os.getenv('PAPERLESS_ADMIN_PASSWORD')
 
         # Return if email address does not pass basic validation
-        if not re.fullmatch(r"[^@]+@[^@]+", mail):
+        if not isEmailAddressValid(mail):
             self.stdout.write(
                 'Given email address failed '
                 'validation.')
