@@ -24,13 +24,20 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         super().tearDown()
         self.reset_environment()
 
+    def test_no_user(self):
+        call_command("manage_superuser")
+
+        # just the consumer user.
+        self.assertEqual(User.objects.count(), 1)
+        self.assertTrue(User.objects.filter(username="consumer").exists())
+
     def test_some_users(self):
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
         User.objects.create_superuser("someuser", "root@localhost", "password")
 
         call_command("manage_superuser")
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 2)
         with self.assertRaises(User.DoesNotExist):
             User.objects.get_by_natural_key("admin")
 
