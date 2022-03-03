@@ -471,7 +471,7 @@ writing. Windows is not and will never be supported.
 Migrating to Paperless-ngx
 ##########################
 
-Migration is possible from both Paperless-ng or directly from the 'original' Paperless.
+Migration is possible both from Paperless-ng or directly from the 'original' Paperless.
 
 Migrating from Paperless-ng
 ===========================
