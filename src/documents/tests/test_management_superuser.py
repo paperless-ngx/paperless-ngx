@@ -46,7 +46,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         call_command("manage_superuser")
 
-        self.assertEqual(User.objects.count(), 2)
+        self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.filter(username="admin").exists())
 
     def test_no_password(self):
