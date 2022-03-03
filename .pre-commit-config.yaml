@@ -43,6 +43,11 @@ repos:
     rev: "v1.3.0"
     hooks:
       - id: yesqa
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: "v2.2.1"
+    hooks:
+      - id: add-trailing-comma
+        exclude: "(migrations)"
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.9.2
     hooks:
@@ -60,11 +65,7 @@ repos:
     rev: 22.1.0
     hooks:
       - id: black
-  - repo: https://github.com/awebdeveloper/pre-commit-tslint
-    rev: "0.0.2"
-    hooks:
-      - id: tslint
-        additional_dependencies: ["tslint@5.0.0"]
+        exclude: "(migrations)"
   - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
     rev: "v0.1.0"
     hooks:
