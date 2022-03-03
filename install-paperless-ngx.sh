@@ -85,58 +85,7 @@ echo ""
 echo "This script will download, configure and start paperless-ngx."
 
 echo ""
-echo "1. Folder configuration"
-echo "======================="
-echo ""
-echo "The target folder is used to store the configuration files of "
-echo "paperless. You can move this folder around after installing paperless."
-echo "You will need this folder whenever you want to start, stop, update or "
-echo "maintain your paperless instance."
-echo ""
-
-ask "Target folder" "$(pwd)/paperless-ngx"
-TARGET_FOLDER=$ask_result
-
-echo ""
-echo "The consume folder is where paperles will search for new documents."
-echo "Point this to a folder where your scanner is able to put your scanned"
-echo "documents."
-echo ""
-echo "CAUTION: You must specify an absolute path starting with / or a relative "
-echo "path starting with ./ here. Examples:"
-echo "  /mnt/consume"
-echo "  ./consume"
-echo ""
-
-ask_docker_folder "Consume folder" "$TARGET_FOLDER/consume"
-CONSUME_FOLDER=$ask_result
-
-echo ""
-echo "The media folder is where paperless stores your documents."
-echo "Leave empty and docker will manage this folder for you."
-echo "Docker usually stores managed folders in /var/lib/docker/volumes."
-echo ""
-echo "CAUTION: If specified, you must specify an absolute path starting with /"
-echo "or a relative path starting with ./ here."
-echo ""
-
-ask_docker_folder "Media folder" ""
-MEDIA_FOLDER=$ask_result
-
-echo ""
-echo "The data folder is where paperless stores other data, such as your"
-echo "SQLite database (if used), the search index and other data."
-echo "As with the media folder, leave empty to have this managed by docker."
-echo ""
-echo "CAUTION: If specified, you must specify an absolute path starting with /"
-echo "or a relative path starting with ./ here."
-echo ""
-
-ask_docker_folder "Data folder" ""
-DATA_FOLDER=$ask_result
-
-echo ""
-echo "2. Application configuration"
+echo "1. Application configuration"
 echo "============================"
 
 echo ""
@@ -200,6 +149,73 @@ ask "Group ID" "$(id -g)"
 USERMAP_GID=$ask_result
 
 echo ""
+echo "2. Folder configuration"
+echo "======================="
+echo ""
+echo "The target folder is used to store the configuration files of "
+echo "paperless. You can move this folder around after installing paperless."
+echo "You will need this folder whenever you want to start, stop, update or "
+echo "maintain your paperless instance."
+echo ""
+
+ask "Target folder" "$(pwd)/paperless-ngx"
+TARGET_FOLDER=$ask_result
+
+echo ""
+echo "The consume folder is where paperles will search for new documents."
+echo "Point this to a folder where your scanner is able to put your scanned"
+echo "documents."
+echo ""
+echo "CAUTION: You must specify an absolute path starting with / or a relative "
+echo "path starting with ./ here. Examples:"
+echo "  /mnt/consume"
+echo "  ./consume"
+echo ""
+
+ask_docker_folder "Consume folder" "$TARGET_FOLDER/consume"
+CONSUME_FOLDER=$ask_result
+
+echo ""
+echo "The media folder is where paperless stores your documents."
+echo "Leave empty and docker will manage this folder for you."
+echo "Docker usually stores managed folders in /var/lib/docker/volumes."
+echo ""
+echo "CAUTION: If specified, you must specify an absolute path starting with /"
+echo "or a relative path starting with ./ here."
+echo ""
+
+ask_docker_folder "Media folder" ""
+MEDIA_FOLDER=$ask_result
+
+echo ""
+echo "The data folder is where paperless stores other data, such as your"
+if [[ "$DATABASE_BACKEND" == "sqlite" ]] ; then
+	echo -n "SQLite database, the "
+fi
+echo "search index and other data."
+echo "As with the media folder, leave empty to have this managed by docker."
+echo ""
+echo "CAUTION: If specified, you must specify an absolute path starting with /"
+echo "or a relative path starting with ./ here."
+echo ""
+
+ask_docker_folder "Data folder" ""
+DATA_FOLDER=$ask_result
+
+if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
+	echo ""
+	echo "The database folder, where postgres stores its data."
+	echo "Leave empty to have this managed by docker."
+	echo ""
+	echo "CAUTION: If specified, you must specify an absolute path starting with /"
+	echo "or a relative path starting with ./ here."
+	echo ""
+
+	ask_docker_folder "Database folder" ""
+	POSTGRES_FOLDER=$ask_result
+fi
+
+echo ""
 echo "3. Login credentials"
 echo "===================="
 echo ""
@@ -249,6 +265,13 @@ if [[ -z $DATA_FOLDER ]] ; then
 	echo "Data folder: Managed by docker"
 else
 	echo "Data folder: $DATA_FOLDER"
+fi
+if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
+	if [[ -z $POSTGRES_FOLDER ]] ; then
+		echo "Database (postgres) folder: Managed by docker"
+	else
+		echo "Database (postgres) folder: $POSTGRES_FOLDER"
+	fi
 fi
 echo ""
 echo "Port: $PORT"
@@ -310,6 +333,10 @@ fi
 
 if [[ -n $DATA_FOLDER ]] ; then
 	sed -i "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
+fi
+
+if [[ -n $POSTGRES_FOLDER ]] ; then
+	sed -i "s#- pgdata:/var/lib/postgresql/data#- $POSTGRES_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
 fi
 
 docker-compose pull
