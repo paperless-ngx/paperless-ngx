@@ -3,6 +3,7 @@
 # See https://pre-commit.com/hooks.html for a listing of possible hooks
 
 repos:
+  # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
     hooks:
@@ -34,6 +35,7 @@ repos:
           - ts
           - markdown
         exclude: "(^Pipfile\\.lock$)"
+  # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
     rev: v2.7.1
     hooks:
@@ -43,6 +45,7 @@ repos:
     rev: "v1.3.0"
     hooks:
       - id: yesqa
+        exclude: "(migrations)"
   - repo: https://github.com/asottile/add-trailing-comma
     rev: "v2.2.1"
     hooks:
@@ -57,19 +60,21 @@ repos:
         args:
           - --max-line-length=88
           - "--ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203"
-  - repo: https://github.com/lovesegfault/beautysh
-    rev: v6.2.1
-    hooks:
-      - id: beautysh
   - repo: https://github.com/psf/black
     rev: 22.1.0
     hooks:
       - id: black
         exclude: "(migrations)"
+  # Dockerfile hooks
   - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
     rev: "v0.1.0"
     hooks:
       - id: dockerfilelint
+  # Shell script hooks
+  - repo: https://github.com/lovesegfault/beautysh
+    rev: v6.2.1
+    hooks:
+      - id: beautysh
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: "v0.8.0.4"
     hooks:
