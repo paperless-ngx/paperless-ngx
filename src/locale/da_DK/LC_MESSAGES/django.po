@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-03 08:29\n"
+"PO-Revision-Date: 2022-03-03 16:53\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -482,7 +482,7 @@ msgstr "Svensk"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr "Paperless- ngx administration"
+msgstr "Paperless-ngx administration"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
