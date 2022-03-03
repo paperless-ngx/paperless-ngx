@@ -329,15 +329,19 @@ sed -i "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/pap
 
 if [[ -n $MEDIA_FOLDER ]] ; then
 	sed -i "s#- media:/usr/src/paperless/media#- $MEDIA_FOLDER:/usr/src/paperless/media#g" docker-compose.yml
+	sed -i "/^\s*media:/d" docker-compose.yml
 fi
 
 if [[ -n $DATA_FOLDER ]] ; then
 	sed -i "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
+    sed -i "/^\s*data:/d" docker-compose.yml
 fi
 
 if [[ -n $POSTGRES_FOLDER ]] ; then
 	sed -i "s#- pgdata:/var/lib/postgresql/data#- $POSTGRES_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
+    sed -i "/^\s*pgdata:/d" docker-compose.yml
 fi
+
 
 docker-compose pull
 
