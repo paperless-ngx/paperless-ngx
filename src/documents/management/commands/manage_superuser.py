@@ -27,7 +27,7 @@ class Command(BaseCommand):
         Logic:
               Check if email is valid, if not exit
               Check if password is set, if not exit
-              Check is admin user exists, if exists exit
+              Check if user count > 0, if yes exit
                                           else create
     """.replace("    ", "")
 
@@ -51,12 +51,12 @@ class Command(BaseCommand):
                 '"docker-compose.env" file.')
             return
 
-        # Check if user exists already, leave as is if it does
-        if not User.objects.filter(username=username).exists():
+        # Check user count > 0 and exits if users already exist
+        if not User.objects.count() > 0:
             # Create superuser based on env variables
             User.objects.create_superuser(username, mail, password)
             self.stdout.write(
                 f'Created superuser "{username}" with provided password.')
         else:
             self.stdout.write(
-                f'No changes made as user "{username}" already exists')
+                f'No changes made as there are  already users in the database')
