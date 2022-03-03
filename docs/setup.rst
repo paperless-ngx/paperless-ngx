@@ -491,7 +491,8 @@ to
 
   image: ghcr.io/paperless-ngx/paperless-ngx:latest
     
-Then restart your container and that's it! 
+Then make sure you pull the new image (e.g. ``docker-compose pull`` if using compose), restart
+your container and that's it! 
 
 Users who installed with the bare-metal route should
 also update their Git clone to point to ``https://github.com/paperless-ngx/paperless-ngx``.
