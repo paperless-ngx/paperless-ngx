@@ -35,15 +35,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Get info from env
         username = os.getenv('PAPERLESS_ADMIN_USER', 'admin')
-        mail = os.getenv('PAPERLESS_ADMIN_MAIL', 'root@localhost')
+        mail = os.getenv('PAPERLESS_ADMIN_MAIL')
         password = os.getenv('PAPERLESS_ADMIN_PASSWORD')
 
-        # Return if email address does not pass basic validation
+        # if email address is not valid, set default 
         if not isEmailAddressValid(mail):
             self.stdout.write(
                 'Given email address failed '
-                'validation.')
-            return
+                'validation. Setting email to default
+                'root@localhost')
+            mail='root@localhost'
 
         # Return if password is not set
         if not password:
