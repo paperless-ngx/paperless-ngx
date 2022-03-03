@@ -51,7 +51,7 @@ search_index() {
 }
 
 superuser() {
-	if [[ -n "${PAPERLESS_ADMIN_USER}" ]]; then
+	if [[ -n "${PAPERLESS_ADMIN_PASSWORD}" ]]; then
 		python3 manage.py manage_superuser
 	fi
 }

@@ -13,8 +13,6 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestManageSuperUser(DirectoriesMixin, TestCase):
     def reset_environment(self):
-        if "PAPERLESS_ADMIN_USER" in os.environ:
-            del os.environ["PAPERLESS_ADMIN_USER"]
         if "PAPERLESS_ADMIN_PASSWORD" in os.environ:
             del os.environ["PAPERLESS_ADMIN_PASSWORD"]
 
@@ -26,40 +24,26 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         super().tearDown()
         self.reset_environment()
 
-    def test_no_user(self):
-        call_command("manage_superuser")
+    def test_some_users(self):
+        User.objects.create_superuser('someuser', 'root@localhost', '123456')
+        os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
 
-        # just the consumer user.
+        call_command("manage_superuser")
+ 
         self.assertEqual(User.objects.count(), 1)
-        self.assertTrue(User.objects.filter(username="consumer").exists())
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get_by_natural_key("admin")
 
     def test_create(self):
-        os.environ["PAPERLESS_ADMIN_USER"] = "new_user"
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
 
         call_command("manage_superuser")
 
-        user: User = User.objects.get_by_natural_key("new_user")
+        user: User = User.objects.get_by_natural_key("admin")
         self.assertTrue(user.check_password("123456"))
 
-    def test_update(self):
-        os.environ["PAPERLESS_ADMIN_USER"] = "new_user"
-        os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
-
-        call_command("manage_superuser")
-
-        os.environ["PAPERLESS_ADMIN_USER"] = "new_user"
-        os.environ["PAPERLESS_ADMIN_PASSWORD"] = "more_secure_pwd_7645"
-
-        call_command("manage_superuser")
-
-        user: User = User.objects.get_by_natural_key("new_user")
-        self.assertTrue(user.check_password("more_secure_pwd_7645"))
-
     def test_no_password(self):
-        os.environ["PAPERLESS_ADMIN_USER"] = "new_user"
-
         call_command("manage_superuser")
 
         with self.assertRaises(User.DoesNotExist):
-            User.objects.get_by_natural_key("new_user")
+            User.objects.get_by_natural_key("admin")

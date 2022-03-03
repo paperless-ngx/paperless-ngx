@@ -1,5 +1,7 @@
+from asyncore import write
 import logging
 import os
+from sys import stdout
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -11,33 +13,32 @@ logger = logging.getLogger("paperless.management.superuser")
 class Command(BaseCommand):
 
     help = """
-        Creates a Django superuser based on env variables.
+        Creates a Django superuser:
+        User named: admin
+        Email: root@localhost
+        with password based on env variable.
+        In case any user already exists no
+        changes are made
     """.replace(
         "    ", ""
     )
 
     def handle(self, *args, **options):
 
-        username = os.getenv("PAPERLESS_ADMIN_USER")
-        if not username:
-            return
-
-        mail = os.getenv("PAPERLESS_ADMIN_MAIL", "root@localhost")
+        username = 'admin'
+        mail = 'root@localhost'
         password = os.getenv("PAPERLESS_ADMIN_PASSWORD")
 
-        # Check if user exists already, leave as is if it does
-        if User.objects.filter(username=username).exists():
-            user: User = User.objects.get_by_natural_key(username)
-            user.set_password(password)
-            user.save()
-            self.stdout.write(f"Changed password of user {username}.")
+        # Check if any user  exists already, leave as is if it does
+        if User.objects.count() > 0:
+            self.stdout.write('Did not create superuser.')
+            self.stdout.write('The db already contains users')
         elif password:
-            # Create superuser based on env variables
+            # Create superuser with password based on env variable
             User.objects.create_superuser(username, mail, password)
-            self.stdout.write(f'Created superuser "{username}" with provided password.')
+            self.stdout.write(f'Created superuser "{username}"')
+            self.stdout.write('with provided password.')
         else:
-            self.stdout.write(f'Did not create superuser "{username}".')
-            self.stdout.write(
-                'Make sure you specified "PAPERLESS_ADMIN_PASSWORD" in your '
-                '"docker-compose.env" file.'
-            )
+            self.stdout.write('Please check if PAPERLESS_ADMIN_PASSWORD')
+            self.stdout.write('has been set in docker-compose.env')
+        return
