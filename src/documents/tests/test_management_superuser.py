@@ -25,7 +25,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         self.reset_environment()
 
     def test_some_users(self):
-        User.objects.create_superuser('someuser', 'root@localhost', '123456')
+        User.objects.create_superuser("someuser", "root@localhost", "123456")
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
 
         call_command("manage_superuser")

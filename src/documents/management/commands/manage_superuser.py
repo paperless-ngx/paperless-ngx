@@ -25,20 +25,21 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        username = 'admin'
-        mail = 'root@localhost'
+        username = "admin"
+        mail = "root@localhost"
         password = os.getenv("PAPERLESS_ADMIN_PASSWORD")
 
         # Check if any user  exists already, leave as is if it does
         if User.objects.count() > 0:
-            self.stdout.write('Did not create superuser.')
-            self.stdout.write('The db already contains users')
+            self.stdout.write("Did not create superuser.")
+            self.stdout.write("The db already contains users")
         elif password:
             # Create superuser with password based on env variable
             User.objects.create_superuser(username, mail, password)
             self.stdout.write(f'Created superuser "{username}"')
-            self.stdout.write('with provided password.')
+            self.stdout.write("with provided password.")
         else:
-            self.stdout.write('Please check if PAPERLESS_ADMIN_PASSWORD')
-            self.stdout.write('has been set in docker-compose.env')
+            self.stdout.write("Please check if PAPERLESS_ADMIN_PASSWORD")
+            self.stdout.write("has been set in docker-compose.env")
+
         return
