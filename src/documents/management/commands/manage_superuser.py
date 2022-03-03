@@ -33,11 +33,13 @@ class Command(BaseCommand):
         if User.objects.count() > 0:
             self.stdout.write("Did not create superuser.")
             self.stdout.write("The db already contains users")
+            return
         elif password:
             # Create superuser with password based on env variable
             User.objects.create_superuser(username, mail, password)
             self.stdout.write(f'Created superuser "{username}"')
             self.stdout.write("with provided password.")
+            return
         else:
             self.stdout.write("Please check if PAPERLESS_ADMIN_PASSWORD")
             self.stdout.write("has been set in docker-compose.env")
