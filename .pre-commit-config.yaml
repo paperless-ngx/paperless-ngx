@@ -64,7 +64,6 @@ repos:
     rev: 22.1.0
     hooks:
       - id: black
-        exclude: "(migrations)"
   # Dockerfile hooks
   - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
     rev: "v0.1.0"
