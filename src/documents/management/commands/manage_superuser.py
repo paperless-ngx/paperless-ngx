@@ -6,14 +6,15 @@ from django.core.management.base import BaseCommand, CommandError
 from django.forms import EmailField
 from django.core.exceptions import ValidationError
 
-def isEmailAddressValid( email ):
+logger = logging.getLogger("paperless.management.superuser")
+
+
+def isEmailAddressValid(email):
     try:
         EmailField().clean(email)
         return True
     except ValidationError:
         return False
-
-logger = logging.getLogger("paperless.management.superuser")
 
 
 class Command(BaseCommand):
