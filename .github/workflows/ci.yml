@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - ngx-*
+      - beta-*
     branches-ignore:
       - 'translations**'
   pull_request:
@@ -278,7 +279,7 @@ jobs:
   publish-release:
     runs-on: ubuntu-latest
     needs: build-release
-    if: contains(github.ref, 'refs/tags/ngx-')
+    if: contains(github.ref, 'refs/tags/ngx-') || contains(github.ref, 'refs/tags/beta-')
     steps:
       -
         name: Download release artifact
@@ -290,7 +291,13 @@ jobs:
         name: Get version
         id: get_version
         run: |
-          echo ::set-output name=version::${GITHUB_REF#refs/tags/ngx-}
+          if [[ $GITHUB_REF == refs/tags/ngx-* ]]; then
+            echo ::set-output name=version::${GITHUB_REF#refs/tags/ngx-}
+            echo ::set-output name=prerelease::false
+          elif [[ $GITHUB_REF == refs/tags/beta-* ]]; then
+            echo ::set-output name=version::${GITHUB_REF#refs/tags/beta-}
+            echo ::set-output name=prerelease::true
+          fi
       -
         name: Create release
         id: create_release
@@ -301,7 +308,7 @@ jobs:
           tag_name: ngx-${{ steps.get_version.outputs.version }}
           release_name: Paperless-ngx ${{ steps.get_version.outputs.version }}
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.get_version.outputs.prerelease }}
           body: |
             For a complete list of changes, see the changelog at https://paperless-ngx.readthedocs.io/en/latest/changelog.html.
       -
