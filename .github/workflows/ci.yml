@@ -143,6 +143,71 @@ jobs:
           cd src/
           coveralls --service=github
 
+  # build and push image to docker hub.
+  build-docker-image:
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-'))
+    runs-on: ubuntu-latest
+    needs: [tests, codeformatting, codestyle]
+    steps:
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}
+          if [[ $GITHUB_REF == refs/tags/ngx-* ]]; then
+            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/tags/ngx-},${IMAGE_NAME}:latest
+            INSPECT_TAG=${IMAGE_NAME}:latest
+          elif [[ $GITHUB_REF == refs/heads/* ]]; then
+            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/heads/}
+            INSPECT_TAG=${TAGS}
+          else
+            exit 1
+          fi
+          echo ::set-output name=tags::${TAGS}
+          echo ::set-output name=inspect_tag::${INSPECT_TAG}
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Login to Github Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          push: true
+          tags: ${{ steps.prepare.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      -
+        name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ steps.prepare.outputs.inspect_tag }}
+      -
+        name: Export frontend artifact from docker
+        run: |
+          docker run -d --name frontend-extract ${{ steps.prepare.outputs.tags }}
+          docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
+      -
+        name: Upload frontend artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
+
   build-release:
     needs: [build-docker-image, documentation, tests, codeformatting, codestyle]
     runs-on: ubuntu-20.04
@@ -250,68 +315,3 @@ jobs:
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
-
-  # build and push image to docker hub.
-  build-docker-image:
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-'))
-    runs-on: ubuntu-latest
-    needs: [tests, codeformatting, codestyle]
-    steps:
-      -
-        name: Prepare
-        id: prepare
-        run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}
-          if [[ $GITHUB_REF == refs/tags/ngx-* ]]; then
-            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/tags/ngx-},${IMAGE_NAME}:latest
-            INSPECT_TAG=${IMAGE_NAME}:latest
-          elif [[ $GITHUB_REF == refs/heads/* ]]; then
-            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/heads/}
-            INSPECT_TAG=${TAGS}
-          else
-            exit 1
-          fi
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=inspect_tag::${INSPECT_TAG}
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Login to Github Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
-          push: true
-          tags: ${{ steps.prepare.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      -
-        name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ steps.prepare.outputs.inspect_tag }}
-      -
-        name: Export frontend artifact from docker
-        run: |
-          docker run -d --name frontend-extract ${{ steps.prepare.outputs.tags }}
-          docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
-      -
-        name: Upload frontend artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: frontend-compiled
-          path: src/documents/static/frontend/
