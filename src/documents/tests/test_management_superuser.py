@@ -24,15 +24,25 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         super().tearDown()
         self.reset_environment()
 
+    def test_no_user(self):
+        call_command("manage_superuser")
+
+        # just the consumer user which is created
+        # during migration
+        self.assertEqual(User.objects.count(), 1)
+        self.assertTrue(User.objects.filter(username="consumer").exists())
+
     def test_create(self):
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
 
         call_command("manage_superuser")
 
-        self.assertEqual(User.objects.count(), 1)
+        # count is 2 as there's the consumer
+        # user already created during migration
+        self.assertEqual(User.objects.count(), 2)
         self.assertTrue(User.objects.filter(username="admin").exists())
 
-    def test_some_users(self):
+    def test_some_superuser_exists(self):
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
         User.objects.create_superuser("someuser", "root@localhost", "password")
 
@@ -41,6 +51,16 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         self.assertEqual(User.objects.count(), 2)
         with self.assertRaises(User.DoesNotExist):
             User.objects.get_by_natural_key("admin")
+
+    def test_admin_superuser_exists(self):
+        os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
+        User.objects.create_superuser("admin", "root@localhost", "password")
+
+        call_command("manage_superuser")
+
+        self.assertEqual(User.objects.count(), 2)
+        user: User = User.objects.get_by_natural_key("admin")
+        self.assertTrue(user.check_password("password"))
 
     def test_no_password(self):
         call_command("manage_superuser")
