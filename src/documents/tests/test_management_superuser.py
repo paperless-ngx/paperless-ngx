@@ -41,6 +41,7 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         # user already created during migration
         self.assertEqual(User.objects.count(), 2)
         self.assertTrue(User.objects.filter(username="admin").exists())
+        self.assertTrue(User.objects.filter(username="admin").is_superuser())
 
     def test_some_superuser_exists(self):
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
@@ -61,6 +62,17 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
         self.assertEqual(User.objects.count(), 2)
         user: User = User.objects.get_by_natural_key("admin")
         self.assertTrue(user.check_password("password"))
+
+    def test_admin_user_exists(self):
+        os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
+        User.objects.create_user("admin", "root@localhost", "password")
+
+        call_command("manage_superuser")
+
+        self.assertEqual(User.objects.count(), 2)
+        user: User = User.objects.get_by_natural_key("admin")
+        self.assertTrue(user.check_password("password"))
+        self.assertFalse(user.is_superuser())
 
     def test_no_password(self):
         call_command("manage_superuser")
