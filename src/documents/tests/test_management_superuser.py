@@ -39,9 +39,9 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
 
         # count is 2 as there's the consumer
         # user already created during migration
+        user: User = User.objects.get_by_natural_key("admin")
         self.assertEqual(User.objects.count(), 2)
-        self.assertTrue(User.objects.filter(username="admin").exists())
-        self.assertTrue(User.objects.filter(username="admin").is_superuser)
+        self.assertTrue(user.is_superuser)
 
     def test_some_superuser_exists(self):
         os.environ["PAPERLESS_ADMIN_PASSWORD"] = "123456"
