@@ -29,10 +29,11 @@ class Command(BaseCommand):
         mail = "root@localhost"
         password = os.getenv("PAPERLESS_ADMIN_PASSWORD")
 
-        # Check if any user  exists already, leave as is if it does
-        if User.objects.count() > 0:
+        # Check if any superuseruser
+        # exists already, leave as is if it does
+        if User.objects.filter(is_superuser=True).count() > 0:
             self.stdout.write("Did not create superuser.")
-            self.stdout.write("The db already contains users")
+            self.stdout.write("The db already contains superusers")
             return
 
         if password:
