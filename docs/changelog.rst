@@ -48,6 +48,8 @@ Another big thanks to the people who have contributed translations:
 * David Morais Ferreira (DavidMoraisFerreira) voted for 10 translations in Portuguese and Luxembourgish.
 * David Morais Ferreira (DavidMoraisFerreira) suggested 88 translations into French, German, Portuguese, Portuguese, Brazilian and Luxembourgish.
 * 汪泠沣 (wlfcss) suggested 13 translations into Chinese Traditional.
+* Lars Sørensen (Lrss) suggested 167 translations into Danish.
+* Philmo67 suggested 11 translations into French.
 
 paperless-ng 1.5.0
 ##################
