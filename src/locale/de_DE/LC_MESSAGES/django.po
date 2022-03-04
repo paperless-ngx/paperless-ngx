@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-02 22:29\n"
+"PO-Revision-Date: 2022-03-04 23:16\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -378,11 +378,11 @@ msgstr "Dateityp %(type)s nicht unterstützt"
 
 #: documents/templates/index.html:22
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx wird geladen..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx abgemeldet"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
@@ -394,7 +394,7 @@ msgstr "Erneut anmelden"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx Anmeldung"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
@@ -422,11 +422,11 @@ msgstr "Englisch (US)"
 
 #: paperless/settings.py:300
 msgid "Czech"
-msgstr ""
+msgstr "Tschechisch"
 
 #: paperless/settings.py:301
 msgid "Danish"
-msgstr ""
+msgstr "Dänisch"
 
 #: paperless/settings.py:302
 msgid "German"
@@ -450,7 +450,7 @@ msgstr "Italienisch"
 
 #: paperless/settings.py:307
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgisch"
 
 #: paperless/settings.py:308
 msgid "Dutch"
@@ -482,7 +482,7 @@ msgstr "Schwedisch"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx Administration"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
