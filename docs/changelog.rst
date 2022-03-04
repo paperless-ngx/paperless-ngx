@@ -23,6 +23,7 @@ Version 1.6.0 merges several pending PRs from jonaswinkler's repo and includes n
 * `@shamoon`_ added 'any' / 'all' and 'not' filtering with tags (#10).
 * `@shamoon`_ added warnings for unsaved changes, with smart edit buttons (#13).
 * `@benjaminfrank`_ enabled a non-root access to port 80 via systemd (#18).
+* `@tribut`_ added simple "delete to trash" functionality (#24). See ``PAPERLESS_TRASH_DIR``.
 * `@amenk`_ fixed the search box overlay menu on mobile (#32).
 * `@dblitt`_ updated the login form to not auto-capitalize usernames (#36).
 * `@evilsidekick293`_ made the worker timeout configurable (#37). See ``PAPERLESS_WORKER_TIMEOUT``.
