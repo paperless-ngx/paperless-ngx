@@ -342,6 +342,15 @@ if [[ -n $POSTGRES_FOLDER ]] ; then
     sed -i "/^\s*pgdata:/d" docker-compose.yml
 fi
 
+# remove trailing blank lines from end of file
+sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' docker-compose.yml
+# if last line in file contains "volumes:", remove that line since no more named volumes are left
+l1=$(grep -n '^volumes:' docker-compose.yml | cut -d : -f 1)  # get line number containing volume: at begin of line
+l2=$(wc -l < docker-compose.yml)  # get total number of lines
+if [ "$l1" -eq "$l2" ] ; then
+    sed -i "/^volumes:/d" docker-compose.yml
+fi
+
 
 docker-compose pull
 
