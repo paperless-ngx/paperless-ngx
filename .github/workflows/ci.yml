@@ -297,9 +297,11 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/ngx-* ]]; then
             echo ::set-output name=version::${GITHUB_REF#refs/tags/ngx-}
             echo ::set-output name=prerelease::false
+            echo ::set-output name=body::"For a complete list of changes, see the changelog at https://paperless-ngx.readthedocs.io/en/latest/changelog.html"
           elif [[ $GITHUB_REF == refs/tags/beta-* ]]; then
             echo ::set-output name=version::${GITHUB_REF#refs/tags/beta-}
             echo ::set-output name=prerelease::true
+            echo ::set-output name=body::"For a complete list of changes, see the changelog at https://github.com/paperless-ngx/paperless-ngx/blob/beta/docs/changelog.rst"
           fi
       -
         name: Create release
@@ -312,8 +314,7 @@ jobs:
           release_name: Paperless-ngx ${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: ${{ steps.get_version.outputs.prerelease }}
-          body: |
-            For a complete list of changes, see the changelog at https://paperless-ngx.readthedocs.io/en/latest/changelog.html.
+          body: ${{ steps.get_version.outputs.body }}
       -
         name: Upload release archive
         id: upload-release-asset
