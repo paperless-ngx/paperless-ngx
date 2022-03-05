@@ -511,7 +511,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Bonjour <x id="PH" equiv-text="this.displayName"/>, bienvenue sur Paperless-ngx!</target>
+        <target state="translated">Bonjour <x id="PH" equiv-text="this.displayName"/>, bienvenue dans Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="795745990148149834" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
@@ -519,7 +519,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="translated">Bienvenue sur Paperless-ngx!</target>
+        <target state="translated">Bienvenue dans Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html" approved="yes">
         <source>Show all</source>
