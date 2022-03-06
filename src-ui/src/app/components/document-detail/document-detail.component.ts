@@ -94,10 +94,11 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     private toastService: ToastService,
     private settings: SettingsService) {
       this.titleSubject.pipe(
-        debounceTime(200),
+        debounceTime(1000),
         distinctUntilChanged(),
         takeUntil(this.unsubscribeNotifier)
       ).subscribe(titleValue => {
+        this.title = titleValue
         this.documentForm.patchValue({'title': titleValue})
       })
     }
@@ -146,7 +147,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
         correspondent: doc.correspondent,
         document_type: doc.document_type,
         archive_serial_number: doc.archive_serial_number,
-        tags: doc.tags
+        tags: [...doc.tags]
       })
 
       this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
