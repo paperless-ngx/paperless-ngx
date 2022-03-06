@@ -146,7 +146,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
         correspondent: doc.correspondent,
         document_type: doc.document_type,
         archive_serial_number: doc.archive_serial_number,
-        tags: doc.tags
+        tags: [...doc.tags]
       })
 
       this.isDirty$ = dirtyCheck(this.documentForm, this.store.asObservable())
