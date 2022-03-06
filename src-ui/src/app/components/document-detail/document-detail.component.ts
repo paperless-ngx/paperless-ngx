@@ -94,10 +94,11 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     private toastService: ToastService,
     private settings: SettingsService) {
       this.titleSubject.pipe(
-        debounceTime(200),
+        debounceTime(1000),
         distinctUntilChanged(),
         takeUntil(this.unsubscribeNotifier)
       ).subscribe(titleValue => {
+        this.title = titleValue
         this.documentForm.patchValue({'title': titleValue})
       })
     }
