@@ -27,7 +27,8 @@ Please format and test your code! I know it's a hassle, but it makes sure that y
 
 To test your code, execute `pytest` in the src/ directory. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
 
-Before you can run `pytest`, ensure to install `pytest-xdist` and `pytest-cov` by running `pip3 install pytest-xdist pytest-cov`.
+Before you can run `pytest`, ensure to run `pipenv install`
+and `pipenv install --dev` so all python dependencies are installed.
 
 ## More info:
 
