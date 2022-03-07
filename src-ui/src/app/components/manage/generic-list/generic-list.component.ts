@@ -125,4 +125,8 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
   set nameFilter(nameFilter: string) {
     this.nameFilterDebounce.next(nameFilter)
   }
+  
+  onNameFilterKeyUp(event: KeyboardEvent) {
+    if (event.code == 'Escape') this.nameFilterDebounce.next(null)
+  }
 }
