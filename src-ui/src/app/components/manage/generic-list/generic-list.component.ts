@@ -61,6 +61,7 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
       distinctUntilChanged()
     ).subscribe(title => {
       this._nameFilter = title
+      this.page = 1
       this.reloadData()
     })
   }
