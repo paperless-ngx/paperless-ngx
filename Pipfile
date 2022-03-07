@@ -21,7 +21,6 @@ fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
-numpy = "~=1.22.0"
 pathvalidate = "*"
 pillow = "~=9.0"
 pikepdf = "~=5.0"
@@ -46,11 +45,7 @@ channels = "~=3.0"
 channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
-# uvloop 0.15+ incompatible with python 3.6
-uvloop = "~=0.16"
-cryptography = "~=36.0.1"
 "pdfminer.six" = "*"
-"backports.zoneinfo" = "*"
 
 [dev-packages]
 coveralls = "*"
