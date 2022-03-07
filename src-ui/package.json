@@ -12,14 +12,14 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "~13.2.4",
-    "@angular/common": "~13.2.4",
+    "@angular/common": "~13.2.5",
     "@angular/compiler": "~13.2.4",
     "@angular/core": "~13.2.4",
-    "@angular/forms": "~13.2.4",
+    "@angular/forms": "~13.2.5",
     "@angular/localize": "~13.2.4",
-    "@angular/platform-browser": "~13.2.4",
+    "@angular/platform-browser": "~13.2.5",
     "@angular/platform-browser-dynamic": "~13.2.4",
-    "@angular/router": "~13.2.4",
+    "@angular/router": "~13.2.5",
     "@ng-bootstrap/ng-bootstrap": "^12.0.0",
     "@ng-select/ng-select": "^8.1.1",
     "@ngneat/dirty-check-forms": "^1.1.0",
@@ -52,7 +52,7 @@
     "karma-jasmine": "~4.0.1",
     "karma-jasmine-html-reporter": "^1.7.0",
     "protractor": "~7.0.0",
-    "ts-node": "~10.5.0",
+    "ts-node": "~10.7.0",
     "tslint": "~6.1.3",
     "typescript": "~4.5.5"
   }
