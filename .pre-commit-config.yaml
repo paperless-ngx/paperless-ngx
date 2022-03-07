@@ -58,7 +58,7 @@ repos:
         files: ^src/
         exclude: "(migrations)|(paperless/settings.py)|(.*\\.tox)|(.*/tests/.*)"
         args:
-          - --max-line-length=88
+          - "--max-line-length=88"
           - "--ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203"
   - repo: https://github.com/psf/black
     rev: 22.1.0
@@ -74,6 +74,8 @@ repos:
     rev: v6.2.1
     hooks:
       - id: beautysh
+        args:
+          - "--tab"
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: "v0.8.0.4"
     hooks:
