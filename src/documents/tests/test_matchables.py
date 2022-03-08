@@ -162,7 +162,7 @@ class TestMatching(TestCase):
     def test_match_regex(self):
 
         self._test_matching(
-            "alpha\w+gamma",
+            r"alpha\w+gamma",
             "MATCH_REGEX",
             (
                 "I have alpha_and_gamma in me",
@@ -181,7 +181,7 @@ class TestMatching(TestCase):
         )
 
     def test_tach_invalid_regex(self):
-        self._test_matching("[[", "MATCH_REGEX", [], ["Don't match this"])
+        self._test_matching("[", "MATCH_REGEX", [], ["Don't match this"])
 
     def test_match_fuzzy(self):
 

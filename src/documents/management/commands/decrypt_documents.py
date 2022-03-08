@@ -59,8 +59,10 @@ class Command(BaseCommand):
 
             old_paths = [document.source_path, document.thumbnail_path]
 
-            raw_document = GnuPG.decrypted(document.source_file, passphrase)
-            raw_thumb = GnuPG.decrypted(document.thumbnail_file, passphrase)
+            with document.source_file as file_handle:
+                raw_document = GnuPG.decrypted(file_handle, passphrase)
+            with document.thumbnail_file as file_handle:
+                raw_thumb = GnuPG.decrypted(file_handle, passphrase)
 
             document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
