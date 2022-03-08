@@ -1,8 +1,11 @@
+// bs options
+$enable-negative-margins: true;
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "~@ng-select/ng-select/themes/default.theme.css";
 @import "theme";
 @import "theme_dark";
 @import "print";
-@import "node_modules/bootstrap/scss/bootstrap";
-@import "~@ng-select/ng-select/themes/default.theme.css";
 
 .toolbaricon {
   width: 1.2em;
@@ -114,7 +117,7 @@ body {
 }
 
 .ngx-file-drop__drop-zone--over {
-  background-color: $primaryFaded !important;
+  background-color: var(--ngx-primary-faded) !important;
 }
 
 // Bootstrap 5 tweaks
@@ -130,6 +133,6 @@ a.badge {
 }
 
 .btn-outline-primary:not(:disabled):not(.disabled).active,.btn-outline-primary:not(:disabled):not(.disabled):active,.show>.btn-outline-primary.dropdown-toggle {
-    background-color: $paperless-green;
-    border-color: $paperless-green;
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
 }
