@@ -10,6 +10,7 @@ from unittest import mock
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.test import override_settings
 from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
@@ -567,11 +568,15 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         d3.tags.add(t)
         d3.tags.add(t2)
         d4 = Document.objects.create(
-            checksum="4", created=datetime.datetime(2020, 7, 13), content="test"
+            checksum="4",
+            created=timezone.datetime(2020, 7, 13),
+            content="test",
         )
         d4.tags.add(t2)
         d5 = Document.objects.create(
-            checksum="5", added=datetime.datetime(2020, 7, 13), content="test"
+            checksum="5",
+            added=timezone.datetime(2020, 7, 13),
+            content="test",
         )
         d6 = Document.objects.create(checksum="6", content="test2")
 
