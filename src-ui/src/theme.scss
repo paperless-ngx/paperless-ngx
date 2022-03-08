@@ -8,8 +8,7 @@
   --ngx-primary-lighten-10: hsl(var(--ngx-green), calc(var(--l) + 10%));
   --ngx-primary-lighten-30: hsl(var(--ngx-green), calc(var(--l) + 30%));
   --ngx-primary-darken-10: hsl(var(--ngx-green), calc(var(--l) - 10%));
-  --ngx-primary-darken-15: hsl(var(--ngx-green), calc(var(--l) - 15%));
-  --ngx-primary-darken-25: hsl(var(--ngx-green), calc(var(--l) - 25%));
+  --ngx-primary-darken-20: hsl(var(--ngx-green), calc(var(--l) - 20%));
 }
 
 svg.logo {
@@ -37,15 +36,15 @@ svg.logo {
   background-color: var(--bs-primary);
   border-color: var(--bs-primary);
 
+  &:hover, &:focus {
+    background-color: var(--ngx-primary-darken-10);
+    border-color: var(--ngx-primary-darken-10);
+  }
+
   &:disabled, &.disabled {
     background-color: var(--ngx-primary-darken-10) !important;
     border-color: var(--ngx-primary-darken-10) !important;
   }
-}
-
-.btn-primary:hover {
-  background-color: var(--ngx-primary-darken-10);
-  border-color: var(--ngx-primary-darken-10);
 }
 
 .btn-outline-primary {
@@ -58,10 +57,16 @@ svg.logo {
   }
 }
 
+.btn-outline-secondary {
+  color: var(--bs-secondary);
+}
+
 .btn:focus,
 .dropdown-item:focus,
 .btn-check:focus + .btn,
-.form-control:focus {
+.form-control:focus,
+.form-check-input:focus,
+.form-check-radio:focus {
   box-shadow: 0 0 0 0.25rem hsla(var(--ngx-green), var(--l), 0.7);
 }
 
@@ -91,7 +96,7 @@ textarea,
   border-color: var(--bs-border-color);
 
   &:focus {
-    background-color: var(--ngx-bg-color-darker);
+    background-color: var(--ngx-bg-darker);
     color: var(--bs-body-color) !important;
   }
 }
@@ -118,7 +123,7 @@ textarea,
 }
 
 .page-item.disabled .page-link {
-  background-color: var(--ngx-primary-darken-15);
+  background-color: var(--ngx-bg-darker);
 }
 
 .nav-tabs {
@@ -203,11 +208,38 @@ table.table {
 }
 
 .ngx-file-drop__drop-zone--over {
-  background-color: var(--ngx-primary-darken-25)
+  background-color: var(--ngx-primary-darken-20)
 }
 
 .ngb-dp-header,
 .ngb-dp-weekdays,
 .ngb-dp-month {
   background-color: var(--bs-body-bg);
+}
+
+.popover {
+  .popover-header,
+  .popover-body {
+    background-color: var(--ngx-bg-alt);
+    border-color: var(--bs-border-color);
+  }
+}
+
+// fix popover carat colors
+.bs-popover-start > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="left"] {
+  border-left-color: var(--ngx-bg-alt);
+}
+.bs-popover-end > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="right"] {
+  border-right-color: var(--ngx-bg-alt);
+}
+.bs-popover-top > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="top"] {
+  border-top-color: var(--ngx-bg-alt);
+}
+.bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="bottom"] {
+  border-bottom-color: var(--ngx-bg-alt);
+}
+
+.bs-popover-bottom .popover-header::before,
+.bs-popover-auto[x-placement^=bottom] .popover-header::before {
+  border-bottom-color: var(--ngx-bg-alt);
 }
