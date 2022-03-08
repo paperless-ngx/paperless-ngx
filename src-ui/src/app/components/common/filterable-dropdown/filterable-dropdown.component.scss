@@ -42,7 +42,7 @@
   filter: brightness(0.5);
 
   &.active {
-    background-color: lighten($primary, 30%);
+    background-color: var(--ngx-primary-lighten-30);
   }
 }
 
