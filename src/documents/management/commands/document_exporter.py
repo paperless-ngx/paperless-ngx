@@ -199,19 +199,22 @@ class Command(BaseCommand):
 
                 os.makedirs(os.path.dirname(original_target), exist_ok=True)
                 with open(original_target, "wb") as f:
-                    f.write(GnuPG.decrypted(document.source_file))
-                    os.utime(original_target, times=(t, t))
+                    with document.source_file as out_file:
+                        f.write(GnuPG.decrypted(out_file))
+                        os.utime(original_target, times=(t, t))
 
                 os.makedirs(os.path.dirname(thumbnail_target), exist_ok=True)
                 with open(thumbnail_target, "wb") as f:
-                    f.write(GnuPG.decrypted(document.thumbnail_file))
-                    os.utime(thumbnail_target, times=(t, t))
+                    with document.thumbnail_file as out_file:
+                        f.write(GnuPG.decrypted(out_file))
+                        os.utime(thumbnail_target, times=(t, t))
 
                 if archive_target:
                     os.makedirs(os.path.dirname(archive_target), exist_ok=True)
                     with open(archive_target, "wb") as f:
-                        f.write(GnuPG.decrypted(document.archive_path))
-                        os.utime(archive_target, times=(t, t))
+                        with document.archive_path as out_file:
+                            f.write(GnuPG.decrypted(out_file))
+                            os.utime(archive_target, times=(t, t))
             else:
                 self.check_and_copy(
                     document.source_path, document.checksum, original_target
