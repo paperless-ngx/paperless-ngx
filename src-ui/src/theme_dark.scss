@@ -36,7 +36,7 @@ $border-color-dark-mode: #47494f;
   .navbar-brand {
     color: var(--bs-body-color);
   }
-
+  
   .border {
     border-color: var(--bs-border-color) !important;
   }
@@ -53,7 +53,7 @@ $border-color-dark-mode: #47494f;
     border-bottom: 1px solid var(--bs-border-color) !important;
   }
 
-  .text-dark {
+  .text-dark, .text-light {
     color: var(--bs-body-color) !important;
   }
 
