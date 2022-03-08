@@ -62,12 +62,23 @@ svg.logo {
 }
 
 .btn:focus,
+.btn:active:focus,
 .dropdown-item:focus,
 .btn-check:focus + .btn,
 .form-control:focus,
 .form-check-input:focus,
 .form-check-radio:focus {
   box-shadow: 0 0 0 0.25rem hsla(var(--ngx-green), var(--l), 0.7);
+}
+
+.nav-link:focus-visible, .nav-item a:focus-visible {
+  outline: none;
+  background-color: var(--ngx-bg-darker);
+}
+
+a.navbar-brand:focus-visible {
+  outline: none;
+  color: var(--ngx-primary-darken-10);
 }
 
 .dropdown.show {
@@ -136,6 +147,14 @@ textarea,
       border-color: var(--bs-border-color);
       background-color: var(--bs-body-bg);
       color: var(--bs-body-color);
+      border-bottom: 1px solid transparent;
+    }
+
+    &:focus {
+      border-color: var(--bs-border-color);
+    }
+
+    &.active:focus {
       border-bottom: 1px solid transparent;
     }
   }
