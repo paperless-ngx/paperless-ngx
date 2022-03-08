@@ -5,7 +5,8 @@ $danger-dark-mode: #b71631;
 $danger-dark-mode-rgb: 183, 22, 49;
 $bg-dark-mode: #161618;
 $bg-dark-mode-rgb: 22, 22, 24;
-$bg-dark-mode-accent: #21262d;
+$bg-dark-mode-accent: #0a0b0e;
+$bg-dark-mode-alt: #242529;
 $bg-light-dark-mode: #1c1c1f;
 $bg-light-dark-mode-rgb: 28, 28, 31;
 $text-color-dark-mode: #abb2bf;
@@ -26,7 +27,8 @@ $border-color-dark-mode: #47494f;
   --bs-light: #{$bg-light-dark-mode};
   --bs-light-rgb: #{$bg-light-dark-mode-rgb};
   --bs-border-color: #{$border-color-dark-mode};
-  --ngx-bg-color-darker: #{$bg-dark-mode-accent};
+  --ngx-bg-darker: #{$bg-dark-mode-accent};
+  --ngx-bg-alt: #{$bg-dark-mode-alt};
 
   .navbar.bg-primary{
     --bs-primary: hsl(var(--ngx-green),var(--l));
@@ -55,6 +57,10 @@ $border-color-dark-mode: #47494f;
 
   .text-dark, .text-light {
     color: var(--bs-body-color) !important;
+  }
+
+  .btn-outline-secondary:hover {
+    background-color: var(--ngx-bg-darker);
   }
 
   .card {
@@ -126,33 +132,6 @@ $border-color-dark-mode: #47494f;
 
   .modal .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
-  }
-
-  .popover {
-    .popover-header,
-    .popover-body {
-      background-color: $bg-dark-mode-accent;
-      border-color: $border-color-dark-mode;
-    }
-  }
-
-  // fix popover carat colors
-  .bs-popover-start > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="left"] {
-    border-left-color: $bg-dark-mode-accent;
-  }
-  .bs-popover-end > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="right"] {
-    border-right-color: $bg-dark-mode-accent;
-  }
-  .bs-popover-top > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="top"] {
-    border-top-color: $bg-dark-mode-accent;
-  }
-  .bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="bottom"] {
-    border-bottom-color: $bg-dark-mode-accent;
-  }
-
-  .bs-popover-bottom .popover-header::before,
-  .bs-popover-auto[x-placement^=bottom] .popover-header::before {
-    border-bottom-color: $bg-dark-mode-accent;
   }
 }
 
