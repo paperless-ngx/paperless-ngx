@@ -1,10 +1,9 @@
 :root {
   // base color e.g. #17541f = hsl(128, 57%, 21%)
   --ngx-green: 128, 57%;
-  --l:21%;
+  --l: 21%;
 
-  --bs-primary: hsl(var(--ngx-green),var(--l));
-  --bs-primary-rgb: rgba(hsl(var(--ngx-green), var(--l)));
+  --bs-primary: hsl(var(--ngx-green), var(--l));
   --ngx-primary-faded: #d1ddd2;
   --ngx-primary-lighten-10: hsl(var(--ngx-green), calc(var(--l) + 10%));
   --ngx-primary-lighten-30: hsl(var(--ngx-green), calc(var(--l) + 30%));
@@ -57,6 +56,13 @@ svg.logo {
     background-color: var(--bs-primary) !important;
     color: var(--bs-body-color) !important;
   }
+}
+
+.btn:focus,
+.dropdown-item:focus,
+.btn-check:focus + .btn,
+.form-control:focus {
+  box-shadow: 0 0 0 0.25rem hsla(var(--ngx-green), var(--l), 0.7);
 }
 
 .dropdown.show {
@@ -154,7 +160,7 @@ textarea,
   background-color: var(--bs-body-bg);
   border-color: var(--bs-border-color);
 
-  &:hover {
+  &:hover, &:focus {
     background-color: var(--bs-body-bg);
   }
 }
@@ -172,6 +178,10 @@ textarea,
     &:hover {
       background-color: var(--bs-body-bg);
       color: var(--bs-body-color);
+    }
+
+    &.active {
+      background-color: var(--bs-primary);
     }
   }
 }
@@ -194,4 +204,10 @@ table.table {
 
 .ngx-file-drop__drop-zone--over {
   background-color: var(--ngx-primary-darken-25)
+}
+
+.ngb-dp-header,
+.ngb-dp-weekdays,
+.ngb-dp-month {
+  background-color: var(--bs-body-bg);
 }
