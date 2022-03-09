@@ -8,7 +8,8 @@
   --ngx-primary-lighten-10: hsl(var(--ngx-green), calc(var(--l) + 10%));
   --ngx-primary-lighten-30: hsl(var(--ngx-green), calc(var(--l) + 30%));
   --ngx-primary-darken-10: hsl(var(--ngx-green), calc(var(--l) - 10%));
-  --ngx-primary-darken-20: hsl(var(--ngx-green), calc(var(--l) - 20%));
+  --ngx-primary-darken-15: hsl(var(--ngx-green), calc(var(--l) - 15%));
+  --ngx-primary-darken-18: hsl(var(--ngx-green), calc(var(--l) - 18%));
 }
 
 svg.logo {
@@ -227,7 +228,27 @@ table.table {
 }
 
 .ngx-file-drop__drop-zone--over {
-  background-color: var(--ngx-primary-darken-20)
+  background-color: var(--ngx-primary-darken-15) !important;
+}
+
+.alert-danger {
+  color: var(--bs-body-color);
+  background-color: var(--bs-danger);
+  border-color: var(--bs-danger);
+}
+
+.alert-secondary {
+  background-color: var(--ngx-primary-darken-18);
+  border-color: var(--ngx-primary-darken-15);
+  color: var(--bs-body-color);
+}
+
+.toast {
+  background-color: hsla(var(--ngx-green), calc(var(--l) - 18%), 0.9);
+}
+
+.toast-header {
+  background-color: hsla(var(--ngx-green), calc(var(--l) - 10%), 0.9);
 }
 
 .ngb-dp-header,
