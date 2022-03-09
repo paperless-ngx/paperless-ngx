@@ -155,7 +155,7 @@ textarea,
       border-color: var(--bs-border-color);
     }
 
-    &.active:focus {
+    &.active:focus, &:active {
       border-bottom: 1px solid transparent;
     }
   }
