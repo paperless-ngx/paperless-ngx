@@ -4,12 +4,15 @@
   --l: 21%;
 
   --bs-primary: hsl(var(--ngx-green), var(--l));
-  --ngx-primary-faded: #d1ddd2;
+  --bs-border-color: var(--bs-gray-400);
+  --ngx-primary-faded: hsl(var(--ngx-green), calc(var(--l) + 72%));
   --ngx-primary-lighten-10: hsl(var(--ngx-green), calc(var(--l) + 10%));
   --ngx-primary-lighten-30: hsl(var(--ngx-green), calc(var(--l) + 30%));
   --ngx-primary-darken-10: hsl(var(--ngx-green), calc(var(--l) - 10%));
   --ngx-primary-darken-15: hsl(var(--ngx-green), calc(var(--l) - 15%));
   --ngx-primary-darken-18: hsl(var(--ngx-green), calc(var(--l) - 18%));
+  --ngx-bg-darker: var(--bs-gray-100);
+  --ngx-focus-alpha: 0.3;
 }
 
 svg.logo {
@@ -54,11 +57,19 @@ svg.logo {
 
   &:hover, &:focus, &.active, &:active {
     background-color: var(--bs-primary) !important;
-    color: var(--bs-body-color) !important;
+    color: var(--bs-light) !important;
   }
 }
 
 .btn-outline-secondary {
+  color: var(--bs-secondary);
+
+  &:hover, &:focus, &.active, &:active {
+    color: var(--bs-light);
+  }
+}
+
+.nav-item .sidebaricon {
   color: var(--bs-secondary);
 }
 
@@ -69,7 +80,7 @@ svg.logo {
 .form-control:focus,
 .form-check-input:focus,
 .form-check-radio:focus {
-  box-shadow: 0 0 0 0.25rem hsla(var(--ngx-green), var(--l), 0.7);
+  box-shadow: 0 0 0 0.25rem hsla(var(--ngx-green), var(--l), var(--ngx-focus-alpha));
 }
 
 .nav-link:focus-visible, .nav-item a:focus-visible {
@@ -123,19 +134,20 @@ textarea,
 }
 
 .page-link {
-  color: var(--bs-primary);
+  color: var(--bs-light);
   background-color: var(--bs-body-bg);
   border-color: var(--bs-border-color) !important;
 
   &:hover, &:focus {
     background-color: var(--bs-primary) !important;
-    color: var(--bs-body-color) !important;
+    color: var(--bs-light) !important;
   }
 }
 
 .page-item.active .page-link {
   background-color: var(--bs-primary);
-  color: var(--bs-body-color);
+  border-color: var(--bs-primary) !important;
+  color: var(--bs-light);
 }
 
 .page-item.disabled .page-link {
@@ -205,7 +217,7 @@ textarea,
     color: var(--bs-body-color);
 
     &:hover {
-      background-color: var(--bs-body-bg);
+      background-color: var(--ngx-bg-darker);
       color: var(--bs-body-color);
     }
 
@@ -232,7 +244,7 @@ table.table {
 }
 
 .ngx-file-drop__drop-zone--over {
-  background-color: var(--ngx-primary-darken-15) !important;
+  background-color: var(--ngx-primary-faded) !important;
 }
 
 .alert-danger {
@@ -245,14 +257,6 @@ table.table {
   background-color: var(--ngx-primary-darken-18);
   border-color: var(--ngx-primary-darken-15);
   color: var(--bs-body-color);
-}
-
-.toast {
-  background-color: hsla(var(--ngx-green), calc(var(--l) - 18%), 0.9);
-}
-
-.toast-header {
-  background-color: hsla(var(--ngx-green), calc(var(--l) - 10%), 0.9);
 }
 
 .ngb-dp-header,
