@@ -60,6 +60,12 @@ $border-color-dark-mode: #47494f;
     color: var(--bs-body-color) !important;
   }
 
+  .btn-outline-primary, .btn-primary {
+    &:hover, &:focus, &.active, &:active {
+      color: var(--bs-body-color) !important;
+    }
+  }
+
   .btn-outline-secondary {
     &:hover, &:focus, &.active, &:active {
       background-color: var(--ngx-bg-darker);
@@ -69,6 +75,10 @@ $border-color-dark-mode: #47494f;
 
   .card {
     background-color: var(--bs-body-bg);
+
+    .card-header {
+      background-color: rgba(0, 0, 0, 0.12);
+    }
   }
 
   .modal-content, .modal-header, .modal-body, .modal-footer {
