@@ -29,6 +29,7 @@ $border-color-dark-mode: #47494f;
   --bs-border-color: #{$border-color-dark-mode};
   --ngx-bg-darker: #{$bg-dark-mode-accent};
   --ngx-bg-alt: #{$bg-dark-mode-alt};
+  --ngx-body-color-accent: #{$text-color-dark-mode-accent};
   --ngx-focus-alpha: 0.7;
 
   .navbar.bg-primary{
@@ -62,7 +63,7 @@ $border-color-dark-mode: #47494f;
 
   .btn-outline-primary, .btn-primary {
     &:hover, &:focus, &.active, &:active {
-      color: var(--bs-body-color) !important;
+      color: var(--ngx-body-color-accent) !important;
     }
   }
 
