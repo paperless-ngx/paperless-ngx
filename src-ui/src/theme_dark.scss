@@ -29,6 +29,7 @@ $border-color-dark-mode: #47494f;
   --bs-border-color: #{$border-color-dark-mode};
   --ngx-bg-darker: #{$bg-dark-mode-accent};
   --ngx-bg-alt: #{$bg-dark-mode-alt};
+  --ngx-focus-alpha: 0.7;
 
   .navbar.bg-primary{
     --bs-primary: hsl(var(--ngx-green),var(--l));
@@ -59,8 +60,11 @@ $border-color-dark-mode: #47494f;
     color: var(--bs-body-color) !important;
   }
 
-  .btn-outline-secondary:hover {
-    background-color: var(--ngx-bg-darker);
+  .btn-outline-secondary {
+    &:hover, &:focus, &.active, &:active {
+      background-color: var(--ngx-bg-darker);
+      color: var(--bs-primary);
+    }
   }
 
   .card {
@@ -132,6 +136,18 @@ $border-color-dark-mode: #47494f;
 
   .modal .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
+  }
+
+  .ngx-file-drop__drop-zone--over {
+    background-color: var(--ngx-primary-darken-15) !important;
+  }
+
+  .toast {
+    background-color: hsla(var(--ngx-green), calc(var(--l) - 18%), 0.9);
+  }
+  
+  .toast-header {
+    background-color: hsla(var(--ngx-green), calc(var(--l) - 10%), 0.9);
   }
 }
 
