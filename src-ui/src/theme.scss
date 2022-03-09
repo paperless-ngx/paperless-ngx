@@ -118,6 +118,10 @@ textarea,
   border-color: var(--bs-primary);
 }
 
+.form-check-input:focus {
+  border-color: var(--bs-primary);
+}
+
 .page-link {
   color: var(--bs-primary);
   background-color: var(--bs-body-bg);
