@@ -181,7 +181,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
 
   }
 
-  private clearThemeColor() {
+  clearThemeColor() {
     this.settingsForm.get('themeColor').patchValue('');
   }
 }
