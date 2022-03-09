@@ -1,3 +1,4 @@
+import { ColorMode } from "ngx-color"
 
 function componentToHex(c) {
   var hex = Math.floor(c).toString(16)
@@ -42,7 +43,21 @@ function hslToRgb(h, s, l){
   return [r * 255, g * 255, b * 255]
 }
 
-export function randomColor() {
-  let rgb = hslToRgb(Math.random(), 0.6, Math.random() * 0.4 + 0.4)
+export function hslToHex(h: number, s: number, l:number): string {
+  const rgb = hslToRgb(h,s,l)
   return `#${componentToHex(rgb[0])}${componentToHex(rgb[1])}${componentToHex(rgb[2])}`
+}
+
+export function randomColor(colorMode: ColorMode = ColorMode.HEX) {
+  const h = Math.random()
+  const s = 0.6
+  const l = Math.random() * 0.4 + 0.4
+  switch (colorMode) {
+    case ColorMode.HSL:
+      return `${h},${s},${l}`
+      break;
+    default: // HEX
+      return hslToHex(h,s,l)
+      break;
+  }
 }

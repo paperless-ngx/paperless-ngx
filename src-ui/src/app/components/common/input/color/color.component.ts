@@ -1,7 +1,7 @@
 import { Component, Input, forwardRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ColorEvent, ColorMode } from 'ngx-color';
-import { randomColor } from 'src/app/utils/color';
+import { randomColor, hslToHex } from 'src/app/utils/color';
 import { AbstractInputComponent } from '../abstract-input';
 
 @Component({
@@ -24,15 +24,18 @@ export class ColorComponent extends AbstractInputComponent<string> {
   }
 
   randomize() {
-    this.colorChanged(randomColor())
+    const color = randomColor(this.colorMode)
+    let colorHex = color
+    if (this.colorMode == ColorMode.HSL) {
+      const hsl = color.split(',')
+      colorHex = hslToHex(+hsl[0], +hsl[1], +hsl[2])
+    }
+    this.value = colorHex
+    this.onChange(color)
   }
 
   sliderChanged(colorEvent:ColorEvent) {
-    this.colorChanged(colorEvent.color[this.colorMode].toString())
-  }
-
-  colorChanged(color:string) {
-    this.value = color
-    this.onChange(color)
+    this.value = colorEvent.color.hex
+    this.onChange(colorEvent.color[this.colorMode].toString())
   }
 }
