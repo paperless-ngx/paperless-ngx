@@ -1,16 +1,16 @@
 :root {
   // base color e.g. #17541f = hsl(128, 57%, 21%)
-  --ngx-green: 128, 57%;
-  --l: 21%;
+  --pngx-primary: 128, 57%;
+  --pngx-primary-lightness: 21%;
 
-  --bs-primary: hsl(var(--ngx-green), var(--l));
+  --bs-primary: hsl(var(--pngx-primary), var(--pngx-primary-lightness));
   --bs-border-color: var(--bs-gray-400);
-  --ngx-primary-faded: hsl(var(--ngx-green), calc(var(--l) + 72%));
-  --ngx-primary-lighten-10: hsl(var(--ngx-green), calc(var(--l) + 10%));
-  --ngx-primary-lighten-30: hsl(var(--ngx-green), calc(var(--l) + 30%));
-  --ngx-primary-darken-10: hsl(var(--ngx-green), calc(var(--l) - 10%));
-  --ngx-primary-darken-15: hsl(var(--ngx-green), calc(var(--l) - 15%));
-  --ngx-primary-darken-18: hsl(var(--ngx-green), calc(var(--l) - 18%));
+  --ngx-primary-faded: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 72%));
+  --ngx-primary-lighten-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 10%));
+  --ngx-primary-lighten-30: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 30%));
+  --ngx-primary-darken-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 10%));
+  --ngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
+  --ngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
   --ngx-bg-darker: var(--bs-gray-100);
   --ngx-focus-alpha: 0.3;
 }
@@ -81,7 +81,7 @@ svg.logo {
 .form-check-input:focus,
 .form-check-radio:focus,
 .form-select:focus {
-  box-shadow: 0 0 0 0.25rem hsla(var(--ngx-green), var(--l), var(--ngx-focus-alpha));
+  box-shadow: 0 0 0 0.25rem hsla(var(--pngx-primary), var(--pngx-primary-lightness), var(--ngx-focus-alpha));
 }
 
 .form-switch .form-check-input:focus {
