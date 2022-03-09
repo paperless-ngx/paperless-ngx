@@ -1,12 +1,12 @@
 <div class="mb-3">
-  <label [for]="inputId">{{title}}</label>
+  <label *ngIf="title" [for]="inputId">{{title}}</label>
 
   <div class="input-group" [class.is-invalid]="error">
     <span class="input-group-text" [style.background-color]="value">&nbsp;&nbsp;&nbsp;</span>
 
       <ng-template #popContent>
         <div style="min-width: 200px;" class="pb-3">
-          <color-slider [color]="value" (onChangeComplete)="colorChanged($event.color.hex)"></color-slider>
+          <color-slider [color]="value" (onChangeComplete)="sliderChanged($event)"></color-slider>
         </div>
 
       </ng-template>
