@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable, LOCALE_ID, Renderer2, RendererFactory2, RendererStyleFlags2 } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { CookieService } from 'ngx-cookie-service';
+import { hexToHsl } from 'src/app/utils/color';
 
 export interface PaperlessSettings {
   key: string
@@ -87,9 +88,9 @@ export class SettingsService {
     }
 
     if (themeColor) {
-      const hsl = themeColor.split(',')
-      this.renderer.setStyle(document.documentElement, '--pngx-primary',`${+hsl[0] * 360},${hsl[1] * 100}%`, RendererStyleFlags2.DashCase)
-      this.renderer.setStyle(document.documentElement, '--pngx-primary-lightness',`${hsl[2] * 100}%`, RendererStyleFlags2.DashCase)
+      const hsl = hexToHsl(themeColor)
+      this.renderer.setStyle(document.documentElement, '--pngx-primary',`${+hsl.h * 360},${hsl.s * 100}%`, RendererStyleFlags2.DashCase)
+      this.renderer.setStyle(document.documentElement, '--pngx-primary-lightness',`${hsl.l * 100}%`, RendererStyleFlags2.DashCase)
     } else {
       this.renderer.removeStyle(document.documentElement, '--pngx-primary', RendererStyleFlags2.DashCase)
       this.renderer.removeStyle(document.documentElement, '--pngx-primary-lightness', RendererStyleFlags2.DashCase)
