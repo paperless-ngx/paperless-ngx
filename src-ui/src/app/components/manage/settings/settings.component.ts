@@ -101,21 +101,14 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       // Initialize dirtyCheck
       this.isDirty$ = dirtyCheck(this.settingsForm, this.store.asObservable())
 
+      // Record dirty in case we need to 'undo' appearance settings if not saved on close
       this.isDirty$.subscribe(dirty => {
         this.isDirty = dirty
       })
       
       // "Live" visual changes prior to save
-      this.settingsForm.get('darkModeUseSystem').valueChanges.subscribe(darkModeUseSystem => {
-        this.settings.updateAppearanceSettings(darkModeUseSystem, this.settingsForm.get('darkModeEnabled').value)
-      })
-      
-      this.settingsForm.get('darkModeEnabled').valueChanges.subscribe(darkModeEnabled => {
-        this.settings.updateAppearanceSettings(this.settingsForm.get('darkModeEnabled').value, darkModeEnabled)
-      })
-      
-      this.settingsForm.get('themeColor').valueChanges.subscribe(color => {
-        this.settings.updateAppearanceSettings(null, null, color)
+      this.settingsForm.valueChanges.subscribe(() => {
+        this.settings.updateAppearanceSettings(this.settingsForm.get('darkModeEnabled').value, this.settingsForm.get('darkModeEnabled').value, this.settingsForm.get('themeColor').value)
       })
     })
   }
