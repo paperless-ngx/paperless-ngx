@@ -2072,7 +2072,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="final">Oggetti per pagina</target>
+        <target state="final">Elementi per pagina</target>
       </trans-unit>
       <trans-unit id="8028535997917730106" datatype="html" approved="yes">
         <source>Document editor</source>
