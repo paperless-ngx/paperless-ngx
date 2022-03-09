@@ -105,7 +105,7 @@
             <span i18n>Theme Color</span>
           </div>
           <div class="col-3">
-            <app-input-color i18n-title colorMode="hsl" formControlName="themeColor" [error]="error?.color"></app-input-color>
+            <app-input-color i18n-title formControlName="themeColor" [error]="error?.color"></app-input-color>
           </div>
           <div class="col-2">
             <button class="btn btn-link btn-sm pt-2 ps-0" [disabled]="!this.settingsForm.get('themeColor').value" (click)="clearThemeColor()">

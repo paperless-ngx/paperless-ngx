@@ -6,7 +6,7 @@
 
       <ng-template #popContent>
         <div style="min-width: 200px;" class="pb-3">
-          <color-slider [color]="value" (onChangeComplete)="sliderChanged($event)"></color-slider>
+          <color-slider [color]="value" (onChangeComplete)="colorChanged($event.color.hex)"></color-slider>
         </div>
 
       </ng-template>
