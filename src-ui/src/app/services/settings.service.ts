@@ -27,6 +27,7 @@ export const SETTINGS_KEYS = {
   DARK_MODE_USE_SYSTEM: 'general-settings:dark-mode:use-system',
   DARK_MODE_ENABLED: 'general-settings:dark-mode:enabled',
   DARK_MODE_THUMB_INVERTED: 'general-settings:dark-mode:thumb-inverted',
+  THEME_COLOR: 'general-settings:theme:color',
   USE_NATIVE_PDF_VIEWER: 'general-settings:document-details:native-pdf-viewer',
   DATE_LOCALE: 'general-settings:date-display:date-locale',
   DATE_FORMAT: 'general-settings:date-display:date-format',
@@ -43,6 +44,7 @@ const SETTINGS: PaperlessSettings[] = [
   {key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, type: "boolean", default: true},
   {key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: "boolean", default: false},
   {key: SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED, type: "boolean", default: true},
+  {key: SETTINGS_KEYS.THEME_COLOR, type: "string", default: ""},
   {key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: "boolean", default: false},
   {key: SETTINGS_KEYS.DATE_LOCALE, type: "string", default: ""},
   {key: SETTINGS_KEYS.DATE_FORMAT, type: "string", default: "mediumDate"},
@@ -68,12 +70,13 @@ export class SettingsService {
   ) {
     this.renderer = rendererFactory.createRenderer(null, null);
 
-    this.updateDarkModeSettings()
+    this.updateAppearanceSettings()
   }
 
-  updateDarkModeSettings(): void {
-    let darkModeUseSystem = this.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)
-    let darkModeEnabled = this.get(SETTINGS_KEYS.DARK_MODE_ENABLED)
+  public updateAppearanceSettings(darkModeUseSystem = null, darkModeEnabled = null, themeColor = null): void {
+    darkModeUseSystem ??= this.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM)
+    darkModeEnabled ??= this.get(SETTINGS_KEYS.DARK_MODE_ENABLED)
+    themeColor ??= this.get(SETTINGS_KEYS.THEME_COLOR);
 
     if (darkModeUseSystem) {
       this.renderer.addClass(this.document.body, 'color-scheme-system')
@@ -83,6 +86,9 @@ export class SettingsService {
       darkModeEnabled ? this.renderer.addClass(this.document.body, 'color-scheme-dark') : this.renderer.removeClass(this.document.body, 'color-scheme-dark')
     }
 
+    if (themeColor) {
+      console.log('set theme color')
+    }
   }
 
   getLanguageOptions(): LanguageOption[] {
