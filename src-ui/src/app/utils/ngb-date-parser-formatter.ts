@@ -35,7 +35,7 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
    * have it expanded to 10.03.2022, in the case of the German format.
    * (All other formats are also supported)
    * 
-   * It also strips commas or periods before running formatting, 
+   * It also strips any separators before running formatting, 
    * which allows quick entry of the date on the numpad. 
    */
   public preformatDateInput(value: string): string {
