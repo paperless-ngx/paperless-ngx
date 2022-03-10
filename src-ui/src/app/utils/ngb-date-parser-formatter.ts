@@ -35,16 +35,14 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
    * have it expanded to 10.03.2022, in the case of the German format.
    * (All other formats are also supported)
    * 
-   * It also replaces commas with the date separator. 
-   * This allows quick entry of the date on the numpad. 
+   * It also strips commas or periods before running formatting, 
+   * which allows quick entry of the date on the numpad. 
    */
   private preformatDateInput(value: string): string {
     let inputFormat = this.getDateInputFormat()
     let dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
 
-    value = value.replace(/,/g, dateSeparator)
-
-    if (value.includes(dateSeparator)) { return value }
+    value = value.replace(/[\/,\.-]/g, '')
 
     if (value.length == 4 && inputFormat.substring(0, 4) != 'yyyy') {
       return value.substring(0, 2)
