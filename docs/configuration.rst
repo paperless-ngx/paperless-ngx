@@ -473,6 +473,8 @@ Add the configuration variables to the environment of the webserver (alternative
 put the configuration in the ``docker-compose.env`` file) and add the additional
 services below the webserver service. Watch out for indentation.
 
+Make sure to use the correct format `PAPERLESS_TIKA_ENABLED = 1` so python_dotenv can parse the statement correctly.
+
 Software tweaks
 ###############
 
