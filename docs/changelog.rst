@@ -5,6 +5,53 @@
 Changelog
 *********
 
+paperless-ngx 1.6.0
+###################
+
+This is the first release of the revived paperless-ngx project 🎉. Thank you to everyone on the paperless-ngx team for your initiative and excellent teamwork!
+
+Version 1.6.0 merges several pending PRs from jonaswinkler's repo and includes new feature updates and bug fixes. Major backend and UI changes include:
+
+* Updated docs, scripts, CI, and containers to paperless-ngx.
+* Updated Python and Angular dependencies.
+* Dropped support for Python 3.7.
+* Dropped support for Ansible playbooks (thanks `@slankes`_ #109). If someone would like to continue supporting them, please see the `ansible repo`_.
+* Python code is now required to use Black formatting (thanks `@kpj`_ #168).
+* `@tribut`_ added support for a custom SSO logout redirect (jonaswinkler#1258). See ``PAPERLESS_LOGOUT_REDIRECT_URL``.
+* `@shamoon`_ added a loading indicator when document list is reloading (jonaswinkler#1297).
+* `@shamoon`_ improved the PDF viewer on mobile (#2).
+* `@shamoon`_ added 'any' / 'all' and 'not' filtering with tags (#10).
+* `@shamoon`_ added warnings for unsaved changes, with smart edit buttons (#13).
+* `@benjaminfrank`_ enabled a non-root access to port 80 via systemd (#18).
+* `@tribut`_ added simple "delete to trash" functionality (#24). See ``PAPERLESS_TRASH_DIR``.
+* `@amenk`_ fixed the search box overlay menu on mobile (#32).
+* `@dblitt`_ updated the login form to not auto-capitalize usernames (#36).
+* `@evilsidekick293`_ made the worker timeout configurable (#37). See ``PAPERLESS_WORKER_TIMEOUT``.
+* `@Nicarim`_ fixed downloads of UTF-8 formatted documents in Firefox (#56).
+* `@mweimerskirch`_ sorted the language dropdown by locale (#78).
+* `@mweimerskirch`_ enabled the Czech (#83) and Danish (#84) translations.
+* `@cschmatzler`_ enabled specifying the webserver port (#124). See ``PAPERLESS_PORT``.
+* `@muellermartin`_ fixed an error when uploading transparent PNGs (#133).
+* `@shamoon`_ created a slick new logo (#165).
+* `@tim-vogel`_ fixed exports missing groups (#193).
+
+Thank you to the following people for their documentation updates, fixes, and comprehensive testing:
+
+`@m0veax`_, `@a17t`_, `@fignew`_, `@muued`_, `@bauerj`_, `@isigmund`_, `@denilsonsa`_, `@mweimerskirch`_, `@alexander-bauer`_, `@apeltzer`_, `@tribut`_, `@yschroeder`_, `@gador`_, `@sAksham-Ar`_, `@sbrunner`_, `@philpagel`_, `@davemachado`_, `@2600box`_, `@qcasey`_, `@Nicarim`_, `@kpj`_, `@filcuk`_, `@Timoms`_, `@mattlamb99`_, `@padraigkitterick`_, `@ajkavanagh`_, `@Tooa`_, `@Unkn0wnCat`_, `@pewter77`_, `@stumpylog`_, `@Toxix`_, `@azapater`_, `@jschpp`_
+
+Another big thanks to the people who have contributed translations:
+
+* Michel Weimerskirch (michel_weimerskirch) suggested 31 translations into French and Luxembourgish.
+* jo.vandeginste suggested 21 translations into Dutch.
+* Lars Sørensen (Lrss) suggested 486 translations into Danish.
+* Alex (Sky-Dragon) voted for 46 translations in German.
+* Yannic Schröder (yschroeder) suggested 14 translations into German.
+* David Morais Ferreira (DavidMoraisFerreira) voted for 10 translations in Portuguese and Luxembourgish.
+* David Morais Ferreira (DavidMoraisFerreira) suggested 88 translations into French, German, Portuguese, Portuguese, Brazilian and Luxembourgish.
+* 汪泠沣 (wlfcss) suggested 13 translations into Chinese Traditional.
+* Lars Sørensen (Lrss) suggested 167 translations into Danish.
+* Philmo67 suggested 11 translations into French.
+
 paperless-ng 1.5.0
 ##################
 
@@ -1483,6 +1530,49 @@ bulk of the work on this big change.
 .. _Brian Cribbs: https://github.com/cribbstechnolog
 .. _Brendan M. Sleight: https://github.com/bmsleight
 .. _Daniel Albers: https://github.com/AlD
+.. _@shamoon: https://github.com/shamoon
+.. _@amenk: https://github.com/amenk
+.. _@dblitt: https://github.com/dblitt
+.. _@evilsidekick293: https://github.com/evilsidekick293
+.. _@m0veax: https://github.com/m0veax
+.. _@fignew: https://github.com/fignew
+.. _@muued: https://github.com/muued
+.. _@isigmund: https://github.com/isigmund
+.. _@denilsonsa: https://github.com/denilsonsa
+.. _@sAksham-Ar: https://github.com/sAksham-Ar
+.. _@philpagel: https://github.com/philpagel
+.. _@davemachado: https://github.com/davemachado
+.. _@2600box: https://github.com/2600box
+.. _@qcasey: https://github.com/qcasey
+.. _@kpj: https://github.com/kpj
+.. _@mweimerskirch: https://github.com/mweimerskirch
+.. _@filcuk: https://github.com/filcuk
+.. _@FrankStrieter: https://github.com/FrankStrieter
+.. _@tribut: https://github.com/tribut
+.. _@yschroeder: https://github.com/yschroeder
+.. _@gador: https://github.com/gador
+.. _@Nicarim: https://github.com/Nicarim
+.. _@bauerj: https://github.com/bauerj
+.. _@a17t: https://github.com/a17t
+.. _@alexander-bauer: https://github.com/alexander-bauer
+.. _@apeltzer: https://github.com/apeltzer
+.. _@Timoms: https://github.com/Timoms
+.. _@sbrunner: https://github.com/sbrunner
+.. _@slankes: https://github.com/slankes
+.. _@mattlamb99: https://github.com/mattlamb99
+.. _@padraigkitterick: https://github.com/padraigkitterick
+.. _@ajkavanagh: https://github.com/ajkavanagh
+.. _@Tooa: https://github.com/Tooa
+.. _@Unkn0wnCat: https://github.com/Unkn0wnCat
+.. _@pewter77: https://github.com/pewter77
+.. _@cschmatzler: https://github.com/cschmatzler
+.. _@muellermartin: https://github.com/muellermartin
+.. _@stumpylog: https://github.com/stumpylog
+.. _@Toxix: https://github.com/Toxix
+.. _@benjaminfrank: https://github.com/benjaminfrank
+.. _@azapater: https://github.com/azapater
+.. _@tim-vogel: https://github.com/tim-vogel
+.. _@jschpp: https://github.com/jschpp
 
 .. _#20: https://github.com/the-paperless-project/paperless/issues/20
 .. _#44: https://github.com/the-paperless-project/paperless/issues/44
@@ -1595,3 +1685,4 @@ bulk of the work on this big change.
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
 .. _optipng: http://optipng.sourceforge.net/
 .. _DjangoQL: https://github.com/ivelum/djangoql
+.. _ansible repo: https://github.com/paperless-ngx/paperless-ngx-ansible

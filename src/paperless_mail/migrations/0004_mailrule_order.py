@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('paperless_mail', '0003_auto_20201118_1940'),
+        ("paperless_mail", "0003_auto_20201118_1940"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mailrule',
-            name='order',
+            model_name="mailrule",
+            name="order",
             field=models.IntegerField(default=0),
         ),
     ]

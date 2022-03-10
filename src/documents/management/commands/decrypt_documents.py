@@ -19,7 +19,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--passphrase",
             help="If PAPERLESS_PASSPHRASE isn't set already, you need to "
-                 "specify it here"
+            "specify it here",
         )
 
     def handle(self, *args, **options):
@@ -50,12 +50,12 @@ class Command(BaseCommand):
     def __gpg_to_unencrypted(passphrase):
 
         encrypted_files = Document.objects.filter(
-            storage_type=Document.STORAGE_TYPE_GPG)
+            storage_type=Document.STORAGE_TYPE_GPG
+        )
 
         for document in encrypted_files:
 
-            print("Decrypting {}".format(
-                document).encode('utf-8'))
+            print("Decrypting {}".format(document).encode("utf-8"))
 
             old_paths = [document.source_path, document.thumbnail_path]
 
@@ -66,10 +66,11 @@ class Command(BaseCommand):
 
             ext = os.path.splitext(document.filename)[1]
 
-            if not ext == '.gpg':
+            if not ext == ".gpg":
                 raise CommandError(
                     f"Abort: encrypted file {document.source_path} does not "
-                    f"end with .gpg")
+                    f"end with .gpg"
+                )
 
             document.filename = os.path.splitext(document.filename)[0]
 
@@ -80,7 +81,8 @@ class Command(BaseCommand):
                 f.write(raw_thumb)
 
             Document.objects.filter(id=document.id).update(
-                storage_type=document.storage_type, filename=document.filename)
+                storage_type=document.storage_type, filename=document.filename
+            )
 
             for path in old_paths:
                 os.unlink(path)
