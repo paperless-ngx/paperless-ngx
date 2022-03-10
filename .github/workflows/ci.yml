@@ -203,7 +203,7 @@ jobs:
       -
         name: Export frontend artifact from docker
         run: |
-          docker run -d --name frontend-extract ${{ steps.prepare.outputs.tags }}
+          docker run -d --name frontend-extract ${{ steps.prepare.outputs.inspect_tag }}
           docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
       -
         name: Upload frontend artifact
