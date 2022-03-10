@@ -38,7 +38,7 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
    * It also strips commas or periods before running formatting, 
    * which allows quick entry of the date on the numpad. 
    */
-  private preformatDateInput(value: string): string {
+  public preformatDateInput(value: string): string {
     let inputFormat = this.getDateInputFormat()
     let dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
 
