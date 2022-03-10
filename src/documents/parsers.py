@@ -224,6 +224,7 @@ def parse_date(filename, text):
                 "DATE_ORDER": date_order,
                 "PREFER_DAY_OF_MONTH": "first",
                 "RETURN_AS_TIMEZONE_AWARE": True,
+                "TIMEZONE": settings.TIME_ZONE,
             },
         )
 
