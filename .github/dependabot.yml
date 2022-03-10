@@ -11,6 +11,9 @@ updates:
     # Check the npm registry for updates every week
     schedule:
       interval: "weekly"
+    labels:
+      - "frontend"
+      - "dependencies"
 
   # Enable version updates for Python
   - package-ecosystem: "pip"
@@ -20,3 +23,6 @@ updates:
     # Check for updates once a week
     schedule:
       interval: "weekly"
+    labels:
+      - "backend"
+      - "dependencies"
