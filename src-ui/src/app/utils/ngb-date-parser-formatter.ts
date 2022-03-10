@@ -87,7 +87,7 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
   }
 
   parse(value: string): NgbDateStruct | null {
-    value = this.preformatDateInput(value);
+    value = this.preformatDateInput(value)
     let match = this.getDateParseRegex().exec(value)
     if (match) {
       let dateStruct = {
