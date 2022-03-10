@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
-
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import {
@@ -84,6 +83,7 @@ import localeRo from '@angular/common/locales/ro'
 import localeRu from '@angular/common/locales/ru'
 import localeSl from '@angular/common/locales/sl'
 import localeSv from '@angular/common/locales/sv'
+import localeZh from '@angular/common/locales/zh'
 
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)
@@ -101,6 +101,7 @@ registerLocaleData(localeRo)
 registerLocaleData(localeRu)
 registerLocaleData(localeSl)
 registerLocaleData(localeSv)
+registerLocaleData(localeZh)
 
 @NgModule({
   declarations: [
