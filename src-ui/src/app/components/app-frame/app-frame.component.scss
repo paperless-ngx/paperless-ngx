@@ -7,7 +7,7 @@
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 100; /* Behind the navbar */
+  z-index: 995; /* Behind the navbar */
   padding: 50px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
@@ -90,9 +90,14 @@
   }
 
   .nav-link-additional {
-    margin-top: 0.2rem;
+    margin-top: 0.1rem;
     margin-left: 0.25rem;
     padding-top: 0.5rem;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
 
     svg {
       margin-bottom: 2px;
@@ -139,6 +144,7 @@
   svg {
     position: absolute;
     left: 0.6rem;
+    top: 0.5rem;
     color: rgba(255, 255, 255, 0.6);
   }
 

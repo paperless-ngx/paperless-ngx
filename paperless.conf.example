@@ -1,5 +1,5 @@
 # Have a look at the docs for documentation.
-# https://paperless-ng.readthedocs.io/en/latest/configuration.html
+# https://paperless-ngx.readthedocs.io/en/latest/configuration.html
 
 # Debug. Only enable this for development.
 
@@ -19,6 +19,7 @@
 
 #PAPERLESS_CONSUMPTION_DIR=../consume
 #PAPERLESS_DATA_DIR=../data
+#PAPERLESS_TRASH_DIR=
 #PAPERLESS_MEDIA_ROOT=../media
 #PAPERLESS_STATICDIR=../static
 #PAPERLESS_FILENAME_FORMAT=
@@ -60,6 +61,7 @@
 #PAPERLESS_CONSUMER_IGNORE_PATTERNS=[".DS_STORE/*", "._*", ".stfolder/*"]
 #PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=false
 #PAPERLESS_OPTIMIZE_THUMBNAILS=true
+#PAPERLESS_PRE_CONSUME_SCRIPT=/path/to/an/arbitrary/script.sh
 #PAPERLESS_POST_CONSUME_SCRIPT=/path/to/an/arbitrary/script.sh
 #PAPERLESS_FILENAME_DATE_ORDER=YMD
 #PAPERLESS_FILENAME_PARSE_TRANSFORMS=[]

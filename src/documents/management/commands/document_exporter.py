@@ -6,16 +6,25 @@ import time
 
 import tqdm
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from filelock import FileLock
 
-from documents.models import Document, Correspondent, Tag, DocumentType, \
-    SavedView, SavedViewFilterRule
-from documents.settings import EXPORTER_FILE_NAME, EXPORTER_THUMBNAIL_NAME, \
-    EXPORTER_ARCHIVE_NAME
+from documents.models import (
+    Document,
+    Correspondent,
+    Tag,
+    DocumentType,
+    SavedView,
+    SavedViewFilterRule,
+)
+from documents.settings import (
+    EXPORTER_FILE_NAME,
+    EXPORTER_THUMBNAIL_NAME,
+    EXPORTER_ARCHIVE_NAME,
+)
 from paperless.db import GnuPG
 from paperless_mail.models import MailAccount, MailRule
 from ...file_handling import generate_filename, delete_empty_directories
@@ -27,41 +36,46 @@ class Command(BaseCommand):
         Decrypt and rename all files in our collection into a given target
         directory.  And include a manifest file containing document data for
         easy import.
-    """.replace("    ", "")
+    """.replace(
+        "    ", ""
+    )
 
     def add_arguments(self, parser):
         parser.add_argument("target")
 
         parser.add_argument(
-            "-c", "--compare-checksums",
+            "-c",
+            "--compare-checksums",
             default=False,
             action="store_true",
             help="Compare file checksums when determining whether to export "
-                 "a file or not. If not specified, file size and time "
-                 "modified is used instead."
+            "a file or not. If not specified, file size and time "
+            "modified is used instead.",
         )
 
         parser.add_argument(
-            "-f", "--use-filename-format",
+            "-f",
+            "--use-filename-format",
             default=False,
             action="store_true",
             help="Use PAPERLESS_FILENAME_FORMAT for storing files in the "
-                 "export directory, if configured."
+            "export directory, if configured.",
         )
 
         parser.add_argument(
-            "-d", "--delete",
+            "-d",
+            "--delete",
             default=False,
             action="store_true",
             help="After exporting, delete files in the export directory that "
-                 "do not belong to the current export, such as files from "
-                 "deleted documents."
+            "do not belong to the current export, such as files from "
+            "deleted documents.",
         )
         parser.add_argument(
             "--no-progress-bar",
             default=False,
             action="store_true",
-            help="If set, the progress bar will not be shown"
+            help="If set, the progress bar will not be shown",
         )
 
     def __init__(self, *args, **kwargs):
@@ -76,9 +90,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         self.target = options["target"]
-        self.compare_checksums = options['compare_checksums']
-        self.use_filename_format = options['use_filename_format']
-        self.delete = options['delete']
+        self.compare_checksums = options["compare_checksums"]
+        self.use_filename_format = options["use_filename_format"]
+        self.delete = options["delete"]
 
         if not os.path.exists(self.target):
             raise CommandError("That path doesn't exist")
@@ -87,7 +101,7 @@ class Command(BaseCommand):
             raise CommandError("That path doesn't appear to be writable")
 
         with FileLock(settings.MEDIA_LOCK):
-            self.dump(options['no_progress_bar'])
+            self.dump(options["no_progress_bar"])
 
     def dump(self, progress_bar_disable=False):
         # 1. Take a snapshot of what files exist in the current export folder
@@ -100,43 +114,50 @@ class Command(BaseCommand):
         # documents
         with transaction.atomic():
             manifest = json.loads(
-                serializers.serialize("json", Correspondent.objects.all()))
+                serializers.serialize("json", Correspondent.objects.all())
+            )
 
-            manifest += json.loads(serializers.serialize(
-                "json", Tag.objects.all()))
+            manifest += json.loads(serializers.serialize("json", Tag.objects.all()))
 
-            manifest += json.loads(serializers.serialize(
-                "json", DocumentType.objects.all()))
+            manifest += json.loads(
+                serializers.serialize("json", DocumentType.objects.all())
+            )
 
             documents = Document.objects.order_by("id")
             document_map = {d.pk: d for d in documents}
-            document_manifest = json.loads(
-                serializers.serialize("json", documents))
+            document_manifest = json.loads(serializers.serialize("json", documents))
             manifest += document_manifest
 
-            manifest += json.loads(serializers.serialize(
-                "json", MailAccount.objects.all()))
+            manifest += json.loads(
+                serializers.serialize("json", MailAccount.objects.all())
+            )
 
-            manifest += json.loads(serializers.serialize(
-                "json", MailRule.objects.all()))
+            manifest += json.loads(
+                serializers.serialize("json", MailRule.objects.all())
+            )
 
-            manifest += json.loads(serializers.serialize(
-                "json", SavedView.objects.all()))
+            manifest += json.loads(
+                serializers.serialize("json", SavedView.objects.all())
+            )
 
-            manifest += json.loads(serializers.serialize(
-                "json", SavedViewFilterRule.objects.all()))
+            manifest += json.loads(
+                serializers.serialize("json", SavedViewFilterRule.objects.all())
+            )
 
-            manifest += json.loads(serializers.serialize(
-                "json", User.objects.all()))
+            manifest += json.loads(serializers.serialize("json", Group.objects.all()))
+
+            manifest += json.loads(serializers.serialize("json", User.objects.all()))
 
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
             enumerate(document_manifest),
             total=len(document_manifest),
-            disable=progress_bar_disable
+            disable=progress_bar_disable,
         ):
             # 3.1. store files unencrypted
-            document_dict["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED  # NOQA: E501
+            document_dict["fields"][
+                "storage_type"
+            ] = Document.STORAGE_TYPE_UNENCRYPTED  # NOQA: E501
 
             document = document_map[document_dict["pk"]]
 
@@ -145,11 +166,10 @@ class Command(BaseCommand):
             while True:
                 if self.use_filename_format:
                     base_name = generate_filename(
-                        document, counter=filename_counter,
-                        append_gpg=False)
+                        document, counter=filename_counter, append_gpg=False
+                    )
                 else:
-                    base_name = document.get_public_filename(
-                        counter=filename_counter)
+                    base_name = document.get_public_filename(counter=filename_counter)
 
                 if base_name not in self.exported_files:
                     self.exported_files.append(base_name)
@@ -193,22 +213,19 @@ class Command(BaseCommand):
                         f.write(GnuPG.decrypted(document.archive_path))
                         os.utime(archive_target, times=(t, t))
             else:
-                self.check_and_copy(document.source_path,
-                                    document.checksum,
-                                    original_target)
+                self.check_and_copy(
+                    document.source_path, document.checksum, original_target
+                )
 
-                self.check_and_copy(document.thumbnail_path,
-                                    None,
-                                    thumbnail_target)
+                self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
 
                 if archive_target:
-                    self.check_and_copy(document.archive_path,
-                                        document.archive_checksum,
-                                        archive_target)
+                    self.check_and_copy(
+                        document.archive_path, document.archive_checksum, archive_target
+                    )
 
         # 4. write manifest to target forlder
-        manifest_path = os.path.abspath(
-            os.path.join(self.target, "manifest.json"))
+        manifest_path = os.path.abspath(os.path.join(self.target, "manifest.json"))
 
         with open(manifest_path, "w") as f:
             json.dump(manifest, f, indent=2)
@@ -222,8 +239,9 @@ class Command(BaseCommand):
             for f in self.files_in_export_dir:
                 os.remove(f)
 
-                delete_empty_directories(os.path.abspath(os.path.dirname(f)),
-                                         os.path.abspath(self.target))
+                delete_empty_directories(
+                    os.path.abspath(os.path.dirname(f)), os.path.abspath(self.target)
+                )
 
     def check_and_copy(self, source, source_checksum, target):
         if os.path.abspath(target) in self.files_in_export_dir:

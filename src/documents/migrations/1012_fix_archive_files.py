@@ -20,6 +20,7 @@ logger = logging.getLogger("paperless.migrations")
 # This is code copied straight paperless before the change.
 ###############################################################################
 
+
 def archive_name_from_filename(filename):
     return os.path.splitext(filename)[0] + ".pdf"
 
@@ -30,10 +31,7 @@ def archive_path_old(doc):
     else:
         fname = "{:07}.pdf".format(doc.pk)
 
-    return os.path.join(
-        settings.ARCHIVE_DIR,
-        fname
-    )
+    return os.path.join(settings.ARCHIVE_DIR, fname)
 
 
 STORAGE_TYPE_GPG = "gpg"
@@ -41,10 +39,7 @@ STORAGE_TYPE_GPG = "gpg"
 
 def archive_path_new(doc):
     if doc.archive_filename is not None:
-        return os.path.join(
-            settings.ARCHIVE_DIR,
-            str(doc.archive_filename)
-        )
+        return os.path.join(settings.ARCHIVE_DIR, str(doc.archive_filename))
     else:
         return None
 
@@ -57,10 +52,7 @@ def source_path(doc):
         if doc.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"  # pragma: no cover
 
-    return os.path.join(
-        settings.ORIGINALS_DIR,
-        fname
-    )
+    return os.path.join(settings.ORIGINALS_DIR, fname)
 
 
 def generate_unique_filename(doc, archive_filename=False):
@@ -75,7 +67,8 @@ def generate_unique_filename(doc, archive_filename=False):
 
     while True:
         new_filename = generate_filename(
-            doc, counter, archive_filename=archive_filename)
+            doc, counter, archive_filename=archive_filename
+        )
         if new_filename == old_filename:
             # still the same as before.
             return new_filename
@@ -91,14 +84,11 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 
     try:
         if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdictNoStr(lambda: slugify(None),
-                                    many_to_dictionary(doc.tags))
+            tags = defaultdictNoStr(lambda: slugify(None), many_to_dictionary(doc.tags))
 
             tag_list = pathvalidate.sanitize_filename(
-                ",".join(sorted(
-                    [tag.name for tag in doc.tags.all()]
-                )),
-                replacement_text="-"
+                ",".join(sorted([tag.name for tag in doc.tags.all()])),
+                replacement_text="-",
             )
 
             if doc.correspondent:
@@ -116,20 +106,21 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 document_type = "none"
 
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
-                title=pathvalidate.sanitize_filename(
-                    doc.title, replacement_text="-"),
+                title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=f"{doc.created.month:02}" if doc.created else "none",  # NOQA: E501
+                created_month=f"{doc.created.month:02}"
+                if doc.created
+                else "none",  # NOQA: E501
                 created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
                 added_month=f"{doc.added.month:02}" if doc.added else "none",
                 added_day=f"{doc.added.day:02}" if doc.added else "none",
                 tags=tags,
-                tag_list=tag_list
+                tag_list=tag_list,
             ).strip()
 
             path = path.strip(os.sep)
@@ -137,7 +128,8 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     except (ValueError, KeyError, IndexError):
         logger.warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
-            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default")
+            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default"
+        )
 
     counter_str = f"_{counter:02}" if counter else ""
 
@@ -166,29 +158,29 @@ def parse_wrapper(parser, path, mime_type, file_name):
 
 
 def create_archive_version(doc, retry_count=3):
-    from documents.parsers import get_parser_class_for_mime_type, \
-        DocumentParser, \
-        ParseError
-
-    logger.info(
-        f"Regenerating archive document for document ID:{doc.id}"
+    from documents.parsers import (
+        get_parser_class_for_mime_type,
+        DocumentParser,
+        ParseError,
     )
+
+    logger.info(f"Regenerating archive document for document ID:{doc.id}")
     parser_class = get_parser_class_for_mime_type(doc.mime_type)
     for try_num in range(retry_count):
         parser: DocumentParser = parser_class(None, None)
         try:
-            parse_wrapper(parser, source_path(doc), doc.mime_type,
-                          os.path.basename(doc.filename))
+            parse_wrapper(
+                parser, source_path(doc), doc.mime_type, os.path.basename(doc.filename)
+            )
             doc.content = parser.get_text()
 
-            if parser.get_archive_path() and os.path.isfile(
-                parser.get_archive_path()):
+            if parser.get_archive_path() and os.path.isfile(parser.get_archive_path()):
                 doc.archive_filename = generate_unique_filename(
-                    doc, archive_filename=True)
+                    doc, archive_filename=True
+                )
                 with open(parser.get_archive_path(), "rb") as f:
                     doc.archive_checksum = hashlib.md5(f.read()).hexdigest()
-                os.makedirs(os.path.dirname(archive_path_new(doc)),
-                            exist_ok=True)
+                os.makedirs(os.path.dirname(archive_path_new(doc)), exist_ok=True)
                 shutil.copy2(parser.get_archive_path(), archive_path_new(doc))
             else:
                 doc.archive_checksum = None
@@ -241,8 +233,8 @@ def move_old_to_new_locations(apps, schema_editor):
         old_path = archive_path_old(doc)
         if doc.id not in affected_document_ids and not os.path.isfile(old_path):
             raise ValueError(
-                f"Archived document ID:{doc.id} does not exist at: "
-                f"{old_path}")
+                f"Archived document ID:{doc.id} does not exist at: " f"{old_path}"
+            )
 
     # check that we can regenerate affected archive versions
     for doc_id in affected_document_ids:
@@ -253,7 +245,8 @@ def move_old_to_new_locations(apps, schema_editor):
         if not parser_class:
             raise ValueError(
                 f"Document ID:{doc.id} has an invalid archived document, "
-                f"but no parsers are available. Cannot migrate.")
+                f"but no parsers are available. Cannot migrate."
+            )
 
     for doc in Document.objects.filter(archive_checksum__isnull=False):
 
@@ -261,9 +254,7 @@ def move_old_to_new_locations(apps, schema_editor):
             old_path = archive_path_old(doc)
             # remove affected archive versions
             if os.path.isfile(old_path):
-                logger.debug(
-                    f"Removing {old_path}"
-                )
+                logger.debug(f"Removing {old_path}")
                 os.unlink(old_path)
         else:
             # Set archive path for unaffected files
@@ -290,7 +281,8 @@ def move_new_to_old_locations(apps, schema_editor):
             raise ValueError(
                 f"Cannot migrate: Archive file name {old_archive_path} of "
                 f"document {doc.filename} would clash with another archive "
-                f"filename.")
+                f"filename."
+            )
         old_archive_paths.add(old_archive_path)
         if new_archive_path != old_archive_path and os.path.isfile(old_archive_path):
             raise ValueError(
@@ -309,22 +301,35 @@ def move_new_to_old_locations(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '1011_auto_20210101_2340'),
+        ("documents", "1011_auto_20210101_2340"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='archive_filename',
-            field=models.FilePathField(default=None, editable=False, help_text='Current archive filename in storage', max_length=1024, null=True, unique=True, verbose_name='archive filename'),
+            model_name="document",
+            name="archive_filename",
+            field=models.FilePathField(
+                default=None,
+                editable=False,
+                help_text="Current archive filename in storage",
+                max_length=1024,
+                null=True,
+                unique=True,
+                verbose_name="archive filename",
+            ),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='filename',
-            field=models.FilePathField(default=None, editable=False, help_text='Current filename in storage', max_length=1024, null=True, unique=True, verbose_name='filename'),
+            model_name="document",
+            name="filename",
+            field=models.FilePathField(
+                default=None,
+                editable=False,
+                help_text="Current filename in storage",
+                max_length=1024,
+                null=True,
+                unique=True,
+                verbose_name="filename",
+            ),
         ),
-        migrations.RunPython(
-            move_old_to_new_locations,
-            move_new_to_old_locations
-        ),
+        migrations.RunPython(move_old_to_new_locations, move_new_to_old_locations),
     ]

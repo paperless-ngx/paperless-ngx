@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: paperless-ng\n"
+"Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 09:38+0000\n"
-"PO-Revision-Date: 2021-05-16 10:09\n"
+"PO-Revision-Date: 2022-02-17 04:18\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -11,52 +11,52 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Crowdin-Project: paperless-ng\n"
-"X-Crowdin-Project-ID: 434940\n"
+"X-Crowdin-Project: paperless-ngx\n"
+"X-Crowdin-Project-ID: 500308\n"
 "X-Crowdin-Language: zh-CN\n"
 "X-Crowdin-File: /dev/src/locale/en_US/LC_MESSAGES/django.po\n"
-"X-Crowdin-File-ID: 54\n"
+"X-Crowdin-File-ID: 14\n"
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr "文件"
+msgstr ""
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr "任何词"
+msgstr ""
 
 #: documents/models.py:33
 msgid "All words"
-msgstr "所有词"
+msgstr ""
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr "完全符合"
+msgstr ""
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr "正则表达式"
+msgstr ""
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr "模糊词汇"
+msgstr ""
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr "自动"
+msgstr ""
 
 #: documents/models.py:41 documents/models.py:350 paperless_mail/models.py:25
 #: paperless_mail/models.py:117
 msgid "name"
-msgstr "名字"
+msgstr ""
 
 #: documents/models.py:45
 msgid "match"
-msgstr "配对"
+msgstr ""
 
 #: documents/models.py:49
 msgid "matching algorithm"
-msgstr "配对算法"
+msgstr ""
 
 #: documents/models.py:55
 msgid "is insensitive"

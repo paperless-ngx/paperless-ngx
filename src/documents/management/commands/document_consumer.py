@@ -23,24 +23,21 @@ logger = logging.getLogger("paperless.management.consumer")
 
 def _tags_from_path(filepath):
     """Walk up the directory tree from filepath to CONSUMPTION_DIR
-       and get or create Tag IDs for every directory.
+    and get or create Tag IDs for every directory.
     """
     tag_ids = set()
-    path_parts = Path(filepath).relative_to(
-                settings.CONSUMPTION_DIR).parent.parts
+    path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
-        tag_ids.add(Tag.objects.get_or_create(name__iexact=part, defaults={
-            "name": part
-        })[0].pk)
+        tag_ids.add(
+            Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk
+        )
 
     return tag_ids
 
 
 def _is_ignored(filepath: str) -> bool:
-    filepath_relative = PurePath(filepath).relative_to(
-        settings.CONSUMPTION_DIR)
-    return any(
-        filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
+    filepath_relative = PurePath(filepath).relative_to(settings.CONSUMPTION_DIR)
+    return any(filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
 
 
 def _consume(filepath):
@@ -48,13 +45,11 @@ def _consume(filepath):
         return
 
     if not os.path.isfile(filepath):
-        logger.debug(
-            f"Not consuming file {filepath}: File has moved.")
+        logger.debug(f"Not consuming file {filepath}: File has moved.")
         return
 
     if not is_file_ext_supported(os.path.splitext(filepath)[1]):
-        logger.warning(
-            f"Not consuming file {filepath}: Unknown file extension.")
+        logger.warning(f"Not consuming file {filepath}: Unknown file extension.")
         return
 
     tag_ids = None
@@ -66,10 +61,12 @@ def _consume(filepath):
 
     try:
         logger.info(f"Adding {filepath} to the task queue.")
-        async_task("documents.tasks.consume_file",
-                   filepath,
-                   override_tag_ids=tag_ids if tag_ids else None,
-                   task_name=os.path.basename(filepath)[:100])
+        async_task(
+            "documents.tasks.consume_file",
+            filepath,
+            override_tag_ids=tag_ids if tag_ids else None,
+            task_name=os.path.basename(filepath)[:100],
+        )
     except Exception as e:
         # Catch all so that the consumer won't crash.
         # This is also what the test case is listening for to check for
@@ -88,8 +85,9 @@ def _consume_wait_unmodified(file):
         try:
             new_mtime = os.stat(file).st_mtime
         except FileNotFoundError:
-            logger.debug(f"File {file} moved while waiting for it to remain "
-                         f"unmodified.")
+            logger.debug(
+                f"File {file} moved while waiting for it to remain " f"unmodified."
+            )
             return
         if new_mtime == mtime:
             _consume(file)
@@ -102,16 +100,11 @@ def _consume_wait_unmodified(file):
 
 
 class Handler(FileSystemEventHandler):
-
     def on_created(self, event):
-        Thread(
-            target=_consume_wait_unmodified, args=(event.src_path,)
-        ).start()
+        Thread(target=_consume_wait_unmodified, args=(event.src_path,)).start()
 
     def on_moved(self, event):
-        Thread(
-            target=_consume_wait_unmodified, args=(event.dest_path,)
-        ).start()
+        Thread(target=_consume_wait_unmodified, args=(event.dest_path,)).start()
 
 
 class Command(BaseCommand):
@@ -130,26 +123,19 @@ class Command(BaseCommand):
             "directory",
             default=settings.CONSUMPTION_DIR,
             nargs="?",
-            help="The consumption directory."
+            help="The consumption directory.",
         )
-        parser.add_argument(
-            "--oneshot",
-            action="store_true",
-            help="Run only once."
-        )
+        parser.add_argument("--oneshot", action="store_true", help="Run only once.")
 
     def handle(self, *args, **options):
         directory = options["directory"]
         recursive = settings.CONSUMER_RECURSIVE
 
         if not directory:
-            raise CommandError(
-                "CONSUMPTION_DIR does not appear to be set."
-            )
+            raise CommandError("CONSUMPTION_DIR does not appear to be set.")
 
         if not os.path.isdir(directory):
-            raise CommandError(
-                f"Consumption directory {directory} does not exist")
+            raise CommandError(f"Consumption directory {directory} does not exist")
 
         if recursive:
             for dirpath, _, filenames in os.walk(directory):
@@ -171,8 +157,7 @@ class Command(BaseCommand):
         logger.debug("Consumer exiting.")
 
     def handle_polling(self, directory, recursive):
-        logger.info(
-            f"Polling directory for changes: {directory}")
+        logger.info(f"Polling directory for changes: {directory}")
         self.observer = PollingObserver(timeout=settings.CONSUMER_POLLING)
         self.observer.schedule(Handler(), directory, recursive=recursive)
         self.observer.start()
@@ -186,8 +171,7 @@ class Command(BaseCommand):
         self.observer.join()
 
     def handle_inotify(self, directory, recursive):
-        logger.info(
-            f"Using inotify to watch directory for changes: {directory}")
+        logger.info(f"Using inotify to watch directory for changes: {directory}")
 
         inotify = INotify()
         inotify_flags = flags.CLOSE_WRITE | flags.MOVED_TO

@@ -151,21 +151,21 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   clickTag(tagID: number) {
     this.list.selectNone()
     setTimeout(() => {
-      this.filterEditor.toggleTag(tagID)
+      this.filterEditor.addTag(tagID)
     })
   }
 
   clickCorrespondent(correspondentID: number) {
     this.list.selectNone()
     setTimeout(() => {
-      this.filterEditor.toggleCorrespondent(correspondentID)
+      this.filterEditor.addCorrespondent(correspondentID)
     })
   }
 
   clickDocumentType(documentTypeID: number) {
     this.list.selectNone()
     setTimeout(() => {
-      this.filterEditor.toggleDocumentType(documentTypeID)
+      this.filterEditor.addDocumentType(documentTypeID)
     })
   }
 

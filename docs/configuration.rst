@@ -80,6 +80,15 @@ PAPERLESS_DATA_DIR=<path>
 
     Defaults to "../data/", relative to the "src" directory.
 
+PAPERLESS_TRASH_DIR=<path>
+    Instead of removing deleted documents, they are moved to this directory.
+
+    This must be writeable by the user running paperless. When running inside
+    docker, ensure that this path is within a permanent volume (such as
+    "../media/trash") so it won't get lost on upgrades.
+
+    Defaults to empty (i.e. really delete documents).
+
 PAPERLESS_MEDIA_ROOT=<path>
     This is where your documents and thumbnails are stored.
 
@@ -409,7 +418,7 @@ Tika settings
 #############
 
 Paperless can make use of `Tika <https://tika.apache.org/>`_ and
-`Gotenberg <https://thecodingmachine.github.io/gotenberg/>`_ for parsing and
+`Gotenberg <https://gotenberg.dev/>`_ for parsing and
 converting "Office" documents (such as ".doc", ".xlsx" and ".odt"). If you
 wish to use this, you must provide a Tika server and a Gotenberg server,
 configure their endpoints, and enable the feature.
@@ -451,10 +460,10 @@ requires are as follows:
         # ...
 
         gotenberg:
-            image: thecodingmachine/gotenberg
+            image: gotenberg/gotenberg:7
             restart: unless-stopped
             environment:
-                DISABLE_GOOGLE_CHROME: 1
+                CHROMIUM_DISABLE_ROUTES: 1
 
         tika:
             image: apache/tika
@@ -512,6 +521,12 @@ PAPERLESS_THREADS_PER_WORKER=<num>
 
     If you only specify PAPERLESS_TASK_WORKERS, paperless will adjust
     PAPERLESS_THREADS_PER_WORKER automatically.
+
+
+PAPERLESS_WORKER_TIMEOUT=<num>
+    Machines with few cores or weak ones might not be able to finish OCR on
+    large documents within the default 1800 seconds. So extending this timeout
+    may prove to be useful on weak hardware setups.
 
 
 PAPERLESS_TIME_ZONE=<timezone>
@@ -683,6 +698,17 @@ PAPERLESS_WEBSERVER_WORKERS=<num>
     Consider configuring this to 1 on low power devices with limited amount of RAM.
 
     Defaults to 2.
+
+PAPERLESS_PORT=<port>
+    The port number the webserver will listen on inside the container. There are
+    special setups where you may need this to avoid collisions with other
+    services (like using podman with multiple containers in one pod).
+
+    Don't change this when using Docker. To change the port the webserver is
+    reachable outside of the container, instead refer to the "ports" key in
+    ``docker-compose.yml``.
+
+    Defaults to 8000.
 
 USERMAP_UID=<uid>
     The ID of the paperless user in the container. Set this to your actual user ID on the
