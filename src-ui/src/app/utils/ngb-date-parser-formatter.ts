@@ -45,41 +45,16 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
     value = value.replace(/[\/,\.-]/g, '')
 
     if (value.length == 4 && inputFormat.substring(0, 4) != 'yyyy') {
-      return value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-        + dateSeparator
-        + new Date().getFullYear()
-    }
-    else if (value.length == 4 && inputFormat.substring(0, 4) == 'yyyy') {
-      return new Date().getFullYear()
-        + dateSeparator
-        + value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-    }
-    else if (value.length == 6) {
-      return value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-        + dateSeparator
-        + value.substring(4, 6)
-    }
-    else if (value.length == 8 && inputFormat.substring(0, 4) != 'yyyy') {
-      return value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-        + dateSeparator
-        + value.substring(4, 8)
-    }
-    else if (value.length == 8 && inputFormat.substring(0, 4) == 'yyyy') {
-      return value.substring(0, 4)
-        + dateSeparator
-        + value.substring(4, 6)
-        + dateSeparator
-        + value.substring(6, 8)
-    }
-    else {
+      return [value.substring(0, 2), value.substring(2, 4), new Date().getFullYear()].join(dateSeparator)
+    } else if (value.length == 4 && inputFormat.substring(0, 4) == 'yyyy') {
+      return [new Date().getFullYear(), value.substring(0, 2), value.substring(2, 4)].join(dateSeparator)
+    } else if (value.length == 6) {
+      return [value.substring(0, 2), value.substring(2, 4), value.substring(4, 6)].join(dateSeparator)
+    } else if (value.length == 8 && inputFormat.substring(0, 4) != 'yyyy') {
+      return [value.substring(0, 2), value.substring(2, 4), value.substring(4, 8)].join(dateSeparator)
+    } else if (value.length == 8 && inputFormat.substring(0, 4) == 'yyyy') {
+      return [value.substring(0, 4), value.substring(4, 6), value.substring(6, 8)].join(dateSeparator)
+    } else {
       return value
     }
   }
