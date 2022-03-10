@@ -63,10 +63,6 @@ svg.logo {
 
 .btn-outline-secondary {
   color: var(--bs-secondary);
-
-  &:hover, &:focus, &.active, &:active {
-    color: var(--bs-light);
-  }
 }
 
 .nav-item .sidebaricon {
