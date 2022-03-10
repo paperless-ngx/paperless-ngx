@@ -288,7 +288,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         shutil.copy(src, dst)
         return dst
 
-    @override_settings(PAPERLESS_FILENAME_FORMAT=None)
+    @override_settings(PAPERLESS_FILENAME_FORMAT=None, TIME_ZONE="America/Chicago")
     def testNormalOperation(self):
 
         filename = self.get_test_file()
