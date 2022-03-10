@@ -8,13 +8,13 @@ assignees: ''
 ---
 
 <!---
-=> Before opening an issue, please check the documentation and see if it helps you resolve your issue: https://paperless-ng.readthedocs.io/en/latest/troubleshooting.html
+=> Before opening an issue, please check the documentation and see if it helps you resolve your issue: https://paperless-ngx.readthedocs.io/en/latest/troubleshooting.html
 => Please also make sure that you followed the installation instructions.
 => Please search the issues and look for similar issues before opening a bug report.
 
-=> If you would like to submit a feature request please submit one under https://github.com/jonaswinkler/paperless-ng/discussions/categories/feature-requests
+=> If you would like to submit a feature request please submit one under https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests
 
-=> If you encounter issues while installing of configuring Paperless-ng, please post that in the "Support" section of the discussions. Remember that Paperless successfully runs on a variety of different systems. If paperless does not start, it's probably an issue with your system, and not an issue of paperless.
+=> If you encounter issues while installing of configuring Paperless-ngx, please post that in the "Support" section of the discussions. Remember that Paperless successfully runs on a variety of different systems. If paperless does not start, it's probably an issue with your system, and not an issue of paperless.
 
 => Don't remove the [BUG] prefix from the title.
 -->

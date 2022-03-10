@@ -12,7 +12,6 @@ from documents.tests.utils import DirectoriesMixin
 
 
 class TestManageSuperUser(DirectoriesMixin, TestCase):
-
     def reset_environment(self):
         if "PAPERLESS_ADMIN_USER" in os.environ:
             del os.environ["PAPERLESS_ADMIN_USER"]

@@ -30,9 +30,9 @@ export class DashboardComponent implements OnInit {
 
   get subtitle() {
     if (this.displayName) {
-      return $localize`Hello ${this.displayName}, welcome to Paperless-ng!`
+      return $localize`Hello ${this.displayName}, welcome to Paperless-ngx!`
     } else {
-      return $localize`Welcome to Paperless-ng!`
+      return $localize`Welcome to Paperless-ngx!`
     }
   }
 

@@ -7,7 +7,6 @@ from paperless.settings import default_task_workers, default_threads_per_worker
 
 
 class TestSettings(TestCase):
-
     @mock.patch("paperless.settings.multiprocessing.cpu_count")
     def test_single_core(self, cpu_count):
         cpu_count.return_value = 1
@@ -21,7 +20,9 @@ class TestSettings(TestCase):
 
     def test_workers_threads(self):
         for i in range(1, 64):
-            with mock.patch("paperless.settings.multiprocessing.cpu_count") as cpu_count:
+            with mock.patch(
+                "paperless.settings.multiprocessing.cpu_count"
+            ) as cpu_count:
                 cpu_count.return_value = i
 
                 default_workers = default_task_workers()

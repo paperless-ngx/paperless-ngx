@@ -14,14 +14,16 @@ def set_added_time_to_created_time(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('documents', '0019_add_consumer_user'),
+        ("documents", "0019_add_consumer_user"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='added',
-            field=models.DateTimeField(db_index=True, default=django.utils.timezone.now, editable=False),
+            model_name="document",
+            name="added",
+            field=models.DateTimeField(
+                db_index=True, default=django.utils.timezone.now, editable=False
+            ),
         ),
-        migrations.RunPython(set_added_time_to_created_time)
+        migrations.RunPython(set_added_time_to_created_time),
     ]

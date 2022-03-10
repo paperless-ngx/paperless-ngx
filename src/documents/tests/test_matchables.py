@@ -12,25 +12,24 @@ from ..signals import document_consumption_finished
 
 
 class TestMatching(TestCase):
-
     def _test_matching(self, text, algorithm, true, false):
         for klass in (Tag, Correspondent, DocumentType):
             instance = klass.objects.create(
                 name=str(randint(10000, 99999)),
                 match=text,
-                matching_algorithm=getattr(klass, algorithm)
+                matching_algorithm=getattr(klass, algorithm),
             )
             for string in true:
                 doc = Document(content=string)
                 self.assertTrue(
                     matching.matches(instance, doc),
-                    '"%s" should match "%s" but it does not' % (text, string)
+                    '"%s" should match "%s" but it does not' % (text, string),
                 )
             for string in false:
                 doc = Document(content=string)
                 self.assertFalse(
                     matching.matches(instance, doc),
-                    '"%s" should not match "%s" but it does' % (text, string)
+                    '"%s" should not match "%s" but it does' % (text, string),
                 )
 
     def test_match_all(self):
@@ -47,15 +46,13 @@ class TestMatching(TestCase):
                 "I have alphas, charlie, and gamma in me",
                 "I have alphas in me",
                 "I have bravo in me",
-            )
+            ),
         )
 
         self._test_matching(
             "12 34 56",
             "MATCH_ALL",
-            (
-                "I have 12 34, and 56 in me",
-            ),
+            ("I have 12 34, and 56 in me",),
             (
                 "I have 12 in me",
                 "I have 34 in me",
@@ -64,7 +61,7 @@ class TestMatching(TestCase):
                 "I have 120, 34, and 56 in me",
                 "I have 123456 in me",
                 "I have 01234567 in me",
-            )
+            ),
         )
 
         self._test_matching(
@@ -79,7 +76,7 @@ class TestMatching(TestCase):
                 "the quick brown wolf jumped over the lazy dogs",
                 "the quick brown fox jumped over the fat dogs",
                 "the quick brown fox jumped over the lazy... dogs",
-            )
+            ),
         )
 
     def test_match_any(self):
@@ -97,7 +94,7 @@ class TestMatching(TestCase):
             (
                 "I have alphas in me",
                 "I have bravo in me",
-            )
+            ),
         )
 
         self._test_matching(
@@ -114,7 +111,7 @@ class TestMatching(TestCase):
             (
                 "I have 123456 in me",
                 "I have 01234567 in me",
-            )
+            ),
         )
 
         self._test_matching(
@@ -124,9 +121,7 @@ class TestMatching(TestCase):
                 "the quick brown fox",
                 "jumped over the lazy  dogs.",
             ),
-            (
-                "the lazy fox jumped over the brown dogs",
-            )
+            ("the lazy fox jumped over the brown dogs",),
         )
 
     def test_match_literal(self):
@@ -134,9 +129,7 @@ class TestMatching(TestCase):
         self._test_matching(
             "alpha charlie gamma",
             "MATCH_LITERAL",
-            (
-                "I have 'alpha charlie gamma' in me",
-            ),
+            ("I have 'alpha charlie gamma' in me",),
             (
                 "I have alpha in me",
                 "I have charlie in me",
@@ -146,15 +139,13 @@ class TestMatching(TestCase):
                 "I have alphas, charlie, and gamma in me",
                 "I have alphas in me",
                 "I have bravo in me",
-            )
+            ),
         )
 
         self._test_matching(
             "12 34 56",
             "MATCH_LITERAL",
-            (
-                "I have 12 34 56 in me",
-            ),
+            ("I have 12 34 56 in me",),
             (
                 "I have 12 in me",
                 "I have 34 in me",
@@ -165,7 +156,7 @@ class TestMatching(TestCase):
                 "I have 120, 340, and 560 in me",
                 "I have 123456 in me",
                 "I have 01234567 in me",
-            )
+            ),
         )
 
     def test_match_regex(self):
@@ -186,18 +177,11 @@ class TestMatching(TestCase):
                 "I have alpha, charlie, and gamma in me",
                 "I have alphas, charlie, and gamma in me",
                 "I have alphas in me",
-            )
+            ),
         )
 
     def test_tach_invalid_regex(self):
-        self._test_matching(
-            "[[",
-            "MATCH_REGEX",
-            [],
-            [
-                "Don't match this"
-            ]
-        )
+        self._test_matching("[[", "MATCH_REGEX", [], ["Don't match this"])
 
     def test_match_fuzzy(self):
 
@@ -210,9 +194,7 @@ class TestMatching(TestCase):
                 "1220 Main Street, Springfeld, Miss.",
                 "1220 Main Street Springfield Miss",
             ),
-            (
-                "1220 Main Street, Springfield, Mich.",
-            )
+            ("1220 Main Street, Springfield, Mich.",),
         )
 
 
@@ -225,9 +207,10 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
 
     def setUp(self):
         TestCase.setUp(self)
-        User.objects.create_user(username='test_consumer', password='12345')
+        User.objects.create_user(username="test_consumer", password="12345")
         self.doc_contains = Document.objects.create(
-            content="I contain the keyword.", mime_type="application/pdf")
+            content="I contain the keyword.", mime_type="application/pdf"
+        )
 
         self.index_dir = tempfile.mkdtemp()
         # TODO: we should not need the index here.
@@ -238,40 +221,43 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
 
     def test_tag_applied_any(self):
         t1 = Tag.objects.create(
-            name="test", match="keyword", matching_algorithm=Tag.MATCH_ANY)
+            name="test", match="keyword", matching_algorithm=Tag.MATCH_ANY
+        )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains)
+            sender=self.__class__, document=self.doc_contains
+        )
         self.assertTrue(list(self.doc_contains.tags.all()) == [t1])
 
     def test_tag_not_applied(self):
         Tag.objects.create(
-            name="test", match="no-match", matching_algorithm=Tag.MATCH_ANY)
+            name="test", match="no-match", matching_algorithm=Tag.MATCH_ANY
+        )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains)
+            sender=self.__class__, document=self.doc_contains
+        )
         self.assertTrue(list(self.doc_contains.tags.all()) == [])
 
     def test_correspondent_applied(self):
         correspondent = Correspondent.objects.create(
-            name="test",
-            match="keyword",
-            matching_algorithm=Correspondent.MATCH_ANY
+            name="test", match="keyword", matching_algorithm=Correspondent.MATCH_ANY
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains)
+            sender=self.__class__, document=self.doc_contains
+        )
         self.assertTrue(self.doc_contains.correspondent == correspondent)
 
     def test_correspondent_not_applied(self):
         Tag.objects.create(
-            name="test",
-            match="no-match",
-            matching_algorithm=Correspondent.MATCH_ANY
+            name="test", match="no-match", matching_algorithm=Correspondent.MATCH_ANY
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains)
+            sender=self.__class__, document=self.doc_contains
+        )
         self.assertEqual(self.doc_contains.correspondent, None)
 
     def test_logentry_created(self):
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains)
+            sender=self.__class__, document=self.doc_contains
+        )
 
         self.assertEqual(LogEntry.objects.count(), 1)

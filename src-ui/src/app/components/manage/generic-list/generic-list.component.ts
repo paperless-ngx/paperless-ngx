@@ -61,6 +61,7 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
       distinctUntilChanged()
     ).subscribe(title => {
       this._nameFilter = title
+      this.page = 1
       this.reloadData()
     })
   }
@@ -123,5 +124,9 @@ export abstract class GenericListComponent<T extends ObjectWithId> implements On
 
   set nameFilter(nameFilter: string) {
     this.nameFilterDebounce.next(nameFilter)
+  }
+  
+  onNameFilterKeyUp(event: KeyboardEvent) {
+    if (event.code == 'Escape') this.nameFilterDebounce.next(null)
   }
 }

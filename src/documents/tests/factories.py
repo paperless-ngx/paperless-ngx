@@ -5,7 +5,6 @@ from ..models import Document, Correspondent
 
 
 class CorrespondentFactory(DjangoModelFactory):
-
     class Meta:
         model = Correspondent
 
@@ -13,6 +12,5 @@ class CorrespondentFactory(DjangoModelFactory):
 
 
 class DocumentFactory(DjangoModelFactory):
-
     class Meta:
         model = Document

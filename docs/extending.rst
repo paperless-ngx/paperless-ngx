@@ -3,7 +3,7 @@
 Paperless development
 #####################
 
-This section describes the steps you need to take to start development on paperless-ng.
+This section describes the steps you need to take to start development on paperless-ngx.
 
 Check out the source from github. The repository is organized in the following way:
 
@@ -51,19 +51,21 @@ To do the setup you need to perform the steps from the following chapters in a c
 
         .. code:: shell-session
 
-            docker run -d -p 6379:6379 -restart unless-stopped redis:latest
+            docker run -d -p 6379:6379 --restart unless-stopped redis:latest
 
 6.  Install the python dependencies by performing in the src/ directory.
-
     .. code:: shell-session
 
         pipenv install --dev
 
-7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From root folder:
+  * Make sure you're using python 3.9.x or lower. Otherwise you might get issues with building dependencies. You can use `pyenv <https://github.com/pyenv/pyenv>`_ to install a specific python version.
+
+7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
 
     .. code:: shell-session
 
-        compile-frontend.sh
+        npm install .
+        ./node_modules/.bin/ng build --configuration production
 
 8.  Apply migrations and create a superuser for your dev instance:
 
@@ -106,6 +108,7 @@ Testing and code style:
 *   Run ``pytest`` in the src/ directory to execute all tests. This also generates a HTML coverage
     report. When runnings test, paperless.conf is loaded as well. However: the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings except for DEBUG are overridden when testing.
+*   Run ``black`` to format your code.
 *   Run ``pycodestyle`` to test your code for issues with the configured code style settings.
 
     .. note::
@@ -272,15 +275,7 @@ directory.
 Building the Docker image
 =========================
 
-Building the docker image from source requires the following two steps:
-
-1.  Build the front end.
-
-    .. code:: shell-session
-
-        ./compile-frontend.sh
-
-2.  Build the docker image.
+Building the docker image from source:
 
     .. code:: shell-session
 
