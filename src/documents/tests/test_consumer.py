@@ -341,7 +341,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress()
 
-        self.assertEqual(document.created.tzinfo.zone, 'America/Chicago')
+        self.assertEqual(document.created.tzinfo.zone, "America/Chicago")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):
