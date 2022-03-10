@@ -108,7 +108,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       
       // "Live" visual changes prior to save
       this.settingsForm.valueChanges.subscribe(() => {
-        this.settings.updateAppearanceSettings(this.settingsForm.get('darkModeEnabled').value, this.settingsForm.get('darkModeEnabled').value, this.settingsForm.get('themeColor').value)
+        this.settings.updateAppearanceSettings(this.settingsForm.get('darkModeUseSystem').value, this.settingsForm.get('darkModeEnabled').value, this.settingsForm.get('themeColor').value)
       })
     })
   }
