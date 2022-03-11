@@ -61,6 +61,6 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
 
     def test_created(self):
         doc = Document.objects.create(
-            title="test", created=timezone.datetime(2020, 4, 12)
+            title="test", created=timezone.make_aware(timezone.datetime(2020, 4, 12))
         )
         self.assertEqual(self.doc_admin.created_(doc), "2020-04-12")
