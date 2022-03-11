@@ -1,5 +1,4 @@
 export interface WebsocketConsumerStatusMessage {
-
   filename?: string
   task_id?: string
   current_progress?: number
@@ -7,5 +6,4 @@ export interface WebsocketConsumerStatusMessage {
   status?: string
   message?: string
   document_id: number
-
 }

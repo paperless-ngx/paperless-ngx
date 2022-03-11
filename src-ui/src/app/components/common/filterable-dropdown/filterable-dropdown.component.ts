@@ -1,17 +1,23 @@
-import { Component, EventEmitter, Input, Output, ElementRef, ViewChild } from '@angular/core';
-import { FilterPipe } from  'src/app/pipes/filter.pipe';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ElementRef,
+  ViewChild,
+} from '@angular/core'
+import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap'
-import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component';
-import { MatchingModel } from 'src/app/data/matching-model';
-import { Subject } from 'rxjs';
+import { ToggleableItemState } from './toggleable-dropdown-button/toggleable-dropdown-button.component'
+import { MatchingModel } from 'src/app/data/matching-model'
+import { Subject } from 'rxjs'
 
 export interface ChangedItems {
-  itemsToAdd: MatchingModel[],
+  itemsToAdd: MatchingModel[]
   itemsToRemove: MatchingModel[]
 }
 
 export class FilterableDropdownSelectionModel {
-
   changed = new Subject<FilterableDropdownSelectionModel>()
 
   multiple = false
@@ -22,14 +28,20 @@ export class FilterableDropdownSelectionModel {
 
   get itemsSorted(): MatchingModel[] {
     // TODO: this is getting called very often
-    return this.items.sort((a,b) => {
+    return this.items.sort((a, b) => {
       if (a.id == null && b.id != null) {
         return -1
       } else if (a.id != null && b.id == null) {
         return 1
-      } else if (this.getNonTemporary(a.id) == ToggleableItemState.NotSelected && this.getNonTemporary(b.id) != ToggleableItemState.NotSelected) {
+      } else if (
+        this.getNonTemporary(a.id) == ToggleableItemState.NotSelected &&
+        this.getNonTemporary(b.id) != ToggleableItemState.NotSelected
+      ) {
         return 1
-      } else if (this.getNonTemporary(a.id) != ToggleableItemState.NotSelected && this.getNonTemporary(b.id) == ToggleableItemState.NotSelected) {
+      } else if (
+        this.getNonTemporary(a.id) != ToggleableItemState.NotSelected &&
+        this.getNonTemporary(b.id) == ToggleableItemState.NotSelected
+      ) {
         return -1
       } else {
         return a.name.localeCompare(b.name)
@@ -42,11 +54,17 @@ export class FilterableDropdownSelectionModel {
   private temporarySelectionStates = new Map<number, ToggleableItemState>()
 
   getSelectedItems() {
-    return this.items.filter(i => this.temporarySelectionStates.get(i.id) == ToggleableItemState.Selected)
+    return this.items.filter(
+      (i) =>
+        this.temporarySelectionStates.get(i.id) == ToggleableItemState.Selected
+    )
   }
 
   getExcludedItems() {
-    return this.items.filter(i => this.temporarySelectionStates.get(i.id) == ToggleableItemState.Excluded)
+    return this.items.filter(
+      (i) =>
+        this.temporarySelectionStates.get(i.id) == ToggleableItemState.Excluded
+    )
   }
 
   set(id: number, state: ToggleableItemState, fireEvent = true) {
@@ -62,9 +80,16 @@ export class FilterableDropdownSelectionModel {
 
   toggle(id: number, fireEvent = true) {
     let state = this.temporarySelectionStates.get(id)
-    if (state == null || (state != ToggleableItemState.Selected && state != ToggleableItemState.Excluded)) {
+    if (
+      state == null ||
+      (state != ToggleableItemState.Selected &&
+        state != ToggleableItemState.Excluded)
+    ) {
       this.temporarySelectionStates.set(id, ToggleableItemState.Selected)
-    } else if (state == ToggleableItemState.Selected || state == ToggleableItemState.Excluded) {
+    } else if (
+      state == ToggleableItemState.Selected ||
+      state == ToggleableItemState.Excluded
+    ) {
       this.temporarySelectionStates.delete(id)
     }
 
@@ -91,7 +116,7 @@ export class FilterableDropdownSelectionModel {
     }
   }
 
-  exclude(id: number, fireEvent:boolean = true) {
+  exclude(id: number, fireEvent: boolean = true) {
     let state = this.temporarySelectionStates.get(id)
     if (state == null || state != ToggleableItemState.Excluded) {
       this.temporarySelectionStates.set(id, ToggleableItemState.Excluded)
@@ -130,7 +155,9 @@ export class FilterableDropdownSelectionModel {
   }
 
   get(id: number) {
-    return this.temporarySelectionStates.get(id) || ToggleableItemState.NotSelected
+    return (
+      this.temporarySelectionStates.get(id) || ToggleableItemState.NotSelected
+    )
   }
 
   selectionSize() {
@@ -150,9 +177,19 @@ export class FilterableDropdownSelectionModel {
   }
 
   isDirty() {
-    if (!Array.from(this.temporarySelectionStates.keys()).every(id => this.temporarySelectionStates.get(id) == this.selectionStates.get(id))) {
+    if (
+      !Array.from(this.temporarySelectionStates.keys()).every(
+        (id) =>
+          this.temporarySelectionStates.get(id) == this.selectionStates.get(id)
+      )
+    ) {
       return true
-    } else if (!Array.from(this.selectionStates.keys()).every(id => this.selectionStates.get(id) == this.temporarySelectionStates.get(id))) {
+    } else if (
+      !Array.from(this.selectionStates.keys()).every(
+        (id) =>
+          this.selectionStates.get(id) == this.temporarySelectionStates.get(id)
+      )
+    ) {
       return true
     } else if (this.temporaryLogicalOperator !== this._logicalOperator) {
       return true
@@ -162,7 +199,10 @@ export class FilterableDropdownSelectionModel {
   }
 
   isNoneSelected() {
-    return this.selectionSize() == 1 && this.get(null) == ToggleableItemState.Selected
+    return (
+      this.selectionSize() == 1 &&
+      this.get(null) == ToggleableItemState.Selected
+    )
   }
 
   init(map) {
@@ -187,8 +227,17 @@ export class FilterableDropdownSelectionModel {
 
   diff(): ChangedItems {
     return {
-      itemsToAdd: this.items.filter(item => this.temporarySelectionStates.get(item.id) == ToggleableItemState.Selected && this.selectionStates.get(item.id) != ToggleableItemState.Selected),
-      itemsToRemove: this.items.filter(item => !this.temporarySelectionStates.has(item.id) && this.selectionStates.has(item.id)),
+      itemsToAdd: this.items.filter(
+        (item) =>
+          this.temporarySelectionStates.get(item.id) ==
+            ToggleableItemState.Selected &&
+          this.selectionStates.get(item.id) != ToggleableItemState.Selected
+      ),
+      itemsToRemove: this.items.filter(
+        (item) =>
+          !this.temporarySelectionStates.has(item.id) &&
+          this.selectionStates.has(item.id)
+      ),
     }
   }
 }
@@ -196,10 +245,9 @@ export class FilterableDropdownSelectionModel {
 @Component({
   selector: 'app-filterable-dropdown',
   templateUrl: './filterable-dropdown.component.html',
-  styleUrls: ['./filterable-dropdown.component.scss']
+  styleUrls: ['./filterable-dropdown.component.scss'],
 })
 export class FilterableDropdownComponent {
-
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
   @ViewChild('dropdown') dropdown: NgbDropdown
 
@@ -211,7 +259,7 @@ export class FilterableDropdownComponent {
       this._selectionModel.items = Array.from(items)
       this._selectionModel.items.unshift({
         name: $localize`:Filter drop down element to filter for documents with no correspondent/type/tag assigned:Not assigned`,
-        id: null
+        id: null,
       })
     }
   }
@@ -229,7 +277,7 @@ export class FilterableDropdownComponent {
       model.items = this.selectionModel.items
       model.multiple = this.selectionModel.multiple
     }
-    model.changed.subscribe(updatedModel => {
+    model.changed.subscribe((updatedModel) => {
       this.selectionModelChange.next(updatedModel)
     })
     this._selectionModel = model
@@ -255,7 +303,7 @@ export class FilterableDropdownComponent {
   title: string
 
   @Input()
-  filterPlaceholder: string = ""
+  filterPlaceholder: string = ''
 
   @Input()
   icon: string
@@ -276,14 +324,17 @@ export class FilterableDropdownComponent {
   open = new EventEmitter()
 
   get operatorToggleEnabled(): boolean {
-    return this.selectionModel.selectionSize() > 1 && this.selectionModel.getExcludedItems().length == 0
+    return (
+      this.selectionModel.selectionSize() > 1 &&
+      this.selectionModel.getExcludedItems().length == 0
+    )
   }
 
   modelIsDirty: boolean = false
 
   constructor(private filterPipe: FilterPipe) {
     this.selectionModel = new FilterableDropdownSelectionModel()
-    this.selectionModelChange.subscribe(updatedModel => {
+    this.selectionModelChange.subscribe((updatedModel) => {
       this.modelIsDirty = updatedModel.isDirty()
     })
   }
@@ -300,7 +351,7 @@ export class FilterableDropdownComponent {
   dropdownOpenChange(open: boolean): void {
     if (open) {
       setTimeout(() => {
-        this.listFilterTextInput.nativeElement.focus();
+        this.listFilterTextInput.nativeElement.focus()
       }, 0)
       if (this.editing) {
         this.selectionModel.reset()

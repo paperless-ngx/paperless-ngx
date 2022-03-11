@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
-import { Subject, zip } from 'rxjs';
+import { Injectable } from '@angular/core'
+import { Subject, zip } from 'rxjs'
 
 export interface Toast {
-
   title: string
 
   content: string
@@ -12,15 +11,13 @@ export interface Toast {
   action?: any
 
   actionName?: string
-
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ToastService {
-
-  constructor() { }
+  constructor() {}
 
   private toasts: Toast[] = []
 
@@ -32,15 +29,15 @@ export class ToastService {
   }
 
   showError(content: string, delay: number = 10000) {
-    this.show({title: $localize`Error`, content: content, delay: delay})
+    this.show({ title: $localize`Error`, content: content, delay: delay })
   }
 
   showInfo(content: string, delay: number = 5000) {
-    this.show({title: $localize`Information`, content: content, delay: delay})
+    this.show({ title: $localize`Information`, content: content, delay: delay })
   }
 
   closeToast(toast: Toast) {
-    let index = this.toasts.findIndex(t => t == toast)
+    let index = this.toasts.findIndex((t) => t == toast)
     if (index > -1) {
       this.toasts.splice(index, 1)
       this.toastsSubject.next(this.toasts)
@@ -50,5 +47,4 @@ export class ToastService {
   getToasts() {
     return this.toastsSubject
   }
-
 }

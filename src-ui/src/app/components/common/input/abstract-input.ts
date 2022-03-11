@@ -1,30 +1,29 @@
-import { Directive, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { ControlValueAccessor } from '@angular/forms';
-import { v4 as uuidv4 } from 'uuid';
+import { Directive, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
+import { ControlValueAccessor } from '@angular/forms'
+import { v4 as uuidv4 } from 'uuid'
 
 @Directive()
 export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
-
-  @ViewChild("inputField")
+  @ViewChild('inputField')
   inputField: ElementRef
 
-  constructor() { }
+  constructor() {}
 
-  onChange = (newValue: T) => {};
+  onChange = (newValue: T) => {}
 
-  onTouched = () => {};
+  onTouched = () => {}
 
   writeValue(newValue: any): void {
     this.value = newValue
   }
   registerOnChange(fn: any): void {
-    this.onChange = fn;
+    this.onChange = fn
   }
   registerOnTouched(fn: any): void {
-    this.onTouched = fn;
+    this.onTouched = fn
   }
   setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.disabled = isDisabled
   }
 
   focus() {
@@ -37,7 +36,7 @@ export class AbstractInputComponent<T> implements OnInit, ControlValueAccessor {
   title: string
 
   @Input()
-  disabled = false;
+  disabled = false
 
   @Input()
   error: string
