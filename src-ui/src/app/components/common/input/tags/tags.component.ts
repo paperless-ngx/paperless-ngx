@@ -1,45 +1,46 @@
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TagEditDialogComponent } from 'src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
-import { TagService } from 'src/app/services/rest/tag.service';
+import { Component, forwardRef, Input, OnInit } from '@angular/core'
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { TagEditDialogComponent } from 'src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component'
+import { PaperlessTag } from 'src/app/data/paperless-tag'
+import { TagService } from 'src/app/services/rest/tag.service'
 
 @Component({
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => TagsComponent),
-    multi: true
-  }],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => TagsComponent),
+      multi: true,
+    },
+  ],
   selector: 'app-input-tags',
   templateUrl: './tags.component.html',
-  styleUrls: ['./tags.component.scss']
+  styleUrls: ['./tags.component.scss'],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
-
   constructor(private tagService: TagService, private modalService: NgbModal) {
     this.createTagRef = this.createTag.bind(this)
   }
 
-  onChange = (newValue: number[]) => {};
+  onChange = (newValue: number[]) => {}
 
-  onTouched = () => {};
+  onTouched = () => {}
 
   writeValue(newValue: number[]): void {
     this.value = newValue
   }
   registerOnChange(fn: any): void {
-    this.onChange = fn;
+    this.onChange = fn
   }
   registerOnTouched(fn: any): void {
-    this.onTouched = fn;
+    this.onTouched = fn
   }
   setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.disabled = isDisabled
   }
 
   ngOnInit(): void {
-    this.tagService.listAll().subscribe(result => {
+    this.tagService.listAll().subscribe((result) => {
       this.tags = result.results
     })
   }
@@ -63,7 +64,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   getTag(id) {
     if (this.tags) {
-      return this.tags.find(tag => tag.id == id)
+      return this.tags.find((tag) => tag.id == id)
     } else {
       return null
     }
@@ -80,12 +81,15 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   createTag(name: string = null) {
-    var modal = this.modalService.open(TagEditDialogComponent, {backdrop: 'static'})
+    var modal = this.modalService.open(TagEditDialogComponent, {
+      backdrop: 'static',
+    })
     modal.componentInstance.dialogMode = 'create'
     if (name) modal.componentInstance.object = { name: name }
-    else if (this._lastSearchTerm) modal.componentInstance.object = { name: this._lastSearchTerm }
-    modal.componentInstance.success.subscribe(newTag => {
-      this.tagService.listAll().subscribe(tags => {
+    else if (this._lastSearchTerm)
+      modal.componentInstance.object = { name: this._lastSearchTerm }
+    modal.componentInstance.success.subscribe((newTag) => {
+      this.tagService.listAll().subscribe((tags) => {
         this.tags = tags.results
         this.value = [...this.value, newTag.id]
         this.onChange(this.value)
@@ -95,7 +99,9 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   getSuggestions() {
     if (this.suggestions && this.tags) {
-      return this.suggestions.filter(id => !this.value.includes(id)).map(id => this.tags.find(tag => tag.id == id))
+      return this.suggestions
+        .filter((id) => !this.value.includes(id))
+        .map((id) => this.tags.find((tag) => tag.id == id))
     } else {
       return []
     }
@@ -117,7 +123,6 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   onBlur() {
     setTimeout(() => {
       this.clearLastSearchTerm()
-    }, 3000);
+    }, 3000)
   }
-
 }

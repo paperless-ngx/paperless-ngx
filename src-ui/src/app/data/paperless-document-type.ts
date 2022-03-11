@@ -1,5 +1,3 @@
-import { MatchingModel } from './matching-model';
+import { MatchingModel } from './matching-model'
 
-export interface PaperlessDocumentType extends MatchingModel {
-
-}
+export interface PaperlessDocumentType extends MatchingModel {}

@@ -1,25 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { MetadataCollapseComponent } from './metadata-collapse.component';
+import { MetadataCollapseComponent } from './metadata-collapse.component'
 
 describe('MetadataCollapseComponent', () => {
-  let component: MetadataCollapseComponent;
-  let fixture: ComponentFixture<MetadataCollapseComponent>;
+  let component: MetadataCollapseComponent
+  let fixture: ComponentFixture<MetadataCollapseComponent>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MetadataCollapseComponent ]
-    })
-    .compileComponents();
-  });
+      declarations: [MetadataCollapseComponent],
+    }).compileComponents()
+  })
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MetadataCollapseComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(MetadataCollapseComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})
