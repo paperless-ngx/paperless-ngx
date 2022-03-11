@@ -1,25 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { UploadFileWidgetComponent } from './upload-file-widget.component';
+import { UploadFileWidgetComponent } from './upload-file-widget.component'
 
 describe('UploadFileWidgetComponent', () => {
-  let component: UploadFileWidgetComponent;
-  let fixture: ComponentFixture<UploadFileWidgetComponent>;
+  let component: UploadFileWidgetComponent
+  let fixture: ComponentFixture<UploadFileWidgetComponent>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UploadFileWidgetComponent ]
-    })
-    .compileComponents();
-  });
+      declarations: [UploadFileWidgetComponent],
+    }).compileComponents()
+  })
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UploadFileWidgetComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(UploadFileWidgetComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

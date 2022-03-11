@@ -1,10 +1,9 @@
 ---
 name: Other
 about: Anything that is not a feature request or bug.
-title: "[Other] Title of your issue"
+title: '[Other] Title of your issue'
 labels: ''
 assignees: ''
-
 ---
 
 <!--

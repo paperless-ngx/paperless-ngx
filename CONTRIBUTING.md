@@ -4,10 +4,10 @@ If you feel like contributing to the project, please do! Bug fixes and improveme
 
 If you want to implement something big:
 
-* Please start a discussion about that in the issues! Maybe something similar is already in development and we can make it happen together.
-* When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
-* Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
-* Please see the [paperless-ngx merge process](#merging-prs) below.
+- Please start a discussion about that in the issues! Maybe something similar is already in development and we can make it happen together.
+- When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
+- Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
+- Please see the [paperless-ngx merge process](#merging-prs) below.
 
 ## Python
 
@@ -41,9 +41,9 @@ PRs deemed `non-trivial` will go through a stricter review process before being 
 
 Examples of `non-trivial` PRs might include:
 
-* Additional features
-* Large changes to many distinct files
-* Breaking or depreciation of existing features
+- Additional features
+- Large changes to many distinct files
+- Breaking or depreciation of existing features
 
 Our community review process for `non-trivial` PRs is the following:
 
@@ -75,18 +75,18 @@ If a language has already been added, and you would like to contribute new trans
 If you would like the project to be translated to another language, first head over to https://crwd.in/paperless-ngx to check if that language has already been enabled for translation.
 If not, please request the language to be added by creating an issue on GitHub. The issue should contain:
 
-* English name of the language (the localized name can be added on Crowdin).
-* ISO language code. A list of those can be found here: https://support.crowdin.com/enterprise/language-codes/
-* Date format commonly used for the language, e.g. dd/mm/yyyy, mm/dd/yyyy, etc.
+- English name of the language (the localized name can be added on Crowdin).
+- ISO language code. A list of those can be found here: https://support.crowdin.com/enterprise/language-codes/
+- Date format commonly used for the language, e.g. dd/mm/yyyy, mm/dd/yyyy, etc.
 
 After the language has been added and some translations have been made on Crowdin, the language needs to be enabled in the code.
 Note that there is no need to manually add a .po of .xlf file as those will be automatically generated and imported from Crowdin.
 The following files need to be changed:
 
-* src-ui/angular.json (under the _projects/paperless-ui/i18n/locales_ JSON key)
-* src/paperless/settings.py (in the _LANGUAGES_ array)
-* src-ui/src/app/services/settings.service.ts (inside the _getLanguageOptions_ method)
-* src-ui/src/app/app.module.ts (import locale from _angular/common/locales_ and call _registerLocaleData_)
+- src-ui/angular.json (under the _projects/paperless-ui/i18n/locales_ JSON key)
+- src/paperless/settings.py (in the _LANGUAGES_ array)
+- src-ui/src/app/services/settings.service.ts (inside the _getLanguageOptions_ method)
+- src-ui/src/app/app.module.ts (import locale from _angular/common/locales_ and call _registerLocaleData_)
 
 Please add the language in the correct order, alphabetically by locale.
 Note that _en-us_ needs to stay on top of the list, as it is the default project language

@@ -6,10 +6,9 @@ import { Results } from 'src/app/data/results'
 import { environment } from 'src/environments/environment'
 
 export abstract class AbstractPaperlessService<T extends ObjectWithId> {
-
   protected baseUrl: string = environment.apiBaseUrl
 
-  constructor(protected http: HttpClient, private resourceName: string) { }
+  constructor(protected http: HttpClient, private resourceName: string) {}
 
   protected getResourceUrl(id?: number, action?: string): string {
     let url = `${this.baseUrl}${this.resourceName}/`
@@ -30,7 +29,13 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     }
   }
 
-  list(page?: number, pageSize?: number, sortField?: string, sortReverse?: boolean, extraParams?): Observable<Results<T>> {
+  list(
+    page?: number,
+    pageSize?: number,
+    sortField?: string,
+    sortReverse?: boolean,
+    extraParams?
+  ): Observable<Results<T>> {
     let httpParams = new HttpParams()
     if (page) {
       httpParams = httpParams.set('page', page.toString())
@@ -47,30 +52,39 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
         httpParams = httpParams.set(extraParamKey, extraParams[extraParamKey])
       }
     }
-    return this.http.get<Results<T>>(this.getResourceUrl(), {params: httpParams})
+    return this.http.get<Results<T>>(this.getResourceUrl(), {
+      params: httpParams,
+    })
   }
 
   private _listAll: Observable<Results<T>>
 
-  listAll(sortField?: string, sortReverse?: boolean, extraParams?): Observable<Results<T>> {
+  listAll(
+    sortField?: string,
+    sortReverse?: boolean,
+    extraParams?
+  ): Observable<Results<T>> {
     if (!this._listAll) {
-      this._listAll = this.list(1, 100000, sortField, sortReverse, extraParams).pipe(
-        publishReplay(1),
-        refCount()
-      )
+      this._listAll = this.list(
+        1,
+        100000,
+        sortField,
+        sortReverse,
+        extraParams
+      ).pipe(publishReplay(1), refCount())
     }
     return this._listAll
   }
 
   getCached(id: number): Observable<T> {
     return this.listAll().pipe(
-      map(list => list.results.find(o => o.id == id))
+      map((list) => list.results.find((o) => o.id == id))
     )
   }
 
   getCachedMany(ids: number[]): Observable<T[]> {
     return this.listAll().pipe(
-      map(list => ids.map(id => list.results.find(o => o.id == id)))
+      map((list) => ids.map((id) => list.results.find((o) => o.id == id)))
     )
   }
 
@@ -101,5 +115,4 @@ export abstract class AbstractPaperlessService<T extends ObjectWithId> {
     this.clearCache()
     return this.http.patch<T>(this.getResourceUrl(o.id), o)
   }
-
 }

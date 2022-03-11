@@ -1,25 +1,22 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { PaperlessTag } from 'src/app/data/paperless-tag';
+import { Component, Input, OnInit } from '@angular/core'
+import { PaperlessTag } from 'src/app/data/paperless-tag'
 
 @Component({
   selector: 'app-tag',
   templateUrl: './tag.component.html',
-  styleUrls: ['./tag.component.scss']
+  styleUrls: ['./tag.component.scss'],
 })
 export class TagComponent implements OnInit {
-
-  constructor() { }
+  constructor() {}
 
   @Input()
   tag: PaperlessTag
 
   @Input()
-  linkTitle: string = ""
+  linkTitle: string = ''
 
   @Input()
   clickable: boolean = false
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

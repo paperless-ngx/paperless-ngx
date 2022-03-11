@@ -1,25 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { BulkEditorComponent } from './bulk-editor.component';
+import { BulkEditorComponent } from './bulk-editor.component'
 
 describe('BulkEditorComponent', () => {
-  let component: BulkEditorComponent;
-  let fixture: ComponentFixture<BulkEditorComponent>;
+  let component: BulkEditorComponent
+  let fixture: ComponentFixture<BulkEditorComponent>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BulkEditorComponent ]
-    })
-    .compileComponents();
-  });
+      declarations: [BulkEditorComponent],
+    }).compileComponents()
+  })
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BulkEditorComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(BulkEditorComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})
