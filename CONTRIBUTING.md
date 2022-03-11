@@ -93,3 +93,38 @@ Note that _en-us_ needs to stay on top of the list, as it is the default project
 
 If you are familiar with Git, feel free to send a Pull Request with those changes.
 If not, let us know in the issue you created for the language, so that another developer can make these changes.
+
+# Organization Structure & Membership
+
+Paperless-ngx is a community project. We do our best to delegate permission and responsibility among a team of people to ensure the longevity of the project.
+
+## Structure
+
+As of writing, there are 21 members in paperless-ngx. 4 of these people have complete administrative privileges to the repo:
+
+* [@shamoon](https://github.com/shamoon)
+* [@bauerj](https://github.com/bauerj)
+* [@qcasey](https://github.com/qcasey)
+* [@FrankStrieter](https://github.com/FrankStrieter)
+
+There are 5 teams collaborating on specific tasks within paperless-ngx:
+
+* @paperless-ngx/backend (Python / django)
+* @paperless-ngx/frontend (JavaScript / Typescript)
+* @paperless-ngx/ci-cd (GitHub Actions / Deployment)
+* @paperless-ngx/issues (Issue triage)
+* @paperless-ngx/test (General testing for larger PRs)
+
+## Permissions
+
+All team members are notified when mentioned or assigned to a relevant issue or pull request. Additionally, each team has slightly different access to paperless-ngx:
+
+* The **test** team has no special permissions.
+* The **issues** team has `triage` access. This means they can organize issues and pull requests.
+* The **backend**, **frontend**, and **ci-cd** teams have `write` access. This means they can approve PRs and push code, containers, releases, and more.
+
+## Joining
+
+We are not overly strict with inviting people to the organization. If you have read the [team permissions](#permissions) and think having additional access would enhance your contributions, please reach out to an [admin](#structure) of the team.
+
+The admins occasionally invite contributors directly if we believe having them on a team will accelerate their work.
