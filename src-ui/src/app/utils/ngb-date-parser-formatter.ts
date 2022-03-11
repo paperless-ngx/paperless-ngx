@@ -40,9 +40,9 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
    * any parts of the string, e.g. allowing for 1/2/22,
    * which allows quick entry of the date on the numpad. 
    */
-  public preformatDateInput(value: string): string {
-    let inputFormat = this.getDateInputFormat()
-    let dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
+  private preformatDateInput(value: string): string {
+    const inputFormat = this.getDateInputFormat()
+    const dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
     
     if (this.separatorRegExp.test(value)) {
       // split on separator, pad & re-join without separator
