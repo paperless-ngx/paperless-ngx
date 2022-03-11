@@ -1,17 +1,16 @@
-import { Component, Input } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { environment } from 'src/environments/environment';
+import { Component, Input } from '@angular/core'
+import { Title } from '@angular/platform-browser'
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'app-page-header',
   templateUrl: './page-header.component.html',
-  styleUrls: ['./page-header.component.scss']
+  styleUrls: ['./page-header.component.scss'],
 })
 export class PageHeaderComponent {
+  constructor(private titleService: Title) {}
 
-  constructor(private titleService: Title) { }
-
-  _title = ""
+  _title = ''
 
   @Input()
   set title(title: string) {
@@ -24,6 +23,5 @@ export class PageHeaderComponent {
   }
 
   @Input()
-  subTitle: string = ""
-
+  subTitle: string = ''
 }

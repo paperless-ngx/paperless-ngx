@@ -1,15 +1,14 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { Component, EventEmitter, Input, Output } from '@angular/core'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { Subject } from 'rxjs'
 
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
-  styleUrls: ['./confirm-dialog.component.scss']
+  styleUrls: ['./confirm-dialog.component.scss'],
 })
 export class ConfirmDialogComponent {
-
-  constructor(public activeModal: NgbActiveModal) { }
+  constructor(public activeModal: NgbActiveModal) {}
 
   @Output()
   public confirmClicked = new EventEmitter()
@@ -24,7 +23,7 @@ export class ConfirmDialogComponent {
   message
 
   @Input()
-  btnClass = "btn-primary"
+  btnClass = 'btn-primary'
 
   @Input()
   btnCaption = $localize`Confirm`
