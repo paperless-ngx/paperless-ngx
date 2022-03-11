@@ -433,15 +433,19 @@ export class DocumentDetailComponent
   }
 
   nextDoc() {
-    this.documentListViewService.getNext(this.document.id).subscribe((nextDocId: number) => {
-      this.router.navigate(['documents', nextDocId])
-    })
+    this.documentListViewService
+      .getNext(this.document.id)
+      .subscribe((nextDocId: number) => {
+        this.router.navigate(['documents', nextDocId])
+      })
   }
-  
-  previousDoc () {
-    this.documentListViewService.getPrevious(this.document.id).subscribe((prevDocId: number) => {
-      this.router.navigate(['documents', prevDocId])
-    })
+
+  previousDoc() {
+    this.documentListViewService
+      .getPrevious(this.document.id)
+      .subscribe((prevDocId: number) => {
+        this.router.navigate(['documents', prevDocId])
+      })
   }
 
   pdfPreviewLoaded(pdf: PDFDocumentProxy) {
