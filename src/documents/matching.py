@@ -1,8 +1,10 @@
 import logging
 import re
 
-
-from documents.models import MatchingModel, Correspondent, DocumentType, Tag
+from documents.models import Correspondent
+from documents.models import DocumentType
+from documents.models import MatchingModel
+from documents.models import Tag
 
 
 logger = logging.getLogger("paperless.matching")
@@ -12,7 +14,7 @@ def log_reason(matching_model, document, reason):
     class_name = type(matching_model).__name__
     logger.debug(
         f"{class_name} {matching_model.name} matched on document "
-        f"{document} because {reason}"
+        f"{document} because {reason}",
     )
 
 
@@ -25,7 +27,7 @@ def match_correspondents(document, classifier):
     correspondents = Correspondent.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk == pred_id, correspondents)
+        filter(lambda o: matches(o, document) or o.pk == pred_id, correspondents),
     )
 
 
@@ -38,7 +40,7 @@ def match_document_types(document, classifier):
     document_types = DocumentType.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk == pred_id, document_types)
+        filter(lambda o: matches(o, document) or o.pk == pred_id, document_types),
     )
 
 
@@ -51,7 +53,7 @@ def match_tags(document, classifier):
     tags = Tag.objects.all()
 
     return list(
-        filter(lambda o: matches(o, document) or o.pk in predicted_tag_ids, tags)
+        filter(lambda o: matches(o, document) or o.pk in predicted_tag_ids, tags),
     )
 
 
@@ -92,7 +94,7 @@ def matches(matching_model, document):
                 rf"\b{re.escape(matching_model.match)}\b",
                 document_content,
                 **search_kwargs,
-            )
+            ),
         )
         if result:
             log_reason(
@@ -105,11 +107,12 @@ def matches(matching_model, document):
     elif matching_model.matching_algorithm == MatchingModel.MATCH_REGEX:
         try:
             match = re.search(
-                re.compile(matching_model.match, **search_kwargs), document_content
+                re.compile(matching_model.match, **search_kwargs),
+                document_content,
             )
         except re.error:
             logger.error(
-                f"Error while processing regular expression " f"{matching_model.match}"
+                f"Error while processing regular expression " f"{matching_model.match}",
             )
             return False
         if match:
