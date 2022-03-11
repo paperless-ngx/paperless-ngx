@@ -292,6 +292,24 @@ export class DocumentDetailComponent implements OnInit, OnDestroy, DirtyComponen
     return this.documentListViewService.hasNext(this.documentId)
   }
 
+  hasPrevious() {
+    return this.documentListViewService.hasPrevious(this.documentId)
+  }
+
+  nextDoc() {
+    this.documentListViewService.getNext(this.document.id).subscribe((nextDocId: number) => {
+      this.router.navigate(['documents', nextDocId])
+      this.titleInput?.focus()
+    })
+  }
+  
+  previousDoc () {
+    this.documentListViewService.getPrevious(this.document.id).subscribe((prevDocId: number) => {
+      this.router.navigate(['documents', prevDocId])
+      this.titleInput?.focus()
+    })
+  }
+
   pdfPreviewLoaded(pdf: PDFDocumentProxy) {
     this.previewNumPages = pdf.numPages
   }
