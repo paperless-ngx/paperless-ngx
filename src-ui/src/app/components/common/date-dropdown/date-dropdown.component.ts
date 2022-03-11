@@ -4,6 +4,7 @@ import { NgbDateAdapter } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { SettingsService } from 'src/app/services/settings.service';
+import { LocalizedDateParserFormatter } from 'src/app/utils/ngb-date-parser-formatter';
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter';
 
 export interface DateSelection {
@@ -25,9 +26,11 @@ const LAST_YEAR = 3
   ]
 })
 export class DateDropdownComponent implements OnInit, OnDestroy {
+  private settings: SettingsService
 
   constructor(settings: SettingsService) {
-    this.datePlaceHolder = settings.getLocalizedDateInputFormat()
+    this.settings = settings
+    this.datePlaceHolder = this.settings.getLocalizedDateInputFormat()
   }
 
   quickFilters = [
@@ -108,6 +111,23 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
 
   onChangeDebounce() {
     this.datesSetDebounce$.next({after: this.dateAfter, before: this.dateBefore})
+  }
+
+  onFocusOut() {
+    this.dateAfter = this.maybePadString(this.dateAfter)
+    this.dateBefore = this.maybePadString(this.dateBefore)
+  }
+
+  maybePadString(value): string {
+    // Allow dates to be specified without 'padding' e.g. 2/3
+    if (!value || value.length == 10) return value; // null or already formatted
+    if ([',','.','/','-'].some(sep => value.includes(sep))) {
+      let valArr = value.split(/[\.,\/-]+/)
+      valArr = valArr.map(segment => segment.padStart(2,'0'))
+      let dateFormatter = new LocalizedDateParserFormatter(this.settings)
+      value = dateFormatter.preformatDateInput(valArr.join(''))
+    }
+    return value
   }
 
   clearBefore() {
