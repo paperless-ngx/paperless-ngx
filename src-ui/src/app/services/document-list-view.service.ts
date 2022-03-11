@@ -262,6 +262,13 @@ export class DocumentListViewService {
     }
   }
 
+  hasPrevious(doc: number) {
+    if (this.documents) {
+      let index = this.documents.findIndex(d => d.id == doc)
+      return index != -1 && !(index == 0 && this.currentPage == 1)
+    }
+  }
+
   getNext(currentDocId: number): Observable<number> {
     return new Observable(nextDocId => {
       if (this.documents != null) {
@@ -282,6 +289,30 @@ export class DocumentListViewService {
         }
       } else {
         nextDocId.complete()
+      }
+    })
+  }
+
+  getPrevious(currentDocId: number): Observable<number> {
+    return new Observable(prevDocId => {
+      if (this.documents != null) {
+
+        let index = this.documents.findIndex(d => d.id == currentDocId)
+
+        if (index != 0) {
+          prevDocId.next(this.documents[index-1].id)
+          prevDocId.complete()
+        } else if (this.currentPage > 1) {
+          this.currentPage -= 1
+          this.reload(() => {
+            prevDocId.next(this.documents[this.documents.length - 1].id)
+            prevDocId.complete()
+          })
+        } else {
+          prevDocId.complete()
+        }
+      } else {
+        prevDocId.complete()
       }
     })
   }

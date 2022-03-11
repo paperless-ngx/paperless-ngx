@@ -34,11 +34,25 @@
         </svg>&nbsp;<span class="d-none d-lg-inline" i18n>More like this</span>
     </button>
 
-    <button type="button" class="btn btn-sm btn-outline-primary" (click)="close()">
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#x" />
-        </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Close</span>
+        </svg>
     </button>
+
+    <div class="button-group">
+        <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
+            <svg class="buttonicon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
+            </svg>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-primary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
+            <svg class="buttonicon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
+            </svg>
+        </button>
+    </div>
+
 </app-page-header>
 
 
