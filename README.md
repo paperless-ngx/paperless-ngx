@@ -10,23 +10,23 @@
 </p>
 
 <!-- omit in toc -->
+
 # Paperless-ngx
 
-Paperless-ngx is a document management system that transforms your physical documents into a searchable online archive so you can keep, well, *less paper*.
+Paperless-ngx is a document management system that transforms your physical documents into a searchable online archive so you can keep, well, _less paper_.
 
 Paperless-ngx forked from [paperless-ng](https://github.com/jonaswinkler/paperless-ng) to continue the great work and distribute responsibility of supporting and advancing the project among a team of people. [Consider joining us!](#community-support) Discussion of this transition can be found in issues
 [#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599) and [#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
-A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) using login `demo` / `demo`. *Note: demo content is reset frequently and confidential information should not be uploaded.*
-
+A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) using login `demo` / `demo`. _Note: demo content is reset frequently and confidential information should not be uploaded._
 
 - [Features](#features)
 - [Getting started](#getting-started)
 - [Contributing](#contributing)
-	- [Community Support](#community-support)
-	- [Translation](#translation)
-	- [Feature Requests](#feature-requests)
-	- [Bugs](#bugs)
+  - [Community Support](#community-support)
+  - [Translation](#translation)
+  - [Feature Requests](#feature-requests)
+  - [Bugs](#bugs)
 - [Affiliated Projects](#affiliated-projects)
 - [Important Note](#important-note)
 
@@ -35,28 +35,28 @@ A demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) 
 ![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/_static/screenshots/documents-wchrome.png#gh-light-mode-only)
 ![Dashboard](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docs/_static/screenshots/documents-wchrome-dark.png#gh-dark-mode-only)
 
-* Organize and index your scanned documents with tags, correspondents, types, and more.
-* Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
-* Supports PDF documents, images, plain text files, and Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents).
-	* Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ngx.readthedocs.io/en/latest/configuration.html#tika-settings))
-* Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely.
-* Single page application front end.
-	* Includes a dashboard that shows basic statistics and has document upload.
-	* Filtering by tags, correspondents, types, and more.
-	* Customizable views can be saved and displayed on the dashboard.
-* Full text search helps you find what you need.
-	* Auto completion suggests relevant words from your documents.
-	* Results are sorted by relevance to your search query.
-	* Highlighting shows you which parts of the document matched the query.
-	* Searching for similar documents ("More like this")
-* Email processing: Paperless adds documents from your email accounts.
-	* Configure multiple accounts and filters for each account.
-	* When adding documents from mail, paperless can move these mail to a new folder, mark them as read, flag them as important or delete them.
-* Machine learning powered document matching.
-	* Paperless-ngx learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
-* Optimized for multi core systems: Paperless-ngx consumes multiple documents in parallel.
-* The integrated sanity checker makes sure that your document archive is in good health.
-* [More screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
+- Organize and index your scanned documents with tags, correspondents, types, and more.
+- Performs OCR on your documents, adds selectable text to image only documents and adds tags, correspondents and document types to your documents.
+- Supports PDF documents, images, plain text files, and Office documents (Word, Excel, Powerpoint, and LibreOffice equivalents).
+  - Office document support is optional and provided by Apache Tika (see [configuration](https://paperless-ngx.readthedocs.io/en/latest/configuration.html#tika-settings))
+- Paperless stores your documents plain on disk. Filenames and folders are managed by paperless and their format can be configured freely.
+- Single page application front end.
+  - Includes a dashboard that shows basic statistics and has document upload.
+  - Filtering by tags, correspondents, types, and more.
+  - Customizable views can be saved and displayed on the dashboard.
+- Full text search helps you find what you need.
+  - Auto completion suggests relevant words from your documents.
+  - Results are sorted by relevance to your search query.
+  - Highlighting shows you which parts of the document matched the query.
+  - Searching for similar documents ("More like this")
+- Email processing: Paperless adds documents from your email accounts.
+  - Configure multiple accounts and filters for each account.
+  - When adding documents from mail, paperless can move these mail to a new folder, mark them as read, flag them as important or delete them.
+- Machine learning powered document matching.
+  - Paperless-ngx learns from your documents and will be able to automatically assign tags, correspondents and types to documents once you've stored a few documents in paperless.
+- Optimized for multi core systems: Paperless-ngx consumes multiple documents in parallel.
+- The integrated sanity checker makes sure that your document archive is in good health.
+- [More screenshots are available in the documentation](https://paperless-ngx.readthedocs.io/en/latest/screenshots.html).
 
 # Getting started
 
@@ -73,6 +73,7 @@ Alternatively, you can install the dependencies and setup apache and a database 
 Migrating from Paperless-ng is easy, just drop in the new docker image! See the [documentation on migrating](https://paperless-ngx.readthedocs.io/en/latest/setup.html#migrating-from-paperless-ng) for more details.
 
 <!-- omit in toc -->
+
 ### Documentation
 
 The documentation for Paperless-ngx is available on [ReadTheDocs](https://paperless-ngx.readthedocs.io/).
@@ -101,18 +102,18 @@ For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/i
 
 Paperless has been around a while now, and people are starting to build stuff on top of it. If you're one of those people, we can add your project to this list:
 
-* [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless-ngx. Also works with the original Paperless and Paperless-ngx.
-* [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
-* [Scan to Paperless](https://github.com/sbrunner/scan-to-paperless): Scan and prepare (crop, deskew, OCR, ...) your documents for Paperless.
+- [Paperless App](https://github.com/bauerj/paperless_app): An Android/iOS app for Paperless-ngx. Also works with the original Paperless and Paperless-ngx.
+- [Paperless Share](https://github.com/qcasey/paperless_share). Share any files from your Android application with paperless. Very simple, but works with all of the mobile scanning apps out there that allow you to share scanned documents.
+- [Scan to Paperless](https://github.com/sbrunner/scan-to-paperless): Scan and prepare (crop, deskew, OCR, ...) your documents for Paperless.
 
 These projects also exist, but their status and compatibility with paperless-ngx is unknown.
 
-* [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
+- [paperless-cli](https://github.com/stgarf/paperless-cli): A golang command line binary to interact with a Paperless instance.
 
 This project also exists, but needs updates to be compatible with paperless-ngx.
 
-* [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation. Runs on Mac, Linux, and Windows.
-	Known issues on Mac: (Could not load reminders and documents)
+- [Paperless Desktop](https://github.com/thomasbrueggemann/paperless-desktop): A desktop UI for your Paperless installation. Runs on Mac, Linux, and Windows.
+  Known issues on Mac: (Could not load reminders and documents)
 
 # Important Note
 
