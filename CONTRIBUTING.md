@@ -100,7 +100,7 @@ Paperless-ngx is a community project. We do our best to delegate permission and 
 
 ## Structure
 
-As of writing, there are 21 members in paperless-ngx. 4 of these people have complete administrative privliges to the repo:
+As of writing, there are 21 members in paperless-ngx. 4 of these people have complete administrative privileges to the repo:
 
 * [@shamoon](https://github.com/shamoon)
 * [@bauerj](https://github.com/bauerj)
