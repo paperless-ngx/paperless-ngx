@@ -17,7 +17,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title">
             <ng-container *ngIf="document.correspondent">
-              <a *ngIf="clickCorrespondent.observers.length ; else nolink" [routerLink]="[]" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold">{{(document.correspondent$ | async)?.name}}</a>
+              <a *ngIf="clickCorrespondent.observers.length ; else nolink" [routerLink]="[]" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>
               <ng-template #nolink>{{(document.correspondent$ | async)?.name}}</ng-template>:
             </ng-container>
             {{document.title | documentTitle}}

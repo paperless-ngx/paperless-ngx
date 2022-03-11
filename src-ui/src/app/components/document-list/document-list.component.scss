@@ -5,7 +5,7 @@ tr {
 }
 
 .table-row-selected {
-  background-color: $primaryFaded;
+  background-color: var(--ngx-primary-faded);
 }
 
 $paperless-card-breakpoints: (

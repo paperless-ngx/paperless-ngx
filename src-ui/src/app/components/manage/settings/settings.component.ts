@@ -24,6 +24,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     'darkModeUseSystem': new FormControl(null),
     'darkModeEnabled': new FormControl(null),
     'darkModeInvertThumbs': new FormControl(null),
+    'themeColor': new FormControl(null),
     'useNativePdfViewer': new FormControl(null),
     'savedViews': this.savedViewGroup,
     'displayLanguage': new FormControl(null),
@@ -40,6 +41,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
   store: BehaviorSubject<any>
   storeSub: Subscription
   isDirty$: Observable<boolean>
+  isDirty: Boolean = false
 
   get computedDateLocale(): string {
     return this.settingsForm.value.dateLocale || this.settingsForm.value.displayLanguage || this.currentLocale
@@ -63,6 +65,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
         'darkModeUseSystem': this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
         'darkModeEnabled': this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
         'darkModeInvertThumbs': this.settings.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED),
+        'themeColor': this.settings.get(SETTINGS_KEYS.THEME_COLOR),
         'useNativePdfViewer': this.settings.get(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER),
         'savedViews': {},
         'displayLanguage': this.settings.getLanguage(),
@@ -97,10 +100,21 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
 
       // Initialize dirtyCheck
       this.isDirty$ = dirtyCheck(this.settingsForm, this.store.asObservable())
+
+      // Record dirty in case we need to 'undo' appearance settings if not saved on close
+      this.isDirty$.subscribe(dirty => {
+        this.isDirty = dirty
+      })
+      
+      // "Live" visual changes prior to save
+      this.settingsForm.valueChanges.subscribe(() => {
+        this.settings.updateAppearanceSettings(this.settingsForm.get('darkModeUseSystem').value, this.settingsForm.get('darkModeEnabled').value, this.settingsForm.get('themeColor').value)
+      })
     })
   }
 
   ngOnDestroy() {
+    if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didnt save
     this.storeSub && this.storeSub.unsubscribe();
   }
 
@@ -119,6 +133,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.set(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, this.settingsForm.value.darkModeUseSystem)
     this.settings.set(SETTINGS_KEYS.DARK_MODE_ENABLED, (this.settingsForm.value.darkModeEnabled == true).toString())
     this.settings.set(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED, (this.settingsForm.value.darkModeInvertThumbs == true).toString())
+    this.settings.set(SETTINGS_KEYS.THEME_COLOR, (this.settingsForm.value.themeColor).toString())
     this.settings.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, this.settingsForm.value.useNativePdfViewer)
     this.settings.set(SETTINGS_KEYS.DATE_LOCALE, this.settingsForm.value.dateLocale)
     this.settings.set(SETTINGS_KEYS.DATE_FORMAT, this.settingsForm.value.dateFormat)
@@ -129,7 +144,7 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.store.next(this.settingsForm.value)
     this.documentListViewService.updatePageSize()
-    this.settings.updateDarkModeSettings()
+    this.settings.updateAppearanceSettings()
     this.toastService.showInfo($localize`Settings saved successfully.`)
   }
 
@@ -164,5 +179,9 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       this.saveLocalSettings()
     }
 
+  }
+
+  clearThemeColor() {
+    this.settingsForm.get('themeColor').patchValue('');
   }
 }
