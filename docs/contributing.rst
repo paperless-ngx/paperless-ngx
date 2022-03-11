@@ -19,114 +19,28 @@ How to Get Your Changes Rolled Into Paperless
 If you've found a bug, but don't know how to fix it, you can always post an
 issue on `GitHub`_ in the hopes that someone will have the time to fix it for
 you.  If however you're the one with the time, pull requests are always
-welcome, you just have to make sure that your code conforms to a few standards:
+welcome, you just have to make sure that your code conforms to a few standards.
 
-Pep8
-----
-
-It's the standard for all Python development, so it's `very well documented`_.
-The short version is:
-
-* Lines should wrap at 79 characters
-* Use ``snake_case`` for variables, ``CamelCase`` for classes, and ``ALL_CAPS``
-  for constants.
-* Space out your operators: ``stuff + 7`` instead of ``stuff+7``
-* Two empty lines between classes, and functions, but 1 empty line between
-  class methods.
-
-There's more to it than that, but if you follow those, you'll probably be
-alright.  When you submit your pull request, there's a pep8 checker that'll
-look at your code to see if anything is off.  If it finds anything, it'll
-complain at you until you fix it.
-
-
-Additional Style Guides
+pre-commit Hooks
 -----------------------
 
-Where pep8 is ambiguous, I've tried to be a little more specific.  These rules
-aren't hard-and-fast, but if you can conform to them, I'll appreciate it and
-spend less time trying to conform your PR before merging:
+To ensure a consistent style and formatting across the project source, the project
+utilizes a Git `pre-commit` hook to preform some formatting and linting before a
+commit is allowed.  That way, everyone uses the same style and some common issues
+can be caught early on.
 
+The first time you are setting up to contribute, you'll need to install this hook.
+If you've followed the initial development setup instructions, just run the following:
 
-Function calls
-..............
+.. code:: shell-session
 
-If you're calling a function and that necessitates more than one line of code,
-please format it like this:
+        pre-commit install
 
-.. code:: python
-
-    my_function(
-        argument1,
-        kwarg1="x",
-        kwarg2="y"
-        another_really_long_kwarg="some big value"
-        a_kwarg_calling_another_long_function=another_function(
-            another_arg,
-            another_kwarg="kwarg!"
-        )
-    )
-
-This is all in the interest of code uniformity rather than anything else.  If
-we stick to a style, everything is understandable in the same way.
-
-
-Quoting Strings
-...............
-
-pep8 is a little too open-minded on this for my liking.  Python strings should
-be quoted with double quotes (``"``) except in cases where the resulting string
-would require too much escaping of a double quote, in which case, a single
-quoted, or triple-quoted string will do:
-
-.. code:: python
-
-    my_string = "This is my string"
-    problematic_string = 'This is a "string" with "quotes" in it'
-
-In HTML templates, please use double-quotes for tag attributes, and single
-quotes for arguments passed to Django template tags:
-
-.. code:: html
-
-    <div class="stuff">
-        <a href="{% url 'some-url-name' pk='w00t' %}">link this</a>
-    </div>
-
-This is to keep linters happy they look at an HTML file and see an attribute
-closing the ``"`` before it should have been.
-
---
-
-That's all there is in terms of guidelines, so I hope it's not too daunting.
-
-
-Indentation & Spacing
-.....................
-
-When it comes to indentation:
-
-* For Python, the rule is: follow pep8 and use 4 spaces.
-* For Javascript, CSS, and HTML, please use 1 tab.
-
-Additionally, Django templates making use of block elements like ``{% if %}``,
-``{% for %}``, and ``{% block %}`` etc. should be indented:
-
-Good:
-
-.. code:: html
-
-    {% block stuff %}
-    	<h1>This is the stuff</h1>
-    {% endblock %}
-
-Bad:
-
-.. code:: html
-
-    {% block stuff %}
-    <h1>This is the stuff</h1>
-    {% endblock %}
+That's it!  The hooks will now run when you commit. If the formatting isn't quite right
+or a linter catches something, the commit will be rejected.  You'll need to look at the
+output and fix the issue.  Some hooks, such as the Python formatting tool `black`
+will format failing files, so all you need to do is `git add` those files again and retry your
+commit.
 
 
 The Code of Conduct
@@ -141,5 +55,4 @@ I'm proud to say that the CoC has never had to be enforced because everyone has
 been awesome, friendly, and professional.
 
 .. _GitHub: https://github.com/the-paperless-project/paperless/issues
-.. _very well documented: https://www.python.org/dev/peps/pep-0008/
 .. _code of conduct: https://github.com/the-paperless-project/paperless/blob/master/CODE_OF_CONDUCT.md
