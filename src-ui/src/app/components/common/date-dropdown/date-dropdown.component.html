@@ -20,7 +20,7 @@
           </div>
 
           <div class="input-group input-group-sm">
-            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
+            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (focusout)="onFocusOut()"
                     [(ngModel)]="dateAfter" ngbDatepicker #dateAfterPicker="ngbDatepicker">
             <button class="btn btn-outline-secondary" (click)="dateAfterPicker.toggle()" type="button">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
@@ -43,7 +43,7 @@
           </div>
 
           <div class="input-group input-group-sm">
-            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()"
+            <input class="form-control" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (focusout)="onFocusOut()"
                     [(ngModel)]="dateBefore" ngbDatepicker #dateBeforePicker="ngbDatepicker">
             <button class="btn btn-outline-secondary" (click)="dateBeforePicker.toggle()" type="button">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
