@@ -3,7 +3,7 @@
 from django.db import migrations
 
 
-def migrate_tag(apps, schema_editor):
+def migrate_tag_to_tags(apps, schema_editor):
     # Manual data migration, see
     # https://docs.djangoproject.com/en/3.2/topics/migrations/#data-migrations
     #
@@ -15,6 +15,20 @@ def migrate_tag(apps, schema_editor):
             mail_rule.save()
 
 
+def migrate_tags_to_tag(apps, schema_editor):
+    # Manual data migration, see
+    # https://docs.djangoproject.com/en/3.2/topics/migrations/#data-migrations
+    #
+    # Copy the unique value in the assign_tags set to the old assign_tag property.
+    # Do nothing if the tag is not unique.
+    MailRule = apps.get_model("paperless_mail", "MailRule")
+    for mail_rule in MailRule.objects.all():
+        tags = mail_rule.assign_tags.all()
+        if len(tags) == 1:
+            mail_rule.assign_tag = tags[0]
+            mail_rule.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -22,5 +36,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_tag),
+        migrations.RunPython(migrate_tag_to_tags, migrate_tags_to_tag),
     ]
