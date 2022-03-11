@@ -19,7 +19,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor (private settings: SettingsService, private consumerStatusService: ConsumerStatusService, private toastService: ToastService, private router: Router) {
     let anyWindow = (window as any)
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js';
-    this.settings.updateDarkModeSettings()
+    this.settings.updateAppearanceSettings()
   }
 
   ngOnDestroy(): void {

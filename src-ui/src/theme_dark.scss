@@ -1,8 +1,14 @@
 $primary-dark-mode: #45973a;
+$primary-dark-mode-rgb: 69, 151, 58;
+$primary-dark-mode-darken-10: darken($primary-dark-mode, 10%);
 $danger-dark-mode: #b71631;
+$danger-dark-mode-rgb: 183, 22, 49;
 $bg-dark-mode: #161618;
-$bg-dark-mode-accent: #21262d;
+$bg-dark-mode-rgb: 22, 22, 24;
+$bg-dark-mode-accent: #101216;
+$bg-dark-mode-alt: #242529;
 $bg-light-dark-mode: #1c1c1f;
+$bg-light-dark-mode-rgb: 28, 28, 31;
 $text-color-dark-mode: #abb2bf;
 $text-color-dark-mode-accent: lighten($text-color-dark-mode, 10%);
 $border-color-dark-mode: #47494f;
@@ -12,139 +18,77 @@ $border-color-dark-mode: #47494f;
 }
 
 @mixin dark-mode {
-  background-color: $bg-dark-mode !important;
-  color: $text-color-dark-mode;
+  --bs-primary: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 10%));
+  --bs-danger: #{$danger-dark-mode};
+  --bs-danger-rgb: #{$danger-dark-mode-rgb};
+  --bs-body-bg: #{$bg-dark-mode};
+  --bs-body-bg-rgb: #{$bg-dark-mode-rgb};
+  --bs-body-color: #{$text-color-dark-mode};
+  --bs-light: #{$bg-light-dark-mode};
+  --bs-light-rgb: #{$bg-light-dark-mode-rgb};
+  --bs-border-color: #{$border-color-dark-mode};
+  --ngx-bg-darker: #{$bg-dark-mode-accent};
+  --ngx-bg-alt: #{$bg-dark-mode-alt};
+  --ngx-body-color-accent: #{$text-color-dark-mode-accent};
+  --ngx-focus-alpha: 0.7;
 
+  .navbar.bg-primary{
+    --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
+    --bs-primary-rgb: var(--bs-primary);
+  }
+  
   .navbar-brand {
-    color: $text-color-dark-mode;
+    color: var(--bs-body-color);
   }
-
-  svg.logo {
-    .leaf {
-      color: $primary-dark-mode !important;
-    }
-    .text {
-      fill: $text-color-dark-mode !important;
-    }
-  }
-
-  .bg-light {
-    background-color: $bg-light-dark-mode !important;
-
-    a,
-    div {
-      color: $text-color-dark-mode;
-    }
-  }
-
-  .bg-body {
-    background-color: $bg-dark-mode !important;
-  }
-
-  .text-light {
-    color: $text-color-dark-mode !important;
-  }
-
+  
   .border {
-    border-color: $border-color-dark-mode !important;
+    border-color: var(--bs-border-color) !important;
   }
 
   .border-end {
-    border-right: 1px solid $border-color-dark-mode !important;
+    border-right: 1px solid var(--bs-border-color) !important;
   }
 
   .border-start {
-    border-left: 1px solid $border-color-dark-mode !important;
+    border-left: 1px solid var(--bs-border-color) !important;
   }
 
   .border-bottom {
-    border-bottom: 1px solid $border-color-dark-mode !important;
+    border-bottom: 1px solid var(--bs-border-color) !important;
   }
 
-  .nav-link {
-    color: $text-color-dark-mode !important;
+  .text-dark, .text-light {
+    color: var(--bs-body-color) !important;
+  }
 
-    &.active {
-      background-color: $bg-dark-mode;
-      color: $text-color-dark-mode;
-      border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
-
-      .close {
-        background-color: inherit !important;
-      }
-    }
-
-    &:hover {
-      color: $text-color-dark-mode-accent !important;
-      border-color: $border-color-dark-mode $border-color-dark-mode $bg-dark-mode;
+  .btn-outline-primary, .btn-primary {
+    &:hover, &:focus, &.active, &:active {
+      color: var(--ngx-body-color-accent) !important;
     }
   }
 
-  .page-item.active .page-link {
-    background-color: darken($primary-dark-mode, 10%);
-  }
-
-  .nav-tabs {
-    border-color: $border-color-dark-mode;
-
-    .nav-link {
-      color: $primary-dark-mode !important;
-
-      &.active {
-        color: $text-color-dark-mode !important;
-      }
-    }
-  }
-
-  .dropdown-menu {
-    background-color: $bg-light-dark-mode;
-
-    .dropdown-divider {
-      border-color: $border-color-dark-mode;
-    }
-
-    .dropdown-item {
-      color: $text-color-dark-mode;
-
-      &:hover {
-        background-color: $bg-light-dark-mode;
-        color: $text-color-dark-mode;
-      }
-    }
-
-    .dropdown-item.disabled {
-      color: darken($text-color-dark-mode, 20%);
+  .btn-outline-secondary {
+    &:hover, &:focus, &.active, &:active {
+      background-color: var(--ngx-bg-darker);
+      color: var(--bs-primary);
     }
   }
 
   .card {
-    background-color: $bg-light-dark-mode;
+    background-color: var(--bs-body-bg);
 
-    .card-text {
-      color: $text-color-dark-mode;
+    .card-header {
+      background-color: rgba(0, 0, 0, 0.12);
     }
   }
 
-  .text-dark {
-    color: $text-color-dark-mode !important;
-  }
-
   .modal-content, .modal-header, .modal-body, .modal-footer {
-    background-color: $bg-light-dark-mode;
-    border-color: $border-color-dark-mode;
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
   }
 
   app-tag .badge {
     filter: brightness(.8);
-  }
-
-  .badge-light {
-    background-color: darken($bg-dark-mode, 20%);
-    color: $text-color-dark-mode-accent;
-  }
-
-  .badge.border-light {
-    border-color: $bg-dark-mode !important;
   }
 
   .doc-img-container {
@@ -157,8 +101,9 @@ $border-color-dark-mode: #47494f;
   .doc-img {
     mix-blend-mode: normal;
     border-radius: 0;
-    border-color: $bg-dark-mode;
+    border-color: var(--bs-border-color);
     filter: invert(10%);
+
     &.border-end {
       border-right: none !important;
     }
@@ -172,34 +117,14 @@ $border-color-dark-mode: #47494f;
     mix-blend-mode: luminosity;
   }
 
-  .toast {
-    background-color: opacify($bg-light-dark-mode, .85);
-  }
-
-  .toast-header {
-    background-color: opacify($bg-dark-mode, .85);
-  }
-
-  a,
-  .card-title a {
-    color: $primary-dark-mode;
-
-    &:hover {
-      color: lighten($primary, 10%);
-    }
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+    background-color: $bg-light-dark-mode;
   }
 
   table {
-    background-color: $bg-dark-mode;
-    color: $text-color-dark-mode;
-    border-color: $border-color-dark-mode;
-
     .des,
     .asc {
-      background-color: transparent !important;
-      color: $text-color-dark-mode;
-      border-color: $border-color-dark-mode;
-
       &::after {
         filter: invert(0.8); /* arrow is a black inline png bkgd image (!) so use filter */
       }
@@ -209,238 +134,31 @@ $border-color-dark-mode: #47494f;
       background-color: $bg-light-dark-mode;
       color: $text-color-dark-mode-accent;
     }
-  }
 
-  .table td,
-  .table th {
-    border-color: $border-color-dark-mode;
-  }
-
-  .table-row-selected {
-    background-color: $bg-light-dark-mode;
   }
 
   .table-striped > tbody > tr:nth-of-type(odd) > * {
     color: $text-color-dark-mode-accent;
   }
 
-  .close {
-    color: $text-color-dark-mode;
+  .close, .modal .btn-close {
     text-shadow: 0 1px 0 #666;
   }
 
   .modal .btn-close {
-    color: $text-color-dark-mode;
-    text-shadow: 0 1px 0 #666;
     filter: invert(1) grayscale(100%) brightness(200%);
   }
 
-  .btn-outline-primary {
-    border-color: $primary-dark-mode;
-    color: $primary-dark-mode;
-
-    &:not(:disabled):not(.disabled).active,
-    &:not(:disabled):not(.disabled):hover {
-      background-color: darken($primary-dark-mode, 10%);
-      border-color: darken($primary-dark-mode, 10%);
-      color: $text-color-dark-mode-accent;
-    }
-
-    &.disabled.active {
-      background-color: darken($primary-dark-mode, 10%);
-    }
-  }
-
-  .btn-outline-secondary {
-    border-color: darken($text-color-dark-mode, 30%);
-    color: $text-color-dark-mode;
-
-    &:not(:disabled):not(.disabled):hover {
-      background-color: $bg-dark-mode;
-    }
-  }
-
-  .btn-outline-danger {
-    border-color: $danger-dark-mode;
-    color: $danger-dark-mode;
-
-    &:not(:disabled):not(.disabled):hover {
-      background-color: darken($danger-dark-mode, 10%);
-      border-color: darken($danger-dark-mode, 10%);
-      color: $text-color-dark-mode-accent;
-    }
-  }
-
-  .btn-outline-dark {
-    border-color: $border-color-dark-mode;
-    color: $text-color-dark-mode;
-
-    &:not(:disabled):not(.disabled):hover {
-      color: $text-color-dark-mode-accent;
-    }
-  }
-
-  .btn-light:not(:disabled):not(.disabled) {
-    background-color: $bg-dark-mode;
-    color: $text-color-dark-mode-accent;
-
-    &:hover {
-      background-color: $text-color-dark-mode;
-      color: $bg-dark-mode;
-    }
-  }
-
-  .btn-link:not(:disabled):not(.disabled) {
-    color: $primary-dark-mode;
-  }
-
-  .btn-link:hover,
-  .btn-outline-primary:not(:disabled):not(.disabled).active,
-  .btn-outline-primary:not(:disabled):not(.disabled):active,
-  .show > .btn-outline-primary.dropdown-toggle {
-    color: $text-color-dark-mode-accent;
-  }
-
-  button.bg-light:hover {
-    background-color: $bg-dark-mode !important;
-  }
-
-  .card-footer button:hover {
-    color: $primary-dark-mode !important;
-  }
-
-  .form-control:not(.is-invalid):not(.btn),
-  input:not(.is-invalid),
-  textarea:not(.is-invalid) {
-    border-color: $border-color-dark-mode; /* we dont want to override controls that get highlighting for errors */
-  }
-
-  .form-control:not(.btn),
-  input,
-  select,
-  textarea {
-    background-color: $bg-dark-mode;
-    color: $text-color-dark-mode;
-
-    &::placeholder {
-      color: $text-color-dark-mode;
-    }
-
-    &:focus {
-      background-color: $bg-light-dark-mode !important;
-      color: darken($text-color-dark-mode, 10%) !important;
-    }
-  }
-
-  .form-select:not(.is-invalid):not(:disabled) {
-    border-color: $border-color-dark-mode;
-  }
-
-  .ng-select-container,
-  .ng-select.ng-select-opened > .ng-select-container,
-  .ng-dropdown-panel,
-  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
-    background-color: $bg-dark-mode;
-    color: $text-color-dark-mode;
-    border-color: $border-color-dark-mode;
-
-    input:focus {
-      background-color: transparent !important;
-    }
-  }
-
-  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
-  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-    background-color: $bg-light-dark-mode;
-  }
-
-  .input-group-text {
-    color: $text-color-dark-mode;
-    background-color: $bg-light-dark-mode;
-    border-color: $border-color-dark-mode;
-  }
-
-  .list-group-item {
-    color: $text-color-dark-mode;
-    background-color: $bg-light-dark-mode;
-    border-color: $border-color-dark-mode;
-  }
-
-  .page-item.disabled .page-link {
-    background-color: $bg-dark-mode;
-    border-color: $border-color-dark-mode;
-  }
-
-  .list-group-item,
-  .page-link {
-    background-color: $bg-light-dark-mode;
-    border-color: $border-color-dark-mode;
-  }
-
-  .page-item.active .page-link {
-    border-color: $border-color-dark-mode;
-    color: $text-color-dark-mode-accent;
-  }
-
-  .progress {
-    background-color: $border-color-dark-mode;
-  }
-
-  .alert-danger {
-    color: $text-color-dark-mode-accent;
-    background-color: darken($danger-dark-mode, 20%);
-    border-color: darken($danger-dark-mode, 20%);
-  }
-
-  .bg-dark {
-    background-color: $bg-light-dark-mode !important;
-  }
-
   .ngx-file-drop__drop-zone--over {
-    background-color: darken($primary-dark-mode, 35%) !important;
+    background-color: var(--ngx-primary-darken-15) !important;
   }
 
-  .alert-secondary {
-    background-color: $bg-light-dark-mode;
-    border-color: darken($bg-light-dark-mode, 10%);
-    color: $text-color-dark-mode-accent;
+  .toast {
+    background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%), 0.9);
   }
-
-  .progress-bar.bg-primary {
-    background-color: darken($primary-dark-mode, 5%) !important;
-  }
-
-  .popover {
-    .popover-header,
-    .popover-body {
-      background-color: $bg-dark-mode-accent;
-      border-color: $border-color-dark-mode;
-    }
-  }
-
-  // fix popover carat colors
-  .bs-popover-start > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="left"] {
-    border-left-color: $bg-dark-mode-accent;
-  }
-  .bs-popover-end > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="right"] {
-    border-right-color: $bg-dark-mode-accent;
-  }
-  .bs-popover-top > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="top"] {
-    border-top-color: $bg-dark-mode-accent;
-  }
-  .bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="bottom"] {
-    border-bottom-color: $bg-dark-mode-accent;
-  }
-
-  .bs-popover-bottom .popover-header::before,
-  .bs-popover-auto[x-placement^=bottom] .popover-header::before {
-    border-bottom-color: $bg-dark-mode-accent;
-  }
-
-  .ngb-dp-header,
-  .ngb-dp-weekdays,
-  .ngb-dp-month {
-    background-color: $bg-light-dark-mode;
+  
+  .toast-header {
+    background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 10%), 0.9);
   }
 }
 
