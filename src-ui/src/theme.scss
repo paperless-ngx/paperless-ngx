@@ -255,24 +255,27 @@ table.table {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(23, 84, 31, .7);
-  // z-index: $zindex-modal; // 1055
-  z-index: 1055;
-  opacity: 0;
+  background-color: rgba(23, 84, 31, .8);
+  z-index: 1055; // $zindex-modal
   pointer-events: none !important;
   user-select: none !important;
   text-align: center;
   padding-top: 25%;
-  transition: opacity 0.2s ease;
-}
 
-.main-dropzone.ngx-file-drop__drop-zone--over {
-  .global-dropzone-overlay {
-    opacity: 1;
+  &.show {
+    opacity: 1 !important;
+  }
+
+  &.hide {
+    display: none;
   }
 }
 
-.main-content.inert {
+.ngx-file-drop__drop-zone--over .global-dropzone-overlay {
+  opacity: 0;
+}
+
+.inert {
   pointer-events: none !important;
   user-select: none !important;
 }
