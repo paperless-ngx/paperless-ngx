@@ -56,9 +56,9 @@ class MatchingModelSerializer(serializers.ModelSerializer):
         ):
             try:
                 re.compile(match)
-            except Exception as e:
+            except re.error as e:
                 raise serializers.ValidationError(
-                    _("Invalid regular expression: %(error)s") % {"error": str(e)},
+                    _("Invalid regular expression: %(error)s") % {"error": str(e.msg)},
                 )
         return match
 
