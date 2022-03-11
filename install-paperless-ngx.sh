@@ -301,8 +301,8 @@ if [[ $TIKA_ENABLED == "yes" ]] ; then
 	DOCKER_COMPOSE_VERSION="$DOCKER_COMPOSE_VERSION-tika"
 fi
 
-wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
-wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docker/compose/.env" -O .env
+wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
+wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
 
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
