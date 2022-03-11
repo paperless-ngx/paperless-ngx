@@ -60,27 +60,32 @@ To do the setup you need to perform the steps from the following chapters in a c
 
   * Make sure you're using python 3.9.x or lower. Otherwise you might get issues with building dependencies. You can use `pyenv <https://github.com/pyenv/pyenv>`_ to install a specific python version.
 
-7.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
+7.  Install the Git hooks
+    .. code:: shell-session
+
+        pre-commit install
+
+8.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
 
     .. code:: shell-session
 
         npm install .
         ./node_modules/.bin/ng build --configuration production
 
-8.  Apply migrations and create a superuser for your dev instance:
+9.  Apply migrations and create a superuser for your dev instance:
 
     .. code:: shell-session
 
         python3 manage.py migrate
         python3 manage.py createsuperuser
 
-9.  Now spin up the dev backend. Depending on which part of paperless you're developing for, you need to have some or all of them running.
+10.  Now spin up the dev backend. Depending on which part of paperless you're developing for, you need to have some or all of them running.
 
     .. code:: shell-session
 
         python3 manage.py runserver & python3 manage.py document_consumer & python3 manage.py qcluster
 
-10. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
+11. Login with the superuser credentials provided in step 8 at ``http://localhost:8000`` to create a session that enables you to use the backend.
 
 Backend development environment is now ready, to start Frontend development go to ``/src-ui`` and run ``ng serve``. From there you can use ``http://localhost:4200`` for a preview.
 
@@ -108,8 +113,9 @@ Testing and code style:
 *   Run ``pytest`` in the src/ directory to execute all tests. This also generates a HTML coverage
     report. When runnings test, paperless.conf is loaded as well. However: the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings except for DEBUG are overridden when testing.
-*   Run ``black`` to format your code.
-*   Run ``pycodestyle`` to test your code for issues with the configured code style settings.
+*   Coding style is enforced by the Git pre-commit hooks.  These will ensure your code is formatted and do some
+    linting when you do a `git commit`.
+  * You can also run ``black`` manually to format your code
 
     .. note::
 
