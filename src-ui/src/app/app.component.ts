@@ -1,11 +1,5 @@
 import { SettingsService, SETTINGS_KEYS } from './services/settings.service'
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  Renderer2,
-  RendererFactory2,
-} from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { ConsumerStatusService } from './services/consumer-status.service'
