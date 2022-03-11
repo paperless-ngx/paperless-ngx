@@ -3,10 +3,12 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from django.test import TestCase, override_settings
+from django.test import override_settings
+from django.test import TestCase
 from django.utils import timezone
 
-from ..models import Document, Correspondent
+from ..models import Correspondent
+from ..models import Document
 
 
 class TestDocument(TestCase):

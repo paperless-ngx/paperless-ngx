@@ -1,17 +1,18 @@
 import logging
 import os
-from pathlib import Path, PurePath
+from pathlib import Path
+from pathlib import PurePath
 from threading import Thread
 from time import sleep
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from django_q.tasks import async_task
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers.polling import PollingObserver
-
 from documents.models import Tag
 from documents.parsers import is_file_ext_supported
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers.polling import PollingObserver
 
 try:
     from inotifyrecursive import INotify, flags
@@ -29,7 +30,7 @@ def _tags_from_path(filepath):
     path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
     for part in path_parts:
         tag_ids.add(
-            Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk
+            Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
         )
 
     return tag_ids
@@ -56,7 +57,7 @@ def _consume(filepath):
     try:
         if settings.CONSUMER_SUBDIRS_AS_TAGS:
             tag_ids = _tags_from_path(filepath)
-    except Exception as e:
+    except Exception:
         logger.exception("Error creating tags from path")
 
     try:
@@ -67,7 +68,7 @@ def _consume(filepath):
             override_tag_ids=tag_ids if tag_ids else None,
             task_name=os.path.basename(filepath)[:100],
         )
-    except Exception as e:
+    except Exception:
         # Catch all so that the consumer won't crash.
         # This is also what the test case is listening for to check for
         # errors.
@@ -86,7 +87,7 @@ def _consume_wait_unmodified(file):
             new_mtime = os.stat(file).st_mtime
         except FileNotFoundError:
             logger.debug(
-                f"File {file} moved while waiting for it to remain " f"unmodified."
+                f"File {file} moved while waiting for it to remain " f"unmodified.",
             )
             return
         if new_mtime == mtime:

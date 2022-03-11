@@ -7,13 +7,17 @@ from pathlib import Path
 from unittest import mock
 
 from django.core.management import call_command
-from django.test import TestCase, override_settings
-
+from django.test import override_settings
+from django.test import TestCase
 from documents.management.commands import document_exporter
-from documents.models import Document, Tag, DocumentType, Correspondent
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
 from documents.sanity_checker import check_sanity
 from documents.settings import EXPORTER_FILE_NAME
-from documents.tests.utils import DirectoriesMixin, paperless_environment
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import paperless_environment
 
 
 class TestExportImport(DirectoriesMixin, TestCase):
@@ -66,8 +70,9 @@ class TestExportImport(DirectoriesMixin, TestCase):
     def _get_document_from_manifest(self, manifest, id):
         f = list(
             filter(
-                lambda d: d["model"] == "documents.document" and d["pk"] == id, manifest
-            )
+                lambda d: d["model"] == "documents.document" and d["pk"] == id,
+                manifest,
+            ),
         )
         if len(f) == 1:
             return f[0]
@@ -76,7 +81,10 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
     @override_settings(PASSPHRASE="test")
     def _do_export(
-        self, use_filename_format=False, compare_checksums=False, delete=False
+        self,
+        use_filename_format=False,
+        compare_checksums=False,
+        delete=False,
     ):
         args = ["document_exporter", self.target]
         if use_filename_format:
@@ -104,7 +112,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
 
         self.assertEqual(len(manifest), 8)
         self.assertEqual(
-            len(list(filter(lambda e: e["model"] == "documents.document", manifest))), 4
+            len(list(filter(lambda e: e["model"] == "documents.document", manifest))),
+            4,
         )
 
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
@@ -129,7 +138,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
         for element in manifest:
             if element["model"] == "documents.document":
                 fname = os.path.join(
-                    self.target, element[document_exporter.EXPORTER_FILE_NAME]
+                    self.target,
+                    element[document_exporter.EXPORTER_FILE_NAME],
                 )
                 self.assertTrue(os.path.exists(fname))
                 self.assertTrue(
@@ -137,8 +147,8 @@ class TestExportImport(DirectoriesMixin, TestCase):
                         os.path.join(
                             self.target,
                             element[document_exporter.EXPORTER_THUMBNAIL_NAME],
-                        )
-                    )
+                        ),
+                    ),
                 )
 
                 with open(fname, "rb") as f:
@@ -146,12 +156,14 @@ class TestExportImport(DirectoriesMixin, TestCase):
                 self.assertEqual(checksum, element["fields"]["checksum"])
 
                 self.assertEqual(
-                    element["fields"]["storage_type"], Document.STORAGE_TYPE_UNENCRYPTED
+                    element["fields"]["storage_type"],
+                    Document.STORAGE_TYPE_UNENCRYPTED,
                 )
 
                 if document_exporter.EXPORTER_ARCHIVE_NAME in element:
                     fname = os.path.join(
-                        self.target, element[document_exporter.EXPORTER_ARCHIVE_NAME]
+                        self.target,
+                        element[document_exporter.EXPORTER_ARCHIVE_NAME],
                     )
                     self.assertTrue(os.path.exists(fname))
 
@@ -188,7 +200,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         )
 
         with override_settings(
-            PAPERLESS_FILENAME_FORMAT="{created_year}/{correspondent}/{title}"
+            PAPERLESS_FILENAME_FORMAT="{created_year}/{correspondent}/{title}",
         ):
             self.test_exporter(use_filename_format=True)
 
@@ -205,7 +217,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         st_mtime_1 = os.stat(os.path.join(self.target, "manifest.json")).st_mtime
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2"
+            "documents.management.commands.document_exporter.shutil.copy2",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -216,7 +228,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         Path(self.d1.source_path).touch()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2"
+            "documents.management.commands.document_exporter.shutil.copy2",
         ) as m:
             self._do_export()
             self.assertEqual(m.call_count, 1)
@@ -239,7 +251,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2"
+            "documents.management.commands.document_exporter.shutil.copy2",
         ) as m:
             self._do_export()
             m.assert_not_called()
@@ -250,7 +262,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.d2.save()
 
         with mock.patch(
-            "documents.management.commands.document_exporter.shutil.copy2"
+            "documents.management.commands.document_exporter.shutil.copy2",
         ) as m:
             self._do_export(compare_checksums=True)
             self.assertEqual(m.call_count, 1)
@@ -270,26 +282,29 @@ class TestExportImport(DirectoriesMixin, TestCase):
         doc_from_manifest = self._get_document_from_manifest(manifest, self.d3.id)
         self.assertTrue(
             os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])
-            )
+                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
+            ),
         )
         self.d3.delete()
 
         manifest = self._do_export()
         self.assertRaises(
-            ValueError, self._get_document_from_manifest, manifest, self.d3.id
+            ValueError,
+            self._get_document_from_manifest,
+            manifest,
+            self.d3.id,
         )
         self.assertTrue(
             os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])
-            )
+                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
+            ),
         )
 
         manifest = self._do_export(delete=True)
         self.assertFalse(
             os.path.isfile(
-                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME])
-            )
+                os.path.join(self.target, doc_from_manifest[EXPORTER_FILE_NAME]),
+            ),
         )
 
         self.assertTrue(len(manifest), 6)
@@ -316,7 +331,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.target, "manifest.json")))
         self.assertTrue(os.path.isfile(os.path.join(self.target, "wow2", "none.pdf")))
         self.assertTrue(
-            os.path.isfile(os.path.join(self.target, "wow2", "none_01.pdf"))
+            os.path.isfile(os.path.join(self.target, "wow2", "none_01.pdf")),
         )
 
     def test_export_missing_files(self):

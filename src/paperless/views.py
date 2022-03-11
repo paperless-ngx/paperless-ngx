@@ -14,7 +14,11 @@ class StandardPagination(PageNumberPagination):
 class FaviconView(View):
     def get(self, request, *args, **kwargs):
         favicon = os.path.join(
-            os.path.dirname(__file__), "static", "paperless", "img", "favicon.ico"
+            os.path.dirname(__file__),
+            "static",
+            "paperless",
+            "img",
+            "favicon.ico",
         )
         with open(favicon, "rb") as f:
             return HttpResponse(f, content_type="image/x-icon")

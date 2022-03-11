@@ -5,8 +5,8 @@ import shutil
 import tqdm
 from django import db
 from django.core.management.base import BaseCommand
-
 from documents.models import Document
+
 from ...parsers import get_parser_class_for_mime_type
 
 
@@ -22,7 +22,9 @@ def _process_document(doc_in):
 
     try:
         thumb = parser.get_optimised_thumbnail(
-            document.source_path, document.mime_type, document.get_public_filename()
+            document.source_path,
+            document.mime_type,
+            document.get_public_filename(),
         )
 
         shutil.move(thumb, document.thumbnail_path)
@@ -35,7 +37,8 @@ class Command(BaseCommand):
     help = """
         This will regenerate the thumbnails for all documents.
     """.replace(
-        "    ", ""
+        "    ",
+        "",
     )
 
     def add_arguments(self, parser):
@@ -76,5 +79,5 @@ class Command(BaseCommand):
                     pool.imap_unordered(_process_document, ids),
                     total=len(ids),
                     disable=options["no_progress_bar"],
-                )
+                ),
             )

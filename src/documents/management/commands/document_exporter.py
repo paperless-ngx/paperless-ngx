@@ -6,28 +6,28 @@ import time
 
 import tqdm
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.core import serializers
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from django.db import transaction
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import SavedView
+from documents.models import SavedViewFilterRule
+from documents.models import Tag
+from documents.settings import EXPORTER_ARCHIVE_NAME
+from documents.settings import EXPORTER_FILE_NAME
+from documents.settings import EXPORTER_THUMBNAIL_NAME
 from filelock import FileLock
-
-from documents.models import (
-    Document,
-    Correspondent,
-    Tag,
-    DocumentType,
-    SavedView,
-    SavedViewFilterRule,
-)
-from documents.settings import (
-    EXPORTER_FILE_NAME,
-    EXPORTER_THUMBNAIL_NAME,
-    EXPORTER_ARCHIVE_NAME,
-)
 from paperless.db import GnuPG
-from paperless_mail.models import MailAccount, MailRule
-from ...file_handling import generate_filename, delete_empty_directories
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
+
+from ...file_handling import delete_empty_directories
+from ...file_handling import generate_filename
 
 
 class Command(BaseCommand):
@@ -37,7 +37,8 @@ class Command(BaseCommand):
         directory.  And include a manifest file containing document data for
         easy import.
     """.replace(
-        "    ", ""
+        "    ",
+        "",
     )
 
     def add_arguments(self, parser):
@@ -107,20 +108,20 @@ class Command(BaseCommand):
         # 1. Take a snapshot of what files exist in the current export folder
         for root, dirs, files in os.walk(self.target):
             self.files_in_export_dir.extend(
-                map(lambda f: os.path.abspath(os.path.join(root, f)), files)
+                map(lambda f: os.path.abspath(os.path.join(root, f)), files),
             )
 
         # 2. Create manifest, containing all correspondents, types, tags and
         # documents
         with transaction.atomic():
             manifest = json.loads(
-                serializers.serialize("json", Correspondent.objects.all())
+                serializers.serialize("json", Correspondent.objects.all()),
             )
 
             manifest += json.loads(serializers.serialize("json", Tag.objects.all()))
 
             manifest += json.loads(
-                serializers.serialize("json", DocumentType.objects.all())
+                serializers.serialize("json", DocumentType.objects.all()),
             )
 
             documents = Document.objects.order_by("id")
@@ -129,19 +130,19 @@ class Command(BaseCommand):
             manifest += document_manifest
 
             manifest += json.loads(
-                serializers.serialize("json", MailAccount.objects.all())
+                serializers.serialize("json", MailAccount.objects.all()),
             )
 
             manifest += json.loads(
-                serializers.serialize("json", MailRule.objects.all())
+                serializers.serialize("json", MailRule.objects.all()),
             )
 
             manifest += json.loads(
-                serializers.serialize("json", SavedView.objects.all())
+                serializers.serialize("json", SavedView.objects.all()),
             )
 
             manifest += json.loads(
-                serializers.serialize("json", SavedViewFilterRule.objects.all())
+                serializers.serialize("json", SavedViewFilterRule.objects.all()),
             )
 
             manifest += json.loads(serializers.serialize("json", Group.objects.all()))
@@ -155,9 +156,7 @@ class Command(BaseCommand):
             disable=progress_bar_disable,
         ):
             # 3.1. store files unencrypted
-            document_dict["fields"][
-                "storage_type"
-            ] = Document.STORAGE_TYPE_UNENCRYPTED  # NOQA: E501
+            document_dict["fields"]["storage_type"] = Document.STORAGE_TYPE_UNENCRYPTED
 
             document = document_map[document_dict["pk"]]
 
@@ -166,7 +165,9 @@ class Command(BaseCommand):
             while True:
                 if self.use_filename_format:
                     base_name = generate_filename(
-                        document, counter=filename_counter, append_gpg=False
+                        document,
+                        counter=filename_counter,
+                        append_gpg=False,
                     )
                 else:
                     base_name = document.get_public_filename(counter=filename_counter)
@@ -217,14 +218,18 @@ class Command(BaseCommand):
                             os.utime(archive_target, times=(t, t))
             else:
                 self.check_and_copy(
-                    document.source_path, document.checksum, original_target
+                    document.source_path,
+                    document.checksum,
+                    original_target,
                 )
 
                 self.check_and_copy(document.thumbnail_path, None, thumbnail_target)
 
                 if archive_target:
                     self.check_and_copy(
-                        document.archive_path, document.archive_checksum, archive_target
+                        document.archive_path,
+                        document.archive_checksum,
+                        archive_target,
                     )
 
         # 4. write manifest to target forlder
@@ -243,7 +248,8 @@ class Command(BaseCommand):
                 os.remove(f)
 
                 delete_empty_directories(
-                    os.path.abspath(os.path.dirname(f)), os.path.abspath(self.target)
+                    os.path.abspath(os.path.dirname(f)),
+                    os.path.abspath(self.target),
                 )
 
     def check_and_copy(self, source, source_checksum, target):
