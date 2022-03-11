@@ -42,7 +42,11 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
     let inputFormat = this.getDateInputFormat()
     let dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
 
-    value = value.replace(/[\/,\.-]/g, '')
+    if ([',','.','/','-'].some(sep => value.includes(sep))) {
+      let valArr = value.split(/[\.,\/-]+/)
+      valArr = valArr.map(segment => segment.padStart(2,'0'))
+      value = valArr.join('')
+    }    
 
     if (value.length == 4 && inputFormat.substring(0, 4) != 'yyyy') {
       return [value.substring(0, 2), value.substring(2, 4), new Date().getFullYear()].join(dateSeparator)
