@@ -172,7 +172,6 @@ class MailRule(models.Model):
     assign_tags = models.ManyToManyField(
         document_models.Tag,
         blank=True,
-        related_name="mail_rules_multi",
         verbose_name=_("assign this tag"),
     )
 
