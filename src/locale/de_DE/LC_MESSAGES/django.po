@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-04 23:16\n"
+"PO-Revision-Date: 2022-03-11 13:56\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -344,7 +344,7 @@ msgstr "Ähnliche Dokumente"
 
 #: documents/models.py:353
 msgid "has tags in"
-msgstr ""
+msgstr "hat Tags in"
 
 #: documents/models.py:363
 msgid "rule type"
