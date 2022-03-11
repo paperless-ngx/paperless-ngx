@@ -34,22 +34,22 @@
         </svg>&nbsp;<span class="d-none d-lg-inline" i18n>More like this</span>
     </button>
 
-    <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="close()">
+    <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Close" (click)="close()">
         <svg class="buttonicon" fill="currentColor">
             <use xlink:href="assets/bootstrap-icons.svg#x" />
         </svg>&nbsp;<span class="d-none d-lg-inline" i18n>Close</span>
     </button>
 
     <div class="button-group">
-        <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="previousDoc()" [disabled]="!hasPrevious()">
+        <button type="button" class="btn btn-sm btn-outline-primary me-2" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#arrow-left" />
-            </svg>&nbsp;
+            </svg>
         </button>
-        <button type="button" class="btn btn-sm btn-outline-primary" (click)="nextDoc()"  [disabled]="!hasNext()">
+        <button type="button" class="btn btn-sm btn-outline-primary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
             <svg class="buttonicon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#arrow-right" />
-            </svg>&nbsp;
+            </svg>
         </button>
     </div>
 
