@@ -1,8 +1,6 @@
-import { Component, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { NgbDateAdapter, NgbDateParserFormatter, NgbDatepickerContent } from '@ng-bootstrap/ng-bootstrap';
+import { Component, forwardRef, OnInit } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SettingsService } from 'src/app/services/settings.service';
-import { v4 as uuidv4 } from 'uuid';
 import { AbstractInputComponent } from '../abstract-input';
 
 
@@ -29,4 +27,10 @@ export class DateComponent extends AbstractInputComponent<string> implements OnI
 
   placeholder: string
 
+  // prevent chars other than numbers and separators
+  onKeyPress(event: KeyboardEvent) {
+    if ('Enter' !== event.key && !/[0-9,\.\/-]+/.test(event.key)) {
+      event.preventDefault()
+    }
+  }
 }
