@@ -143,5 +143,6 @@ export class AppComponent implements OnInit, OnDestroy {
       'inert'
     )
     this.uploadDocumentsService.uploadFiles(files)
+    this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }
 }
