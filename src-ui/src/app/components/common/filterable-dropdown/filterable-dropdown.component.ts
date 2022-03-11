@@ -137,6 +137,10 @@ export class FilterableDropdownSelectionModel {
     return this.getSelectedItems().length
   }
 
+  get totalCount() {
+    return this.getSelectedItems().length + this.getExcludedItems().length
+  }
+
   clear(fireEvent = true) {
     this.temporarySelectionStates.clear()
     this.temporaryLogicalOperator = this._logicalOperator = 'and'
