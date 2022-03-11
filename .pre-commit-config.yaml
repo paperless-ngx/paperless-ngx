@@ -30,6 +30,9 @@ repos:
     rev: "v2.5.1"
     hooks:
       - id: prettier
+        args:
+          - "--no-semi"
+          - "--single-quote"
         types_or:
           - javascript
           - ts
