@@ -23,7 +23,7 @@
     <div class="card-body p-2">
       <p class="card-text">
         <ng-container *ngIf="document.correspondent">
-          <a [routerLink]="[]" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold">{{(document.correspondent$ | async)?.name}}</a>:
+          <a [routerLink]="[]" title="Filter by correspondent" i18n-title (click)="clickCorrespondent.emit(document.correspondent);$event.stopPropagation()" class="fw-bold btn-link">{{(document.correspondent$ | async)?.name}}</a>:
         </ng-container>
         {{document.title | documentTitle}}
       </p>

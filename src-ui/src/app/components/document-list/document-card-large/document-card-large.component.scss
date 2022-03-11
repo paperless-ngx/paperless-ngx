@@ -52,7 +52,7 @@
 }
 
 .card-selected {
-  border-color: $primary;
+  border-color: var(--bs-primary);
 
   .document-card-check {
     display: block;
@@ -60,7 +60,7 @@
 }
 
 .doc-img-background-selected {
-  background-color: $primaryFaded;
+  background-color: var(--ngx-primary-faded);
 }
 
 .card-info {
