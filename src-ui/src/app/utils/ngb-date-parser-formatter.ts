@@ -4,6 +4,7 @@ import { SettingsService } from "../services/settings.service"
 
 @Injectable()
 export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
+  private separatorRegExp: RegExp = /[\.,\/-]+/
 
   constructor(private settings: SettingsService) {
     super()
@@ -35,59 +36,36 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
    * have it expanded to 10.03.2022, in the case of the German format.
    * (All other formats are also supported)
    * 
-   * It also replaces commas with the date separator. 
-   * This allows quick entry of the date on the numpad. 
+   * It also strips any separators before running formatting and pads
+   * any parts of the string, e.g. allowing for 1/2/22,
+   * which allows quick entry of the date on the numpad. 
    */
   private preformatDateInput(value: string): string {
-    let inputFormat = this.getDateInputFormat()
-    let dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
-
-    value = value.replace(/,/g, dateSeparator)
-
-    if (value.includes(dateSeparator)) { return value }
+    const inputFormat = this.getDateInputFormat()
+    const dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
+    
+    if (this.separatorRegExp.test(value)) {
+      // split on separator, pad & re-join without separator
+      value = value.split(this.separatorRegExp).map(segment => segment.padStart(2,'0')).join('')
+    }    
 
     if (value.length == 4 && inputFormat.substring(0, 4) != 'yyyy') {
-      return value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-        + dateSeparator
-        + new Date().getFullYear()
-    }
-    else if (value.length == 4 && inputFormat.substring(0, 4) == 'yyyy') {
-      return new Date().getFullYear()
-        + dateSeparator
-        + value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-    }
-    else if (value.length == 6) {
-      return value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-        + dateSeparator
-        + value.substring(4, 6)
-    }
-    else if (value.length == 8 && inputFormat.substring(0, 4) != 'yyyy') {
-      return value.substring(0, 2)
-        + dateSeparator
-        + value.substring(2, 4)
-        + dateSeparator
-        + value.substring(4, 8)
-    }
-    else if (value.length == 8 && inputFormat.substring(0, 4) == 'yyyy') {
-      return value.substring(0, 4)
-        + dateSeparator
-        + value.substring(4, 6)
-        + dateSeparator
-        + value.substring(6, 8)
-    }
-    else {
+      return [value.substring(0, 2), value.substring(2, 4), new Date().getFullYear()].join(dateSeparator)
+    } else if (value.length == 4 && inputFormat.substring(0, 4) == 'yyyy') {
+      return [new Date().getFullYear(), value.substring(0, 2), value.substring(2, 4)].join(dateSeparator)
+    } else if (value.length == 6) {
+      return [value.substring(0, 2), value.substring(2, 4), value.substring(4, 6)].join(dateSeparator)
+    } else if (value.length == 8 && inputFormat.substring(0, 4) != 'yyyy') {
+      return [value.substring(0, 2), value.substring(2, 4), value.substring(4, 8)].join(dateSeparator)
+    } else if (value.length == 8 && inputFormat.substring(0, 4) == 'yyyy') {
+      return [value.substring(0, 4), value.substring(4, 6), value.substring(6, 8)].join(dateSeparator)
+    } else {
       return value
     }
   }
 
   parse(value: string): NgbDateStruct | null {
-    value = this.preformatDateInput(value);
+    value = this.preformatDateInput(value)
     let match = this.getDateParseRegex().exec(value)
     if (match) {
       let dateStruct = {
