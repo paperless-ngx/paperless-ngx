@@ -244,8 +244,37 @@ table.table {
   color: var(--bs-body-color);
 }
 
-.ngx-file-drop__drop-zone--over {
-  background-color: var(--ngx-primary-faded) !important;
+.main-dropzone {
+  height: 100%;
+  width: 100%;
+}
+
+.global-dropzone-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(23, 84, 31, .7);
+  // z-index: $zindex-modal; // 1055
+  z-index: 1055;
+  opacity: 0;
+  pointer-events: none !important;
+  user-select: none !important;
+  text-align: center;
+  padding-top: 25%;
+  transition: opacity 0.2s ease;
+}
+
+.main-dropzone.ngx-file-drop__drop-zone--over {
+  .global-dropzone-overlay {
+    opacity: 1;
+  }
+}
+
+.main-content.inert {
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
 .alert-danger {

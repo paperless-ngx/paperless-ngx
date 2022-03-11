@@ -1,3 +1,11 @@
 <app-toasts></app-toasts>
 
-<router-outlet></router-outlet>
+<ngx-file-drop dropZoneClassName="main-dropzone" contentClassName="main-content" [disabled]="!dragDropEnabled"
+(onFileDrop)="dropped($event)" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()">
+    <ng-template ngx-file-drop-content-tmp>
+        <div class="global-dropzone-overlay">
+            <h1 class="display-6">Drop files to begin upload</h1>
+        </div>
+        <router-outlet></router-outlet>
+    </ng-template>
+</ngx-file-drop>
