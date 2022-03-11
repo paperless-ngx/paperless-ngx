@@ -120,4 +120,10 @@ export class DateDropdownComponent implements OnInit, OnDestroy {
     this.onChange()
   }
 
+  // prevent chars other than numbers and separators
+  onKeyPress(event: KeyboardEvent) {
+    if ('Enter' !== event.key && !/[0-9,\.\/-]+/.test(event.key)) {
+      event.preventDefault()
+    }
+  }
 }
