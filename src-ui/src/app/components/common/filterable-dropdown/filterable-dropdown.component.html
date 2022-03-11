@@ -6,7 +6,7 @@
     <div class="d-none d-sm-inline">&nbsp;{{title}}</div>
     <ng-container *ngIf="!editing && selectionModel.selectionSize() > 0">
       <div *ngIf="multiple" class="position-absolute top-0 start-100 translate-middle badge bg-secondary border border-light text-light rounded-pill">
-        {{selectionModel.selectionSize()}}<span class="visually-hidden">selected</span>
+        {{selectionModel.totalCount}}<span class="visually-hidden">selected</span>
       </div>
       <div *ngIf="!multiple" class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
         <span class="visually-hidden">selected</span>
