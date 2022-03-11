@@ -169,11 +169,10 @@ class MailRule(models.Model):
         default=TitleSource.FROM_SUBJECT,
     )
 
-    assign_tag = models.ForeignKey(
+    assign_tags = models.ManyToManyField(
         document_models.Tag,
-        null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        related_name="mail_rules_multi",
         verbose_name=_("assign this tag"),
     )
 
