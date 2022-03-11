@@ -4,6 +4,7 @@ import { SettingsService } from "../services/settings.service"
 
 @Injectable()
 export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
+  private separatorRegExp: RegExp = /[\.,\/-]+/
 
   constructor(private settings: SettingsService) {
     super()
@@ -35,17 +36,17 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
    * have it expanded to 10.03.2022, in the case of the German format.
    * (All other formats are also supported)
    * 
-   * It also strips any separators before running formatting, 
+   * It also strips any separators before running formatting and pads
+   * any parts of the string, e.g. allowing for 1/2/22,
    * which allows quick entry of the date on the numpad. 
    */
   public preformatDateInput(value: string): string {
     let inputFormat = this.getDateInputFormat()
     let dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
-
-    if ([',','.','/','-'].some(sep => value.includes(sep))) {
-      let valArr = value.split(/[\.,\/-]+/)
-      valArr = valArr.map(segment => segment.padStart(2,'0'))
-      value = valArr.join('')
+    
+    if (this.separatorRegExp.test(value)) {
+      // split on separator, pad & re-join without separator
+      value = value.split(this.separatorRegExp).map(segment => segment.padStart(2,'0')).join('')
     }    
 
     if (value.length == 4 && inputFormat.substring(0, 4) != 'yyyy') {
