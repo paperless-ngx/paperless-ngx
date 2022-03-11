@@ -265,7 +265,7 @@ export class DocumentListViewService {
   hasPrevious(doc: number) {
     if (this.documents) {
       let index = this.documents.findIndex(d => d.id == doc)
-      return !(index == 0 && this.currentPage == 1)
+      return index != -1 && !(index == 0 && this.currentPage == 1)
     }
   }
 
