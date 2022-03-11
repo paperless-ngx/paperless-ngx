@@ -826,7 +826,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="final">Excluir</target>
+        <target state="final">Apagar</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html" approved="yes">
         <source>Download</source>
