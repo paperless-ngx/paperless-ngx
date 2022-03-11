@@ -40,4 +40,11 @@ export class DateComponent extends AbstractInputComponent<string> implements OnI
       this.value = dateFormatter.preformatDateInput(valArr.join(''))
     }
   }
+
+  // prevent chars other than numbers and separators
+  onKeyPress(event: KeyboardEvent) {
+    if (!/[0-9,\.\/-]+/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
 }
