@@ -4,14 +4,14 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: "http://localhost:8000/api/",
-  apiVersion: "2",
-  appTitle: "Paperless-ngx",
-  version: "DEVELOPMENT",
-  webSocketHost: "localhost:8000",
-  webSocketProtocol: "ws:",
-  webSocketBaseUrl: "/ws/",
-};
+  apiBaseUrl: 'http://localhost:8000/api/',
+  apiVersion: '2',
+  appTitle: 'Paperless-ngx',
+  version: 'DEVELOPMENT',
+  webSocketHost: 'localhost:8000',
+  webSocketProtocol: 'ws:',
+  webSocketBaseUrl: '/ws/',
+}
 
 /*
  * For easier debugging in development mode, you can import the following file

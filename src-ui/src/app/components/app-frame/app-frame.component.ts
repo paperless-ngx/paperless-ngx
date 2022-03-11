@@ -1,26 +1,31 @@
-import { Component } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router, Params } from '@angular/router';
-import { from, Observable, Subscription, BehaviorSubject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, switchMap, first } from 'rxjs/operators';
-import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { OpenDocumentsService } from 'src/app/services/open-documents.service';
-import { SavedViewService } from 'src/app/services/rest/saved-view.service';
-import { SearchService } from 'src/app/services/rest/search.service';
-import { environment } from 'src/environments/environment';
-import { DocumentDetailComponent } from '../document-detail/document-detail.component';
-import { Meta } from '@angular/platform-browser';
-import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type';
+import { Component } from '@angular/core'
+import { FormControl } from '@angular/forms'
+import { ActivatedRoute, Router, Params } from '@angular/router'
+import { from, Observable, Subscription, BehaviorSubject } from 'rxjs'
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  switchMap,
+  first,
+} from 'rxjs/operators'
+import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SearchService } from 'src/app/services/rest/search.service'
+import { environment } from 'src/environments/environment'
+import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { Meta } from '@angular/platform-browser'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
 
 @Component({
   selector: 'app-app-frame',
   templateUrl: './app-frame.component.html',
-  styleUrls: ['./app-frame.component.scss']
+  styleUrls: ['./app-frame.component.scss'],
 })
 export class AppFrameComponent {
-
-  constructor (
+  constructor(
     public router: Router,
     private activatedRoute: ActivatedRoute,
     private openDocumentsService: OpenDocumentsService,
@@ -28,7 +33,7 @@ export class AppFrameComponent {
     public savedViewService: SavedViewService,
     private list: DocumentListViewService,
     private meta: Meta
-    ) { }
+  ) {}
 
   versionString = `${environment.appTitle} ${environment.version}`
 
@@ -48,14 +53,14 @@ export class AppFrameComponent {
     text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
-      map(term => {
+      map((term) => {
         if (term.lastIndexOf(' ') != -1) {
           return term.substring(term.lastIndexOf(' ') + 1)
         } else {
           return term
         }
       }),
-      switchMap(term =>
+      switchMap((term) =>
         term.length < 2 ? from([[]]) : this.searchService.autocomplete(term)
       )
     )
@@ -66,49 +71,60 @@ export class AppFrameComponent {
     let lastSpaceIndex = currentSearch.lastIndexOf(' ')
     if (lastSpaceIndex != -1) {
       currentSearch = currentSearch.substring(0, lastSpaceIndex + 1)
-      currentSearch += event.item + " "
+      currentSearch += event.item + ' '
     } else {
-      currentSearch = event.item + " "
+      currentSearch = event.item + ' '
     }
     this.searchField.patchValue(currentSearch)
   }
 
   search() {
     this.closeMenu()
-    this.list.quickFilter([{rule_type: FILTER_FULLTEXT_QUERY, value: this.searchField.value}])
+    this.list.quickFilter([
+      { rule_type: FILTER_FULLTEXT_QUERY, value: this.searchField.value },
+    ])
   }
 
   closeDocument(d: PaperlessDocument) {
-    this.openDocumentsService.closeDocument(d).pipe(first()).subscribe(confirmed => {
-      if (confirmed) {
-        this.closeMenu()
-        let route = this.activatedRoute.snapshot
-        while (route.firstChild) {
-          route = route.firstChild
+    this.openDocumentsService
+      .closeDocument(d)
+      .pipe(first())
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.closeMenu()
+          let route = this.activatedRoute.snapshot
+          while (route.firstChild) {
+            route = route.firstChild
+          }
+          if (
+            route.component == DocumentDetailComponent &&
+            route.params['id'] == d.id
+          ) {
+            this.router.navigate([''])
+          }
         }
-        if (route.component == DocumentDetailComponent && route.params['id'] == d.id) {
-          this.router.navigate([""])
-        }
-      }
-    })
+      })
   }
 
   closeAll() {
     // user may need to confirm losing unsaved changes
-    this.openDocumentsService.closeAll().pipe(first()).subscribe(confirmed => {
-      if (confirmed) {
-        this.closeMenu()
+    this.openDocumentsService
+      .closeAll()
+      .pipe(first())
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.closeMenu()
 
-        // TODO: is there a better way to do this?
-        let route = this.activatedRoute
-        while (route.firstChild) {
-          route = route.firstChild
+          // TODO: is there a better way to do this?
+          let route = this.activatedRoute
+          while (route.firstChild) {
+            route = route.firstChild
+          }
+          if (route.component === DocumentDetailComponent) {
+            this.router.navigate([''])
+          }
         }
-        if (route.component === DocumentDetailComponent) {
-          this.router.navigate([""])
-        }
-      }
-    })
+      })
   }
 
   get displayName() {
@@ -123,5 +139,4 @@ export class AppFrameComponent {
       return null
     }
   }
-
 }

@@ -1,16 +1,16 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing'
 
-import { CorrespondentService } from './correspondent.service';
+import { CorrespondentService } from './correspondent.service'
 
 describe('CorrespondentService', () => {
-  let service: CorrespondentService;
+  let service: CorrespondentService
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(CorrespondentService);
-  });
+    TestBed.configureTestingModule({})
+    service = TestBed.inject(CorrespondentService)
+  })
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-});
+    expect(service).toBeTruthy()
+  })
+})

@@ -1,13 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core'
 
 @Component({
   selector: 'app-metadata-collapse',
   templateUrl: './metadata-collapse.component.html',
-  styleUrls: ['./metadata-collapse.component.scss']
+  styleUrls: ['./metadata-collapse.component.scss'],
 })
 export class MetadataCollapseComponent implements OnInit {
-
-  constructor() { }
+  constructor() {}
 
   expand = false
 
@@ -17,7 +16,5 @@ export class MetadataCollapseComponent implements OnInit {
   @Input()
   title = $localize`Metadata`
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }
