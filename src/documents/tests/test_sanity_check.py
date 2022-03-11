@@ -6,9 +6,9 @@ from pathlib import Path
 import filelock
 from django.conf import settings
 from django.test import TestCase
-
 from documents.models import Document
-from documents.sanity_checker import check_sanity, SanityCheckMessages
+from documents.sanity_checker import check_sanity
+from documents.sanity_checker import SanityCheckMessages
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -23,7 +23,8 @@ class TestSanityCheckMessages(TestCase):
             self.assertEqual(len(capture.output), 1)
             self.assertEqual(capture.records[0].levelno, logging.INFO)
             self.assertEqual(
-                capture.records[0].message, "Sanity checker detected no issues."
+                capture.records[0].message,
+                "Sanity checker detected no issues.",
             )
 
     def test_info(self):

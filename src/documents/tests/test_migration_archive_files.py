@@ -6,9 +6,9 @@ from unittest import mock
 
 from django.conf import settings
 from django.test import override_settings
-
 from documents.parsers import ParseError
-from documents.tests.utils import DirectoriesMixin, TestMigrations
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import TestMigrations
 
 
 STORAGE_TYPE_GPG = "gpg"
@@ -93,10 +93,18 @@ def make_test_document(
 simple_jpg = os.path.join(os.path.dirname(__file__), "samples", "simple.jpg")
 simple_pdf = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 simple_pdf2 = os.path.join(
-    os.path.dirname(__file__), "samples", "documents", "originals", "0000002.pdf"
+    os.path.dirname(__file__),
+    "samples",
+    "documents",
+    "originals",
+    "0000002.pdf",
 )
 simple_pdf3 = os.path.join(
-    os.path.dirname(__file__), "samples", "documents", "originals", "0000003.pdf"
+    os.path.dirname(__file__),
+    "samples",
+    "documents",
+    "originals",
+    "0000003.pdf",
 )
 simple_txt = os.path.join(os.path.dirname(__file__), "samples", "simple.txt")
 simple_png = os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.png")
@@ -121,19 +129,43 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
             simple_pdf,
         )
         self.no_text = make_test_document(
-            Document, "no-text", "image/png", simple_png2, "no-text.png", simple_pdf
+            Document,
+            "no-text",
+            "image/png",
+            simple_png2,
+            "no-text.png",
+            simple_pdf,
         )
         self.doc_no_archive = make_test_document(
-            Document, "no_archive", "text/plain", simple_txt, "no_archive.txt"
+            Document,
+            "no_archive",
+            "text/plain",
+            simple_txt,
+            "no_archive.txt",
         )
         self.clash1 = make_test_document(
-            Document, "clash", "application/pdf", simple_pdf, "clash.pdf", simple_pdf
+            Document,
+            "clash",
+            "application/pdf",
+            simple_pdf,
+            "clash.pdf",
+            simple_pdf,
         )
         self.clash2 = make_test_document(
-            Document, "clash", "image/jpeg", simple_jpg, "clash.jpg", simple_pdf
+            Document,
+            "clash",
+            "image/jpeg",
+            simple_jpg,
+            "clash.jpg",
+            simple_pdf,
         )
         self.clash3 = make_test_document(
-            Document, "clash", "image/png", simple_png, "clash.png", simple_pdf
+            Document,
+            "clash",
+            "image/png",
+            simple_png,
+            "clash.png",
+            simple_pdf,
         )
         self.clash4 = make_test_document(
             Document,
@@ -147,7 +179,8 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
         self.assertEqual(archive_path_old(self.clash1), archive_path_old(self.clash2))
         self.assertEqual(archive_path_old(self.clash1), archive_path_old(self.clash3))
         self.assertNotEqual(
-            archive_path_old(self.clash1), archive_path_old(self.clash4)
+            archive_path_old(self.clash1),
+            archive_path_old(self.clash4),
         )
 
     def testArchiveFilesMigrated(self):
@@ -171,19 +204,23 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
                 self.assertEqual(archive_checksum, doc.archive_checksum)
 
         self.assertEqual(
-            Document.objects.filter(archive_checksum__isnull=False).count(), 6
+            Document.objects.filter(archive_checksum__isnull=False).count(),
+            6,
         )
 
     def test_filenames(self):
         Document = self.apps.get_model("documents", "Document")
         self.assertEqual(
-            Document.objects.get(id=self.unrelated.id).archive_filename, "unrelated.pdf"
+            Document.objects.get(id=self.unrelated.id).archive_filename,
+            "unrelated.pdf",
         )
         self.assertEqual(
-            Document.objects.get(id=self.no_text.id).archive_filename, "no-text.pdf"
+            Document.objects.get(id=self.no_text.id).archive_filename,
+            "no-text.pdf",
         )
         self.assertEqual(
-            Document.objects.get(id=self.doc_no_archive.id).archive_filename, None
+            Document.objects.get(id=self.doc_no_archive.id).archive_filename,
+            None,
         )
         self.assertEqual(
             Document.objects.get(id=self.clash1.id).archive_filename,
@@ -198,7 +235,8 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
             f"{self.clash3.id:07}.pdf",
         )
         self.assertEqual(
-            Document.objects.get(id=self.clash4.id).archive_filename, "clash.png.pdf"
+            Document.objects.get(id=self.clash4.id).archive_filename,
+            "clash.png.pdf",
         )
 
 
@@ -207,16 +245,20 @@ class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
     def test_filenames(self):
         Document = self.apps.get_model("documents", "Document")
         self.assertEqual(
-            Document.objects.get(id=self.unrelated.id).archive_filename, "unrelated.pdf"
+            Document.objects.get(id=self.unrelated.id).archive_filename,
+            "unrelated.pdf",
         )
         self.assertEqual(
-            Document.objects.get(id=self.no_text.id).archive_filename, "no-text.pdf"
+            Document.objects.get(id=self.no_text.id).archive_filename,
+            "no-text.pdf",
         )
         self.assertEqual(
-            Document.objects.get(id=self.doc_no_archive.id).archive_filename, None
+            Document.objects.get(id=self.doc_no_archive.id).archive_filename,
+            None,
         )
         self.assertEqual(
-            Document.objects.get(id=self.clash1.id).archive_filename, "none/clash.pdf"
+            Document.objects.get(id=self.clash1.id).archive_filename,
+            "none/clash.pdf",
         )
         self.assertEqual(
             Document.objects.get(id=self.clash2.id).archive_filename,
@@ -227,7 +269,8 @@ class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
             "none/clash_02.pdf",
         )
         self.assertEqual(
-            Document.objects.get(id=self.clash4.id).archive_filename, "clash.png.pdf"
+            Document.objects.get(id=self.clash4.id).archive_filename,
+            "clash.png.pdf",
         )
 
 
@@ -248,12 +291,19 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         Document = self.apps.get_model("documents", "Document")
 
         doc = make_test_document(
-            Document, "clash", "application/pdf", simple_pdf, "clash.pdf", simple_pdf
+            Document,
+            "clash",
+            "application/pdf",
+            simple_pdf,
+            "clash.pdf",
+            simple_pdf,
         )
         os.unlink(archive_path_old(doc))
 
         self.assertRaisesMessage(
-            ValueError, "does not exist at: ", self.performMigration
+            ValueError,
+            "does not exist at: ",
+            self.performMigration,
         )
 
     def test_parser_missing(self):
@@ -277,7 +327,9 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         )
 
         self.assertRaisesMessage(
-            ValueError, "no parsers are available", self.performMigration
+            ValueError,
+            "no parsers are available",
+            self.performMigration,
         )
 
     @mock.patch("documents.migrations.1012_fix_archive_files.parse_wrapper")
@@ -286,7 +338,12 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         Document = self.apps.get_model("documents", "Document")
 
         doc1 = make_test_document(
-            Document, "document", "image/png", simple_png, "document.png", simple_pdf
+            Document,
+            "document",
+            "image/png",
+            simple_png,
+            "document.png",
+            simple_pdf,
         )
         doc2 = make_test_document(
             Document,
@@ -311,8 +368,8 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
                     filter(
                         lambda log: "Parse error, will try again in 5 seconds" in log,
                         capture.output,
-                    )
-                )
+                    ),
+                ),
             ),
             4,
         )
@@ -324,8 +381,8 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
                         lambda log: "Unable to regenerate archive document for ID:"
                         in log,
                         capture.output,
-                    )
-                )
+                    ),
+                ),
             ),
             2,
         )
@@ -347,7 +404,12 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         Document = self.apps.get_model("documents", "Document")
 
         doc1 = make_test_document(
-            Document, "document", "image/png", simple_png, "document.png", simple_pdf
+            Document,
+            "document",
+            "image/png",
+            simple_png,
+            "document.png",
+            simple_pdf,
         )
         doc2 = make_test_document(
             Document,
@@ -368,8 +430,8 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
                         lambda log: "Parser did not return an archive document for document"
                         in log,
                         capture.output,
-                    )
-                )
+                    ),
+                ),
             ),
             2,
         )
@@ -405,7 +467,11 @@ class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
             "unrelated.pdf",
         )
         doc_no_archive = make_test_document(
-            Document, "no_archive", "text/plain", simple_txt, "no_archive.txt"
+            Document,
+            "no_archive",
+            "text/plain",
+            simple_txt,
+            "no_archive.txt",
         )
         clashB = make_test_document(
             Document,
@@ -434,13 +500,14 @@ class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
                 self.assertEqual(archive_checksum, doc.archive_checksum)
 
         self.assertEqual(
-            Document.objects.filter(archive_checksum__isnull=False).count(), 2
+            Document.objects.filter(archive_checksum__isnull=False).count(),
+            2,
         )
 
 
 @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
 class TestMigrateArchiveFilesBackwardsWithFilenameFormat(
-    TestMigrateArchiveFilesBackwards
+    TestMigrateArchiveFilesBackwards,
 ):
     pass
 
@@ -505,5 +572,7 @@ class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
         )
 
         self.assertRaisesMessage(
-            ValueError, "file already exists.", self.performMigration
+            ValueError,
+            "file already exists.",
+            self.performMigration,
         )

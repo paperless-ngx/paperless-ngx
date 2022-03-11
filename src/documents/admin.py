@@ -1,13 +1,11 @@
 from django.contrib import admin
 
-from .models import (
-    Correspondent,
-    Document,
-    DocumentType,
-    Tag,
-    SavedView,
-    SavedViewFilterRule,
-)
+from .models import Correspondent
+from .models import Document
+from .models import DocumentType
+from .models import SavedView
+from .models import SavedViewFilterRule
+from .models import Tag
 
 
 class CorrespondentAdmin(admin.ModelAdmin):

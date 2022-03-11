@@ -1,8 +1,8 @@
-from django.contrib import admin
 from django import forms
-from paperless_mail.models import MailAccount, MailRule
-
+from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 
 class MailAccountAdminForm(forms.ModelForm):
@@ -48,7 +48,7 @@ class MailRuleAdmin(admin.ModelAdmin):
             {
                 "description": _(
                     "Paperless will only process mails that match ALL of the "
-                    "filters given below."
+                    "filters given below.",
                 ),
                 "fields": (
                     "filter_from",
@@ -66,7 +66,7 @@ class MailRuleAdmin(admin.ModelAdmin):
                 "description": _(
                     "The action applied to the mail. This action is only "
                     "performed when documents were consumed from the mail. "
-                    "Mails without attachments will remain entirely untouched."
+                    "Mails without attachments will remain entirely untouched.",
                 ),
                 "fields": ("action", "action_parameter"),
             },
@@ -78,7 +78,7 @@ class MailRuleAdmin(admin.ModelAdmin):
                     "Assign metadata to documents consumed from this rule "
                     "automatically. If you do not assign tags, types or "
                     "correspondents here, paperless will still process all "
-                    "matching rules that you have defined."
+                    "matching rules that you have defined.",
                 ),
                 "fields": (
                     "assign_title_from",

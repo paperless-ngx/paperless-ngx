@@ -4,10 +4,14 @@ from random import randint
 
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.test import override_settings
+from django.test import TestCase
 
 from .. import matching
-from ..models import Correspondent, Document, Tag, DocumentType
+from ..models import Correspondent
+from ..models import Document
+from ..models import DocumentType
+from ..models import Tag
 from ..signals import document_consumption_finished
 
 
@@ -209,7 +213,8 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
         TestCase.setUp(self)
         User.objects.create_user(username="test_consumer", password="12345")
         self.doc_contains = Document.objects.create(
-            content="I contain the keyword.", mime_type="application/pdf"
+            content="I contain the keyword.",
+            mime_type="application/pdf",
         )
 
         self.index_dir = tempfile.mkdtemp()
@@ -221,43 +226,56 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
 
     def test_tag_applied_any(self):
         t1 = Tag.objects.create(
-            name="test", match="keyword", matching_algorithm=Tag.MATCH_ANY
+            name="test",
+            match="keyword",
+            matching_algorithm=Tag.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertTrue(list(self.doc_contains.tags.all()) == [t1])
 
     def test_tag_not_applied(self):
         Tag.objects.create(
-            name="test", match="no-match", matching_algorithm=Tag.MATCH_ANY
+            name="test",
+            match="no-match",
+            matching_algorithm=Tag.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertTrue(list(self.doc_contains.tags.all()) == [])
 
     def test_correspondent_applied(self):
         correspondent = Correspondent.objects.create(
-            name="test", match="keyword", matching_algorithm=Correspondent.MATCH_ANY
+            name="test",
+            match="keyword",
+            matching_algorithm=Correspondent.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertTrue(self.doc_contains.correspondent == correspondent)
 
     def test_correspondent_not_applied(self):
         Tag.objects.create(
-            name="test", match="no-match", matching_algorithm=Correspondent.MATCH_ANY
+            name="test",
+            match="no-match",
+            matching_algorithm=Correspondent.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertEqual(self.doc_contains.correspondent, None)
 
     def test_logentry_created(self):
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
 
         self.assertEqual(LogEntry.objects.count(), 1)

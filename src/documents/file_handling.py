@@ -103,15 +103,17 @@ def generate_unique_filename(doc, archive_filename=False):
     if archive_filename and doc.filename:
         new_filename = os.path.splitext(doc.filename)[0] + ".pdf"
         if new_filename == old_filename or not os.path.exists(
-            os.path.join(root, new_filename)
-        ):  # NOQA: E501
+            os.path.join(root, new_filename),
+        ):
             return new_filename
 
     counter = 0
 
     while True:
         new_filename = generate_filename(
-            doc, counter, archive_filename=archive_filename
+            doc,
+            counter,
+            archive_filename=archive_filename,
         )
         if new_filename == old_filename:
             # still the same as before.
@@ -137,14 +139,16 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 
             if doc.correspondent:
                 correspondent = pathvalidate.sanitize_filename(
-                    doc.correspondent.name, replacement_text="-"
+                    doc.correspondent.name,
+                    replacement_text="-",
                 )
             else:
                 correspondent = "none"
 
             if doc.document_type:
                 document_type = pathvalidate.sanitize_filename(
-                    doc.document_type.name, replacement_text="-"
+                    doc.document_type.name,
+                    replacement_text="-",
                 )
             else:
                 document_type = "none"
@@ -160,9 +164,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=f"{doc.created.month:02}"
-                if doc.created
-                else "none",  # NOQA: E501
+                created_month=f"{doc.created.month:02}" if doc.created else "none",
                 created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
@@ -178,7 +180,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     except (ValueError, KeyError, IndexError):
         logger.warning(
             f"Invalid PAPERLESS_FILENAME_FORMAT: "
-            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default"
+            f"{settings.PAPERLESS_FILENAME_FORMAT}, falling back to default",
         )
 
     counter_str = f"_{counter:02}" if counter else ""
