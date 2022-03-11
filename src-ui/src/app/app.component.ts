@@ -1,11 +1,5 @@
 import { SettingsService, SETTINGS_KEYS } from './services/settings.service'
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  Renderer2,
-  RendererFactory2,
-} from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { ConsumerStatusService } from './services/consumer-status.service'
@@ -23,22 +17,20 @@ export class AppComponent implements OnInit, OnDestroy {
   successSubscription: Subscription
   failedSubscription: Subscription
 
-  private renderer: Renderer2
   private fileLeaveTimeoutID: any
+  fileIsOver: boolean = false
+  hidden: boolean = true
 
   constructor(
     private settings: SettingsService,
     private consumerStatusService: ConsumerStatusService,
     private toastService: ToastService,
     private router: Router,
-    private uploadDocumentsService: UploadDocumentsService,
-    rendererFactory: RendererFactory2
+    private uploadDocumentsService: UploadDocumentsService
   ) {
     let anyWindow = window as any
     anyWindow.pdfWorkerSrc = 'assets/js/pdf.worker.min.js'
     this.settings.updateAppearanceSettings()
-
-    this.renderer = rendererFactory.createRenderer(null, null)
   }
 
   ngOnDestroy(): void {
@@ -121,27 +113,29 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public fileOver() {
-    this.renderer.addClass(
-      document.getElementsByClassName('main-content').item(0),
-      'inert'
-    )
+    // allows transition
+    setTimeout(() => {
+      this.fileIsOver = true
+    }, 1)
+    this.hidden = false
+    // stop fileLeave timeout
     clearTimeout(this.fileLeaveTimeoutID)
   }
 
-  public fileLeave() {
+  public fileLeave(immediate: boolean = false) {
+    const ms = immediate ? 0 : 500
+
     this.fileLeaveTimeoutID = setTimeout(() => {
-      this.renderer.removeClass(
-        document.getElementsByClassName('main-content').item(0),
-        'inert'
-      )
-    }, 1000)
+      this.fileIsOver = false
+      // await transition completed
+      setTimeout(() => {
+        this.hidden = true
+      }, 150)
+    }, ms)
   }
 
   public dropped(files: NgxFileDropEntry[]) {
-    this.renderer.removeClass(
-      document.getElementsByClassName('main-content').item(0),
-      'inert'
-    )
+    this.fileLeave(true)
     this.uploadDocumentsService.uploadFiles(files)
     this.toastService.showInfo($localize`Initiating upload...`, 3000)
   }
