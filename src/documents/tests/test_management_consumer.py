@@ -6,12 +6,13 @@ from time import sleep
 from unittest import mock
 
 from django.conf import settings
-from django.core.management import call_command, CommandError
-from django.test import override_settings, TransactionTestCase
-
-from documents.models import Tag
+from django.core.management import call_command
+from django.core.management import CommandError
+from django.test import override_settings
+from django.test import TransactionTestCase
 from documents.consumer import ConsumerError
 from documents.management.commands import document_consumer
+from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -41,7 +42,7 @@ class ConsumerMixin:
         super(ConsumerMixin, self).setUp()
         self.t = None
         patcher = mock.patch(
-            "documents.management.commands.document_consumer.async_task"
+            "documents.management.commands.document_consumer.async_task",
         )
         self.task_mock = patcher.start()
         self.addCleanup(patcher.stop)
@@ -208,13 +209,16 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
         self.t_start()
 
         shutil.copy(
-            self.sample_file, os.path.join(self.dirs.consumption_dir, ".DS_STORE")
+            self.sample_file,
+            os.path.join(self.dirs.consumption_dir, ".DS_STORE"),
         )
         shutil.copy(
-            self.sample_file, os.path.join(self.dirs.consumption_dir, "my_file.pdf")
+            self.sample_file,
+            os.path.join(self.dirs.consumption_dir, "my_file.pdf"),
         )
         shutil.copy(
-            self.sample_file, os.path.join(self.dirs.consumption_dir, "._my_file.pdf")
+            self.sample_file,
+            os.path.join(self.dirs.consumption_dir, "._my_file.pdf"),
         )
         shutil.copy(
             self.sample_file,
@@ -258,7 +262,9 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
 
 
 @override_settings(
-    CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=3, CONSUMER_POLLING_RETRY_COUNT=20
+    CONSUMER_POLLING=1,
+    CONSUMER_POLLING_DELAY=3,
+    CONSUMER_POLLING_RETRY_COUNT=20,
 )
 class TestConsumerPolling(TestConsumer):
     # just do all the tests with polling
@@ -319,7 +325,9 @@ class TestConsumerTags(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
         self.assertCountEqual(kwargs["override_tag_ids"], tag_ids)
 
     @override_settings(
-        CONSUMER_POLLING=1, CONSUMER_POLLING_DELAY=1, CONSUMER_POLLING_RETRY_COUNT=20
+        CONSUMER_POLLING=1,
+        CONSUMER_POLLING_DELAY=1,
+        CONSUMER_POLLING_RETRY_COUNT=20,
     )
     def test_consume_file_with_path_tags_polling(self):
         self.test_consume_file_with_path_tags()

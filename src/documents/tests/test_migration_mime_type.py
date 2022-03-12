@@ -3,9 +3,9 @@ import shutil
 
 from django.conf import settings
 from django.test import override_settings
-
 from documents.parsers import get_default_file_extension
-from documents.tests.utils import DirectoriesMixin, TestMigrations
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import TestMigrations
 
 STORAGE_TYPE_UNENCRYPTED = "unencrypted"
 STORAGE_TYPE_GPG = "gpg"
@@ -46,7 +46,9 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
     def setUpBeforeMigration(self, apps):
         Document = apps.get_model("documents", "Document")
         doc = Document.objects.create(
-            title="test", file_type="pdf", filename="file1.pdf"
+            title="test",
+            file_type="pdf",
+            filename="file1.pdf",
         )
         self.doc_id = doc.id
         shutil.copy(
@@ -55,7 +57,9 @@ class TestMigrateMimeType(DirectoriesMixin, TestMigrations):
         )
 
         doc2 = Document.objects.create(
-            checksum="B", file_type="pdf", storage_type=STORAGE_TYPE_GPG
+            checksum="B",
+            file_type="pdf",
+            storage_type=STORAGE_TYPE_GPG,
         )
         self.doc2_id = doc2.id
         shutil.copy(
@@ -88,7 +92,9 @@ class TestMigrateMimeTypeBackwards(DirectoriesMixin, TestMigrations):
     def setUpBeforeMigration(self, apps):
         Document = apps.get_model("documents", "Document")
         doc = Document.objects.create(
-            title="test", mime_type="application/pdf", filename="file1.pdf"
+            title="test",
+            mime_type="application/pdf",
+            filename="file1.pdf",
         )
         self.doc_id = doc.id
         shutil.copy(

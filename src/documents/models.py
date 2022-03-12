@@ -5,17 +5,14 @@ import os
 import re
 from collections import OrderedDict
 
-import pathvalidate
-
 import dateutil.parser
+import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.timezone import is_aware
-
 from django.utils.translation import gettext_lazy as _
-
 from documents.parsers import get_default_file_extension
 
 
@@ -42,7 +39,9 @@ class MatchingModel(models.Model):
     match = models.CharField(_("match"), max_length=256, blank=True)
 
     matching_algorithm = models.PositiveIntegerField(
-        _("matching algorithm"), choices=MATCHING_ALGORITHMS, default=MATCH_ANY
+        _("matching algorithm"),
+        choices=MATCHING_ALGORITHMS,
+        default=MATCH_ANY,
     )
 
     is_insensitive = models.BooleanField(_("is insensitive"), default=True)
@@ -71,7 +70,7 @@ class Tag(MatchingModel):
         default=False,
         help_text=_(
             "Marks this tag as an inbox tag: All newly consumed "
-            "documents will be tagged with inbox tags."
+            "documents will be tagged with inbox tags.",
         ),
     )
 
@@ -120,14 +119,17 @@ class Document(models.Model):
         blank=True,
         help_text=_(
             "The raw, text-only data of the document. This field is "
-            "primarily used for searching."
+            "primarily used for searching.",
         ),
     )
 
     mime_type = models.CharField(_("mime type"), max_length=256, editable=False)
 
     tags = models.ManyToManyField(
-        Tag, related_name="documents", blank=True, verbose_name=_("tags")
+        Tag,
+        related_name="documents",
+        blank=True,
+        verbose_name=_("tags"),
     )
 
     checksum = models.CharField(
@@ -150,7 +152,10 @@ class Document(models.Model):
     created = models.DateTimeField(_("created"), default=timezone.now, db_index=True)
 
     modified = models.DateTimeField(
-        _("modified"), auto_now=True, editable=False, db_index=True
+        _("modified"),
+        auto_now=True,
+        editable=False,
+        db_index=True,
     )
 
     storage_type = models.CharField(
@@ -162,7 +167,10 @@ class Document(models.Model):
     )
 
     added = models.DateTimeField(
-        _("added"), default=timezone.now, editable=False, db_index=True
+        _("added"),
+        default=timezone.now,
+        editable=False,
+        db_index=True,
     )
 
     filename = models.FilePathField(
@@ -192,7 +200,7 @@ class Document(models.Model):
         unique=True,
         db_index=True,
         help_text=_(
-            "The position of this document in your physical document " "archive."
+            "The position of this document in your physical document " "archive.",
         ),
     )
 
@@ -289,7 +297,9 @@ class Log(models.Model):
     message = models.TextField(_("message"))
 
     level = models.PositiveIntegerField(
-        _("level"), choices=LEVELS, default=logging.INFO
+        _("level"),
+        choices=LEVELS,
+        default=logging.INFO,
     )
 
     created = models.DateTimeField(_("created"), auto_now_add=True)
@@ -321,7 +331,10 @@ class SavedView(models.Model):
     )
 
     sort_field = models.CharField(
-        _("sort field"), max_length=128, null=True, blank=True
+        _("sort field"),
+        max_length=128,
+        null=True,
+        blank=True,
     )
     sort_reverse = models.BooleanField(_("sort reverse"), default=False)
 
@@ -383,11 +396,16 @@ class FileInfo:
                 ),
             ),
             ("title", re.compile(r"(?P<title>.*)$", flags=re.IGNORECASE)),
-        ]
+        ],
     )
 
     def __init__(
-        self, created=None, correspondent=None, title=None, tags=(), extension=None
+        self,
+        created=None,
+        correspondent=None,
+        title=None,
+        tags=(),
+        extension=None,
     ):
 
         self.created = created
