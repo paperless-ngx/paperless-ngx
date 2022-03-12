@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-12 17:20\n"
+"PO-Revision-Date: 2022-03-12 18:21\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -19,104 +19,104 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "Dokumenty"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "Akékoľvek slovo"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "Všetky slová"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "Presná zhoda"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "Normálny výraz"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Nejasné slovo"
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr ""
+msgstr "Automatické"
 
 #: documents/models.py:40 documents/models.py:314 paperless_mail/models.py:23
 #: paperless_mail/models.py:107
 msgid "name"
-msgstr ""
+msgstr "meno"
 
 #: documents/models.py:42
 msgid "match"
-msgstr ""
+msgstr "zhoda"
 
 #: documents/models.py:45
 msgid "matching algorithm"
-msgstr ""
+msgstr "zhodový algoritmus"
 
 #: documents/models.py:48
 msgid "is insensitive"
-msgstr ""
+msgstr "je necitlivý"
 
 #: documents/models.py:61 documents/models.py:104
 msgid "correspondent"
-msgstr ""
+msgstr "korešpondencia"
 
 #: documents/models.py:62
 msgid "correspondents"
-msgstr ""
+msgstr "zodpovedá"
 
 #: documents/models.py:67
 msgid "color"
-msgstr ""
+msgstr "farba"
 
 #: documents/models.py:70
 msgid "is inbox tag"
-msgstr ""
+msgstr "je štítok pošty"
 
 #: documents/models.py:73
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Označí tento štítok ako štítok doručenej pošty: Všetky novo spotrebované dokumenty budú označené štítkami doručenej pošty."
 
 #: documents/models.py:79
 msgid "tag"
-msgstr ""
+msgstr "štítok"
 
 #: documents/models.py:80 documents/models.py:130
 msgid "tags"
-msgstr ""
+msgstr "štítky"
 
 #: documents/models.py:85 documents/models.py:115
 msgid "document type"
-msgstr ""
+msgstr "typ dokumentu"
 
 #: documents/models.py:86
 msgid "document types"
-msgstr ""
+msgstr "typy dokumentov"
 
 #: documents/models.py:94
 msgid "Unencrypted"
-msgstr ""
+msgstr "Nešifrované"
 
 #: documents/models.py:95
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Šifrované pomocou GNU Privacy Guard"
 
 #: documents/models.py:107
 msgid "title"
-msgstr ""
+msgstr "názov"
 
 #: documents/models.py:119
 msgid "content"
-msgstr ""
+msgstr "obsah"
 
 #: documents/models.py:122
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Nespracované, iba textové údaje dokumentu. Toto pole sa primárne používa na vyhľadávanie."
 
 #: documents/models.py:127
 msgid "mime type"
@@ -124,55 +124,55 @@ msgstr ""
 
 #: documents/models.py:134
 msgid "checksum"
-msgstr ""
+msgstr "kontrolný súčet"
 
 #: documents/models.py:138
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Kontrolný súčet originálneho dokumentu."
 
 #: documents/models.py:142
 msgid "archive checksum"
-msgstr ""
+msgstr "archivovať kontrolný súčet"
 
 #: documents/models.py:147
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Kontrolný súčet archivovaného dokumentu."
 
 #: documents/models.py:150 documents/models.py:295
 msgid "created"
-msgstr ""
+msgstr "vytovrené"
 
 #: documents/models.py:153
 msgid "modified"
-msgstr ""
+msgstr "upravené"
 
 #: documents/models.py:157
 msgid "storage type"
-msgstr ""
+msgstr "typ úložiska"
 
 #: documents/models.py:165
 msgid "added"
-msgstr ""
+msgstr "pridané"
 
 #: documents/models.py:169
 msgid "filename"
-msgstr ""
+msgstr "názov súboru"
 
 #: documents/models.py:175
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Aktuálny názov dokumentu v úložisku"
 
 #: documents/models.py:179
 msgid "archive filename"
-msgstr ""
+msgstr "archovovať názov súboru"
 
 #: documents/models.py:185
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Aktuálny archovivaný názov dokumentu v úložisku"
 
 #: documents/models.py:189
 msgid "archive serial number"
-msgstr ""
+msgstr "archivovať sériové číslo"
 
 #: documents/models.py:195
 msgid "The position of this document in your physical document archive."
