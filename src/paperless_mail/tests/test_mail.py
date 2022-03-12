@@ -7,13 +7,15 @@ from unittest import mock
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
-from imap_tools import MailMessageFlags, MailboxFolderSelectError
-
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
+from imap_tools import MailboxFolderSelectError
+from imap_tools import MailMessageFlags
 from paperless_mail import tasks
-from paperless_mail.mail import MailError, MailAccountHandler
-from paperless_mail.models import MailRule, MailAccount
+from paperless_mail.mail import MailAccountHandler
+from paperless_mail.mail import MailError
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 
 class BogusFolderManager:
@@ -83,7 +85,7 @@ class BogusMailBox(ContextManager):
     def move(self, uid_list, folder):
         if folder == "spam":
             self.messages_spam.append(
-                filter(lambda m: m.uid in uid_list, self.messages)
+                filter(lambda m: m.uid in uid_list, self.messages),
             )
             self.messages = list(filter(lambda m: m.uid not in uid_list, self.messages))
         else:
@@ -115,7 +117,9 @@ def create_message(
 
 
 def create_attachment(
-    filename="the_file.pdf", content_disposition="attachment", payload=b"a PDF document"
+    filename="the_file.pdf",
+    content_disposition="attachment",
+    payload=b"a PDF document",
 ):
     attachment = namedtuple("Attachment", [])
     attachment.filename = filename
@@ -163,7 +167,7 @@ class TestMail(DirectoriesMixin, TestCase):
                 body="cables",
                 seen=True,
                 flagged=False,
-            )
+            ),
         )
         self.bogus_mailbox.messages.append(
             create_message(
@@ -171,14 +175,14 @@ class TestMail(DirectoriesMixin, TestCase):
                 body="from my favorite electronic store",
                 seen=False,
                 flagged=True,
-            )
+            ),
         )
         self.bogus_mailbox.messages.append(
             create_message(
                 subject="Claim your $10M price now!",
                 from_="amazon@amazon-some-indian-site.org",
                 seen=False,
-            )
+            ),
         )
 
     def test_get_correspondent(self):
@@ -196,12 +200,14 @@ class TestMail(DirectoriesMixin, TestCase):
         handler = MailAccountHandler()
 
         rule = MailRule(
-            name="a", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING
+            name="a",
+            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING,
         )
         self.assertIsNone(handler.get_correspondent(message, rule))
 
         rule = MailRule(
-            name="b", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL
+            name="b",
+            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL,
         )
         c = handler.get_correspondent(message, rule)
         self.assertIsNotNone(c)
@@ -212,7 +218,8 @@ class TestMail(DirectoriesMixin, TestCase):
         self.assertEqual(c.id, me_localhost.id)
 
         rule = MailRule(
-            name="c", assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME
+            name="c",
+            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME,
         )
         c = handler.get_correspondent(message, rule)
         self.assertIsNotNone(c)
@@ -244,7 +251,9 @@ class TestMail(DirectoriesMixin, TestCase):
 
     def test_handle_message(self):
         message = create_message(
-            subject="the message title", from_="Myself", num_attachments=2
+            subject="the message title",
+            from_="Myself",
+            num_attachments=2,
         )
 
         account = MailAccount()
@@ -376,11 +385,16 @@ class TestMail(DirectoriesMixin, TestCase):
     def test_handle_mail_account_mark_read(self):
 
         account = MailAccount.objects.create(
-            name="test", imap_server="", username="admin", password="secret"
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
 
         rule = MailRule.objects.create(
-            name="testrule", account=account, action=MailRule.ACTION_MARK_READ
+            name="testrule",
+            account=account,
+            action=MailRule.ACTION_MARK_READ,
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
@@ -394,7 +408,10 @@ class TestMail(DirectoriesMixin, TestCase):
     def test_handle_mail_account_delete(self):
 
         account = MailAccount.objects.create(
-            name="test", imap_server="", username="admin", password="secret"
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
 
         rule = MailRule.objects.create(
@@ -412,7 +429,10 @@ class TestMail(DirectoriesMixin, TestCase):
 
     def test_handle_mail_account_flag(self):
         account = MailAccount.objects.create(
-            name="test", imap_server="", username="admin", password="secret"
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
 
         rule = MailRule.objects.create(
@@ -432,7 +452,10 @@ class TestMail(DirectoriesMixin, TestCase):
 
     def test_handle_mail_account_move(self):
         account = MailAccount.objects.create(
-            name="test", imap_server="", username="admin", password="secret"
+            name="test",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
 
         rule = MailRule.objects.create(
@@ -453,7 +476,10 @@ class TestMail(DirectoriesMixin, TestCase):
 
     def test_error_login(self):
         account = MailAccount.objects.create(
-            name="test", imap_server="", username="admin", password="wrong"
+            name="test",
+            imap_server="",
+            username="admin",
+            password="wrong",
         )
 
         try:
@@ -465,11 +491,17 @@ class TestMail(DirectoriesMixin, TestCase):
 
     def test_error_skip_account(self):
         account_faulty = MailAccount.objects.create(
-            name="test", imap_server="", username="admin", password="wroasdng"
+            name="test",
+            imap_server="",
+            username="admin",
+            password="wroasdng",
         )
 
         account = MailAccount.objects.create(
-            name="test2", imap_server="", username="admin", password="secret"
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
         rule = MailRule.objects.create(
             name="testrule",
@@ -487,7 +519,10 @@ class TestMail(DirectoriesMixin, TestCase):
     def test_error_skip_rule(self):
 
         account = MailAccount.objects.create(
-            name="test2", imap_server="", username="admin", password="secret"
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
         rule = MailRule.objects.create(
             name="testrule",
@@ -523,7 +558,10 @@ class TestMail(DirectoriesMixin, TestCase):
         m.side_effect = get_correspondent_fake
 
         account = MailAccount.objects.create(
-            name="test2", imap_server="", username="admin", password="secret"
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
         rule = MailRule.objects.create(
             name="testrule",
@@ -544,7 +582,10 @@ class TestMail(DirectoriesMixin, TestCase):
     def test_error_create_correspondent(self):
 
         account = MailAccount.objects.create(
-            name="test2", imap_server="", username="admin", password="secret"
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
         rule = MailRule.objects.create(
             name="testrule",
@@ -579,7 +620,10 @@ class TestMail(DirectoriesMixin, TestCase):
     def test_filters(self):
 
         account = MailAccount.objects.create(
-            name="test3", imap_server="", username="admin", password="secret"
+            name="test3",
+            imap_server="",
+            username="admin",
+            password="secret",
         )
         rule = MailRule.objects.create(
             name="testrule3",
@@ -629,7 +673,7 @@ class TestMail(DirectoriesMixin, TestCase):
 
 class TestManagementCommand(TestCase):
     @mock.patch(
-        "paperless_mail.management.commands.mail_fetcher.tasks.process_mail_accounts"
+        "paperless_mail.management.commands.mail_fetcher.tasks.process_mail_accounts",
     )
     def test_mail_fetcher(self, m):
 
@@ -644,10 +688,16 @@ class TestTasks(TestCase):
         m.side_effect = lambda account: 6
 
         MailAccount.objects.create(
-            name="A", imap_server="A", username="A", password="A"
+            name="A",
+            imap_server="A",
+            username="A",
+            password="A",
         )
         MailAccount.objects.create(
-            name="B", imap_server="A", username="A", password="A"
+            name="B",
+            imap_server="A",
+            username="A",
+            password="A",
         )
 
         result = tasks.process_mail_accounts()
@@ -663,7 +713,10 @@ class TestTasks(TestCase):
     def test_single_accounts(self, m):
 
         MailAccount.objects.create(
-            name="A", imap_server="A", username="A", password="A"
+            name="A",
+            imap_server="A",
+            username="A",
+            password="A",
         )
 
         tasks.process_mail_account("A")

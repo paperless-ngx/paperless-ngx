@@ -3,13 +3,18 @@ import logging
 import tqdm
 from django.conf import settings
 from django.db.models.signals import post_save
-from whoosh.writing import AsyncWriter
-
-from documents import index, sanity_checker
-from documents.classifier import DocumentClassifier, load_classifier
-from documents.consumer import Consumer, ConsumerError
-from documents.models import Document, Tag, DocumentType, Correspondent
+from documents import index
+from documents import sanity_checker
+from documents.classifier import DocumentClassifier
+from documents.classifier import load_classifier
+from documents.consumer import Consumer
+from documents.consumer import ConsumerError
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
+from whoosh.writing import AsyncWriter
 
 logger = logging.getLogger("paperless.tasks")
 
@@ -47,7 +52,7 @@ def train_classifier():
     try:
         if classifier.train():
             logger.info(
-                "Saving updated classifier model to {}...".format(settings.MODEL_FILE)
+                "Saving updated classifier model to {}...".format(settings.MODEL_FILE),
             )
             classifier.save()
         else:
@@ -82,7 +87,7 @@ def consume_file(
     else:
         raise ConsumerError(
             "Unknown error: Returned document was null, but "
-            "no error message was given."
+            "no error message was given.",
         )
 
 

@@ -1,5 +1,4 @@
 import gnupg
-
 from django.conf import settings
 
 

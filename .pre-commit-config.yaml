@@ -62,6 +62,7 @@ repos:
         exclude: "(migrations)|(paperless/settings.py)|(.*\\.tox)|(.*/tests/.*)"
         args:
           - "--max-line-length=88"
+          - "--ignore=E203,W503"
   - repo: https://github.com/psf/black
     rev: 22.1.0
     hooks:

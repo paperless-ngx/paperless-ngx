@@ -2,8 +2,8 @@ from unittest import mock
 
 from channels.layers import get_channel_layer
 from channels.testing import WebsocketCommunicator
-from django.test import TestCase, override_settings
-
+from django.test import override_settings
+from django.test import TestCase
 from paperless.asgi import application
 
 
@@ -46,7 +46,8 @@ class TestWebSockets(TestCase):
 
         channel_layer = get_channel_layer()
         await channel_layer.group_send(
-            "status_updates", {"type": "status_update", "data": message}
+            "status_updates",
+            {"type": "status_update", "data": message},
         )
 
         response = await communicator.receive_json_from()

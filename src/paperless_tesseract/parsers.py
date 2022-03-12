@@ -2,10 +2,11 @@ import json
 import os
 import re
 
-from PIL import Image
 from django.conf import settings
-
-from documents.parsers import DocumentParser, ParseError, make_thumbnail_from_pdf
+from documents.parsers import DocumentParser
+from documents.parsers import make_thumbnail_from_pdf
+from documents.parsers import ParseError
+from PIL import Image
 
 
 class NoTextFoundException(Exception):
@@ -42,7 +43,7 @@ class RasterisedDocumentParser(DocumentParser):
                             "prefix": meta.REVERSE_NS[m.group(1)],
                             "key": m.group(2),
                             "value": value,
-                        }
+                        },
                     )
                 except Exception as e:
                     self.log(
@@ -53,7 +54,9 @@ class RasterisedDocumentParser(DocumentParser):
 
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         return make_thumbnail_from_pdf(
-            self.archive_path or document_path, self.tempdir, self.logging_group
+            self.archive_path or document_path,
+            self.tempdir,
+            self.logging_group,
         )
 
     def is_image(self, mime_type):
@@ -110,7 +113,6 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
         from pdfminer.high_level import extract_text as pdfminer_extract_text
-        from pdfminer.pdftypes import PDFException
 
         try:
             stripped = post_process_text(pdfminer_extract_text(pdf_file))
@@ -129,7 +131,12 @@ class RasterisedDocumentParser(DocumentParser):
             return None
 
     def construct_ocrmypdf_parameters(
-        self, input_file, mime_type, output_file, sidecar_file, safe_fallback=False
+        self,
+        input_file,
+        mime_type,
+        output_file,
+        sidecar_file,
+        safe_fallback=False,
     ):
         ocrmypdf_args = {
             "input_file": input_file,
@@ -167,7 +174,7 @@ class RasterisedDocumentParser(DocumentParser):
             ocrmypdf_args["rotate_pages"] = True
             ocrmypdf_args[
                 "rotate_pages_threshold"
-            ] = settings.OCR_ROTATE_PAGES_THRESHOLD  # NOQA: E501
+            ] = settings.OCR_ROTATE_PAGES_THRESHOLD
 
         if settings.OCR_PAGES > 0:
             ocrmypdf_args["pages"] = f"1-{settings.OCR_PAGES}"
@@ -202,7 +209,7 @@ class RasterisedDocumentParser(DocumentParser):
                 raise ParseError(
                     f"Cannot produce archive PDF for image {input_file}, "
                     f"no DPI information is present in this image and "
-                    f"OCR_IMAGE_DPI is not set."
+                    f"OCR_IMAGE_DPI is not set.",
                 )
 
         if settings.OCR_USER_ARGS and not safe_fallback:
@@ -241,7 +248,10 @@ class RasterisedDocumentParser(DocumentParser):
         sidecar_file = os.path.join(self.tempdir, "sidecar.txt")
 
         args = self.construct_ocrmypdf_parameters(
-            document_path, mime_type, archive_path, sidecar_file
+            document_path,
+            mime_type,
+            archive_path,
+            sidecar_file,
         )
 
         try:
@@ -289,7 +299,8 @@ class RasterisedDocumentParser(DocumentParser):
                 # is bigger and blurry due to --force-ocr.
 
                 self.text = self.extract_text(
-                    sidecar_file_fallback, archive_path_fallback
+                    sidecar_file_fallback,
+                    archive_path_fallback,
                 )
 
             except Exception as e:

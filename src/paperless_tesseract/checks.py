@@ -1,7 +1,9 @@
 import subprocess
 
 from django.conf import settings
-from django.core.checks import Error, Warning, register
+from django.core.checks import Error
+from django.core.checks import register
+from django.core.checks import Warning
 
 
 def get_tesseract_langs():
@@ -19,8 +21,8 @@ def check_default_language_available(app_configs, **kwargs):
         return [
             Warning(
                 "No OCR language has been specified with PAPERLESS_OCR_LANGUAGE. "
-                "This means that tesseract will fallback to english."
-            )
+                "This means that tesseract will fallback to english.",
+            ),
         ]
 
     specified_langs = settings.OCR_LANGUAGE.split("+")
@@ -31,8 +33,8 @@ def check_default_language_available(app_configs, **kwargs):
                 Error(
                     f"The selected ocr language {lang} is "
                     f"not installed. Paperless cannot OCR your documents "
-                    f"without it. Please fix PAPERLESS_OCR_LANGUAGE."
-                )
+                    f"without it. Please fix PAPERLESS_OCR_LANGUAGE.",
+                ),
             ]
 
     return []

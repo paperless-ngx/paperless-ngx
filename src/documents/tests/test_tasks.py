@@ -4,10 +4,13 @@ from unittest import mock
 from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
-
 from documents import tasks
-from documents.models import Document, Tag, Correspondent, DocumentType
-from documents.sanity_checker import SanityCheckMessages, SanityCheckFailedException
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
+from documents.sanity_checker import SanityCheckFailedException
+from documents.sanity_checker import SanityCheckMessages
 from documents.tests.utils import DirectoriesMixin
 
 
@@ -106,7 +109,8 @@ class TestTasks(DirectoriesMixin, TestCase):
         messages.warning("Some warning")
         m.return_value = messages
         self.assertEqual(
-            tasks.sanity_check(), "Sanity check exited with warnings. See log."
+            tasks.sanity_check(),
+            "Sanity check exited with warnings. See log.",
         )
         m.assert_called_once()
 
@@ -116,7 +120,8 @@ class TestTasks(DirectoriesMixin, TestCase):
         messages.info("Some info")
         m.return_value = messages
         self.assertEqual(
-            tasks.sanity_check(), "Sanity check exited with infos. See log."
+            tasks.sanity_check(),
+            "Sanity check exited with infos. See log.",
         )
         m.assert_called_once()
 

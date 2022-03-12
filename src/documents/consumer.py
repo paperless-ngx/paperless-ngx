@@ -15,11 +15,19 @@ from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from .classifier import load_classifier
-from .file_handling import create_source_path_directory, generate_unique_filename
+from .file_handling import create_source_path_directory
+from .file_handling import generate_unique_filename
 from .loggers import LoggingMixin
-from .models import Document, FileInfo, Correspondent, DocumentType, Tag
-from .parsers import ParseError, get_parser_class_for_mime_type, parse_date
-from .signals import document_consumption_finished, document_consumption_started
+from .models import Correspondent
+from .models import Document
+from .models import DocumentType
+from .models import FileInfo
+from .models import Tag
+from .parsers import get_parser_class_for_mime_type
+from .parsers import parse_date
+from .parsers import ParseError
+from .signals import document_consumption_finished
+from .signals import document_consumption_started
 
 
 class ConsumerError(Exception):
@@ -46,12 +54,15 @@ class Consumer(LoggingMixin):
     logging_name = "paperless.consumer"
 
     def _send_progress(
-        self, current_progress, max_progress, status, message=None, document_id=None
+        self,
+        current_progress,
+        max_progress,
+        status,
+        message=None,
+        document_id=None,
     ):
         payload = {
-            "filename": os.path.basename(self.filename)
-            if self.filename
-            else None,  # NOQA: E501
+            "filename": os.path.basename(self.filename) if self.filename else None,
             "task_id": self.task_id,
             "current_progress": current_progress,
             "max_progress": max_progress,
@@ -60,7 +71,8 @@ class Consumer(LoggingMixin):
             "document_id": document_id,
         }
         async_to_sync(self.channel_layer.group_send)(
-            "status_updates", {"type": "status_update", "data": payload}
+            "status_updates",
+            {"type": "status_update", "data": payload},
         )
 
     def _fail(self, message, log_message=None, exc_info=None):
@@ -83,15 +95,16 @@ class Consumer(LoggingMixin):
     def pre_check_file_exists(self):
         if not os.path.isfile(self.path):
             self._fail(
-                MESSAGE_FILE_NOT_FOUND, f"Cannot consume {self.path}: File not found."
+                MESSAGE_FILE_NOT_FOUND,
+                f"Cannot consume {self.path}: File not found.",
             )
 
     def pre_check_duplicate(self):
         with open(self.path, "rb") as f:
             checksum = hashlib.md5(f.read()).hexdigest()
         if Document.objects.filter(
-            Q(checksum=checksum) | Q(archive_checksum=checksum)
-        ).exists():  # NOQA: E501
+            Q(checksum=checksum) | Q(archive_checksum=checksum),
+        ).exists():
             if settings.CONSUMER_DELETE_DUPLICATES:
                 os.unlink(self.path)
             self._fail(
@@ -139,7 +152,8 @@ class Consumer(LoggingMixin):
             )
 
         self.log(
-            "info", f"Executing post-consume script {settings.POST_CONSUME_SCRIPT}"
+            "info",
+            f"Executing post-consume script {settings.POST_CONSUME_SCRIPT}",
         )
 
         try:
@@ -154,7 +168,7 @@ class Consumer(LoggingMixin):
                     reverse("document-thumb", kwargs={"pk": document.pk}),
                     str(document.correspondent),
                     str(",".join(document.tags.all().values_list("name", flat=True))),
-                )
+                ),
             ).wait()
         except Exception as e:
             self._fail(
@@ -213,7 +227,9 @@ class Consumer(LoggingMixin):
         # Notify all listeners that we're going to do some work.
 
         document_consumption_started.send(
-            sender=self.__class__, filename=self.path, logging_group=self.logging_group
+            sender=self.__class__,
+            filename=self.path,
+            logging_group=self.logging_group,
         )
 
         self.run_pre_consume_script()
@@ -247,7 +263,9 @@ class Consumer(LoggingMixin):
             self.log("debug", f"Generating thumbnail for {self.filename}...")
             self._send_progress(70, 100, "WORKING", MESSAGE_GENERATING_THUMBNAIL)
             thumbnail = document_parser.get_optimised_thumbnail(
-                self.path, mime_type, self.filename
+                self.path,
+                mime_type,
+                self.filename,
             )
 
             text = document_parser.get_text()
@@ -301,21 +319,26 @@ class Consumer(LoggingMixin):
                     self._write(document.storage_type, self.path, document.source_path)
 
                     self._write(
-                        document.storage_type, thumbnail, document.thumbnail_path
+                        document.storage_type,
+                        thumbnail,
+                        document.thumbnail_path,
                     )
 
                     if archive_path and os.path.isfile(archive_path):
                         document.archive_filename = generate_unique_filename(
-                            document, archive_filename=True
+                            document,
+                            archive_filename=True,
                         )
                         create_source_path_directory(document.archive_path)
                         self._write(
-                            document.storage_type, archive_path, document.archive_path
+                            document.storage_type,
+                            archive_path,
+                            document.archive_path,
                         )
 
                         with open(archive_path, "rb") as f:
                             document.archive_checksum = hashlib.md5(
-                                f.read()
+                                f.read(),
                             ).hexdigest()
 
                 # Don't save with the lock active. Saving will cause the file
@@ -328,7 +351,8 @@ class Consumer(LoggingMixin):
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
                 shadow_file = os.path.join(
-                    os.path.dirname(self.path), "._" + os.path.basename(self.path)
+                    os.path.dirname(self.path),
+                    "._" + os.path.basename(self.path),
                 )
 
                 if os.path.isfile(shadow_file):
@@ -390,12 +414,12 @@ class Consumer(LoggingMixin):
     def apply_overrides(self, document):
         if self.override_correspondent_id:
             document.correspondent = Correspondent.objects.get(
-                pk=self.override_correspondent_id
+                pk=self.override_correspondent_id,
             )
 
         if self.override_document_type_id:
             document.document_type = DocumentType.objects.get(
-                pk=self.override_document_type_id
+                pk=self.override_document_type_id,
             )
 
         if self.override_tag_ids:

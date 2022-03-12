@@ -1,8 +1,8 @@
 import os
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-
+from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from documents.models import Document
 from paperless.db import GnuPG
 
@@ -31,9 +31,9 @@ class Command(BaseCommand):
                 "this unless you've got a recent backup\nWARNING: handy.  It "
                 "*should* work without a hitch, but be safe and backup your\n"
                 "WARNING: stuff first.\n\nHit Ctrl+C to exit now, or Enter to "
-                "continue.\n\n"
+                "continue.\n\n",
             )
-            __ = input()
+            _ = input()
         except KeyboardInterrupt:
             return
 
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         if not passphrase:
             raise CommandError(
                 "Passphrase not defined.  Please set it with --passphrase or "
-                "by declaring it in your environment or your config."
+                "by declaring it in your environment or your config.",
             )
 
         self.__gpg_to_unencrypted(passphrase)
@@ -50,7 +50,7 @@ class Command(BaseCommand):
     def __gpg_to_unencrypted(passphrase):
 
         encrypted_files = Document.objects.filter(
-            storage_type=Document.STORAGE_TYPE_GPG
+            storage_type=Document.STORAGE_TYPE_GPG,
         )
 
         for document in encrypted_files:
@@ -71,7 +71,7 @@ class Command(BaseCommand):
             if not ext == ".gpg":
                 raise CommandError(
                     f"Abort: encrypted file {document.source_path} does not "
-                    f"end with .gpg"
+                    f"end with .gpg",
                 )
 
             document.filename = os.path.splitext(document.filename)[0]
@@ -83,7 +83,8 @@ class Command(BaseCommand):
                 f.write(raw_thumb)
 
             Document.objects.filter(id=document.id).update(
-                storage_type=document.storage_type, filename=document.filename
+                storage_type=document.storage_type,
+                filename=document.filename,
             )
 
             for path in old_paths:
