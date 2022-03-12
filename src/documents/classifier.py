@@ -6,8 +6,8 @@ import re
 import shutil
 
 from django.conf import settings
-
-from documents.models import Document, MatchingModel
+from documents.models import Document
+from documents.models import MatchingModel
 
 
 class IncompatibleClassifierVersionError(Exception):
@@ -30,8 +30,8 @@ def preprocess_content(content):
 def load_classifier():
     if not os.path.isfile(settings.MODEL_FILE):
         logger.debug(
-            f"Document classification model does not exist (yet), not "
-            f"performing automatic matching."
+            "Document classification model does not exist (yet), not "
+            "performing automatic matching.",
         )
         return None
 
@@ -42,16 +42,16 @@ def load_classifier():
     except (ClassifierModelCorruptError, IncompatibleClassifierVersionError):
         # there's something wrong with the model file.
         logger.exception(
-            f"Unrecoverable error while loading document "
-            f"classification model, deleting model file."
+            "Unrecoverable error while loading document "
+            "classification model, deleting model file.",
         )
         os.unlink(settings.MODEL_FILE)
         classifier = None
     except OSError:
-        logger.exception(f"IO error while loading document classification model")
+        logger.exception("IO error while loading document classification model")
         classifier = None
     except Exception:
-        logger.exception(f"Unknown error while loading document classification model")
+        logger.exception("Unknown error while loading document classification model")
         classifier = None
 
     return classifier
@@ -78,7 +78,7 @@ class DocumentClassifier(object):
 
             if schema_version != self.FORMAT_VERSION:
                 raise IncompatibleClassifierVersionError(
-                    "Cannor load classifier, incompatible versions."
+                    "Cannor load classifier, incompatible versions.",
                 )
             else:
                 try:
@@ -122,8 +122,8 @@ class DocumentClassifier(object):
         logger.debug("Gathering data from database...")
         m = hashlib.sha1()
         for doc in Document.objects.order_by("pk").exclude(
-            tags__is_inbox_tag=True
-        ):  # NOQA: E501
+            tags__is_inbox_tag=True,
+        ):
             preprocessed_content = preprocess_content(doc.content)
             m.update(preprocessed_content.encode("utf-8"))
             data.append(preprocessed_content)
@@ -146,9 +146,9 @@ class DocumentClassifier(object):
                 [
                     tag.pk
                     for tag in doc.tags.filter(
-                        matching_algorithm=MatchingModel.MATCH_AUTO
+                        matching_algorithm=MatchingModel.MATCH_AUTO,
                     )
-                ]
+                ],
             )
             for tag in tags:
                 m.update(tag.to_bytes(4, "little", signed=True))
@@ -177,8 +177,11 @@ class DocumentClassifier(object):
         logger.debug(
             "{} documents, {} tag(s), {} correspondent(s), "
             "{} document type(s).".format(
-                len(data), num_tags, num_correspondents, num_document_types
-            )
+                len(data),
+                num_tags,
+                num_correspondents,
+                num_document_types,
+            ),
         )
 
         from sklearn.feature_extraction.text import CountVectorizer
@@ -188,7 +191,9 @@ class DocumentClassifier(object):
         # Step 2: vectorize data
         logger.debug("Vectorizing data...")
         self.data_vectorizer = CountVectorizer(
-            analyzer="word", ngram_range=(1, 2), min_df=0.01
+            analyzer="word",
+            ngram_range=(1, 2),
+            min_df=0.01,
         )
         data_vectorized = self.data_vectorizer.fit_transform(data)
 
@@ -204,7 +209,7 @@ class DocumentClassifier(object):
                 ]
                 self.tags_binarizer = LabelBinarizer()
                 labels_tags_vectorized = self.tags_binarizer.fit_transform(
-                    labels_tags
+                    labels_tags,
                 ).ravel()
             else:
                 self.tags_binarizer = MultiLabelBinarizer()
@@ -223,7 +228,8 @@ class DocumentClassifier(object):
         else:
             self.correspondent_classifier = None
             logger.debug(
-                "There are no correspondents. Not training correspondent " "classifier."
+                "There are no correspondents. Not training correspondent "
+                "classifier.",
             )
 
         if num_document_types > 0:
@@ -233,7 +239,8 @@ class DocumentClassifier(object):
         else:
             self.document_type_classifier = None
             logger.debug(
-                "There are no document types. Not training document type " "classifier."
+                "There are no document types. Not training document type "
+                "classifier.",
             )
 
         self.data_hash = new_data_hash

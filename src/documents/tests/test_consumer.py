@@ -6,13 +6,20 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import override_settings
+from django.test import TestCase
 
-from .utils import DirectoriesMixin
-from ..consumer import Consumer, ConsumerError
-from ..models import FileInfo, Tag, Correspondent, DocumentType, Document
-from ..parsers import DocumentParser, ParseError
+from ..consumer import Consumer
+from ..consumer import ConsumerError
+from ..models import Correspondent
+from ..models import Document
+from ..models import DocumentType
+from ..models import FileInfo
+from ..models import Tag
+from ..parsers import DocumentParser
+from ..parsers import ParseError
 from ..tasks import sanity_check
+from .utils import DirectoriesMixin
 
 
 class TestAttributes(TestCase):
@@ -33,12 +40,18 @@ class TestAttributes(TestCase):
 
     def test_guess_attributes_from_name_when_title_starts_with_dash(self):
         self._test_guess_attributes_from_name(
-            "- weird but should not break.pdf", None, "- weird but should not break", ()
+            "- weird but should not break.pdf",
+            None,
+            "- weird but should not break",
+            (),
         )
 
     def test_guess_attributes_from_name_when_title_ends_with_dash(self):
         self._test_guess_attributes_from_name(
-            "weird but should not break -.pdf", None, "weird but should not break -", ()
+            "weird but should not break -.pdf",
+            None,
+            "weird but should not break -",
+            (),
         )
 
 
@@ -53,7 +66,12 @@ class TestFieldPermutations(TestCase):
     valid_tags = ["tag", "tig,tag", "tag1,tag2,tag-3"]
 
     def _test_guessed_attributes(
-        self, filename, created=None, correspondent=None, title=None, tags=None
+        self,
+        filename,
+        created=None,
+        correspondent=None,
+        title=None,
+        tags=None,
     ):
 
         info = FileInfo.from_filename(filename)
@@ -131,7 +149,7 @@ class TestFieldPermutations(TestCase):
             FILENAME_PARSE_TRANSFORMS=[
                 (all_patt, "all.gif"),
                 (all_patt, "anotherall.gif"),
-            ]
+            ],
         ):
             info = FileInfo.from_filename(filename)
             self.assertEqual(info.title, "all")
@@ -141,7 +159,7 @@ class TestFieldPermutations(TestCase):
             FILENAME_PARSE_TRANSFORMS=[
                 (none_patt, "none.gif"),
                 (all_patt, "anotherall.gif"),
-            ]
+            ],
         ):
             info = FileInfo.from_filename(filename)
             self.assertEqual(info.title, "anotherall")
@@ -238,7 +256,9 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
     def make_dummy_parser(self, logging_group, progress_callback=None):
         return DummyParser(
-            logging_group, self.dirs.scratch_dir, self.get_test_archive_file()
+            logging_group,
+            self.dirs.scratch_dir,
+            self.get_test_archive_file(),
         )
 
     def make_faulty_parser(self, logging_group, progress_callback=None):
@@ -257,7 +277,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
                     "mime_types": {"application/pdf": ".pdf"},
                     "weight": 0,
                 },
-            )
+            ),
         ]
         self.addCleanup(patcher.stop)
 
@@ -282,7 +302,11 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
     def get_test_archive_file(self):
         src = os.path.join(
-            os.path.dirname(__file__), "samples", "documents", "archive", "0000001.pdf"
+            os.path.dirname(__file__),
+            "samples",
+            "documents",
+            "archive",
+            "0000001.pdf",
         )
         dst = os.path.join(self.dirs.scratch_dir, "sample_archive.pdf")
         shutil.copy(src, dst)
@@ -296,7 +320,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertEqual(document.content, "The Text")
         self.assertEqual(
-            document.title, os.path.splitext(os.path.basename(filename))[0]
+            document.title,
+            os.path.splitext(os.path.basename(filename))[0],
         )
         self.assertIsNone(document.correspondent)
         self.assertIsNone(document.document_type)
@@ -339,7 +364,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
         override_filename = "Statement for November.pdf"
 
         document = self.consumer.try_consume_file(
-            filename, override_filename=override_filename
+            filename,
+            override_filename=override_filename,
         )
 
         self.assertEqual(document.title, "Statement for November")
@@ -348,7 +374,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
     def testOverrideTitle(self):
         document = self.consumer.try_consume_file(
-            self.get_test_file(), override_title="Override Title"
+            self.get_test_file(),
+            override_title="Override Title",
         )
         self.assertEqual(document.title, "Override Title")
         self._assert_first_last_send_progress()
@@ -357,7 +384,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
         c = Correspondent.objects.create(name="test")
 
         document = self.consumer.try_consume_file(
-            self.get_test_file(), override_correspondent_id=c.pk
+            self.get_test_file(),
+            override_correspondent_id=c.pk,
         )
         self.assertEqual(document.correspondent.id, c.id)
         self._assert_first_last_send_progress()
@@ -366,7 +394,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
         dt = DocumentType.objects.create(name="test")
 
         document = self.consumer.try_consume_file(
-            self.get_test_file(), override_document_type_id=dt.pk
+            self.get_test_file(),
+            override_document_type_id=dt.pk,
         )
         self.assertEqual(document.document_type.id, dt.id)
         self._assert_first_last_send_progress()
@@ -376,7 +405,8 @@ class TestConsumer(DirectoriesMixin, TestCase):
         t2 = Tag.objects.create(name="t2")
         t3 = Tag.objects.create(name="t3")
         document = self.consumer.try_consume_file(
-            self.get_test_file(), override_tag_ids=[t1.id, t3.id]
+            self.get_test_file(),
+            override_tag_ids=[t1.id, t3.id],
         )
 
         self.assertIn(t1, document.tags.all())
@@ -446,7 +476,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
                     "mime_types": {"application/pdf": ".pdf"},
                     "weight": 0,
                 },
-            )
+            ),
         ]
 
         self.assertRaisesMessage(
@@ -595,16 +625,16 @@ class TestConsumer(DirectoriesMixin, TestCase):
                     "mime_types": {"application/pdf": ".pdf", "image/png": ".png"},
                     "weight": 0,
                 },
-            )
+            ),
         ]
         doc1 = self.consumer.try_consume_file(
-            os.path.join(settings.CONSUMPTION_DIR, "simple.png")
+            os.path.join(settings.CONSUMPTION_DIR, "simple.png"),
         )
         doc2 = self.consumer.try_consume_file(
-            os.path.join(settings.CONSUMPTION_DIR, "simple.pdf")
+            os.path.join(settings.CONSUMPTION_DIR, "simple.pdf"),
         )
         doc3 = self.consumer.try_consume_file(
-            os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf")
+            os.path.join(settings.CONSUMPTION_DIR, "simple.png.pdf"),
         )
 
         self.assertEqual(doc1.filename, "simple.png")
@@ -691,7 +721,9 @@ class PostConsumeTestCase(TestCase):
             with override_settings(POST_CONSUME_SCRIPT=script.name):
                 c = Correspondent.objects.create(name="my_bank")
                 doc = Document.objects.create(
-                    title="Test", mime_type="application/pdf", correspondent=c
+                    title="Test",
+                    mime_type="application/pdf",
+                    correspondent=c,
                 )
                 tag1 = Tag.objects.create(name="a")
                 tag2 = Tag.objects.create(name="b")

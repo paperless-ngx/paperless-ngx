@@ -3,7 +3,6 @@ from unittest import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 from django.utils import timezone
-
 from documents import index
 from documents.admin import DocumentAdmin
 from documents.models import Document
@@ -42,7 +41,8 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
         docs = []
         for i in range(42):
             doc = Document.objects.create(
-                title="Many documents with the same title", checksum=f"{i:02}"
+                title="Many documents with the same title",
+                checksum=f"{i:02}",
             )
             docs.append(doc)
             index.add_or_update_document(doc)
@@ -61,6 +61,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
 
     def test_created(self):
         doc = Document.objects.create(
-            title="test", created=timezone.make_aware(timezone.datetime(2020, 4, 12))
+            title="test",
+            created=timezone.make_aware(timezone.datetime(2020, 4, 12)),
         )
         self.assertEqual(self.doc_admin.created_(doc), "2020-04-12")

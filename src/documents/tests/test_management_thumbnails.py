@@ -4,9 +4,11 @@ from unittest import mock
 
 from django.core.management import call_command
 from django.test import TestCase
-
 from documents.management.commands.document_thumbnails import _process_document
-from documents.models import Document, Tag, Correspondent, DocumentType
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 

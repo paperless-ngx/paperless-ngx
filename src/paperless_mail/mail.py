@@ -1,6 +1,7 @@
 import os
 import tempfile
-from datetime import timedelta, date
+from datetime import date
+from datetime import timedelta
 from fnmatch import fnmatch
 
 import magic
@@ -8,18 +9,16 @@ import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
 from django_q.tasks import async_task
-from imap_tools import (
-    MailBox,
-    MailBoxUnencrypted,
-    AND,
-    MailMessageFlags,
-    MailboxFolderSelectError,
-)
-
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
-from paperless_mail.models import MailAccount, MailRule
+from imap_tools import AND
+from imap_tools import MailBox
+from imap_tools import MailboxFolderSelectError
+from imap_tools import MailBoxUnencrypted
+from imap_tools import MailMessageFlags
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 
 class MailError(Exception):
@@ -120,8 +119,8 @@ class MailAccountHandler(LoggingMixin):
 
         else:
             raise NotImplementedError(
-                "Unknown title selector."
-            )  # pragma: nocover  # NOQA: E501
+                "Unknown title selector.",
+            )  # pragma: nocover
 
     def get_correspondent(self, message, rule):
         c_from = rule.assign_correspondent_from
@@ -137,7 +136,7 @@ class MailAccountHandler(LoggingMixin):
                 message.from_values
                 and "name" in message.from_values
                 and message.from_values["name"]
-            ):  # NOQA: E501
+            ):
                 return self._correspondent_from_name(message.from_values["name"])
             else:
                 return self._correspondent_from_name(message.from_)
@@ -147,8 +146,8 @@ class MailAccountHandler(LoggingMixin):
 
         else:
             raise NotImplementedError(
-                "Unknwown correspondent selector"
-            )  # pragma: nocover  # NOQA: E501
+                "Unknwown correspondent selector",
+            )  # pragma: nocover
 
     def handle_mail_account(self, account):
 
@@ -159,7 +158,9 @@ class MailAccountHandler(LoggingMixin):
         total_processed_files = 0
 
         with get_mailbox(
-            account.imap_server, account.imap_port, account.imap_security
+            account.imap_server,
+            account.imap_port,
+            account.imap_security,
         ) as M:
 
             try:
@@ -193,7 +194,7 @@ class MailAccountHandler(LoggingMixin):
         except MailboxFolderSelectError:
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
-                f"does not exist in account {rule.account}"
+                f"does not exist in account {rule.account}",
             )
 
         criterias = make_criterias(rule)
@@ -242,12 +243,14 @@ class MailAccountHandler(LoggingMixin):
 
         try:
             get_rule_action(rule).post_consume(
-                M, post_consume_messages, rule.action_parameter
+                M,
+                post_consume_messages,
+                rule.action_parameter,
             )
 
         except Exception as e:
             raise MailError(
-                f"Rule {rule}: Error while processing post-consume actions: " f"{e}"
+                f"Rule {rule}: Error while processing post-consume actions: " f"{e}",
             )
 
         return total_processed_files
@@ -274,7 +277,7 @@ class MailAccountHandler(LoggingMixin):
             if (
                 not att.content_disposition == "attachment"
                 and rule.attachment_type == MailRule.ATTACHMENT_TYPE_ATTACHMENTS_ONLY
-            ):  # NOQA: E501
+            ):
                 self.log(
                     "debug",
                     f"Rule {rule}: "
@@ -297,7 +300,8 @@ class MailAccountHandler(LoggingMixin):
 
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
                 _, temp_filename = tempfile.mkstemp(
-                    prefix="paperless-mail-", dir=settings.SCRATCH_DIR
+                    prefix="paperless-mail-",
+                    dir=settings.SCRATCH_DIR,
                 )
                 with open(temp_filename, "wb") as f:
                     f.write(att.payload)
@@ -313,15 +317,13 @@ class MailAccountHandler(LoggingMixin):
                     "documents.tasks.consume_file",
                     path=temp_filename,
                     override_filename=pathvalidate.sanitize_filename(
-                        att.filename
-                    ),  # NOQA: E501
+                        att.filename,
+                    ),
                     override_title=title,
                     override_correspondent_id=correspondent.id
                     if correspondent
-                    else None,  # NOQA: E501
-                    override_document_type_id=doc_type.id
-                    if doc_type
-                    else None,  # NOQA: E501
+                    else None,
+                    override_document_type_id=doc_type.id if doc_type else None,
                     override_tag_ids=[tag.id] if tag else None,
                     task_name=att.filename[:100],
                 )

@@ -1,24 +1,21 @@
+import math
 import re
 
 import magic
-import math
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from . import bulk_edit
-from .models import (
-    Correspondent,
-    Tag,
-    Document,
-    DocumentType,
-    SavedView,
-    SavedViewFilterRule,
-    MatchingModel,
-)
+from .models import Correspondent
+from .models import Document
+from .models import DocumentType
+from .models import MatchingModel
+from .models import SavedView
+from .models import SavedViewFilterRule
+from .models import Tag
 from .parsers import is_mime_type_supported
-
-from django.utils.translation import gettext as _
 
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
@@ -56,12 +53,12 @@ class MatchingModelSerializer(serializers.ModelSerializer):
         if (
             "matching_algorithm" in self.initial_data
             and self.initial_data["matching_algorithm"] == MatchingModel.MATCH_REGEX
-        ):  # NOQA: E501
+        ):
             try:
                 re.compile(match)
-            except Exception as e:
+            except re.error as e:
                 raise serializers.ValidationError(
-                    _("Invalid regular expression: %(error)s") % {"error": str(e)}
+                    _("Invalid regular expression: %(error)s") % {"error": str(e.msg)},
                 )
         return match
 
@@ -156,7 +153,7 @@ class TagSerializer(MatchingModelSerializer):
             luminance = math.sqrt(
                 0.299 * math.pow(rgb[0], 2)
                 + 0.587 * math.pow(rgb[1], 2)
-                + 0.114 * math.pow(rgb[2], 2)
+                + 0.114 * math.pow(rgb[2], 2),
             )
             return "#ffffff" if luminance < 0.53 else "#000000"
         except ValueError:
@@ -298,7 +295,7 @@ class DocumentListSerializer(serializers.Serializer):
         count = Document.objects.filter(id__in=documents).count()
         if not count == len(documents):
             raise serializers.ValidationError(
-                f"Some documents in {name} don't exist or were " f"specified twice."
+                f"Some documents in {name} don't exist or were " f"specified twice.",
             )
 
     def validate_documents(self, documents):
@@ -331,7 +328,7 @@ class BulkEditSerializer(DocumentListSerializer):
         count = Tag.objects.filter(id__in=tags).count()
         if not count == len(tags):
             raise serializers.ValidationError(
-                f"Some tags in {name} don't exist or were specified twice."
+                f"Some tags in {name} don't exist or were specified twice.",
             )
 
     def validate_method(self, method):
@@ -456,7 +453,7 @@ class PostDocumentSerializer(serializers.Serializer):
 
         if not is_mime_type_supported(mime_type):
             raise serializers.ValidationError(
-                _("File type %(type)s not supported") % {"type": mime_type}
+                _("File type %(type)s not supported") % {"type": mime_type},
             )
 
         return document.name, document_data
@@ -483,11 +480,13 @@ class PostDocumentSerializer(serializers.Serializer):
 class BulkDownloadSerializer(DocumentListSerializer):
 
     content = serializers.ChoiceField(
-        choices=["archive", "originals", "both"], default="archive"
+        choices=["archive", "originals", "both"],
+        default="archive",
     )
 
     compression = serializers.ChoiceField(
-        choices=["none", "deflated", "bzip2", "lzma"], default="none"
+        choices=["none", "deflated", "bzip2", "lzma"],
+        default="none",
     )
 
     def validate_compression(self, compression):
