@@ -1,0 +1,21 @@
+## Description
+
+Please include a summary of the change and which issue is fixed (if any) and any relevant motivation / context. List any dependencies that are required for this change. 
+Screenshots and / or videos can also be helpful if appropriate.
+
+Fixes # (issue)
+
+## Type of change
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+
+## Checklist:
+
+- [ ] I have read & agree with the [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUCT.md).
+- [ ] If applicable, I have tested my code for new features & regressions on both mobile & desktop devices, using the latest version of major browsers.
+- [ ] If applicable, I have checked that all tests pass, see [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html#back-end-development).
+- [ ] I have run all `pre-commit` hooks, see [documentation](https://paperless-ngx.readthedocs.io/en/latest/contributing.html#pre-commit-hooks).
+- [ ] I have made corresponding changes to the documentation as needed.
+- [ ] I have checked my modifications for any breaking changes.
