@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-02 22:29\n"
+"PO-Revision-Date: 2022-03-13 20:59\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -84,7 +84,7 @@ msgstr "Zaznacza ten tag jako tag skrzynki odbiorczej: Wszystkie nowo przetworzo
 
 #: documents/models.py:79
 msgid "tag"
-msgstr ""
+msgstr "znacznik"
 
 #: documents/models.py:80 documents/models.py:130
 msgid "tags"
@@ -378,11 +378,11 @@ msgstr "Typ pliku %(type)s nie jest obsługiwany"
 
 #: documents/templates/index.html:22
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Wczytywanie Paperless-ngx..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Wylogowano z Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
@@ -394,7 +394,7 @@ msgstr "Zaloguj się ponownie"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Logowanie do Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
@@ -422,11 +422,11 @@ msgstr "Angielski (USA)"
 
 #: paperless/settings.py:300
 msgid "Czech"
-msgstr ""
+msgstr "Czeski"
 
 #: paperless/settings.py:301
 msgid "Danish"
-msgstr ""
+msgstr "Duński"
 
 #: paperless/settings.py:302
 msgid "German"
@@ -450,7 +450,7 @@ msgstr "Włoski"
 
 #: paperless/settings.py:307
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luksemburski"
 
 #: paperless/settings.py:308
 msgid "Dutch"
@@ -482,7 +482,7 @@ msgstr "Szwedzki"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Zarządzanie Paperless-ngx"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
@@ -638,7 +638,7 @@ msgstr "konto"
 
 #: paperless_mail/models.py:119
 msgid "folder"
-msgstr ""
+msgstr "katalog"
 
 #: paperless_mail/models.py:122
 msgid "Subfolders must be separated by dots."
