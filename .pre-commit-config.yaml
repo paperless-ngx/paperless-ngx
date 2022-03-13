@@ -30,9 +30,6 @@ repos:
     rev: "v2.5.1"
     hooks:
       - id: prettier
-        args:
-          - "--no-semi"
-          - "--single-quote"
         types_or:
           - javascript
           - ts
@@ -59,10 +56,8 @@ repos:
     hooks:
       - id: flake8
         files: ^src/
-        exclude: "(migrations)|(paperless/settings.py)|(.*\\.tox)|(.*/tests/.*)"
         args:
-          - "--max-line-length=88"
-          - "--ignore=E203,W503"
+          - "--config=./src/setup.cfg"
   - repo: https://github.com/psf/black
     rev: 22.1.0
     hooks:
