@@ -107,33 +107,29 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Install pipenv
+        run: pip install pipenv
+      -
         name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
+          cache: "pipenv"
       -
-        name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip${{ matrix.python-version }}
-      -
-        name: Install dependencies
+        name: Install system dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng
+      -
+        name: Install Python dependencies
+        run: |
           pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
+          pipenv install --dev --ignore-pipfile
       -
         name: Tests
         run: |
           cd src/
-          pytest
+          pipenv run pytest
       -
         name: Publish coverage results
         if: matrix.python-version == '3.9'
