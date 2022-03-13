@@ -26,3 +26,13 @@ updates:
     labels:
       - "backend"
       - "dependencies"
+
+  # Enable updates for Github Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      # Check for updates to GitHub Actions every month
+      interval: "monthly"
+    labels:
+      - "ci-cd"
+      - "dependencies"
