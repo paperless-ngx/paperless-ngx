@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-13 20:59\n"
+"PO-Revision-Date: 2022-03-13 22:12\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -188,7 +188,7 @@ msgstr "dokumenty"
 
 #: documents/models.py:280
 msgid "debug"
-msgstr ""
+msgstr "debugowanie"
 
 #: documents/models.py:281
 msgid "information"
@@ -220,7 +220,7 @@ msgstr "poziom"
 
 #: documents/models.py:299
 msgid "log"
-msgstr ""
+msgstr "log"
 
 #: documents/models.py:300
 msgid "logs"
@@ -344,7 +344,7 @@ msgstr "podobne dokumenty"
 
 #: documents/models.py:353
 msgid "has tags in"
-msgstr ""
+msgstr "ma znaczniki w"
 
 #: documents/models.py:363
 msgid "rule type"
@@ -482,7 +482,7 @@ msgstr "Szwedzki"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr "Zarządzanie Paperless-ngx"
+msgstr "Administracja Paperless-ngx"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
