@@ -31,16 +31,17 @@ $border-color-dark-mode: #47494f;
   --ngx-bg-alt: #{$bg-dark-mode-alt};
   --ngx-body-color-accent: #{$text-color-dark-mode-accent};
   --ngx-focus-alpha: 0.7;
+  --ngx-primary-faded: var(--ngx-primary-darken-15);
 
   .navbar.bg-primary{
     --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
     --bs-primary-rgb: var(--bs-primary);
   }
-  
+
   .navbar-brand {
     color: var(--bs-body-color);
   }
-  
+
   .border {
     border-color: var(--bs-border-color) !important;
   }
@@ -134,7 +135,6 @@ $border-color-dark-mode: #47494f;
       background-color: $bg-light-dark-mode;
       color: $text-color-dark-mode-accent;
     }
-
   }
 
   .table-striped > tbody > tr:nth-of-type(odd) > * {
@@ -149,14 +149,10 @@ $border-color-dark-mode: #47494f;
     filter: invert(1) grayscale(100%) brightness(200%);
   }
 
-  .ngx-file-drop__drop-zone--over {
-    background-color: var(--ngx-primary-darken-15) !important;
-  }
-
   .toast {
     background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%), 0.9);
   }
-  
+
   .toast-header {
     background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 10%), 0.9);
   }
