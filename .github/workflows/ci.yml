@@ -31,7 +31,7 @@ jobs:
       -
         name: Install dependencies
         run: |
-          pipenv install --dev --ignore-pipfile
+          pipenv sync --dev
       -
         name: Make documentation
         run: |
@@ -63,7 +63,7 @@ jobs:
       -
         name: Install dependencies
         run: |
-          pipenv install --dev --ignore-pipfile
+          pipenv sync --dev
       -
         name: Codestyle
         run: |
@@ -110,7 +110,7 @@ jobs:
       -
         name: Install Python dependencies
         run: |
-          pipenv install --dev --ignore-pipfile
+          pipenv sync --dev
       -
         name: Tests
         run: |
