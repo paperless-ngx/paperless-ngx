@@ -19,31 +19,24 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Install pipenv
+        run: pipx install pipenv
+      -
         name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      -
-        name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip3.8}
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
       -
         name: Install dependencies
         run: |
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
+          pipenv install --dev --ignore-pipfile
       -
         name: Make documentation
         run: |
           cd docs/
-          make html
+          pipenv run make html
       -
         name: Upload artifact
         uses: actions/upload-artifact@v2
@@ -58,31 +51,24 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Install pipenv
+        run: pipx install pipenv
+      -
         name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      -
-        name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip${{ matrix.python-version }}
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
       -
         name: Install dependencies
         run: |
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
+          pipenv install --dev --ignore-pipfile
       -
         name: Codestyle
         run: |
           cd src/
-          pycodestyle --max-line-length=88 --ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203
+          pipenv run pycodestyle --max-line-length=88 --ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203
   codeformatting:
     runs-on: ubuntu-20.04
     steps:
