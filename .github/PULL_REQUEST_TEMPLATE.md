@@ -5,6 +5,12 @@ Screenshots and / or videos can also be helpful if appropriate.
 
 Fixes # (issue)
 
+Please also tag the relevant team to help with review. You can tag any of the following:
+@paperless-ngx/backend (Python / django, database, etc.)
+@paperless-ngx/frontend (JavaScript/Typescript, HTML, CSS, etc.)
+@paperless-ngx/ci-cd (GitHub Actions, deployment)
+@paperless-ngx/test (General testing for larger PRs)
+
 ## Type of change
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
@@ -13,7 +19,7 @@ Fixes # (issue)
 
 ## Checklist:
 
-- [ ] I have read & agree with the [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUCT.md).
+- [ ] I have read & agree with the [contributing guidelines](https://github.com/paperless-ngx/paperless-ngx/blob/main/CONTRIBUTING.md).
 - [ ] If applicable, I have tested my code for new features & regressions on both mobile & desktop devices, using the latest version of major browsers.
 - [ ] If applicable, I have checked that all tests pass, see [documentation](https://paperless-ngx.readthedocs.io/en/latest/extending.html#back-end-development).
 - [ ] I have run all `pre-commit` hooks, see [documentation](https://paperless-ngx.readthedocs.io/en/latest/contributing.html#pre-commit-hooks).
