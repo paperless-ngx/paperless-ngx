@@ -44,45 +44,68 @@ jobs:
           name: documentation
           path: docs/_build/html/
 
-  codestyle:
+  backend-code-checks:
+    name: "Backend Code Checks"
     runs-on: ubuntu-20.04
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Install pipenv
-        run: pipx install pipenv
-      -
-        name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
-      -
-        name: Install dependencies
+        name: Install checkers
         run: |
-          pipenv sync --dev
+          pipx install reorder-python-imports
+          pipx install yesqa
+          pipx install add-trailing-comma
+          pipx install flake8
       -
-        name: Codestyle
+        name: Run reorder-python-imports
         run: |
-          cd src/
-          pipenv run pycodestyle --max-line-length=88 --ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203
-  codeformatting:
-    runs-on: ubuntu-20.04
-    steps:
+          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs reorder-python-imports
       -
-        name: Checkout
-        uses: actions/checkout@v2
+        name: Run yesqa
+        run: |
+          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs yesqa
+      -
+        name: Run add-trailing-comma
+        run: |
+          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs add-trailing-comma
+      # black is placed after add-trailing-comma because it may format differently
+      # if a trailing comma is added
       -
         name: Run black
         uses: psf/black@stable
         with:
           options: "--check --diff"
           version: "22.1.0"
+      -
+        name: Run flake8 checks
+        run: |
+          cd src/
+          flake8 --max-line-length=88 --ignore=E203,W503
 
-  tests:
+  frontend-code-checks:
+    name: "Frontend Code Checks"
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      -
+        name: Install prettier
+        run: |
+          npm install prettier
+      -
+        name: Run prettier
+        run:
+          npx prettier --check --ignore-path Pipfile.lock **/*.js **/*.ts *.md **/*.md
+
+  backend-tests:
+    needs: [backend-code-checks]
+    name: "Backend Tests (${{ matrix.python-version }})"
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -130,7 +153,7 @@ jobs:
   build-docker-image:
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
     runs-on: ubuntu-latest
-    needs: [tests, codeformatting, codestyle]
+    needs: [backend-tests, frontend-code-checks]
     steps:
       -
         name: Prepare
@@ -195,7 +218,7 @@ jobs:
           path: src/documents/static/frontend/
 
   build-release:
-    needs: [build-docker-image, documentation, tests, codeformatting, codestyle]
+    needs: [build-docker-image, documentation, backend-tests, backend-code-checks, frontend-code-checks]
     runs-on: ubuntu-20.04
     steps:
       -
