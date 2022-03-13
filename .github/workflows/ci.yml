@@ -138,7 +138,7 @@ jobs:
         # https://github.com/coveralls-clients/coveralls-python/issues/251
         run: |
           cd src/
-          coveralls --service=github
+          pipenv run coveralls --service=github
 
   # build and push image to docker hub.
   build-docker-image:
