@@ -2460,7 +2460,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Tem certeza que quer sair?</target>
+        <target state="translated">Tem a certeza de que pretende sair?</target>
       </trans-unit>
       <trans-unit id="729881853265307704" datatype="html">
         <source>Leave page</source>
