@@ -734,7 +734,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="translated">Dokumente lahko začnete nalagati tako, da jih spustite v polje za nalaganje datotek na desni ali tako, da jih spustite v konfigurirano mapo in začeli se bodo prikazovati na seznamu dokumentov. Ko v svoje dokumente dodate nekaj metapodatkov, uporabite mehanizme filtriranja paperless, da ustvarite poglede po meri (na primer »Nedavno dodano«, »Označeno TODO«) in prikazani bodo na pregledni plošči namesto tega sporočila.</target>
+        <target state="translated">Dokumente lahko začnete nalagati tako, da jih spustite v polje za nalaganje datotek na desni ali tako, da jih spustite v nastavljeno mapo in začeli se bodo prikazovati na seznamu dokumentov. Ko v svoje dokumente dodate nekaj metapodatkov, uporabite mehanizme filtriranja Paperless, da ustvarite poglede po meri (na primer »Nedavno dodano«, »Označeno TODO«) in prikazani bodo na pregledni plošči namesto tega sporočila.</target>
       </trans-unit>
       <trans-unit id="3075670502036161287" datatype="html">
         <source>Paperless offers some more features that try to make your life easier:</source>
@@ -1528,7 +1528,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Izbrano <x id="INTERPOLATION"/> enega dokumenta} other {Izbrano <x id="INTERPOLATION"/> od <x id="INTERPOLATION_1"/> dokumentov}}</target>
       </trans-unit>
       <trans-unit id="6600548268163632449" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
@@ -1536,7 +1536,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Dokument} other {<x id="INTERPOLATION"/> dokumentov}}</target>
       </trans-unit>
       <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
