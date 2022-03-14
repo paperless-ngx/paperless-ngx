@@ -46,6 +46,9 @@ channels-redis = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 concurrent-log-handler = "*"
 "pdfminer.six" = "*"
+"backports.zoneinfo" = {version = "*", markers = "python_version < '3.9'"}
+"importlib-resources" = {version = "*", markers = "python_version < '3.9'"}
+zipp = {version = "*", markers = "python_version < '3.9'"}
 
 [dev-packages]
 coveralls = "*"
