@@ -19,7 +19,7 @@
     "@angular/localize": "~13.2.4",
     "@angular/platform-browser": "~13.2.5",
     "@angular/platform-browser-dynamic": "~13.2.4",
-    "@angular/router": "~13.2.5",
+    "@angular/router": "~13.2.6",
     "@ng-bootstrap/ng-bootstrap": "^12.0.0",
     "@ng-select/ng-select": "^8.1.1",
     "@ngneat/dirty-check-forms": "^1.1.0",
