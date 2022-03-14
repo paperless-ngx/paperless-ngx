@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-13 22:12\n"
+"PO-Revision-Date: 2022-03-14 23:41\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -120,7 +120,7 @@ msgstr "Surowe, tekstowe dane dokumentu. To pole jest używane głównie do wysz
 
 #: documents/models.py:127
 msgid "mime type"
-msgstr "typ mime"
+msgstr "mime type"
 
 #: documents/models.py:134
 msgid "checksum"
