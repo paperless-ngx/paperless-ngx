@@ -2104,7 +2104,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="translated">Temen način</target>
+        <target state="translated">Temni način</target>
       </trans-unit>
       <trans-unit id="4913823100518391922" datatype="html">
         <source>Use system settings</source>
@@ -2160,7 +2160,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="translated">Uporabite ob zaprtju</target>
+        <target state="translated">Potrdite ob zaprtju</target>
       </trans-unit>
       <trans-unit id="5851560788527570644" datatype="html">
         <source>Notifications</source>
