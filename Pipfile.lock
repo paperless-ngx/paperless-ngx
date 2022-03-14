@@ -479,11 +479,11 @@
         },
         "imap-tools": {
             "hashes": [
-                "sha256:04fbaaa4ee1517bcb00e60857e62ea97b3b3f792310d2c5e7ea4c08992f56c17",
-                "sha256:aa64c21e60459e10ab70bdab7e407510b3747867ad459fbe99f8d3f7ddebe86f"
+                "sha256:119f1a60ea4048a4c5d72d9e9fa47c295685e340c730cb0b71fdf0ad3b7e53f8",
+                "sha256:3648bac835657b1c56ba856452c8a28bdbe3689d3730f95a4ad20d4c39f1c2d0"
             ],
             "index": "pypi",
-            "version": "==0.52.0"
+            "version": "==0.53.0"
         },
         "img2pdf": {
             "hashes": [
@@ -1609,9 +1609,6 @@
             "version": "==8.0.4"
         },
         "coverage": {
-            "extras": [
-
-            ],
             "hashes": [
                 "sha256:03e2a7826086b91ef345ff18742ee9fc47a6839ccd517061ef8fa1976e652ce9",
                 "sha256:07e6db90cd9686c767dcc593dff16c8c09f9814f5e9c51034066cad3373b914d",

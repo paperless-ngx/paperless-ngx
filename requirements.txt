@@ -46,7 +46,7 @@ httptools==0.4.0
 humanfriendly==10.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 hyperlink==21.0.0
 idna==3.3; python_version >= '3.5'
-imap-tools==0.52.0
+imap-tools==0.53.0
 img2pdf==0.4.3
 importlib-resources==5.4.0; python_version < '3.9'
 incremental==21.3.0
