@@ -20,6 +20,13 @@
 </head>
 <body class="color-scheme-system">
 	<app-root>
+		<script type="text/javascript">
+			setTimeout(() => {
+				let warning = document.getElementsByClassName('warning').item(0)
+				warning.classList.remove('hide')
+				warning.classList.add('show')
+			}, 8000)
+		</script>
 		<style type="text/css">
 			html, body {
 				width: 100%;
@@ -38,7 +45,7 @@
 				}
 			}
 
-			.app-loader {
+			.app-loader svg, .app-loader h6 {
 				opacity: 0.1;
 				-webkit-animation: pulsate 2s ease-out;
 				-webkit-animation-iteration-count: infinite;
@@ -69,6 +76,7 @@
 					</g>
 				</svg>
 				<h6 class="m-auto">{% translate "Paperless-ngx is loading..." %}</h6>
+				<p class="warning m-auto mt-3 small fade hide">{% translate "Still here?! Hmm, something might be wrong." %} <a href="https://paperless-ngx.readthedocs.io/en/latest/">{% translate "Here's a link to the docs." %}</a></p>
 			</div>
 		</div>
 	</app-root>
