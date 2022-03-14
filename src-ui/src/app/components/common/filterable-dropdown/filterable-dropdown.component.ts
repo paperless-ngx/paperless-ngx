@@ -356,7 +356,7 @@ export class FilterableDropdownComponent {
       if (this.editing) {
         this.selectionModel.reset()
       }
-      this.open.next()
+      this.open.next(this)
     } else {
       this.filterText = ''
       if (this.applyOnClose && this.selectionModel.isDirty()) {
