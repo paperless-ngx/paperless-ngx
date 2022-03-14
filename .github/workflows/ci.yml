@@ -141,7 +141,8 @@ jobs:
           pipenv run pytest
       -
         name: Publish coverage results
-        if: matrix.python-version == '3.9'
+        # Publish results for 3.9, and not for dependabot branches
+        if: matrix.python-version == '3.9' && !contains(github.ref, 'dependabot')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # https://github.com/coveralls-clients/coveralls-python/issues/251
