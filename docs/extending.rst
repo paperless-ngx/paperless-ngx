@@ -115,7 +115,7 @@ Testing and code style:
     configuration. This is not ideal. But for now, make sure no settings except for DEBUG are overridden when testing.
 *   Coding style is enforced by the Git pre-commit hooks.  These will ensure your code is formatted and do some
     linting when you do a `git commit`.
-  * You can also run ``black`` manually to format your code
+*   You can also run ``black`` manually to format your code
 
     .. note::
 
