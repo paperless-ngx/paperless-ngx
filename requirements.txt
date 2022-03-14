@@ -5,9 +5,10 @@
 #    pipenv lock --requirements
 #
 
--i https://pypi.python.org/simple
---extra-index-url https://www.piwheels.org/simple
+-i https://pypi.python.org/simple/
+--extra-index-url https://www.piwheels.org/simple/
 aioredis==1.3.1
+anyio==3.5.0; python_full_version >= '3.6.2'
 arrow==1.2.2; python_version >= '3.6'
 asgiref==3.5.0; python_version >= '3.7'
 async-timeout==4.0.2; python_version >= '3.6'
@@ -56,7 +57,7 @@ langdetect==1.0.9
 lxml==4.8.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 msgpack==1.0.3
 numpy==1.22.3; python_version >= '3.8'
-ocrmypdf==13.4.0
+ocrmypdf==13.4.1
 packaging==21.3; python_version >= '3.6'
 pathvalidate==2.5.0
 pdfminer.six==20211012
@@ -87,6 +88,7 @@ scipy==1.8.0; python_version < '3.11' and python_version >= '3.8'
 service-identity==21.1.0
 setuptools==60.9.3; python_version >= '3.7'
 six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+sniffio==1.2.0; python_version >= '3.5'
 sqlparse==0.4.2; python_version >= '3.5'
 threadpoolctl==3.1.0; python_version >= '3.6'
 tika==1.24
@@ -100,10 +102,10 @@ urllib3==1.26.8; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.
 uvicorn[standard]==0.17.6
 uvloop==0.16.0
 watchdog==2.1.6
-watchgod==0.7
+watchgod==0.8
 wcwidth==0.2.5
 websockets==10.2
 whitenoise==6.0.0
 whoosh==2.7.4
-zipp==3.7.0; python_version < '3.10'
+zipp==3.7.0; python_version < '3.9'
 zope.interface==5.4.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
