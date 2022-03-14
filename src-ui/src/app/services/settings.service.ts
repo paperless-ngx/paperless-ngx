@@ -264,6 +264,12 @@ export class SettingsService {
         englishName: 'Swedish',
         dateInputFormat: 'yyyy-mm-dd',
       },
+      {
+        code: "zh-cn",
+        name: $localize`Chinese Simplified`,
+        englishName: "Chinese Simplified",
+        dateInputFormat: "yyyy-mm-dd"
+      }
     ]
 
     // Sort languages by localized name at runtime
