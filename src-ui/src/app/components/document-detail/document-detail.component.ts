@@ -206,18 +206,18 @@ export class DocumentDetailComponent
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(
-        ({ doc, dirty }) => {
+      .subscribe({
+        next: ({ doc, dirty }) => {
           this.openDocumentService.setDirty(doc.id, dirty)
         },
-        (error) => {
+        error: (error) => {
           this.router.navigate(['404'])
-        }
-      )
+        },
+      })
   }
 
   ngOnDestroy(): void {
-    this.unsubscribeNotifier.next()
+    this.unsubscribeNotifier.next(this)
     this.unsubscribeNotifier.complete()
   }
 
@@ -226,25 +226,25 @@ export class DocumentDetailComponent
     this.documentsService
       .getMetadata(doc.id)
       .pipe(first())
-      .subscribe(
-        (result) => {
+      .subscribe({
+        next: (result) => {
           this.metadata = result
         },
-        (error) => {
+        error: (error) => {
           this.metadata = null
-        }
-      )
+        },
+      })
     this.documentsService
       .getSuggestions(doc.id)
       .pipe(first())
-      .subscribe(
-        (result) => {
+      .subscribe({
+        next: (result) => {
           this.suggestions = result
         },
-        (error) => {
+        error: (error) => {
           this.suggestions = null
-        }
-      )
+        },
+      })
     this.title = this.documentTitlePipe.transform(doc.title)
     this.documentForm.patchValue(doc)
   }
@@ -315,17 +315,17 @@ export class DocumentDetailComponent
     this.documentsService
       .update(this.document)
       .pipe(first())
-      .subscribe(
-        (result) => {
+      .subscribe({
+        next: (result) => {
           this.close()
           this.networkActive = false
           this.error = null
         },
-        (error) => {
+        error: (error) => {
           this.networkActive = false
           this.error = error.error
-        }
-      )
+        },
+      })
   }
 
   saveEditNext() {
@@ -351,8 +351,8 @@ export class DocumentDetailComponent
         })
       )
       .pipe(first())
-      .subscribe(
-        ({ updateResult, nextDocId, closeResult }) => {
+      .subscribe({
+        next: ({ updateResult, nextDocId, closeResult }) => {
           this.error = null
           this.networkActive = false
           if (closeResult && updateResult && nextDocId) {
@@ -360,11 +360,11 @@ export class DocumentDetailComponent
             this.titleInput?.focus()
           }
         },
-        (error) => {
+        error: (error) => {
           this.networkActive = false
           this.error = error.error
-        }
-      )
+        },
+      })
   }
 
   close() {
