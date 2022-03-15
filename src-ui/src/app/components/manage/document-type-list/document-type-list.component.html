@@ -50,3 +50,8 @@
     </tr>
   </tbody>
 </table>
+
+<div class="d-flex">
+  <div i18n *ngIf="collectionSize > 0">{collectionSize, plural, =1 {One document type} other {{{collectionSize || 0}} total document types}}</div>
+  <ngb-pagination *ngIf="collectionSize > 20" class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" (pageChange)="reloadData()" aria-label="Default pagination"></ngb-pagination>
+</div>
