@@ -9,6 +9,7 @@ from django.db import DatabaseError
 from django.test import TestCase
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
+from imap_tools import EmailAddress
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailMessageFlags
 from paperless_mail import tasks
@@ -19,7 +20,6 @@ from paperless_mail.models import MailRule
 
 
 class BogusFolderManager:
-
     current_folder = "INBOX"
 
     def set(self, new_folder):
@@ -129,7 +129,6 @@ def create_attachment(
 
 
 def fake_magic_from_buffer(buffer, mime=False):
-
     if mime:
         if "PDF" in str(buffer):
             return "application/pdf"
@@ -188,11 +187,19 @@ class TestMail(DirectoriesMixin, TestCase):
     def test_get_correspondent(self):
         message = namedtuple("MailMessage", [])
         message.from_ = "someone@somewhere.com"
-        message.from_values = {"name": "Someone!", "email": "someone@somewhere.com"}
+        message.from_values = EmailAddress(
+            "Someone!",
+            "someone@somewhere.com",
+            "Someone! <someone@somewhere.com>",
+        )
 
         message2 = namedtuple("MailMessage", [])
         message2.from_ = "me@localhost.com"
-        message2.from_values = {"name": "", "email": "fake@localhost.com"}
+        message2.from_values = EmailAddress(
+            "",
+            "fake@localhost.com",
+            "",
+        )
 
         me_localhost = Correspondent.objects.create(name=message2.from_)
         someone_else = Correspondent.objects.create(name="someone else")
@@ -482,12 +489,11 @@ class TestMail(DirectoriesMixin, TestCase):
             password="wrong",
         )
 
-        try:
+        with self.assertRaises(MailError) as context:
             self.mail_account_handler.handle_mail_account(account)
-        except MailError as e:
-            self.assertTrue(str(e).startswith("Error while authenticating account"))
-        else:
-            self.fail("Should raise exception")
+            self.assertTrue(
+                str(context).startswith("Error while authenticating account"),
+            )
 
     def test_error_skip_account(self):
         account_faulty = MailAccount.objects.create(
@@ -676,7 +682,6 @@ class TestManagementCommand(TestCase):
         "paperless_mail.management.commands.mail_fetcher.tasks.process_mail_accounts",
     )
     def test_mail_fetcher(self, m):
-
         call_command("mail_fetcher")
 
         m.assert_called_once()
@@ -711,7 +716,6 @@ class TestTasks(TestCase):
 
     @mock.patch("paperless_mail.tasks.MailAccountHandler.handle_mail_account")
     def test_single_accounts(self, m):
-
         MailAccount.objects.create(
             name="A",
             imap_server="A",
