@@ -16,6 +16,7 @@ from imap_tools import AND
 from imap_tools import MailBox
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
+from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -122,7 +123,7 @@ class MailAccountHandler(LoggingMixin):
                 "Unknown title selector.",
             )  # pragma: nocover
 
-    def get_correspondent(self, message, rule):
+    def get_correspondent(self, message: MailMessage, rule):
         c_from = rule.assign_correspondent_from
 
         if c_from == MailRule.CORRESPONDENT_FROM_NOTHING:
@@ -132,12 +133,9 @@ class MailAccountHandler(LoggingMixin):
             return self._correspondent_from_name(message.from_)
 
         elif c_from == MailRule.CORRESPONDENT_FROM_NAME:
-            if (
-                message.from_values
-                and "name" in message.from_values
-                and message.from_values["name"]
-            ):
-                return self._correspondent_from_name(message.from_values["name"])
+            from_values = message.from_values
+            if from_values is not None and len(from_values.name) > 0:
+                return self._correspondent_from_name(from_values.name)
             else:
                 return self._correspondent_from_name(message.from_)
 
