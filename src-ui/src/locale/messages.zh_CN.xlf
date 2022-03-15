@@ -766,7 +766,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">关于如何使用这些功能，请查阅文档。对于基本使用的部分也有一些关于如何使用 paperless-ngx 的一般信息。</target>
+        <target state="translated">请参阅有关如何使用这些功能的文档。基本使用的部分也有一些关于如何使用 paperless-ngx 的一般信息。</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
