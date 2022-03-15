@@ -92,6 +92,8 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       -
         name: Install pipenv
         run: pipx install pipenv
@@ -117,9 +119,21 @@ jobs:
           cd src/
           pipenv run pytest
       -
+        name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v18.1
+        with:
+          files: |
+            src/**
+      -
+        name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files-specific.outputs.all_changed_files }}; do
+            echo "${file} was changed"
+          done
+      -
         name: Publish coverage results
-        # Publish results for 3.9, and not for dependabot branches
-        if: matrix.python-version == '3.9' && !contains(github.ref, 'dependabot')
+        if: matrix.python-version == '3.9' && steps.changed-files-specific.outputs.any_changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # https://github.com/coveralls-clients/coveralls-python/issues/251
