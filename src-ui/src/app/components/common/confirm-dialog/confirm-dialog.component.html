@@ -8,9 +8,12 @@
       <p *ngIf="message">{{message}}</p>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" [disabled]="!buttonsEnabled" i18n>Cancel</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel()" [disabled]="!buttonsEnabled" i18n>
+        <span class="d-inline-block" style="padding-bottom: 1px;" >Cancel</span>
+      </button>
       <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
         {{btnCaption}}
-        <span *ngIf="!confirmButtonEnabled"> ({{seconds}})</span>
+        <ngb-progressbar *ngIf="!confirmButtonEnabled" style="height: 1px;" type="dark" [max]="secondsTotal" [value]="seconds"></ngb-progressbar>
+        <span class="visually-hidden">{{ seconds | number: '1.0-0' }} seconds</span>
       </button>
     </div>
