@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-13 09:17\n"
+"PO-Revision-Date: 2022-03-14 16:48\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -494,7 +494,7 @@ msgstr "Napredne nastavitve"
 
 #: paperless_mail/admin.py:47
 msgid "Filter"
-msgstr "Filter"
+msgstr "Filtriraj"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."

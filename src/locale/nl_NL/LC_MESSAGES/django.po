@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-02 22:29\n"
+"PO-Revision-Date: 2022-03-14 13:34\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -64,7 +64,7 @@ msgstr "is niet hoofdlettergevoelig"
 
 #: documents/models.py:61 documents/models.py:104
 msgid "correspondent"
-msgstr ""
+msgstr "correspondent"
 
 #: documents/models.py:62
 msgid "correspondents"
@@ -124,7 +124,7 @@ msgstr "mimetype"
 
 #: documents/models.py:134
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 #: documents/models.py:138
 msgid "The checksum of the original document."
@@ -180,7 +180,7 @@ msgstr "De positie van dit document in je fysieke documentenarchief."
 
 #: documents/models.py:201
 msgid "document"
-msgstr ""
+msgstr "document"
 
 #: documents/models.py:202
 msgid "documents"
@@ -188,7 +188,7 @@ msgstr "documenten"
 
 #: documents/models.py:280
 msgid "debug"
-msgstr ""
+msgstr "debug"
 
 #: documents/models.py:281
 msgid "information"
@@ -264,11 +264,11 @@ msgstr "inhoud bevat"
 
 #: documents/models.py:333
 msgid "ASN is"
-msgstr ""
+msgstr "ASN is"
 
 #: documents/models.py:334
 msgid "correspondent is"
-msgstr ""
+msgstr "correspondent is"
 
 #: documents/models.py:335
 msgid "document type is"
@@ -344,7 +344,7 @@ msgstr "meer zoals dit"
 
 #: documents/models.py:353
 msgid "has tags in"
-msgstr ""
+msgstr "heeft tags in"
 
 #: documents/models.py:363
 msgid "rule type"
@@ -378,11 +378,11 @@ msgstr "Bestandstype %(type)s niet ondersteund"
 
 #: documents/templates/index.html:22
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx is aan het laden..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Paperless-ngx afgemeld"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
@@ -394,7 +394,7 @@ msgstr "Meld je opnieuw aan"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx afgemeld"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
@@ -422,11 +422,11 @@ msgstr "Engels (US)"
 
 #: paperless/settings.py:300
 msgid "Czech"
-msgstr ""
+msgstr "Tsjechisch"
 
 #: paperless/settings.py:301
 msgid "Danish"
-msgstr ""
+msgstr "Deens"
 
 #: paperless/settings.py:302
 msgid "German"
@@ -450,7 +450,7 @@ msgstr "Italiaans"
 
 #: paperless/settings.py:307
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgs"
 
 #: paperless/settings.py:308
 msgid "Dutch"
@@ -482,7 +482,7 @@ msgstr "Zweeds"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx administratie"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
@@ -494,7 +494,7 @@ msgstr "Geavanceerde instellingen"
 
 #: paperless_mail/admin.py:47
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."
@@ -510,7 +510,7 @@ msgstr "De actie die wordt toegepast op de mail. Deze actie wordt alleen uitgevo
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
-msgstr ""
+msgstr "Metadata"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
@@ -634,7 +634,7 @@ msgstr "volgorde"
 
 #: paperless_mail/models.py:115
 msgid "account"
-msgstr ""
+msgstr "account"
 
 #: paperless_mail/models.py:119
 msgid "folder"
