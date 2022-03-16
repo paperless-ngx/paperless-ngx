@@ -16,7 +16,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="translated">文档 <x id="PH" equiv-text="status.filename"/> 已添加到 paperless。</target>
+        <target state="translated">文档 <x id="PH" equiv-text="status.filename"/> 已添加到 paperless-ngx。</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -726,7 +726,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">Paperless-ng 正在运行！:)</target>
+        <target state="translated">Paperless-ngx 正在运行！:)</target>
       </trans-unit>
       <trans-unit id="3219476236085665313" datatype="html">
         <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
@@ -734,7 +734,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="translated">你可以通过把文件拖拽到右边的文件上传框中，或者把它们放到配置好的处理文件夹中上传文件，它们就会开始显示在文件列表中。在你给文件添加了一些元数据后，使用 paperless 的过滤机制来创建自定义视图（如 "最近添加"、"标签TODO"），它们就会出现在仪表盘上，而不是此信息。</target>
+        <target state="translated">你可以通过把文件拖拽到右边的文件上传框中，或者把它们放到配置好的处理文件夹中上传文件，它们就会开始显示在文件列表中。在你给文件添加了一些元数据后，使用 paperless-ngx 的过滤机制来创建自定义视图（如 "最近添加"、"标签TODO"），它们就会出现在仪表盘上，而不是此信息。</target>
       </trans-unit>
       <trans-unit id="3075670502036161287" datatype="html">
         <source>Paperless offers some more features that try to make your life easier:</source>
@@ -750,7 +750,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">一旦你在 paperless 中上传了几个文件，并为它们添加了元数据，paperless 就能自动将这些元数据分配给新的文件。</target>
+        <target state="translated">一旦你在 paperless-ngx 中上传了几个文件，并为它们添加了元数据，paperless-ngx 就能自动将这些元数据分配给新的文件。</target>
       </trans-unit>
       <trans-unit id="1409400388362030038" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
@@ -758,7 +758,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">你可以配置 paperless 来读取你的邮件并从附件中添加文档。</target>
+        <target state="translated">你可以配置 paperless-ngx 来读取你的邮件并从附件中添加文档。</target>
       </trans-unit>
       <trans-unit id="7326108403480639438" datatype="html">
         <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
@@ -766,7 +766,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">关于如何使用这些功能，请查阅文档。对于基本使用的部分也有一些关于如何使用 paperless 的一般信息。</target>
+        <target state="translated">请参阅有关如何使用这些功能的文档。基本使用的部分也有一些关于如何使用 paperless-ngx 的一般信息。</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -1672,7 +1672,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="translated">标题&amp; 内容</target>
+        <target state="translated">标题 &amp; 内容</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
