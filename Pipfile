@@ -51,6 +51,8 @@ concurrent-log-handler = "*"
 "backports.zoneinfo" = {version = "*", markers = "python_version < '3.9'"}
 "importlib-resources" = {version = "*", markers = "python_version < '3.9'"}
 zipp = {version = "*", markers = "python_version < '3.9'"}
+pyzbar = "*"
+pdf2image = "*"
 
 [dev-packages]
 coveralls = "*"
