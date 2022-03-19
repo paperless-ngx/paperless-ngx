@@ -81,11 +81,11 @@ python requirements do not have precompiled packages for ARM / ARM64. Installati
 of these will require additional development libraries and compilation will take
 a long time.
 
-**Q:** *How do I run this on unRaid?*
+**Q:** *How do I run this on Unraid?*
 
-**A:** Head over to `<https://github.com/selfhosters/unRAID-CA-templates>`_,
-`Uli Fahrer <https://github.com/Tooa>`_ created a container template for that.
-I don't exactly know how to use that though, since I don't use unRaid.
+**A:** Paperless-ngx is available as community app in Unraid
+`<https://unraid.net/community/apps?q=paperless-ngx>`_, `Uli Fahrer <https://github.com/Tooa>`_
+created a container template for that.
 
 **Q:** *How do I run this on my toaster?*
 
