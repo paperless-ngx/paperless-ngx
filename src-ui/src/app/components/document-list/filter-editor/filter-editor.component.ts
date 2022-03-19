@@ -427,11 +427,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
         distinctUntilChanged(),
         filter((query) => !query.length || query.length > 2)
       )
-      .subscribe((text) => {
-        this._textFilter = text
-        this.documentService.searchQuery = text
-        this.updateRules()
-      })
+      .subscribe((text) => this.updateTextFilter(text))
 
     if (this._textFilter) this.documentService.searchQuery = this._textFilter
   }
@@ -474,6 +470,21 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   onDocumentTypeDropdownOpen() {
     this.documentTypeSelectionModel.apply()
+  }
+
+  updateTextFilter(text) {
+    this._textFilter = text
+    this.documentService.searchQuery = text
+    this.updateRules()
+  }
+
+  textFilterEnter() {
+    const filterString = (
+      this.textFilterInput.nativeElement as HTMLInputElement
+    ).value
+    if (filterString.length) {
+      this.updateTextFilter(filterString)
+    }
   }
 
   changeTextFilterTarget(target) {
