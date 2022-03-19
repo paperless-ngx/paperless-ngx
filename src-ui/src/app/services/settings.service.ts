@@ -265,11 +265,11 @@ export class SettingsService {
         dateInputFormat: 'yyyy-mm-dd',
       },
       {
-        code: "zh-cn",
+        code: 'zh-cn',
         name: $localize`Chinese Simplified`,
-        englishName: "Chinese Simplified",
-        dateInputFormat: "yyyy-mm-dd"
-      }
+        englishName: 'Chinese Simplified',
+        dateInputFormat: 'yyyy-mm-dd',
+      },
     ]
 
     // Sort languages by localized name at runtime
