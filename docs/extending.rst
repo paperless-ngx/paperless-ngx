@@ -7,7 +7,7 @@ This section describes the steps you need to take to start development on paperl
 
 Check out the source from github. The repository is organized in the following way:
 
-*   ``master`` always represents the latest release and will only see changes
+*   ``main`` always represents the latest release and will only see changes
     when a new release is made.
 *   ``dev`` contains the code that will be in the next release.
 *   ``feature-X`` contain bigger changes that will be in some release, but not
