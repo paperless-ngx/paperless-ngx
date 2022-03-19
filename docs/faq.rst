@@ -83,9 +83,8 @@ a long time.
 
 **Q:** *How do I run this on Unraid?*
 
-**A:** Paperless-ngx is available as community app in Unraid
-`<https://unraid.net/community/apps?q=paperless-ngx>`_, `Uli Fahrer <https://github.com/Tooa>`_
-created a container template for that.
+**A:** Paperless-ngx is available as `community app <https://unraid.net/community/apps?q=paperless-ngx>`_ 
+in Unraid. `Uli Fahrer <https://github.com/Tooa>`_ created a container template for that.
 
 **Q:** *How do I run this on my toaster?*
 
