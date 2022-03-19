@@ -15,7 +15,7 @@ Paperless supports python 3.8 and 3.9. We format Python code with [Black](https:
 
 ## Branches
 
-`master` always reflects the latest release. Apart from changes to the documentation or readme, absolutely no functional changes on this branch in between releases.
+`main` always reflects the latest release. Apart from changes to the documentation or readme, absolutely no functional changes on this branch in between releases.
 
 `dev` contains all changes that will be part of the next release. Use this branch to start making your changes.
 
