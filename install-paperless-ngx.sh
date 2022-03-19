@@ -162,7 +162,7 @@ ask "Target folder" "$(pwd)/paperless-ngx"
 TARGET_FOLDER=$ask_result
 
 echo ""
-echo "The consume folder is where paperles will search for new documents."
+echo "The consume folder is where paperless will search for new documents."
 echo "Point this to a folder where your scanner is able to put your scanned"
 echo "documents."
 echo ""
