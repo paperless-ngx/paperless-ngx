@@ -477,7 +477,7 @@ Migrating from Paperless-ng
 ===========================
 
 Paperless-ngx is meant to be a drop-in replacement for Paperless-ng and thus upgrading should be
-trivial for most users, especially when using docker. However, as with any major change, it is 
+trivial for most users, especially when using docker. However, as with any major change, it is
 recommended to take a full backup first. Once you are ready, simply change the docker image to
 point to the new source. E.g. if using Docker Compose, edit ``docker-compose.yml`` and change:
 
@@ -490,12 +490,12 @@ to
 .. code::
 
   image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    
+
 and then run ``docker-compose up -d`` which will pull the new image recreate the container.
 That's it!
 
-Users who installed with the bare-metal route should also update their Git clone to point to 
-``https://github.com/paperless-ngx/paperless-ngx``, e.g. using the command 
+Users who installed with the bare-metal route should also update their Git clone to point to
+``https://github.com/paperless-ngx/paperless-ngx``, e.g. using the command
 ``git remote set-url origin https://github.com/paperless-ngx/paperless-ngx`` and then pull the
 lastest version.
 
