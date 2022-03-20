@@ -17,8 +17,10 @@ class Command(BaseCommand):
         User named: admin
         Email: root@localhost
         with password based on env variable.
-        In case any user already exists no
-        changes are made
+        No superuser will be created, when:
+        - A user named admin already exists
+        - A superuser already exists
+        - PAPERLESS_ADMIN_PASSWORD is not set
     """.replace(
         "    ",
         "",
