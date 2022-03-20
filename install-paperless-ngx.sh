@@ -3,16 +3,16 @@
 ask() {
 	while true ; do
 		if [[ -z $3 ]] ; then
-			read -p "$1 [$2]: " result
+			read -r -p "$1 [$2]: " result
 		else
-			read -p "$1 ($3) [$2]: " result
+			read -r -p "$1 ($3) [$2]: " result
 		fi
 		if [[ -z $result ]]; then
 			ask_result=$2
 			return
 		fi
 		array=$3
-		if [[ -z $3 || " ${array[@]} " =~ " ${result} " ]]; then
+		if [[ -z $3 || " ${array[*]} " =~ ${result} ]]; then
 			ask_result=$result
 			return
 		else
@@ -24,7 +24,7 @@ ask() {
 ask_docker_folder() {
 	while true ; do
 
-		read -p "$1 [$2]: " result
+		read -r -p "$1 [$2]: " result
 
 		if [[ -z $result ]]; then
 			ask_result=$2
@@ -64,8 +64,8 @@ fi
 
 # Check if user has permissions to run Docker by trying to get the status of Docker (docker status).
 # If this fails, the user probably does not have permissions for Docker.
-docker stats --no-stream 2>/dev/null 1>&2
-if [ $? -ne 0 ] ; then
+
+if [ "$(docker stats --no-stream 2>/dev/null 1>&2)" -ne 0 ] ; then
 	echo ""
 	echo "WARN: It look like the current user does not have Docker permissions."
 	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user."
@@ -228,7 +228,7 @@ ask "Paperless username" "$(whoami)"
 USERNAME=$ask_result
 
 while true; do
-	read -sp "Paperless password: " PASSWORD
+	read -r -sp "Paperless password: " PASSWORD
 	echo ""
 
 	if [[ -z $PASSWORD ]] ; then
@@ -236,7 +236,7 @@ while true; do
 		continue
 	fi
 
-	read -sp "Paperless password (again): " PASSWORD_REPEAT
+	read -r -sp "Paperless password (again): " PASSWORD_REPEAT
 	echo ""
 
 	if [[ ! "$PASSWORD" == "$PASSWORD_REPEAT" ]] ; then
@@ -285,7 +285,7 @@ echo "Paperless username: $USERNAME"
 echo "Paperless email: $EMAIL"
 
 echo ""
-read -p "Press any key to install."
+read -r  -p "Press any key to install."
 
 echo ""
 echo "Installing paperless..."
@@ -304,7 +304,7 @@ fi
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
 
-SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+SECRET_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
 
 DEFAULT_LANGUAGES="deu eng fra ita spa"
 
@@ -318,7 +318,7 @@ DEFAULT_LANGUAGES="deu eng fra ita spa"
 	echo "PAPERLESS_TIME_ZONE=$TIME_ZONE"
 	echo "PAPERLESS_OCR_LANGUAGE=$OCR_LANGUAGE"
 	echo "PAPERLESS_SECRET_KEY=$SECRET_KEY"
-	if [[ ! " ${DEFAULT_LANGUAGES[@]} " =~ " ${OCR_LANGUAGE} " ]] ; then
+	if [[ ! " ${DEFAULT_LANGUAGES[*]} " =~ ${OCR_LANGUAGE} ]] ; then
 		echo "PAPERLESS_OCR_LANGUAGES=$OCR_LANGUAGE"
 	fi
 } > docker-compose.env
@@ -334,12 +334,12 @@ fi
 
 if [[ -n $DATA_FOLDER ]] ; then
 	sed -i "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
-    sed -i "/^\s*data:/d" docker-compose.yml
+	sed -i "/^\s*data:/d" docker-compose.yml
 fi
 
 if [[ -n $POSTGRES_FOLDER ]] ; then
 	sed -i "s#- pgdata:/var/lib/postgresql/data#- $POSTGRES_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
-    sed -i "/^\s*pgdata:/d" docker-compose.yml
+	sed -i "/^\s*pgdata:/d" docker-compose.yml
 fi
 
 # remove trailing blank lines from end of file
@@ -348,7 +348,7 @@ sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' docker-compose.yml
 l1=$(grep -n '^volumes:' docker-compose.yml | cut -d : -f 1)  # get line number containing volume: at begin of line
 l2=$(wc -l < docker-compose.yml)  # get total number of lines
 if [ "$l1" -eq "$l2" ] ; then
-    sed -i "/^volumes:/d" docker-compose.yml
+	sed -i "/^volumes:/d" docker-compose.yml
 fi
 
 

@@ -36,11 +36,11 @@ $border-color-dark-mode: #47494f;
     --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
     --bs-primary-rgb: var(--bs-primary);
   }
-  
+
   .navbar-brand {
     color: var(--bs-body-color);
   }
-  
+
   .border {
     border-color: var(--bs-border-color) !important;
   }
@@ -156,7 +156,7 @@ $border-color-dark-mode: #47494f;
   .toast {
     background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%), 0.9);
   }
-  
+
   .toast-header {
     background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 10%), 0.9);
   }

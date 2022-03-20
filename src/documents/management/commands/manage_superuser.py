@@ -1,7 +1,5 @@
-from asyncore import write
 import logging
 import os
-from sys import stdout
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
