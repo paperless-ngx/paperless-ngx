@@ -1,16 +1,18 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing'
 
-import { ApiVersionInterceptor } from './api-version.interceptor';
+import { ApiVersionInterceptor } from './api-version.interceptor'
 
 describe('ApiVersionInterceptor', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      ApiVersionInterceptor
-      ]
-  }));
+  beforeEach(() =>
+    TestBed.configureTestingModule({
+      providers: [ApiVersionInterceptor],
+    })
+  )
 
   it('should be created', () => {
-    const interceptor: ApiVersionInterceptor = TestBed.inject(ApiVersionInterceptor);
-    expect(interceptor).toBeTruthy();
-  });
-});
+    const interceptor: ApiVersionInterceptor = TestBed.inject(
+      ApiVersionInterceptor
+    )
+    expect(interceptor).toBeTruthy()
+  })
+})

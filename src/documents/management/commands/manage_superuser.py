@@ -4,7 +4,7 @@ import os
 from sys import stdout
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 logger = logging.getLogger("paperless.management.superuser")
@@ -20,7 +20,8 @@ class Command(BaseCommand):
         In case any user already exists no
         changes are made
     """.replace(
-        "    ", ""
+        "    ",
+        "",
     )
 
     def handle(self, *args, **options):

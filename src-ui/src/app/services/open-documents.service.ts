@@ -1,23 +1,27 @@
-import { Injectable } from '@angular/core';
-import { PaperlessDocument } from '../data/paperless-document';
-import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys';
-import { DocumentService } from './rest/document.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component';
-import { Observable, Subject, of } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { Injectable } from '@angular/core'
+import { PaperlessDocument } from '../data/paperless-document'
+import { OPEN_DOCUMENT_SERVICE } from '../data/storage-keys'
+import { DocumentService } from './rest/document.service'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { Observable, Subject, of } from 'rxjs'
+import { first } from 'rxjs/operators'
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OpenDocumentsService {
-
   private MAX_OPEN_DOCUMENTS = 5
 
-  constructor(private documentService: DocumentService, private modalService: NgbModal) {
+  constructor(
+    private documentService: DocumentService,
+    private modalService: NgbModal
+  ) {
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
       try {
-        this.openDocuments = JSON.parse(sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS))
+        this.openDocuments = JSON.parse(
+          sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)
+        )
       } catch (e) {
         sessionStorage.removeItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)
         this.openDocuments = []
@@ -29,14 +33,17 @@ export class OpenDocumentsService {
   private dirtyDocuments: Set<number> = new Set<number>()
 
   refreshDocument(id: number) {
-    let index = this.openDocuments.findIndex(doc => doc.id == id)
+    let index = this.openDocuments.findIndex((doc) => doc.id == id)
     if (index > -1) {
-      this.documentService.get(id).subscribe(doc => {
-        this.openDocuments[index] = doc
-      }, error => {
-        this.openDocuments.splice(index, 1)
-        this.save()
-      })
+      this.documentService.get(id).subscribe(
+        (doc) => {
+          this.openDocuments[index] = doc
+        },
+        (error) => {
+          this.openDocuments.splice(index, 1)
+          this.save()
+        }
+      )
     }
   }
 
@@ -45,11 +52,11 @@ export class OpenDocumentsService {
   }
 
   getOpenDocument(id: number): PaperlessDocument {
-    return this.openDocuments.find(d => d.id == id)
+    return this.openDocuments.find((d) => d.id == id)
   }
 
   openDocument(doc: PaperlessDocument) {
-    if (this.openDocuments.find(d => d.id == doc.id) == null) {
+    if (this.openDocuments.find((d) => d.id == doc.id) == null) {
       this.openDocuments.unshift(doc)
       if (this.openDocuments.length > this.MAX_OPEN_DOCUMENTS) {
         this.openDocuments.pop()
@@ -64,18 +71,20 @@ export class OpenDocumentsService {
   }
 
   closeDocument(doc: PaperlessDocument): Observable<boolean> {
-    let index = this.openDocuments.findIndex(d => d.id == doc.id)
-    if (index == -1) return of(true);
+    let index = this.openDocuments.findIndex((d) => d.id == doc.id)
+    if (index == -1) return of(true)
     if (!this.dirtyDocuments.has(doc.id)) {
       this.openDocuments.splice(index, 1)
       this.save()
       return of(true)
     } else {
-      let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
       modal.componentInstance.title = $localize`Unsaved Changes`
       modal.componentInstance.messageBold = $localize`You have unsaved changes.`
       modal.componentInstance.message = $localize`Are you sure you want to close this document?`
-      modal.componentInstance.btnClass = "btn-warning"
+      modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Close document`
       modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
@@ -92,11 +101,13 @@ export class OpenDocumentsService {
 
   closeAll(): Observable<boolean> {
     if (this.dirtyDocuments.size) {
-      let modal = this.modalService.open(ConfirmDialogComponent, {backdrop: 'static'})
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
       modal.componentInstance.title = $localize`Unsaved Changes`
       modal.componentInstance.messageBold = $localize`You have unsaved changes.`
       modal.componentInstance.message = $localize`Are you sure you want to close all documents?`
-      modal.componentInstance.btnClass = "btn-warning"
+      modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Close documents`
       modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
         modal.componentInstance.buttonsEnabled = false
@@ -117,7 +128,9 @@ export class OpenDocumentsService {
   }
 
   save() {
-    sessionStorage.setItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS, JSON.stringify(this.openDocuments))
+    sessionStorage.setItem(
+      OPEN_DOCUMENT_SERVICE.DOCUMENTS,
+      JSON.stringify(this.openDocuments)
+    )
   }
-
 }

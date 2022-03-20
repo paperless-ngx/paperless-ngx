@@ -5,9 +5,8 @@ import os
 import re
 
 from concurrent_log_handler.queue import setup_logging_queues
-from dotenv import load_dotenv
-
 from django.utils.translation import gettext_lazy as _
+from dotenv import load_dotenv
 
 # Tap paperless.conf if it's available
 if os.path.exists("../paperless.conf"):
@@ -68,7 +67,8 @@ MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 LOGGING_DIR = os.getenv("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
 
 CONSUMPTION_DIR = os.getenv(
-    "PAPERLESS_CONSUMPTION_DIR", os.path.join(BASE_DIR, "..", "consume")
+    "PAPERLESS_CONSUMPTION_DIR",
+    os.path.join(BASE_DIR, "..", "consume"),
 )
 
 # This will be created if it doesn't exist
@@ -119,7 +119,7 @@ REST_FRAMEWORK = {
 
 if DEBUG:
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
-        "paperless.auth.AngularApiAuthenticationOverride"
+        "paperless.auth.AngularApiAuthenticationOverride",
     )
 
 MIDDLEWARE = [
@@ -191,7 +191,8 @@ if AUTO_LOGIN_USERNAME:
 
 ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
 HTTP_REMOTE_USER_HEADER_NAME = os.getenv(
-    "PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME", "HTTP_REMOTE_USER"
+    "PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME",
+    "HTTP_REMOTE_USER",
 )
 
 if ENABLE_HTTP_REMOTE_USER:
@@ -201,7 +202,7 @@ if ENABLE_HTTP_REMOTE_USER:
         "django.contrib.auth.backends.ModelBackend",
     ]
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
-        "rest_framework.authentication.RemoteUserAuthentication"
+        "rest_framework.authentication.RemoteUserAuthentication",
     )
 
 # X-Frame options for embedded PDF display:
@@ -212,7 +213,7 @@ else:
 
 # We allow CORS from localhost:8080
 CORS_ALLOWED_ORIGINS = tuple(
-    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(",")
+    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","),
 )
 
 if DEBUG:
@@ -223,7 +224,8 @@ if DEBUG:
 # Paperless on a closed network.  However, if you're putting this anywhere
 # public, you should change the key to something unique and verbose.
 SECRET_KEY = os.getenv(
-    "PAPERLESS_SECRET_KEY", "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee"
+    "PAPERLESS_SECRET_KEY",
+    "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee",
 )
 
 _allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
@@ -268,7 +270,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(DATA_DIR, "db.sqlite3"),
-    }
+    },
 }
 
 if os.getenv("PAPERLESS_DBHOST"):
@@ -311,7 +313,9 @@ LANGUAGES = [
     ("pt-pt", _("Portuguese")),
     ("ro-ro", _("Romanian")),
     ("ru-ru", _("Russian")),
+    ("sl-si", _("Slovenian")),
     ("sv-se", _("Swedish")),
+    ("zh-cn", _("Chinese Simplified")),
 ]
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
@@ -423,7 +427,8 @@ def default_threads_per_worker(task_workers):
 
 
 THREADS_PER_WORKER = os.getenv(
-    "PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker(TASK_WORKERS)
+    "PAPERLESS_THREADS_PER_WORKER",
+    default_threads_per_worker(TASK_WORKERS),
 )
 
 ###############################################################################
@@ -435,7 +440,7 @@ CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
 
 CONSUMER_POLLING_RETRY_COUNT = int(
-    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5)
+    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5),
 )
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
@@ -448,8 +453,8 @@ CONSUMER_IGNORE_PATTERNS = list(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
             '[".DS_STORE/*", "._*", ".stfolder/*"]',
-        )
-    )
+        ),
+    ),
 )
 
 CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
@@ -479,7 +484,7 @@ OCR_DESKEW = __get_boolean("PAPERLESS_OCR_DESKEW", "true")
 OCR_ROTATE_PAGES = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES", "true")
 
 OCR_ROTATE_PAGES_THRESHOLD = float(
-    os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0)
+    os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
 )
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
@@ -536,7 +541,8 @@ THUMBNAIL_FONT_NAME = os.getenv(
 PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
 PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
 PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
-    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
+    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT",
+    "http://localhost:3000",
 )
 
 if PAPERLESS_TIKA_ENABLED:

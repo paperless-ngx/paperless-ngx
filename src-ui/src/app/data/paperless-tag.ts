@@ -1,11 +1,9 @@
-import { MatchingModel } from "./matching-model";
+import { MatchingModel } from './matching-model'
 
 export interface PaperlessTag extends MatchingModel {
+  color?: string
 
-    color?: string
+  text_color?: string
 
-    text_color?: string
-
-    is_inbox_tag?: boolean
-
+  is_inbox_tag?: boolean
 }

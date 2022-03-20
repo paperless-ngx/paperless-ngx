@@ -2,8 +2,9 @@ import itertools
 
 from django.db.models import Q
 from django_q.tasks import async_task
-
-from documents.models import Document, Correspondent, DocumentType
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
 
 
 def set_correspondent(doc_ids, correspondent):
@@ -40,7 +41,7 @@ def add_tag(doc_ids, tag):
     DocumentTagRelationship = Document.tags.through
 
     DocumentTagRelationship.objects.bulk_create(
-        [DocumentTagRelationship(document_id=doc, tag_id=tag) for doc in affected_docs]
+        [DocumentTagRelationship(document_id=doc, tag_id=tag) for doc in affected_docs],
     )
 
     async_task("documents.tasks.bulk_update_documents", document_ids=affected_docs)
@@ -56,7 +57,7 @@ def remove_tag(doc_ids, tag):
     DocumentTagRelationship = Document.tags.through
 
     DocumentTagRelationship.objects.filter(
-        Q(document_id__in=affected_docs) & Q(tag_id=tag)
+        Q(document_id__in=affected_docs) & Q(tag_id=tag),
     ).delete()
 
     async_task("documents.tasks.bulk_update_documents", document_ids=affected_docs)

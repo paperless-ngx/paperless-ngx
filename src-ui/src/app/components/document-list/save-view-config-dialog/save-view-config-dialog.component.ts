@@ -1,15 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { FormControl, FormGroup } from '@angular/forms'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
   selector: 'app-save-view-config-dialog',
   templateUrl: './save-view-config-dialog.component.html',
-  styleUrls: ['./save-view-config-dialog.component.scss']
+  styleUrls: ['./save-view-config-dialog.component.scss'],
 })
 export class SaveViewConfigDialogComponent implements OnInit {
-
-  constructor(private modal: NgbActiveModal) { }
+  constructor(private modal: NgbActiveModal) {}
 
   @Output()
   public saveClicked = new EventEmitter()
@@ -22,7 +21,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
 
   closeEnabled = false
 
-  _defaultName = ""
+  _defaultName = ''
 
   get defaultName() {
     return this._defaultName
@@ -31,7 +30,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
   @Input()
   set defaultName(value: string) {
     this._defaultName = value
-    this.saveViewConfigForm.patchValue({name: value})
+    this.saveViewConfigForm.patchValue({ name: value })
   }
 
   saveViewConfigForm = new FormGroup({
@@ -44,7 +43,7 @@ export class SaveViewConfigDialogComponent implements OnInit {
     // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
       this.closeEnabled = true
-    });
+    })
   }
 
   save() {

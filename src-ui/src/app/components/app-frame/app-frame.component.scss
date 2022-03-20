@@ -35,16 +35,14 @@
 
 .sidebar .nav-link {
   font-weight: 500;
-  color: #333;
 }
 
 .sidebar .nav-link .sidebaricon {
   margin-right: 4px;
-  color: #999;
 }
 
 .sidebar .nav-link.active {
-  color: $primary;
+  color: var(--bs-primary);
   font-weight: bold;
 }
 
@@ -172,8 +170,7 @@
     }
 
     &:focus {
-      background-color: #fff;
-      color: #212529;
+      background-color: rgba(0, 0, 0, 0.3);
       flex-grow: 1;
       padding-left: 0.5rem;
     }

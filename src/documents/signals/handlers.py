@@ -1,24 +1,26 @@
 import logging
 import os
 
-from django.utils import termcolors
 from django.conf import settings
-from django.contrib.admin.models import ADDITION, LogEntry
+from django.contrib.admin.models import ADDITION
+from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db import models, DatabaseError
+from django.db import DatabaseError
+from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
-from django.utils import termcolors, timezone
+from django.utils import termcolors
+from django.utils import timezone
 from filelock import FileLock
 
 from .. import matching
-from ..file_handling import (
-    delete_empty_directories,
-    create_source_path_directory,
-    generate_unique_filename,
-)
-from ..models import Document, Tag, MatchingModel
+from ..file_handling import create_source_path_directory
+from ..file_handling import delete_empty_directories
+from ..file_handling import generate_unique_filename
+from ..models import Document
+from ..models import MatchingModel
+from ..models import Tag
 
 
 logger = logging.getLogger("paperless.handlers")
@@ -72,7 +74,7 @@ def set_correspondent(
                 print(
                     termcolors.colorize(str(document), fg="green")
                     if color
-                    else str(document)
+                    else str(document),
                 )
                 print(f"{base_url}/documents/{document.pk}")
             else:
@@ -82,7 +84,7 @@ def set_correspondent(
                         if color
                         else str(document)
                     )
-                    + f" [{document.pk}]"
+                    + f" [{document.pk}]",
                 )
             print(f"Suggest correspondent {selected}")
         else:
@@ -139,7 +141,7 @@ def set_document_type(
                 print(
                     termcolors.colorize(str(document), fg="green")
                     if color
-                    else str(document)
+                    else str(document),
                 )
                 print(f"{base_url}/documents/{document.pk}")
             else:
@@ -149,7 +151,7 @@ def set_document_type(
                         if color
                         else str(document)
                     )
-                    + f" [{document.pk}]"
+                    + f" [{document.pk}]",
                 )
             print(f"Suggest document type {selected}")
         else:
@@ -176,9 +178,9 @@ def set_tags(
 
     if replace:
         Document.tags.through.objects.filter(document=document).exclude(
-            Q(tag__is_inbox_tag=True)
+            Q(tag__is_inbox_tag=True),
         ).exclude(
-            Q(tag__match="") & ~Q(tag__matching_algorithm=Tag.MATCH_AUTO)
+            Q(tag__match="") & ~Q(tag__matching_algorithm=Tag.MATCH_AUTO),
         ).delete()
 
     current_tags = set(document.tags.all())
@@ -198,7 +200,7 @@ def set_tags(
             print(
                 termcolors.colorize(str(document), fg="green")
                 if color
-                else str(document)
+                else str(document),
             )
             print(f"{base_url}/documents/{document.pk}")
         else:
@@ -208,7 +210,7 @@ def set_tags(
                     if color
                     else str(document)
                 )
-                + f" [{document.pk}]"
+                + f" [{document.pk}]",
             )
         if relevant_tags:
             print("Suggest tags: " + ", ".join([t.name for t in relevant_tags]))
@@ -254,7 +256,7 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
             except OSError as e:
                 logger.error(
                     f"Failed to move {instance.source_path} to trash at "
-                    f"{new_file_path}: {e}. Skipping cleanup!"
+                    f"{new_file_path}: {e}. Skipping cleanup!",
                 )
                 return
 
@@ -270,16 +272,18 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
                 except OSError as e:
                     logger.warning(
                         f"While deleting document {str(instance)}, the file "
-                        f"{filename} could not be deleted: {e}"
+                        f"{filename} could not be deleted: {e}",
                     )
 
         delete_empty_directories(
-            os.path.dirname(instance.source_path), root=settings.ORIGINALS_DIR
+            os.path.dirname(instance.source_path),
+            root=settings.ORIGINALS_DIR,
         )
 
         if instance.has_archive_version:
             delete_empty_directories(
-                os.path.dirname(instance.archive_path), root=settings.ARCHIVE_DIR
+                os.path.dirname(instance.archive_path),
+                root=settings.ARCHIVE_DIR,
             )
 
 
@@ -297,7 +301,7 @@ def validate_move(instance, old_path, new_path):
         # Can't do anything if the new file already exists. Skip updating file.
         logger.warning(
             f"Document {str(instance)}: Cannot rename file "
-            f"since target path {new_path} already exists."
+            f"since target path {new_path} already exists.",
         )
         raise CannotMoveFilesException()
 
@@ -331,12 +335,11 @@ def update_filename_and_move_files(sender, instance, **kwargs):
             if instance.has_archive_version:
 
                 instance.archive_filename = generate_unique_filename(
-                    instance, archive_filename=True
+                    instance,
+                    archive_filename=True,
                 )
 
-                move_archive = (
-                    old_archive_filename != instance.archive_filename
-                )  # NOQA: E501
+                move_archive = old_archive_filename != instance.archive_filename
             else:
                 move_archive = False
 
@@ -374,7 +377,7 @@ def update_filename_and_move_files(sender, instance, **kwargs):
                 if move_archive and os.path.isfile(instance.archive_path):
                     os.rename(instance.archive_path, old_archive_path)
 
-            except Exception as e:
+            except Exception:
                 # This is fine, since:
                 # A: if we managed to move source from A to B, we will also
                 #  manage to move it from B to A. If not, we have a serious
@@ -393,14 +396,16 @@ def update_filename_and_move_files(sender, instance, **kwargs):
         # something has failed above.
         if not os.path.isfile(old_source_path):
             delete_empty_directories(
-                os.path.dirname(old_source_path), root=settings.ORIGINALS_DIR
+                os.path.dirname(old_source_path),
+                root=settings.ORIGINALS_DIR,
             )
 
         if instance.has_archive_version and not os.path.isfile(
-            old_archive_path
-        ):  # NOQA: E501
+            old_archive_path,
+        ):
             delete_empty_directories(
-                os.path.dirname(old_archive_path), root=settings.ARCHIVE_DIR
+                os.path.dirname(old_archive_path),
+                root=settings.ARCHIVE_DIR,
             )
 
 

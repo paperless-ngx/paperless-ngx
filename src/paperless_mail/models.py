@@ -1,7 +1,5 @@
-from django.db import models
-
 import documents.models as document_models
-
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
@@ -30,12 +28,14 @@ class MailAccount(models.Model):
         null=True,
         help_text=_(
             "This is usually 143 for unencrypted and STARTTLS "
-            "connections, and 993 for SSL connections."
+            "connections, and 993 for SSL connections.",
         ),
     )
 
     imap_security = models.PositiveIntegerField(
-        _("IMAP security"), choices=IMAP_SECURITY_OPTIONS, default=IMAP_SECURITY_SSL
+        _("IMAP security"),
+        choices=IMAP_SECURITY_OPTIONS,
+        default=IMAP_SECURITY_SSL,
     )
 
     username = models.CharField(_("username"), max_length=256)
@@ -48,7 +48,7 @@ class MailAccount(models.Model):
         default="UTF-8",
         help_text=_(
             "The character set to use when communicating with the "
-            "mail server, such as 'UTF-8' or 'US-ASCII'."
+            "mail server, such as 'UTF-8' or 'US-ASCII'.",
         ),
     )
 
@@ -123,13 +123,22 @@ class MailRule(models.Model):
     )
 
     filter_from = models.CharField(
-        _("filter from"), max_length=256, null=True, blank=True
+        _("filter from"),
+        max_length=256,
+        null=True,
+        blank=True,
     )
     filter_subject = models.CharField(
-        _("filter subject"), max_length=256, null=True, blank=True
+        _("filter subject"),
+        max_length=256,
+        null=True,
+        blank=True,
     )
     filter_body = models.CharField(
-        _("filter body"), max_length=256, null=True, blank=True
+        _("filter body"),
+        max_length=256,
+        null=True,
+        blank=True,
     )
 
     filter_attachment_filename = models.CharField(
@@ -140,12 +149,14 @@ class MailRule(models.Model):
         help_text=_(
             "Only consume documents which entirely match this "
             "filename if specified. Wildcards such as *.pdf or "
-            "*invoice* are allowed. Case insensitive."
+            "*invoice* are allowed. Case insensitive.",
         ),
     )
 
     maximum_age = models.PositiveIntegerField(
-        _("maximum age"), default=30, help_text=_("Specified in days.")
+        _("maximum age"),
+        default=30,
+        help_text=_("Specified in days."),
     )
 
     attachment_type = models.PositiveIntegerField(
@@ -154,7 +165,7 @@ class MailRule(models.Model):
         default=ATTACHMENT_TYPE_ATTACHMENTS_ONLY,
         help_text=_(
             "Inline attachments include embedded images, so it's best "
-            "to combine this option with a filename filter."
+            "to combine this option with a filename filter.",
         ),
     )
 
@@ -173,12 +184,14 @@ class MailRule(models.Model):
             "Additional parameter for the action selected above, "
             "i.e., "
             "the target folder of the move to folder action. "
-            "Subfolders must be separated by dots."
+            "Subfolders must be separated by dots.",
         ),
     )
 
     assign_title_from = models.PositiveIntegerField(
-        _("assign title from"), choices=TITLE_SELECTOR, default=TITLE_FROM_SUBJECT
+        _("assign title from"),
+        choices=TITLE_SELECTOR,
+        default=TITLE_FROM_SUBJECT,
     )
 
     assign_tag = models.ForeignKey(

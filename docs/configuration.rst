@@ -462,8 +462,9 @@ requires are as follows:
         gotenberg:
             image: gotenberg/gotenberg:7
             restart: unless-stopped
-            environment:
-                CHROMIUM_DISABLE_ROUTES: 1
+            command:
+                - "gotenberg"
+                - "--chromium-disable-routes=true"
 
         tika:
             image: apache/tika
@@ -472,6 +473,8 @@ requires are as follows:
 Add the configuration variables to the environment of the webserver (alternatively
 put the configuration in the ``docker-compose.env`` file) and add the additional
 services below the webserver service. Watch out for indentation.
+
+Make sure to use the correct format `PAPERLESS_TIKA_ENABLED = 1` so python_dotenv can parse the statement correctly.
 
 Software tweaks
 ###############
