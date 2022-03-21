@@ -8,6 +8,9 @@ on:
     types:
       - opened
       - reopened
+    branches:
+      - main
+      - dev
 
 # map fields with customized labels
 env:
