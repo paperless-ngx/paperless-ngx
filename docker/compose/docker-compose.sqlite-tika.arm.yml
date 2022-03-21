@@ -39,9 +39,11 @@ services:
   broker:
     image: redis:6.0
     restart: unless-stopped
+    volumes:
+      - redisdata:/data
 
   webserver:
-    image: jonaswinkler/paperless-ng:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
       - broker
@@ -76,6 +78,7 @@ services:
     image: iwishiwasaneagle/apache-tika-arm
     restart: unless-stopped
 
-volumes:
+  media:
+  redisdata:
   data:
   media:
