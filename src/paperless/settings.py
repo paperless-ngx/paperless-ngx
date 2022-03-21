@@ -489,6 +489,10 @@ OCR_ROTATE_PAGES_THRESHOLD = float(
     os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
 )
 
+OCR_MAX_IMAGE_PIXELS = os.environ.get(
+    'PAPERLESS_OCR_MAX_IMAGE_PIXELS', Image.MAX_IMAGE_PIXELS
+)
+
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
 
 # GNUPG needs a home directory for some reason
