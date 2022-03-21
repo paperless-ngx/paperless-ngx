@@ -70,7 +70,6 @@ Contents
    faq
    troubleshooting
    extending
-   contributing
    scanners
    screenshots
    changelog
