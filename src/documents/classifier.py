@@ -59,7 +59,7 @@ def load_classifier():
 
 class DocumentClassifier(object):
 
-    FORMAT_VERSION = 6
+    FORMAT_VERSION = 7
 
     def __init__(self):
         # hash of the training data. used to prevent re-training when the
