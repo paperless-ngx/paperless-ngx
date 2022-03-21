@@ -1,13 +1,13 @@
 .. _extending:
 
-Paperless development
-#####################
+Paperless-ngx Development
+#########################
 
 This section describes the steps you need to take to start development on paperless-ngx.
 
 Check out the source from github. The repository is organized in the following way:
 
-*   ``master`` always represents the latest release and will only see changes
+*   ``main`` always represents the latest release and will only see changes
     when a new release is made.
 *   ``dev`` contains the code that will be in the next release.
 *   ``feature-X`` contain bigger changes that will be in some release, but not
@@ -23,6 +23,31 @@ Apart from that, the folder structure is as follows:
 *   ``scripts/`` - Various scripts that help with different parts of development.
 *   ``docker/`` - Files required to build the docker image.
 
+Contributing to Paperless
+=========================
+
+Maybe you've been using Paperless for a while and want to add a feature or two,
+or maybe you've come across a bug that you have some ideas how to solve.  The
+beauty of open source software is that you can see what's wrong and help to get
+it fixed for everyone!
+
+Before contributing please review our `code of conduct`_ and other important
+information in the `contributing guidelines`_.
+
+Code formatting with pre-commit Hooks
+=====================================
+
+To ensure a consistent style and formatting across the project source, the project
+utilizes a Git `pre-commit` hook to perform some formatting and linting before a
+commit is allowed. That way, everyone uses the same style and some common issues
+can be caught early on. See below for installation instructions.
+
+Once installed, hooks will run when you commit. If the formatting isn't quite right
+or a linter catches something, the commit will be rejected. You'll need to look at the
+output and fix the issue. Some hooks, such as the Python formatting tool `black`,
+will format failing files, so all you need to do is `git add` those files again and
+retry your commit.
+
 Initial setup and first start
 =============================
 
@@ -37,13 +62,19 @@ To do the setup you need to perform the steps from the following chapters in a c
 
         $ npm install -g @angular/cli
 
-4.  Create ``consume`` and ``media`` folders in the cloned root folder.
+4.  Install pre-commit
+
+    .. code:: shell-session
+
+        pre-commit install
+
+5.  Create ``consume`` and ``media`` folders in the cloned root folder.
 
     .. code:: shell-session
 
         mkdir -p consume media
 
-5.  You can now either ...
+6.  You can now either ...
 
     *  install redis or
     *  use the included scripts/start-services.sh to use docker to fire up a redis instance (and some other services such as tika, gotenberg and a postgresql server) or
@@ -53,17 +84,12 @@ To do the setup you need to perform the steps from the following chapters in a c
 
             docker run -d -p 6379:6379 --restart unless-stopped redis:latest
 
-6.  Install the python dependencies by performing in the src/ directory.
+7.  Install the python dependencies by performing in the src/ directory.
     .. code:: shell-session
 
         pipenv install --dev
 
   * Make sure you're using python 3.9.x or lower. Otherwise you might get issues with building dependencies. You can use `pyenv <https://github.com/pyenv/pyenv>`_ to install a specific python version.
-
-7.  Install the Git hooks
-    .. code:: shell-session
-
-        pre-commit install
 
 8.  Generate the static UI so you can perform a login to get session that is required for frontend development (this needs to be done one time only). From src-ui directory:
 
@@ -92,7 +118,7 @@ Backend development environment is now ready, to start Frontend development go t
 Back end development
 ====================
 
-The backend is a django application. I use PyCharm for development, but you can use whatever
+The backend is a django application. PyCharm works well for development, but you can use whatever
 you want.
 
 Configure the IDE to use the src/ folder as the base source folder. Configure the following
@@ -127,9 +153,8 @@ Testing and code style:
 Front end development
 =====================
 
-The front end is build using angular. I use the ``Code - OSS`` IDE for development.
-
-In order to get started, you need ``npm``. Install the Angular CLI interface with
+The front end is built using Angular. In order to get started, you need ``npm``.
+Install the Angular CLI interface with
 
 .. code:: shell-session
 
@@ -367,3 +392,6 @@ that returns information about your parser:
     download. We could guess that from the file extensions, but some mime types have many extensions
     associated with them and the python methods responsible for guessing the extension do not always
     return the same value.
+
+.. _code of conduct: https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUCT.md
+.. _contributing guidelines: https://github.com/paperless-ngx/paperless-ngx/blob/main/CONTRIBUTING.md
