@@ -1304,7 +1304,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="final">Cette action affectera le correspondant "<x id="PH" equiv-text="correspondent.name"/>" au(x) <x id="PH_1" equiv-text="this.list.selected.size"/>document(s) sélectionné(s).</target>
+        <target state="final">Cette action affectera le correspondant "<x id="PH" equiv-text="correspondent.name"/>" au(x) <x id="PH_1" equiv-text="this.list.selected.size"/> document(s) sélectionné(s).</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html" approved="yes">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
