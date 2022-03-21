@@ -5,7 +5,7 @@
 repos:
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.2.0
     hooks:
       - id: check-docstring-first
       - id: check-json
@@ -27,7 +27,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v2.6.1"
+    rev: "v2.6.2"
     hooks:
       - id: prettier
         types_or:
@@ -47,7 +47,7 @@ repos:
       - id: yesqa
         exclude: "(migrations)"
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: "v2.2.1"
+    rev: "v2.2.2"
     hooks:
       - id: add-trailing-comma
         exclude: "(migrations)"
