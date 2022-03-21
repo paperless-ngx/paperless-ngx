@@ -14,12 +14,12 @@ WORKDIR /usr/src/jbig2enc
 RUN apt-get update \
   && apt-get install -y --no-install-recommends build-essential \
     automake \
-	libtool \
-	libleptonica-dev \
-	zlib1g-dev \
-	git \
-	ca-certificates \
-&& rm -rf /var/lib/apt/lists/*
+    libtool \
+    libleptonica-dev \
+    zlib1g-dev \
+    git \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/agl/jbig2enc .
 RUN ./autogen.sh
