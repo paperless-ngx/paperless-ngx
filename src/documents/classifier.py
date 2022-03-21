@@ -78,7 +78,7 @@ class DocumentClassifier(object):
 
             if schema_version != self.FORMAT_VERSION:
                 raise IncompatibleClassifierVersionError(
-                    "Cannor load classifier, incompatible versions.",
+                    "Cannot load classifier, incompatible versions.",
                 )
             else:
                 try:
