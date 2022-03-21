@@ -52,8 +52,11 @@ Another big thanks to the people who have contributed translations:
 * Lars Sørensen (Lrss) suggested 167 translations into Danish.
 * Philmo67 suggested 11 translations into French.
 
+Paperless-ng
+############
+
 paperless-ng 1.5.0
-##################
+==================
 
 Support for Python 3.6 was dropped.
 
@@ -64,7 +67,7 @@ Support for Python 3.6 was dropped.
 * `Daniel Albers`_ added support for making the files and folders ignored by the paperless consume folder scanner configurable. See ``PAPERLESS_CONSUMER_IGNORE_PATTERNS``.
 
 paperless-ng 1.4.5
-##################
+==================
 
 This is a maintenance release.
 
@@ -77,7 +80,7 @@ This is a maintenance release.
   with PDFminer even from non-PDF files.
 
 paperless-ng 1.4.4
-##################
+==================
 
 * Drastically decreased the startup time of the docker container. The startup script adjusts file permissions of all data only if changes are required.
 * Paperless mail: Added ability to specify the character set for each server.
@@ -86,7 +89,7 @@ paperless-ng 1.4.4
 * Updated translations.
 
 paperless-ng 1.4.3
-##################
+==================
 
 * Additions and changes
 
@@ -103,12 +106,12 @@ paperless-ng 1.4.3
   * Fixed an issue with the document consumer crashing on certain documents due to issues with pdfminer.six. This library is used for PDF text extraction.
 
 paperless-ng 1.4.2
-##################
+==================
 
 * Fixed an issue with ``sudo`` that caused paperless to not start on many Raspberry Pi devices. Thank you `WhiteHatTux`_!
 
 paperless-ng 1.4.1
-##################
+==================
 
 * Added Polish locale.
 
@@ -124,7 +127,7 @@ paperless-ng 1.4.1
   ``PAPERLESS_ADMIN_PASSWORD`` as environment variables to the docker container.
 
 paperless-ng 1.4.0
-##################
+==================
 
 * Docker images now use tesseract 4.1.1, which should fix a series of issues with OCR.
 
@@ -157,7 +160,7 @@ paperless-ng 1.4.0
   (see :ref:`administration-index`).
 
 paperless-ng 1.3.2
-##################
+==================
 
 * Added translation into Portuguese.
 
@@ -172,7 +175,7 @@ paperless-ng 1.3.2
   * Fixed an issue with any/all/exact matching when characters used in regular expressions were used for the match.
 
 paperless-ng 1.3.1
-##################
+==================
 
 * Added translation into Spanish and Russian.
 
@@ -197,7 +200,7 @@ paperless-ng 1.3.1
   * Fixed ``AUTO_LOGIN_USERNAME``: Unable to perform POST/PUT/DELETE requests and unable to receive WebSocket messages.
 
 paperless-ng 1.3.0
-##################
+==================
 
 This release contains new database migrations.
 
@@ -223,7 +226,7 @@ This release contains new database migrations.
 
 
 paperless-ng 1.2.1
-##################
+==================
 
 * `Rodrigo Avelino <https://github.com/rodavelino>`_ translated Paperless into Portuguese (Brazil)!
 
@@ -236,7 +239,7 @@ paperless-ng 1.2.1
 * Regression fix: Dates on the front end did not respect date locale settings in some cases.
 
 paperless-ng 1.2.0
-##################
+==================
 
 * Changes to the OCRmyPDF integration
 
@@ -260,14 +263,14 @@ paperless-ng 1.2.0
 * Paperless no longer depends on ``libpoppler-cpp-dev``.
 
 paperless-ng 1.1.4
-##################
+==================
 
 * Added English (GB) locale.
 
 * Added ISO-8601 date display option.
 
 paperless-ng 1.1.3
-##################
+==================
 
 * Added a docker-specific configuration option to adjust the number of
   worker processes of the web server. See :ref:`configuration-docker`.
@@ -277,7 +280,7 @@ paperless-ng 1.1.3
 * Don't show inbox statistics if no inbox tag is defined.
 
 paperless-ng 1.1.2
-##################
+==================
 
 * Always show top left corner of thumbnails, even for extra wide documents.
 
@@ -293,7 +296,7 @@ paperless-ng 1.1.2
 * Some memory usage optimizations.
 
 paperless-ng 1.1.1
-##################
+==================
 
 This release contains new database migrations.
 
@@ -314,7 +317,7 @@ This release contains new database migrations.
   also ensure that they're always executed as the paperless user and you're less likely to run into permission issues. See :ref:`utilities-management-commands`.
 
 paperless-ng 1.1.0
-##################
+==================
 
 * Document processing status
 
@@ -374,7 +377,7 @@ paperless-ng 1.1.0
     ``PAPERLESS_LOGROTATE_MAX_BACKUPS``.
 
 paperless-ng 1.0.0
-##################
+==================
 
 Nothing special about this release, but since there are relatively few bug reports coming in, I think that this is reasonably stable.
 
@@ -397,7 +400,7 @@ Nothing special about this release, but since there are relatively few bug repor
 
 
 paperless-ng 0.9.14
-###################
+===================
 
 Starting with this version, releases are getting built automatically. This release also comes with changes on how to install and
 update paperless.
@@ -445,13 +448,13 @@ update paperless.
   * An issue with the consumer crashing when invalid regular expression were used was fixed.
 
 paperless-ng 0.9.13
-###################
+===================
 
 * Fixed an issue with Paperless not starting due to the new Tika integration when ``USERMAP_UID`` and ``USERMAP_GID`` was used
   in the ``docker-compose.env`` file.
 
 paperless-ng 0.9.12
-###################
+===================
 
 * Paperless localization
 
@@ -493,13 +496,13 @@ paperless-ng 0.9.12
     a document that did not yet exist in the database.
 
 paperless-ng 0.9.11
-###################
+===================
 
 * Fixed an issue with the docker image not starting at all due to a configuration change of the web server.
 
 
 paperless-ng 0.9.10
-###################
+===================
 
 * Bulk editing
 
@@ -532,7 +535,7 @@ paperless-ng 0.9.10
   by :ref:`running the management command document_index with the argument reindex <administration-index>`.
 
 paperless-ng 0.9.9
-##################
+==================
 
 Christmas release!
 
@@ -566,7 +569,7 @@ Christmas release!
   * Most of the guesswork features have been removed. Paperless no longer tries to extract correspondents and tags from file names.
 
 paperless-ng 0.9.8
-##################
+==================
 
 This release addresses two severe issues with the previous release.
 
@@ -575,7 +578,7 @@ This release addresses two severe issues with the previous release.
 
 
 paperless-ng 0.9.7
-##################
+==================
 
 
 * Front end
@@ -617,7 +620,7 @@ paperless-ng 0.9.7
 
 
 paperless-ng 0.9.6
-##################
+==================
 
 This release focusses primarily on many small issues with the UI.
 
@@ -658,7 +661,7 @@ This release focusses primarily on many small issues with the UI.
 
 
 paperless-ng 0.9.5
-##################
+==================
 
 This release concludes the big changes I wanted to get rolled into paperless. The next releases before 1.0 will
 focus on fixing issues, primarily.
@@ -708,7 +711,7 @@ focus on fixing issues, primarily.
   * Assigning correspondents from mail sender names failed for very long names. Paperless no longer assigns correspondents in these cases.
 
 paperless-ng 0.9.4
-##################
+==================
 
 * Searching:
 
@@ -736,7 +739,7 @@ paperless-ng 0.9.4
   how to setup the development environment.
 
 paperless-ng 0.9.3
-##################
+==================
 
 * Setting ``PAPERLESS_AUTO_LOGIN_USERNAME`` replaces ``PAPERLESS_DISABLE_LOGIN``.
   You have to specify your username.
@@ -754,7 +757,7 @@ paperless-ng 0.9.3
 * Added lots of tests for various parts of the application.
 
 paperless-ng 0.9.2
-##################
+==================
 
 * Major changes to the front end (colors, logo, shadows, layout of the cards,
   better mobile support)
@@ -784,7 +787,7 @@ paperless-ng 0.9.2
   up in the admin.
 
 paperless-ng 0.9.1
-##################
+==================
 
 * Moved documentation of the settings to the actual documentation.
 * Updated release script to force the user to choose between SQLite
@@ -792,7 +795,7 @@ paperless-ng 0.9.1
 
 
 paperless-ng 0.9.0
-##################
+==================
 
 * **Deprecated:** GnuPG. :ref:`See this note on the state of GnuPG in paperless-ng. <utilities-encyption>`
   This features will most likely be removed in future versions.

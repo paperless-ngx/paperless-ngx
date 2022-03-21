@@ -14,6 +14,9 @@ updates:
     labels:
       - "frontend"
       - "dependencies"
+    # Add reviewers
+    reviewers:
+      - "paperless-ngx/frontend"
 
   # Enable version updates for Python
   - package-ecosystem: "pip"
@@ -36,3 +39,6 @@ updates:
     labels:
       - "ci-cd"
       - "dependencies"
+    # Add reviewers
+    reviewers:
+      - "paperless-ngx/backend"
