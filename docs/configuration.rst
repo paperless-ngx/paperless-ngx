@@ -397,7 +397,7 @@ PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>
     recognized metadata.
     If you have enough resources or if you are certain that your uploaded files
     are not malicious you can increase this value to your needs.
-    The default value is 256000000.
+    The default value is 256000000, an image with more pixels than that would not be parsed.
 
 PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
