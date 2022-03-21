@@ -104,26 +104,26 @@ Paperless-ngx is a community project. We do our best to delegate permission and 
 
 As of writing, there are 21 members in paperless-ngx. 4 of these people have complete administrative privileges to the repo:
 
-* [@shamoon](https://github.com/shamoon)
-* [@bauerj](https://github.com/bauerj)
-* [@qcasey](https://github.com/qcasey)
-* [@FrankStrieter](https://github.com/FrankStrieter)
+- [@shamoon](https://github.com/shamoon)
+- [@bauerj](https://github.com/bauerj)
+- [@qcasey](https://github.com/qcasey)
+- [@FrankStrieter](https://github.com/FrankStrieter)
 
 There are 5 teams collaborating on specific tasks within paperless-ngx:
 
-* @paperless-ngx/backend (Python / django)
-* @paperless-ngx/frontend (JavaScript / Typescript)
-* @paperless-ngx/ci-cd (GitHub Actions / Deployment)
-* @paperless-ngx/issues (Issue triage)
-* @paperless-ngx/test (General testing for larger PRs)
+- @paperless-ngx/backend (Python / django)
+- @paperless-ngx/frontend (JavaScript / Typescript)
+- @paperless-ngx/ci-cd (GitHub Actions / Deployment)
+- @paperless-ngx/issues (Issue triage)
+- @paperless-ngx/test (General testing for larger PRs)
 
 ## Permissions
 
 All team members are notified when mentioned or assigned to a relevant issue or pull request. Additionally, each team has slightly different access to paperless-ngx:
 
-* The **test** team has no special permissions.
-* The **issues** team has `triage` access. This means they can organize issues and pull requests.
-* The **backend**, **frontend**, and **ci-cd** teams have `write` access. This means they can approve PRs and push code, containers, releases, and more.
+- The **test** team has no special permissions.
+- The **issues** team has `triage` access. This means they can organize issues and pull requests.
+- The **backend**, **frontend**, and **ci-cd** teams have `write` access. This means they can approve PRs and push code, containers, releases, and more.
 
 ## Joining
 
