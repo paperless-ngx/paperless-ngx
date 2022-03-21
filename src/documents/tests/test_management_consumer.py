@@ -260,6 +260,21 @@ class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
                 f'_is_ignored("{file_path}") != {expected_ignored}',
             )
 
+    @mock.patch("documents.management.commands.document_consumer.open")
+    def test_consume_file_busy(self, open_mock):
+
+        # Calling this mock always raises this
+        open_mock.side_effect = OSError
+
+        self.t_start()
+
+        f = os.path.join(self.dirs.consumption_dir, "my_file.pdf")
+        shutil.copy(self.sample_file, f)
+
+        self.wait_for_task_mock_call()
+
+        self.task_mock.assert_not_called()
+
 
 @override_settings(
     CONSUMER_POLLING=1,
