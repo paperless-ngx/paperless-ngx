@@ -9,7 +9,7 @@ verify_ssl = true
 name = "piwheels"
 
 [packages]
-dateparser = "~=1.1.0"
+dateparser = "~=1.1.1"
 django = "~=3.2"
 django-cors-headers = "*"
 django-extensions = "*"
