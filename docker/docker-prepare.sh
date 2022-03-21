@@ -10,7 +10,7 @@ wait_for_postgres() {
 	port="${PAPERLESS_DBPORT:=5342}"
 
 
-	while [ ! "$(pg_isready -h "$host" -p "$port")" ]; do
+	while [ ! "$(pg_isready -h $host -p $port)" ]; do
 
 		if [ $attempt_num -eq $max_attempts ]; then
 			echo "Unable to connect to database."
