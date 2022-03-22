@@ -401,7 +401,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="translated">Krairaj novu stavku</target>
+        <target state="translated">Kreiraj novu stavku</target>
       </trans-unit>
       <trans-unit id="5324147361912094446" datatype="html">
         <source>Edit item</source>
