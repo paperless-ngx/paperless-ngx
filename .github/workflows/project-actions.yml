@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
-      - name: Move issue to ${{ env.todo }}
+      - name: Set issue status to ${{ env.todo }}
         uses: leonsteinhaeuser/project-beta-automations@v1.2.1
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
@@ -35,9 +35,9 @@ jobs:
   pr_opened_or_reopened:
     name: pr_opened_or_reopened
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
+    if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
-      - name: Move PR to ${{ env.in_progress }}
+      - name: Set PR status to ${{ env.in_progress }}
         uses: leonsteinhaeuser/project-beta-automations@v1.2.1
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
