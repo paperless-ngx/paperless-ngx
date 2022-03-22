@@ -10,7 +10,7 @@ updates:
     directory: "/src-ui"
     # Check the npm registry for updates every week
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     # Add reviewers
     reviewers:
       - "paperless-ngx/frontend"
