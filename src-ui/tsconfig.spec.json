@@ -1,14 +1,15 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "types": [
-      "jasmine"
-    ]
+      "jest"
+    ],
+    "module": "commonjs",
+    "emitDecoratorMetadata": true,
+    "allowJs": true
   },
   "files": [
-    "src/test.ts",
     "src/polyfills.ts"
   ],
   "include": [
