@@ -1256,7 +1256,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tag "<x id="PH" equiv-text="tag.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ova operacija će dodati oznaku "<x id="PH" equiv-text="tag.name"/>" to <x id="PH_1" equiv-text="this.list.selected.size"/> na selektovan(e) dokument(e).</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1264,7 +1264,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ova operacija će dodati oznake <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> na <x id="PH_1" equiv-text="this.list.selected.size"/> selektovan(e) dokument(e).</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1272,7 +1272,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tag "<x id="PH" equiv-text="tag.name"/>" from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ova operacija će obrisati oznaku "<x id="PH" equiv-text="tag.name"/>" iz <x id="PH_1" equiv-text="this.list.selected.size"/> selektovanih dokumenata.</target>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1280,7 +1280,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="needs-translation">This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</target>
+        <target state="translated">Ova operacija će obrisati oznake <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> iz <x id="PH_1" equiv-text="this.list.selected.size"/> selektovanih dokumenata.</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1848,7 +1848,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Create</target>
+        <target state="translated">Kreiraj</target>
       </trans-unit>
       <trans-unit id="4010735610815226758" datatype="html">
         <source>Filter by:</source>
@@ -1864,7 +1864,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Filter by:</target>
+        <target state="translated">Filtriraj po:</target>
       </trans-unit>
       <trans-unit id="1383365546483928780" datatype="html">
         <source>Matching</source>
@@ -1924,7 +1924,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Actions</target>
+        <target state="translated">Akcije</target>
       </trans-unit>
       <trans-unit id="7427874343955308724" datatype="html">
         <source>Do you really want to delete the correspondent &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -1976,7 +1976,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete this element?</target>
+        <target state="translated">Da li ste sigurni da želite da obrišete ovaj element?</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
@@ -2000,7 +2000,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">General settings</target>
+        <target state="translated">Opšta podešavanja</target>
       </trans-unit>
       <trans-unit id="8671234314555525900" datatype="html">
         <source>Appearance</source>
@@ -2008,7 +2008,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Appearance</target>
+        <target state="translated">Izglеd</target>
       </trans-unit>
       <trans-unit id="3777637051272512093" datatype="html">
         <source>Display language</source>
@@ -2032,7 +2032,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Date display</target>
+        <target state="translated">Prikaz datuma</target>
       </trans-unit>
       <trans-unit id="3733378544613473393" datatype="html">
         <source>Date format</source>
@@ -2040,7 +2040,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Date format</target>
+        <target state="translated">Format datuma</target>
       </trans-unit>
       <trans-unit id="3407788781115661841" datatype="html">
         <source>Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;shortDate&apos;:null:computedDateLocale}}"/></source>
@@ -2048,7 +2048,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Kratak: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="6290748171049664628" datatype="html">
         <source>Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;mediumDate&apos;:null:computedDateLocale}}"/></source>
@@ -2056,7 +2056,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Srednji: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="7189855711197998347" datatype="html">
         <source>Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;longDate&apos;:null:computedDateLocale}}"/></source>
@@ -2064,7 +2064,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Dugačak: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="8939587804990976924" datatype="html">
         <source>Items per page</source>
@@ -2112,7 +2112,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Use system settings</target>
+        <target state="translated">Koristi sistemska podešavanja</target>
       </trans-unit>
       <trans-unit id="5782828784040423650" datatype="html">
         <source>Enable dark mode</source>
@@ -2136,7 +2136,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Bulk editing</target>
+        <target state="translated">Grupno uređivanje</target>
       </trans-unit>
       <trans-unit id="8158899674926420054" datatype="html">
         <source>Show confirmation dialogs</source>
@@ -2240,7 +2240,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="needs-translation">Saved view "<x id="PH" equiv-text="savedView.name"/>" deleted.</target>
+        <target state="translated">Sačuvani pogled "<x id="PH" equiv-text="savedView.name"/>" je obrisan.</target>
       </trans-unit>
       <trans-unit id="5647210819299459618" datatype="html">
         <source>Settings saved successfully.</source>
@@ -2248,7 +2248,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">Settings saved successfully.</target>
+        <target state="translated">Podešavanja su uspešno sačuvana.</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html">
         <source>Use system language</source>
@@ -2256,7 +2256,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Use system language</target>
+        <target state="translated">Koristi sistemski jezik</target>
       </trans-unit>
       <trans-unit id="7729897675462249787" datatype="html">
         <source>Use date format of display language</source>
@@ -2308,7 +2308,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Create new tag</target>
+        <target state="translated">Kreiraj novu oznaku</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -2316,7 +2316,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Edit tag</target>
+        <target state="translated">Izmeni oznaku</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -2324,7 +2324,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the tag "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Da li stvarno želite da obrišete oznaku "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="181464970911903082" datatype="html">
         <source>404 Not Found</source>
@@ -2332,7 +2332,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">404 Not Found</target>
+        <target state="translated">404 Nije pronađeno</target>
       </trans-unit>
       <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
@@ -2340,7 +2340,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Any word</target>
+        <target state="translated">Bilo koja reč</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -2356,7 +2356,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">All words</target>
+        <target state="translated">Sve reči</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
