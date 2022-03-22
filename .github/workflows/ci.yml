@@ -164,6 +164,22 @@ jobs:
           cd src/
           pipenv run coveralls --service=github
 
+  tests-frontend:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cd src-ui && npm ci
+      - run: cd src-ui && npm run test
+      - run: cd src-ui && npm run e2e:ci
+
   # build and push image to docker hub.
   build-docker-image:
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
