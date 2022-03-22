@@ -579,13 +579,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         d3.tags.add(t2)
         d4 = Document.objects.create(
             checksum="4",
-            created=timezone.datetime(2020, 7, 13),
+            created=timezone.make_aware(datetime.datetime(2020, 7, 13)),
             content="test",
         )
         d4.tags.add(t2)
         d5 = Document.objects.create(
             checksum="5",
-            added=timezone.datetime(2020, 7, 13),
+            added=timezone.make_aware(datetime.datetime(2020, 7, 13)),
             content="test",
         )
         d6 = Document.objects.create(checksum="6", content="test2")
@@ -1897,21 +1897,21 @@ class TestBulkDownload(DirectoriesMixin, APITestCase):
             filename="docA.pdf",
             mime_type="application/pdf",
             checksum="B",
-            created=datetime.datetime(2021, 1, 1),
+            created=timezone.make_aware(datetime.datetime(2021, 1, 1)),
         )
         self.doc2b = Document.objects.create(
             title="document A",
             filename="docA2.pdf",
             mime_type="application/pdf",
             checksum="D",
-            created=datetime.datetime(2021, 1, 1),
+            created=timezone.make_aware(datetime.datetime(2021, 1, 1)),
         )
         self.doc3 = Document.objects.create(
             title="document B",
             filename="docB.jpg",
             mime_type="image/jpeg",
             checksum="C",
-            created=datetime.datetime(2020, 3, 21),
+            created=timezone.make_aware(datetime.datetime(2020, 3, 21)),
             archive_filename="docB.pdf",
             archive_checksum="D",
         )
