@@ -75,7 +75,7 @@ services:
       DISABLE_GOOGLE_CHROME: 1
 
   tika:
-    image: iwishiwasaneagle/apache-tika-arm
+    image: iwishiwasaneagle/apache-tika-arm@sha256:c1b16bcadcb97a08d47a09fc99bea4d47b63cec06bbf4f437b99c2c3b17181eb
     restart: unless-stopped
 
   media:
