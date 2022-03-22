@@ -3,6 +3,7 @@ import math
 import multiprocessing
 import os
 import re
+from typing import Final
 
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
@@ -29,12 +30,19 @@ elif os.path.exists("/usr/local/etc/paperless.conf"):
 os.environ["OMP_THREAD_LIMIT"] = "1"
 
 
-def __get_boolean(key, default="NO"):
+def __get_boolean(key: str, default: str = "NO") -> bool:
     """
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
     return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
+
+
+def __get_int(key: str, default: int) -> int:
+    """
+    Return an integer value based on the environment variable or a default
+    """
+    return int(os.getenv(key, default))
 
 
 # NEVER RUN WITH DEBUG IN PRODUCTION.
@@ -395,7 +403,7 @@ LOGGING = {
 # in total.
 
 
-def default_task_workers():
+def default_task_workers() -> int:
     # always leave one core open
     available_cores = max(multiprocessing.cpu_count(), 1)
     try:
@@ -406,20 +414,29 @@ def default_task_workers():
         return 1
 
 
-TASK_WORKERS = int(os.getenv("PAPERLESS_TASK_WORKERS", default_task_workers()))
+TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", default_task_workers())
+
+PAPERLESS_WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
+
+# Per django-q docs, timeout must be smaller than retry
+# We default retry to 10s more than the timeout
+PAPERLESS_WORKER_RETRY: Final[int] = __get_int(
+    "PAPERLESS_WORKER_RETRY",
+    PAPERLESS_WORKER_TIMEOUT + 10,
+)
 
 Q_CLUSTER = {
     "name": "paperless",
     "catch_up": False,
     "recycle": 1,
-    "retry": 1800,
-    "timeout": int(os.getenv("PAPERLESS_WORKER_TIMEOUT", 1800)),
+    "retry": PAPERLESS_WORKER_RETRY,
+    "timeout": PAPERLESS_WORKER_TIMEOUT,
     "workers": TASK_WORKERS,
     "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
 }
 
 
-def default_threads_per_worker(task_workers):
+def default_threads_per_worker(task_workers) -> int:
     # always leave one core open
     available_cores = max(multiprocessing.cpu_count(), 1)
     try:
