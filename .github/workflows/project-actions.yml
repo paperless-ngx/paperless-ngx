@@ -1,15 +1,18 @@
-name: Project automations
+name: Project Automations
+
 on:
   issues:
     types:
       - opened
       - reopened
-  pull_request:
+  pull_request_target: #_target allows access to secrets
     types:
       - opened
       - reopened
+    branches:
+      - main
+      - dev
 
-# map fields with customized labels
 env:
   todo: Todo
   done: Done
@@ -21,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
-      - name: Move issue to ${{ env.todo }}
+      - name: Set issue status to ${{ env.todo }}
         uses: leonsteinhaeuser/project-beta-automations@v1.2.1
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
@@ -29,12 +32,12 @@ jobs:
           project_id: 2
           resource_node_id: ${{ github.event.issue.node_id }}
           status_value: ${{ env.todo }} # Target status
-  pr_opened_or_reopened_or_reviewrequested:
-    name: pr_opened_or_reopened_or_reviewrequested
+  pr_opened_or_reopened:
+    name: pr_opened_or_reopened
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'review_requested')
+    if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
-      - name: Move PR to ${{ env.in_progress }}
+      - name: Set PR status to ${{ env.in_progress }}
         uses: leonsteinhaeuser/project-beta-automations@v1.2.1
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
