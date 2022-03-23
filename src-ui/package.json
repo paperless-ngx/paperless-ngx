@@ -9,7 +9,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "cy:run": "cypress run",
-    "e2e:ci": "concurrently \"npm run start\" \"wait-on http-get://localhost:4200 && npm run cy:run\" --kill-others --success first"
+    "e2e:ci": "concurrently 'npm run start' 'wait-on http-get://localhost:4200 && npm run cy:run' --kill-others --success first"
   },
   "private": true,
   "dependencies": {
