@@ -314,6 +314,7 @@ LANGUAGES = [
     ("ro-ro", _("Romanian")),
     ("ru-ru", _("Russian")),
     ("sl-si", _("Slovenian")),
+    ("sr-cs", _("Serbian")),
     ("sv-se", _("Swedish")),
     ("zh-cn", _("Chinese Simplified")),
 ]
