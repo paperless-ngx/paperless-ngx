@@ -5,31 +5,43 @@ import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { GenericListComponent } from '../generic-list/generic-list.component'
-import { TagEditDialogComponent } from './tag-edit-dialog/tag-edit-dialog.component'
+import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
   selector: 'app-tag-list',
-  templateUrl: './tag-list.component.html',
-  styleUrls: ['./tag-list.component.scss'],
+  templateUrl: './../management-list/management-list.component.html',
+  styleUrls: ['./../management-list/management-list.component.scss'],
 })
-export class TagListComponent extends GenericListComponent<PaperlessTag> {
+export class TagListComponent extends ManagementListComponent<PaperlessTag> {
   constructor(
     tagService: TagService,
     modalService: NgbModal,
-    private list: DocumentListViewService,
-    toastService: ToastService
+    toastService: ToastService,
+    list: DocumentListViewService
   ) {
-    super(tagService, modalService, TagEditDialogComponent, toastService)
+    super(
+      tagService,
+      modalService,
+      TagEditDialogComponent,
+      toastService,
+      list,
+      FILTER_HAS_TAGS_ALL,
+      $localize`tag`,
+      [
+        {
+          key: 'color',
+          name: $localize`Color`,
+          rendersHtml: true,
+          valueFn: (t: PaperlessTag) => {
+            return `<span class="badge" style="color: ${t.text_color}; background-color: ${t.color}">${t.color}</span>`
+          },
+        },
+      ]
+    )
   }
 
   getDeleteMessage(object: PaperlessTag) {
     return $localize`Do you really want to delete the tag "${object.name}"?`
-  }
-
-  filterDocuments(object: PaperlessTag) {
-    this.list.quickFilter([
-      { rule_type: FILTER_HAS_TAGS_ALL, value: object.id.toString() },
-    ])
   }
 }
