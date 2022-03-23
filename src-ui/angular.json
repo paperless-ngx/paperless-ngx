@@ -34,7 +34,7 @@
 					"sr-CS": "src/locale/messages.sr_CS.xlf",
 					"sv-SE": "src/locale/messages.sv_SE.xlf",
 					"zh-CN": "src/locale/messages.zh_CN.xlf"
-        }
+				}
 			},
 			"architect": {
 				"build": {
@@ -124,12 +124,9 @@
 					}
 				},
 				"test": {
-					"builder": "@angular-devkit/build-angular:karma",
+					"builder": "@angular-builders/jest:run",
 					"options": {
-						"main": "src/test.ts",
-						"polyfills": "src/polyfills.ts",
 						"tsConfig": "tsconfig.spec.json",
-						"karmaConfig": "karma.conf.js",
 						"assets": [
 							"src/favicon.ico",
 							"src/apple-touch-icon.png",
@@ -143,15 +140,34 @@
 					}
 				},
 				"e2e": {
-					"builder": "@angular-devkit/build-angular:protractor",
+					"builder": "@cypress/schematic:cypress",
 					"options": {
-						"protractorConfig": "e2e/protractor.conf.js",
+						"devServerTarget": "paperless-ui:serve",
+						"watch": true,
+						"headless": false
+					},
+					"configurations": {
+						"production": {
+							"devServerTarget": "paperless-ui:serve:production"
+						}
+					}
+				},
+				"cypress-run": {
+					"builder": "@cypress/schematic:cypress",
+					"options": {
 						"devServerTarget": "paperless-ui:serve"
 					},
 					"configurations": {
 						"production": {
 							"devServerTarget": "paperless-ui:serve:production"
 						}
+					}
+				},
+				"cypress-open": {
+					"builder": "@cypress/schematic:cypress",
+					"options": {
+						"watch": true,
+						"headless": false
 					}
 				}
 			}
