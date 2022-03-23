@@ -112,3 +112,23 @@ On Android, you can use these applications in combination with one of the :ref:`
 
 .. _hannahswain: https://github.com/hannahswain
 .. _benjaminfrank: https://github.com/benjaminfrank
+
+API Scanning Setup
+==================
+
+This sections contains information on how to set up scanners to post directly to :ref:`Paperless API <api-file_uploads>`.
+
+Doxie Q2
+--------
+
+This part assumes your Doxie is connected to WiFi and you know its IP.
+
+1. Open your Doxie web UI by navigating to its IP address
+2. Navigate to Options -> Webhook
+3. Set the *URL* to ``https://[your-paperless-ngx-instance]/api/documents/post_document/``
+4. Set the *File Parameter Name* to ``document``
+5. Add the username and password to the respective fields (Consider creating a user just for your Doxie)
+6. Click *Submit* at the bottom of the page
+
+Congrats, you can now scan directly from your Doxie to your Paperless-ngx instance!
+
