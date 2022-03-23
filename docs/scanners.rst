@@ -121,7 +121,7 @@ This sections contains information on how to set up scanners to post directly to
 Doxie Q2
 --------
 
-This part assumes your Doxie is connected to WiFi and you know it's IP.
+This part assumes your Doxie is connected to WiFi and you know its IP.
 
 1. Open your Doxie web UI by navigating to its IP address
 2. Navigate to Options -> Webhook
