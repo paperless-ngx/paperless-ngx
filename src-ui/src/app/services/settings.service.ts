@@ -259,6 +259,12 @@ export class SettingsService {
         dateInputFormat: 'dd.mm.yyyy',
       },
       {
+        code: 'sr-cs',
+        name: $localize`Serbian`,
+        englishName: 'Serbian',
+        dateInputFormat: 'dd.mm.yyyy',
+      },
+      {
         code: 'sv-se',
         name: $localize`Swedish`,
         englishName: 'Swedish',
