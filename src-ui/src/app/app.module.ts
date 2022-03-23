@@ -13,16 +13,16 @@ import { DocumentDetailComponent } from './components/document-detail/document-d
 import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { TagListComponent } from './components/manage/tag-list/tag-list.component'
 import { DocumentTypeListComponent } from './components/manage/document-type-list/document-type-list.component'
+import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { LogsComponent } from './components/manage/logs/logs.component'
 import { SettingsComponent } from './components/manage/settings/settings.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { DatePipe, registerLocaleData } from '@angular/common'
 import { NotFoundComponent } from './components/not-found/not-found.component'
-import { CorrespondentListComponent } from './components/manage/correspondent-list/correspondent-list.component'
 import { ConfirmDialogComponent } from './components/common/confirm-dialog/confirm-dialog.component'
-import { CorrespondentEditDialogComponent } from './components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component'
-import { TagEditDialogComponent } from './components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component'
-import { DocumentTypeEditDialogComponent } from './components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component'
+import { CorrespondentEditDialogComponent } from './components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { TagEditDialogComponent } from './components/common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from './components/common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
 import { TagComponent } from './components/common/tag/tag.component'
 import { PageHeaderComponent } from './components/common/page-header/page-header.component'
 import { AppFrameComponent } from './components/app-frame/app-frame.component'
@@ -58,7 +58,8 @@ import { MetadataCollapseComponent } from './components/document-detail/metadata
 import { SelectDialogComponent } from './components/common/select-dialog/select-dialog.component'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { NumberComponent } from './components/common/input/number/number.component'
-import { SafePipe } from './pipes/safe.pipe'
+import { SafeUrlPipe } from './pipes/safeurl.pipe'
+import { SafeHtmlPipe } from './pipes/safehtml.pipe'
 import { CustomDatePipe } from './pipes/custom-date.pipe'
 import { DateComponent } from './components/common/input/date/date.component'
 import { ISODateTimeAdapter } from './utils/ngb-iso-date-time-adapter'
@@ -112,8 +113,8 @@ registerLocaleData(localeZh)
     DocumentDetailComponent,
     DashboardComponent,
     TagListComponent,
-    CorrespondentListComponent,
     DocumentTypeListComponent,
+    CorrespondentListComponent,
     LogsComponent,
     SettingsComponent,
     NotFoundComponent,
@@ -150,7 +151,8 @@ registerLocaleData(localeZh)
     MetadataCollapseComponent,
     SelectDialogComponent,
     NumberComponent,
-    SafePipe,
+    SafeUrlPipe,
+    SafeHtmlPipe,
     CustomDatePipe,
     DateComponent,
     ColorComponent,

@@ -2,39 +2,48 @@ import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { FILTER_CORRESPONDENT } from 'src/app/data/filter-rule-type'
 import { PaperlessCorrespondent } from 'src/app/data/paperless-correspondent'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { GenericListComponent } from '../generic-list/generic-list.component'
-import { CorrespondentEditDialogComponent } from './correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
+import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
   selector: 'app-correspondent-list',
-  templateUrl: './correspondent-list.component.html',
-  styleUrls: ['./correspondent-list.component.scss'],
+  templateUrl: './../management-list/management-list.component.html',
+  styleUrls: ['./../management-list/management-list.component.scss'],
+  providers: [{ provide: CustomDatePipe }],
 })
-export class CorrespondentListComponent extends GenericListComponent<PaperlessCorrespondent> {
+export class CorrespondentListComponent extends ManagementListComponent<PaperlessCorrespondent> {
   constructor(
     correspondentsService: CorrespondentService,
     modalService: NgbModal,
-    private list: DocumentListViewService,
-    toastService: ToastService
+    toastService: ToastService,
+    list: DocumentListViewService,
+    private datePipe: CustomDatePipe
   ) {
     super(
       correspondentsService,
       modalService,
       CorrespondentEditDialogComponent,
-      toastService
+      toastService,
+      list,
+      FILTER_CORRESPONDENT,
+      $localize`correspondent`,
+      [
+        {
+          key: 'last_correspondence',
+          name: $localize`Last correspondence`,
+          valueFn: (c: PaperlessCorrespondent) => {
+            return this.datePipe.transform(c.last_correspondence)
+          },
+        },
+      ]
     )
   }
 
   getDeleteMessage(object: PaperlessCorrespondent) {
     return $localize`Do you really want to delete the correspondent "${object.name}"?`
-  }
-
-  filterDocuments(object: PaperlessCorrespondent) {
-    this.list.quickFilter([
-      { rule_type: FILTER_CORRESPONDENT, value: object.id.toString() },
-    ])
   }
 }

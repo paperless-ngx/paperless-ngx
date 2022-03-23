@@ -142,11 +142,11 @@
                             <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [render-text-mode]="2"></pdf-viewer>
                         </div>
                         <ng-template #nativePdfViewer>
-                            <object [data]="previewUrl | safe" class="preview-sticky" width="100%"></object>
+                            <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
                         </ng-template>
                     </ng-container>
                     <ng-container *ngIf="getContentType() == 'text/plain'">
-                        <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
+                        <object [data]="previewUrl | safeUrl" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
                     </ng-container>
                   </ng-template>
                 </li>
@@ -166,11 +166,11 @@
                 <pdf-viewer [src]="previewUrl" [original-size]="false" [show-borders]="true" [show-all]="true" [(page)]="previewCurrentPage" [render-text-mode]="2" (after-load-complete)="pdfPreviewLoaded($event)"></pdf-viewer>
             </div>
             <ng-template #nativePdfViewer>
-                <object [data]="previewUrl | safe" class="preview-sticky" width="100%"></object>
+                <object [data]="previewUrl | safeUrl" class="preview-sticky" width="100%"></object>
             </ng-template>
         </ng-container>
         <ng-container *ngIf="getContentType() == 'text/plain'">
-            <object [data]="previewUrl | safe" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
+            <object [data]="previewUrl | safeUrl" type="text/plain" class="preview-sticky bg-white" width="100%"></object>
         </ng-container>
     </div>
 </div>

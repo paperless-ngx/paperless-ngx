@@ -5,31 +5,34 @@ import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { GenericListComponent } from '../generic-list/generic-list.component'
-import { DocumentTypeEditDialogComponent } from './document-type-edit-dialog/document-type-edit-dialog.component'
+import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
+import { ManagementListComponent } from '../management-list/management-list.component'
 
 @Component({
   selector: 'app-document-type-list',
-  templateUrl: './document-type-list.component.html',
-  styleUrls: ['./document-type-list.component.scss'],
+  templateUrl: './../management-list/management-list.component.html',
+  styleUrls: ['./../management-list/management-list.component.scss'],
 })
-export class DocumentTypeListComponent extends GenericListComponent<PaperlessDocumentType> {
+export class DocumentTypeListComponent extends ManagementListComponent<PaperlessDocumentType> {
   constructor(
-    service: DocumentTypeService,
+    documentTypeService: DocumentTypeService,
     modalService: NgbModal,
-    private list: DocumentListViewService,
-    toastService: ToastService
+    toastService: ToastService,
+    list: DocumentListViewService
   ) {
-    super(service, modalService, DocumentTypeEditDialogComponent, toastService)
+    super(
+      documentTypeService,
+      modalService,
+      DocumentTypeEditDialogComponent,
+      toastService,
+      list,
+      FILTER_DOCUMENT_TYPE,
+      $localize`document type`,
+      []
+    )
   }
 
   getDeleteMessage(object: PaperlessDocumentType) {
     return $localize`Do you really want to delete the document type "${object.name}"?`
-  }
-
-  filterDocuments(object: PaperlessDocumentType) {
-    this.list.quickFilter([
-      { rule_type: FILTER_DOCUMENT_TYPE, value: object.id.toString() },
-    ])
   }
 }
