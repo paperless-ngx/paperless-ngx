@@ -1,5 +1,4 @@
 FROM python:3.5.1
-MAINTAINER Pit Kleyersburg <pitkley@googlemail.com>
 
 # Install Sphinx and Pygments
 RUN pip install Sphinx Pygments

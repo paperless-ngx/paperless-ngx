@@ -5,11 +5,11 @@ Frequently asked questions
 
 **Q:** *What's the general plan for Paperless-ngx?*
 
-**A:** While Paperless-ngx is already considered largely "feature-complete" it is a community-driven 
+**A:** While Paperless-ngx is already considered largely "feature-complete" it is a community-driven
 project and development will be guided in this way. New features can be submitted via
 GitHub discussions and "up-voted" by the community but this is not a garauntee the feature
 will be implemented. This project will always be open to collaboration in the form of PRs,
-ideas etc. 
+ideas etc.
 
 **Q:** *I'm using docker. Where are my documents?*
 
@@ -83,7 +83,7 @@ a long time.
 
 **Q:** *How do I run this on Unraid?*
 
-**A:** Paperless-ngx is available as `community app <https://unraid.net/community/apps?q=paperless-ngx>`_ 
+**A:** Paperless-ngx is available as `community app <https://unraid.net/community/apps?q=paperless-ngx>`_
 in Unraid. `Uli Fahrer <https://github.com/Tooa>`_ created a container template for that.
 
 **Q:** *How do I run this on my toaster?*
