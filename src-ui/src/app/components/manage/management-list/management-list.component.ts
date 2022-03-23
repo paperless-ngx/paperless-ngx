@@ -18,19 +18,34 @@ import {
   SortableDirective,
   SortEvent,
 } from 'src/app/directives/sortable.directive'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 
+export interface ManagementListColumn {
+  key: string
+
+  name: string
+
+  valueFn: any
+
+  rendersHtml?: boolean
+}
+
 @Directive()
-export abstract class GenericListComponent<T extends ObjectWithId>
+export abstract class ManagementListComponent<T extends ObjectWithId>
   implements OnInit, OnDestroy
 {
   constructor(
     private service: AbstractNameFilterService<T>,
     private modalService: NgbModal,
     private editDialogComponent: any,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private list: DocumentListViewService,
+    protected filterRuleType: number,
+    public typeName: string,
+    public extraColumns: ManagementListColumn[]
   ) {}
 
   @ViewChildren(SortableDirective) headers: QueryList<SortableDirective>
@@ -48,24 +63,6 @@ export abstract class GenericListComponent<T extends ObjectWithId>
   private subscription: Subscription
   private _nameFilter: string
 
-  getMatching(o: MatchingModel) {
-    if (o.matching_algorithm == MATCH_AUTO) {
-      return $localize`Automatic`
-    } else if (o.match && o.match.length > 0) {
-      return `${
-        MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
-      }: ${o.match}`
-    } else {
-      return '-'
-    }
-  }
-
-  onSort(event: SortEvent) {
-    this.sortField = event.column
-    this.sortReverse = event.reverse
-    this.reloadData()
-  }
-
   ngOnInit(): void {
     this.reloadData()
 
@@ -82,6 +79,24 @@ export abstract class GenericListComponent<T extends ObjectWithId>
 
   ngOnDestroy() {
     this.subscription.unsubscribe()
+  }
+
+  getMatching(o: MatchingModel) {
+    if (o.matching_algorithm == MATCH_AUTO) {
+      return $localize`Automatic`
+    } else if (o.match && o.match.length > 0) {
+      return `${
+        MATCHING_ALGORITHMS.find((a) => a.id == o.matching_algorithm).shortName
+      }: ${o.match}`
+    } else {
+      return '-'
+    }
+  }
+
+  onSort(event: SortEvent) {
+    this.sortField = event.column
+    this.sortReverse = event.reverse
+    this.reloadData()
   }
 
   reloadData() {
@@ -121,7 +136,13 @@ export abstract class GenericListComponent<T extends ObjectWithId>
   }
 
   getDeleteMessage(object: T) {
-    return $localize`Do you really want to delete this element?`
+    return $localize`Do you really want to delete the ${this.typeName}?`
+  }
+
+  filterDocuments(object: ObjectWithId) {
+    this.list.quickFilter([
+      { rule_type: this.filterRuleType, value: object.id.toString() },
+    ])
   }
 
   openDeleteDialog(object: T) {
