@@ -19,27 +19,27 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
   ) {}
 
   @Input()
-  dialogMode: string = 'create';
+  dialogMode: string = 'create'
 
   @Input()
-  object: T;
+  object: T
 
   @Output()
-  success = new EventEmitter();
+  success = new EventEmitter()
 
-  networkActive = false;
+  networkActive = false
 
-  closeEnabled = false;
+  closeEnabled = false
 
-  error = null;
+  error = null
 
-  abstract getForm(): FormGroup;
+  abstract getForm(): FormGroup
 
-  objectForm: FormGroup = this.getForm();
+  objectForm: FormGroup = this.getForm()
 
   ngOnInit(): void {
     if (this.object != null) {
-      this.objectForm.patchValue(this.object);
+      this.objectForm.patchValue(this.object)
     }
 
     // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
@@ -49,34 +49,34 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
   }
 
   getCreateTitle() {
-    return $localize`Create new item`;
+    return $localize`Create new item`
   }
 
   getEditTitle() {
-    return $localize`Edit item`;
+    return $localize`Edit item`
   }
 
   getSaveErrorMessage(error: string) {
-    return $localize`Could not save element: ${error}`;
+    return $localize`Could not save element: ${error}`
   }
 
   getTitle() {
     switch (this.dialogMode) {
       case 'create':
-        return this.getCreateTitle();
+        return this.getCreateTitle()
       case 'edit':
-        return this.getEditTitle();
+        return this.getEditTitle()
       default:
         break
     }
   }
 
   getMatchingAlgorithms() {
-    return MATCHING_ALGORITHMS;
+    return MATCHING_ALGORITHMS
   }
 
   get patternRequired(): boolean {
-    return this.objectForm?.value.matching_algorithm !== MATCH_AUTO;
+    return this.objectForm?.value.matching_algorithm !== MATCH_AUTO
   }
 
   save() {
@@ -90,7 +90,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
         serverResponse = this.service.create(newObject)
         break
       case 'edit':
-        serverResponse = this.service.update(newObject);
+        serverResponse = this.service.update(newObject)
       default:
         break
     }
@@ -108,6 +108,6 @@ export abstract class EditDialogComponent<T extends ObjectWithId>
   }
 
   cancel() {
-    this.activeModal.close();
+    this.activeModal.close()
   }
 }
