@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 for command in document_archiver document_exporter document_importer mail_fetcher document_create_classifier document_index document_renamer document_retagger document_thumbnails document_sanity_checker manage_superuser;
 do
 	echo "installing $command..."

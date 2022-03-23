@@ -42,4 +42,3 @@ Mobile support in the future? This kinda works, however some layouts are still
 too wide.
 
 .. image:: _static/screenshots/mobile.png
-
