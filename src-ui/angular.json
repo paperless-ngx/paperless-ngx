@@ -31,6 +31,7 @@
 					"ro-RO": "src/locale/messages.ro_RO.xlf",
 					"ru-RU": "src/locale/messages.ru_RU.xlf",
 					"sl-SI": "src/locale/messages.sl_SI.xlf",
+					"sr-CS": "src/locale/messages.sr_CS.xlf",
 					"sv-SE": "src/locale/messages.sv_SE.xlf",
 					"zh-CN": "src/locale/messages.zh_CN.xlf"
         }
