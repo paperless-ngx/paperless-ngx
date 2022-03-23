@@ -130,5 +130,5 @@ This part assumes your Doxie is connected to WiFi and you know its IP.
 5. Add the username and password to the respective fields (Consider creating a user just for your Doxie)
 6. Click *Submit* at the bottom of the page
 
-Congrats, you can now scan directly from your Doxie to your Paperless-ng instance!
+Congrats, you can now scan directly from your Doxie to your Paperless-ngx instance!
 
