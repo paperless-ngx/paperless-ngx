@@ -13,6 +13,8 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
 from documents.tests.utils import DirectoriesMixin
 
+from PIL import Image
+
 
 class TestTasks(DirectoriesMixin, TestCase):
     def test_index_reindex(self):
@@ -88,6 +90,15 @@ class TestTasks(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(settings.MODEL_FILE))
         mtime3 = os.stat(settings.MODEL_FILE).st_mtime
         self.assertNotEqual(mtime2, mtime3)
+
+    def test_barcode_reader(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t.pbm"
+        )
+        img = Image.open(test_file)
+        self.assertEqual(tasks.barcode_reader(img), ["b'PATCHT'"])
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_success(self, m):
