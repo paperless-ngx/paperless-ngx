@@ -20,11 +20,35 @@ describe('documents-list', () => {
   })
 
   it('should show a list of documents rendered as cards with thumbnails', () => {
-    cy.contains('One document')
+    cy.contains('3 documents')
     cy.contains('lorem-ipsum')
     cy.get('app-document-card-small:first-of-type img')
       .invoke('attr', 'src')
       .should('eq', 'http://localhost:8000/api/documents/1/thumb/')
+  })
+
+  it('should change to table "details" view', () => {
+    cy.get('div.btn-group-toggle input[value="details"]').parent().click()
+    cy.get('table')
+  })
+
+  it('should change to large cards view', () => {
+    cy.get('div.btn-group-toggle input[value="largeCards"]').parent().click()
+    cy.get('app-document-card-large')
+  })
+
+  it('should filter tags', () => {
+    // e.g. http://localhost:8000/api/documents/?page=1&page_size=50&ordering=-created&tags__id__all=2
+    cy.intercept('http://localhost:8000/api/documents/*', {
+      fixture: 'documents/documents_filtered.json',
+    })
+    cy.get('app-filter-editor app-filterable-dropdown[title="Tags"]').within(
+      () => {
+        cy.contains('button', 'Tags').click()
+        cy.contains('button', 'Tag 2').click()
+      }
+    )
+    cy.contains('One document')
   })
 
   it('should apply tags', () => {
