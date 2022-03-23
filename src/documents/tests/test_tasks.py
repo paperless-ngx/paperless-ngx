@@ -93,12 +93,42 @@ class TestTasks(DirectoriesMixin, TestCase):
 
     def test_barcode_reader(self):
         test_file = os.path.join(
-            os.path.dirname(__file__),
-            "samples",
-            "patch-code-t.pbm"
+            os.path.dirname(__file__), "samples", "patch-code-t.pbm"
         )
         img = Image.open(test_file)
         self.assertEqual(tasks.barcode_reader(img), ["b'PATCHT'"])
+
+    def test_barcode_reader2(self):
+        test_file = os.path.join(os.path.dirname(__file__), "samples", "simple.png")
+        img = Image.open(test_file)
+        self.assertEqual(tasks.barcode_reader(img), [])
+
+    def test_scan_file_for_seperating_barcodes(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__), "samples", "patch-code-t.pdf"
+        )
+        pages = tasks.scan_file_for_seperating_barcodes(test_file)
+        self.assertEqual(pages, [0])
+
+    def test_scan_file_for_seperating_barcodes2(self):
+        test_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
+        pages = tasks.scan_file_for_seperating_barcodes(test_file)
+        self.assertEqual(pages, [])
+
+    def test_scan_file_for_seperating_barcodes3(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf"
+        )
+        pages = tasks.scan_file_for_seperating_barcodes(test_file)
+        self.assertEqual(pages, [1])
+
+    def test_seperate_pages(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf"
+        )
+        pages = tasks.seperate_pages(test_file, [1])
+
+        self.assertEqual(len(pages), 2)
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_success(self, m):
