@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-24 16:26\n"
+"PO-Revision-Date: 2022-03-24 17:28\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -116,63 +116,63 @@ msgstr "içerik"
 
 #: documents/models.py:122
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Ham, dökümanin salt-metin olan verisi. Bu alan öncelikle arama için kullaniliyor."
 
 #: documents/models.py:127
 msgid "mime type"
-msgstr ""
+msgstr "mime türü"
 
 #: documents/models.py:134
 msgid "checksum"
-msgstr ""
+msgstr "sağlama toplamı"
 
 #: documents/models.py:138
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Orjianal dökümanın sağlama toplamı."
 
 #: documents/models.py:142
 msgid "archive checksum"
-msgstr ""
+msgstr "arşiv sağlama toplamı"
 
 #: documents/models.py:147
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Arşivlenen dökümanın sağlama toplamı."
 
 #: documents/models.py:150 documents/models.py:295
 msgid "created"
-msgstr ""
+msgstr "oluşturma"
 
 #: documents/models.py:153
 msgid "modified"
-msgstr ""
+msgstr "değiştirilmiş"
 
 #: documents/models.py:157
 msgid "storage type"
-msgstr ""
+msgstr "depolama türü"
 
 #: documents/models.py:165
 msgid "added"
-msgstr ""
+msgstr "eklendi"
 
 #: documents/models.py:169
 msgid "filename"
-msgstr ""
+msgstr "dosya adı"
 
 #: documents/models.py:175
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Depolamadaki geçerli dosya adı"
 
 #: documents/models.py:179
 msgid "archive filename"
-msgstr ""
+msgstr "arşiv dosya adı"
 
 #: documents/models.py:185
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Depolamadaki geçerli arşiv dosya adı"
 
 #: documents/models.py:189
 msgid "archive serial number"
-msgstr ""
+msgstr "arşiv seri numarası"
 
 #: documents/models.py:195
 msgid "The position of this document in your physical document archive."
