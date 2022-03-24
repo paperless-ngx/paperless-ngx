@@ -80,7 +80,7 @@ def barcode_reader(image) -> list:
     detected_barcodes = pyzbar.decode(image)
 
     if not detected_barcodes:
-        logger.debug(f"No barcode detected")
+        logger.debug("No barcode detected")
     else:
         # Traverse through all the detected barcodes in image
         for barcode in detected_barcodes:
@@ -124,7 +124,7 @@ def separate_pages(filepath: str, pages_to_split_on: list) -> list:
     # TODO: Get the directory of the file and save the other files there
     # TODO: Return list of new paths of the new files
     if len(pages_to_split_on) <= 0:
-        logger.warning(f"No pages to split on!")
+        logger.warning("No pages to split on!")
     else:
         # go from the first page to the first separator page
         dst = Pdf.new()
