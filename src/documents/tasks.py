@@ -22,6 +22,7 @@ from pyzbar import pyzbar
 from pdf2image import convert_from_path
 import tempfile
 from pikepdf import Pdf
+import shutil
 
 logger = logging.getLogger("paperless.tasks")
 
@@ -91,25 +92,25 @@ def barcode_reader(image) -> list:
     return barcodes
 
 
-def scan_file_for_seperating_barcodes(filepath: str) -> list:
+def scan_file_for_separating_barcodes(filepath: str) -> list:
     """
-    Scan the provided file for page seperating barcodes
-    Returns a list of pagenumbers, which seperate the file
+    Scan the provided file for page separating barcodes
+    Returns a list of pagenumbers, which separate the file
     """
-    seperator_page_numbers = []
+    separator_page_numbers = []
     # use a temporary directory in case the file os too big to handle in memory
     with tempfile.TemporaryDirectory() as path:
         pages_from_path = convert_from_path(filepath, output_folder=path)
         for current_page_number, page in enumerate(pages_from_path):
             current_barcodes = barcode_reader(page)
             if "b'PATCHT'" in current_barcodes:
-                seperator_page_numbers = seperator_page_numbers + [current_page_number]
-    return seperator_page_numbers
+                separator_page_numbers = separator_page_numbers + [current_page_number]
+    return separator_page_numbers
 
 
-def seperate_pages(filepath: str, pages_to_split_on: list) -> list:
+def separate_pages(filepath: str, pages_to_split_on: list) -> list:
     """
-    Seperate the provided file on the pages_to_split_on.
+    Separate the provided file on the pages_to_split_on.
     The pages which are defined by page_numbers will be removed.
     Returns a list of (temporary) filepaths to consume.
     These will need to be deleted later.
@@ -156,6 +157,14 @@ def seperate_pages(filepath: str, pages_to_split_on: list) -> list:
     logger.debug(f"Temp files are {str(document_paths)}")
     return document_paths
 
+def save_to_dir(filepath, target_dir=settings.CONSUMPTION_DIR):
+    """
+    Copies filepath to target_dir.
+    """
+    if os.path.isfile(filepath) and os.path.isdir(target_dir):
+        shutil.copy(filepath, target_dir)
+    else:
+        logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")
 
 def consume_file(
     path,
@@ -167,10 +176,10 @@ def consume_file(
     task_id=None,
 ):
 
-    # check for seperators in current document
-    seperator_page_numbers = scan_file_for_seperating_barcodes(path)
-    if seperator_page_numbers != []:
-        logger.debug(f"Pages with seperators found: {str(seperator_page_numbers)}")
+    # check for separators in current document
+    separator_page_numbers = scan_file_for_separating_barcodes(path)
+    if separator_page_numbers != []:
+        logger.debug(f"Pages with separators found: {str(separator_page_numbers)}")
 
     document = Consumer().try_consume_file(
         path,

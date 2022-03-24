@@ -14,6 +14,7 @@ from documents.sanity_checker import SanityCheckMessages
 from documents.tests.utils import DirectoriesMixin
 
 from PIL import Image
+import tempfile
 
 
 class TestTasks(DirectoriesMixin, TestCase):
@@ -103,32 +104,71 @@ class TestTasks(DirectoriesMixin, TestCase):
         img = Image.open(test_file)
         self.assertEqual(tasks.barcode_reader(img), [])
 
-    def test_scan_file_for_seperating_barcodes(self):
+    def test_scan_file_for_separating_barcodes(self):
         test_file = os.path.join(
             os.path.dirname(__file__), "samples", "patch-code-t.pdf"
         )
-        pages = tasks.scan_file_for_seperating_barcodes(test_file)
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
         self.assertEqual(pages, [0])
 
-    def test_scan_file_for_seperating_barcodes2(self):
+    def test_scan_file_for_separating_barcodes2(self):
         test_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
-        pages = tasks.scan_file_for_seperating_barcodes(test_file)
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
         self.assertEqual(pages, [])
 
-    def test_scan_file_for_seperating_barcodes3(self):
+    def test_scan_file_for_separating_barcodes3(self):
         test_file = os.path.join(
             os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf"
         )
-        pages = tasks.scan_file_for_seperating_barcodes(test_file)
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
         self.assertEqual(pages, [1])
 
-    def test_seperate_pages(self):
+    def test_separate_pages(self):
         test_file = os.path.join(
             os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf"
         )
-        pages = tasks.seperate_pages(test_file, [1])
-
+        pages = tasks.separate_pages(test_file, [1])
         self.assertEqual(len(pages), 2)
+
+    def test_save_to_dir(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__), "samples", "patch-code-t.pdf"
+        )
+        tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        tasks.save_to_dir(test_file, tempdir)
+        target_file = os.path.join(tempdir, "patch-code-t.pdf")
+        self.assertTrue(os.path.isfile(target_file))
+
+    def test_save_to_dir2(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__), "samples", "patch-code-t.pdf"
+        )
+        nonexistingdir = "/nowhere"
+        if not os.path.isdir(nonexistingdir):
+            with self.assertLogs("paperless.tasks", level="WARNING") as cm:
+                tasks.save_to_dir(test_file, nonexistingdir)
+            self.assertEqual(
+                cm.output,
+                [
+                    f"WARNING:paperless.tasks:{str(test_file)} or {str(nonexistingdir)} don't exist."
+                ],
+            )
+
+    def test_barcode_splitter(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf"
+        )
+        tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        separators = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertTrue(separators != [])
+        document_list = tasks.separate_pages(test_file, separators)
+        self.assertTrue(document_list != [])
+        for document in document_list:
+            tasks.save_to_dir(document, tempdir)
+        target_file1 = os.path.join(tempdir, "patch-code-t-middle_document_0.pdf")
+        target_file2 = os.path.join(tempdir, "patch-code-t-middle_document_1.pdf")
+        self.assertTrue(os.path.isfile(target_file1))
+        self.assertTrue(os.path.isfile(target_file2))
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_success(self, m):
