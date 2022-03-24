@@ -3,7 +3,7 @@ describe('settings', () => {
     this.modifiedViews = []
 
     // mock API methods
-    cy.fixture('settings/savedviews.json').then((savedViewsJson) => {
+    cy.fixture('saved_views/savedviews.json').then((savedViewsJson) => {
       // saved views PATCH
       cy.intercept(
         'PATCH',
