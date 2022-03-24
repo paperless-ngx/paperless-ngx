@@ -58,15 +58,15 @@ describe('documents-list', () => {
     })
 
     cy.intercept('http://localhost:8000/api/tags/*', {
-      fixture: 'documents/tags.json',
+      fixture: 'tags/tags.json',
     })
 
     cy.intercept('http://localhost:8000/api/correspondents/*', {
-      fixture: 'documents/correspondents.json',
+      fixture: 'correspondents/correspondents.json',
     })
 
     cy.intercept('http://localhost:8000/api/document_types/*', {
-      fixture: 'documents/doctypes.json',
+      fixture: 'document_types/doctypes.json',
     })
 
     cy.visit('/documents')
