@@ -1,6 +1,7 @@
-# docker-compose file for running paperless from the Docker Hub.
+# docker-compose file for running paperless from the docker container registry.
 # This file contains everything paperless needs to run.
-# Paperless supports amd64, arm and arm64 hardware.
+# Paperless supports amd64, arm and arm64 hardware. The apache/tika image
+# does not support arm or arm64, however.
 #
 # All compose files of paperless configure paperless in the following way:
 #
