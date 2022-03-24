@@ -21,6 +21,7 @@ from pdf2image import convert_from_path
 from pikepdf import Pdf
 from pyzbar import pyzbar
 from whoosh.writing import AsyncWriter
+
 # barcode decoder
 
 logger = logging.getLogger("paperless.tasks")
@@ -156,6 +157,7 @@ def separate_pages(filepath: str, pages_to_split_on: list) -> list:
     logger.debug(f"Temp files are {str(document_paths)}")
     return document_paths
 
+
 def save_to_dir(filepath, target_dir=settings.CONSUMPTION_DIR):
     """
     Copies filepath to target_dir.
@@ -164,6 +166,7 @@ def save_to_dir(filepath, target_dir=settings.CONSUMPTION_DIR):
         shutil.copy(filepath, target_dir)
     else:
         logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")
+
 
 def consume_file(
     path,

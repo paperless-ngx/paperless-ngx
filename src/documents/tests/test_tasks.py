@@ -93,7 +93,9 @@ class TestTasks(DirectoriesMixin, TestCase):
 
     def test_barcode_reader(self):
         test_file = os.path.join(
-            os.path.dirname(__file__), "samples", "patch-code-t.pbm",
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t.pbm",
         )
         img = Image.open(test_file)
         self.assertEqual(tasks.barcode_reader(img), ["b'PATCHT'"])
@@ -105,7 +107,9 @@ class TestTasks(DirectoriesMixin, TestCase):
 
     def test_scan_file_for_separating_barcodes(self):
         test_file = os.path.join(
-            os.path.dirname(__file__), "samples", "patch-code-t.pdf",
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t.pdf",
         )
         pages = tasks.scan_file_for_separating_barcodes(test_file)
         self.assertEqual(pages, [0])
@@ -117,21 +121,27 @@ class TestTasks(DirectoriesMixin, TestCase):
 
     def test_scan_file_for_separating_barcodes3(self):
         test_file = os.path.join(
-            os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf",
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t-middle.pdf",
         )
         pages = tasks.scan_file_for_separating_barcodes(test_file)
         self.assertEqual(pages, [1])
 
     def test_separate_pages(self):
         test_file = os.path.join(
-            os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf",
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t-middle.pdf",
         )
         pages = tasks.separate_pages(test_file, [1])
         self.assertEqual(len(pages), 2)
 
     def test_save_to_dir(self):
         test_file = os.path.join(
-            os.path.dirname(__file__), "samples", "patch-code-t.pdf",
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t.pdf",
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
         tasks.save_to_dir(test_file, tempdir)
@@ -140,7 +150,9 @@ class TestTasks(DirectoriesMixin, TestCase):
 
     def test_save_to_dir2(self):
         test_file = os.path.join(
-            os.path.dirname(__file__), "samples", "patch-code-t.pdf",
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t.pdf",
         )
         nonexistingdir = "/nowhere"
         if os.path.isdir(nonexistingdir):
@@ -157,7 +169,9 @@ class TestTasks(DirectoriesMixin, TestCase):
 
     def test_barcode_splitter(self):
         test_file = os.path.join(
-            os.path.dirname(__file__), "samples", "patch-code-t-middle.pdf",
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t-middle.pdf",
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
         separators = tasks.scan_file_for_separating_barcodes(test_file)
