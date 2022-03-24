@@ -25,11 +25,12 @@ describe('settings', () => {
         }
 
         req.reply(response)
-      })
+      }).as('savedViews')
     })
 
     cy.viewport(1024, 1024)
     cy.visit('/settings')
+    cy.wait('@savedViews')
   })
 
   it('should activate / deactivate save button when settings change and are saved', () => {
