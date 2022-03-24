@@ -81,3 +81,4 @@ services:
 volumes:
   data:
   media:
+  redisdata:
