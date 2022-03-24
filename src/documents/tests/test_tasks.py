@@ -1,4 +1,5 @@
 import os
+import tempfile
 from unittest import mock
 
 from django.conf import settings
@@ -12,9 +13,7 @@ from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
 from documents.tests.utils import DirectoriesMixin
-
 from PIL import Image
-import tempfile
 
 
 class TestTasks(DirectoriesMixin, TestCase):
