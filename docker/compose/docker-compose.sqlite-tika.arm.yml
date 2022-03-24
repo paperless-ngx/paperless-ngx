@@ -1,7 +1,6 @@
 # docker-compose file for running paperless from the docker container registry.
 # This file contains everything paperless needs to run.
-# Paperless supports amd64, arm and arm64 hardware. The apache/tika image
-# does not support arm or arm64, however.
+# Paperless supports amd64, arm and arm64 hardware.
 #
 # All compose files of paperless configure paperless in the following way:
 #
@@ -11,10 +10,14 @@
 #   as this file and mounted to the correct folders inside the container.
 # - Paperless listens on port 8000.
 #
+# SQLite is used as the database. The SQLite file is stored in the data volume.
+#
+# iwishiwasaneagle/apache-tika-arm docker image is used to enable arm64 arch
+# which apache/tika does not currently support.
+#
 # In addition to that, this docker-compose file adds the following optional
 # configurations:
 #
-# - Instead of SQLite (default), PostgreSQL is used as the database server.
 # - Apache Tika and Gotenberg servers are started with paperless and paperless
 #   is configured to use these services. These provide support for consuming
 #   Office documents (Word, Excel, Power Point and their LibreOffice counter-
@@ -39,21 +42,10 @@ services:
     volumes:
       - redisdata:/data
 
-  db:
-    image: postgres:13
-    restart: unless-stopped
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
-
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
-      - db
       - broker
       - gotenberg
       - tika
@@ -72,24 +64,21 @@ services:
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
-      PAPERLESS_DBHOST: db
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
 
   gotenberg:
-    image: gotenberg/gotenberg:7
+    image: thecodingmachine/gotenberg
     restart: unless-stopped
-    command:
-      - "gotenberg"
-      - "--chromium-disable-routes=true"
+    environment:
+      DISABLE_GOOGLE_CHROME: 1
 
   tika:
-    image: apache/tika
+    image: iwishiwasaneagle/apache-tika-arm@sha256:a78c25ffe57ecb1a194b2859d42a61af46e9e845191512b8f1a4bf90578ffdfd
     restart: unless-stopped
 
 volumes:
   data:
   media:
-  pgdata:
   redisdata:
