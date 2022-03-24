@@ -86,7 +86,7 @@ def barcode_reader(image) -> list:
             if barcode.data != "":
                 barcodes = barcodes + [str(barcode.data)]
                 logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {str(barcode.data)}"
+                    f"Barcode of type {str(barcode.type)} found: {str(barcode.data)}",
                 )
     return barcodes
 
