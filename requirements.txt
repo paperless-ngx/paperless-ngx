@@ -60,7 +60,7 @@ numpy==1.22.3; python_version >= '3.8'
 ocrmypdf==13.4.1
 packaging==21.3; python_version >= '3.6'
 pathvalidate==2.5.0
-pdfminer.six==20220319
+pdfminer.six==20211012
 pikepdf==5.0.1
 pillow==9.0.1
 pluggy==1.0.0; python_version >= '3.6'
