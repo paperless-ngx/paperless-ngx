@@ -1,4 +1,7 @@
 import logging
+import os
+import shutil
+import tempfile
 
 import tqdm
 from django.conf import settings
@@ -14,15 +17,11 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
-from whoosh.writing import AsyncWriter
-
-# barcode decoder
-import os
-from pyzbar import pyzbar
 from pdf2image import convert_from_path
-import tempfile
 from pikepdf import Pdf
-import shutil
+from pyzbar import pyzbar
+from whoosh.writing import AsyncWriter
+# barcode decoder
 
 logger = logging.getLogger("paperless.tasks")
 
