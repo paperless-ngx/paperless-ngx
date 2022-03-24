@@ -1,17 +1,70 @@
 describe('documents-list', () => {
   beforeEach(() => {
-    cy.intercept('http://localhost:8000/api/documents/*', {
-      fixture: 'documents/documents.json',
+    this.bulkEdits = {}
+
+    // mock API methods
+    cy.fixture('documents/documents.json').then((documentsJson) => {
+      // bulk edit
+      cy.intercept(
+        'POST',
+        'http://localhost:8000/api/documents/bulk_edit/',
+        (req) => {
+          this.bulkEdits = req.body // store this for later
+          req.reply({ result: 'OK' })
+        }
+      )
+
+      cy.intercept('GET', 'http://localhost:8000/api/documents/*', (req) => {
+        let response = { ...documentsJson }
+
+        // bulkEdits was set earlier by bulk_edit intercept
+        if (this.bulkEdits.hasOwnProperty('documents')) {
+          response.results = response.results.map((d) => {
+            if ((this.bulkEdits['documents'] as Array<number>).includes(d.id)) {
+              switch (this.bulkEdits['method']) {
+                case 'modify_tags':
+                  d.tags = (d.tags as Array<number>).concat([
+                    this.bulkEdits['parameters']['add_tags'],
+                  ])
+                  break
+                case 'set_correspondent':
+                  d.correspondent =
+                    this.bulkEdits['parameters']['correspondent']
+                  break
+                case 'set_document_type':
+                  d.document_type =
+                    this.bulkEdits['parameters']['document_type']
+                  break
+              }
+            }
+
+            return d
+          })
+        } else if (req.query.hasOwnProperty('tags__id__all')) {
+          // filtering e.g. http://localhost:8000/api/documents/?page=1&page_size=50&ordering=-created&tags__id__all=2
+          const tag_id = +req.query['tags__id__all']
+          response.results = (documentsJson.results as Array<any>).filter((d) =>
+            (d.tags as Array<number>).includes(tag_id)
+          )
+          response.count = response.results.length
+        }
+
+        req.reply(response)
+      })
     })
+
     cy.intercept('http://localhost:8000/api/documents/1/thumb/', {
       fixture: 'documents/lorem-ipsum.png',
     })
+
     cy.intercept('http://localhost:8000/api/tags/*', {
       fixture: 'documents/tags.json',
     })
+
     cy.intercept('http://localhost:8000/api/correspondents/*', {
       fixture: 'documents/correspondents.json',
     })
+
     cy.intercept('http://localhost:8000/api/document_types/*', {
       fixture: 'documents/doctypes.json',
     })
@@ -38,10 +91,6 @@ describe('documents-list', () => {
   })
 
   it('should filter tags', () => {
-    // e.g. http://localhost:8000/api/documents/?page=1&page_size=50&ordering=-created&tags__id__all=2
-    cy.intercept('http://localhost:8000/api/documents/*', {
-      fixture: 'documents/documents_filtered.json',
-    })
     cy.get('app-filter-editor app-filterable-dropdown[title="Tags"]').within(
       () => {
         cy.contains('button', 'Tags').click()
@@ -52,9 +101,6 @@ describe('documents-list', () => {
   })
 
   it('should apply tags', () => {
-    cy.intercept('http://localhost:8000/api/documents/*', {
-      fixture: 'documents/documents_saved.json',
-    })
     cy.get('app-document-card-small:first-of-type').click()
     cy.get('app-bulk-editor app-filterable-dropdown[title="Tags"]').within(
       () => {
@@ -68,9 +114,6 @@ describe('documents-list', () => {
   })
 
   it('should apply correspondent', () => {
-    cy.intercept('http://localhost:8000/api/documents/*', {
-      fixture: 'documents/documents_saved.json',
-    })
     cy.get('app-document-card-small:first-of-type').click()
     cy.get(
       'app-bulk-editor app-filterable-dropdown[title="Correspondent"]'
@@ -86,9 +129,6 @@ describe('documents-list', () => {
   })
 
   it('should apply document type', () => {
-    cy.intercept('http://localhost:8000/api/documents/*', {
-      fixture: 'documents/documents_saved.json',
-    })
     cy.get('app-document-card-small:first-of-type').click()
     cy.get(
       'app-bulk-editor app-filterable-dropdown[title="Document type"]'
