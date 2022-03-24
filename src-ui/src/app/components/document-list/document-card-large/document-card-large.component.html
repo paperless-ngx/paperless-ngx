@@ -51,7 +51,7 @@
               </svg>&nbsp;<span class="d-block d-md-inline" i18n>View</span>
             </a>
             <ng-template #previewContent>
-              <object [data]="previewUrl | safe" class="preview" width="100%"></object>
+              <object [data]="previewUrl | safeUrl" class="preview" width="100%"></object>
             </ng-template>
             <a class="btn btn-sm btn-outline-secondary" [href]="getDownloadUrl()">
               <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
