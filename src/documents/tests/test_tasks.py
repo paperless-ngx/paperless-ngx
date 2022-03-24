@@ -144,7 +144,9 @@ class TestTasks(DirectoriesMixin, TestCase):
             os.path.dirname(__file__), "samples", "patch-code-t.pdf"
         )
         nonexistingdir = "/nowhere"
-        if not os.path.isdir(nonexistingdir):
+        if os.path.isdir(nonexistingdir):
+            self.skipTest("non-existing dir exists")
+        else:
             with self.assertLogs("paperless.tasks", level="WARNING") as cm:
                 tasks.save_to_dir(test_file, nonexistingdir)
             self.assertEqual(
