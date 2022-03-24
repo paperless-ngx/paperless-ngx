@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-02 22:29\n"
+"PO-Revision-Date: 2022-03-24 18:56\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -378,7 +378,7 @@ msgstr "Тип файла %(type)s не поддерживается"
 
 #: documents/templates/index.html:22
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx загружается..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
@@ -422,11 +422,11 @@ msgstr "Английский (США)"
 
 #: paperless/settings.py:300
 msgid "Czech"
-msgstr ""
+msgstr "Чешский"
 
 #: paperless/settings.py:301
 msgid "Danish"
-msgstr ""
+msgstr "Датский"
 
 #: paperless/settings.py:302
 msgid "German"
@@ -446,7 +446,7 @@ msgstr "Французский"
 
 #: paperless/settings.py:306
 msgid "Italian"
-msgstr ""
+msgstr "Итальянский"
 
 #: paperless/settings.py:307
 msgid "Luxembourgish"
@@ -470,7 +470,7 @@ msgstr "Португальский"
 
 #: paperless/settings.py:312
 msgid "Romanian"
-msgstr ""
+msgstr "Румынский"
 
 #: paperless/settings.py:313
 msgid "Russian"
