@@ -1,10 +1,10 @@
 describe('documents-list', () => {
   beforeEach(() => {
     cy.intercept('http://localhost:8000/api/correspondents/*', {
-      fixture: 'manage/correspondents.json',
+      fixture: 'correspondents/correspondents.json',
     })
     cy.intercept('http://localhost:8000/api/tags/*', {
-      fixture: 'manage/tags.json',
+      fixture: 'tags/tags.json',
     })
   })
 
