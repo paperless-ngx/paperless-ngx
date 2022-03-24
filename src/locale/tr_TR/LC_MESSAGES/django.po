@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-24 15:27\n"
+"PO-Revision-Date: 2022-03-24 16:26\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -19,100 +19,100 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr ""
+msgstr "Dokümanlar"
 
 #: documents/models.py:32
 msgid "Any word"
-msgstr ""
+msgstr "Herhangi bir kelime"
 
 #: documents/models.py:33
 msgid "All words"
-msgstr ""
+msgstr "Tüm Kelimeler"
 
 #: documents/models.py:34
 msgid "Exact match"
-msgstr ""
+msgstr "Tam eşleşme"
 
 #: documents/models.py:35
 msgid "Regular expression"
-msgstr ""
+msgstr "Düzenli ifade"
 
 #: documents/models.py:36
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Fuzzy Kelime"
 
 #: documents/models.py:37
 msgid "Automatic"
-msgstr ""
+msgstr "Otomatik"
 
 #: documents/models.py:40 documents/models.py:314 paperless_mail/models.py:23
 #: paperless_mail/models.py:107
 msgid "name"
-msgstr ""
+msgstr "ad"
 
 #: documents/models.py:42
 msgid "match"
-msgstr ""
+msgstr "eşleme"
 
 #: documents/models.py:45
 msgid "matching algorithm"
-msgstr ""
+msgstr "eşleştirme algoritması"
 
 #: documents/models.py:48
 msgid "is insensitive"
-msgstr ""
+msgstr "duyarsızdır"
 
 #: documents/models.py:61 documents/models.py:104
 msgid "correspondent"
-msgstr ""
+msgstr "yazışan"
 
 #: documents/models.py:62
 msgid "correspondents"
-msgstr ""
+msgstr "yazışanlar"
 
 #: documents/models.py:67
 msgid "color"
-msgstr ""
+msgstr "renk"
 
 #: documents/models.py:70
 msgid "is inbox tag"
-msgstr ""
+msgstr "gelen kutu etiketidir"
 
 #: documents/models.py:73
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Bu etiketi, gelen kutusu etiketi olarak işaretle: Tüm yeni olarak tüketilen dökümanlar gelen kutusu etiketi ile etiketlendirileceklerdir."
 
 #: documents/models.py:79
 msgid "tag"
-msgstr ""
+msgstr "etiket"
 
 #: documents/models.py:80 documents/models.py:130
 msgid "tags"
-msgstr ""
+msgstr "etiketler"
 
 #: documents/models.py:85 documents/models.py:115
 msgid "document type"
-msgstr ""
+msgstr "döküman türü"
 
 #: documents/models.py:86
 msgid "document types"
-msgstr ""
+msgstr "doküman türleri"
 
 #: documents/models.py:94
 msgid "Unencrypted"
-msgstr ""
+msgstr "Şifresiz"
 
 #: documents/models.py:95
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "GNU Gizlilik Koruması (GNU Privacy Guard) ile şifrelendirilmiştir"
 
 #: documents/models.py:107
 msgid "title"
-msgstr ""
+msgstr "başlık"
 
 #: documents/models.py:119
 msgid "content"
-msgstr ""
+msgstr "içerik"
 
 #: documents/models.py:122
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
