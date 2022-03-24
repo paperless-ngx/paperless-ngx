@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-24 17:28\n"
+"PO-Revision-Date: 2022-03-24 22:50\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: documents/apps.py:10
 msgid "Documents"
-msgstr "Dokümanlar"
+msgstr "Belgeler"
 
 #: documents/models.py:32
 msgid "Any word"
@@ -92,11 +92,11 @@ msgstr "etiketler"
 
 #: documents/models.py:85 documents/models.py:115
 msgid "document type"
-msgstr "döküman türü"
+msgstr "belge türü"
 
 #: documents/models.py:86
 msgid "document types"
-msgstr "doküman türleri"
+msgstr "belge türleri"
 
 #: documents/models.py:94
 msgid "Unencrypted"
@@ -104,7 +104,7 @@ msgstr "Şifresiz"
 
 #: documents/models.py:95
 msgid "Encrypted with GNU Privacy Guard"
-msgstr "GNU Gizlilik Koruması (GNU Privacy Guard) ile şifrelendirilmiştir"
+msgstr "GNU Gizlilik Koruması ile şifrelendirilmiştir"
 
 #: documents/models.py:107
 msgid "title"
@@ -116,7 +116,7 @@ msgstr "içerik"
 
 #: documents/models.py:122
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr "Ham, dökümanin salt-metin olan verisi. Bu alan öncelikle arama için kullaniliyor."
+msgstr "Belgenin ham, yalnızca metin verileri. Bu alan öncelikle arama için kullanılır."
 
 #: documents/models.py:127
 msgid "mime type"
@@ -128,7 +128,7 @@ msgstr "sağlama toplamı"
 
 #: documents/models.py:138
 msgid "The checksum of the original document."
-msgstr "Orjianal dökümanın sağlama toplamı."
+msgstr "Orjinal belgenin sağlama toplamı."
 
 #: documents/models.py:142
 msgid "archive checksum"
@@ -136,11 +136,11 @@ msgstr "arşiv sağlama toplamı"
 
 #: documents/models.py:147
 msgid "The checksum of the archived document."
-msgstr "Arşivlenen dökümanın sağlama toplamı."
+msgstr "Arşivlenen belgenin sağlama toplamı."
 
 #: documents/models.py:150 documents/models.py:295
 msgid "created"
-msgstr "oluşturma"
+msgstr "oluşturuldu"
 
 #: documents/models.py:153
 msgid "modified"
@@ -176,23 +176,23 @@ msgstr "arşiv seri numarası"
 
 #: documents/models.py:195
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Bu belgenin fiziksel belge arşivinizdeki posizyonu."
 
 #: documents/models.py:201
 msgid "document"
-msgstr ""
+msgstr "belge"
 
 #: documents/models.py:202
 msgid "documents"
-msgstr ""
+msgstr "belgeler"
 
 #: documents/models.py:280
 msgid "debug"
-msgstr ""
+msgstr "hata ayıklama"
 
 #: documents/models.py:281
 msgid "information"
-msgstr ""
+msgstr "bilgi"
 
 #: documents/models.py:282
 msgid "warning"
