@@ -13,7 +13,7 @@
     <tbody>
       <tr *ngFor="let doc of documents" routerLink="/documents/{{doc.id}}">
         <td>{{doc.created | customDate}}</td>
-        <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1"></app-tag></td>
+        <td>{{doc.title | documentTitle}}<app-tag [tag]="t" *ngFor="let t of doc.tags$ | async" class="ms-1" (click)="clickTag(t); $event.stopPropagation();"></app-tag></td>
       </tr>
     </tbody>
   </table>
