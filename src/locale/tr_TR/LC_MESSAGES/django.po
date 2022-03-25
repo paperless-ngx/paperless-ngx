@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-24 23:51\n"
+"PO-Revision-Date: 2022-03-25 00:58\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -498,7 +498,7 @@ msgstr "Filtre"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr "Paperless yalnızca aşağıda verilen tüm filtrelerle eşleşen mailleri işler."
+msgstr "Paperless yalnızca aşağıda verilen TÜM filtrelerle eşleşen e-postalari işler."
 
 #: paperless_mail/admin.py:64
 msgid "Actions"
@@ -506,7 +506,7 @@ msgstr "Eylemler"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr "Eylem maile uygulandı. Bu eylem yalnızca belgeler mailden tüketildiğinde gerçekleştirilir. Eki olmayan maillere tamamen dokunulmayacaktır."
+msgstr "Eylem e-postaya uygulandı. Bu eylem yalnızca belgeler e-postadan tüketildiğinde gerçekleştirilir. Eki olmayan e-postalarına tamamen dokunulmayacaktır."
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
@@ -518,197 +518,197 @@ msgstr "Bu kuraldan tüketilen belgelere otomatik olarak meta veriler atayın. B
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless e-posta"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr ""
+msgstr "e-posta hesabı"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr ""
+msgstr "e-posta hesapları"
 
 #: paperless_mail/models.py:18
 msgid "No encryption"
-msgstr ""
+msgstr "Şifreleme yok"
 
 #: paperless_mail/models.py:19
 msgid "Use SSL"
-msgstr ""
+msgstr "SSL kullan"
 
 #: paperless_mail/models.py:20
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "STARTTLS kullan"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP sunucusu"
 
 #: paperless_mail/models.py:28
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP portu"
 
 #: paperless_mail/models.py:32
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Şifresiz ve STARTTLS bağlantılar için bu genellikle 143 dür ve SSL bağlantılar için 993 dür."
 
 #: paperless_mail/models.py:38
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP güvenliği"
 
 #: paperless_mail/models.py:41
 msgid "username"
-msgstr ""
+msgstr "kullanıcı adı"
 
 #: paperless_mail/models.py:43
 msgid "password"
-msgstr ""
+msgstr "şifre"
 
 #: paperless_mail/models.py:46
 msgid "character set"
-msgstr ""
+msgstr "karakter seti"
 
 #: paperless_mail/models.py:50
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "E-posta sunucusu ile iletişim kurulduğunda kullanılan 'UTF-8' veya 'US-ASCII' olan Karakter seti."
 
 #: paperless_mail/models.py:61
 msgid "mail rule"
-msgstr ""
+msgstr "e-posta kuralı"
 
 #: paperless_mail/models.py:62
 msgid "mail rules"
-msgstr ""
+msgstr "e-posta kuralları"
 
 #: paperless_mail/models.py:68
 msgid "Only process attachments."
-msgstr ""
+msgstr "Sadece ekleri işle."
 
 #: paperless_mail/models.py:71
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Tüm dosyaları işle, 'satır içi' ekletiler dahil."
 
 #: paperless_mail/models.py:81
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Okunmuş olarak işaretle, okunmuş e-postaları işleme"
 
 #: paperless_mail/models.py:82
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "E-Postayi etiketlendir, etiketlendirilmiş e-postaları işleme"
 
 #: paperless_mail/models.py:83
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Belirtilen klasöre taşı"
 
 #: paperless_mail/models.py:84
 msgid "Delete"
-msgstr ""
+msgstr "Sil"
 
 #: paperless_mail/models.py:91
 msgid "Use subject as title"
-msgstr ""
+msgstr "Konuyu başlık olarak kullan"
 
 #: paperless_mail/models.py:92
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Eklenti dosyanın ismini başlık olarak kullan"
 
 #: paperless_mail/models.py:101
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Muhabir atanma"
 
 #: paperless_mail/models.py:102
 msgid "Use mail address"
-msgstr ""
+msgstr "E-posta adresi kullan"
 
 #: paperless_mail/models.py:103
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "İsim kullan (veya yoksa e-posta adresini)"
 
 #: paperless_mail/models.py:104
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Aşağıdaki seçili olan muhabiri kullan"
 
 #: paperless_mail/models.py:109
 msgid "order"
-msgstr ""
+msgstr "sıra"
 
 #: paperless_mail/models.py:115
 msgid "account"
-msgstr ""
+msgstr "hesap"
 
 #: paperless_mail/models.py:119
 msgid "folder"
-msgstr ""
+msgstr "klasör"
 
 #: paperless_mail/models.py:122
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Alt klasörler noktalar ile ayrıştırılmalıdır."
 
 #: paperless_mail/models.py:126
 msgid "filter from"
-msgstr ""
+msgstr "den filtrele"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
-msgstr ""
+msgstr "konuyu filtrele"
 
 #: paperless_mail/models.py:132
 msgid "filter body"
-msgstr ""
+msgstr "içerik filtrele"
 
 #: paperless_mail/models.py:136
 msgid "filter attachment filename"
-msgstr ""
+msgstr "eklenti ismini filtrele"
 
 #: paperless_mail/models.py:141
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Yalnızca belirtilmişse bu dosya ismiyla tamamen eşleşen belgeleri tüket. *.pdf veya *fatura* gibi joker karakterlere izin verilir. Büyük küçük yazılımına duyarsız."
 
 #: paperless_mail/models.py:148
 msgid "maximum age"
-msgstr ""
+msgstr "yaş sınırı"
 
 #: paperless_mail/models.py:148
 msgid "Specified in days."
-msgstr ""
+msgstr "Gün olarak belirtilmiş."
 
 #: paperless_mail/models.py:152
 msgid "attachment type"
-msgstr ""
+msgstr "eklenti türü"
 
 #: paperless_mail/models.py:156
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Satır içi ekler katıştırılmış görüntüler içerir, bu nedenle bu seçeneği bir dosya adı filtresiyle birleştirmek en iyisidir."
 
 #: paperless_mail/models.py:162
 msgid "action"
-msgstr ""
+msgstr "eylem"
 
 #: paperless_mail/models.py:168
 msgid "action parameter"
-msgstr ""
+msgstr "eylem parametreleri"
 
 #: paperless_mail/models.py:173
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Yukarıda seçilen eylem için ek parametre, örneğin klasöre taşı eyleminin hedef klasörü gibi. Alt klasörler noktalarla ayrıştırılmalıdır."
 
 #: paperless_mail/models.py:181
 msgid "assign title from"
-msgstr ""
+msgstr "başlik atan"
 
 #: paperless_mail/models.py:189
 msgid "assign this tag"
-msgstr ""
+msgstr "bu etiketi atan"
 
 #: paperless_mail/models.py:197
 msgid "assign this document type"
-msgstr ""
+msgstr "bu dosya türünü atan"
 
 #: paperless_mail/models.py:201
 msgid "assign correspondent from"
-msgstr ""
+msgstr "muhabiri atan"
 
 #: paperless_mail/models.py:211
 msgid "assign this correspondent"
-msgstr ""
+msgstr "bu muhabiri atan"
 
