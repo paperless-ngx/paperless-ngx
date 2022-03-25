@@ -3,7 +3,7 @@ FROM node:16 AS compile-frontend
 COPY . /src
 
 WORKDIR /src/src-ui
-RUN npm update npm -g && npm install
+RUN npm update npm -g && npm ci --no-optional
 RUN ./node_modules/.bin/ng build --configuration production
 
 
