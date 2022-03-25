@@ -551,7 +551,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Created</target>
+        <target state="translated">Oluşturuldu</target>
       </trans-unit>
       <trans-unit id="5701618810648052610" datatype="html">
         <source>Title</source>
@@ -575,7 +575,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Title</target>
+        <target state="translated">Başlık</target>
       </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
@@ -583,7 +583,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Statistics</target>
+        <target state="translated">İstatistikler</target>
       </trans-unit>
       <trans-unit id="1171694977288479084" datatype="html">
         <source>Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></source>
@@ -591,7 +591,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
+        <target state="translated">Gelen kutusundaki belgeler: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
       </trans-unit>
       <trans-unit id="4207135462646354574" datatype="html">
         <source>Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></source>
@@ -599,7 +599,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
+        <target state="translated">Toplam belgeler: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
       </trans-unit>
       <trans-unit id="8187573012244728580" datatype="html">
         <source>Upload new documents</source>
@@ -607,7 +607,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Upload new documents</target>
+        <target state="translated">Yeni belge yükle</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
@@ -616,7 +616,7 @@
           <context context-type="linenumber">4</context>
         </context-group>
         <note priority="1" from="description">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
-        <target state="needs-translation">Dismiss completed</target>
+        <target state="translated">Bitmiş olanları gizle</target>
       </trans-unit>
       <trans-unit id="118343233500414755" datatype="html">
         <source>Drop documents here or</source>
