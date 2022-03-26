@@ -21,6 +21,8 @@ from pdf2image import convert_from_path
 from pikepdf import Pdf
 from pyzbar import pyzbar
 from whoosh.writing import AsyncWriter
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 # barcode decoder
 
@@ -121,8 +123,6 @@ def separate_pages(filepath: str, pages_to_split_on: list) -> list:
     pdf = Pdf.open(filepath)
     document_paths = []
     logger.debug(f"Temp dir is {str(tempdir)}")
-    # TODO: Get the directory of the file and save the other files there
-    # TODO: Return list of new paths of the new files
     if len(pages_to_split_on) <= 0:
         logger.warning("No pages to split on!")
     else:
@@ -158,12 +158,19 @@ def separate_pages(filepath: str, pages_to_split_on: list) -> list:
     return document_paths
 
 
-def save_to_dir(filepath, target_dir=settings.CONSUMPTION_DIR):
+def save_to_dir(filepath, newname=None, target_dir=settings.CONSUMPTION_DIR):
     """
     Copies filepath to target_dir.
+    Optionally rename the file.
     """
+    logger.debug(f"filepath: {str(filepath)}")
+    logger.debug(f"newname: {str(newname)}")
+    logger.debug(f"target_dir: {str(target_dir)}")
     if os.path.isfile(filepath) and os.path.isdir(target_dir):
-        shutil.copy(filepath, target_dir)
+        dst = shutil.copy(filepath, target_dir)
+        if newname:
+            dst_new = os.path.join(target_dir, newname)
+            os.rename(dst, dst_new)
     else:
         logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")
 
@@ -189,13 +196,29 @@ def consume_file(
     if document_list == []:
         pass
     else:
-        for document in document_list:
+        for n, document in enumerate(document_list):
             # save to consumption dir
-            save_to_dir(document)
+            # rename it to the original filename  with number prefix
+            newname = f"{str(n)}_" + override_filename
+            save_to_dir(document, newname=newname)
         # if we got here, the document was successfully split
         # and can safely be deleted
         logger.debug("Deleting file {}".format(path))
         os.unlink(path)
+        # notify the sender, otherwise the progress bar
+        # in the UI stays stuck
+        payload = {
+            "filename": override_filename,
+            "task_id": task_id,
+            "current_progress": 100,
+            "max_progress": 100,
+            "status": "SUCCESS",
+            "message": "finished"
+        }
+        async_to_sync(get_channel_layer().group_send)(
+            "status_updates",
+            {"type": "status_update", "data": payload},
+        )
         return "File successfully split"
 
     # continue with consumption if no barcode was found
