@@ -143,8 +143,8 @@ export class DocumentListViewService {
         activeListViewState.sortReverse,
         activeListViewState.filterRules
       )
-      .subscribe(
-        (result) => {
+      .subscribe({
+        next: (result) => {
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
@@ -153,7 +153,7 @@ export class DocumentListViewService {
           }
           this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
         },
-        (error) => {
+        error: (error) => {
           this.isReloading = false
           if (activeListViewState.currentPage != 1 && error.status == 404) {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
@@ -162,8 +162,8 @@ export class DocumentListViewService {
           } else {
             this.error = error.error
           }
-        }
-      )
+        },
+      })
   }
 
   set filterRules(filterRules: FilterRule[]) {
