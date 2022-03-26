@@ -588,6 +588,27 @@ PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>
 
     Defaults to false.
 
+PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
+    Enables the scanning and page separation based on detected barcodes.
+    This allows for scanning and adding multiple documents per uploaded
+    file, which are separated by one or multiple barcode pages.
+
+    For ease of use, it is suggested to use a standardized separation page,
+    e.g. `here <https://www.alliancegroup.co.uk/patch-codes.htm>`_.
+
+    If no barcodes are detected in the uploaded file, no page separation
+    will happen.
+
+    Defaults to true.
+
+
+PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
+  Defines the string to be detected as a separator barcode.
+  If paperless is used with the PATCH-T separator pages, users
+  shouldn't change this.
+
+  Defaults to "PATCHT"
+
 
 PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
     On smaller systems, or even in the case of Very Large Documents, the consumer
