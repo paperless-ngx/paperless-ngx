@@ -18,6 +18,7 @@ from django.db.models.functions import Lower
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
@@ -332,7 +333,7 @@ class DocumentViewSet(
             raise Http404()
 
     @action(methods=["get"], detail=True)
-    @cache_control(public=False, max_age=315360000)
+    @method_decorator(cache_control(public=False, max_age=315360000))
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)
