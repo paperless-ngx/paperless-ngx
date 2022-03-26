@@ -8,6 +8,8 @@ on:
     branches-ignore:
       - 'translations**'
   pull_request:
+    # We do not need synchronize event, it is covered by on:push
+    types: [opened, reopened]
     branches-ignore:
       - 'translations**'
 
@@ -18,13 +20,13 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Install pipenv
         run: pipx install pipenv
       -
         name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
           cache: "pipenv"
@@ -40,7 +42,7 @@ jobs:
           pipenv run make html
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: documentation
           path: docs/_build/html/
@@ -51,7 +53,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Install checkers
         run: |
@@ -91,8 +93,8 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
       -
@@ -115,7 +117,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
       -
@@ -123,7 +125,7 @@ jobs:
         run: pipx install pipenv
       -
         name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "${{ matrix.python-version }}"
           cache: "pipenv"
@@ -168,14 +170,14 @@ jobs:
   tests-frontend:
     needs: [code-checks-frontend]
     name: "Frontend Tests"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         node-version: [16.x]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - run: cd src-ui && npm ci
@@ -185,31 +187,23 @@ jobs:
   # build and push image to docker hub.
   build-docker-image:
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [tests-backend, tests-frontend]
     steps:
       -
-        name: Prepare
-        id: prepare
-        run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}
-          if [[ $GITHUB_REF == refs/tags/ngx-* ]]; then
-            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/tags/ngx-},${IMAGE_NAME}:latest
-            INSPECT_TAG=${IMAGE_NAME}:latest
-          elif [[ $GITHUB_REF == refs/tags/beta-* ]]; then
-            TAGS=${IMAGE_NAME}:beta
-            INSPECT_TAG=${TAGS}
-          elif [[ $GITHUB_REF == refs/heads/* ]]; then
-            TAGS=${IMAGE_NAME}:${GITHUB_REF#refs/heads/}
-            INSPECT_TAG=${TAGS}
-          else
-            exit 1
-          fi
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=inspect_tag::${INSPECT_TAG}
+        name: Gather Docker metadata
+        id: docker-meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ghcr.io/${{ github.repository }}/paperless-ngx
+          tags: |
+            type=match,pattern=ngx-(\d.\d.\d),group=1
+            type=semver,pattern=ngx-{{version}}
+            type=semver,pattern=ngx-{{major}}.{{minor}}
+            type=ref
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -230,22 +224,23 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
-          push: true
-          tags: ${{ steps.prepare.outputs.tags }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ steps.prepare.outputs.inspect_tag }}
+          docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
       -
         name: Export frontend artifact from docker
         run: |
-          docker run -d --name frontend-extract ${{ steps.prepare.outputs.inspect_tag }}
+          docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
           docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
       -
         name: Upload frontend artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
@@ -256,10 +251,10 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       -
@@ -271,13 +266,13 @@ jobs:
           pip3 install -r requirements.txt
       -
         name: Download frontend artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: frontend-compiled
           path: src/documents/static/frontend/
       -
         name: Download documentation artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: documentation
           path: docs/_build/html/
@@ -312,19 +307,19 @@ jobs:
           tar -cJf paperless-ngx.tar.xz paperless-ngx/
       -
         name: Upload release artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: release
           path: dist/paperless-ngx.tar.xz
 
   publish-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build-release
     if: contains(github.ref, 'refs/tags/ngx-') || contains(github.ref, 'refs/tags/beta-')
     steps:
       -
         name: Download release artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: release
           path: ./
