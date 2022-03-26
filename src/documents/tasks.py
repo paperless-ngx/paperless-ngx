@@ -4,6 +4,8 @@ import shutil
 import tempfile
 
 import tqdm
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db.models.signals import post_save
 from documents import index
@@ -21,8 +23,6 @@ from pdf2image import convert_from_path
 from pikepdf import Pdf
 from pyzbar import pyzbar
 from whoosh.writing import AsyncWriter
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 
 # barcode decoder
 
@@ -213,7 +213,7 @@ def consume_file(
             "current_progress": 100,
             "max_progress": 100,
             "status": "SUCCESS",
-            "message": "finished"
+            "message": "finished",
         }
         async_to_sync(get_channel_layer().group_send)(
             "status_updates",
