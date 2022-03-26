@@ -98,7 +98,8 @@ class TestTasks(DirectoriesMixin, TestCase):
             "patch-code-t.pbm",
         )
         img = Image.open(test_file)
-        self.assertEqual(tasks.barcode_reader(img), ["b'PATCHT'"])
+        separator_barcode = "b'" + str(settings.CONSUMER_BARCODE_STRING) + "'"
+        self.assertEqual(tasks.barcode_reader(img), [separator_barcode])
 
     def test_barcode_reader2(self):
         test_file = os.path.join(os.path.dirname(__file__), "samples", "simple.png")
