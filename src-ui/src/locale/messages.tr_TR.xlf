@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="ru">
+  <file source-language="en" datatype="plaintext" original="ng2.template" target-language="tr">
     <body>
-      <trans-unit id="9103526311244275943" datatype="html" approved="yes">
+      <trans-unit id="9103526311244275943" datatype="html">
         <source>Document added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="final">Документ добавлен</target>
+        <target state="translated">Belge eklendi</target>
       </trans-unit>
-      <trans-unit id="9204248378636247318" datatype="html" approved="yes">
+      <trans-unit id="9204248378636247318" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="final">Документ <x id="PH" equiv-text="status.filename"/> был добавлен в paperless.</target>
+        <target state="translated">Belge <x id="PH" equiv-text="status.filename"/> paperless'e eklendi.</target>
       </trans-unit>
-      <trans-unit id="1931214133925051574" datatype="html" approved="yes">
+      <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
@@ -28,31 +28,31 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="final">Открыть документ</target>
+        <target state="translated">Belgeyi aç</target>
       </trans-unit>
-      <trans-unit id="8582620835547864448" datatype="html" approved="yes">
+      <trans-unit id="8582620835547864448" datatype="html">
         <source>Could not add <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="final">Невозможно добавить <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
+        <target state="translated"><x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/> 'i ekliyemiyorum</target>
       </trans-unit>
-      <trans-unit id="1710712016675379662" datatype="html" approved="yes">
+      <trans-unit id="1710712016675379662" datatype="html">
         <source>New document detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="final">Обнаружен новый документ</target>
+        <target state="translated">Yeni belge algılandı</target>
       </trans-unit>
-      <trans-unit id="587031278561344416" datatype="html" approved="yes">
+      <trans-unit id="587031278561344416" datatype="html">
         <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="final">Документ <x id="PH" equiv-text="status.filename"/> обрабатывается paperless</target>
+        <target state="translated"><x id="PH" equiv-text="status.filename"/> adlı belge paperless tarafından işleniyor.</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -63,23 +63,23 @@
         <note priority="1" from="description">app title</note>
         <target state="translated">Paperless-ngx</target>
       </trans-unit>
-      <trans-unit id="7100953725264790651" datatype="html" approved="yes">
+      <trans-unit id="7100953725264790651" datatype="html">
         <source>Search documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="final">Поиск документов</target>
+        <target state="translated">Belgeleri Ara</target>
       </trans-unit>
-      <trans-unit id="2448391510242468907" datatype="html" approved="yes">
+      <trans-unit id="2448391510242468907" datatype="html">
         <source>Logged in as <x id="INTERPOLATION" equiv-text="{{displayName}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="final">Вошёл как <x id="INTERPOLATION" equiv-text="{{displayName}}"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{displayName}}"/> olarak oturum açıldı</target>
       </trans-unit>
-      <trans-unit id="4930506384627295710" datatype="html" approved="yes">
+      <trans-unit id="4930506384627295710" datatype="html">
         <source>Settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -93,17 +93,17 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Настройки</target>
+        <target state="translated">Ayarlar</target>
       </trans-unit>
-      <trans-unit id="3797778920049399855" datatype="html" approved="yes">
+      <trans-unit id="3797778920049399855" datatype="html">
         <source>Logout</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="final">Выход</target>
+        <target state="translated">Oturumu kapat</target>
       </trans-unit>
-      <trans-unit id="6570363013146073520" datatype="html" approved="yes">
+      <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -113,9 +113,9 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Главная</target>
+        <target state="translated">Kontrol Paneli</target>
       </trans-unit>
-      <trans-unit id="4733307402565258070" datatype="html" approved="yes">
+      <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -137,9 +137,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="final">Документы</target>
+        <target state="translated">Belgeler</target>
       </trans-unit>
-      <trans-unit id="472206565520537964" datatype="html" approved="yes">
+      <trans-unit id="472206565520537964" datatype="html">
         <source>Saved views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -149,33 +149,33 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">134</context>
         </context-group>
-        <target state="final">Представления</target>
+        <target state="translated">Kaydedilen görünümler</target>
       </trans-unit>
-      <trans-unit id="6988090220128974198" datatype="html" approved="yes">
+      <trans-unit id="6988090220128974198" datatype="html">
         <source>Open documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="final">Открыть документы</target>
+        <target state="translated">Belgeleri aç</target>
       </trans-unit>
-      <trans-unit id="5687256342387781369" datatype="html" approved="yes">
+      <trans-unit id="5687256342387781369" datatype="html">
         <source>Close all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">106</context>
         </context-group>
-        <target state="final">Закрыть всё</target>
+        <target state="translated">Tümünü kapat</target>
       </trans-unit>
-      <trans-unit id="3897348120591552265" datatype="html" approved="yes">
+      <trans-unit id="3897348120591552265" datatype="html">
         <source>Manage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="final">Управлять</target>
+        <target state="translated">Yönet</target>
       </trans-unit>
-      <trans-unit id="7437910965833684826" datatype="html" approved="yes">
+      <trans-unit id="7437910965833684826" datatype="html">
         <source>Correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -185,9 +185,9 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Корреспонденты</target>
+        <target state="translated">Muhabirler</target>
       </trans-unit>
-      <trans-unit id="7886570921510760899" datatype="html" approved="yes">
+      <trans-unit id="7886570921510760899" datatype="html">
         <source>Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -209,9 +209,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Теги</target>
+        <target state="translated">Etiketler</target>
       </trans-unit>
-      <trans-unit id="3079652255369035" datatype="html" approved="yes">
+      <trans-unit id="3079652255369035" datatype="html">
         <source>Document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -221,9 +221,9 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Типы документов</target>
+        <target state="translated">Belge türleri</target>
       </trans-unit>
-      <trans-unit id="4804785061014590286" datatype="html" approved="yes">
+      <trans-unit id="4804785061014590286" datatype="html">
         <source>Logs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
@@ -233,31 +233,31 @@
           <context context-type="sourcefile">src/app/components/manage/logs/logs.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Логи</target>
+        <target state="translated">Günlükler</target>
       </trans-unit>
-      <trans-unit id="5041354590769758251" datatype="html" approved="yes">
+      <trans-unit id="5041354590769758251" datatype="html">
         <source>Admin</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="final">Администрирование</target>
+        <target state="translated">Yönetici</target>
       </trans-unit>
-      <trans-unit id="314315645942131479" datatype="html" approved="yes">
+      <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">160</context>
         </context-group>
-        <target state="final">Информация</target>
+        <target state="translated">Bilgi</target>
       </trans-unit>
-      <trans-unit id="4895326106573044490" datatype="html" approved="yes">
+      <trans-unit id="4895326106573044490" datatype="html">
         <source>Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="final">Документация</target>
+        <target state="translated">Dökümantasyon</target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -265,17 +265,17 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">175</context>
         </context-group>
-        <target state="translated">GitHub</target>
+        <target state="translated">Github</target>
       </trans-unit>
-      <trans-unit id="5612903193691847840" datatype="html" approved="yes">
+      <trans-unit id="5612903193691847840" datatype="html">
         <source>Suggest an idea</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">181</context>
         </context-group>
-        <target state="final">Предложить идею</target>
+        <target state="translated">Bir fikir öner</target>
       </trans-unit>
-      <trans-unit id="2159130950882492111" datatype="html" approved="yes">
+      <trans-unit id="2159130950882492111" datatype="html">
         <source>Cancel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.html</context>
@@ -305,17 +305,17 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="final">Отменить</target>
+        <target state="translated">Vazgeç</target>
       </trans-unit>
-      <trans-unit id="1234709746630139322" datatype="html" approved="yes">
+      <trans-unit id="1234709746630139322" datatype="html">
         <source>Confirmation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="final">Подтверждение</target>
+        <target state="translated">Onayla</target>
       </trans-unit>
-      <trans-unit id="9178182467454450952" datatype="html" approved="yes">
+      <trans-unit id="9178182467454450952" datatype="html">
         <source>Confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.ts</context>
@@ -333,17 +333,17 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">189</context>
         </context-group>
-        <target state="final">Подтвердить</target>
+        <target state="translated">Onayla</target>
       </trans-unit>
-      <trans-unit id="6371576811194810854" datatype="html" approved="yes">
+      <trans-unit id="6371576811194810854" datatype="html">
         <source>After</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">После</target>
+        <target state="translated">Sonrası</target>
       </trans-unit>
-      <trans-unit id="8700121026680200191" datatype="html" approved="yes">
+      <trans-unit id="8700121026680200191" datatype="html">
         <source>Clear</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
@@ -353,79 +353,79 @@
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="final">Очистить</target>
+        <target state="translated">Temizle</target>
       </trans-unit>
-      <trans-unit id="1218334388194408974" datatype="html" approved="yes">
+      <trans-unit id="1218334388194408974" datatype="html">
         <source>Before</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="final">До</target>
+        <target state="translated">Öncesinde</target>
       </trans-unit>
-      <trans-unit id="4873149362496451858" datatype="html" approved="yes">
+      <trans-unit id="4873149362496451858" datatype="html">
         <source>Last 7 days</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="final">7 дней</target>
+        <target state="translated">Son 7 gün</target>
       </trans-unit>
-      <trans-unit id="4463380307954693363" datatype="html" approved="yes">
+      <trans-unit id="4463380307954693363" datatype="html">
         <source>Last month</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="final">Месяц</target>
+        <target state="translated">Geçen ay</target>
       </trans-unit>
-      <trans-unit id="8697368973702409683" datatype="html" approved="yes">
+      <trans-unit id="8697368973702409683" datatype="html">
         <source>Last 3 months</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="final">Три месяца</target>
+        <target state="translated">Son 3 ay</target>
       </trans-unit>
-      <trans-unit id="3566342898065860218" datatype="html" approved="yes">
+      <trans-unit id="3566342898065860218" datatype="html">
         <source>Last year</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/date-dropdown/date-dropdown.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="final">Год</target>
+        <target state="translated">Geçen yıl</target>
       </trans-unit>
-      <trans-unit id="4561076822163447092" datatype="html" approved="yes">
+      <trans-unit id="4561076822163447092" datatype="html">
         <source>Create new item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="final">Создать новый объект</target>
+        <target state="translated">Yeni Öğe Oluştur</target>
       </trans-unit>
-      <trans-unit id="5324147361912094446" datatype="html" approved="yes">
+      <trans-unit id="5324147361912094446" datatype="html">
         <source>Edit item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="final">Редактировать объект</target>
+        <target state="translated">Öğeyi Düzenle</target>
       </trans-unit>
-      <trans-unit id="1699589597032579396" datatype="html" approved="yes">
+      <trans-unit id="1699589597032579396" datatype="html">
         <source>Could not save element: <x id="PH" equiv-text="error"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/edit-dialog.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="final">Не могу сохранить элемент: <x id="PH" equiv-text="error"/></target>
+        <target state="translated"><x id="PH" equiv-text="error"/> olan öğeyi kayıt edemiyorum</target>
       </trans-unit>
-      <trans-unit id="4391289919356861627" datatype="html" approved="yes">
+      <trans-unit id="4391289919356861627" datatype="html">
         <source>Apply</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="final">Подтвердить</target>
+        <target state="translated">Uygula</target>
       </trans-unit>
       <trans-unit id="7780041345210191160" datatype="html">
         <source>Click again to exclude items.</source>
@@ -433,35 +433,35 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Click again to exclude items.</target>
+        <target state="translated">Öğeleri hariç tutmak için yeniden tıklatın.</target>
       </trans-unit>
-      <trans-unit id="7593728289020204896" datatype="html" approved="yes">
+      <trans-unit id="7593728289020204896" datatype="html">
         <source>Not assigned</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.ts</context>
           <context context-type="linenumber">209</context>
         </context-group>
         <note priority="1" from="description">Filter drop down element to filter for documents with no correspondent/type/tag assigned</note>
-        <target state="final">Не назначено</target>
+        <target state="translated">Atanmadı</target>
       </trans-unit>
-      <trans-unit id="445302259125375799" datatype="html" approved="yes">
+      <trans-unit id="445302259125375799" datatype="html">
         <source>Invalid date.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">Неверная дата.</target>
+        <target state="translated">Geçersiz tarih.</target>
       </trans-unit>
-      <trans-unit id="2722549756198502062" datatype="html" approved="yes">
+      <trans-unit id="2722549756198502062" datatype="html">
         <source>Add item</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">Used for both types and correspondents</note>
-        <target state="final">Добавить элемент</target>
+        <target state="translated">Öge ekle</target>
       </trans-unit>
-      <trans-unit id="524422427194414813" datatype="html" approved="yes">
+      <trans-unit id="524422427194414813" datatype="html">
         <source>Suggestions:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
@@ -471,17 +471,17 @@
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="final">Рекомендации:</target>
+        <target state="translated">Öneriler:</target>
       </trans-unit>
-      <trans-unit id="6560126119609945418" datatype="html" approved="yes">
+      <trans-unit id="6560126119609945418" datatype="html">
         <source>Add tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="final">Добавить тег</target>
+        <target state="translated">Etiket ekle</target>
       </trans-unit>
-      <trans-unit id="3797570084942068182" datatype="html" approved="yes">
+      <trans-unit id="3797570084942068182" datatype="html">
         <source>Select</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.html</context>
@@ -495,15 +495,15 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="final">Выбрать</target>
+        <target state="translated">Seç</target>
       </trans-unit>
-      <trans-unit id="7103181924469214926" datatype="html" approved="yes">
+      <trans-unit id="7103181924469214926" datatype="html">
         <source>Please select an object</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/select-dialog/select-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">Пожалуйста, выберите объект</target>
+        <target state="translated">Lütfen bir öğe seçin</target>
       </trans-unit>
       <trans-unit id="5412339817978503936" datatype="html">
         <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</source>
@@ -511,7 +511,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Привет, <x id="PH" equiv-text="this.displayName"/>, добро пожаловать в Paperless-ngx!</target>
+        <target state="translated"><x id="PH" equiv-text="this.displayName"/> merhaba, Paperless-ngx'e hoşgeldiniz!</target>
       </trans-unit>
       <trans-unit id="795745990148149834" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
@@ -519,9 +519,9 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="translated">Добро пожаловать в Paperless-ngx!</target>
+        <target state="translated">Paperless-ngx'e hoşgeldiniz!</target>
       </trans-unit>
-      <trans-unit id="2946624699882754313" datatype="html" approved="yes">
+      <trans-unit id="2946624699882754313" datatype="html">
         <source>Show all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
@@ -531,9 +531,9 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="final">Показать всё</target>
+        <target state="translated">Tümünü göster</target>
       </trans-unit>
-      <trans-unit id="4207916966377787111" datatype="html" approved="yes">
+      <trans-unit id="4207916966377787111" datatype="html">
         <source>Created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
@@ -551,9 +551,9 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">Создано</target>
+        <target state="translated">Oluşturuldu</target>
       </trans-unit>
-      <trans-unit id="5701618810648052610" datatype="html" approved="yes">
+      <trans-unit id="5701618810648052610" datatype="html">
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
@@ -575,97 +575,97 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="final">Заголовок</target>
+        <target state="translated">Başlık</target>
       </trans-unit>
-      <trans-unit id="1069523139277190436" datatype="html" approved="yes">
+      <trans-unit id="1069523139277190436" datatype="html">
         <source>Statistics</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Статистика</target>
+        <target state="translated">İstatistikler</target>
       </trans-unit>
-      <trans-unit id="1171694977288479084" datatype="html" approved="yes">
+      <trans-unit id="1171694977288479084" datatype="html">
         <source>Documents in inbox: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="final">Документов во входящих: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
+        <target state="translated">Gelen kutusundaki belgeler: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_inbox}}"/></target>
       </trans-unit>
-      <trans-unit id="4207135462646354574" datatype="html" approved="yes">
+      <trans-unit id="4207135462646354574" datatype="html">
         <source>Total documents: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="final">Всего документов: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
+        <target state="translated">Toplam belgeler: <x id="INTERPOLATION" equiv-text="{{statistics?.documents_total}}"/></target>
       </trans-unit>
-      <trans-unit id="8187573012244728580" datatype="html" approved="yes">
+      <trans-unit id="8187573012244728580" datatype="html">
         <source>Upload new documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Загрузить новые документы</target>
+        <target state="translated">Yeni belge yükle</target>
       </trans-unit>
-      <trans-unit id="1749180330008942007" datatype="html" approved="yes">
+      <trans-unit id="1749180330008942007" datatype="html">
         <source>Dismiss completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
         <note priority="1" from="description">This button dismisses all status messages about processed documents on the dashboard (failed and successful)</note>
-        <target state="final">Скрыть завершённые</target>
+        <target state="translated">Bitmiş olanları gizle</target>
       </trans-unit>
-      <trans-unit id="118343233500414755" datatype="html" approved="yes">
+      <trans-unit id="118343233500414755" datatype="html">
         <source>Drop documents here or</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">Перетащите документы или</target>
+        <target state="translated">Belgeleri buraya bırak</target>
       </trans-unit>
-      <trans-unit id="8133800334834354642" datatype="html" approved="yes">
+      <trans-unit id="8133800334834354642" datatype="html">
         <source>Browse files</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">Загрузите файлы</target>
+        <target state="translated">Dosyalara göz atın</target>
       </trans-unit>
-      <trans-unit id="2330646618997399019" datatype="html" approved="yes">
+      <trans-unit id="2330646618997399019" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One more document} other {<x id="INTERPOLATION"/> more documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
         <note priority="1" from="description">This is shown as a summary line when there are more than 5 document in the processing pipeline.</note>
-        <target state="final">{VAR_PLURAL, plural, =1 {Ещё документ: 1} other {Ещё документов: <x id="INTERPOLATION"/>}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Bir belge daha} other {<x id="INTERPOLATION"/> daha fazla belgel}}</target>
       </trans-unit>
-      <trans-unit id="6443586946875325554" datatype="html" approved="yes">
+      <trans-unit id="6443586946875325554" datatype="html">
         <source>Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="final">Обрабатываются: <x id="PH" equiv-text="countUploadingAndProcessing"/></target>
+        <target state="translated">Işleniyor: <x id="PH" equiv-text="countUploadingAndProcessing"/></target>
       </trans-unit>
-      <trans-unit id="9182918211699394982" datatype="html" approved="yes">
+      <trans-unit id="9182918211699394982" datatype="html">
         <source>Failed: <x id="PH" equiv-text="countFailed"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="final">Ошибка: <x id="PH" equiv-text="countFailed"/></target>
+        <target state="translated">Başarısız: <x id="PH" equiv-text="countFailed"/></target>
       </trans-unit>
-      <trans-unit id="534116346205124059" datatype="html" approved="yes">
+      <trans-unit id="534116346205124059" datatype="html">
         <source>Added: <x id="PH" equiv-text="countSuccess"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="final">Добавлено: <x id="PH" equiv-text="countSuccess"/></target>
+        <target state="translated">Eklenen: <x id="PH" equiv-text="countSuccess"/></target>
       </trans-unit>
       <trans-unit id="760986369763309193" datatype="html">
         <source>, </source>
@@ -678,105 +678,105 @@
           <context context-type="linenumber">117</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="needs-translation">, </target>
+        <target state="translated">, </target>
       </trans-unit>
-      <trans-unit id="3852289441366561594" datatype="html" approved="yes">
+      <trans-unit id="3852289441366561594" datatype="html">
         <source>Connecting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="final">Подключение...</target>
+        <target state="translated">Bağlaniyor...</target>
       </trans-unit>
-      <trans-unit id="1245343823699368872" datatype="html" approved="yes">
+      <trans-unit id="1245343823699368872" datatype="html">
         <source>Uploading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="final">Загрузка...</target>
+        <target state="translated">Yükleniyor...</target>
       </trans-unit>
-      <trans-unit id="7446520539098045935" datatype="html" approved="yes">
+      <trans-unit id="7446520539098045935" datatype="html">
         <source>Upload complete, waiting...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="final">Загрузка завершена, ждите...</target>
+        <target state="translated">Yükleme tamamlanmıştır, bekliyor...</target>
       </trans-unit>
-      <trans-unit id="1405142710727603568" datatype="html" approved="yes">
+      <trans-unit id="1405142710727603568" datatype="html">
         <source>HTTP error: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
           <context context-type="linenumber">136</context>
         </context-group>
-        <target state="final">Ошибка HTTP: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
+        <target state="translated">HTTP hatası: <x id="PH" equiv-text="error.status"/> <x id="PH_1" equiv-text="error.statusText"/></target>
       </trans-unit>
-      <trans-unit id="8522270084976549870" datatype="html" approved="yes">
+      <trans-unit id="8522270084976549870" datatype="html">
         <source>First steps</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Первые шаги</target>
+        <target state="translated">İlk adımlar</target>
       </trans-unit>
-      <trans-unit id="3028507502889531992" datatype="html" approved="yes">
+      <trans-unit id="3028507502889531992" datatype="html">
         <source>Paperless is running! :)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="final">Paperless запущен! ;)</target>
+        <target state="translated">Paperless çalışıyor! :)</target>
       </trans-unit>
-      <trans-unit id="3219476236085665313" datatype="html" approved="yes">
+      <trans-unit id="3219476236085665313" datatype="html">
         <source>You can start uploading documents by dropping them in the file upload box to the right or by dropping them in the configured consumption folder and they&apos;ll start showing up in the documents list. After you&apos;ve added some metadata to your documents, use the filtering mechanisms of paperless to create custom views (such as &apos;Recently added&apos;, &apos;Tagged TODO&apos;) and they will appear on the dashboard instead of this message.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="final">Вы можете загрузить документы, перетащив их на панель загрузки файлов справа, либо положив их в каталог, указанный в настройках. После обработки документы появятся в списке документов. После того, как вы добавите метаданные в свои документы, используйте безбумажные механизмы фильтрации для создания пользовательских представлений (таких как «Недавно добавленные», «Tagged TODO»), и они появятся здесь вместо этого сообщения.</target>
+        <target state="translated">Belgeleri, sağada bulunan dosya karşıya yükleme kutusuna bırakarak veya yapılandırılmış tüketim klasörüne bırakarak karşıya yüklemeye başlayabilirsiniz ve böylece belgeler listesinde görünmeye başlarlar. Belgelerinize bazı meta veriler ekledikten sonra, özel görünümler oluşturmak için paperless filtreleme mekanizmalarını kullanın ('Son eklenen', 'YAPILACAKLAR olarak etiketli' gibi) ve bunlar bu ileti yerine kontrol panosunda görünür.</target>
       </trans-unit>
-      <trans-unit id="3075670502036161287" datatype="html" approved="yes">
+      <trans-unit id="3075670502036161287" datatype="html">
         <source>Paperless offers some more features that try to make your life easier:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="final">Paperless предлагает больше возможностей, чтобы сделать вашу жизнь легче:</target>
+        <target state="translated">Paperless, hayatınızı kolaylaştırmaya çalışan bazı özellikler daha sunar:</target>
       </trans-unit>
-      <trans-unit id="5055533501472191663" datatype="html" approved="yes">
+      <trans-unit id="5055533501472191663" datatype="html">
         <source>Once you&apos;ve got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="final">После того, как вы добавите несколько документов в paperless и добавите к ним метаданные, paperless сможет автоматически назначать эти метаданные новым документам.</target>
+        <target state="translated">Paperless'e birkaç belge ve sonra bunlara da meta veriler ekledikten sonra, paperless bu meta verileri otomatik olarak yeni belgelere atayabilir.</target>
       </trans-unit>
-      <trans-unit id="1409400388362030038" datatype="html" approved="yes">
+      <trans-unit id="1409400388362030038" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="final">Вы можете настроить paperless на чтение ваших писем и добавление документов из прикрепленных файлов.</target>
+        <target state="translated">Paperless'i e-postalarınızı okuması için ve ekli dosyalardan belge ekleyecek şekilde yapılandırabilirsiniz.</target>
       </trans-unit>
-      <trans-unit id="7326108403480639438" datatype="html" approved="yes">
+      <trans-unit id="7326108403480639438" datatype="html">
         <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">Обратитесь к документации по использованию этих функций. Раздел "Использование" содержит общую информацию о работе с paperless.</target>
+        <target state="translated">Bu özelliklerin nasıl kullanılacağına ilişkin dökümentasyona bakın. Temel kullanım bölümünde, paperless'in genel kullanımın hakkında da ayrıntılı bilgiler vardır.</target>
       </trans-unit>
-      <trans-unit id="7822640317427130239" datatype="html" approved="yes">
+      <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="final">Поиск документа с asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="translated">Belgeyi asn <x id="INTERPOLATION" equiv-text="{{asn}}"/> ile arama</target>
       </trans-unit>
-      <trans-unit id="1407560924967345762" datatype="html" approved="yes">
+      <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -786,17 +786,17 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">Страница</target>
+        <target state="translated">Sayfa</target>
       </trans-unit>
-      <trans-unit id="2266163016683537825" datatype="html" approved="yes">
+      <trans-unit id="2266163016683537825" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="final">из <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
+        <target state="translated">/ <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
       </trans-unit>
-      <trans-unit id="7022070615528435141" datatype="html" approved="yes">
+      <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -826,9 +826,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="final">Удалить</target>
+        <target state="translated">Sil</target>
       </trans-unit>
-      <trans-unit id="3099741642167775297" datatype="html" approved="yes">
+      <trans-unit id="3099741642167775297" datatype="html">
         <source>Download</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -846,17 +846,17 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="final">Скачать</target>
+        <target state="translated">İndir</target>
       </trans-unit>
-      <trans-unit id="8659635229098859487" datatype="html" approved="yes">
+      <trans-unit id="8659635229098859487" datatype="html">
         <source>Download original</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">Скачать оригинал</target>
+        <target state="translated">Orijinal Dosyayı İndir</target>
       </trans-unit>
-      <trans-unit id="1418444397960583910" datatype="html" approved="yes">
+      <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -866,41 +866,41 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="final">Больше похожих</target>
+        <target state="translated">Buna benzer daha</target>
       </trans-unit>
-      <trans-unit id="7819314041543176992" datatype="html" approved="yes">
+      <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="final">Закрыть</target>
+        <target state="translated">Kapat</target>
       </trans-unit>
-      <trans-unit id="5028777105388019087" datatype="html" approved="yes">
+      <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="final">Детали</target>
+        <target state="translated">Ayrıntılar</target>
       </trans-unit>
-      <trans-unit id="1379170675585571971" datatype="html" approved="yes">
+      <trans-unit id="1379170675585571971" datatype="html">
         <source>Archive serial number</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="final">Архивный номер (АН)</target>
+        <target state="translated">Arşiv seri numarası</target>
       </trans-unit>
-      <trans-unit id="5114742157723900905" datatype="html" approved="yes">
+      <trans-unit id="5114742157723900905" datatype="html">
         <source>Date created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="final">Дата создания</target>
+        <target state="translated">Oluşturma tarihi</target>
       </trans-unit>
-      <trans-unit id="2691296884221415710" datatype="html" approved="yes">
+      <trans-unit id="2691296884221415710" datatype="html">
         <source>Correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -922,9 +922,9 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="final">Корреспондент</target>
+        <target state="translated">Muhabir</target>
       </trans-unit>
-      <trans-unit id="5066119607229701477" datatype="html" approved="yes">
+      <trans-unit id="5066119607229701477" datatype="html">
         <source>Document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -946,17 +946,17 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="final">Тип документа</target>
+        <target state="translated">Belge türü</target>
       </trans-unit>
-      <trans-unit id="6205355627445317276" datatype="html" approved="yes">
+      <trans-unit id="6205355627445317276" datatype="html">
         <source>Content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="final">Содержимое</target>
+        <target state="translated">Içerik</target>
       </trans-unit>
-      <trans-unit id="218403386307979629" datatype="html" approved="yes">
+      <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -966,105 +966,105 @@
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="final">Метаданные</target>
+        <target state="translated">Metaveri</target>
       </trans-unit>
-      <trans-unit id="1826652001816486190" datatype="html" approved="yes">
+      <trans-unit id="1826652001816486190" datatype="html">
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="final">Дата изменения</target>
+        <target state="translated">Değiştirilme tarihi</target>
       </trans-unit>
-      <trans-unit id="6392918669949841614" datatype="html" approved="yes">
+      <trans-unit id="6392918669949841614" datatype="html">
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="final">Дата добавления</target>
+        <target state="translated">Ekleme tarihi</target>
       </trans-unit>
-      <trans-unit id="146828917013192897" datatype="html" approved="yes">
+      <trans-unit id="146828917013192897" datatype="html">
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="final">Имя файла</target>
+        <target state="translated">Medya dosya ismi</target>
       </trans-unit>
-      <trans-unit id="7985558498848210210" datatype="html" approved="yes">
+      <trans-unit id="7985558498848210210" datatype="html">
         <source>Original MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="final">Оригинальная MD5 сумма</target>
+        <target state="translated">Orijinal MD5 sağlama toplamı</target>
       </trans-unit>
-      <trans-unit id="5888243105821763422" datatype="html" approved="yes">
+      <trans-unit id="5888243105821763422" datatype="html">
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="final">Размер оригинального файла</target>
+        <target state="translated">Orijinal dosya boyutu</target>
       </trans-unit>
-      <trans-unit id="2696647325713149563" datatype="html" approved="yes">
+      <trans-unit id="2696647325713149563" datatype="html">
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="final">Оригинальный MIME тип</target>
+        <target state="translated">Orijinal mime türü</target>
       </trans-unit>
-      <trans-unit id="342875990758166588" datatype="html" approved="yes">
+      <trans-unit id="342875990758166588" datatype="html">
         <source>Archive MD5 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="final">MD5 сумма архива</target>
+        <target state="translated">Arşiv MD5 sağlama toplamı</target>
       </trans-unit>
-      <trans-unit id="6033581412811562084" datatype="html" approved="yes">
+      <trans-unit id="6033581412811562084" datatype="html">
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="final">Размер архива</target>
+        <target state="translated">Arşiv dosya boyutu</target>
       </trans-unit>
-      <trans-unit id="6992781481378431874" datatype="html" approved="yes">
+      <trans-unit id="6992781481378431874" datatype="html">
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="final">Метаданные оригинального документа</target>
+        <target state="translated">Orijinal belge meta verisi</target>
       </trans-unit>
-      <trans-unit id="2846565152091361585" datatype="html" approved="yes">
+      <trans-unit id="2846565152091361585" datatype="html">
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="final">Метаданные архивного документа</target>
+        <target state="translated">Arşivlenen belge meta verileri</target>
       </trans-unit>
-      <trans-unit id="3823219296477075982" datatype="html" approved="yes">
+      <trans-unit id="3823219296477075982" datatype="html">
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="final">Отменить</target>
+        <target state="translated">Gözardı et</target>
       </trans-unit>
-      <trans-unit id="5129524307369213584" datatype="html" approved="yes">
+      <trans-unit id="5129524307369213584" datatype="html">
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="final">Сохранить &amp; следующий</target>
+        <target state="translated">Kaydet &amp; sonraki</target>
       </trans-unit>
-      <trans-unit id="3768927257183755959" datatype="html" approved="yes">
+      <trans-unit id="3768927257183755959" datatype="html">
         <source>Save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -1090,9 +1090,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="final">Сохранить</target>
+        <target state="translated">Kaydet</target>
       </trans-unit>
-      <trans-unit id="9021887951960049161" datatype="html" approved="yes">
+      <trans-unit id="9021887951960049161" datatype="html">
         <source>Confirm delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -1102,65 +1102,65 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
-        <target state="final">Подтвердите удаление</target>
+        <target state="translated">Silmeyi onayla</target>
       </trans-unit>
-      <trans-unit id="5382975254277698192" datatype="html" approved="yes">
+      <trans-unit id="5382975254277698192" datatype="html">
         <source>Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="final">Вы действительно хотите удалить документ "<x id="PH" equiv-text="this.document.title"/>"?</target>
+        <target state="translated">"<x id="PH" equiv-text="this.document.title"/>" olan belgeyi gerçekten silmek istiyormusunuz?</target>
       </trans-unit>
-      <trans-unit id="6691075929777935948" datatype="html" approved="yes">
+      <trans-unit id="6691075929777935948" datatype="html">
         <source>The files for this document will be deleted permanently. This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">269</context>
         </context-group>
-        <target state="final">Файлы из этого документа будут удалены незамедлительно. Это операцию нельзя отменить.</target>
+        <target state="translated">Bu belgeye ait dosyalar kalıcı olarak siliniecektir. Bu işlem geri alınamaz.</target>
       </trans-unit>
-      <trans-unit id="719892092227206532" datatype="html" approved="yes">
+      <trans-unit id="719892092227206532" datatype="html">
         <source>Delete document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">271</context>
         </context-group>
-        <target state="final">Удалить документ</target>
+        <target state="translated">Belgeyi sil</target>
       </trans-unit>
-      <trans-unit id="1844801255494293730" datatype="html" approved="yes">
+      <trans-unit id="1844801255494293730" datatype="html">
         <source>Error deleting document: <x id="PH" equiv-text="JSON.stringify(error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">281</context>
         </context-group>
-        <target state="final">Ошибка удаления документа: <x id="PH" equiv-text="JSON.stringify(error)"/></target>
+        <target state="translated"><x id="PH" equiv-text="JSON.stringify(error)"/> belgeyi silerken hata</target>
       </trans-unit>
-      <trans-unit id="6857598786757174736" datatype="html" approved="yes">
+      <trans-unit id="6857598786757174736" datatype="html">
         <source>Select:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="final">Выбрано:</target>
+        <target state="translated">Seç:</target>
       </trans-unit>
-      <trans-unit id="1616102757855967475" datatype="html" approved="yes">
+      <trans-unit id="1616102757855967475" datatype="html">
         <source>All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="final">Все</target>
+        <target state="translated">Tümü</target>
       </trans-unit>
-      <trans-unit id="6299008920007331381" datatype="html" approved="yes">
+      <trans-unit id="6299008920007331381" datatype="html">
         <source>Edit:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="final">Редактировать:</target>
+        <target state="translated">Düzenle:</target>
       </trans-unit>
-      <trans-unit id="7001227209911602786" datatype="html" approved="yes">
+      <trans-unit id="7001227209911602786" datatype="html">
         <source>Filter tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1170,9 +1170,9 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="final">Фильтр тегов</target>
+        <target state="translated">Etiketlere göre filtrele</target>
       </trans-unit>
-      <trans-unit id="184185893993764098" datatype="html" approved="yes">
+      <trans-unit id="184185893993764098" datatype="html">
         <source>Filter correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1182,9 +1182,9 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="final">Фильтр корреспондентов</target>
+        <target state="translated">Muhabire göre filtrele</target>
       </trans-unit>
-      <trans-unit id="2947613869920454977" datatype="html" approved="yes">
+      <trans-unit id="2947613869920454977" datatype="html">
         <source>Filter document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1194,23 +1194,23 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="final">Фильтр типа документов</target>
+        <target state="translated">Belge türlerini göre filtrele</target>
       </trans-unit>
-      <trans-unit id="6224229575087660549" datatype="html" approved="yes">
+      <trans-unit id="6224229575087660549" datatype="html">
         <source>Download originals</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="final">Скачать оригиналы</target>
+        <target state="translated">Orijinaleri indir</target>
       </trans-unit>
-      <trans-unit id="7985804062689412812" datatype="html" approved="yes">
+      <trans-unit id="7985804062689412812" datatype="html">
         <source>Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="final">Ошибка выполнения массовой операции: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated"><x id="PH" equiv-text="JSON.stringify(error.error)"/> yığın işlem sırasında hata</target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
@@ -1222,155 +1222,155 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">"<x id="PH" equiv-text="items[0].name"/>"</target>
+        <target state="translated">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
-      <trans-unit id="8639884465898458690" datatype="html" approved="yes">
+      <trans-unit id="8639884465898458690" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
-        <target state="final">"<x id="PH" equiv-text="items[0].name"/>" и "<x id="PH_1" equiv-text="items[1].name"/>"</target>
+        <target state="translated">"<x id="PH" equiv-text="items[0].name"/>" ve "<x id="PH_1" equiv-text="items[1].name"/>"</target>
       </trans-unit>
-      <trans-unit id="1822679894391095557" datatype="html" approved="yes">
+      <trans-unit id="1822679894391095557" datatype="html">
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">118</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
-        <target state="final"><x id="PH" equiv-text="list"/> и "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
+        <target state="translated"><x id="PH" equiv-text="list"/> ve "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
       </trans-unit>
-      <trans-unit id="4137232459980262849" datatype="html" approved="yes">
+      <trans-unit id="4137232459980262849" datatype="html">
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="final">Подтвердить применяемый тег</target>
+        <target state="translated">Etiket atanmayi doğrulayın</target>
       </trans-unit>
-      <trans-unit id="6619516195038467207" datatype="html" approved="yes">
+      <trans-unit id="6619516195038467207" datatype="html">
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="final">Эта операция добавит тег "<x id="PH" equiv-text="tag.name"/>" выбранным документам <x id="PH_1" equiv-text="this.list.selected.size"/>.</target>
+        <target state="translated">Bu işlem "<x id="PH" equiv-text="tag.name"/>" etiketini <x id="PH_1" equiv-text="this.list.selected.size"/> seçili belge(ye/lere) ekliyecektir.</target>
       </trans-unit>
-      <trans-unit id="1894412783609570695" datatype="html" approved="yes">
+      <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="final">Эта операция добавит теги <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> <x id="PH_1" equiv-text="this.list.selected.size"/> выбранным документам.</target>
+        <target state="translated">Bu işlem "<x id="PH" equiv-text="tag.name"/>" etiketlerini <x id="PH_1" equiv-text="this.list.selected.size"/> seçili belge(ye/lere) ekliyecektir.</target>
       </trans-unit>
-      <trans-unit id="7181166515756808573" datatype="html" approved="yes">
+      <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="final">Эта операция удалит теги "<x id="PH" equiv-text="tag.name"/>" с <x id="PH_1" equiv-text="this.list.selected.size"/> выбранных документов.</target>
+        <target state="translated">Bu işlem "<x id="PH" equiv-text="tag.name"/>" etiketini <x id="PH_1" equiv-text="this.list.selected.size"/> seçili belge(den/lerden) kaldıracaktır.</target>
       </trans-unit>
-      <trans-unit id="3819792277998068944" datatype="html" approved="yes">
+      <trans-unit id="3819792277998068944" datatype="html">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="final">Эта операция удалит теги <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> с <x id="PH_1" equiv-text="this.list.selected.size"/> выбранных документов.</target>
+        <target state="translated">Bu işlem "<x id="PH" equiv-text="tag.name"/>" etiketlerini <x id="PH_1" equiv-text="this.list.selected.size"/> seçili belge(den/lerden) kaldıracaktır.</target>
       </trans-unit>
-      <trans-unit id="2739066218579571288" datatype="html" approved="yes">
+      <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">139</context>
         </context-group>
-        <target state="final">Эта операция добавит теги <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> и удалит теги <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> на выбранных документах.</target>
+        <target state="translated">Bu işlem <x id="PH_2" equiv-text="this.list.selected.size"/> olan secili belge(ye/lere) <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> etiketlerini ekliyecektir ve <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> olan etiketlerini çıkartacaktır.</target>
       </trans-unit>
-      <trans-unit id="2996713129519325161" datatype="html" approved="yes">
+      <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="final">Подтвердите назначения корреспондента</target>
+        <target state="translated">Muhabir atanmayı onaylayın</target>
       </trans-unit>
-      <trans-unit id="6900893559485781849" datatype="html" approved="yes">
+      <trans-unit id="6900893559485781849" datatype="html">
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="final">Эта операция назначит корреспондента "<x id="PH" equiv-text="correspondent.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> выбранным документам.</target>
+        <target state="translated">Bu işlem "<x id="PH" equiv-text="correspondent.name"/>" muhabirini <x id="PH_1" equiv-text="this.list.selected.size"/> seçili belge(ye/lere) atıyacaktır.</target>
       </trans-unit>
-      <trans-unit id="1257522660364398440" datatype="html" approved="yes">
+      <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="final">Эта операция удалит корреспондента из <x id="PH" equiv-text="this.list.selected.size"/> выбранных документов.</target>
+        <target state="translated">Bu işlem, muhabiri "<x id="PH" equiv-text="this.list.selected.size"/>" seçili belge(den/lerden) kaldıracaktır.</target>
       </trans-unit>
-      <trans-unit id="5393409374423140648" datatype="html" approved="yes">
+      <trans-unit id="5393409374423140648" datatype="html">
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="final">Подтвердите назначение типа документа</target>
+        <target state="translated">Belge türü atanmayı onaylayın</target>
       </trans-unit>
-      <trans-unit id="332180123895325027" datatype="html" approved="yes">
+      <trans-unit id="332180123895325027" datatype="html">
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="final">Эта операция присвоит тип "<x id="PH" equiv-text="documentType.name"/>" <x id="PH_1" equiv-text="this.list.selected.size"/> выбранным документам.</target>
+        <target state="translated">Bu işlem "<x id="PH" equiv-text="documentType.name"/>" belge türünü <x id="PH_1" equiv-text="this.list.selected.size"/> seçili belge(ye/lere) atıyacaktır.</target>
       </trans-unit>
-      <trans-unit id="2236642492594872779" datatype="html" approved="yes">
+      <trans-unit id="2236642492594872779" datatype="html">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="final">Эта операция удалит тип из <x id="PH" equiv-text="this.list.selected.size"/> выбранных документов.</target>
+        <target state="translated">Bu işlem, belge türünü "<x id="PH" equiv-text="this.list.selected.size"/>" seçili belge(den/lerden) kaldıracaktır.</target>
       </trans-unit>
-      <trans-unit id="749430623564850405" datatype="html" approved="yes">
+      <trans-unit id="749430623564850405" datatype="html">
         <source>Delete confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="final">Подтвердите удаление</target>
+        <target state="translated">Silmeyi onaylayın</target>
       </trans-unit>
-      <trans-unit id="4303174930844518780" datatype="html" approved="yes">
+      <trans-unit id="4303174930844518780" datatype="html">
         <source>This operation will permanently delete <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">202</context>
         </context-group>
-        <target state="final">Эта операция навсегда удалит <x id="PH" equiv-text="this.list.selected.size"/> выбранных документов.</target>
+        <target state="translated">Bu işlem, "<x id="PH" equiv-text="this.list.selected.size"/>" seçili belge(leri) kalıcı olarak silecektir.</target>
       </trans-unit>
-      <trans-unit id="5641451190833696892" datatype="html" approved="yes">
+      <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">203</context>
         </context-group>
-        <target state="final">Эту операцию нельзя отменить.</target>
+        <target state="translated">Bu işlem geri alınamaz.</target>
       </trans-unit>
-      <trans-unit id="6734339521247847366" datatype="html" approved="yes">
+      <trans-unit id="6734339521247847366" datatype="html">
         <source>Delete document(s)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">205</context>
         </context-group>
-        <target state="final">Удалить документ(ы)</target>
+        <target state="translated">Belge(yi/leri) sil</target>
       </trans-unit>
-      <trans-unit id="8076495233090006322" datatype="html" approved="yes">
+      <trans-unit id="8076495233090006322" datatype="html">
         <source>Filter by correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -1380,9 +1380,9 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="final">Отфильтровать по корреспонденту</target>
+        <target state="translated">Muhabire göre filtrele</target>
       </trans-unit>
-      <trans-unit id="2784168796433474565" datatype="html" approved="yes">
+      <trans-unit id="2784168796433474565" datatype="html">
         <source>Filter by tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -1392,9 +1392,9 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">Отфильтровать по тегу</target>
+        <target state="translated">Etikete göre filtrele</target>
       </trans-unit>
-      <trans-unit id="7585826646011739428" datatype="html" approved="yes">
+      <trans-unit id="7585826646011739428" datatype="html">
         <source>Edit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -1416,103 +1416,103 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="final">Редактировать</target>
+        <target state="translated">Düzenle</target>
       </trans-unit>
-      <trans-unit id="2509141182388535183" datatype="html" approved="yes">
+      <trans-unit id="2509141182388535183" datatype="html">
         <source>View</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="final">Представление</target>
+        <target state="translated">Görüntüle</target>
       </trans-unit>
-      <trans-unit id="2332107018974972998" datatype="html" approved="yes">
+      <trans-unit id="2332107018974972998" datatype="html">
         <source>Score:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="final">Оценка:</target>
+        <target state="translated">Puan:</target>
       </trans-unit>
-      <trans-unit id="3727324658595204357" datatype="html" approved="yes">
+      <trans-unit id="3727324658595204357" datatype="html">
         <source>Created: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="final">Создано: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></target>
+        <target state="translated">Oluşturulan: <x id="INTERPOLATION" equiv-text="{{ document.created | customDate}}"/></target>
       </trans-unit>
-      <trans-unit id="2030261243264601523" datatype="html" approved="yes">
+      <trans-unit id="2030261243264601523" datatype="html">
         <source>Added: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="final">Добавлено: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></target>
+        <target state="translated">Eklenen: <x id="INTERPOLATION" equiv-text="{{ document.added | customDate}}"/></target>
       </trans-unit>
-      <trans-unit id="4235671847487610290" datatype="html" approved="yes">
+      <trans-unit id="4235671847487610290" datatype="html">
         <source>Modified: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="final">Изменено: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate}}"/></target>
+        <target state="translated">Değiştirilen: <x id="INTERPOLATION" equiv-text="{{ document.modified | customDate}}"/></target>
       </trans-unit>
-      <trans-unit id="5145213156408463657" datatype="html" approved="yes">
+      <trans-unit id="5145213156408463657" datatype="html">
         <source>Select none</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="final">Ничего</target>
+        <target state="translated">Seçimi kaldır</target>
       </trans-unit>
-      <trans-unit id="1512866475468373520" datatype="html" approved="yes">
+      <trans-unit id="1512866475468373520" datatype="html">
         <source>Select page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="final">Выбрать страницу</target>
+        <target state="translated">Sayfayı seç</target>
       </trans-unit>
-      <trans-unit id="1494518490116523821" datatype="html" approved="yes">
+      <trans-unit id="1494518490116523821" datatype="html">
         <source>Select all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">Выбрать всё</target>
+        <target state="translated">Tümünü seç</target>
       </trans-unit>
-      <trans-unit id="5146398958364876914" datatype="html" approved="yes">
+      <trans-unit id="5146398958364876914" datatype="html">
         <source>Sort</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="final">Сортировка</target>
+        <target state="translated">Sırala</target>
       </trans-unit>
-      <trans-unit id="2123659921722214537" datatype="html" approved="yes">
+      <trans-unit id="2123659921722214537" datatype="html">
         <source>Views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="final">Представления</target>
+        <target state="translated">Görünümler</target>
       </trans-unit>
-      <trans-unit id="1233494216161906927" datatype="html" approved="yes">
+      <trans-unit id="1233494216161906927" datatype="html">
         <source>Save &quot;<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="final">Сохранить "<x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/>"</target>
+        <target state="translated">Kayıt et <x id="INTERPOLATION" equiv-text="{{list.activeSavedViewTitle}}"/></target>
       </trans-unit>
-      <trans-unit id="2276119452079372898" datatype="html" approved="yes">
+      <trans-unit id="2276119452079372898" datatype="html">
         <source>Save as...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="final">Сохранить как...</target>
+        <target state="translated">Farklı kaydet...</target>
       </trans-unit>
       <trans-unit id="3894950702316166331" datatype="html">
         <source>Loading...</source>
@@ -1520,33 +1520,33 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="translated">Загрузка...</target>
+        <target state="translated">Yükleniyor...</target>
       </trans-unit>
-      <trans-unit id="8786996283897742947" datatype="html" approved="yes">
+      <trans-unit id="8786996283897742947" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {Selected <x id="INTERPOLATION"/> of one document} other {Selected <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="final">{VAR_PLURAL, plural, =1 {Выделено документов: <x id="INTERPOLATION"/> из 1} other {Выделено документов: <x id="INTERPOLATION"/> из <x id="INTERPOLATION_1"/>}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Seçili <x id="INTERPOLATION"/> bir belgeden} other {Seçili <x id="INTERPOLATION"/>, <x id="INTERPOLATION_1"/> belgeden}}</target>
       </trans-unit>
-      <trans-unit id="6600548268163632449" datatype="html" approved="yes">
+      <trans-unit id="6600548268163632449" datatype="html">
         <source>{VAR_PLURAL, plural, =1 {One document} other {<x id="INTERPOLATION"/> documents}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="final">{VAR_PLURAL, plural, =1 {Один документ} other {<x id="INTERPOLATION"/> документа(ов)}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {Bir belge} other {<x id="INTERPOLATION"/> belgeler}}</target>
       </trans-unit>
-      <trans-unit id="2243770355958919528" datatype="html" approved="yes">
+      <trans-unit id="2243770355958919528" datatype="html">
         <source>(filtered)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="final">(отфильтровано)</target>
+        <target state="translated">(filtrelenmiş)</target>
       </trans-unit>
-      <trans-unit id="7517688192215738656" datatype="html" approved="yes">
+      <trans-unit id="7517688192215738656" datatype="html">
         <source>ASN</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1560,9 +1560,9 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="final">АН</target>
+        <target state="translated">ASN</target>
       </trans-unit>
-      <trans-unit id="231679111972850796" datatype="html" approved="yes">
+      <trans-unit id="231679111972850796" datatype="html">
         <source>Added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1576,129 +1576,129 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">Добавлено</target>
+        <target state="translated">Eklendi</target>
       </trans-unit>
-      <trans-unit id="2155249406916744630" datatype="html" approved="yes">
+      <trans-unit id="2155249406916744630" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="final">Представление "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" успешно сохранено.</target>
+        <target state="translated">"<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" adlı görünüm başarı ile kayıt edildi.</target>
       </trans-unit>
-      <trans-unit id="6837554170707123455" datatype="html" approved="yes">
+      <trans-unit id="6837554170707123455" datatype="html">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="final">Представление "<x id="PH" equiv-text="savedView.name"/>" успешно создано.</target>
+        <target state="translated"><x id="PH" equiv-text="savedView.name"/> adlı görünüm başarı ile oluşturuldu.</target>
       </trans-unit>
-      <trans-unit id="6849725902312323996" datatype="html" approved="yes">
+      <trans-unit id="6849725902312323996" datatype="html">
         <source>Reset filters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="final">Сбросить фильтры</target>
+        <target state="translated">Filtreleri sıfırla</target>
       </trans-unit>
-      <trans-unit id="5195932016807797291" datatype="html" approved="yes">
+      <trans-unit id="5195932016807797291" datatype="html">
         <source>Correspondent: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="final">Корреспондент: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></target>
+        <target state="translated">Muhabir: <x id="PH" equiv-text="this.correspondents.find(c =&gt; c.id == +rule.value)?.name"/></target>
       </trans-unit>
-      <trans-unit id="8170755470576301659" datatype="html" approved="yes">
+      <trans-unit id="8170755470576301659" datatype="html">
         <source>Without correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="final">Без корреспондента</target>
+        <target state="translated">Muhabiri olmayan</target>
       </trans-unit>
-      <trans-unit id="8705701325879965907" datatype="html" approved="yes">
+      <trans-unit id="8705701325879965907" datatype="html">
         <source>Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="final">Тип: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></target>
+        <target state="translated">Tür: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></target>
       </trans-unit>
-      <trans-unit id="4362173610367509215" datatype="html" approved="yes">
+      <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="final">Без типа документа</target>
+        <target state="translated">Belge türü olmayan</target>
       </trans-unit>
-      <trans-unit id="8180755793012580465" datatype="html" approved="yes">
+      <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="final">Тег: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></target>
+        <target state="translated">Etiket: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
-      <trans-unit id="6494566478302448576" datatype="html" approved="yes">
+      <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="final">Без тегов</target>
+        <target state="translated">Herhangi bir etiket olmayan</target>
       </trans-unit>
-      <trans-unit id="6523384805359286307" datatype="html" approved="yes">
+      <trans-unit id="6523384805359286307" datatype="html">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="final">Название: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">Başlık: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
-      <trans-unit id="1872523635812236432" datatype="html" approved="yes">
+      <trans-unit id="1872523635812236432" datatype="html">
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="final">Архивный номер: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">ASN: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
-      <trans-unit id="3100631071441658964" datatype="html" approved="yes">
+      <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="final">Название и содержимое</target>
+        <target state="translated">Başlık &amp; İçerik</target>
       </trans-unit>
-      <trans-unit id="1010505078885609376" datatype="html" approved="yes">
+      <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="final">Расширенный поиск</target>
+        <target state="translated">Gelişmiş arama</target>
       </trans-unit>
-      <trans-unit id="2649431021108393503" datatype="html" approved="yes">
+      <trans-unit id="2649431021108393503" datatype="html">
         <source>More like</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="final">Больше похожих</target>
+        <target state="translated">Benzeri gibi</target>
       </trans-unit>
-      <trans-unit id="7210076240260527720" datatype="html" approved="yes">
+      <trans-unit id="7210076240260527720" datatype="html">
         <source>Save current view</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="final">Сохранить текущее представление</target>
+        <target state="translated">Geçerli görünümü kaydet</target>
       </trans-unit>
-      <trans-unit id="8953033926734869941" datatype="html" approved="yes">
+      <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -1744,9 +1744,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="final">Имя</target>
+        <target state="translated">İsim</target>
       </trans-unit>
-      <trans-unit id="8689274715612276035" datatype="html" approved="yes">
+      <trans-unit id="8689274715612276035" datatype="html">
         <source>Show in sidebar</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -1756,9 +1756,9 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="final">Показать в боковой панели</target>
+        <target state="translated">Kenar çubuğunda göster</target>
       </trans-unit>
-      <trans-unit id="4104807402967139762" datatype="html" approved="yes">
+      <trans-unit id="4104807402967139762" datatype="html">
         <source>Show on dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
@@ -1768,9 +1768,9 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">149</context>
         </context-group>
-        <target state="final">Показать на главной</target>
+        <target state="translated">Kontrol paneli'nde göster</target>
       </trans-unit>
-      <trans-unit id="8743659855412792665" datatype="html" approved="yes">
+      <trans-unit id="8743659855412792665" datatype="html">
         <source>Matching algorithm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
@@ -1784,9 +1784,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">Алгоритм сопоставления</target>
+        <target state="translated">Eşleştirme algoritması</target>
       </trans-unit>
-      <trans-unit id="2656329676292524585" datatype="html" approved="yes">
+      <trans-unit id="2656329676292524585" datatype="html">
         <source>Matching pattern</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
@@ -1800,9 +1800,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="final">Шаблон соответствия</target>
+        <target state="translated">Eşleşme düzeni</target>
       </trans-unit>
-      <trans-unit id="6063936469630366525" datatype="html" approved="yes">
+      <trans-unit id="6063936469630366525" datatype="html">
         <source>Case insensitive</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.html</context>
@@ -1816,25 +1816,25 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">Без учёта регистра</target>
+        <target state="translated">Büyük / küçük harf duyarsız</target>
       </trans-unit>
-      <trans-unit id="6457471243969293847" datatype="html" approved="yes">
+      <trans-unit id="6457471243969293847" datatype="html">
         <source>Create new correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">Создать нового корреспондента</target>
+        <target state="translated">Yeni bir muhabir oluşturun</target>
       </trans-unit>
-      <trans-unit id="2059822531169388684" datatype="html" approved="yes">
+      <trans-unit id="2059822531169388684" datatype="html">
         <source>Edit correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-edit-dialog/correspondent-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">Редактировать корреспондента</target>
+        <target state="translated">Muhabiri düzenleyin</target>
       </trans-unit>
-      <trans-unit id="5674286808255988565" datatype="html" approved="yes">
+      <trans-unit id="5674286808255988565" datatype="html">
         <source>Create</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
@@ -1848,9 +1848,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="final">Создать</target>
+        <target state="translated">Oluştur</target>
       </trans-unit>
-      <trans-unit id="4010735610815226758" datatype="html" approved="yes">
+      <trans-unit id="4010735610815226758" datatype="html">
         <source>Filter by:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
@@ -1864,9 +1864,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="final">Фильтр по:</target>
+        <target state="translated">Filtreleme kriteri:</target>
       </trans-unit>
-      <trans-unit id="1383365546483928780" datatype="html" approved="yes">
+      <trans-unit id="1383365546483928780" datatype="html">
         <source>Matching</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
@@ -1880,9 +1880,9 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">Совпадения</target>
+        <target state="translated">Eşleştirme</target>
       </trans-unit>
-      <trans-unit id="1488347670280290838" datatype="html" approved="yes">
+      <trans-unit id="1488347670280290838" datatype="html">
         <source>Document count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
@@ -1896,17 +1896,17 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">Количество документов</target>
+        <target state="translated">Belge sayısı</target>
       </trans-unit>
-      <trans-unit id="697889236478552968" datatype="html" approved="yes">
+      <trans-unit id="697889236478552968" datatype="html">
         <source>Last correspondence</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">Недавние корреспонденты</target>
+        <target state="translated">Son yazışma</target>
       </trans-unit>
-      <trans-unit id="3193976279273491157" datatype="html" approved="yes">
+      <trans-unit id="3193976279273491157" datatype="html">
         <source>Actions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.html</context>
@@ -1924,41 +1924,41 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="final">Действия</target>
+        <target state="translated">Eylemler</target>
       </trans-unit>
-      <trans-unit id="7427874343955308724" datatype="html" approved="yes">
+      <trans-unit id="7427874343955308724" datatype="html">
         <source>Do you really want to delete the correspondent &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="final">Вы действительно хотите удалить этого корреспондента "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">"<x id="PH" equiv-text="object.name"/>" muhabirini gerçekten silmek istiyor musunuz?</target>
       </trans-unit>
-      <trans-unit id="6672809941092516947" datatype="html" approved="yes">
+      <trans-unit id="6672809941092516947" datatype="html">
         <source>Create new document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">Создать новый тип документа</target>
+        <target state="translated">Yeni belge türü oluştur</target>
       </trans-unit>
-      <trans-unit id="36335016091244220" datatype="html" approved="yes">
+      <trans-unit id="36335016091244220" datatype="html">
         <source>Edit document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">Редактировать тип документа</target>
+        <target state="translated">Belge türünü düzenle</target>
       </trans-unit>
-      <trans-unit id="4990731724078522539" datatype="html" approved="yes">
+      <trans-unit id="4990731724078522539" datatype="html">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="final">Вы действительно хотите удалить этот тип документа: "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">"<x id="PH" equiv-text="object.name"/>" belge türünü gerçekten silmek istiyor musunuz?</target>
       </trans-unit>
-      <trans-unit id="810888510148304696" datatype="html" approved="yes">
+      <trans-unit id="810888510148304696" datatype="html">
         <source>Automatic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
@@ -1968,313 +1968,313 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="final">Автоматически</target>
+        <target state="translated">Otomatik</target>
       </trans-unit>
-      <trans-unit id="5044611416737085530" datatype="html" approved="yes">
+      <trans-unit id="5044611416737085530" datatype="html">
         <source>Do you really want to delete this element?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="final">Вы действительно хотите удалить этот элемент?</target>
+        <target state="translated">Bu öğeyi gerçekten silmek istiyor musunuz?</target>
       </trans-unit>
-      <trans-unit id="8371896857609524947" datatype="html" approved="yes">
+      <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="final">Связанные документы не будут удалены.</target>
+        <target state="translated">İlişkilendirilmiş belgeler silinmeyecektir.</target>
       </trans-unit>
-      <trans-unit id="5467489005440577210" datatype="html" approved="yes">
+      <trans-unit id="5467489005440577210" datatype="html">
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="final">Возникла ошибка при удалении: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated"><x id="PH" equiv-text="JSON.stringify(error.error)"/> öge silerken hata oluştu</target>
       </trans-unit>
-      <trans-unit id="1347241542439262355" datatype="html" approved="yes">
+      <trans-unit id="1347241542439262355" datatype="html">
         <source>General settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="final">Основные</target>
+        <target state="translated">Genel ayarlar</target>
       </trans-unit>
-      <trans-unit id="8671234314555525900" datatype="html" approved="yes">
+      <trans-unit id="8671234314555525900" datatype="html">
         <source>Appearance</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">Вид</target>
+        <target state="translated">Görünüm</target>
       </trans-unit>
-      <trans-unit id="3777637051272512093" datatype="html" approved="yes">
+      <trans-unit id="3777637051272512093" datatype="html">
         <source>Display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="final">Язык интерфейса</target>
+        <target state="translated">Uygulama dili</target>
       </trans-unit>
-      <trans-unit id="53523152145406584" datatype="html" approved="yes">
+      <trans-unit id="53523152145406584" datatype="html">
         <source>You need to reload the page after applying a new language.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">Вы должны перезагрузить страница, после применения нового языка.</target>
+        <target state="translated">Yeni bir dil uyguladıktan sonra sayfayı yeniden yüklemeniz gerekir.</target>
       </trans-unit>
-      <trans-unit id="3766032098416558788" datatype="html" approved="yes">
+      <trans-unit id="3766032098416558788" datatype="html">
         <source>Date display</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="final">Дата</target>
+        <target state="translated">Tarih Gösterimi</target>
       </trans-unit>
-      <trans-unit id="3733378544613473393" datatype="html" approved="yes">
+      <trans-unit id="3733378544613473393" datatype="html">
         <source>Date format</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="final">Формат даты</target>
+        <target state="translated">Tarih formatı</target>
       </trans-unit>
-      <trans-unit id="3407788781115661841" datatype="html" approved="yes">
+      <trans-unit id="3407788781115661841" datatype="html">
         <source>Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;shortDate&apos;:null:computedDateLocale}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="final">Краткий: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Kısa: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
       </trans-unit>
-      <trans-unit id="6290748171049664628" datatype="html" approved="yes">
+      <trans-unit id="6290748171049664628" datatype="html">
         <source>Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;mediumDate&apos;:null:computedDateLocale}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="final">Средний: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Orta: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
       </trans-unit>
-      <trans-unit id="7189855711197998347" datatype="html" approved="yes">
+      <trans-unit id="7189855711197998347" datatype="html">
         <source>Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;longDate&apos;:null:computedDateLocale}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="final">Длинный: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Uzun: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
       </trans-unit>
-      <trans-unit id="8939587804990976924" datatype="html" approved="yes">
+      <trans-unit id="8939587804990976924" datatype="html">
         <source>Items per page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="final">Элементов на странице</target>
+        <target state="translated">Sayfa başına öğe</target>
       </trans-unit>
-      <trans-unit id="8028535997917730106" datatype="html" approved="yes">
+      <trans-unit id="8028535997917730106" datatype="html">
         <source>Document editor</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="final">Редактор документов</target>
+        <target state="translated">Belge düzenleyici</target>
       </trans-unit>
-      <trans-unit id="6708098108196142028" datatype="html" approved="yes">
+      <trans-unit id="6708098108196142028" datatype="html">
         <source>Use PDF viewer provided by the browser</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="final">Использовать просмотрщик PDF встроенный в браузер</target>
+        <target state="translated">Tarayıcı tarafından sağlanan PDF görüntüleyiciyi kullan</target>
       </trans-unit>
-      <trans-unit id="9003921625412907981" datatype="html" approved="yes">
+      <trans-unit id="9003921625412907981" datatype="html">
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="final">Это, обычно, более быстрый способ отображения больших PDF документов, но он может не работать в некоторых браузерах.</target>
+        <target state="translated">Bu genellikle büyük PDF belgelerini görüntülemek için daha hızlıdır, ancak bazı tarayıcılarda çalışmayabilir.</target>
       </trans-unit>
-      <trans-unit id="1356890996281769972" datatype="html" approved="yes">
+      <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="final">Тёмный режим</target>
+        <target state="translated">Karanlık modu</target>
       </trans-unit>
-      <trans-unit id="4913823100518391922" datatype="html" approved="yes">
+      <trans-unit id="4913823100518391922" datatype="html">
         <source>Use system settings</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="final">Использовать системные настройки</target>
+        <target state="translated">Sistem ayarlarını kullan</target>
       </trans-unit>
-      <trans-unit id="5782828784040423650" datatype="html" approved="yes">
+      <trans-unit id="5782828784040423650" datatype="html">
         <source>Enable dark mode</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="final">Включить тёмный режим</target>
+        <target state="translated">Karanlık modu etkinleştir</target>
       </trans-unit>
-      <trans-unit id="6336642923114460405" datatype="html" approved="yes">
+      <trans-unit id="6336642923114460405" datatype="html">
         <source>Invert thumbnails in dark mode</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="final">Инвертировать эскизы при включенном тёмном режиме</target>
+        <target state="translated">Karanlık modunda küçük resimleri tersine çevir</target>
       </trans-unit>
-      <trans-unit id="8508424367627989968" datatype="html" approved="yes">
+      <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="final">Массовое редактирование</target>
+        <target state="translated">Toplu düzenlemec</target>
       </trans-unit>
-      <trans-unit id="8158899674926420054" datatype="html" approved="yes">
+      <trans-unit id="8158899674926420054" datatype="html">
         <source>Show confirmation dialogs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="final">Показывать диалоги подтверждения</target>
+        <target state="translated">Onaylama iletişim kutuları göster</target>
       </trans-unit>
-      <trans-unit id="6906812245033969309" datatype="html" approved="yes">
+      <trans-unit id="6906812245033969309" datatype="html">
         <source>Deleting documents will always ask for confirmation.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="final">Удаление документов всегда будет требовать подтверждения.</target>
+        <target state="translated">Belgeleri silmek her zaman onay ister.</target>
       </trans-unit>
-      <trans-unit id="290238406234356122" datatype="html" approved="yes">
+      <trans-unit id="290238406234356122" datatype="html">
         <source>Apply on close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="final">Применить при закрытии</target>
+        <target state="translated">Kapanışta uygula</target>
       </trans-unit>
-      <trans-unit id="5851560788527570644" datatype="html" approved="yes">
+      <trans-unit id="5851560788527570644" datatype="html">
         <source>Notifications</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="final">Уведомления</target>
+        <target state="translated">Bildirimler</target>
       </trans-unit>
-      <trans-unit id="8545554728558600606" datatype="html" approved="yes">
+      <trans-unit id="8545554728558600606" datatype="html">
         <source>Document processing</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="final">Обработка документа</target>
+        <target state="translated">Belge işleme</target>
       </trans-unit>
-      <trans-unit id="3656786776644872398" datatype="html" approved="yes">
+      <trans-unit id="3656786776644872398" datatype="html">
         <source>Show notifications when new documents are detected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="final">Показывать уведомления, когда новый документ удалён</target>
+        <target state="translated">Yeni belge bulunduğunda bildirimi göster</target>
       </trans-unit>
-      <trans-unit id="6057053428592387613" datatype="html" approved="yes">
+      <trans-unit id="6057053428592387613" datatype="html">
         <source>Show notifications when document processing completes successfully</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="final">Показывать уведомления, когда обработка документа успешна</target>
+        <target state="translated">Belge işleme başarıyla tamamlandığında bildirimleri göster</target>
       </trans-unit>
-      <trans-unit id="370315664367425513" datatype="html" approved="yes">
+      <trans-unit id="370315664367425513" datatype="html">
         <source>Show notifications when document processing fails</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="final">Показывать уведомления, когда обработка документа не удалась</target>
+        <target state="translated">Belge işleme başarız tamamlandığında bildirimleri göster</target>
       </trans-unit>
-      <trans-unit id="6838309441164918531" datatype="html" approved="yes">
+      <trans-unit id="6838309441164918531" datatype="html">
         <source>Suppress notifications on dashboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="final">Спрятать уведомления на главной</target>
+        <target state="translated">Kontrol panodaki bildirimleri bastır</target>
       </trans-unit>
-      <trans-unit id="2741919327232918179" datatype="html" approved="yes">
+      <trans-unit id="2741919327232918179" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="final">Это отключит все сообщения о статусе обработки документов на главной.</target>
+        <target state="translated">Bu, kontrol panodaki belge işleme durumuyla ilgili tüm iletileri bastırır.</target>
       </trans-unit>
-      <trans-unit id="6925788033494878061" datatype="html" approved="yes">
+      <trans-unit id="6925788033494878061" datatype="html">
         <source>Appears on</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="final">Появляется на</target>
+        <target state="translated">Görünür</target>
       </trans-unit>
-      <trans-unit id="7877440816920439876" datatype="html" approved="yes">
+      <trans-unit id="7877440816920439876" datatype="html">
         <source>No saved views defined.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="final">Нет сохраненных представлений.</target>
+        <target state="translated">Kaydedilmiş görünüm tanımlanmadı.</target>
       </trans-unit>
-      <trans-unit id="5610279464668232148" datatype="html" approved="yes">
+      <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="final">Сохраненное представление "<x id="PH" equiv-text="savedView.name"/>" удалено.</target>
+        <target state="translated"><x id="PH" equiv-text="savedView.name"/> adlı görünüm silindi.</target>
       </trans-unit>
-      <trans-unit id="5647210819299459618" datatype="html" approved="yes">
+      <trans-unit id="5647210819299459618" datatype="html">
         <source>Settings saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="final">Настройки успешно сохранены.</target>
+        <target state="translated">Ayarlar başarıyla kaydedildi.</target>
       </trans-unit>
-      <trans-unit id="6839066544204061364" datatype="html" approved="yes">
+      <trans-unit id="6839066544204061364" datatype="html">
         <source>Use system language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="final">Использовать язык системы</target>
+        <target state="translated">Sistem dilini kullan</target>
       </trans-unit>
-      <trans-unit id="7729897675462249787" datatype="html" approved="yes">
+      <trans-unit id="7729897675462249787" datatype="html">
         <source>Use date format of display language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="final">Использовать формат даты, соответствующий языку</target>
+        <target state="translated">Görüntüleme dilinin tarih formatını kullan</target>
       </trans-unit>
-      <trans-unit id="8488620293789898901" datatype="html" approved="yes">
+      <trans-unit id="8488620293789898901" datatype="html">
         <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="final">Ошибка при хранении настроек на сервере: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated">Ayarları servere kayıt edilirken hata oluştu: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
-      <trans-unit id="9011959596901584887" datatype="html" approved="yes">
+      <trans-unit id="9011959596901584887" datatype="html">
         <source>Color</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
@@ -2284,143 +2284,143 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="final">Цвет</target>
+        <target state="translated">Renk</target>
       </trans-unit>
-      <trans-unit id="1426037806946650347" datatype="html" approved="yes">
+      <trans-unit id="1426037806946650347" datatype="html">
         <source>Inbox tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">Входящий теги</target>
+        <target state="translated">Gelen kutusu etiketi</target>
       </trans-unit>
-      <trans-unit id="8566220514470905459" datatype="html" approved="yes">
+      <trans-unit id="8566220514470905459" datatype="html">
         <source>Inbox tags are automatically assigned to all consumed documents.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">Входящий тег будет автоматически назначен всем добавленным документам.</target>
+        <target state="translated">Gelen kutusu etiketleri, otomatik olarak tüketilen bütin belgelere atanmaktadır.</target>
       </trans-unit>
-      <trans-unit id="9153094873118985366" datatype="html" approved="yes">
+      <trans-unit id="9153094873118985366" datatype="html">
         <source>Create new tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">Создать новый тег</target>
+        <target state="translated">Yeni etiket oluştur</target>
       </trans-unit>
-      <trans-unit id="5872175735754226507" datatype="html" approved="yes">
+      <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="final">Редактировать тег</target>
+        <target state="translated">Etiketi düzenle</target>
       </trans-unit>
-      <trans-unit id="93754014749412887" datatype="html" approved="yes">
+      <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="final">Вы действительно хотите удалить тег "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">"<x id="PH" equiv-text="object.name"/>" olan etiketi gerçekten silmek istiyormusunuz?</target>
       </trans-unit>
-      <trans-unit id="181464970911903082" datatype="html" approved="yes">
+      <trans-unit id="181464970911903082" datatype="html">
         <source>404 Not Found</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="final">404 Не найдено</target>
+        <target state="translated">404 Sayfa Bulunamadı</target>
       </trans-unit>
-      <trans-unit id="5851669019930456395" datatype="html" approved="yes">
+      <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">Любые слова</target>
+        <target state="translated">Herhangi bir kelime</target>
       </trans-unit>
-      <trans-unit id="7517655726614958140" datatype="html" approved="yes">
+      <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">Любой: Документ содержит любое из этих слов (разделитель - пробел)</target>
+        <target state="translated">Herhangi biri: Belge bu sözcüklerden herhangi birini içerir (boşlukla ayrılmış olarak)</target>
       </trans-unit>
-      <trans-unit id="700315718208181326" datatype="html" approved="yes">
+      <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">Все слова</target>
+        <target state="translated">Tüm Kelimeler</target>
       </trans-unit>
-      <trans-unit id="111914402588955480" datatype="html" approved="yes">
+      <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="final">Все: Документ содержит все эти слова (разделитель - пробел)</target>
+        <target state="translated">Tümü: Belge bu sözcüklerin tümünü içerir (boşlukla ayrılmış olarak)</target>
       </trans-unit>
-      <trans-unit id="9180173992399180575" datatype="html" approved="yes">
+      <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="final">Точное соответствие</target>
+        <target state="translated">Tam eşleşme</target>
       </trans-unit>
-      <trans-unit id="7109184332944610787" datatype="html" approved="yes">
+      <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="final">Точное: Документ содержит эту строку</target>
+        <target state="translated">Tam: Belge bu ifadeyi içerir</target>
       </trans-unit>
-      <trans-unit id="1338733395833138319" datatype="html" approved="yes">
+      <trans-unit id="1338733395833138319" datatype="html">
         <source>Regular expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">Регулярное выражение</target>
+        <target state="translated">Düzenli ifade</target>
       </trans-unit>
-      <trans-unit id="7548151332424148033" datatype="html" approved="yes">
+      <trans-unit id="7548151332424148033" datatype="html">
         <source>Regular expression: Document matches this regular expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">Регулярное выражение: Документ соответствует этому регулярному выражению</target>
+        <target state="translated">Düzenli ifade: Belge bu düzenli ifade ile eşleşir</target>
       </trans-unit>
-      <trans-unit id="1856513373880048959" datatype="html" approved="yes">
+      <trans-unit id="1856513373880048959" datatype="html">
         <source>Fuzzy word</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="final">"Нечёткий" режим</target>
+        <target state="translated">Fuzzy Kelime</target>
       </trans-unit>
-      <trans-unit id="8419167206585286450" datatype="html" approved="yes">
+      <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="final">Нечетко: Документ содержит слово, подобное этому слову</target>
+        <target state="translated">Fuzzy: Belge bu kelimeye benzer bir ifade içerir</target>
       </trans-unit>
-      <trans-unit id="2167862279705099846" datatype="html" approved="yes">
+      <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="final">Авто: Автоматически изучать соответствие</target>
+        <target state="translated">Otomatik mod: Eşleşmeyi otomatik olarak öğrenir</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html">
         <source>Unsaved Changes</source>
@@ -2436,7 +2436,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="translated">Несохранённые изменения</target>
+        <target state="translated">Kaydedilmemiş değişiklikler</target>
       </trans-unit>
       <trans-unit id="2573823578527613511" datatype="html">
         <source>You have unsaved changes.</source>
@@ -2452,7 +2452,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes.</target>
+        <target state="translated">Kaydedilmemiş değişiklikleriniz var.</target>
       </trans-unit>
       <trans-unit id="3305084982600522070" datatype="html">
         <source>Are you sure you want to leave?</source>
@@ -2460,7 +2460,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Вы уверены, что хотите выйти?</target>
+        <target state="translated">Ayrılmak istediğinizden emin misiniz?</target>
       </trans-unit>
       <trans-unit id="729881853265307704" datatype="html">
         <source>Leave page</source>
@@ -2468,139 +2468,139 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Leave page</target>
+        <target state="translated">Sayfadan ayrıl</target>
       </trans-unit>
-      <trans-unit id="7536524521722799066" datatype="html" approved="yes">
+      <trans-unit id="7536524521722799066" datatype="html">
         <source>(no title)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="final">(без названия)</target>
+        <target state="translated">(başlıksız)</target>
       </trans-unit>
-      <trans-unit id="2807800733729323332" datatype="html" approved="yes">
+      <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="final">Да</target>
+        <target state="translated">Evet</target>
       </trans-unit>
-      <trans-unit id="3542042671420335679" datatype="html" approved="yes">
+      <trans-unit id="3542042671420335679" datatype="html">
         <source>No</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="final">Нет</target>
+        <target state="translated">Hayır</target>
       </trans-unit>
-      <trans-unit id="2119857572761283468" datatype="html" approved="yes">
+      <trans-unit id="2119857572761283468" datatype="html">
         <source>Document already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="final">Такой документ уже существует.</target>
+        <target state="translated">Belge zaten var.</target>
       </trans-unit>
-      <trans-unit id="148389968432135849" datatype="html" approved="yes">
+      <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="final">Файл не найден.</target>
+        <target state="translated">Dosya bulunamadı.</target>
       </trans-unit>
-      <trans-unit id="1520671543092565667" datatype="html" approved="yes">
+      <trans-unit id="1520671543092565667" datatype="html">
         <source>Pre-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="final">Скрипт предобработки не существует.</target>
+        <target state="translated">Tüketim öncesi komut dosyası yok.</target>
       </trans-unit>
-      <trans-unit id="7742915911032564889" datatype="html" approved="yes">
+      <trans-unit id="7742915911032564889" datatype="html">
         <source>Error while executing pre-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="final">Ошибка при выполнении скрипта предобработки.</target>
+        <target state="translated">Tüketim öncesi komut dosyasını işlerken hata oluştu.</target>
       </trans-unit>
-      <trans-unit id="8995193730018060346" datatype="html" approved="yes">
+      <trans-unit id="8995193730018060346" datatype="html">
         <source>Post-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="final">Скрипт постобработки не существует.</target>
+        <target state="translated">Tüketim sonrası komut dosyası yok.</target>
       </trans-unit>
-      <trans-unit id="256773668518189604" datatype="html" approved="yes">
+      <trans-unit id="256773668518189604" datatype="html">
         <source>Error while executing post-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="final">Ошибка при выполнении скрипта постобработки.</target>
+        <target state="translated">Tüketim sonrası komut dosyasını işlerken hata oluştu.</target>
       </trans-unit>
-      <trans-unit id="6252258095055634191" datatype="html" approved="yes">
+      <trans-unit id="6252258095055634191" datatype="html">
         <source>Received new file.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="final">Получен новый файл.</target>
+        <target state="translated">Yeni dosya alındı.</target>
       </trans-unit>
-      <trans-unit id="7337565919209746135" datatype="html" approved="yes">
+      <trans-unit id="7337565919209746135" datatype="html">
         <source>File type not supported.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="final">Этот тип файла не поддерживается.</target>
+        <target state="translated">Dosya türü desteklenmiyor.</target>
       </trans-unit>
-      <trans-unit id="5002399167376099234" datatype="html" approved="yes">
+      <trans-unit id="5002399167376099234" datatype="html">
         <source>Processing document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="final">Обработка документа...</target>
+        <target state="translated">Belge işleniyor...</target>
       </trans-unit>
-      <trans-unit id="1085975194762600381" datatype="html" approved="yes">
+      <trans-unit id="1085975194762600381" datatype="html">
         <source>Generating thumbnail...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="final">Создание эскиза...</target>
+        <target state="translated">Küçük resimler oluşturuluyor...</target>
       </trans-unit>
-      <trans-unit id="3280851677698431426" datatype="html" approved="yes">
+      <trans-unit id="3280851677698431426" datatype="html">
         <source>Retrieving date from document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="final">Получение даты из документа...</target>
+        <target state="translated">Belgeden tarih alınıyor...</target>
       </trans-unit>
-      <trans-unit id="7162102384876037296" datatype="html" approved="yes">
+      <trans-unit id="7162102384876037296" datatype="html">
         <source>Saving document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="final">Сохранение документа...</target>
+        <target state="translated">Belge kayıt ediliyor...</target>
       </trans-unit>
-      <trans-unit id="4550450765009165976" datatype="html" approved="yes">
+      <trans-unit id="4550450765009165976" datatype="html">
         <source>Finished.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="final">Завершено.</target>
+        <target state="translated">Tamamlandı.</target>
       </trans-unit>
       <trans-unit id="2089045849587358256" datatype="html">
         <source>Are you sure you want to close this document?</source>
@@ -2608,7 +2608,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this document?</target>
+        <target state="translated">Bu belgeyi kapatmak istediğinizden emin misin?</target>
       </trans-unit>
       <trans-unit id="2885986061416655600" datatype="html">
         <source>Close document</source>
@@ -2616,7 +2616,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">Close document</target>
+        <target state="translated">Belgeyi kapat</target>
       </trans-unit>
       <trans-unit id="6755718693176327396" datatype="html">
         <source>Are you sure you want to close all documents?</source>
@@ -2624,7 +2624,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close all documents?</target>
+        <target state="translated">Tüm belgeleri kapatmak istediğinizden emin misiniz?</target>
       </trans-unit>
       <trans-unit id="4215561719980781894" datatype="html">
         <source>Close documents</source>
@@ -2632,24 +2632,24 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="needs-translation">Close documents</target>
+        <target state="translated">Belgeleri kapat</target>
       </trans-unit>
-      <trans-unit id="3553216189604488439" datatype="html" approved="yes">
+      <trans-unit id="3553216189604488439" datatype="html">
         <source>Modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="final">Изменено</target>
+        <target state="translated">Değiştirilmiş</target>
       </trans-unit>
-      <trans-unit id="4460262093225954455" datatype="html" approved="yes">
+      <trans-unit id="4460262093225954455" datatype="html">
         <source>Search score</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
         <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
-        <target state="final">Релевантность</target>
+        <target state="translated">Puanı ara</target>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
         <source>English (US)</source>
@@ -2657,7 +2657,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">Английский (США)</target>
+        <target state="translated">İngilizce (Birleşik Devletler)</target>
       </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
@@ -2665,7 +2665,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="translated">Чешский</target>
+        <target state="translated">Çekçe</target>
       </trans-unit>
       <trans-unit id="2924289692679201020" datatype="html">
         <source>Danish</source>
@@ -2673,7 +2673,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="translated">Датский</target>
+        <target state="translated">Danca</target>
       </trans-unit>
       <trans-unit id="1858110241312746425" datatype="html">
         <source>German</source>
@@ -2681,7 +2681,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="translated">Немецкий</target>
+        <target state="translated">Almanca</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -2689,15 +2689,15 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="translated">Английский (Великобритании)</target>
+        <target state="translated">İngilizce (GB)</target>
       </trans-unit>
-      <trans-unit id="5190825892106392539" datatype="html" approved="yes">
+      <trans-unit id="5190825892106392539" datatype="html">
         <source>Spanish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="final">Испанский</target>
+        <target state="translated">İspanyolca</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html">
         <source>French</source>
@@ -2705,7 +2705,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="translated">Французский</target>
+        <target state="translated">Fransızca</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
@@ -2713,7 +2713,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">Итальянский</target>
+        <target state="translated">İtalyanca</target>
       </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>
@@ -2721,23 +2721,23 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Luxembourgish</target>
+        <target state="translated">Lüksemburgca</target>
       </trans-unit>
-      <trans-unit id="3071065188816255493" datatype="html" approved="yes">
+      <trans-unit id="3071065188816255493" datatype="html">
         <source>Dutch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="final">Голландский</target>
+        <target state="translated">Hollandaca</target>
       </trans-unit>
-      <trans-unit id="792060551707690640" datatype="html" approved="yes">
+      <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="final">Польский</target>
+        <target state="translated">Polonyaca</target>
       </trans-unit>
       <trans-unit id="9184513005098760425" datatype="html">
         <source>Portuguese (Brazil)</source>
@@ -2745,15 +2745,15 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="translated">Португальский (Бразилия)</target>
+        <target state="translated">Portekizce (Brezilya)</target>
       </trans-unit>
-      <trans-unit id="153799456510623899" datatype="html" approved="yes">
+      <trans-unit id="153799456510623899" datatype="html">
         <source>Portuguese</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
-        <target state="final">Португальский</target>
+        <target state="translated">Portekizce</target>
       </trans-unit>
       <trans-unit id="8118856427047826368" datatype="html">
         <source>Romanian</source>
@@ -2761,23 +2761,23 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="translated">Румынский</target>
+        <target state="translated">Romence</target>
       </trans-unit>
-      <trans-unit id="7137419789978325708" datatype="html" approved="yes">
+      <trans-unit id="7137419789978325708" datatype="html">
         <source>Russian</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="final">Русский</target>
+        <target state="translated">Rusça</target>
       </trans-unit>
-      <trans-unit id="499386805970351976" datatype="html" approved="yes">
+      <trans-unit id="499386805970351976" datatype="html">
         <source>Swedish</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="final">Шведский</target>
+        <target state="translated">İsveççe</target>
       </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
@@ -2785,23 +2785,23 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">ISO 8601</target>
+        <target state="translated">ISO 8601</target>
       </trans-unit>
-      <trans-unit id="1519954996184640001" datatype="html" approved="yes">
+      <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="final">Ошибка</target>
+        <target state="translated">Hata</target>
       </trans-unit>
-      <trans-unit id="5037437391296624618" datatype="html" approved="yes">
+      <trans-unit id="5037437391296624618" datatype="html">
         <source>Information</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="final">Информация</target>
+        <target state="translated">Bilgi</target>
       </trans-unit>
     </body>
   </file>
