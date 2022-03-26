@@ -316,6 +316,7 @@ LANGUAGES = [
     ("sl-si", _("Slovenian")),
     ("sr-cs", _("Serbian")),
     ("sv-se", _("Swedish")),
+    ("tr-tr", _("Turkish")),
     ("zh-cn", _("Chinese Simplified")),
 ]
 
