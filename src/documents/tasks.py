@@ -24,8 +24,6 @@ from pikepdf import Pdf
 from pyzbar import pyzbar
 from whoosh.writing import AsyncWriter
 
-# barcode decoder
-
 logger = logging.getLogger("paperless.tasks")
 
 
@@ -100,12 +98,13 @@ def scan_file_for_separating_barcodes(filepath: str) -> list:
     Returns a list of pagenumbers, which separate the file
     """
     separator_page_numbers = []
+    separator_barcode = "b'" + str(settings.CONSUMER_BARCODE_STRING) + "'"
     # use a temporary directory in case the file os too big to handle in memory
     with tempfile.TemporaryDirectory() as path:
         pages_from_path = convert_from_path(filepath, output_folder=path)
         for current_page_number, page in enumerate(pages_from_path):
             current_barcodes = barcode_reader(page)
-            if "b'PATCHT'" in current_barcodes:
+            if separator_barcode in current_barcodes:
                 separator_page_numbers = separator_page_numbers + [current_page_number]
     return separator_page_numbers
 
@@ -163,13 +162,12 @@ def save_to_dir(filepath, newname=None, target_dir=settings.CONSUMPTION_DIR):
     Copies filepath to target_dir.
     Optionally rename the file.
     """
-    logger.debug(f"filepath: {str(filepath)}")
-    logger.debug(f"newname: {str(newname)}")
-    logger.debug(f"target_dir: {str(target_dir)}")
     if os.path.isfile(filepath) and os.path.isdir(target_dir):
         dst = shutil.copy(filepath, target_dir)
+        logging.debug(f"saved {str(filepath)} to {str(dst)}")
         if newname:
             dst_new = os.path.join(target_dir, newname)
+            logger.debug(f"moving {str(dst)} to {str(dst_new)}")
             os.rename(dst, dst_new)
     else:
         logger.warning(f"{str(filepath)} or {str(target_dir)} don't exist.")
@@ -186,7 +184,9 @@ def consume_file(
 ):
 
     # check for separators in current document
-    separators = scan_file_for_separating_barcodes(path)
+    separators = []
+    if settings.CONSUMER_ENABLE_BARCODES:
+        separators = scan_file_for_separating_barcodes(path)
     document_list = []
     if separators == []:
         pass
