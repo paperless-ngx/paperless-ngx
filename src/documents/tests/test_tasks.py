@@ -144,7 +144,7 @@ class TestTasks(DirectoriesMixin, TestCase):
             "patch-code-t.pdf",
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
-        tasks.save_to_dir(test_file, tempdir)
+        tasks.save_to_dir(test_file, target_dir=tempdir)
         target_file = os.path.join(tempdir, "patch-code-t.pdf")
         self.assertTrue(os.path.isfile(target_file))
 
@@ -159,13 +159,24 @@ class TestTasks(DirectoriesMixin, TestCase):
             self.skipTest("non-existing dir exists")
         else:
             with self.assertLogs("paperless.tasks", level="WARNING") as cm:
-                tasks.save_to_dir(test_file, nonexistingdir)
+                tasks.save_to_dir(test_file, target_dir=nonexistingdir)
             self.assertEqual(
                 cm.output,
                 [
                     f"WARNING:paperless.tasks:{str(test_file)} or {str(nonexistingdir)} don't exist.",
                 ],
             )
+
+    def test_save_to_dir3(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "patch-code-t.pdf",
+        )
+        tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+        tasks.save_to_dir(test_file, newname="newname.pdf", target_dir=tempdir)
+        target_file = os.path.join(tempdir, "newname.pdf")
+        self.assertTrue(os.path.isfile(target_file))
 
     def test_barcode_splitter(self):
         test_file = os.path.join(
@@ -179,7 +190,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         document_list = tasks.separate_pages(test_file, separators)
         self.assertTrue(document_list != [])
         for document in document_list:
-            tasks.save_to_dir(document, tempdir)
+            tasks.save_to_dir(document, target_dir=tempdir)
         target_file1 = os.path.join(tempdir, "patch-code-t-middle_document_0.pdf")
         target_file2 = os.path.join(tempdir, "patch-code-t-middle_document_1.pdf")
         self.assertTrue(os.path.isfile(target_file1))
