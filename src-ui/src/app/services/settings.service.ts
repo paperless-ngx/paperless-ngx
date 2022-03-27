@@ -271,6 +271,12 @@ export class SettingsService {
         dateInputFormat: 'yyyy-mm-dd',
       },
       {
+        code: 'tr-tr',
+        name: $localize`Turkish`,
+        englishName: 'Turkish',
+        dateInputFormat: 'yyyy-mm-dd',
+      },
+      {
         code: 'zh-cn',
         name: $localize`Chinese Simplified`,
         englishName: 'Chinese Simplified',
