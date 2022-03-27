@@ -922,7 +922,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">Dopisnici</target>
+        <target state="translated">Dopisnik</target>
       </trans-unit>
       <trans-unit id="5066119607229701477" datatype="html">
         <source>Document type</source>
@@ -1488,7 +1488,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Sortirati</target>
+        <target state="translated">Sortiraj</target>
       </trans-unit>
       <trans-unit id="2123659921722214537" datatype="html">
         <source>Views</source>
