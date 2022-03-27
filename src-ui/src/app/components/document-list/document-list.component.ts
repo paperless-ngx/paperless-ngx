@@ -33,8 +33,6 @@ import { ToastService } from 'src/app/services/toast.service'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 
-const filterQueryVars: string[] = FILTER_RULE_TYPES.map((rt) => rt.filtervar)
-
 @Component({
   selector: 'app-document-list',
   templateUrl: './document-list.component.html',
@@ -113,6 +111,10 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
           this.unmodifiedFilterRules = view.filter_rules
         })
       })
+
+    const filterQueryVars: string[] = FILTER_RULE_TYPES.map(
+      (rt) => rt.filtervar
+    )
 
     this.route.queryParamMap
       .pipe(filter((qp) => !this.route.snapshot.paramMap.has('id'))) // only when not on saved view
