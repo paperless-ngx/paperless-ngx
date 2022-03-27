@@ -47,6 +47,7 @@ export interface SelectionData {
 })
 export class DocumentService extends AbstractPaperlessService<PaperlessDocument> {
   private _searchQuery: string
+  public queryParams: Object = {}
 
   constructor(
     http: HttpClient,
@@ -57,7 +58,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     super(http, 'documents')
   }
 
-  private filterRulesToQueryParams(filterRules: FilterRule[]) {
+  private filterRulesToQueryParams(filterRules: FilterRule[]): Object {
     if (filterRules) {
       let params = {}
       for (let rule of filterRules) {
@@ -101,12 +102,13 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     filterRules?: FilterRule[],
     extraParams = {}
   ): Observable<Results<PaperlessDocument>> {
+    this.queryParams = this.filterRulesToQueryParams(filterRules)
     return this.list(
       page,
       pageSize,
       sortField,
       sortReverse,
-      Object.assign(extraParams, this.filterRulesToQueryParams(filterRules))
+      Object.assign(extraParams, this.queryParams)
     ).pipe(
       map((results) => {
         results.results.forEach((doc) => this.addObservablesToDocument(doc))

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   OnDestroy,
   OnInit,
@@ -6,11 +7,14 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, ParamMap, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { Subscription } from 'rxjs'
+import { filter, Subscription } from 'rxjs'
 import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule'
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
+import {
+  FILTER_FULLTEXT_MORELIKE,
+  FILTER_RULE_TYPES,
+} from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import {
@@ -20,6 +24,7 @@ import {
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
+  DocumentService,
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/services/rest/document.service'
@@ -28,14 +33,17 @@ import { ToastService } from 'src/app/services/toast.service'
 import { FilterEditorComponent } from './filter-editor/filter-editor.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-view-config-dialog.component'
 
+const filterQueryVars: string[] = FILTER_RULE_TYPES.map((rt) => rt.filtervar)
+
 @Component({
   selector: 'app-document-list',
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss'],
 })
-export class DocumentListComponent implements OnInit, OnDestroy {
+export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     public list: DocumentListViewService,
+    private documentService: DocumentService,
     public savedViewService: SavedViewService,
     public route: ActivatedRoute,
     private router: Router,
@@ -85,13 +93,16 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     if (localStorage.getItem('document-list:displayMode') != null) {
       this.displayMode = localStorage.getItem('document-list:displayMode')
     }
+
     this.consumptionFinishedSubscription = this.consumerStatusService
       .onDocumentConsumptionFinished()
       .subscribe(() => {
         this.list.reload()
       })
-    this.route.paramMap.subscribe((params) => {
-      if (params.has('id')) {
+
+    this.route.paramMap
+      .pipe(filter((params) => params.has('id'))) // only on saved view
+      .subscribe((params) => {
         this.savedViewService.getCached(+params.get('id')).subscribe((view) => {
           if (!view) {
             this.router.navigate(['404'])
@@ -101,11 +112,57 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.list.reload()
           this.unmodifiedFilterRules = view.filter_rules
         })
-      } else {
+      })
+
+    this.route.queryParamMap
+      .pipe(filter((qp) => !this.route.snapshot.paramMap.has('id'))) // only when not on saved view
+      .subscribe((queryParams) => {
+        const queryVarsFilterRules = []
+
+        filterQueryVars.forEach((filterQueryVar) => {
+          if (queryParams.has(filterQueryVar)) {
+            const value = queryParams.get(filterQueryVar)
+            if (value.split(',').length > 1) {
+              value.split(',').forEach((splitVal) => {
+                queryVarsFilterRules.push({
+                  rule_type: FILTER_RULE_TYPES.find(
+                    (rt) => rt.filtervar == filterQueryVar
+                  ).id,
+                  value: splitVal,
+                })
+              })
+            } else {
+              queryVarsFilterRules.push({
+                rule_type: FILTER_RULE_TYPES.find(
+                  (rt) => rt.filtervar == filterQueryVar
+                ).id,
+                value: value,
+              })
+            }
+          }
+        })
+
         this.list.activateSavedView(null)
+        this.list.filterRules = queryVarsFilterRules
         this.list.reload()
         this.unmodifiedFilterRules = []
-      }
+      })
+  }
+
+  ngAfterViewInit(): void {
+    this.filterEditor.filterRulesChange.subscribe({
+      next: (rules) => {
+        const params = this.documentService.queryParams
+
+        // if we were on a saved view we navigate 'away' to /documents
+        let base = []
+        if (this.route.snapshot.paramMap.has('id')) base = ['/documents']
+
+        this.router.navigate(base, {
+          relativeTo: this.route,
+          queryParams: params,
+        })
+      },
     })
   }
 
