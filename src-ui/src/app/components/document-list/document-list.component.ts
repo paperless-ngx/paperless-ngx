@@ -151,8 +151,9 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.filterEditor.filterRulesChange.subscribe({
-      next: (rules) => {
-        const params = this.documentService.queryParams
+      next: (filterRules) => {
+        const params =
+          this.documentService.filterRulesToQueryParams(filterRules)
 
         // if we were on a saved view we navigate 'away' to /documents
         let base = []

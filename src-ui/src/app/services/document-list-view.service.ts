@@ -249,20 +249,11 @@ export class DocumentListViewService {
   }
 
   quickFilter(filterRules: FilterRule[]) {
-    this._activeSavedViewId = null
-    this.activeListViewState.filterRules = filterRules
-    this.activeListViewState.currentPage = 1
-    if (isFullTextFilterRule(filterRules)) {
-      this.activeListViewState.sortField = 'score'
-      this.activeListViewState.sortReverse = false
-    }
-    this.reduceSelectionToFilter()
-    this.saveDocumentListView()
-    if (this.router.url == '/documents') {
-      this.reload()
-    } else {
-      this.router.navigate(['documents'])
-    }
+    const params = this.documentService.filterRulesToQueryParams(filterRules)
+    this.router.navigate(['/documents'], {
+      relativeTo: this.route,
+      queryParams: params,
+    })
   }
 
   getLastPage(): number {
