@@ -57,7 +57,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     super(http, 'documents')
   }
 
-  private filterRulesToQueryParams(filterRules: FilterRule[]) {
+  public filterRulesToQueryParams(filterRules: FilterRule[]): Object {
     if (filterRules) {
       let params = {}
       for (let rule of filterRules) {
