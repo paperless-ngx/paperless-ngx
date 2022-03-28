@@ -81,7 +81,10 @@ export class AppFrameComponent {
   search() {
     this.closeMenu()
     this.list.quickFilter([
-      { rule_type: FILTER_FULLTEXT_QUERY, value: this.searchField.value },
+      {
+        rule_type: FILTER_FULLTEXT_QUERY,
+        value: (this.searchField.value as string).trim(),
+      },
     ])
   }
 
