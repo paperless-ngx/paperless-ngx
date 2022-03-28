@@ -7,9 +7,17 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core'
-import { ActivatedRoute, ParamMap, Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { filter, Subscription } from 'rxjs'
+import {
+  filter,
+  first,
+  map,
+  Subject,
+  Subscription,
+  switchMap,
+  takeUntil,
+} from 'rxjs'
 import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule'
 import {
   FILTER_FULLTEXT_MORELIKE,
@@ -59,6 +67,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   unmodifiedFilterRules: FilterRule[] = []
 
+  private unsubscribeNotifier: Subject<any> = new Subject()
   private consumptionFinishedSubscription: Subscription
 
   get isFiltered() {
@@ -94,22 +103,29 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.consumptionFinishedSubscription = this.consumerStatusService
       .onDocumentConsumptionFinished()
+      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         this.list.reload()
       })
 
     this.route.paramMap
-      .pipe(filter((params) => params.has('id'))) // only on saved view
-      .subscribe((params) => {
-        this.savedViewService.getCached(+params.get('id')).subscribe((view) => {
-          if (!view) {
-            this.router.navigate(['404'])
-            return
-          }
-          this.list.activateSavedView(view)
-          this.list.reload()
-          this.unmodifiedFilterRules = view.filter_rules
+      .pipe(
+        filter((params) => params.has('id')), // only on saved view
+        switchMap((params) => {
+          return this.savedViewService
+            .getCached(+params.get('id'))
+            .pipe(map((view) => ({ params, view })))
         })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ view, params }) => {
+        if (!view) {
+          this.router.navigate(['404'])
+          return
+        }
+        this.list.activateSavedView(view)
+        this.list.reload()
+        this.unmodifiedFilterRules = view.filter_rules
       })
 
     const filterQueryVars: string[] = FILTER_RULE_TYPES.map(
@@ -117,7 +133,10 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     )
 
     this.route.queryParamMap
-      .pipe(filter((qp) => !this.route.snapshot.paramMap.has('id'))) // only when not on saved view
+      .pipe(
+        filter((qp) => !this.route.snapshot.paramMap.has('id')), // only when not on saved view
+        takeUntil(this.unsubscribeNotifier)
+      )
       .subscribe((queryParams) => {
         const queryVarsFilterRules = []
 
@@ -152,27 +171,29 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.filterEditor.filterRulesChange.subscribe({
-      next: (filterRules) => {
-        const params =
-          this.documentService.filterRulesToQueryParams(filterRules)
+    this.filterEditor.filterRulesChange
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (filterRules) => {
+          const params =
+            this.documentService.filterRulesToQueryParams(filterRules)
 
-        // if we were on a saved view we navigate 'away' to /documents
-        let base = []
-        if (this.route.snapshot.paramMap.has('id')) base = ['/documents']
+          // if we were on a saved view we navigate 'away' to /documents
+          let base = []
+          if (this.route.snapshot.paramMap.has('id')) base = ['/documents']
 
-        this.router.navigate(base, {
-          relativeTo: this.route,
-          queryParams: params,
-        })
-      },
-    })
+          this.router.navigate(base, {
+            relativeTo: this.route,
+            queryParams: params,
+          })
+        },
+      })
   }
 
   ngOnDestroy() {
-    if (this.consumptionFinishedSubscription) {
-      this.consumptionFinishedSubscription.unsubscribe()
-    }
+    // unsubscribes all
+    this.unsubscribeNotifier.next(this)
+    this.unsubscribeNotifier.complete()
   }
 
   loadViewConfig(view: PaperlessSavedView) {
@@ -188,12 +209,15 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
         sort_field: this.list.sortField,
         sort_reverse: this.list.sortReverse,
       }
-      this.savedViewService.patch(savedView).subscribe((result) => {
-        this.toastService.showInfo(
-          $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
-        )
-        this.unmodifiedFilterRules = this.list.filterRules
-      })
+      this.savedViewService
+        .patch(savedView)
+        .pipe(first())
+        .subscribe((result) => {
+          this.toastService.showInfo(
+            $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
+          )
+          this.unmodifiedFilterRules = this.list.filterRules
+        })
     }
   }
 
@@ -202,7 +226,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       backdrop: 'static',
     })
     modal.componentInstance.defaultName = this.filterEditor.generateFilterName()
-    modal.componentInstance.saveClicked.subscribe((formValue) => {
+    modal.componentInstance.saveClicked.pipe(first()).subscribe((formValue) => {
       modal.componentInstance.buttonsEnabled = false
       let savedView: PaperlessSavedView = {
         name: formValue.name,
@@ -213,18 +237,21 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
         sort_field: this.list.sortField,
       }
 
-      this.savedViewService.create(savedView).subscribe(
-        () => {
-          modal.close()
-          this.toastService.showInfo(
-            $localize`View "${savedView.name}" created successfully.`
-          )
-        },
-        (error) => {
-          modal.componentInstance.error = error.error
-          modal.componentInstance.buttonsEnabled = true
-        }
-      )
+      this.savedViewService
+        .create(savedView)
+        .pipe(first())
+        .subscribe({
+          next: () => {
+            modal.close()
+            this.toastService.showInfo(
+              $localize`View "${savedView.name}" created successfully.`
+            )
+          },
+          error: (error) => {
+            modal.componentInstance.error = error.error
+            modal.componentInstance.buttonsEnabled = true
+          },
+        })
     })
   }
 
