@@ -119,7 +119,10 @@ class MailRule(models.Model):
         _("folder"),
         default="INBOX",
         max_length=256,
-        help_text=_("Subfolders must be separated by dots."),
+        help_text=_(
+            "Subfolders must be separated by a delimiter, often a dot ('.') or "
+            " slash ('/'), but it varies by mail server.",
+        ),
     )
 
     filter_from = models.CharField(
