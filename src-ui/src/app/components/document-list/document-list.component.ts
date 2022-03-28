@@ -128,43 +128,40 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.unmodifiedFilterRules = view.filter_rules
       })
 
-    const filterQueryVars: string[] = FILTER_RULE_TYPES.map(
+    const allFilterRuleQueryParams: string[] = FILTER_RULE_TYPES.map(
       (rt) => rt.filtervar
     )
 
     this.route.queryParamMap
       .pipe(
-        filter((qp) => !this.route.snapshot.paramMap.has('id')), // only when not on saved view
+        filter(() => !this.route.snapshot.paramMap.has('id')), // only when not on saved view
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe((queryParams) => {
-        const queryVarsFilterRules = []
+        // transform query params to filter rules
+        let filterRulesFromQueryParams: FilterRule[] = []
+        allFilterRuleQueryParams
+          .filter((frqp) => queryParams.has(frqp))
+          .forEach((filterQueryParamName) => {
+            const filterQueryParamValues: string[] = queryParams
+              .get(filterQueryParamName)
+              .split(',')
 
-        filterQueryVars.forEach((filterQueryVar) => {
-          if (queryParams.has(filterQueryVar)) {
-            const value = queryParams.get(filterQueryVar)
-            if (value.split(',').length > 1) {
-              value.split(',').forEach((splitVal) => {
-                queryVarsFilterRules.push({
+            filterRulesFromQueryParams = filterRulesFromQueryParams.concat(
+              // map all values to filter rules
+              filterQueryParamValues.map((val) => {
+                return {
                   rule_type: FILTER_RULE_TYPES.find(
-                    (rt) => rt.filtervar == filterQueryVar
+                    (rt) => rt.filtervar == filterQueryParamName
                   ).id,
-                  value: splitVal,
-                })
+                  value: val,
+                }
               })
-            } else {
-              queryVarsFilterRules.push({
-                rule_type: FILTER_RULE_TYPES.find(
-                  (rt) => rt.filtervar == filterQueryVar
-                ).id,
-                value: value,
-              })
-            }
-          }
-        })
+            )
+          })
 
         this.list.activateSavedView(null)
-        this.list.filterRules = queryVarsFilterRules
+        this.list.filterRules = filterRulesFromQueryParams
         this.list.reload()
         this.unmodifiedFilterRules = []
       })
