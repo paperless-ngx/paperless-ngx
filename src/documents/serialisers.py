@@ -149,16 +149,23 @@ class TagSerializerVersion1(MatchingModelSerializer):
 
 
 class TagSerializer(MatchingModelSerializer):
+
+    def __linearizeColorComponent(self, component):
+        return component/12.92 if component <= .03928 else ((component + .055) / 1.055)**2.4
+
+    def __computeLuminance(self, rgb):
+        return 0.2126 * self.__linearizeColorComponent(rgb[0]) \
+             + 0.7152 * self.__linearizeColorComponent(rgb[1]) \
+             + 0.0722 * self.__linearizeColorComponent(rgb[2])
+
     def get_text_color(self, obj):
         try:
             h = obj.color.lstrip("#")
             rgb = tuple(int(h[i : i + 2], 16) / 256 for i in (0, 2, 4))
-            luminance = math.sqrt(
-                0.299 * math.pow(rgb[0], 2)
-                + 0.587 * math.pow(rgb[1], 2)
-                + 0.114 * math.pow(rgb[2], 2)
-            )
-            return "#ffffff" if luminance < 0.53 else "#000000"
+            relativeLuminance = self.__computeLuminance(rgb)
+            # https://api.flutter.dev/flutter/material/ThemeData/estimateBrightnessForColor.html
+            kThreshold = .15
+            return "#000000" if ((relativeLuminance + 0.05) * (relativeLuminance + 0.05) > kThreshold) else "#ffffff"
         except ValueError:
             return "#000000"
 
