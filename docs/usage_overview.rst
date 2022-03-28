@@ -180,6 +180,14 @@ These are as follows:
 
 .. note::
 
+    When defining a mail rule with a folder, you may need to try different characters to
+    define how the sub-folders are separated.  Common values include ".", "/" or "|", but
+    this varies by the mail server.  Unfortunately, this isn't a value we can determine
+    automatically.  Either check the documentation for your mail server, or check for
+    errors in the logs and try different folder separator values.
+
+.. note::
+
     Paperless will process the rules in the order defined in the admin page.
 
     You can define catch-all rules and have them executed last to consume
