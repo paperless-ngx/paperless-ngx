@@ -8,15 +8,10 @@ class MailAccount(models.Model):
         verbose_name = _("mail account")
         verbose_name_plural = _("mail accounts")
 
-    IMAP_SECURITY_NONE = 1
-    IMAP_SECURITY_SSL = 2
-    IMAP_SECURITY_STARTTLS = 3
-
-    IMAP_SECURITY_OPTIONS = (
-        (IMAP_SECURITY_NONE, _("No encryption")),
-        (IMAP_SECURITY_SSL, _("Use SSL")),
-        (IMAP_SECURITY_STARTTLS, _("Use STARTTLS")),
-    )
+    class ImapSecurity(models.IntegerChoices):
+        NONE = 1, _("No encryption")
+        SSL = 2, _("Use SSL")
+        STARTTLS = 3, _("Use STARTTLS")
 
     name = models.CharField(_("name"), max_length=256, unique=True)
 
@@ -34,8 +29,8 @@ class MailAccount(models.Model):
 
     imap_security = models.PositiveIntegerField(
         _("IMAP security"),
-        choices=IMAP_SECURITY_OPTIONS,
-        default=IMAP_SECURITY_SSL,
+        choices=ImapSecurity.choices,
+        default=ImapSecurity.SSL,
     )
 
     username = models.CharField(_("username"), max_length=256)
@@ -61,48 +56,25 @@ class MailRule(models.Model):
         verbose_name = _("mail rule")
         verbose_name_plural = _("mail rules")
 
-    ATTACHMENT_TYPE_ATTACHMENTS_ONLY = 1
-    ATTACHMENT_TYPE_EVERYTHING = 2
+    class AttachmentProcessing(models.IntegerChoices):
+        ATTACHMENTS_ONLY = 1, _("Only process attachments.")
+        EVERYTHING = 2, _("Process all files, including 'inline' " "attachments.")
 
-    ATTACHMENT_TYPES = (
-        (ATTACHMENT_TYPE_ATTACHMENTS_ONLY, _("Only process attachments.")),
-        (
-            ATTACHMENT_TYPE_EVERYTHING,
-            _("Process all files, including 'inline' " "attachments."),
-        ),
-    )
+    class AttachmentAction(models.IntegerChoices):
+        DELETE = 1, _("Mark as read, don't process read mails")
+        MOVE = 2, _("Flag the mail, don't process flagged mails")
+        MARK_READ = 3, _("Move to specified folder")
+        FLAG = 4, _("Delete")
 
-    ACTION_DELETE = 1
-    ACTION_MOVE = 2
-    ACTION_MARK_READ = 3
-    ACTION_FLAG = 4
+    class TitleSource(models.IntegerChoices):
+        FROM_SUBJECT = 1, _("Use subject as title")
+        FROM_FILENAME = 2, _("Use attachment filename as title")
 
-    ACTIONS = (
-        (ACTION_MARK_READ, _("Mark as read, don't process read mails")),
-        (ACTION_FLAG, _("Flag the mail, don't process flagged mails")),
-        (ACTION_MOVE, _("Move to specified folder")),
-        (ACTION_DELETE, _("Delete")),
-    )
-
-    TITLE_FROM_SUBJECT = 1
-    TITLE_FROM_FILENAME = 2
-
-    TITLE_SELECTOR = (
-        (TITLE_FROM_SUBJECT, _("Use subject as title")),
-        (TITLE_FROM_FILENAME, _("Use attachment filename as title")),
-    )
-
-    CORRESPONDENT_FROM_NOTHING = 1
-    CORRESPONDENT_FROM_EMAIL = 2
-    CORRESPONDENT_FROM_NAME = 3
-    CORRESPONDENT_FROM_CUSTOM = 4
-
-    CORRESPONDENT_SELECTOR = (
-        (CORRESPONDENT_FROM_NOTHING, _("Do not assign a correspondent")),
-        (CORRESPONDENT_FROM_EMAIL, _("Use mail address")),
-        (CORRESPONDENT_FROM_NAME, _("Use name (or mail address if not available)")),
-        (CORRESPONDENT_FROM_CUSTOM, _("Use correspondent selected below")),
-    )
+    class CorrespondentSource(models.IntegerChoices):
+        FROM_NOTHING = 1, _("Do not assign a correspondent")
+        FROM_EMAIL = 2, _("Use mail address")
+        FROM_NAME = 3, _("Use name (or mail address if not available)")
+        FROM_CUSTOM = 4, _("Use correspondent selected below")
 
     name = models.CharField(_("name"), max_length=256, unique=True)
 
@@ -120,7 +92,7 @@ class MailRule(models.Model):
         default="INBOX",
         max_length=256,
         help_text=_(
-            "Subfolders must be separated by a delimiter, often a dot ('.') or "
+            "Subfolders must be separated by a delimiter, often a dot ('.') or"
             " slash ('/'), but it varies by mail server.",
         ),
     )
@@ -164,8 +136,8 @@ class MailRule(models.Model):
 
     attachment_type = models.PositiveIntegerField(
         _("attachment type"),
-        choices=ATTACHMENT_TYPES,
-        default=ATTACHMENT_TYPE_ATTACHMENTS_ONLY,
+        choices=AttachmentProcessing.choices,
+        default=AttachmentProcessing.ATTACHMENTS_ONLY,
         help_text=_(
             "Inline attachments include embedded images, so it's best "
             "to combine this option with a filename filter.",
@@ -174,8 +146,8 @@ class MailRule(models.Model):
 
     action = models.PositiveIntegerField(
         _("action"),
-        choices=ACTIONS,
-        default=ACTION_MARK_READ,
+        choices=AttachmentAction.choices,
+        default=AttachmentAction.MARK_READ,
     )
 
     action_parameter = models.CharField(
@@ -193,8 +165,8 @@ class MailRule(models.Model):
 
     assign_title_from = models.PositiveIntegerField(
         _("assign title from"),
-        choices=TITLE_SELECTOR,
-        default=TITLE_FROM_SUBJECT,
+        choices=TitleSource.choices,
+        default=TitleSource.FROM_SUBJECT,
     )
 
     assign_tag = models.ForeignKey(
@@ -215,8 +187,8 @@ class MailRule(models.Model):
 
     assign_correspondent_from = models.PositiveIntegerField(
         _("assign correspondent from"),
-        choices=CORRESPONDENT_SELECTOR,
-        default=CORRESPONDENT_FROM_NOTHING,
+        choices=CorrespondentSource.choices,
+        default=CorrespondentSource.FROM_NOTHING,
     )
 
     assign_correspondent = models.ForeignKey(
