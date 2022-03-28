@@ -68,7 +68,6 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   unmodifiedFilterRules: FilterRule[] = []
 
   private unsubscribeNotifier: Subject<any> = new Subject()
-  private consumptionFinishedSubscription: Subscription
 
   get isFiltered() {
     return this.list.filterRules?.length > 0
@@ -101,7 +100,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       this.displayMode = localStorage.getItem('document-list:displayMode')
     }
 
-    this.consumptionFinishedSubscription = this.consumerStatusService
+    this.consumerStatusService
       .onDocumentConsumptionFinished()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
