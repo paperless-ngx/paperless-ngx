@@ -27,7 +27,7 @@ repos:
       - id: check-case-conflict
       - id: detect-private-key
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v2.5.1"
+    rev: "v2.6.1"
     hooks:
       - id: prettier
         types_or:
@@ -37,7 +37,7 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.7.1
+    rev: v3.0.1
     hooks:
       - id: reorder-python-imports
         exclude: "(migrations)"
@@ -59,7 +59,7 @@ repos:
         args:
           - "--config=./src/setup.cfg"
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 22.3.0
     hooks:
       - id: black
   # Dockerfile hooks
