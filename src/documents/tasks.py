@@ -79,12 +79,10 @@ def barcode_reader(image) -> list:
     # Decode the barcode image
     detected_barcodes = pyzbar.decode(image)
 
-    if not detected_barcodes:
-        logger.debug("No barcode detected")
-    else:
+    if detected_barcodes:
         # Traverse through all the detected barcodes in image
         for barcode in detected_barcodes:
-            if barcode.data != "":
+            if barcode.data:
                 barcodes.append(str(barcode.data))
                 logger.debug(
                     f"Barcode of type {str(barcode.type)} found: {str(barcode.data)}",
@@ -122,7 +120,7 @@ def separate_pages(filepath: str, pages_to_split_on: list) -> list:
     pdf = Pdf.open(filepath)
     document_paths = []
     logger.debug(f"Temp dir is {str(tempdir)}")
-    if len(pages_to_split_on) <= 0:
+    if not pages_to_split_on:
         logger.warning("No pages to split on!")
     else:
         # go from the first page to the first separator page
@@ -188,14 +186,10 @@ def consume_file(
     if settings.CONSUMER_ENABLE_BARCODES:
         separators = scan_file_for_separating_barcodes(path)
     document_list = []
-    if separators == []:
-        pass
-    else:
+    if separators:
         logger.debug(f"Pages with separators found in: {str(path)}")
         document_list = separate_pages(path, separators)
-    if document_list == []:
-        pass
-    else:
+    if document_list:
         for n, document in enumerate(document_list):
             # save to consumption dir
             # rename it to the original filename  with number prefix
