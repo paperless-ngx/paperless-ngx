@@ -101,7 +101,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">注销</target>
+        <target state="translated">退出</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -241,7 +241,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="translated">管理</target>
+        <target state="translated">后台管理</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -257,7 +257,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="translated">文档</target>
+        <target state="translated">帮助文档</target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -1256,7 +1256,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="translated">此操作将把标签“<x id="PH" equiv-text="tag.name"/>”添加到 <x id="PH_1" equiv-text="this.list.selected.size"/> 选定的文档。</target>
+        <target state="translated">此操作将把标签“<x id="PH" equiv-text="tag.name"/>”添加到 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档。</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
