@@ -185,38 +185,38 @@ def consume_file(
 ):
 
     # check for separators in current document
-    separators = []
     if settings.CONSUMER_ENABLE_BARCODES:
+        separators = []
+        document_list = []
         separators = scan_file_for_separating_barcodes(path)
-    document_list = []
-    if separators:
-        logger.debug(f"Pages with separators found in: {str(path)}")
-        document_list = separate_pages(path, separators)
-    if document_list:
-        for n, document in enumerate(document_list):
-            # save to consumption dir
-            # rename it to the original filename  with number prefix
-            newname = f"{str(n)}_" + override_filename
-            save_to_dir(document, newname=newname)
-        # if we got here, the document was successfully split
-        # and can safely be deleted
-        logger.debug("Deleting file {}".format(path))
-        os.unlink(path)
-        # notify the sender, otherwise the progress bar
-        # in the UI stays stuck
-        payload = {
-            "filename": override_filename,
-            "task_id": task_id,
-            "current_progress": 100,
-            "max_progress": 100,
-            "status": "SUCCESS",
-            "message": "finished",
-        }
-        async_to_sync(get_channel_layer().group_send)(
-            "status_updates",
-            {"type": "status_update", "data": payload},
-        )
-        return "File successfully split"
+        if separators:
+            logger.debug(f"Pages with separators found in: {str(path)}")
+            document_list = separate_pages(path, separators)
+        if document_list:
+            for n, document in enumerate(document_list):
+                # save to consumption dir
+                # rename it to the original filename  with number prefix
+                newname = f"{str(n)}_" + override_filename
+                save_to_dir(document, newname=newname)
+            # if we got here, the document was successfully split
+            # and can safely be deleted
+            logger.debug("Deleting file {}".format(path))
+            os.unlink(path)
+            # notify the sender, otherwise the progress bar
+            # in the UI stays stuck
+            payload = {
+                "filename": override_filename,
+                "task_id": task_id,
+                "current_progress": 100,
+                "max_progress": 100,
+                "status": "SUCCESS",
+                "message": "finished",
+            }
+            async_to_sync(get_channel_layer().group_send)(
+                "status_updates",
+                {"type": "status_update", "data": payload},
+            )
+            return "File successfully split"
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
