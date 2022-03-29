@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ElementRef,
-} from '@angular/core'
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap'
@@ -89,6 +83,9 @@ export class DocumentDetailComponent
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
+
+  requiresPassword: boolean = false
+  password: string
 
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
@@ -450,5 +447,18 @@ export class DocumentDetailComponent
 
   pdfPreviewLoaded(pdf: PDFDocumentProxy) {
     this.previewNumPages = pdf.numPages
+    if (this.password) this.requiresPassword = false
+  }
+
+  onError(event) {
+    if (event.name == 'PasswordException') {
+      this.requiresPassword = true
+    }
+  }
+
+  onPasswordKeyUp(event: KeyboardEvent) {
+    if ('Enter' == event.key) {
+      this.password = (event.target as HTMLInputElement).value
+    }
   }
 }
