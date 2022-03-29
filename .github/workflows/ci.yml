@@ -13,37 +13,31 @@ on:
 
 jobs:
   documentation:
+    name: "Build Documentation"
     runs-on: ubuntu-20.04
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
       -
+        name: Install pipenv
+        run: pipx install pipenv
+      -
         name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      -
-        name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip3.8}
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
       -
         name: Install dependencies
         run: |
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
+          pipenv sync --dev
       -
         name: Make documentation
         run: |
           cd docs/
-          make html
+          pipenv run make html
       -
         name: Upload artifact
         uses: actions/upload-artifact@v2
@@ -51,52 +45,68 @@ jobs:
           name: documentation
           path: docs/_build/html/
 
-  codestyle:
+  code-checks-backend:
+    name: "Backend Code Checks"
     runs-on: ubuntu-20.04
     steps:
       -
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      -
-        name: Get pip cache dir
-        id: pip-cache
+        name: Install checkers
         run: |
-          echo "::set-output name=dir::$(pip cache dir)"
+          pipx install reorder-python-imports
+          pipx install yesqa
+          pipx install add-trailing-comma
+          pipx install flake8
       -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip${{ matrix.python-version }}
-      -
-        name: Install dependencies
+        name: Run reorder-python-imports
         run: |
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
+          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs reorder-python-imports
       -
-        name: Codestyle
+        name: Run yesqa
         run: |
-          cd src/
-          pycodestyle --max-line-length=88 --ignore=E121,E123,E126,E226,E24,E704,W503,W504,E203
-  codeformatting:
-    runs-on: ubuntu-20.04
-    steps:
+          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs yesqa
       -
-        name: Checkout
-        uses: actions/checkout@v2
+        name: Run add-trailing-comma
+        run: |
+          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs add-trailing-comma
+      # black is placed after add-trailing-comma because it may format differently
+      # if a trailing comma is added
       -
         name: Run black
         uses: psf/black@stable
         with:
           options: "--check --diff"
-          version: "22.1.0"
+          version: "22.3.0"
+      -
+        name: Run flake8 checks
+        run: |
+          cd src/
+          flake8 --max-line-length=88 --ignore=E203,W503
 
-  tests:
+  code-checks-frontend:
+    name: "Frontend Code Checks"
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      -
+        name: Install prettier
+        run: |
+          npm install prettier
+      -
+        name: Run prettier
+        run:
+          npx prettier --check --ignore-path Pipfile.lock **/*.js **/*.ts *.md **/*.md
+
+  tests-backend:
+    needs: [code-checks-backend]
+    name: "Backend Tests (${{ matrix.python-version }})"
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -106,49 +116,77 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      -
+        name: Install pipenv
+        run: pipx install pipenv
       -
         name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
+          cache: "pipenv"
+          cache-dependency-path: 'Pipfile.lock'
       -
-        name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      -
-        name: Persistent Github pip cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip${{ matrix.python-version }}
-      -
-        name: Install dependencies
+        name: Install system dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng
-          pip install --upgrade pipenv
-          pipenv install --system --dev --ignore-pipfile
+      -
+        name: Install Python dependencies
+        run: |
+          pipenv sync --dev
       -
         name: Tests
         run: |
           cd src/
-          pytest
+          pipenv run pytest
+      -
+        name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v18.1
+        with:
+          files: |
+            src/**
+      -
+        name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files-specific.outputs.all_changed_files }}; do
+            echo "${file} was changed"
+          done
       -
         name: Publish coverage results
-        if: matrix.python-version == '3.9'
+        if: matrix.python-version == '3.9' && steps.changed-files-specific.outputs.any_changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # https://github.com/coveralls-clients/coveralls-python/issues/251
         run: |
           cd src/
-          coveralls --service=github
+          pipenv run coveralls --service=github
+
+  tests-frontend:
+    needs: [code-checks-frontend]
+    name: "Frontend Tests"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cd src-ui && npm ci
+      - run: cd src-ui && npm run test
+      - run: cd src-ui && npm run e2e:ci
 
   # build and push image to docker hub.
   build-docker-image:
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
     runs-on: ubuntu-latest
-    needs: [tests, codeformatting, codestyle]
+    needs: [tests-backend, tests-frontend]
     steps:
       -
         name: Prepare
@@ -213,7 +251,7 @@ jobs:
           path: src/documents/static/frontend/
 
   build-release:
-    needs: [build-docker-image, documentation, tests, codeformatting, codestyle]
+    needs: [build-docker-image, documentation]
     runs-on: ubuntu-20.04
     steps:
       -
