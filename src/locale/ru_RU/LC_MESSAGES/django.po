@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-29 10:25\n"
+"PO-Revision-Date: 2022-03-29 11:25\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -382,7 +382,7 @@ msgstr "Paperless-ngx загружается..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Выполнен выход из Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
@@ -450,7 +450,7 @@ msgstr "Итальянский"
 
 #: paperless/settings.py:307
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Люксембургский"
 
 #: paperless/settings.py:308
 msgid "Dutch"
@@ -462,7 +462,7 @@ msgstr "Польский"
 
 #: paperless/settings.py:310
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Португальский (Бразилия)"
 
 #: paperless/settings.py:311
 msgid "Portuguese"
@@ -482,7 +482,7 @@ msgstr "Шведский"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Администрирование Paperless-ng"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
