@@ -187,9 +187,9 @@ class TestTasks(DirectoriesMixin, TestCase):
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
         separators = tasks.scan_file_for_separating_barcodes(test_file)
-        self.assertTrue(separators != [])
+        self.assertTrue(separators)
         document_list = tasks.separate_pages(test_file, separators)
-        self.assertTrue(document_list != [])
+        self.assertTrue(document_list)
         for document in document_list:
             tasks.save_to_dir(document, target_dir=tempdir)
         target_file1 = os.path.join(tempdir, "patch-code-t-middle_document_0.pdf")
