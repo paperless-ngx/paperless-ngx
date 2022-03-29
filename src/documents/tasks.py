@@ -70,7 +70,7 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
-def barcode_reader(image) -> list:
+def barcode_reader(image) -> list[str]:
     """
     Read any barcodes contained in image
     Returns a list containing all found barcodes
@@ -91,7 +91,7 @@ def barcode_reader(image) -> list:
     return barcodes
 
 
-def scan_file_for_separating_barcodes(filepath: str) -> list:
+def scan_file_for_separating_barcodes(filepath: str) -> list[int]:
     """
     Scan the provided file for page separating barcodes
     Returns a list of pagenumbers, which separate the file
@@ -108,7 +108,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> list:
     return separator_page_numbers
 
 
-def separate_pages(filepath: str, pages_to_split_on: list) -> list:
+def separate_pages(filepath: str, pages_to_split_on: list[int]) -> list[str]:
     """
     Separate the provided file on the pages_to_split_on.
     The pages which are defined by page_numbers will be removed.
@@ -156,7 +156,9 @@ def separate_pages(filepath: str, pages_to_split_on: list) -> list:
     return document_paths
 
 
-def save_to_dir(filepath, newname=None, target_dir=settings.CONSUMPTION_DIR):
+def save_to_dir(
+    filepath: str, newname: str = None, target_dir: str = settings.CONSUMPTION_DIR
+):
     """
     Copies filepath to target_dir.
     Optionally rename the file.
