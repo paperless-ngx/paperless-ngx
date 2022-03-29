@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-09 23:50\n"
+"PO-Revision-Date: 2022-03-29 06:26\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -104,7 +104,7 @@ msgstr "未加密"
 
 #: documents/models.py:95
 msgid "Encrypted with GNU Privacy Guard"
-msgstr "使用 GNU 隐私防护加密"
+msgstr "使用 GNU 隐私防护（GPG）加密"
 
 #: documents/models.py:107
 msgid "title"
@@ -308,19 +308,19 @@ msgstr "创建日期是"
 
 #: documents/models.py:344
 msgid "added before"
-msgstr "添加于"
+msgstr "添加早于"
 
 #: documents/models.py:345
 msgid "added after"
-msgstr "添加后"
+msgstr "添加晚于"
 
 #: documents/models.py:346
 msgid "modified before"
-msgstr "修改前"
+msgstr "修改早于"
 
 #: documents/models.py:347
 msgid "modified after"
-msgstr "修改后"
+msgstr "修改晚于"
 
 #: documents/models.py:348
 msgid "does not have tag"
@@ -344,7 +344,7 @@ msgstr "更多类似内容"
 
 #: documents/models.py:353
 msgid "has tags in"
-msgstr "有标签于"
+msgstr "有标签包含于"
 
 #: documents/models.py:363
 msgid "rule type"
@@ -382,11 +382,11 @@ msgstr "Paperless-ngx 正在加载..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr "Paperless-ngx 注销"
+msgstr "Paperless-ngx 已退出"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr "您已成功注销。Bye！"
+msgstr "您已成功退出。再见！"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
@@ -402,7 +402,7 @@ msgstr "请登录。"
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr "您的用户名和密码不匹配，请重试。"
+msgstr "您的用户名和密码不匹配。请重试。"
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
