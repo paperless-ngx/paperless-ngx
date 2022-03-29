@@ -58,14 +58,15 @@ def match_tags(document, classifier):
 def matches(matching_model, document):
     search_kwargs = {}
 
-    document_content = document.content.lower()
-
     # Check that match is not empty
     if matching_model.match.strip() == "":
         return False
 
     if matching_model.is_insensitive:
         search_kwargs = {"flags": re.IGNORECASE}
+        document_content = document.content.lower()
+    else:
+        document_content = document.content
 
     if matching_model.matching_algorithm == MatchingModel.MATCH_ALL:
         for word in _split_match(matching_model):
