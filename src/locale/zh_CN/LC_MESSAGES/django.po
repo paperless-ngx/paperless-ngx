@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-29 07:31\n"
+"PO-Revision-Date: 2022-03-29 08:58\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -514,7 +514,7 @@ msgstr "元数据"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr "将元数据自动分配到从此规则处理的文档。 如果您不在这里分配标签、类型或联系人，Paperless-ngx 仍将处理您已定义的所有匹配规则。"
+msgstr "将元数据自动指定到被此规则所处理的文档。 如果您不在这里指定标签、类型或联系人，Paperless-ngx 仍将处理您已定义的所有匹配规则。"
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
@@ -522,7 +522,7 @@ msgstr "Paperless-ngx 邮件"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr "邮件帐户"
+msgstr "邮件账号"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
@@ -570,7 +570,7 @@ msgstr "字符集"
 
 #: paperless_mail/models.py:50
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr "与邮件服务器通信时使用的字符集，例如'UTF-8'或 'US-ASCII'。"
+msgstr "与邮件服务器通信时使用的字符集，例如“UTF-8”或“US-ASCII”。"
 
 #: paperless_mail/models.py:61
 msgid "mail rule"
@@ -594,7 +594,7 @@ msgstr "标记为已读，不处理已读邮件"
 
 #: paperless_mail/models.py:82
 msgid "Flag the mail, don't process flagged mails"
-msgstr "标记邮件，不处理标记的邮件"
+msgstr "标记邮件，不处理已标记的邮件"
 
 #: paperless_mail/models.py:83
 msgid "Move to specified folder"
@@ -634,7 +634,7 @@ msgstr "排序"
 
 #: paperless_mail/models.py:115
 msgid "account"
-msgstr "帐户"
+msgstr "账户"
 
 #: paperless_mail/models.py:119
 msgid "folder"
@@ -642,7 +642,7 @@ msgstr "文件夹"
 
 #: paperless_mail/models.py:122
 msgid "Subfolders must be separated by dots."
-msgstr "子文件夹必须用 \".\" 分隔。"
+msgstr "子文件夹必须用“.”分隔。"
 
 #: paperless_mail/models.py:126
 msgid "filter from"
@@ -662,7 +662,7 @@ msgstr "过滤附件文件名"
 
 #: paperless_mail/models.py:141
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr "如果指定的话，只处理完全匹配此文件名的文档。允许使用通配符，如 *.pdf 或 *发票*。不区分大小写。"
+msgstr "如果指定了文件名，只处理完全匹配此文件名的文档。允许使用通配符，如 *.pdf 或 *发票*。不区分大小写。"
 
 #: paperless_mail/models.py:148
 msgid "maximum age"
@@ -690,11 +690,11 @@ msgstr "操作参数"
 
 #: paperless_mail/models.py:173
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "上面选择的操作的附加参数，即移动到文件夹操作的目标文件夹。子文件夹必须用 \".\" 来分隔。"
+msgstr "上面选择的操作的附加参数，即移动到文件夹操作的目标文件夹。子文件夹必须用“.”来分隔。"
 
 #: paperless_mail/models.py:181
 msgid "assign title from"
-msgstr "分配标题自"
+msgstr "分配标题来自"
 
 #: paperless_mail/models.py:189
 msgid "assign this tag"
@@ -706,7 +706,7 @@ msgstr "分配此文档类型"
 
 #: paperless_mail/models.py:201
 msgid "assign correspondent from"
-msgstr "分配联系人自"
+msgstr "分配联系人来自"
 
 #: paperless_mail/models.py:211
 msgid "assign this correspondent"
