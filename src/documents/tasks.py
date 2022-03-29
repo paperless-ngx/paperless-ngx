@@ -85,7 +85,7 @@ def barcode_reader(image) -> list:
         # Traverse through all the detected barcodes in image
         for barcode in detected_barcodes:
             if barcode.data != "":
-                barcodes = barcodes + [str(barcode.data)]
+                barcodes.append(str(barcode.data))
                 logger.debug(
                     f"Barcode of type {str(barcode.type)} found: {str(barcode.data)}",
                 )
@@ -105,7 +105,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> list:
         for current_page_number, page in enumerate(pages_from_path):
             current_barcodes = barcode_reader(page)
             if separator_barcode in current_barcodes:
-                separator_page_numbers = separator_page_numbers + [current_page_number]
+                separator_page_numbers.append(current_page_number)
     return separator_page_numbers
 
 
@@ -152,7 +152,7 @@ def separate_pages(filepath: str, pages_to_split_on: list) -> list:
         savepath = os.path.join(tempdir, output_filename)
         with open(savepath, "wb") as out:
             dst.save(out)
-        document_paths = document_paths + [savepath]
+        document_paths.append(savepath)
     logger.debug(f"Temp files are {str(document_paths)}")
     return document_paths
 
