@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-24 18:56\n"
+"PO-Revision-Date: 2022-03-29 10:25\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -344,7 +344,7 @@ msgstr "больше похожих"
 
 #: documents/models.py:353
 msgid "has tags in"
-msgstr ""
+msgstr "имеет теги в"
 
 #: documents/models.py:363
 msgid "rule type"
@@ -394,7 +394,7 @@ msgstr "Войти снова"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Войти в Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
