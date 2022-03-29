@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-29 20:03\n"
+"PO-Revision-Date: 2022-03-29 21:29\n"
 "Last-Translator: \n"
 "Language-Team: Belarusian\n"
 "Language: be_BY\n"
@@ -76,147 +76,147 @@ msgstr "колер"
 
 #: documents/models.py:70
 msgid "is inbox tag"
-msgstr ""
+msgstr "гэта ўваходны тэг"
 
 #: documents/models.py:73
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Пазначыць гэты тэг як тэг папкі \"Уваходныя\": Усе нядаўна спажытыя дакументы будуць пазначаны тэгамі \"Уваходныя\"."
 
 #: documents/models.py:79
 msgid "tag"
-msgstr ""
+msgstr "тэг"
 
 #: documents/models.py:80 documents/models.py:130
 msgid "tags"
-msgstr ""
+msgstr "тэгі"
 
 #: documents/models.py:85 documents/models.py:115
 msgid "document type"
-msgstr ""
+msgstr "тып дакумента"
 
 #: documents/models.py:86
 msgid "document types"
-msgstr ""
+msgstr "тыпы дакументаў"
 
 #: documents/models.py:94
 msgid "Unencrypted"
-msgstr ""
+msgstr "Незашыфраваны"
 
 #: documents/models.py:95
 msgid "Encrypted with GNU Privacy Guard"
-msgstr ""
+msgstr "Зашыфравана з дапамогай GNU Privacy Guard"
 
 #: documents/models.py:107
 msgid "title"
-msgstr ""
+msgstr "назва"
 
 #: documents/models.py:119
 msgid "content"
-msgstr ""
+msgstr "змест"
 
 #: documents/models.py:122
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Неапрацаваныя тэкставыя даныя дакумента. Гэта поле ў асноўным выкарыстоўваецца для пошуку."
 
 #: documents/models.py:127
 msgid "mime type"
-msgstr ""
+msgstr "тып MIME"
 
 #: documents/models.py:134
 msgid "checksum"
-msgstr ""
+msgstr "кантрольная сума"
 
 #: documents/models.py:138
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Кантрольная сума зыходнага дакумента."
 
 #: documents/models.py:142
 msgid "archive checksum"
-msgstr ""
+msgstr "кантрольная сума архіва"
 
 #: documents/models.py:147
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Кантрольная сума архіўнага дакумента."
 
 #: documents/models.py:150 documents/models.py:295
 msgid "created"
-msgstr ""
+msgstr "створаны"
 
 #: documents/models.py:153
 msgid "modified"
-msgstr ""
+msgstr "мадыфікаваны"
 
 #: documents/models.py:157
 msgid "storage type"
-msgstr ""
+msgstr "тып захоўвання"
 
 #: documents/models.py:165
 msgid "added"
-msgstr ""
+msgstr "дададзена"
 
 #: documents/models.py:169
 msgid "filename"
-msgstr ""
+msgstr "імя файла"
 
 #: documents/models.py:175
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Цяперашняе імя файла ў сховішчы"
 
 #: documents/models.py:179
 msgid "archive filename"
-msgstr ""
+msgstr "імя файла архіва"
 
 #: documents/models.py:185
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Цяперашняе імя файла архіва ў сховішчы"
 
 #: documents/models.py:189
 msgid "archive serial number"
-msgstr ""
+msgstr "парадкавы нумар архіва"
 
 #: documents/models.py:195
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Пазіцыя гэтага дакумента ў вашым фізічным архіве дакументаў."
 
 #: documents/models.py:201
 msgid "document"
-msgstr ""
+msgstr "дакумент"
 
 #: documents/models.py:202
 msgid "documents"
-msgstr ""
+msgstr "дакументы"
 
 #: documents/models.py:280
 msgid "debug"
-msgstr ""
+msgstr "адладка"
 
 #: documents/models.py:281
 msgid "information"
-msgstr ""
+msgstr "інфармацыя"
 
 #: documents/models.py:282
 msgid "warning"
-msgstr ""
+msgstr "папярэджанне"
 
 #: documents/models.py:283
 msgid "error"
-msgstr ""
+msgstr "памылка"
 
 #: documents/models.py:284
 msgid "critical"
-msgstr ""
+msgstr "крытычны"
 
 #: documents/models.py:287
 msgid "group"
-msgstr ""
+msgstr "група"
 
 #: documents/models.py:289
 msgid "message"
-msgstr ""
+msgstr "паведамленне"
 
 #: documents/models.py:292
 msgid "level"
-msgstr ""
+msgstr "узровень"
 
 #: documents/models.py:299
 msgid "log"
@@ -228,185 +228,185 @@ msgstr ""
 
 #: documents/models.py:310 documents/models.py:360
 msgid "saved view"
-msgstr ""
+msgstr "захаваны выгляд"
 
 #: documents/models.py:311
 msgid "saved views"
-msgstr ""
+msgstr "захаваныя выгляды"
 
 #: documents/models.py:313
 msgid "user"
-msgstr ""
+msgstr "карыстальнік"
 
 #: documents/models.py:317
 msgid "show on dashboard"
-msgstr ""
+msgstr "паказаць на панэлі"
 
 #: documents/models.py:320
 msgid "show in sidebar"
-msgstr ""
+msgstr "паказаць у бакавой панэлі"
 
 #: documents/models.py:324
 msgid "sort field"
-msgstr ""
+msgstr "поле сартавання"
 
 #: documents/models.py:326
 msgid "sort reverse"
-msgstr ""
+msgstr "сартаваць у адваротным парадку"
 
 #: documents/models.py:331
 msgid "title contains"
-msgstr ""
+msgstr "назва змяшчае"
 
 #: documents/models.py:332
 msgid "content contains"
-msgstr ""
+msgstr "змест змяшчае"
 
 #: documents/models.py:333
 msgid "ASN is"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:334
 msgid "correspondent is"
-msgstr ""
+msgstr "карэспандэнт"
 
 #: documents/models.py:335
 msgid "document type is"
-msgstr ""
+msgstr "тып дакумента"
 
 #: documents/models.py:336
 msgid "is in inbox"
-msgstr ""
+msgstr "ва ўваходных"
 
 #: documents/models.py:337
 msgid "has tag"
-msgstr ""
+msgstr "мае тэг"
 
 #: documents/models.py:338
 msgid "has any tag"
-msgstr ""
+msgstr "мае любы тэг"
 
 #: documents/models.py:339
 msgid "created before"
-msgstr ""
+msgstr "створана перад"
 
 #: documents/models.py:340
 msgid "created after"
-msgstr ""
+msgstr "створана пасля"
 
 #: documents/models.py:341
 msgid "created year is"
-msgstr ""
+msgstr "год стварэння"
 
 #: documents/models.py:342
 msgid "created month is"
-msgstr ""
+msgstr "месяц стварэння"
 
 #: documents/models.py:343
 msgid "created day is"
-msgstr ""
+msgstr "дзень стварэння"
 
 #: documents/models.py:344
 msgid "added before"
-msgstr ""
+msgstr "даданы перад"
 
 #: documents/models.py:345
 msgid "added after"
-msgstr ""
+msgstr "даданы пасля"
 
 #: documents/models.py:346
 msgid "modified before"
-msgstr ""
+msgstr "зменены перад"
 
 #: documents/models.py:347
 msgid "modified after"
-msgstr ""
+msgstr "зменены пасля"
 
 #: documents/models.py:348
 msgid "does not have tag"
-msgstr ""
+msgstr "не мае тэга"
 
 #: documents/models.py:349
 msgid "does not have ASN"
-msgstr ""
+msgstr "не мае ASN"
 
 #: documents/models.py:350
 msgid "title or content contains"
-msgstr ""
+msgstr "назва або змест смяшчае"
 
 #: documents/models.py:351
 msgid "fulltext query"
-msgstr ""
+msgstr "поўнатэкставы запыт"
 
 #: documents/models.py:352
 msgid "more like this"
-msgstr ""
+msgstr "больш падобнага"
 
 #: documents/models.py:353
 msgid "has tags in"
-msgstr ""
+msgstr "мае тэгі ў"
 
 #: documents/models.py:363
 msgid "rule type"
-msgstr ""
+msgstr "тып правіла"
 
 #: documents/models.py:365
 msgid "value"
-msgstr ""
+msgstr "значэнне"
 
 #: documents/models.py:368
 msgid "filter rule"
-msgstr ""
+msgstr "правіла фільтрацыі"
 
 #: documents/models.py:369
 msgid "filter rules"
-msgstr ""
+msgstr "правілы фільтрацыі"
 
 #: documents/serialisers.py:64
 #, python-format
 msgid "Invalid regular expression: %(error)s"
-msgstr ""
+msgstr "Няправільны рэгулярны выраз: %(error)s"
 
 #: documents/serialisers.py:185
 msgid "Invalid color."
-msgstr ""
+msgstr "Няправільны колер."
 
 #: documents/serialisers.py:459
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Тып файла %(type)s не падтрымліваецца"
 
 #: documents/templates/index.html:22
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx загружаецца..."
 
 #: documents/templates/registration/logged_out.html:14
 msgid "Paperless-ngx signed out"
-msgstr ""
+msgstr "Выкананы выхад з Paperless-ngx"
 
 #: documents/templates/registration/logged_out.html:59
 msgid "You have been successfully logged out. Bye!"
-msgstr ""
+msgstr "Вы паспяхова выйшлі з сістэмы. Да пабачэння!"
 
 #: documents/templates/registration/logged_out.html:60
 msgid "Sign in again"
-msgstr ""
+msgstr "Увайсці зноў"
 
 #: documents/templates/registration/login.html:15
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Увайсці ў Paperless-ngx"
 
 #: documents/templates/registration/login.html:61
 msgid "Please sign in."
-msgstr ""
+msgstr "Калі ласка, увайдзіце."
 
 #: documents/templates/registration/login.html:64
 msgid "Your username and password didn't match. Please try again."
-msgstr ""
+msgstr "Няправільныя імя карыстальніка або пароль! Паспрабуйце яшчэ раз."
 
 #: documents/templates/registration/login.html:67
 msgid "Username"
-msgstr ""
+msgstr "Імя карыстальніка"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
@@ -602,91 +602,91 @@ msgstr ""
 
 #: paperless_mail/models.py:84
 msgid "Delete"
-msgstr ""
+msgstr "Выдаліць"
 
 #: paperless_mail/models.py:91
 msgid "Use subject as title"
-msgstr ""
+msgstr "Тэма ў якасці загалоўка"
 
 #: paperless_mail/models.py:92
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Выкарыстоўваць імя ўкладзенага файла як загаловак"
 
 #: paperless_mail/models.py:101
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Не прызначаць карэспандэнта"
 
 #: paperless_mail/models.py:102
 msgid "Use mail address"
-msgstr ""
+msgstr "Выкарыстоўваць email адрас"
 
 #: paperless_mail/models.py:103
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Выкарыстоўваць імя (або адрас электроннай пошты, калі недаступна)"
 
 #: paperless_mail/models.py:104
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Выкарыстоўваць карэспандэнта, абранага ніжэй"
 
 #: paperless_mail/models.py:109
 msgid "order"
-msgstr ""
+msgstr "парадак"
 
 #: paperless_mail/models.py:115
 msgid "account"
-msgstr ""
+msgstr "ўліковы запіс"
 
 #: paperless_mail/models.py:119
 msgid "folder"
-msgstr ""
+msgstr "каталог"
 
 #: paperless_mail/models.py:122
 msgid "Subfolders must be separated by dots."
-msgstr ""
+msgstr "Падкаталогі павінны быць падзелены кропкамі."
 
 #: paperless_mail/models.py:126
 msgid "filter from"
-msgstr ""
+msgstr "фільтр па адпраўніку"
 
 #: paperless_mail/models.py:129
 msgid "filter subject"
-msgstr ""
+msgstr "фільтр па тэме"
 
 #: paperless_mail/models.py:132
 msgid "filter body"
-msgstr ""
+msgstr "фільтр па тэксце паведамлення"
 
 #: paperless_mail/models.py:136
 msgid "filter attachment filename"
-msgstr ""
+msgstr "фільтр па імені ўкладання"
 
 #: paperless_mail/models.py:141
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Апрацоўваць толькі дакументы, якія цалкам супадаюць з імем файла (калі яно пазначана). Маскі, напрыклад *.pdf ці *рахунак*, дазволеныя. Без уліку рэгістра."
 
 #: paperless_mail/models.py:148
 msgid "maximum age"
-msgstr ""
+msgstr "максімальны ўзрост"
 
 #: paperless_mail/models.py:148
 msgid "Specified in days."
-msgstr ""
+msgstr "Указваецца ў днях."
 
 #: paperless_mail/models.py:152
 msgid "attachment type"
-msgstr ""
+msgstr "тып укладання"
 
 #: paperless_mail/models.py:156
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Убудаваныя ўкладанні ўключаюць убудаваныя выявы, таму лепш камбінаваць гэты варыянт з фільтрам імёнаў файла."
 
 #: paperless_mail/models.py:162
 msgid "action"
-msgstr ""
+msgstr "дзеянне"
 
 #: paperless_mail/models.py:168
 msgid "action parameter"
-msgstr ""
+msgstr "параметр дзеяння"
 
 #: paperless_mail/models.py:173
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
