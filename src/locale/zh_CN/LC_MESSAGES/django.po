@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-29 06:26\n"
+"PO-Revision-Date: 2022-03-29 07:31\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -486,7 +486,7 @@ msgstr "Paperless-ngx 管理"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
-msgstr "认证"
+msgstr "身份验证"
 
 #: paperless_mail/admin.py:30
 msgid "Advanced settings"
@@ -506,7 +506,7 @@ msgstr "操作"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr "应用于邮件的操作。此操作仅在从邮件中处理文档时执行。没有附件的邮件将保持完全不受接触。"
+msgstr "应用于邮件的操作。此操作仅在从邮件中处理文档时执行。没有附件的邮件完全不会触及。"
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
