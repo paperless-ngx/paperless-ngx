@@ -505,13 +505,13 @@
         </context-group>
         <target state="final">Пожалуйста, выберите объект</target>
       </trans-unit>
-      <trans-unit id="5412339817978503936" datatype="html">
+      <trans-unit id="5412339817978503936" datatype="html" approved="yes">
         <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Привет, <x id="PH" equiv-text="this.displayName"/>, добро пожаловать в Paperless-ngx!</target>
+        <target state="final">Привет, <x id="PH" equiv-text="this.displayName"/>, добро пожаловать в Paperless-ngx!</target>
       </trans-unit>
       <trans-unit id="795745990148149834" datatype="html">
         <source>Welcome to Paperless-ngx!</source>
@@ -667,7 +667,7 @@
         </context-group>
         <target state="final">Добавлено: <x id="PH" equiv-text="countSuccess"/></target>
       </trans-unit>
-      <trans-unit id="760986369763309193" datatype="html">
+      <trans-unit id="760986369763309193" datatype="html" approved="yes">
         <source>, </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/upload-file-widget/upload-file-widget.component.ts</context>
@@ -678,7 +678,7 @@
           <context context-type="linenumber">117</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
-        <target state="translated">, </target>
+        <target state="final">, </target>
       </trans-unit>
       <trans-unit id="3852289441366561594" datatype="html" approved="yes">
         <source>Connecting...</source>
