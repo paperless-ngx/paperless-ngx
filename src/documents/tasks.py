@@ -83,9 +83,10 @@ def barcode_reader(image) -> list:
         # Traverse through all the detected barcodes in image
         for barcode in detected_barcodes:
             if barcode.data:
-                barcodes.append(str(barcode.data))
+                decoded_barcode = barcode.data.decode("utf-8")
+                barcodes.append(decoded_barcode)
                 logger.debug(
-                    f"Barcode of type {str(barcode.type)} found: {str(barcode.data)}",
+                    f"Barcode of type {str(barcode.type)} found: {decoded_barcode}",
                 )
     return barcodes
 
@@ -96,7 +97,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> list:
     Returns a list of pagenumbers, which separate the file
     """
     separator_page_numbers = []
-    separator_barcode = "b'" + str(settings.CONSUMER_BARCODE_STRING) + "'"
+    separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
     # use a temporary directory in case the file os too big to handle in memory
     with tempfile.TemporaryDirectory() as path:
         pages_from_path = convert_from_path(filepath, output_folder=path)
