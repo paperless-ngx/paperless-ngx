@@ -74,11 +74,49 @@ install_languages() {
 	done
 }
 
+install_packages() {
+	echo "Installing packages..."
+
+	local packages="$1"
+	read -ra packages <<<"$packages"
+
+	# Check that it is not empty
+	if [ ${#packages[@]} -eq 0 ]; then
+		return
+	fi
+	apt-get update
+
+	for package in "${packages[@]}"; do
+		pkg="$package"
+
+		if dpkg -s "$pkg" &>/dev/null; then
+			echo "Package $pkg already installed!"
+			continue
+		fi
+
+		if ! apt-cache show "$pkg" &>/dev/null; then
+			echo "Package $pkg not found! :("
+			continue
+		fi
+
+		echo "Installing package $pkg..."
+		if ! apt-get -y install "$pkg" &>/dev/null; then
+			echo "Could not install $pkg"
+			exit 1
+		fi
+	done
+}
+
 echo "Paperless-ngx docker container starting..."
 
 # Install additional languages if specified
 if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
 	install_languages "$PAPERLESS_OCR_LANGUAGES"
+fi
+
+# Install additional packages if specified
+if [[ -n "$PAPERLESS_CUSTOM_PACKAGES" ]]; then
+	install_packages "$PAPERLESS_CUSTOM_PACKAGES"
 fi
 
 initialize
