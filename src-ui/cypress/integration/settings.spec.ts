@@ -28,6 +28,22 @@ describe('settings', () => {
       }).as('savedViews')
     })
 
+    cy.fixture('documents/documents.json').then((documentsJson) => {
+      cy.intercept('GET', 'http://localhost:8000/api/documents/1/', (req) => {
+        let response = { ...documentsJson }
+        response = response.results.find((d) => d.id == 1)
+        req.reply(response)
+      })
+    })
+
+    cy.intercept('http://localhost:8000/api/documents/1/metadata/', {
+      fixture: 'documents/1/metadata.json',
+    })
+
+    cy.intercept('http://localhost:8000/api/documents/1/suggestions/', {
+      fixture: 'documents/1/suggestions.json',
+    })
+
     cy.viewport(1024, 1024)
     cy.visit('/settings')
     cy.wait('@savedViews')
@@ -46,8 +62,8 @@ describe('settings', () => {
     cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes')
     cy.contains('button', 'Cancel').click()
-    cy.contains('button', 'Save').click()
-    cy.visit('/dashboard')
+    cy.contains('button', 'Save').click().wait('@savedViews')
+    cy.contains('a', 'Dashboard').click()
     cy.contains('You have unsaved changes').should('not.exist')
   })
 
@@ -61,14 +77,14 @@ describe('settings', () => {
   it('should remove saved view from sidebar when unset', () => {
     cy.contains('a', 'Saved views').click()
     cy.get('#show_in_sidebar_1').click()
-    cy.contains('button', 'Save').click()
+    cy.contains('button', 'Save').click().wait('@savedViews')
     cy.contains('li', 'Inbox').should('not.exist')
   })
 
   it('should remove saved view from dashboard when unset', () => {
     cy.contains('a', 'Saved views').click()
     cy.get('#show_on_dashboard_1').click()
-    cy.contains('button', 'Save').click()
+    cy.contains('button', 'Save').click().wait('@savedViews')
     cy.visit('/dashboard')
     cy.get('app-saved-view-widget').contains('Inbox').should('not.exist')
   })
@@ -78,7 +94,7 @@ describe('settings', () => {
     cy.get('object[data*="/api/documents/1/preview/"]').should('not.exist')
     cy.visit('/settings')
     cy.contains('Use PDF viewer provided by the browser').click()
-    cy.contains('button', 'Save').click()
+    cy.contains('button', 'Save').click().wait('@savedViews').wait(1000)
     cy.visit('/documents/1')
     cy.get('object[data*="/api/documents/1/preview/"]')
   })
