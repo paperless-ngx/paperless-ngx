@@ -5,11 +5,6 @@ import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
 
-try:
-    import zoneinfo
-except ImportError:
-    import backports.zoneinfo as zoneinfo
-
 from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
@@ -346,7 +341,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self._assert_first_last_send_progress()
 
-        self.assertEqual(document.created.tzinfo, zoneinfo.ZoneInfo("America/Chicago"))
+        self.assertEqual(document.created.tzinfo.zone, "America/Chicago")
 
     @override_settings(PAPERLESS_FILENAME_FORMAT=None)
     def testDeleteMacFiles(self):
