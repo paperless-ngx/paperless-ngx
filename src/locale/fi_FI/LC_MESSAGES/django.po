@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-30 14:52\n"
+"PO-Revision-Date: 2022-03-30 15:49\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -124,7 +124,7 @@ msgstr "mime-tyyppi"
 
 #: documents/models.py:134
 msgid "checksum"
-msgstr ""
+msgstr "tarkistussumma"
 
 #: documents/models.py:138
 msgid "The checksum of the original document."
