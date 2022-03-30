@@ -157,7 +157,9 @@ def separate_pages(filepath: str, pages_to_split_on: list[int]) -> list[str]:
 
 
 def save_to_dir(
-    filepath: str, newname: str = None, target_dir: str = settings.CONSUMPTION_DIR
+    filepath: str,
+    newname: str = None,
+    target_dir: str = settings.CONSUMPTION_DIR,
 ):
     """
     Copies filepath to target_dir.
