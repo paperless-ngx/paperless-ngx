@@ -92,6 +92,13 @@ class TestDate(TestCase):
             datetime.datetime(2020, 3, 1, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
 
+    def test_date_format_9(self):
+        text = "Customer Number Currency 22-MAR-2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
     @override_settings(SCRATCH_DIR=SCRATCH)
     def test_date_format_9(self):
         text = "lorem ipsum\n" "27. Nullmonth 2020\n" "März 2020\n" "lorem ipsum"
