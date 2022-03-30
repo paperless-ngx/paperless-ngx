@@ -1,4 +1,4 @@
-describe('documents-list', () => {
+describe('manage', () => {
   beforeEach(() => {
     cy.intercept('http://localhost:8000/api/correspondents/*', {
       fixture: 'correspondents/correspondents.json',
