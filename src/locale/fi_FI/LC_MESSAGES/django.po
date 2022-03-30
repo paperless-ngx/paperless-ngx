@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-30 15:49\n"
+"PO-Revision-Date: 2022-03-30 20:41\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -128,179 +128,179 @@ msgstr "tarkistussumma"
 
 #: documents/models.py:138
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Alkuperäisen dokumentin tarkistussumma."
 
 #: documents/models.py:142
 msgid "archive checksum"
-msgstr ""
+msgstr "arkistotarkastussumma"
 
 #: documents/models.py:147
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Arkistoidun dokumentin tarkistussumma."
 
 #: documents/models.py:150 documents/models.py:295
 msgid "created"
-msgstr ""
+msgstr "luotu"
 
 #: documents/models.py:153
 msgid "modified"
-msgstr ""
+msgstr "muokattu"
 
 #: documents/models.py:157
 msgid "storage type"
-msgstr ""
+msgstr "tallennustilan tyyppi"
 
 #: documents/models.py:165
 msgid "added"
-msgstr ""
+msgstr "lisätty"
 
 #: documents/models.py:169
 msgid "filename"
-msgstr ""
+msgstr "tiedostonimi"
 
 #: documents/models.py:175
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Tiedostonimi tallennustilassa"
 
 #: documents/models.py:179
 msgid "archive filename"
-msgstr ""
+msgstr "arkistointitiedostonimi"
 
 #: documents/models.py:185
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Tämänhetkinen arkistointitiedostoimi tallennustilassa"
 
 #: documents/models.py:189
 msgid "archive serial number"
-msgstr ""
+msgstr "arkistointisarjanumero"
 
 #: documents/models.py:195
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Dokumentin sijainti fyysisessa dokumenttiarkistossa."
 
 #: documents/models.py:201
 msgid "document"
-msgstr ""
+msgstr "dokumentti"
 
 #: documents/models.py:202
 msgid "documents"
-msgstr ""
+msgstr "dokumentit"
 
 #: documents/models.py:280
 msgid "debug"
-msgstr ""
+msgstr "virheenjäljitys"
 
 #: documents/models.py:281
 msgid "information"
-msgstr ""
+msgstr "informaatio"
 
 #: documents/models.py:282
 msgid "warning"
-msgstr ""
+msgstr "varoitus"
 
 #: documents/models.py:283
 msgid "error"
-msgstr ""
+msgstr "virhe"
 
 #: documents/models.py:284
 msgid "critical"
-msgstr ""
+msgstr "kriittinen"
 
 #: documents/models.py:287
 msgid "group"
-msgstr ""
+msgstr "ryhmä"
 
 #: documents/models.py:289
 msgid "message"
-msgstr ""
+msgstr "viesti"
 
 #: documents/models.py:292
 msgid "level"
-msgstr ""
+msgstr "taso"
 
 #: documents/models.py:299
 msgid "log"
-msgstr ""
+msgstr "loki"
 
 #: documents/models.py:300
 msgid "logs"
-msgstr ""
+msgstr "lokit"
 
 #: documents/models.py:310 documents/models.py:360
 msgid "saved view"
-msgstr ""
+msgstr "tallennettu näkymä"
 
 #: documents/models.py:311
 msgid "saved views"
-msgstr ""
+msgstr "tallennetut näkymät"
 
 #: documents/models.py:313
 msgid "user"
-msgstr ""
+msgstr "käyttäjä"
 
 #: documents/models.py:317
 msgid "show on dashboard"
-msgstr ""
+msgstr "näytä etusivulla"
 
 #: documents/models.py:320
 msgid "show in sidebar"
-msgstr ""
+msgstr "näytä sivupaneelissa"
 
 #: documents/models.py:324
 msgid "sort field"
-msgstr ""
+msgstr "lajittelukenttä"
 
 #: documents/models.py:326
 msgid "sort reverse"
-msgstr ""
+msgstr "lajittele käänteisesti"
 
 #: documents/models.py:331
 msgid "title contains"
-msgstr ""
+msgstr "otsikko sisältää"
 
 #: documents/models.py:332
 msgid "content contains"
-msgstr ""
+msgstr "sisältö sisältää"
 
 #: documents/models.py:333
 msgid "ASN is"
-msgstr ""
+msgstr "ASN on"
 
 #: documents/models.py:334
 msgid "correspondent is"
-msgstr ""
+msgstr "yhteyshenkilö on"
 
 #: documents/models.py:335
 msgid "document type is"
-msgstr ""
+msgstr "dokumenttityyppi on"
 
 #: documents/models.py:336
 msgid "is in inbox"
-msgstr ""
+msgstr "on uusi"
 
 #: documents/models.py:337
 msgid "has tag"
-msgstr ""
+msgstr "on tagattu"
 
 #: documents/models.py:338
 msgid "has any tag"
-msgstr ""
+msgstr "on mikä tahansa tagi"
 
 #: documents/models.py:339
 msgid "created before"
-msgstr ""
+msgstr "luotu ennen"
 
 #: documents/models.py:340
 msgid "created after"
-msgstr ""
+msgstr "luotu jälkeen"
 
 #: documents/models.py:341
 msgid "created year is"
-msgstr ""
+msgstr "luotu vuonna"
 
 #: documents/models.py:342
 msgid "created month is"
-msgstr ""
+msgstr "luotu kuukautena"
 
 #: documents/models.py:343
 msgid "created day is"
@@ -458,51 +458,51 @@ msgstr ""
 
 #: paperless/settings.py:309
 msgid "Polish"
-msgstr ""
+msgstr "puola"
 
 #: paperless/settings.py:310
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "portugali (Brasilia)"
 
 #: paperless/settings.py:311
 msgid "Portuguese"
-msgstr ""
+msgstr "portugali"
 
 #: paperless/settings.py:312
 msgid "Romanian"
-msgstr ""
+msgstr "romania"
 
 #: paperless/settings.py:313
 msgid "Russian"
-msgstr ""
+msgstr "venäjä"
 
 #: paperless/settings.py:314
 msgid "Swedish"
-msgstr ""
+msgstr "ruotsi"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx hallintapaneeli"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
-msgstr ""
+msgstr "Autentikaatio"
 
 #: paperless_mail/admin.py:30
 msgid "Advanced settings"
-msgstr ""
+msgstr "Edistyneet asetukset"
 
 #: paperless_mail/admin.py:47
 msgid "Filter"
-msgstr ""
+msgstr "Suodatin"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless prosessoi vain sähköpostit jotka sopivat KAIKKIIN annettuihin filttereihin."
 
 #: paperless_mail/admin.py:64
 msgid "Actions"
-msgstr ""
+msgstr "Toiminnot"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
