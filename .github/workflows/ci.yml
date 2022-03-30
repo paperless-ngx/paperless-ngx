@@ -8,8 +8,6 @@ on:
     branches-ignore:
       - 'translations**'
   pull_request:
-    # We do not need synchronize event, it is covered by on:push
-    types: [opened, reopened]
     branches-ignore:
       - 'translations**'
 
