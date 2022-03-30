@@ -247,6 +247,10 @@ table.table {
 .main-dropzone {
   height: 100%;
   width: 100%;
+
+  &.ngx-file-drop__drop-zone--over {
+    background-color: transparent !important;
+  }
 }
 
 .global-dropzone-overlay {
