@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-29 21:29\n"
+"PO-Revision-Date: 2022-03-30 11:46\n"
 "Last-Translator: \n"
 "Language-Team: Belarusian\n"
 "Language: be_BY\n"
@@ -220,11 +220,11 @@ msgstr "узровень"
 
 #: documents/models.py:299
 msgid "log"
-msgstr ""
+msgstr "лог"
 
 #: documents/models.py:300
 msgid "logs"
-msgstr ""
+msgstr "логі"
 
 #: documents/models.py:310 documents/models.py:360
 msgid "saved view"
@@ -410,27 +410,27 @@ msgstr "Імя карыстальніка"
 
 #: documents/templates/registration/login.html:68
 msgid "Password"
-msgstr ""
+msgstr "Пароль"
 
 #: documents/templates/registration/login.html:73
 msgid "Sign in"
-msgstr ""
+msgstr "Увайсці"
 
 #: paperless/settings.py:299
 msgid "English (US)"
-msgstr ""
+msgstr "Англійская (ЗША)"
 
 #: paperless/settings.py:300
 msgid "Czech"
-msgstr ""
+msgstr "Чэшская"
 
 #: paperless/settings.py:301
 msgid "Danish"
-msgstr ""
+msgstr "Дацкая"
 
 #: paperless/settings.py:302
 msgid "German"
-msgstr ""
+msgstr "Нямецкая"
 
 #: paperless/settings.py:303
 msgid "English (GB)"
@@ -438,87 +438,87 @@ msgstr ""
 
 #: paperless/settings.py:304
 msgid "Spanish"
-msgstr ""
+msgstr "Іспанская"
 
 #: paperless/settings.py:305
 msgid "French"
-msgstr ""
+msgstr "Французская"
 
 #: paperless/settings.py:306
 msgid "Italian"
-msgstr ""
+msgstr "Італьянская"
 
 #: paperless/settings.py:307
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Люксембургская"
 
 #: paperless/settings.py:308
 msgid "Dutch"
-msgstr ""
+msgstr "Нідэрландская"
 
 #: paperless/settings.py:309
 msgid "Polish"
-msgstr ""
+msgstr "Польская"
 
 #: paperless/settings.py:310
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Партугальская (Бразілія)"
 
 #: paperless/settings.py:311
 msgid "Portuguese"
-msgstr ""
+msgstr "Партугальская"
 
 #: paperless/settings.py:312
 msgid "Romanian"
-msgstr ""
+msgstr "Румынская"
 
 #: paperless/settings.py:313
 msgid "Russian"
-msgstr ""
+msgstr "Руская"
 
 #: paperless/settings.py:314
 msgid "Swedish"
-msgstr ""
+msgstr "Шведская"
 
 #: paperless/urls.py:139
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Адміністраванне Paperless-ngx"
 
 #: paperless_mail/admin.py:29
 msgid "Authentication"
-msgstr ""
+msgstr "Аўтэнтыфікацыя"
 
 #: paperless_mail/admin.py:30
 msgid "Advanced settings"
-msgstr ""
+msgstr "Пашыраныя налады"
 
 #: paperless_mail/admin.py:47
 msgid "Filter"
-msgstr ""
+msgstr "Фільтр"
 
 #: paperless_mail/admin.py:50
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless-ngx будзе апрацоўваць толькі лісты, якія адпавядаюць УСІМ фільтрам, прыведзеным ніжэй."
 
 #: paperless_mail/admin.py:64
 msgid "Actions"
-msgstr ""
+msgstr "Дзеянні"
 
 #: paperless_mail/admin.py:67
 msgid "The action applied to the mail. This action is only performed when documents were consumed from the mail. Mails without attachments will remain entirely untouched."
-msgstr ""
+msgstr "Дзеянне распаўсюджваецца на пошту. Гэта дзеянне выконваецца толькі тады, калі дакументы былі спажыты з пошты. Пошты без укладанняў застануцца цалкам некранутымі."
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
-msgstr ""
+msgstr "Метаданыя"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Аўтаматычна прызначаць метададзеныя дакументам, атрыманым з гэтага правіла. Калі вы не прызначаеце тут тэгі, тыпы ці карэспандэнты, Paperless-ngx усё роўна будуць апрацоўваць усе адпаведныя правілы, якія вы вызначылі."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless-ngx пошта"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
