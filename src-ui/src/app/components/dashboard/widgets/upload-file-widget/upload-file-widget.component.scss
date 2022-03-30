@@ -34,6 +34,6 @@ form {
   pointer-events: none;
 }
 
-.ngx-file-drop__drop-zone--over {
+::ng-deep .ngx-file-drop__drop-zone--over {
   background-color: var(--ngx-primary-faded) !important;
 }
