@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-31 09:54\n"
+"PO-Revision-Date: 2022-03-31 10:58\n"
 "Last-Translator: \n"
 "Language-Team: Belarusian\n"
 "Language: be_BY\n"
@@ -562,43 +562,43 @@ msgstr "імя карыстальніка"
 
 #: paperless_mail/models.py:43
 msgid "password"
-msgstr ""
+msgstr "пароль"
 
 #: paperless_mail/models.py:46
 msgid "character set"
-msgstr ""
+msgstr "кадзіроўка"
 
 #: paperless_mail/models.py:50
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Кадзіроўка для сувязі з паштовым серверам, напрыклад «UTF-8» або «US-ASCII»."
 
 #: paperless_mail/models.py:61
 msgid "mail rule"
-msgstr ""
+msgstr "правіла пошты"
 
 #: paperless_mail/models.py:62
 msgid "mail rules"
-msgstr ""
+msgstr "правілы пошты"
 
 #: paperless_mail/models.py:68
 msgid "Only process attachments."
-msgstr ""
+msgstr "Апрацоўваць толькі ўкладанні."
 
 #: paperless_mail/models.py:71
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Апрацоўваць усе файлы, уключаючы 'убудаваныя' укладанні."
 
 #: paperless_mail/models.py:81
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Пазначыць як прачытанае, не апрацоўваць прачытаныя лісты"
 
 #: paperless_mail/models.py:82
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Пазначыць пошту, не апрацоўваць пазначаныя лісты"
 
 #: paperless_mail/models.py:83
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Перамясціць у паказаную папку"
 
 #: paperless_mail/models.py:84
 msgid "Delete"
@@ -690,25 +690,25 @@ msgstr "параметр дзеяння"
 
 #: paperless_mail/models.py:173
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Дадатковы параметр для дзеяння, абранага вышэй, гэта значыць, мэтавая папка дзеяння перамяшчэння ў папку. Падпапкі павінны быць падзеленыя кропкамі."
 
 #: paperless_mail/models.py:181
 msgid "assign title from"
-msgstr ""
+msgstr "прызначыць загаловак з"
 
 #: paperless_mail/models.py:189
 msgid "assign this tag"
-msgstr ""
+msgstr "прызначыць гэты тэг"
 
 #: paperless_mail/models.py:197
 msgid "assign this document type"
-msgstr ""
+msgstr "прызначыць гэты тып дакумента"
 
 #: paperless_mail/models.py:201
 msgid "assign correspondent from"
-msgstr ""
+msgstr "прызначыць карэспандэнта з"
 
 #: paperless_mail/models.py:211
 msgid "assign this correspondent"
-msgstr ""
+msgstr "прызначыць гэтага карэспандэнта"
 
