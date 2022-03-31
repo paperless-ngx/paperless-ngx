@@ -2184,7 +2184,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="final">Показывать уведомления, когда новый документ удалён</target>
+        <target state="final">Показывать уведомления при обнаружении новых документов</target>
       </trans-unit>
       <trans-unit id="6057053428592387613" datatype="html" approved="yes">
         <source>Show notifications when document processing completes successfully</source>
