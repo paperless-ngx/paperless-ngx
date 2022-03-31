@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-30 11:46\n"
+"PO-Revision-Date: 2022-03-31 09:54\n"
 "Last-Translator: \n"
 "Language-Team: Belarusian\n"
 "Language: be_BY\n"
@@ -434,7 +434,7 @@ msgstr "Нямецкая"
 
 #: paperless/settings.py:303
 msgid "English (GB)"
-msgstr ""
+msgstr "Англійская (Вялікабрытанія)"
 
 #: paperless/settings.py:304
 msgid "Spanish"
@@ -522,43 +522,43 @@ msgstr "Paperless-ngx пошта"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr ""
+msgstr "паштовы акаўнт"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr ""
+msgstr "паштовыя акаўнты"
 
 #: paperless_mail/models.py:18
 msgid "No encryption"
-msgstr ""
+msgstr "Без шыфравання"
 
 #: paperless_mail/models.py:19
 msgid "Use SSL"
-msgstr ""
+msgstr "Выкарыстоўваць SSL"
 
 #: paperless_mail/models.py:20
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Выкарыстоўваць STARTTLS"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
-msgstr ""
+msgstr "Сервер IMAP"
 
 #: paperless_mail/models.py:28
 msgid "IMAP port"
-msgstr ""
+msgstr "Порт IMAP"
 
 #: paperless_mail/models.py:32
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Звычайна гэта 143 для незашыфраваных і STARTTLS злучэнняў і 993 для злучэнняў SSL."
 
 #: paperless_mail/models.py:38
 msgid "IMAP security"
-msgstr ""
+msgstr "Бяспека IMAP"
 
 #: paperless_mail/models.py:41
 msgid "username"
-msgstr ""
+msgstr "імя карыстальніка"
 
 #: paperless_mail/models.py:43
 msgid "password"
