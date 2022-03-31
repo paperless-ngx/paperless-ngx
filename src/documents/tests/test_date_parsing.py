@@ -3,7 +3,6 @@ import os
 import shutil
 from uuid import uuid4
 
-import pytest
 from dateutil import tz
 from django.conf import settings
 from django.test import override_settings
