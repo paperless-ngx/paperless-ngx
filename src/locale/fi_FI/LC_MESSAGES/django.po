@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-03-30 20:41\n"
+"PO-Revision-Date: 2022-03-31 08:58\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -510,87 +510,87 @@ msgstr ""
 
 #: paperless_mail/admin.py:75
 msgid "Metadata"
-msgstr ""
+msgstr "Metatiedot"
 
 #: paperless_mail/admin.py:78
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Määritä tuodun dokumentin metadata tämän säännön perusteella automaattisesti. Jos et aseta tageja, tyyppejä tai omistajia täällä, Paperless prosessoi silti kaikki sopivat määritellyt säännöt."
 
 #: paperless_mail/apps.py:9
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless-sähköposti"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr ""
+msgstr "sähköpostitili"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr ""
+msgstr "sähköpostitilit"
 
 #: paperless_mail/models.py:18
 msgid "No encryption"
-msgstr ""
+msgstr "Ei salausta"
 
 #: paperless_mail/models.py:19
 msgid "Use SSL"
-msgstr ""
+msgstr "Käytä SSL-salausta"
 
 #: paperless_mail/models.py:20
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Käytä STARTTLS-salausta"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP-palvelin"
 
 #: paperless_mail/models.py:28
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP-portti"
 
 #: paperless_mail/models.py:32
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Tämä on yleensä 142 salaamattomille sekä STARTTLS-yhteyksille, ja 993 SSL-yhteyksille."
 
 #: paperless_mail/models.py:38
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP-suojaus"
 
 #: paperless_mail/models.py:41
 msgid "username"
-msgstr ""
+msgstr "käyttäjänimi"
 
 #: paperless_mail/models.py:43
 msgid "password"
-msgstr ""
+msgstr "salasana"
 
 #: paperless_mail/models.py:46
 msgid "character set"
-msgstr ""
+msgstr "merkistö"
 
 #: paperless_mail/models.py:50
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Merkistö määritellään sähköpostipalvelimen kanssa komminukointia varten. Se voi olla esimerkiksi \"UTF-8\" tai \"US-ASCII\"."
 
 #: paperless_mail/models.py:61
 msgid "mail rule"
-msgstr ""
+msgstr "sähköpostisääntö"
 
 #: paperless_mail/models.py:62
 msgid "mail rules"
-msgstr ""
+msgstr "sähköpostisäännöt"
 
 #: paperless_mail/models.py:68
 msgid "Only process attachments."
-msgstr ""
+msgstr "Prosessoi vain liitteet."
 
 #: paperless_mail/models.py:71
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Prosessoi kaikki tiedostot, sisältäen \"inline\"-liitteet."
 
 #: paperless_mail/models.py:81
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Merkitse luetuksi, älä prosessoi luettuja sähköposteja"
 
 #: paperless_mail/models.py:82
 msgid "Flag the mail, don't process flagged mails"
