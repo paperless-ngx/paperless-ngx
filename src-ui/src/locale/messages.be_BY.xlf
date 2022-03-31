@@ -1624,7 +1624,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Type: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></target>
+        <target state="translated">Тып: <x id="PH" equiv-text="this.documentTypes.find(dt =&gt; dt.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="4362173610367509215" datatype="html">
         <source>Without document type</source>
@@ -1632,7 +1632,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Without document type</target>
+        <target state="translated">Без тыпу дакумента</target>
       </trans-unit>
       <trans-unit id="8180755793012580465" datatype="html">
         <source>Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></source>
@@ -1640,7 +1640,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Tag: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></target>
+        <target state="translated">Тэг: <x id="PH" equiv-text="this.tags.find(t =&gt; t.id == +rule.value)?.name"/></target>
       </trans-unit>
       <trans-unit id="6494566478302448576" datatype="html">
         <source>Without any tag</source>
@@ -1648,7 +1648,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Without any tag</target>
+        <target state="translated">Без усялякага тэга</target>
       </trans-unit>
       <trans-unit id="6523384805359286307" datatype="html">
         <source>Title: <x id="PH" equiv-text="rule.value"/></source>
@@ -1656,7 +1656,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Title: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">Назва: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1872523635812236432" datatype="html">
         <source>ASN: <x id="PH" equiv-text="rule.value"/></source>
@@ -1664,7 +1664,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">ASN: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">ASN: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="3100631071441658964" datatype="html">
         <source>Title &amp; content</source>
@@ -1672,7 +1672,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Title &amp; content</target>
+        <target state="translated">Назва &amp; змест</target>
       </trans-unit>
       <trans-unit id="1010505078885609376" datatype="html">
         <source>Advanced search</source>
@@ -1680,7 +1680,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Advanced search</target>
+        <target state="translated">Пашыраны пошук</target>
       </trans-unit>
       <trans-unit id="2649431021108393503" datatype="html">
         <source>More like</source>
@@ -1688,7 +1688,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">More like</target>
+        <target state="translated">Больш падобных</target>
       </trans-unit>
       <trans-unit id="7210076240260527720" datatype="html">
         <source>Save current view</source>
@@ -1696,7 +1696,7 @@
           <context context-type="sourcefile">src/app/components/document-list/save-view-config-dialog/save-view-config-dialog.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Save current view</target>
+        <target state="translated">Захаваць цяперашні прагляд</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -1744,7 +1744,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Name</target>
+        <target state="translated">Назва</target>
       </trans-unit>
       <trans-unit id="8689274715612276035" datatype="html">
         <source>Show in sidebar</source>
@@ -1932,7 +1932,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the correspondent "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Вы сапраўды хочаце выдаліць карэспандэнта "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html">
         <source>Create new document type</source>
@@ -1940,7 +1940,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Create new document type</target>
+        <target state="translated">Стварыць новы тып дакумента</target>
       </trans-unit>
       <trans-unit id="36335016091244220" datatype="html">
         <source>Edit document type</source>
@@ -1948,7 +1948,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-edit-dialog/document-type-edit-dialog.component.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Edit document type</target>
+        <target state="translated">Рэдагаваць тып дакумента</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -1956,7 +1956,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the document type "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Вы сапраўды хочаце выдаліць тып дакумента "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="810888510148304696" datatype="html">
         <source>Automatic</source>
@@ -1968,7 +1968,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Automatic</target>
+        <target state="translated">Аўтаматычна</target>
       </trans-unit>
       <trans-unit id="5044611416737085530" datatype="html">
         <source>Do you really want to delete this element?</source>
@@ -1976,7 +1976,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete this element?</target>
+        <target state="translated">Вы сапраўды жадаеце выдаліць гэты элемент?</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html">
         <source>Associated documents will not be deleted.</source>
@@ -1984,7 +1984,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Associated documents will not be deleted.</target>
+        <target state="translated">Звязаныя дакументы не будуць выдалены.</target>
       </trans-unit>
       <trans-unit id="5467489005440577210" datatype="html">
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -1992,7 +1992,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated">Памылка пры выдаленні элемента: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
       <trans-unit id="1347241542439262355" datatype="html">
         <source>General settings</source>
@@ -2000,7 +2000,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">General settings</target>
+        <target state="translated">Агульныя налады</target>
       </trans-unit>
       <trans-unit id="8671234314555525900" datatype="html">
         <source>Appearance</source>
@@ -2008,7 +2008,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Appearance</target>
+        <target state="translated">Знешні выгляд</target>
       </trans-unit>
       <trans-unit id="3777637051272512093" datatype="html">
         <source>Display language</source>
@@ -2016,7 +2016,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Display language</target>
+        <target state="translated">Мова інтэрфейсу</target>
       </trans-unit>
       <trans-unit id="53523152145406584" datatype="html">
         <source>You need to reload the page after applying a new language.</source>
@@ -2024,7 +2024,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">You need to reload the page after applying a new language.</target>
+        <target state="translated">Вам трэба перазагрузіць старонку пасля прымянення новай мовы.</target>
       </trans-unit>
       <trans-unit id="3766032098416558788" datatype="html">
         <source>Date display</source>
@@ -2032,7 +2032,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Date display</target>
+        <target state="translated">Адлюстраванне даты</target>
       </trans-unit>
       <trans-unit id="3733378544613473393" datatype="html">
         <source>Date format</source>
@@ -2040,7 +2040,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Date format</target>
+        <target state="translated">Фармат даты</target>
       </trans-unit>
       <trans-unit id="3407788781115661841" datatype="html">
         <source>Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;shortDate&apos;:null:computedDateLocale}}"/></source>
@@ -2048,7 +2048,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Short: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Кароткі: <x id="INTERPOLATION" equiv-text="{{today | customDate:'shortDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="6290748171049664628" datatype="html">
         <source>Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;mediumDate&apos;:null:computedDateLocale}}"/></source>
@@ -2056,7 +2056,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Medium: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Сярэдні: <x id="INTERPOLATION" equiv-text="{{today | customDate:'mediumDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="7189855711197998347" datatype="html">
         <source>Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:&apos;longDate&apos;:null:computedDateLocale}}"/></source>
@@ -2064,7 +2064,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Long: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
+        <target state="translated">Доўгі: <x id="INTERPOLATION" equiv-text="{{today | customDate:'longDate':null:computedDateLocale}}"/></target>
       </trans-unit>
       <trans-unit id="8939587804990976924" datatype="html">
         <source>Items per page</source>
@@ -2072,7 +2072,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Items per page</target>
+        <target state="translated">Элементаў на старонцы</target>
       </trans-unit>
       <trans-unit id="8028535997917730106" datatype="html">
         <source>Document editor</source>
@@ -2080,7 +2080,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Document editor</target>
+        <target state="translated">Рэдактар дакументаў</target>
       </trans-unit>
       <trans-unit id="6708098108196142028" datatype="html">
         <source>Use PDF viewer provided by the browser</source>
@@ -2088,7 +2088,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Use PDF viewer provided by the browser</target>
+        <target state="translated">Выкарыстоўваць прагляднік PDF убудаваны ў браўзэр</target>
       </trans-unit>
       <trans-unit id="9003921625412907981" datatype="html">
         <source>This is usually faster for displaying large PDF documents, but it might not work on some browsers.</source>
@@ -2096,7 +2096,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">This is usually faster for displaying large PDF documents, but it might not work on some browsers.</target>
+        <target state="translated">Звычайна гэта хутчэй для адлюстравання вялікіх дакументаў PDF, але можа не працаваць у некаторых браўзерах.</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -2104,7 +2104,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Dark mode</target>
+        <target state="translated">Цёмны рэжым</target>
       </trans-unit>
       <trans-unit id="4913823100518391922" datatype="html">
         <source>Use system settings</source>
@@ -2112,7 +2112,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Use system settings</target>
+        <target state="translated">Выкарыстоўваць сістэмныя налады</target>
       </trans-unit>
       <trans-unit id="5782828784040423650" datatype="html">
         <source>Enable dark mode</source>
@@ -2120,7 +2120,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Enable dark mode</target>
+        <target state="translated">Уключыць цёмны рэжым</target>
       </trans-unit>
       <trans-unit id="6336642923114460405" datatype="html">
         <source>Invert thumbnails in dark mode</source>
@@ -2128,7 +2128,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Invert thumbnails in dark mode</target>
+        <target state="translated">Інверціраваць мініяцюры ў цёмным рэжыме</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
@@ -2136,7 +2136,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Bulk editing</target>
+        <target state="translated">Масавае рэдагаванне</target>
       </trans-unit>
       <trans-unit id="8158899674926420054" datatype="html">
         <source>Show confirmation dialogs</source>
@@ -2144,7 +2144,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Show confirmation dialogs</target>
+        <target state="translated">Паказаць дыялогавыя акно пацверджання</target>
       </trans-unit>
       <trans-unit id="6906812245033969309" datatype="html">
         <source>Deleting documents will always ask for confirmation.</source>
@@ -2152,7 +2152,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Deleting documents will always ask for confirmation.</target>
+        <target state="translated">Пры выдаленні дакументаў заўсёды будзе запытвацца пацверджанне.</target>
       </trans-unit>
       <trans-unit id="290238406234356122" datatype="html">
         <source>Apply on close</source>
@@ -2160,7 +2160,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="needs-translation">Apply on close</target>
+        <target state="translated">Ужыць пры зачыненні</target>
       </trans-unit>
       <trans-unit id="5851560788527570644" datatype="html">
         <source>Notifications</source>
@@ -2168,7 +2168,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">116</context>
         </context-group>
-        <target state="needs-translation">Notifications</target>
+        <target state="translated">Апавяшчэнні</target>
       </trans-unit>
       <trans-unit id="8545554728558600606" datatype="html">
         <source>Document processing</source>
@@ -2176,7 +2176,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Document processing</target>
+        <target state="translated">Апрацоўка дакумента</target>
       </trans-unit>
       <trans-unit id="3656786776644872398" datatype="html">
         <source>Show notifications when new documents are detected</source>
@@ -2184,7 +2184,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">123</context>
         </context-group>
-        <target state="needs-translation">Show notifications when new documents are detected</target>
+        <target state="translated">Паказваць апавяшчэнні пры выяўленні новых дакументаў</target>
       </trans-unit>
       <trans-unit id="6057053428592387613" datatype="html">
         <source>Show notifications when document processing completes successfully</source>
@@ -2192,7 +2192,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Show notifications when document processing completes successfully</target>
+        <target state="translated">Паказваць апавяшчэнні, калі апрацоўка дакумента завершана паспяхова</target>
       </trans-unit>
       <trans-unit id="370315664367425513" datatype="html">
         <source>Show notifications when document processing fails</source>
@@ -2200,7 +2200,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="needs-translation">Show notifications when document processing fails</target>
+        <target state="translated">Паказваць апавяшчэнні, калі апрацоўка дакумента няўдалая</target>
       </trans-unit>
       <trans-unit id="6838309441164918531" datatype="html">
         <source>Suppress notifications on dashboard</source>
@@ -2208,7 +2208,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">Suppress notifications on dashboard</target>
+        <target state="translated">Схаваць апавяшчэння на галоўнай панэлі</target>
       </trans-unit>
       <trans-unit id="2741919327232918179" datatype="html">
         <source>This will suppress all messages about document processing status on the dashboard.</source>
@@ -2216,7 +2216,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">This will suppress all messages about document processing status on the dashboard.</target>
+        <target state="translated">Гэта адключыць усе паведамленні аб статуце апрацоўкі дакументаў на галоўнай панэлі.</target>
       </trans-unit>
       <trans-unit id="6925788033494878061" datatype="html">
         <source>Appears on</source>
@@ -2224,7 +2224,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">146</context>
         </context-group>
-        <target state="needs-translation">Appears on</target>
+        <target state="translated">З'яўляецца на</target>
       </trans-unit>
       <trans-unit id="7877440816920439876" datatype="html">
         <source>No saved views defined.</source>
@@ -2232,7 +2232,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">No saved views defined.</target>
+        <target state="translated">Няма захаваных праглядаў.</target>
       </trans-unit>
       <trans-unit id="5610279464668232148" datatype="html">
         <source>Saved view &quot;<x id="PH" equiv-text="savedView.name"/>&quot; deleted.</source>
@@ -2240,7 +2240,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="needs-translation">Saved view "<x id="PH" equiv-text="savedView.name"/>" deleted.</target>
+        <target state="translated">Захаваны выгляд "<x id="PH" equiv-text="savedView.name"/>" выдалены.</target>
       </trans-unit>
       <trans-unit id="5647210819299459618" datatype="html">
         <source>Settings saved successfully.</source>
@@ -2248,7 +2248,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">133</context>
         </context-group>
-        <target state="needs-translation">Settings saved successfully.</target>
+        <target state="translated">Налады паспяхова захаваны.</target>
       </trans-unit>
       <trans-unit id="6839066544204061364" datatype="html">
         <source>Use system language</source>
@@ -2256,7 +2256,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Use system language</target>
+        <target state="translated">Выкарыстоўваць мову сістэмы</target>
       </trans-unit>
       <trans-unit id="7729897675462249787" datatype="html">
         <source>Use date format of display language</source>
@@ -2264,7 +2264,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">144</context>
         </context-group>
-        <target state="needs-translation">Use date format of display language</target>
+        <target state="translated">Выкарыстоўваць фармат даты мовы адлюстравання</target>
       </trans-unit>
       <trans-unit id="8488620293789898901" datatype="html">
         <source>Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -2272,7 +2272,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
+        <target state="translated">Памылка пры захаванні налад на серверы: <x id="PH" equiv-text="JSON.stringify(error.error)"/></target>
       </trans-unit>
       <trans-unit id="9011959596901584887" datatype="html">
         <source>Color</source>
@@ -2284,7 +2284,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Color</target>
+        <target state="translated">Колер</target>
       </trans-unit>
       <trans-unit id="1426037806946650347" datatype="html">
         <source>Inbox tag</source>
@@ -2292,7 +2292,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Inbox tag</target>
+        <target state="translated">Тэг паштовай скрыні</target>
       </trans-unit>
       <trans-unit id="8566220514470905459" datatype="html">
         <source>Inbox tags are automatically assigned to all consumed documents.</source>
@@ -2300,7 +2300,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Inbox tags are automatically assigned to all consumed documents.</target>
+        <target state="translated">Тэгі ўваходняй скрыні аўтаматычна прысвойваюцца ўсім спажываным дакументам.</target>
       </trans-unit>
       <trans-unit id="9153094873118985366" datatype="html">
         <source>Create new tag</source>
@@ -2308,7 +2308,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Create new tag</target>
+        <target state="translated">Стварыць новы тэг</target>
       </trans-unit>
       <trans-unit id="5872175735754226507" datatype="html">
         <source>Edit tag</source>
@@ -2316,7 +2316,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-edit-dialog/tag-edit-dialog.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Edit tag</target>
+        <target state="translated">Рэдагаваць тэг</target>
       </trans-unit>
       <trans-unit id="93754014749412887" datatype="html">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
@@ -2324,7 +2324,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the tag "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Вы сапраўды хочаце выдаліць тэг "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="181464970911903082" datatype="html">
         <source>404 Not Found</source>
@@ -2332,7 +2332,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">404 Not Found</target>
+        <target state="translated">404 Не знойдзена</target>
       </trans-unit>
       <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
@@ -2340,7 +2340,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Any word</target>
+        <target state="translated">Любое слова</target>
       </trans-unit>
       <trans-unit id="7517655726614958140" datatype="html">
         <source>Any: Document contains any of these words (space separated)</source>
@@ -2348,7 +2348,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Any: Document contains any of these words (space separated)</target>
+        <target state="translated">Любы: дакумент змяшчае любое з гэтых слоў (падзеленыя прабелам)</target>
       </trans-unit>
       <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>
@@ -2356,7 +2356,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">All words</target>
+        <target state="translated">Усе словы</target>
       </trans-unit>
       <trans-unit id="111914402588955480" datatype="html">
         <source>All: Document contains all of these words (space separated)</source>
@@ -2364,7 +2364,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">All: Document contains all of these words (space separated)</target>
+        <target state="translated">Усе: дакумент змяшчае ўсе гэтыя словы (падзеленыя прабелам)</target>
       </trans-unit>
       <trans-unit id="9180173992399180575" datatype="html">
         <source>Exact match</source>
@@ -2372,7 +2372,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Exact match</target>
+        <target state="translated">Дакладнае супадзенне</target>
       </trans-unit>
       <trans-unit id="7109184332944610787" datatype="html">
         <source>Exact: Document contains this string</source>
@@ -2380,7 +2380,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Exact: Document contains this string</target>
+        <target state="translated">Дакладна: дакумент змяшчае гэты радок</target>
       </trans-unit>
       <trans-unit id="1338733395833138319" datatype="html">
         <source>Regular expression</source>
@@ -2388,7 +2388,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Regular expression</target>
+        <target state="translated">Рэгулярны выраз</target>
       </trans-unit>
       <trans-unit id="7548151332424148033" datatype="html">
         <source>Regular expression: Document matches this regular expression</source>
@@ -2396,7 +2396,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Regular expression: Document matches this regular expression</target>
+        <target state="translated">Рэгулярны выраз: Дакумент адпавядае гэтаму рэгулярнаму выразу</target>
       </trans-unit>
       <trans-unit id="1856513373880048959" datatype="html">
         <source>Fuzzy word</source>
@@ -2404,7 +2404,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Fuzzy word</target>
+        <target state="translated">Невыразнае слова</target>
       </trans-unit>
       <trans-unit id="8419167206585286450" datatype="html">
         <source>Fuzzy: Document contains a word similar to this word</source>
@@ -2412,7 +2412,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Fuzzy: Document contains a word similar to this word</target>
+        <target state="translated">Невыразна: Дакумент змяшчае слова, падобнае да гэтага слова</target>
       </trans-unit>
       <trans-unit id="2167862279705099846" datatype="html">
         <source>Auto: Learn matching automatically</source>
@@ -2420,7 +2420,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Auto: Learn matching automatically</target>
+        <target state="translated">Аўтаматычны: вучыцеся аўтаматычна</target>
       </trans-unit>
       <trans-unit id="159901853873315050" datatype="html">
         <source>Unsaved Changes</source>
@@ -2436,7 +2436,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Unsaved Changes</target>
+        <target state="translated">Незахаваныя змены</target>
       </trans-unit>
       <trans-unit id="2573823578527613511" datatype="html">
         <source>You have unsaved changes.</source>
@@ -2452,7 +2452,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes.</target>
+        <target state="translated">У вас ёсць незахаваныя змены.</target>
       </trans-unit>
       <trans-unit id="3305084982600522070" datatype="html">
         <source>Are you sure you want to leave?</source>
@@ -2460,7 +2460,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to leave?</target>
+        <target state="translated">Вы ўпэўнены, што хочаце сысці?</target>
       </trans-unit>
       <trans-unit id="729881853265307704" datatype="html">
         <source>Leave page</source>
@@ -2468,7 +2468,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Leave page</target>
+        <target state="translated">Пакінуць старонку</target>
       </trans-unit>
       <trans-unit id="7536524521722799066" datatype="html">
         <source>(no title)</source>
@@ -2476,7 +2476,7 @@
           <context context-type="sourcefile">src/app/pipes/document-title.pipe.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">(no title)</target>
+        <target state="translated">(няма назвы)</target>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
@@ -2484,7 +2484,7 @@
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Yes</target>
+        <target state="translated">Так</target>
       </trans-unit>
       <trans-unit id="3542042671420335679" datatype="html">
         <source>No</source>
@@ -2492,7 +2492,7 @@
           <context context-type="sourcefile">src/app/pipes/yes-no.pipe.ts</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">No</target>
+        <target state="translated">Не</target>
       </trans-unit>
       <trans-unit id="2119857572761283468" datatype="html">
         <source>Document already exists.</source>
@@ -2500,7 +2500,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Document already exists.</target>
+        <target state="translated">Дакумент ужо існуе.</target>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
@@ -2508,7 +2508,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">File not found.</target>
+        <target state="translated">Файл не знойдзены.</target>
       </trans-unit>
       <trans-unit id="1520671543092565667" datatype="html">
         <source>Pre-consume script does not exist.</source>
@@ -2517,7 +2517,7 @@
           <context context-type="linenumber">17</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Pre-consume script does not exist.</target>
+        <target state="translated">Скрыпт перадапрацоўкі не існуе.</target>
       </trans-unit>
       <trans-unit id="7742915911032564889" datatype="html">
         <source>Error while executing pre-consume script.</source>
@@ -2526,7 +2526,7 @@
           <context context-type="linenumber">18</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Error while executing pre-consume script.</target>
+        <target state="translated">Памылка пры выкананні скрыпту перадапрацоўкі.</target>
       </trans-unit>
       <trans-unit id="8995193730018060346" datatype="html">
         <source>Post-consume script does not exist.</source>
@@ -2535,7 +2535,7 @@
           <context context-type="linenumber">19</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Post-consume script does not exist.</target>
+        <target state="translated">Скрыпт постапрацоўкі не існуе.</target>
       </trans-unit>
       <trans-unit id="256773668518189604" datatype="html">
         <source>Error while executing post-consume script.</source>
@@ -2544,7 +2544,7 @@
           <context context-type="linenumber">20</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
-        <target state="needs-translation">Error while executing post-consume script.</target>
+        <target state="translated">Памылка пры выкананні скрыпту постапрацоўкі.</target>
       </trans-unit>
       <trans-unit id="6252258095055634191" datatype="html">
         <source>Received new file.</source>
@@ -2552,7 +2552,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Received new file.</target>
+        <target state="translated">Атрыманы новы файл.</target>
       </trans-unit>
       <trans-unit id="7337565919209746135" datatype="html">
         <source>File type not supported.</source>
@@ -2560,7 +2560,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">File type not supported.</target>
+        <target state="translated">Тып файла не падтрымліваецца.</target>
       </trans-unit>
       <trans-unit id="5002399167376099234" datatype="html">
         <source>Processing document...</source>
@@ -2568,7 +2568,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Processing document...</target>
+        <target state="translated">Апрацоўка дакумента...</target>
       </trans-unit>
       <trans-unit id="1085975194762600381" datatype="html">
         <source>Generating thumbnail...</source>
@@ -2576,7 +2576,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Generating thumbnail...</target>
+        <target state="translated">Стварэнне мініяцюры...</target>
       </trans-unit>
       <trans-unit id="3280851677698431426" datatype="html">
         <source>Retrieving date from document...</source>
@@ -2584,7 +2584,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Retrieving date from document...</target>
+        <target state="translated">Атрыманне даты з дакумента...</target>
       </trans-unit>
       <trans-unit id="7162102384876037296" datatype="html">
         <source>Saving document...</source>
@@ -2592,7 +2592,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Saving document...</target>
+        <target state="translated">Захаванне дакумента...</target>
       </trans-unit>
       <trans-unit id="4550450765009165976" datatype="html">
         <source>Finished.</source>
@@ -2600,7 +2600,7 @@
           <context context-type="sourcefile">src/app/services/consumer-status.service.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Finished.</target>
+        <target state="translated">Завершана.</target>
       </trans-unit>
       <trans-unit id="2089045849587358256" datatype="html">
         <source>Are you sure you want to close this document?</source>
@@ -2608,7 +2608,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this document?</target>
+        <target state="translated">Вы ўпэўнены, што хочаце закрыць гэты дакумент?</target>
       </trans-unit>
       <trans-unit id="2885986061416655600" datatype="html">
         <source>Close document</source>
@@ -2616,7 +2616,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">Close document</target>
+        <target state="translated">Закрыць дакумент</target>
       </trans-unit>
       <trans-unit id="6755718693176327396" datatype="html">
         <source>Are you sure you want to close all documents?</source>
@@ -2624,7 +2624,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close all documents?</target>
+        <target state="translated">Вы ўпэўнены, што хочаце закрыць усе дакументы?</target>
       </trans-unit>
       <trans-unit id="4215561719980781894" datatype="html">
         <source>Close documents</source>
@@ -2632,7 +2632,7 @@
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="needs-translation">Close documents</target>
+        <target state="translated">Закрыць дакументы</target>
       </trans-unit>
       <trans-unit id="3553216189604488439" datatype="html">
         <source>Modified</source>
@@ -2640,7 +2640,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Modified</target>
+        <target state="translated">Зменена</target>
       </trans-unit>
       <trans-unit id="4460262093225954455" datatype="html">
         <source>Search score</source>
@@ -2649,7 +2649,7 @@
           <context context-type="linenumber">28</context>
         </context-group>
         <note priority="1" from="description">Score is a value returned by the full text search engine and specifies how well a result matches the given query</note>
-        <target state="needs-translation">Search score</target>
+        <target state="translated">Рэлевантнасць</target>
       </trans-unit>
       <trans-unit id="1206520795340730278" datatype="html">
         <source>English (US)</source>
@@ -2657,7 +2657,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">English (US)</target>
+        <target state="translated">Англійская (ЗША)</target>
       </trans-unit>
       <trans-unit id="2719780722934172508" datatype="html">
         <source>Czech</source>
@@ -2665,7 +2665,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Czech</target>
+        <target state="translated">Чэшская</target>
       </trans-unit>
       <trans-unit id="2924289692679201020" datatype="html">
         <source>Danish</source>
@@ -2673,7 +2673,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Danish</target>
+        <target state="translated">Дацкая</target>
       </trans-unit>
       <trans-unit id="1858110241312746425" datatype="html">
         <source>German</source>
@@ -2681,7 +2681,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">German</target>
+        <target state="translated">Нямецкая</target>
       </trans-unit>
       <trans-unit id="6987083569809053351" datatype="html">
         <source>English (GB)</source>
@@ -2689,7 +2689,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">English (GB)</target>
+        <target state="translated">Англійская (Вялікабрытанія)</target>
       </trans-unit>
       <trans-unit id="5190825892106392539" datatype="html">
         <source>Spanish</source>
@@ -2697,7 +2697,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Spanish</target>
+        <target state="translated">Іспанская</target>
       </trans-unit>
       <trans-unit id="7633754075223722162" datatype="html">
         <source>French</source>
@@ -2705,7 +2705,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">French</target>
+        <target state="translated">Французская</target>
       </trans-unit>
       <trans-unit id="2935232983274991580" datatype="html">
         <source>Italian</source>
@@ -2713,7 +2713,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Italian</target>
+        <target state="translated">Італьянская</target>
       </trans-unit>
       <trans-unit id="1334425850005897370" datatype="html">
         <source>Luxembourgish</source>
@@ -2721,7 +2721,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Luxembourgish</target>
+        <target state="translated">Люксембургская</target>
       </trans-unit>
       <trans-unit id="3071065188816255493" datatype="html">
         <source>Dutch</source>
@@ -2729,7 +2729,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Dutch</target>
+        <target state="translated">Нідэрландская</target>
       </trans-unit>
       <trans-unit id="792060551707690640" datatype="html">
         <source>Polish</source>
@@ -2737,7 +2737,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="needs-translation">Polish</target>
+        <target state="translated">Польская</target>
       </trans-unit>
       <trans-unit id="9184513005098760425" datatype="html">
         <source>Portuguese (Brazil)</source>
@@ -2745,7 +2745,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="needs-translation">Portuguese (Brazil)</target>
+        <target state="translated">Партугальская (Бразілія)</target>
       </trans-unit>
       <trans-unit id="153799456510623899" datatype="html">
         <source>Portuguese</source>
@@ -2753,7 +2753,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">102</context>
         </context-group>
-        <target state="needs-translation">Portuguese</target>
+        <target state="translated">Партугальская</target>
       </trans-unit>
       <trans-unit id="8118856427047826368" datatype="html">
         <source>Romanian</source>
@@ -2761,7 +2761,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Romanian</target>
+        <target state="translated">Румынская</target>
       </trans-unit>
       <trans-unit id="7137419789978325708" datatype="html">
         <source>Russian</source>
@@ -2769,7 +2769,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Russian</target>
+        <target state="translated">Руская</target>
       </trans-unit>
       <trans-unit id="499386805970351976" datatype="html">
         <source>Swedish</source>
@@ -2777,7 +2777,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Swedish</target>
+        <target state="translated">Шведская</target>
       </trans-unit>
       <trans-unit id="4912706592792948707" datatype="html">
         <source>ISO 8601</source>
@@ -2785,7 +2785,7 @@
           <context context-type="sourcefile">src/app/services/settings.service.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">ISO 8601</target>
+        <target state="translated">ISO 8601</target>
       </trans-unit>
       <trans-unit id="1519954996184640001" datatype="html">
         <source>Error</source>
@@ -2793,7 +2793,7 @@
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Error</target>
+        <target state="translated">Памылка</target>
       </trans-unit>
       <trans-unit id="5037437391296624618" datatype="html">
         <source>Information</source>
@@ -2801,7 +2801,7 @@
           <context context-type="sourcefile">src/app/services/toast.service.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Information</target>
+        <target state="translated">Інфармацыя</target>
       </trans-unit>
     </body>
   </file>
