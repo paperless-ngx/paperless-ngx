@@ -750,7 +750,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Once you've got a couple documents in paperless and added metadata to them, paperless can assign that metadata to new documents automatically.</target>
+        <target state="translated">Пасля таго, як вы атрымаеце пару дакументаў у беспапяровым выглядзе і дадасце да іх метададзеныя, Paperless-ngx можа аўтаматычна прызначыць гэтыя метададзеныя новым дакументам.</target>
       </trans-unit>
       <trans-unit id="1409400388362030038" datatype="html">
         <source>You can configure paperless to read your mails and add documents from attached files.</source>
@@ -758,7 +758,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">You can configure paperless to read your mails and add documents from attached files.</target>
+        <target state="translated">Вы можаце наладзіць Paperless-ngx доступ да чытання вашай пошты і дадання дакументаў з укладзеных файлаў.</target>
       </trans-unit>
       <trans-unit id="7326108403480639438" datatype="html">
         <source>Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</source>
@@ -766,7 +766,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/welcome-widget/welcome-widget.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Consult the documentation on how to use these features. The section on basic usage also has some information on how to use paperless in general.</target>
+        <target state="translated">Звярніцеся да дакументацыі аб выкарыстанні гэтых функцый. У раздзеле аб базавым выкарыстанні таксама ёсць некаторая інфармацыя аб тым, як выкарыстоўваць Paperless-ngx у цэлым.</target>
       </trans-unit>
       <trans-unit id="7822640317427130239" datatype="html">
         <source>Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></source>
@@ -774,7 +774,7 @@
           <context context-type="sourcefile">src/app/components/document-asn/document-asn.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
-        <target state="needs-translation">Searching document with asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
+        <target state="translated">Пошук дакумента з asn <x id="INTERPOLATION" equiv-text="{{asn}}"/></target>
       </trans-unit>
       <trans-unit id="1407560924967345762" datatype="html">
         <source>Page</source>
@@ -786,7 +786,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Page</target>
+        <target state="translated">Старонка</target>
       </trans-unit>
       <trans-unit id="2266163016683537825" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></source>
@@ -794,7 +794,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="needs-translation">of <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
+        <target state="translated">з <x id="INTERPOLATION" equiv-text="{{previewNumPages}}"/></target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
@@ -826,7 +826,7 @@
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.html</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">Delete</target>
+        <target state="translated">Выдаліць</target>
       </trans-unit>
       <trans-unit id="3099741642167775297" datatype="html">
         <source>Download</source>
@@ -846,7 +846,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Download</target>
+        <target state="translated">Спампаваць</target>
       </trans-unit>
       <trans-unit id="8659635229098859487" datatype="html">
         <source>Download original</source>
@@ -854,7 +854,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Download original</target>
+        <target state="translated">Спампаваць арыгінал</target>
       </trans-unit>
       <trans-unit id="1418444397960583910" datatype="html">
         <source>More like this</source>
@@ -866,7 +866,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">More like this</target>
+        <target state="translated">Больш падобнага</target>
       </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
@@ -874,7 +874,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Close</target>
+        <target state="translated">Закрыць</target>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
         <source>Details</source>
@@ -882,7 +882,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Details</target>
+        <target state="translated">Падрабязнасці</target>
       </trans-unit>
       <trans-unit id="1379170675585571971" datatype="html">
         <source>Archive serial number</source>
@@ -890,7 +890,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Archive serial number</target>
+        <target state="translated">Парадкавы нумар архіва</target>
       </trans-unit>
       <trans-unit id="5114742157723900905" datatype="html">
         <source>Date created</source>
@@ -898,7 +898,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Date created</target>
+        <target state="translated">Дата стварэння</target>
       </trans-unit>
       <trans-unit id="2691296884221415710" datatype="html">
         <source>Correspondent</source>
@@ -922,7 +922,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Correspondent</target>
+        <target state="translated">Карэспандэнт</target>
       </trans-unit>
       <trans-unit id="5066119607229701477" datatype="html">
         <source>Document type</source>
@@ -946,7 +946,7 @@
           <context context-type="sourcefile">src/app/services/rest/document.service.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Document type</target>
+        <target state="translated">Тып дакумента</target>
       </trans-unit>
       <trans-unit id="6205355627445317276" datatype="html">
         <source>Content</source>
@@ -954,7 +954,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="needs-translation">Content</target>
+        <target state="translated">Змест</target>
       </trans-unit>
       <trans-unit id="218403386307979629" datatype="html">
         <source>Metadata</source>
@@ -966,7 +966,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Metadata</target>
+        <target state="translated">Метаданыя</target>
       </trans-unit>
       <trans-unit id="1826652001816486190" datatype="html">
         <source>Date modified</source>
@@ -974,7 +974,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Date modified</target>
+        <target state="translated">Дата змянення</target>
       </trans-unit>
       <trans-unit id="6392918669949841614" datatype="html">
         <source>Date added</source>
@@ -982,7 +982,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Date added</target>
+        <target state="translated">Дата дадання</target>
       </trans-unit>
       <trans-unit id="146828917013192897" datatype="html">
         <source>Media filename</source>
@@ -990,7 +990,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Media filename</target>
+        <target state="translated">Імя медыяфайла</target>
       </trans-unit>
       <trans-unit id="7985558498848210210" datatype="html">
         <source>Original MD5 checksum</source>
@@ -998,7 +998,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Original MD5 checksum</target>
+        <target state="translated">Арыгінальная кантрольная сума MD5</target>
       </trans-unit>
       <trans-unit id="5888243105821763422" datatype="html">
         <source>Original file size</source>
@@ -1006,7 +1006,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="needs-translation">Original file size</target>
+        <target state="translated">Арыгінальны памер файла</target>
       </trans-unit>
       <trans-unit id="2696647325713149563" datatype="html">
         <source>Original mime type</source>
@@ -1014,7 +1014,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Original mime type</target>
+        <target state="translated">Арыгінальны MIME тып</target>
       </trans-unit>
       <trans-unit id="342875990758166588" datatype="html">
         <source>Archive MD5 checksum</source>
@@ -1022,7 +1022,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Archive MD5 checksum</target>
+        <target state="translated">MD5 сума архіва</target>
       </trans-unit>
       <trans-unit id="6033581412811562084" datatype="html">
         <source>Archive file size</source>
@@ -1030,7 +1030,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="needs-translation">Archive file size</target>
+        <target state="translated">Памер файла архіва</target>
       </trans-unit>
       <trans-unit id="6992781481378431874" datatype="html">
         <source>Original document metadata</source>
@@ -1038,7 +1038,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Original document metadata</target>
+        <target state="translated">Арыгінальныя метададзеныя дакумента</target>
       </trans-unit>
       <trans-unit id="2846565152091361585" datatype="html">
         <source>Archived document metadata</source>
