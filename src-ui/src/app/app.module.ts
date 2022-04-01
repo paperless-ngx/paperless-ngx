@@ -69,6 +69,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 
+import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
 import localeDa from '@angular/common/locales/da'
 import localeDe from '@angular/common/locales/de'
@@ -88,6 +89,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
 
+registerLocaleData(localeBe)
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)
 registerLocaleData(localeDe)
