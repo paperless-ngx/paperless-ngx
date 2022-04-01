@@ -389,6 +389,15 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
     Default is none, which will automatically calculate image DPI so that
     the produced PDF documents are A4 sized.
 
+PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>
+    Paperless will not OCR images that have more pixels than this limit.
+    This is intended to prevent decompression bombs from overloading paperless.
+    Increasing this limit is desired if you face a DecompressionBombError despite
+    the concerning file not being malicious; this could e.g. be caused by invalidly
+    recognized metadata.
+    If you have enough resources or if you are certain that your uploaded files
+    are not malicious you can increase this value to your needs.
+    The default value is 256000000, an image with more pixels than that would not be parsed.
 
 PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any

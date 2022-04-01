@@ -6,6 +6,8 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
+Image.MAX_IMAGE_PIXELS = settings.OCR_MAX_IMAGE_PIXELS
+
 
 class TextDocumentParser(DocumentParser):
     """
