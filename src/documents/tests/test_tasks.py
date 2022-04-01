@@ -313,7 +313,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         )
         nonexistingdir = "/nowhere"
         if os.path.isdir(nonexistingdir):
-            self.skipTest("non-existing dir exists")
+            self.fail("non-existing dir exists")
         else:
             with self.assertLogs("paperless.tasks", level="WARNING") as cm:
                 tasks.save_to_dir(test_file, target_dir=nonexistingdir)

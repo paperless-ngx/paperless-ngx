@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import tempfile
+from typing import List  # for type hinting. Can be removed, if only Python >3.8 is used
 
 import tqdm
 from asgiref.sync import async_to_sync
@@ -23,6 +24,7 @@ from pdf2image import convert_from_path
 from pikepdf import Pdf
 from pyzbar import pyzbar
 from whoosh.writing import AsyncWriter
+
 
 logger = logging.getLogger("paperless.tasks")
 
@@ -70,7 +72,7 @@ def train_classifier():
         logger.warning("Classifier error: " + str(e))
 
 
-def barcode_reader(image) -> list[str]:
+def barcode_reader(image) -> List[str]:
     """
     Read any barcodes contained in image
     Returns a list containing all found barcodes
@@ -91,7 +93,7 @@ def barcode_reader(image) -> list[str]:
     return barcodes
 
 
-def scan_file_for_separating_barcodes(filepath: str) -> list[int]:
+def scan_file_for_separating_barcodes(filepath: str) -> List[int]:
     """
     Scan the provided file for page separating barcodes
     Returns a list of pagenumbers, which separate the file
@@ -108,7 +110,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> list[int]:
     return separator_page_numbers
 
 
-def separate_pages(filepath: str, pages_to_split_on: list[int]) -> list[str]:
+def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
     """
     Separate the provided file on the pages_to_split_on.
     The pages which are defined by page_numbers will be removed.
