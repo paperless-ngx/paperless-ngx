@@ -566,3 +566,5 @@ if os.getenv("PAPERLESS_IGNORE_DATES", ""):
         d = dateparser.parse(s)
         if d:
             IGNORE_DATES.add(d.date())
+
+ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK", "true")
