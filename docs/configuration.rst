@@ -767,8 +767,8 @@ PAPERLESS_OCR_LANGUAGES=<list>
 
 PAPERLESS_ENABLE_UPDATE_CHECK=<bool>
     Enabling this option enables the check for available updates, which works by
-    loading the version file of the public repository for this project on Github e.g.
-    https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/src/paperless/version.py
+    pinging the releases endpoint of the Github API for the project e.g.
+    https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest
     to determine whether a new version is available. Actual updating of the app must be done manually.
 
     No tracking data is collected by the app in any way.
