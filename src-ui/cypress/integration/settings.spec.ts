@@ -88,14 +88,4 @@ describe('settings', () => {
     cy.visit('/dashboard')
     cy.get('app-saved-view-widget').contains('Inbox').should('not.exist')
   })
-
-  it('should change the pdf viewer type', () => {
-    cy.visit('/documents/1')
-    cy.get('object[data*="/api/documents/1/preview/"]').should('not.exist')
-    cy.visit('/settings').wait('@savedViews')
-    cy.contains('Use PDF viewer provided by the browser').click()
-    cy.contains('button', 'Save').click().wait('@savedViews').wait(1000)
-    cy.visit('/documents/1')
-    cy.get('object[data*="/api/documents/1/preview/"]')
-  })
 })
