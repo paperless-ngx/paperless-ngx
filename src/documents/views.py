@@ -679,8 +679,8 @@ class RemoteVersionView(GenericAPIView):
         if settings.ENABLE_UPDATE_CHECK:
             try:
                 with urllib.request.urlopen(
-                    "https://raw.githubusercontent.com/paperless-ngx"
-                    + "/paperless-ngx/main/src/paperless/version.py",
+                    "https://api.github.com/repos/"
+                    + "paperless-ngx/paperless-ngx/releases/latest",
                 ) as response:
                     remote = response.read().decode("utf-8")
                 try:
