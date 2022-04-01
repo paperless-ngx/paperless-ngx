@@ -198,7 +198,10 @@ def consume_file(
             for n, document in enumerate(document_list):
                 # save to consumption dir
                 # rename it to the original filename  with number prefix
-                newname = f"{str(n)}_" + override_filename
+                if override_filename:
+                    newname = f"{str(n)}_" + override_filename
+                else:
+                    newname = None
                 save_to_dir(document, newname=newname)
             # if we got here, the document was successfully split
             # and can safely be deleted
@@ -214,10 +217,14 @@ def consume_file(
                 "status": "SUCCESS",
                 "message": "finished",
             }
-            async_to_sync(get_channel_layer().group_send)(
-                "status_updates",
-                {"type": "status_update", "data": payload},
-            )
+            try:
+                async_to_sync(get_channel_layer().group_send)(
+                    "status_updates",
+                    {"type": "status_update", "data": payload},
+                )
+            except OSError as e:
+                logger.warning("OSError. It could be, the broker cannot be reached.")
+                logger.warning(str(e))
             return "File successfully split"
 
     # continue with consumption if no barcode was found

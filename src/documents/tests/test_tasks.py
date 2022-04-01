@@ -1,8 +1,10 @@
 import os
+import shutil
 import tempfile
 from unittest import mock
 
 from django.conf import settings
+from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
 from documents import tasks
@@ -95,21 +97,118 @@ class TestTasks(DirectoriesMixin, TestCase):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
-            "patch-code-t.pbm",
+            "barcodes",
+            "barcode-39-PATCHT.png",
         )
         img = Image.open(test_file)
         separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
         self.assertEqual(tasks.barcode_reader(img), [separator_barcode])
 
     def test_barcode_reader2(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "patch-code-t.pbm",
+        )
+        img = Image.open(test_file)
+        separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
+        self.assertEqual(tasks.barcode_reader(img), [separator_barcode])
+
+    def test_barcode_reader_distorsion(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-39-PATCHT-distorsion.png",
+        )
+        img = Image.open(test_file)
+        separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
+        self.assertEqual(tasks.barcode_reader(img), [separator_barcode])
+
+    def test_barcode_reader_distorsion2(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-39-PATCHT-distorsion2.png",
+        )
+        img = Image.open(test_file)
+        separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
+        self.assertEqual(tasks.barcode_reader(img), [separator_barcode])
+
+    def test_barcode_reader_unreadable(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-39-PATCHT-unreadable.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(tasks.barcode_reader(img), [])
+
+    def test_barcode_reader_qr(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "qr-code-PATCHT.png",
+        )
+        img = Image.open(test_file)
+        separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
+        self.assertEqual(tasks.barcode_reader(img), [separator_barcode])
+
+    def test_barcode_reader_128(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-128-PATCHT.png",
+        )
+        img = Image.open(test_file)
+        separator_barcode = str(settings.CONSUMER_BARCODE_STRING)
+        self.assertEqual(tasks.barcode_reader(img), [separator_barcode])
+
+    def test_barcode_reader_no_barcode(self):
         test_file = os.path.join(os.path.dirname(__file__), "samples", "simple.png")
         img = Image.open(test_file)
         self.assertEqual(tasks.barcode_reader(img), [])
+
+    def test_barcode_reader_custom_separator(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-39-custom.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(tasks.barcode_reader(img), ["CUSTOM BARCODE"])
+
+    def test_barcode_reader_custom_qr_separator(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-qr-custom.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(tasks.barcode_reader(img), ["CUSTOM BARCODE"])
+
+    def test_barcode_reader_custom_128_separator(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-128-custom.png",
+        )
+        img = Image.open(test_file)
+        self.assertEqual(tasks.barcode_reader(img), ["CUSTOM BARCODE"])
 
     def test_scan_file_for_separating_barcodes(self):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
+            "barcodes",
             "patch-code-t.pdf",
         )
         pages = tasks.scan_file_for_separating_barcodes(test_file)
@@ -124,15 +223,70 @@ class TestTasks(DirectoriesMixin, TestCase):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
+            "barcodes",
             "patch-code-t-middle.pdf",
         )
         pages = tasks.scan_file_for_separating_barcodes(test_file)
         self.assertEqual(pages, [1])
 
+    def test_scan_file_for_separating_qr_barcodes(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "patch-code-t-qr.pdf",
+        )
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertEqual(pages, [0])
+
+    @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
+    def test_scan_file_for_separating_custom_barcodes(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-39-custom.pdf",
+        )
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertEqual(pages, [0])
+
+    @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
+    def test_scan_file_for_separating_custom_qr_barcodes(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-qr-custom.pdf",
+        )
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertEqual(pages, [0])
+
+    @override_settings(CONSUMER_BARCODE_STRING="CUSTOM BARCODE")
+    def test_scan_file_for_separating_custom_128_barcodes(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-128-custom.pdf",
+        )
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertEqual(pages, [0])
+
+    def test_scan_file_for_separating_wrong_qr_barcodes(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "barcode-39-custom.pdf",
+        )
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertEqual(pages, [])
+
     def test_separate_pages(self):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
+            "barcodes",
             "patch-code-t-middle.pdf",
         )
         pages = tasks.separate_pages(test_file, [1])
@@ -142,6 +296,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
+            "barcodes",
             "patch-code-t.pdf",
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
@@ -153,6 +308,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
+            "barcodes",
             "patch-code-t.pdf",
         )
         nonexistingdir = "/nowhere"
@@ -172,6 +328,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
+            "barcodes",
             "patch-code-t.pdf",
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
@@ -183,6 +340,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         test_file = os.path.join(
             os.path.dirname(__file__),
             "samples",
+            "barcodes",
             "patch-code-t-middle.pdf",
         )
         tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
@@ -196,6 +354,19 @@ class TestTasks(DirectoriesMixin, TestCase):
         target_file2 = os.path.join(tempdir, "patch-code-t-middle_document_1.pdf")
         self.assertTrue(os.path.isfile(target_file1))
         self.assertTrue(os.path.isfile(target_file2))
+
+    @override_settings(CONSUMER_ENABLE_BARCODES=True)
+    def test_consume_barcode_file(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "patch-code-t-middle.pdf",
+        )
+        dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.pd")
+        shutil.copy(test_file, dst)
+
+        self.assertEqual(tasks.consume_file(dst), "File successfully split")
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_success(self, m):
