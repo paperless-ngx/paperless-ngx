@@ -1,3 +1,7 @@
+<!-- 
+Note: All PRs with code changes should be targeted to the `dev` branch, pure documentation changes can target `main`
+-->
+
 ## Proposed change
 
 <!--
