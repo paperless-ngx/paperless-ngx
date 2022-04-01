@@ -12,7 +12,7 @@
   </a>
   <div class="search-form-container flex-grow-1 py-2 pb-3 pb-sm-2 px-3 ps-md-4 me-sm-auto order-3 order-sm-1">
     <form (ngSubmit)="search()" class="form-inline flex-grow-1">
-      <svg width="1em" height="1em">
+      <svg width="1em" height="1em" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#search"/>
       </svg>
       <input class="form-control form-control-sm" type="text" placeholder="Search documents" aria-label="Search"
@@ -25,7 +25,7 @@
         <span *ngIf="displayName" class="navbar-text small me-2 text-light d-none d-sm-inline">
           {{displayName}}
         </span>
-        <svg width="1.3em" height="1.3em">
+        <svg width="1.3em" height="1.3em" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#person-circle"/>
         </svg>
       </button>
@@ -170,13 +170,13 @@
           <li class="nav-item">
             <div class="d-flex w-100 flex-wrap">
               <a class="nav-link pe-2 pb-1" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="sidebaricon bi bi-github" viewBox="0 0 16 16">
-                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="sidebaricon" viewBox="0 0 16 16">
+                  <use xlink:href="assets/bootstrap-icons.svg#github" />
                 </svg>&nbsp;<ng-container i18n>GitHub</ng-container>
               </a>
               <a class="nav-link-additional small text-muted ms-3" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests" title="Suggest an idea">
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" fill="currentColor" class="bi bi-lightbulb pe-1" viewBox="0 0 16 16">
-                  <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                  <use xlink:href="assets/bootstrap-icons.svg#lightbulb" />
                 </svg>
                 <ng-container i18n>Suggest an idea</ng-container>
               </a>
