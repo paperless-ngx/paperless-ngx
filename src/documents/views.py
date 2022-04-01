@@ -674,22 +674,27 @@ class BulkDownloadView(GenericAPIView):
 
 class RemoteVersionView(GenericAPIView):
     def get(self, request, format=None):
-        try:
-            with urllib.request.urlopen(
-                "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx"
-                + "/main/src/paperless/version.py",
-            ) as response:
-                remote = response.read().decode("utf-8")
-            match = re.search("(\\d+, \\d+, \\d+)", remote)
-            if match:
-                remote_version = ".".join(match[0].split(", "))
-        except urllib.error.URLError:
-            remote_version = "0.0.0"
+        remote_version = "0.0.0"
+        is_greater = False
+        if settings.ENABLE_UPDATE_CHECK:
+            try:
+                with urllib.request.urlopen(
+                    "https://raw.githubusercontent.com/paperless-ngx"
+                    + "/paperless-ngx/main/src/paperless/version.py",
+                ) as response:
+                    remote = response.read().decode("utf-8")
+                match = re.search("(\\d+, \\d+, \\d+)", remote)
+                if match:
+                    remote_version = ".".join(match[0].split(", "))
+            except urllib.error.URLError:
+                logger.debug("An error occured checking for available updates")
 
-        current_version = ".".join([str(_) for _ in version.__version__[:3]])
-        is_greater = packaging_version.parse(remote_version) > packaging_version.parse(
-            current_version,
-        )
+            current_version = ".".join([str(_) for _ in version.__version__[:3]])
+            is_greater = packaging_version.parse(
+                remote_version,
+            ) > packaging_version.parse(
+                current_version,
+            )
 
         return Response(
             {
