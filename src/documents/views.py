@@ -1,6 +1,8 @@
 import logging
 import os
+import re
 import tempfile
+import urllib
 import uuid
 import zipfile
 from datetime import datetime
@@ -24,6 +26,8 @@ from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from django_q.tasks import async_task
+from packaging import version as packaging_version
+from paperless import version
 from paperless.db import GnuPG
 from paperless.views import StandardPagination
 from rest_framework import parsers
@@ -666,3 +670,30 @@ class BulkDownloadView(GenericAPIView):
             )
 
             return response
+
+
+class RemoteVersionView(GenericAPIView):
+    def get(self, request, format=None):
+        try:
+            with urllib.request.urlopen(
+                "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx"
+                + "/main/src/paperless/version.py",
+            ) as response:
+                remote = response.read().decode("utf-8")
+            match = re.search("(\\d+, \\d+, \\d+)", remote)
+            if match:
+                remote_version = ".".join(match[0].split(", "))
+        except urllib.error.URLError:
+            remote_version = "0.0.0"
+
+        current_version = ".".join([str(_) for _ in version.__version__[:3]])
+        is_greater = packaging_version.parse(remote_version) > packaging_version.parse(
+            current_version,
+        )
+
+        return Response(
+            {
+                "version": remote_version,
+                "greater_than_current": is_greater,
+            },
+        )
