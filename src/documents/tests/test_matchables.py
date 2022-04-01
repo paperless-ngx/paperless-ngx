@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 from random import randint
+from typing import Iterable
 
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
@@ -15,27 +16,37 @@ from ..models import Tag
 from ..signals import document_consumption_finished
 
 
-class TestMatching(TestCase):
-    def _test_matching(self, text, algorithm, true, false):
+class _TestMatchingBase(TestCase):
+    def _test_matching(
+        self,
+        match_text: str,
+        match_algorithm: str,
+        should_match: Iterable[str],
+        no_match: Iterable[str],
+        case_sensitive: bool = False,
+    ):
         for klass in (Tag, Correspondent, DocumentType):
             instance = klass.objects.create(
                 name=str(randint(10000, 99999)),
-                match=text,
-                matching_algorithm=getattr(klass, algorithm),
+                match=match_text,
+                matching_algorithm=getattr(klass, match_algorithm),
+                is_insensitive=not case_sensitive,
             )
-            for string in true:
+            for string in should_match:
                 doc = Document(content=string)
                 self.assertTrue(
                     matching.matches(instance, doc),
-                    '"%s" should match "%s" but it does not' % (text, string),
+                    '"%s" should match "%s" but it does not' % (match_text, string),
                 )
-            for string in false:
+            for string in no_match:
                 doc = Document(content=string)
                 self.assertFalse(
                     matching.matches(instance, doc),
-                    '"%s" should not match "%s" but it does' % (text, string),
+                    '"%s" should not match "%s" but it does' % (match_text, string),
                 )
 
+
+class TestMatching(_TestMatchingBase):
     def test_match_all(self):
 
         self._test_matching(
@@ -199,6 +210,169 @@ class TestMatching(TestCase):
                 "1220 Main Street Springfield Miss",
             ),
             ("1220 Main Street, Springfield, Mich.",),
+        )
+
+
+class TestCaseSensitiveMatching(_TestMatchingBase):
+    def test_match_all(self):
+        self._test_matching(
+            "alpha charlie gamma",
+            "MATCH_ALL",
+            (
+                "I have alpha, charlie, and gamma in me",
+                "I have gamma, charlie, and alpha in me",
+            ),
+            (
+                "I have Alpha, charlie, and gamma in me",
+                "I have gamma, Charlie, and alpha in me",
+                "I have alpha, charlie, and Gamma in me",
+                "I have gamma, charlie, and ALPHA in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            "Alpha charlie Gamma",
+            "MATCH_ALL",
+            (
+                "I have Alpha, charlie, and Gamma in me",
+                "I have Gamma, charlie, and Alpha in me",
+            ),
+            (
+                "I have Alpha, charlie, and gamma in me",
+                "I have gamma, charlie, and alpha in me",
+                "I have alpha, charlie, and Gamma in me",
+                "I have Gamma, Charlie, and ALPHA in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            'brown fox "lazy dogs"',
+            "MATCH_ALL",
+            (
+                "the quick brown fox jumped over the lazy dogs",
+                "the quick brown fox jumped over the lazy  dogs",
+            ),
+            (
+                "the quick Brown fox jumped over the lazy dogs",
+                "the quick brown Fox jumped over the lazy  dogs",
+                "the quick brown fox jumped over the Lazy dogs",
+                "the quick brown fox jumped over the lazy  Dogs",
+            ),
+            case_sensitive=True,
+        )
+
+    def test_match_any(self):
+        self._test_matching(
+            "alpha charlie gamma",
+            "MATCH_ANY",
+            (
+                "I have alpha in me",
+                "I have charlie in me",
+                "I have gamma in me",
+                "I have alpha, charlie, and gamma in me",
+                "I have alpha and charlie in me",
+            ),
+            (
+                "I have Alpha in me",
+                "I have chaRLie in me",
+                "I have gamMA in me",
+                "I have aLPha, cHArlie, and gAMma in me",
+                "I have AlphA and CharlIe in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            "Alpha Charlie Gamma",
+            "MATCH_ANY",
+            (
+                "I have Alpha in me",
+                "I have Charlie in me",
+                "I have Gamma in me",
+                "I have Alpha, Charlie, and Gamma in me",
+                "I have Alpha and Charlie in me",
+            ),
+            (
+                "I have alpha in me",
+                "I have ChaRLie in me",
+                "I have GamMA in me",
+                "I have ALPha, CHArlie, and GAMma in me",
+                "I have AlphA and CharlIe in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            '"brown fox" " lazy  dogs "',
+            "MATCH_ANY",
+            (
+                "the quick brown fox",
+                "jumped over the lazy  dogs.",
+            ),
+            (
+                "the quick Brown fox",
+                "jumped over the lazy  Dogs.",
+            ),
+            case_sensitive=True,
+        )
+
+    def test_match_literal(self):
+
+        self._test_matching(
+            "alpha charlie gamma",
+            "MATCH_LITERAL",
+            ("I have 'alpha charlie gamma' in me",),
+            (
+                "I have 'Alpha charlie gamma' in me",
+                "I have 'alpha Charlie gamma' in me",
+                "I have 'alpha charlie Gamma' in me",
+                "I have 'Alpha Charlie Gamma' in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            "Alpha Charlie Gamma",
+            "MATCH_LITERAL",
+            ("I have 'Alpha Charlie Gamma' in me",),
+            (
+                "I have 'Alpha charlie gamma' in me",
+                "I have 'alpha Charlie gamma' in me",
+                "I have 'alpha charlie Gamma' in me",
+                "I have 'alpha charlie gamma' in me",
+            ),
+            case_sensitive=True,
+        )
+
+    def test_match_regex(self):
+        self._test_matching(
+            r"alpha\w+gamma",
+            "MATCH_REGEX",
+            (
+                "I have alpha_and_gamma in me",
+                "I have alphas_and_gamma in me",
+            ),
+            (
+                "I have Alpha_and_Gamma in me",
+                "I have alpHAs_and_gaMMa in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            r"Alpha\w+gamma",
+            "MATCH_REGEX",
+            (
+                "I have Alpha_and_gamma in me",
+                "I have Alphas_and_gamma in me",
+            ),
+            (
+                "I have Alpha_and_Gamma in me",
+                "I have alphas_and_gamma in me",
+            ),
+            case_sensitive=True,
         )
 
 
