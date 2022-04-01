@@ -303,7 +303,7 @@ fi
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
 wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
 
-SECRET_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
+SECRET_KEY=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
 
 DEFAULT_LANGUAGES="deu eng fra ita spa"
 
@@ -322,32 +322,32 @@ DEFAULT_LANGUAGES="deu eng fra ita spa"
 	fi
 } > docker-compose.env
 
-sed -i "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
+sed -i.bak "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
 
-sed -i "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/paperless/consume#g" docker-compose.yml
+sed -i.bak "s#- \./consume:/usr/src/paperless/consume#- $CONSUME_FOLDER:/usr/src/paperless/consume#g" docker-compose.yml
 
 if [[ -n $MEDIA_FOLDER ]] ; then
-	sed -i "s#- media:/usr/src/paperless/media#- $MEDIA_FOLDER:/usr/src/paperless/media#g" docker-compose.yml
-	sed -i "/^\s*media:/d" docker-compose.yml
+	sed -i.bak "s#- media:/usr/src/paperless/media#- $MEDIA_FOLDER:/usr/src/paperless/media#g" docker-compose.yml
+	sed -i.bak "/^\s*media:/d" docker-compose.yml
 fi
 
 if [[ -n $DATA_FOLDER ]] ; then
-	sed -i "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
-	sed -i "/^\s*data:/d" docker-compose.yml
+	sed -i.bak "s#- data:/usr/src/paperless/data#- $DATA_FOLDER:/usr/src/paperless/data#g" docker-compose.yml
+	sed -i.bak "/^\s*data:/d" docker-compose.yml
 fi
 
 if [[ -n $POSTGRES_FOLDER ]] ; then
-	sed -i "s#- pgdata:/var/lib/postgresql/data#- $POSTGRES_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
-	sed -i "/^\s*pgdata:/d" docker-compose.yml
+	sed -i.bak "s#- pgdata:/var/lib/postgresql/data#- $POSTGRES_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
+	sed -i.bak "/^\s*pgdata:/d" docker-compose.yml
 fi
 
 # remove trailing blank lines from end of file
-sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' docker-compose.yml
+sed -i.bak '/\n$/D' docker-compose.yml
 # if last line in file contains "volumes:", remove that line since no more named volumes are left
 l1=$(grep -n '^volumes:' docker-compose.yml | cut -d : -f 1)  # get line number containing volume: at begin of line
 l2=$(wc -l < docker-compose.yml)  # get total number of lines
 if [ "$l1" -eq "$l2" ] ; then
-	sed -i "/^volumes:/d" docker-compose.yml
+	sed -i.bak "/^volumes:/d" docker-compose.yml
 fi
 
 
