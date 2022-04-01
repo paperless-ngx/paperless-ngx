@@ -6,7 +6,7 @@ import zipfile
 from datetime import datetime
 from time import mktime
 from unicodedata import normalize
-from urllib.parse import quote_plus
+from urllib.parse import quote
 
 from django.conf import settings
 from django.db.models import Case
@@ -244,7 +244,7 @@ class DocumentViewSet(
         # RFC 5987 addresses this issue
         # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
         filename_normalized = normalize("NFKD", filename).encode("ascii", "ignore")
-        filename_encoded = quote_plus(filename)
+        filename_encoded = quote(filename)
         content_disposition = (
             f"{disposition}; "
             f'filename="{filename_normalized}"; '
