@@ -299,6 +299,7 @@ LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
     ("en-us", _("English (US)")),  # needs to be first to act as fallback language
+    ("be-by", _("Belarusian")),
     ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
     ("de-de", _("German")),
@@ -487,6 +488,11 @@ OCR_ROTATE_PAGES = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES", "true")
 
 OCR_ROTATE_PAGES_THRESHOLD = float(
     os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
+)
+
+OCR_MAX_IMAGE_PIXELS = os.environ.get(
+    "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
+    256000000,
 )
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")

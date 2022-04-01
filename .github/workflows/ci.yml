@@ -78,7 +78,7 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --diff"
-          version: "22.1.0"
+          version: "22.3.0"
       -
         name: Run flake8 checks
         run: |
