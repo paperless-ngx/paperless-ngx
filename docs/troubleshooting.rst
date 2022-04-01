@@ -25,6 +25,19 @@ Check for the following issues:
 *   Go to the admin interface, and check if there are failed tasks. If so, the
     tasks will contain an error message.
 
+Consumer warns ``OCR for XX failed``
+####################################
+
+If you find the OCR accuracy to be too low, and/or the document consumer warns
+that ``OCR for XX failed, but we're going to stick with what we've got since
+FORGIVING_OCR is enabled``, then you might need to install the
+`Tesseract language files <http://packages.ubuntu.com/search?keywords=tesseract-ocr>`_
+marching your document's languages.
+
+As an example, if you are running Paperless-ngx from any Ubuntu or Debian
+box, and your documents are written in Spanish you may need to run::
+
+    apt-get install -y tesseract-ocr-spa
 
 Consumer fails to pickup any new files
 ######################################

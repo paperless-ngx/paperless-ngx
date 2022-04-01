@@ -60,7 +60,7 @@ The endpoints correctly serve the response header fields ``Content-Disposition``
 and ``Content-Type`` to indicate the filename for download and the type of content of
 the document.
 
-In order to download or preview the original document when an archied document is available,
+In order to download or preview the original document when an archived document is available,
 supply the query parameter ``original=true``.
 
 .. hint::
