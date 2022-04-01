@@ -1,6 +1,6 @@
+import json
 import logging
 import os
-import re
 import tempfile
 import urllib
 import uuid
@@ -683,9 +683,11 @@ class RemoteVersionView(GenericAPIView):
                     + "/paperless-ngx/main/src/paperless/version.py",
                 ) as response:
                     remote = response.read().decode("utf-8")
-                match = re.search(r"(\d+, \d+, \d+)", remote)
-                if match:
-                    remote_version = ".".join(match[0].split(", "))
+                try:
+                    remote_json = json.loads(remote)
+                    remote_version = remote_json["tag_name"].replace("ngx-", "")
+                except ValueError:
+                    logger.debug("An error occured parsing remote version json")
             except urllib.error.URLError:
                 logger.debug("An error occured checking for available updates")
 
