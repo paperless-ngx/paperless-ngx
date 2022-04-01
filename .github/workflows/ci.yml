@@ -193,7 +193,7 @@ jobs:
         id: docker-meta
         uses: docker/metadata-action@v3
         with:
-          images: ghcr.io/${{ github.repository }}/paperless-ngx
+          images: ghcr.io/${{ github.repository }}
           tags: |
             type=match,pattern=ngx-(\d.\d.\d),group=1
             type=semver,pattern=ngx-{{version}}
