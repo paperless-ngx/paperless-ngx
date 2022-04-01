@@ -683,7 +683,7 @@ class RemoteVersionView(GenericAPIView):
                     + "/paperless-ngx/main/src/paperless/version.py",
                 ) as response:
                     remote = response.read().decode("utf-8")
-                match = re.search("(\\d+, \\d+, \\d+)", remote)
+                match = re.search(r"(\d+, \d+, \d+)", remote)
                 if match:
                     remote_version = ".".join(match[0].split(", "))
             except urllib.error.URLError:
