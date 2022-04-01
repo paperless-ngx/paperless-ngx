@@ -375,7 +375,7 @@ class SavedViewFilterRule(models.Model):
 
     rule_type = models.PositiveIntegerField(_("rule type"), choices=RULE_TYPES)
 
-    value = models.CharField(_("value"), max_length=128, blank=True, null=True)
+    value = models.CharField(_("value"), max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name = _("filter rule")
