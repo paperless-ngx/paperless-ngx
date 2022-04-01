@@ -183,8 +183,20 @@
             </div>
           </li>
           <li class="nav-item mt-2">
-            <div class="px-3 py-2 text-muted small">
-              {{versionString}}
+            <div class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap">
+              <div class="me-3">{{ versionString }}</div>
+              <div *ngIf="appRemoteVersion?.greater_than_current" class="version-check">
+                <ng-template #updatePopContent>
+                  <span class="small">Paperless-ngx v{{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
+                </ng-template>
+                <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/releases"
+                [ngbPopover]="updatePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
+                  <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
+                    <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
+                  </svg>
+                  <ng-container i18n>Update available</ng-container>
+                </a>
+              </div>
             </div>
           </li>
         </ul>
