@@ -17,3 +17,5 @@
 **/htmlcov
 /src/.pytest_cache
 .idea
+.venv/
+.vscode/
