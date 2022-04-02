@@ -229,6 +229,26 @@ class TestTasks(DirectoriesMixin, TestCase):
         pages = tasks.scan_file_for_separating_barcodes(test_file)
         self.assertEqual(pages, [1])
 
+    def test_scan_file_for_separating_barcodes4(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "several-patcht-codes.pdf",
+        )
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertEqual(pages, [2, 5])
+
+    def test_scan_file_for_separating_barcodes_upsidedown(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "patch-code-t-middle_reverse.pdf",
+        )
+        pages = tasks.scan_file_for_separating_barcodes(test_file)
+        self.assertEqual(pages, [1])
+
     def test_scan_file_for_separating_qr_barcodes(self):
         test_file = os.path.join(
             os.path.dirname(__file__),
