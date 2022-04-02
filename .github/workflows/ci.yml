@@ -198,7 +198,7 @@ jobs:
             type=match,pattern=ngx-(\d.\d.\d),group=1
             type=semver,pattern=ngx-{{version}}
             type=semver,pattern=ngx-{{major}}.{{minor}}
-            type=ref
+            type=ref,event=push
       -
         name: Checkout
         uses: actions/checkout@v3
