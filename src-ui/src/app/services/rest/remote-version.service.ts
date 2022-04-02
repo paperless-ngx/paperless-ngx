@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment'
 
 export interface AppRemoteVersion {
   version: string
-  greater_than_current: boolean
+  update_available: boolean
 }
 
 @Injectable({

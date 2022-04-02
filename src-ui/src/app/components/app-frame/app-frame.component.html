@@ -185,7 +185,7 @@
           <li class="nav-item mt-2">
             <div class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap">
               <div class="me-3">{{ versionString }}</div>
-              <div *ngIf="appRemoteVersion?.greater_than_current" class="version-check">
+              <div *ngIf="appRemoteVersion?.update_available" class="version-check">
                 <ng-template #updatePopContent>
                   <span class="small">Paperless-ngx v{{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
                 </ng-template>
