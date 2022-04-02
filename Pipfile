@@ -23,12 +23,14 @@ imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
 pillow = "~=9.0"
+# Any version update to pikepdf requires a base image update
 pikepdf = "~=5.1"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
-psycopg2-binary = "*"
+# Any version update to psycopg2 requires a base image update
+psycopg2 = "*"
 redis = "*"
 # Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
 scikit-learn="==1.0.2"
