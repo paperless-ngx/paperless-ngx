@@ -701,6 +701,6 @@ class RemoteVersionView(GenericAPIView):
         return Response(
             {
                 "version": remote_version,
-                "greater_than_current": is_greater,
+                "update_available": is_greater,
             },
         )
