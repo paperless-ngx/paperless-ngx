@@ -599,7 +599,7 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
     If no barcodes are detected in the uploaded file, no page separation
     will happen.
 
-    Defaults to true.
+    Defaults to false.
 
 
 PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
