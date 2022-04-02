@@ -39,7 +39,6 @@ import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
-import { InfiniteScrollModule } from 'ngx-infinite-scroll'
 import { TagsComponent } from './components/common/input/tags/tags.component'
 import { SortableDirective } from './directives/sortable.directive'
 import { CookieService } from 'ngx-cookie-service'
@@ -170,7 +169,6 @@ registerLocaleData(localeZh)
     FormsModule,
     ReactiveFormsModule,
     NgxFileDropModule,
-    InfiniteScrollModule,
     PdfViewerModule,
     NgSelectModule,
     ColorSliderModule,
