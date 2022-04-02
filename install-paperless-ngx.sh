@@ -59,12 +59,12 @@ fi
 
 DOCKER_COMPOSE_CMD="docker-compose"
 if ! command -v ${DOCKER_COMPOSE_CMD} ; then
-	{
-		docker compose version &> /dev/null && DOCKER_COMPOSE_CMD="docker compose"
-		} || {
+	if docker compose version &> /dev/null ; then
+		DOCKER_COMPOSE_CMD="docker compose"
+	else
 		echo "docker-compose executable not found. Is docker-compose installed?"
 		exit 1
-	}
+	fi
 fi
 
 # Check if user has permissions to run Docker by trying to get the status of Docker (docker status).
