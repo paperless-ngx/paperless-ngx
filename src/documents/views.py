@@ -675,8 +675,10 @@ class BulkDownloadView(GenericAPIView):
 class RemoteVersionView(GenericAPIView):
     def get(self, request, format=None):
         remote_version = "0.0.0"
-        is_greater = False
-        if settings.ENABLE_UPDATE_CHECK:
+        is_greater_than_current = False
+        # TODO: this can likely be removed when frontend settings are saved to DB
+        feature_is_set = settings.ENABLE_UPDATE_CHECK != "default"
+        if feature_is_set and settings.ENABLE_UPDATE_CHECK:
             try:
                 with urllib.request.urlopen(
                     "https://api.github.com/repos/"
@@ -692,7 +694,7 @@ class RemoteVersionView(GenericAPIView):
                 logger.debug("An error occured checking for available updates")
 
             current_version = ".".join([str(_) for _ in version.__version__[:3]])
-            is_greater = packaging_version.parse(
+            is_greater_than_current = packaging_version.parse(
                 remote_version,
             ) > packaging_version.parse(
                 current_version,
@@ -701,6 +703,7 @@ class RemoteVersionView(GenericAPIView):
         return Response(
             {
                 "version": remote_version,
-                "update_available": is_greater,
+                "update_available": is_greater_than_current,
+                "feature_is_set": feature_is_set,
             },
         )

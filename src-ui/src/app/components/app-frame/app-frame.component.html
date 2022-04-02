@@ -185,17 +185,30 @@
           <li class="nav-item mt-2">
             <div class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap">
               <div class="me-3">{{ versionString }}</div>
-              <div *ngIf="appRemoteVersion?.update_available" class="version-check">
-                <ng-template #updatePopContent>
+              <div *ngIf="appRemoteVersion" class="version-check">
+                <ng-template #updateAvailablePopContent>
                   <span class="small">Paperless-ngx v{{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
                 </ng-template>
-                <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/releases"
-                [ngbPopover]="updatePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
-                  <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
-                    <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
-                  </svg>
-                  <ng-container i18n>Update available</ng-container>
-                </a>
+                <ng-template #updateCheckingNotEnabledPopContent>
+                  <span class="small"><ng-container i18n>Checking for updates is disabled.</ng-container><br/><ng-container i18n>Click for more information.</ng-container></span>
+                </ng-template>
+                <ng-container *ngIf="appRemoteVersion.feature_is_set; else updateCheckNotSet">
+                  <a *ngIf="appRemoteVersion.update_available" class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://github.com/paperless-ngx/paperless-ngx/releases"
+                  [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
+                    <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
+                      <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
+                    </svg>
+                    <ng-container *ngIf="appRemoteVersion?.update_available" i18n>Update available</ng-container>
+                  </a>
+                </ng-container>
+                <ng-template #updateCheckNotSet>
+                  <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer" href="https://paperless-ngx.readthedocs.io/en/latest/configuration.html#update-checking"
+                  [ngbPopover]="updateCheckingNotEnabledPopContent" popoverClass="shadow" triggers="mouseenter:mouseleave" container="body">
+                    <svg fill="currentColor" class="me-1" width="1.2em" height="1.2em" style="vertical-align: text-top;" viewBox="0 0 16 16">
+                      <use xlink:href="assets/bootstrap-icons.svg#info-circle" />
+                    </svg>
+                  </a>
+                </ng-template>
               </div>
             </div>
           </li>
