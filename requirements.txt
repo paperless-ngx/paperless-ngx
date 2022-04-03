@@ -5,15 +5,15 @@
 #    pipenv lock --requirements
 #
 
--i https://pypi.python.org/simple
---extra-index-url https://www.piwheels.org/simple
+-i https://pypi.python.org/simple/
+--extra-index-url https://www.piwheels.org/simple/
 aioredis==1.3.1
 anyio==3.5.0; python_full_version >= '3.6.2'
 arrow==1.2.2; python_version >= '3.6'
 asgiref==3.5.0; python_version >= '3.7'
 async-timeout==4.0.2; python_version >= '3.6'
 attrs==21.4.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
-autobahn==22.2.2; python_version >= '3.7'
+autobahn==22.3.2; python_version >= '3.7'
 automat==20.2.0
 backports.zoneinfo==0.2.1; python_version < '3.9'
 blessed==1.19.1; python_version >= '2.7'
@@ -23,7 +23,7 @@ channels-redis==3.4.0
 channels==3.0.4
 chardet==4.0.0; python_version >= '3.1'
 charset-normalizer==2.0.12; python_version >= '3'
-click==8.0.4; python_version >= '3.6'
+click==8.1.2; python_version >= '3.7'
 coloredlogs==15.0.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 concurrent-log-handler==0.9.20
 constantly==15.1.0
@@ -86,7 +86,7 @@ requests==2.27.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3
 scikit-learn==1.0.2
 scipy==1.8.0; python_version < '3.11' and python_version >= '3.8'
 service-identity==21.1.0
-setuptools==61.1.1; python_version >= '3.7'
+setuptools==61.3.1; python_version >= '3.7'
 six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 sniffio==1.2.0; python_version >= '3.5'
 sqlparse==0.4.2; python_version >= '3.5'
@@ -102,7 +102,7 @@ urllib3==1.26.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.
 uvicorn[standard]==0.17.6
 uvloop==0.16.0
 watchdog==2.1.7
-watchgod==0.8.1
+watchgod==0.8.2
 wcwidth==0.2.5
 websockets==10.2
 whitenoise==6.0.0
