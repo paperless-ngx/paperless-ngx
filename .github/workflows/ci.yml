@@ -196,9 +196,8 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=match,pattern=ngx-(\d.\d.\d),group=1
-            type=semver,pattern=ngx-{{version}}
-            type=semver,pattern=ngx-{{major}}.{{minor}}
-            type=ref
+            type=ref,event=branch
+            type=ref,event=tag
       -
         name: Checkout
         uses: actions/checkout@v3

@@ -47,24 +47,29 @@ if [[ $(id -u) == "0" ]] ; then
 	exit 1
 fi
 
-if [[ -z $(which wget) ]] ; then
+if ! command -v wget &> /dev/null ; then
 	echo "wget executable not found. Is wget installed?"
 	exit 1
 fi
 
-if [[ -z $(which docker) ]] ; then
+if ! command -v docker &> /dev/null ; then
 	echo "docker executable not found. Is docker installed?"
 	exit 1
 fi
 
-if [[ -z $(which docker-compose) ]] ; then
-	echo "docker-compose executable not found. Is docker-compose installed?"
-	exit 1
+DOCKER_COMPOSE_CMD="docker-compose"
+if ! command -v ${DOCKER_COMPOSE_CMD} ; then
+	if docker compose version &> /dev/null ; then
+		DOCKER_COMPOSE_CMD="docker compose"
+	else
+		echo "docker-compose executable not found. Is docker-compose installed?"
+		exit 1
+	fi
 fi
 
 # Check if user has permissions to run Docker by trying to get the status of Docker (docker status).
 # If this fails, the user probably does not have permissions for Docker.
-if [ ! "$(docker stats --no-stream 2>/dev/null 1>&2)" ] ; then
+if ! docker stats --no-stream &> /dev/null ; then
 	echo ""
 	echo "WARN: It look like the current user does not have Docker permissions."
 	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user."
@@ -351,8 +356,8 @@ if [ "$l1" -eq "$l2" ] ; then
 fi
 
 
-docker-compose pull
+${DOCKER_COMPOSE_CMD} pull
 
-docker-compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
+${DOCKER_COMPOSE_CMD} run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
 
-docker-compose up -d
+${DOCKER_COMPOSE_CMD} up -d
