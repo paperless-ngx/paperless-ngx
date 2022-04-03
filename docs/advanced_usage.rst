@@ -199,7 +199,7 @@ Troubleshooting:
 - Check your script's permission e.g. in case of permission error ``sudo chmod 755 post-consumption-example.sh``
 - Pipe your scripts's output to a log file e.g. ``echo "${DOCUMENT_ID}" | tee --append /usr/src/paperless/scripts/post-consumption-example.log``
 
-.. _post-consumption-example.sh: https://github.com/jonaswinkler/paperless-ngx/blob/master/scripts/post-consumption-example.sh
+.. _post-consumption-example.sh: https://github.com/paperless-ngx/paperless-ngx/blob/main/scripts/post-consumption-example.sh
 
 .. _advanced-file_name_handling:
 
