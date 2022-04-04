@@ -1,7 +1,7 @@
 name: Bug report
 description: Something is not working
 title: "[BUG] Concise description of the issue"
-labels: ["bug", "uncomfirmed"]
+labels: ["bug", "unconfirmed"]
 body:
   - type: markdown
     attributes:
