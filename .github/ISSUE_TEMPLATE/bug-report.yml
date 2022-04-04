@@ -9,9 +9,10 @@ body:
         Have a question? 👉 [Start a new discussion](https://github.com/paperless-ngx/paperless-ngx/discussions/new) or [ask in chat](https://matrix.to/#/#paperless:adnidor.de).
         
         Before opening an issue, please check [the documentation](https://paperless-ngx.readthedocs.io/en/latest/troubleshooting.html) and see if it helps you resolve your issue. Please also make sure that you followed the installation instructions.
-        Finally, please search the issues and look for similar issues before opening a bug report.
         
-        If you encounter issues while installing of configuring Paperless-ngx, please post that in the "Support" section of the discussions. Remember that Paperless successfully runs on a variety of different systems. If paperless does not start, it's probably an issue with your system, and not an issue of paperless.
+        If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support). Remember that Paperless successfully runs on a variety of different systems. If paperless does not start, it's likely an issue with your system, not an issue of paperless-ngx.
+        
+        Finally, please search issues and discussions before opening a new bug report.
   - type: textarea
     id: description
     attributes:
