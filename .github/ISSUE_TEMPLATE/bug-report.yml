@@ -10,7 +10,7 @@ body:
         
         Before opening an issue, please check [the documentation](https://paperless-ngx.readthedocs.io/en/latest/troubleshooting.html) and see if it helps you resolve your issue. Please also make sure that you followed the installation instructions.
         
-        If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support). Remember that Paperless successfully runs on a variety of different systems. If paperless does not start, it's likely an issue with your system, not an issue of paperless-ngx.
+        If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support). Remember that Paperless successfully runs on a variety of different systems. If Paperless-ngx does not start, it's likely an issue with your system, not an issue of Paperless-ngx.
         
         Finally, please search issues and discussions before opening a new bug report.
   - type: textarea
