@@ -39,7 +39,7 @@ body:
   - type: textarea
     id: logs
     attributes:
-      label: Webserver logs (optional)
+      label: Webserver logs
       description: If available, post any logs from the web server related to your issue.
       render: bash
   - type: textarea
@@ -51,7 +51,7 @@ body:
     id: version
     attributes:
       label: Paperless-ngx version
-      placeholder: ex. 1.6.0
+      placeholder: e.g. 1.6.0
     validations:
       required: true
   - type: input
