@@ -60,7 +60,7 @@ def match_tags(document, classifier):
 def matches(matching_model, document):
     search_kwargs = {}
 
-    document_content = document.content.lower()
+    document_content = document.content
 
     # Check that match is not empty
     if matching_model.match.strip() == "":
