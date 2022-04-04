@@ -62,12 +62,6 @@ body:
       placeholder: e.g. Archlinux / Ubuntu 20.04
     validations:
       required: true
-  - type: input
-    id: browser
-    attributes:
-      label: Browser
-      description: Which browser you are using, if relevant
-      placeholder: e.g. Chrome, Safari
   - type: dropdown
     id: install-method
     attributes:
@@ -78,6 +72,12 @@ body:
         - Other (please describe above)
     validations:
       required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser you are using, if relevant
+      placeholder: e.g. Chrome, Safari
   - type: input
     id: config-changes
     attributes:
