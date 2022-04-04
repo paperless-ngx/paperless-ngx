@@ -1,0 +1,90 @@
+name: Bug report
+description: Something is not working
+title: "[BUG] Concise description of the issue"
+labels: ["bug", "uncomfirmed"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question? 👉 [Start a new discussion](https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests) or [ask in chat](https://matrix.to/#/#paperless:adnidor.de).
+        
+        Before opening an issue, please check [the documentation](https://paperless-ngx.readthedocs.io/en/latest/troubleshooting.html) and see if it helps you resolve your issue. Please also make sure that you followed the installation instructions.
+        Finally, please search the issues and look for similar issues before opening a bug report.
+        
+        If you encounter issues while installing of configuring Paperless-ngx, please post that in the "Support" section of the discussions. Remember that Paperless successfully runs on a variety of different systems. If paperless does not start, it's probably an issue with your system, and not an issue of paperless.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Currently...
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: In this situation...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior
+      placeholder: "1. Go to '...', 2. Click on '....', 3. See error"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Webserver logs (optional)
+      description: If available, post any logs from the web server related to your issue.
+      render: bash
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+  - type: input
+    id: version
+    attributes:
+      label: Paperless-ngx version
+      placeholder: ex. 1.6.0
+    validations:
+      required: true
+  - type: input
+    id: host-os
+    attributes:
+      label: Host OS
+      description: Host OS of the machine running paperless-ngx
+      placeholder: e.g. Archlinux / Ubuntu 20.04
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser you are using, if relevant
+      placeholder: e.g. Chrome, Safari
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation method
+      options:
+        - Docker
+        - Bare metal
+        - Other (please describe above)
+    validations:
+      required: true
+  - type: input
+    id: config-changes
+    attributes:
+      label: Configuration changes
+      description: Any configuration changes you made in `docker-compose.yml`, `docker-compose.env` or `paperless.conf`.
+  - type: input
+    id: other
+    attributes:
+      label: Other
+      description: Any other relevant details
