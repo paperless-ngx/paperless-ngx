@@ -671,7 +671,7 @@ PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>
 
     This can be adjusted by configuring a custom json array with patterns to exclude.
 
-    Defautls to ``[".DS_STORE/*", "._*", ".stfolder/*"]``.
+    Defaults to ``[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]``.
 
 Binaries
 ########
