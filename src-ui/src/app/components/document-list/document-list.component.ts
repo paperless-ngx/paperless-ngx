@@ -243,8 +243,12 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
               $localize`View "${savedView.name}" created successfully.`
             )
           },
-          error: (error) => {
-            modal.componentInstance.error = error.error
+          error: (httpError) => {
+            let error = httpError.error
+            if (error.filter_rules) {
+              error.filter_rules = error.filter_rules.map((r) => r.value)
+            }
+            modal.componentInstance.error = error
             modal.componentInstance.buttonsEnabled = true
           },
         })

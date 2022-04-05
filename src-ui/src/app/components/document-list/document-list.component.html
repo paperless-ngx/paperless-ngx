@@ -100,7 +100,7 @@
 <ng-container *ngTemplateOutlet="pagination"></ng-container>
 
 <ng-container *ngIf="list.error ; else documentListNoError">
-  <div class="alert alert-danger" role="alert">Error while loading documents: {{list.error}}</div>
+  <div class="alert alert-danger" role="alert"><ng-container i18n>Error while loading documents</ng-container>: {{list.error}}</div>
 </ng-container>
 
 <ng-template #documentListNoError>
