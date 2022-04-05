@@ -9,7 +9,7 @@ import {
 import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { DocumentService } from './rest/document.service'
+import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
 import { SettingsService, SETTINGS_KEYS } from './settings.service'
 
 /**
@@ -160,7 +160,21 @@ export class DocumentListViewService {
             activeListViewState.currentPage = 1
             this.reload()
           } else {
-            this.error = error.error
+            let errorMessage
+            if (Object.keys(error.error).length > 0) {
+              // e.g. { archive_serial_number: Array<string> }
+              errorMessage = Object.keys(error.error)
+                .map((fieldName) => {
+                  const fieldError: Array<string> = error.error[fieldName]
+                  return `${
+                    DOCUMENT_SORT_FIELDS.find((f) => f.field == fieldName)?.name
+                  }: ${fieldError[0]}`
+                })
+                .join(', ')
+            } else {
+              errorMessage = error.error
+            }
+            this.error = errorMessage
           }
         },
       })
