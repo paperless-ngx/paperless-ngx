@@ -176,3 +176,22 @@
     }
   }
 }
+
+.version-check {
+  animation: pulse 2s ease-in-out 0s 1;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 100%;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 100%;
+  }
+}

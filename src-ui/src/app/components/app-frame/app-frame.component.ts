@@ -18,6 +18,10 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
 import { Meta } from '@angular/platform-browser'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { FILTER_FULLTEXT_QUERY } from 'src/app/data/filter-rule-type'
+import {
+  RemoteVersionService,
+  AppRemoteVersion,
+} from 'src/app/services/rest/remote-version.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -32,10 +36,18 @@ export class AppFrameComponent {
     private searchService: SearchService,
     public savedViewService: SavedViewService,
     private list: DocumentListViewService,
-    private meta: Meta
-  ) {}
+    private meta: Meta,
+    private remoteVersionService: RemoteVersionService
+  ) {
+    this.remoteVersionService
+      .checkForUpdates()
+      .subscribe((appRemoteVersion: AppRemoteVersion) => {
+        this.appRemoteVersion = appRemoteVersion
+      })
+  }
 
   versionString = `${environment.appTitle} ${environment.version}`
+  appRemoteVersion
 
   isMenuCollapsed: boolean = true
 
