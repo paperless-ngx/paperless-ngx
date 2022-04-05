@@ -15,6 +15,10 @@
   --ngx-focus-alpha: 0.3;
 }
 
+body {
+  height: 100vh;
+}
+
 svg.logo {
   .leaf {
     fill: var(--bs-primary) !important;
