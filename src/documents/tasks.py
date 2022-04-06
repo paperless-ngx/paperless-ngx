@@ -177,10 +177,26 @@ def consume_file(
 ):
 
     # check for separators in current document
-    separator_page_numbers = scan_file_for_separating_barcodes(path)
-    if separator_page_numbers != []:
-        logger.debug(f"Pages with separators found: {str(separator_page_numbers)}")
+    separators = scan_file_for_separating_barcodes(path)
+    document_list = []
+    if separators == []:
+        pass
+    else:
+        logger.debug(f"Pages with separators found in: {str(path)}")
+        document_list = separate_pages(path, separators)
+    if document_list == []:
+        pass
+    else:
+        for document in document_list:
+            # save to consumption dir
+            save_to_dir(document)
+        # if we got here, the document was successfully split
+        # and can safely be deleted
+        logger.debug("Deleting file {}".format(path))
+        os.unlink(path)
+        return "File successfully split"
 
+    # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
         path,
         override_filename=override_filename,
