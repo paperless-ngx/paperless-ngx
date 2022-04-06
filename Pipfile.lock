@@ -671,11 +671,11 @@
         },
         "ocrmypdf": {
             "hashes": [
-                "sha256:201ed2f589f851be73908fce35fbb6fb05e4739289d3cd8765f9519f49ea1cd9",
-                "sha256:f42e60bc2b6534634dd08928584275b1c556dc875c849650afcc38f7da9e2856"
+                "sha256:7f0a6165b80ba1b37ce5943cf5b4faf93bf98c04c8f5157ef83c5f292491485f",
+                "sha256:d52410bc38cf5b66da27668e38c66ac41fd3136457c1ec388b311f0a78ee213c"
             ],
             "index": "pypi",
-            "version": "==13.4.1"
+            "version": "==13.4.2"
         },
         "packaging": {
             "hashes": [
@@ -695,11 +695,11 @@
         },
         "pdfminer.six": {
             "hashes": [
-                "sha256:0351f17d362ee2d48b158be52bcde6576d96460efd038a3e89a043fba6d634d7",
-                "sha256:d3efb75c0249b51c1bf795e3a8bddf1726b276c77bf75fb136adea471ee2825b"
+                "sha256:af0630f98a292bad4170f54e80f82ca81b916dd0b2c996437ec45c02f11d8762",
+                "sha256:eff2ce0abeaa4df94dc3461f70eab104487c7b4a2b3c7e9fd0aeec6c5f44d6a6"
             ],
             "index": "pypi",
-            "version": "==20211012"
+            "version": "==20220319"
         },
         "pikepdf": {
             "hashes": [
