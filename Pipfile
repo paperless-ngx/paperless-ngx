@@ -22,7 +22,7 @@ gunicorn = "*"
 imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
-pillow = "~=9.0"
+pillow = "~=9.1"
 # Any version update to pikepdf requires a base image update
 pikepdf = "~=5.1"
 python-gnupg = "*"
