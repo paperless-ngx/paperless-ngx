@@ -171,6 +171,7 @@
 
     &:focus {
       background-color: rgba(0, 0, 0, 0.3);
+      color: var(--bs-light);
       flex-grow: 1;
       padding-left: 0.5rem;
     }

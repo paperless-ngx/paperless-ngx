@@ -2,17 +2,18 @@
   // base color e.g. #17541f = hsl(128, 57%, 21%)
   --pngx-primary: 128, 57%;
   --pngx-primary-lightness: 21%;
+  --pngx-primary-text-contrast: var(--bs-light);
 
   --bs-primary: hsl(var(--pngx-primary), var(--pngx-primary-lightness));
   --bs-border-color: var(--bs-gray-400);
-  --ngx-primary-faded: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 72%));
-  --ngx-primary-lighten-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 10%));
-  --ngx-primary-lighten-30: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 30%));
-  --ngx-primary-darken-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 10%));
-  --ngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
-  --ngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
-  --ngx-bg-darker: var(--bs-gray-100);
-  --ngx-focus-alpha: 0.3;
+  --pngx-primary-faded: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 72%));
+  --pngx-primary-lighten-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 10%));
+  --pngx-primary-lighten-30: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 30%));
+  --pngx-primary-darken-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 10%));
+  --pngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
+  --pngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
+  --pngx-bg-darker: var(--bs-gray-100);
+  --pngx-focus-alpha: 0.3;
 }
 
 body {
@@ -45,13 +46,13 @@ svg.logo {
   border-color: var(--bs-primary);
 
   &:hover, &:focus {
-    background-color: var(--ngx-primary-darken-10);
-    border-color: var(--ngx-primary-darken-10);
+    background-color: var(--pngx-primary-darken-10);
+    border-color: var(--pngx-primary-darken-10);
   }
 
   &:disabled, &.disabled {
-    background-color: var(--ngx-primary-darken-10) !important;
-    border-color: var(--ngx-primary-darken-10) !important;
+    background-color: var(--pngx-primary-darken-10) !important;
+    border-color: var(--pngx-primary-darken-10) !important;
   }
 }
 
@@ -67,6 +68,10 @@ svg.logo {
 
 .btn-outline-secondary {
   color: var(--bs-secondary);
+
+  &:hover {
+    color: var(--bs-light);
+  }
 }
 
 .nav-item .sidebaricon {
@@ -81,7 +86,7 @@ svg.logo {
 .form-check-input:focus,
 .form-check-radio:focus,
 .form-select:focus {
-  box-shadow: 0 0 0 0.25rem hsla(var(--pngx-primary), var(--pngx-primary-lightness), var(--ngx-focus-alpha));
+  box-shadow: 0 0 0 0.25rem hsla(var(--pngx-primary), var(--pngx-primary-lightness), var(--pngx-focus-alpha));
 }
 
 .form-switch .form-check-input:focus {
@@ -90,12 +95,12 @@ svg.logo {
 
 .nav-link:focus-visible, .nav-item a:focus-visible {
   outline: none;
-  background-color: var(--ngx-bg-darker);
+  background-color: var(--pngx-bg-darker);
 }
 
 a.navbar-brand:focus-visible {
   outline: none;
-  color: var(--ngx-primary-darken-10);
+  color: var(--pngx-primary-darken-10);
 }
 
 .dropdown.show {
@@ -105,7 +110,7 @@ a.navbar-brand:focus-visible {
   }
 
   > .btn-outline-primary {
-    color: var(--bs-body-color) !important;
+    color: var(--pngx-primary-text-contrast) !important;
   }
 }
 
@@ -124,8 +129,8 @@ textarea,
   border-color: var(--bs-border-color);
 
   &:focus {
-    background-color: var(--ngx-bg-darker);
-    color: var(--bs-body-color) !important;
+    background-color: var(--pngx-bg-darker);
+    color: var(--bs-body-color);
   }
 }
 
@@ -156,7 +161,7 @@ textarea,
 }
 
 .page-item.disabled .page-link {
-  background-color: var(--ngx-bg-darker);
+  background-color: var(--pngx-bg-darker);
 }
 
 .nav-tabs {
@@ -221,13 +226,14 @@ textarea,
   .dropdown-item {
     color: var(--bs-body-color);
 
-    &:hover {
-      background-color: var(--ngx-bg-darker);
+    &:hover, &:focus {
+      background-color: var(--pngx-bg-darker);
       color: var(--bs-body-color);
     }
 
     &.active {
       background-color: var(--bs-primary);
+      color: var(--pngx-primary-text-contrast);
     }
   }
 }
@@ -295,8 +301,8 @@ table.table {
 }
 
 .alert-secondary {
-  background-color: var(--ngx-primary-darken-18);
-  border-color: var(--ngx-primary-darken-15);
+  background-color: var(--pngx-primary-darken-18);
+  border-color: var(--pngx-primary-darken-15);
   color: var(--bs-body-color);
 }
 
@@ -309,7 +315,7 @@ table.table {
 .popover {
   .popover-header,
   .popover-body {
-    background-color: var(--ngx-bg-alt);
+    background-color: var(--pngx-bg-alt);
     border-color: var(--bs-border-color);
     color: var(--bs-body-color);
   }
@@ -317,19 +323,19 @@ table.table {
 
 // fix popover carat colors
 .bs-popover-start > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="left"] {
-  border-left-color: var(--ngx-bg-alt);
+  border-left-color: var(--pngx-bg-alt);
 }
 .bs-popover-end > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="right"] {
-  border-right-color: var(--ngx-bg-alt);
+  border-right-color: var(--pngx-bg-alt);
 }
 .bs-popover-top > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="top"] {
-  border-top-color: var(--ngx-bg-alt);
+  border-top-color: var(--pngx-bg-alt);
 }
 .bs-popover-bottom > .popover-arrow::after, .bs-popover-auto[data-popper-placement^="bottom"] {
-  border-bottom-color: var(--ngx-bg-alt);
+  border-bottom-color: var(--pngx-bg-alt);
 }
 
 .bs-popover-bottom .popover-header::before,
 .bs-popover-auto[x-placement^=bottom] .popover-header::before {
-  border-bottom-color: var(--ngx-bg-alt);
+  border-bottom-color: var(--pngx-bg-alt);
 }

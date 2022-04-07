@@ -27,11 +27,12 @@ $border-color-dark-mode: #47494f;
   --bs-light: #{$bg-light-dark-mode};
   --bs-light-rgb: #{$bg-light-dark-mode-rgb};
   --bs-border-color: #{$border-color-dark-mode};
-  --ngx-bg-darker: #{$bg-dark-mode-accent};
-  --ngx-bg-alt: #{$bg-dark-mode-alt};
-  --ngx-body-color-accent: #{$text-color-dark-mode-accent};
-  --ngx-focus-alpha: 0.7;
-  --ngx-primary-faded: var(--ngx-primary-darken-15);
+  --pngx-bg-darker: #{$bg-dark-mode-accent};
+  --pngx-bg-alt: #{$bg-dark-mode-alt};
+  --pngx-body-color-accent: #{$text-color-dark-mode-accent};
+  --pngx-focus-alpha: 0.7;
+  --pngx-primary-faded: var(--pngx-primary-darken-15);
+  --pngx-primary-text-contrast: var(--bs-body-color);
 
   .navbar.bg-primary{
     --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
@@ -64,14 +65,20 @@ $border-color-dark-mode: #47494f;
 
   .btn-outline-primary, .btn-primary {
     &:hover, &:focus, &.active, &:active {
-      color: var(--ngx-body-color-accent) !important;
+      color: var(--bs-light) !important;
     }
   }
 
   .btn-outline-secondary {
     &:hover, &:focus, &.active, &:active {
-      background-color: var(--ngx-bg-darker);
+      background-color: var(--pngx-bg-darker);
       color: var(--bs-primary);
+    }
+  }
+
+  .search-form-container {
+    input, input:focus {
+      color: var(--bs-body-color) !important;
     }
   }
 
