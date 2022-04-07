@@ -102,12 +102,14 @@ files from the scanner.  Typically, you're looking at an FTP server like
 
 .. TODO: hyperref to configuration of the location of this magic folder.
 
-Dashboard upload
-================
+Web UI Upload
+=============
 
 The dashboard has a file drop field to upload documents to paperless. Simply drag a file
 onto this field or select a file with the file dialog. Multiple files are supported.
 
+You can also upload documents on any other page of the web UI by dragging-and-dropping
+files into your browser window.
 
 .. _usage-mobile_upload:
 
