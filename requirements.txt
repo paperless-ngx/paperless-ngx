@@ -92,7 +92,7 @@ sniffio==1.2.0; python_version >= '3.5'
 sqlparse==0.4.2; python_version >= '3.5'
 threadpoolctl==3.1.0; python_version >= '3.6'
 tika==1.24
-tqdm==4.63.1
+tqdm==4.64.0
 twisted[tls]==22.2.0; python_full_version >= '3.6.7'
 txaio==22.2.1; python_version >= '3.6'
 typing-extensions==4.1.1; python_version >= '3.6'
