@@ -28,6 +28,11 @@ pre, .code, .rst-content .linenodiv pre, .rst-content div[class^=highlight] pre,
   font-size: 1rem
 }
 
+.rst-versions .rst-current-version {
+  font-family: inherit;
+  line-height: 1;
+}
+
 
 /* Layout */
 .wy-side-nav-search, .wy-menu-vertical {
@@ -132,6 +137,10 @@ a, .wy-menu-vertical a, a.icon.icon-home {
 
 a:hover, .wy-breadcrumbs-aside a {
   color: #7253ed; /* reset */
+}
+
+.rst-versions a, .rst-versions .rst-current-version {
+  color: #7253ed;
 }
 
 .wy-nav-content a.reference, .wy-nav-content a:not([class]) {
