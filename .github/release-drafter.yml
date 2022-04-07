@@ -13,6 +13,7 @@ categories:
       - 'deployment'
       - 'translation'
   - title: 'Dependencies'
+    collapse-after: 3
     label: 'dependencies'
 include-labels:
   - 'enhancement'
