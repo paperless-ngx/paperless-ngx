@@ -356,3 +356,9 @@ jobs:
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
+      -
+        name: Create Changelog
+        id: create-changelog
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

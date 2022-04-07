@@ -1,0 +1,24 @@
+categories:
+  - title: 'Features'
+    labels:
+      - 'enhancement'
+  - title: 'Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: 'Documentation'
+    label: 'documentation'
+  - title: 'Maintenance'
+    labels:
+      - 'chore'
+      - 'deployment'
+      - 'translation'
+  - title: 'Dependencies'
+    label: 'dependencies'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&#@'
+template: |
+  ## Changes
+
+  $CHANGES
