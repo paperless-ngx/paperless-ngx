@@ -4,8 +4,6 @@ categories:
       - 'enhancement'
   - title: 'Bug Fixes'
     labels:
-      - 'fix'
-      - 'bugfix'
       - 'bug'
   - title: 'Documentation'
     label: 'documentation'
@@ -16,9 +14,20 @@ categories:
       - 'translation'
   - title: 'Dependencies'
     label: 'dependencies'
+include-labels:
+  - 'enhancement'
+  - 'bug'
+  - 'chore'
+  - 'deployment'
+  - 'translation'
+  - 'dependencies'
+replacers: # Changes "Feature: Update checker" to "Update checker"
+  - search: '/Feature:|Feat:|\[feature\]/gi'
+    replace: ''
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&#@'
+tag-prefix: "ngx-"
 template: |
-  ## Changes
+  ## Changelog
 
   $CHANGES

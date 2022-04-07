@@ -327,24 +327,22 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/ngx-* ]]; then
             echo ::set-output name=version::${GITHUB_REF#refs/tags/ngx-}
             echo ::set-output name=prerelease::false
-            echo ::set-output name=body::"For a complete list of changes, see the changelog at https://paperless-ngx.readthedocs.io/en/latest/changelog.html"
           elif [[ $GITHUB_REF == refs/tags/beta-* ]]; then
             echo ::set-output name=version::${GITHUB_REF#refs/tags/beta-}
             echo ::set-output name=prerelease::true
-            echo ::set-output name=body::"For a complete list of changes, see the changelog at https://github.com/paperless-ngx/paperless-ngx/blob/beta/docs/changelog.rst"
           fi
       -
-        name: Create release
-        id: create_release
-        uses: actions/create-release@v1
+        name: Create Release and Changelog
+        id: create-release
+        uses: release-drafter/release-drafter@v5
+        with:
+          name: Paperless-ngx ${{ steps.get_version.outputs.version }}
+          tag: ngx-${{ steps.get_version.outputs.version }}
+          version: ${{ steps.get_version.outputs.version }}
+          prerelease: ${{ steps.get_version.outputs.prerelease }}
+          publish: true # ensures release is not marked as draft
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ngx-${{ steps.get_version.outputs.version }}
-          release_name: Paperless-ngx ${{ steps.get_version.outputs.version }}
-          draft: false
-          prerelease: ${{ steps.get_version.outputs.prerelease }}
-          body: ${{ steps.get_version.outputs.body }}
       -
         name: Upload release archive
         id: upload-release-asset
@@ -352,13 +350,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
-      -
-        name: Create Changelog
-        id: create-changelog
-        uses: release-drafter/release-drafter@v5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
