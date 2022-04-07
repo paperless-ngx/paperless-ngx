@@ -33,3 +33,7 @@ form {
   mix-blend-mode: soft-light;
   pointer-events: none;
 }
+
+::ng-deep .ngx-file-drop__drop-zone--over {
+  background-color: var(--ngx-primary-faded) !important;
+}

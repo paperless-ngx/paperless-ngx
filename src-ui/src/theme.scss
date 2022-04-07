@@ -15,6 +15,10 @@
   --ngx-focus-alpha: 0.3;
 }
 
+body {
+  height: 100vh;
+}
+
 svg.logo {
   .leaf {
     fill: var(--bs-primary) !important;
@@ -244,8 +248,44 @@ table.table {
   color: var(--bs-body-color);
 }
 
-.ngx-file-drop__drop-zone--over {
-  background-color: var(--ngx-primary-faded) !important;
+.main-dropzone {
+  height: 100%;
+  width: 100%;
+
+  &.ngx-file-drop__drop-zone--over {
+    background-color: transparent !important;
+  }
+}
+
+.global-dropzone-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(23, 84, 31, .8);
+  z-index: 1055; // $zindex-modal
+  pointer-events: none !important;
+  user-select: none !important;
+  text-align: center;
+  padding-top: 25%;
+
+  &.show {
+    opacity: 1 !important;
+  }
+
+  &.hide {
+    display: none;
+  }
+}
+
+.ngx-file-drop__drop-zone--over .global-dropzone-overlay {
+  opacity: 0;
+}
+
+.inert {
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
 .alert-danger {

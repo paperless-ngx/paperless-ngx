@@ -5,3 +5,7 @@
   margin: 0.5em;
   z-index: 1200;
 }
+
+.toast:not(.show) {
+  display: block; // this corrects an ng-bootstrap bug that prevented animations
+}
