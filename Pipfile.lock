@@ -487,9 +487,9 @@
         },
         "img2pdf": {
             "hashes": [
-                "sha256:8e51c5043efa95d751481b516071a006f87c2a4059961a9ac43ec238915de09f"
+                "sha256:8ec898a9646523fd3862b154f3f47cd52609c24cc3e2dc1fb5f0168f0cbe793c"
             ],
-            "version": "==0.4.3"
+            "version": "==0.4.4"
         },
         "importlib-resources": {
             "hashes": [
@@ -1817,11 +1817,11 @@
         },
         "pre-commit": {
             "hashes": [
-                "sha256:725fa7459782d7bec5ead072810e47351de01709be838c2ce1726b9591dad616",
-                "sha256:c1a8040ff15ad3d648c70cc3e55b93e4d2d5b687320955505587fd79bbaed06a"
+                "sha256:02226e69564ebca1a070bd1f046af866aa1c318dbc430027c50ab832ed2b73f2",
+                "sha256:5d445ee1fa8738d506881c5d84f83c62bb5be6b2838e32207433647e8e5ebe10"
             ],
             "index": "pypi",
-            "version": "==2.17.0"
+            "version": "==2.18.1"
         },
         "py": {
             "hashes": [
