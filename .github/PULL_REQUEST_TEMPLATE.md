@@ -1,22 +1,14 @@
-<!-- 
+<!--
 Note: All PRs with code changes should be targeted to the `dev` branch, pure documentation changes can target `main`
 -->
 
 ## Proposed change
 
 <!--
-Please include a summary of the change and which issue is fixed (if any) and any relevant motivation / context. List any dependencies that are required for this change. If appropriate, please include an explanation of how your poposed change can be tested. Screenshots and / or videos can also be helpful if appropriate.
+Please include a summary of the change and which issue is fixed (if any) and any relevant motivation / context. List any dependencies that are required for this change. If appropriate, please include an explanation of how your proposed change can be tested. Screenshots and / or videos can also be helpful if appropriate.
 -->
 
 Fixes # (issue)
-
-<!--
-Please also tag the relevant team to help with review. You can tag any of the following:
-@paperless-ngx/backend (Python / django, database, etc.)
-@paperless-ngx/frontend (JavaScript/Typescript, HTML, CSS, etc.)
-@paperless-ngx/ci-cd (GitHub Actions, deployment)
-@paperless-ngx/test (General testing for larger PRs)
--->
 
 ## Type of change
 
