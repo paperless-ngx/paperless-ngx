@@ -107,5 +107,5 @@ wcwidth==0.2.5
 websockets==10.2
 whitenoise==6.0.0
 whoosh==2.7.4
-zipp==3.7.0; python_version < '3.9'
+zipp==3.8.0; python_version < '3.9'
 zope.interface==5.4.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
