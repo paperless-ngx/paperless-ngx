@@ -1,4 +1,4 @@
-<!-- 
+<!--
 Note: All PRs with code changes should be targeted to the `dev` branch, pure documentation changes can target `main`
 -->
 
@@ -9,14 +9,6 @@ Please include a summary of the change and which issue is fixed (if any) and any
 -->
 
 Fixes # (issue)
-
-<!--
-Please also tag the relevant team to help with review. You can tag any of the following:
-@paperless-ngx/backend (Python / django, database, etc.)
-@paperless-ngx/frontend (JavaScript/Typescript, HTML, CSS, etc.)
-@paperless-ngx/ci-cd (GitHub Actions, deployment)
-@paperless-ngx/test (General testing for larger PRs)
--->
 
 ## Type of change
 
