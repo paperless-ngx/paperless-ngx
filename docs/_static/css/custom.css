@@ -28,7 +28,7 @@ pre, .code, .rst-content .linenodiv pre, .rst-content div[class^=highlight] pre,
   font-size: 1rem
 }
 
-.rst-versions .rst-current-version {
+.rst-versions {
   font-family: inherit;
   line-height: 1;
 }
