@@ -93,6 +93,14 @@ echo "1. Application configuration"
 echo "============================"
 
 echo ""
+echo "The URL paperless will be available at. This is required if the"
+echo "installation will be accessible via the web, otherwise can be left blank."
+echo ""
+
+ask "URL" ""
+URL=$ask_result
+
+echo ""
 echo "The port on which the paperless webserver will listen for incoming"
 echo "connections."
 echo ""
@@ -278,6 +286,7 @@ if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
 	fi
 fi
 echo ""
+echo "URL: $URL"
 echo "Port: $PORT"
 echo "Database: $DATABASE_BACKEND"
 echo "Tika enabled: $TIKA_ENABLED"
@@ -313,6 +322,9 @@ SECRET_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
 DEFAULT_LANGUAGES="deu eng fra ita spa"
 
 {
+	if [[ ! $URL == "" ]] ; then
+		echo "PAPERLESS_URL=$URL"
+	fi
 	if [[ ! $USERMAP_UID == "1000" ]] ; then
 		echo "USERMAP_UID=$USERMAP_UID"
 	fi
