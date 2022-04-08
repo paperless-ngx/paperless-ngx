@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import re
 from typing import Final
+from urllib.parse import urlparse
 
 from concurrent_log_handler.queue import setup_logging_queues
 from django.utils.translation import gettext_lazy as _
@@ -219,7 +220,15 @@ if DEBUG:
 else:
     X_FRAME_OPTIONS = "SAMEORIGIN"
 
-# We allow CORS from localhost:8080
+
+# The next 3 settings can also be set using just PAPERLESS_URL
+_csrf_origins = os.getenv("PAPERLESS_CSRF_TRUSTED_ORIGINS")
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = _csrf_origins.split(",")
+else:
+    CSRF_TRUSTED_ORIGINS = []
+
+# We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = tuple(
     os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","),
 )
@@ -228,6 +237,22 @@ if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ALLOWED_ORIGINS += ("http://localhost:4200",)
 
+_allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
+if _allowed_hosts:
+    ALLOWED_HOSTS = _allowed_hosts.split(",")
+else:
+    ALLOWED_HOSTS = ["*"]
+
+_paperless_url = os.getenv("PAPERLESS_URL")
+if _paperless_url:
+    _paperless_uri = urlparse(_paperless_url)
+    CSRF_TRUSTED_ORIGINS.append(_paperless_url)
+    CORS_ALLOWED_ORIGINS += (_paperless_url,)
+    if _allowed_hosts:
+        ALLOWED_HOSTS.append(_paperless_uri.hostname)
+    else:
+        ALLOWED_HOSTS = [_paperless_uri.hostname]
+
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
 # public, you should change the key to something unique and verbose.
@@ -235,12 +260,6 @@ SECRET_KEY = os.getenv(
     "PAPERLESS_SECRET_KEY",
     "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee",
 )
-
-_allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
-if _allowed_hosts:
-    ALLOWED_HOSTS = _allowed_hosts.split(",")
-else:
-    ALLOWED_HOSTS = ["*"]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
