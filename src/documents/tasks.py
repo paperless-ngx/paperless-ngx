@@ -137,23 +137,26 @@ def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
             dst.save(out)
         document_paths = [savepath]
 
-    for count, page_number in enumerate(pages_to_split_on):
-        logger.debug(f"Count: {str(count)} page_number: {str(page_number)}")
-        dst = Pdf.new()
-        try:
-            next_page = pages_to_split_on[count + 1]
-        except IndexError:
-            next_page = len(pdf.pages)
-        # skip the first page_number. This contains the barcode page
-        for page in range(page_number + 1, next_page):
-            logger.debug(f"page_number: {str(page_number)} next_page: {str(next_page)}")
-            dst.pages.append(pdf.pages[page])
-        output_filename = "{}_document_{}.pdf".format(fname, str(count + 1))
-        logger.debug(f"pdf no:{str(count)} has {str(len(dst.pages))} pages")
-        savepath = os.path.join(tempdir, output_filename)
-        with open(savepath, "wb") as out:
-            dst.save(out)
-        document_paths.append(savepath)
+        # iterate through the rest of the document
+        for count, page_number in enumerate(pages_to_split_on):
+            logger.debug(f"Count: {str(count)} page_number: {str(page_number)}")
+            dst = Pdf.new()
+            try:
+                next_page = pages_to_split_on[count + 1]
+            except IndexError:
+                next_page = len(pdf.pages)
+            # skip the first page_number. This contains the barcode page
+            for page in range(page_number + 1, next_page):
+                logger.debug(
+                    f"page_number: {str(page_number)} next_page: {str(next_page)}",
+                )
+                dst.pages.append(pdf.pages[page])
+            output_filename = "{}_document_{}.pdf".format(fname, str(count + 1))
+            logger.debug(f"pdf no:{str(count)} has {str(len(dst.pages))} pages")
+            savepath = os.path.join(tempdir, output_filename)
+            with open(savepath, "wb") as out:
+                dst.save(out)
+            document_paths.append(savepath)
     logger.debug(f"Temp files are {str(document_paths)}")
     return document_paths
 

@@ -312,6 +312,23 @@ class TestTasks(DirectoriesMixin, TestCase):
         pages = tasks.separate_pages(test_file, [1])
         self.assertEqual(len(pages), 2)
 
+    def test_separate_pages_no_list(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "patch-code-t-middle.pdf",
+        )
+        with self.assertLogs("paperless.tasks", level="WARNING") as cm:
+            pages = tasks.separate_pages(test_file, [])
+            self.assertEqual(pages, [])
+            self.assertEqual(
+                cm.output,
+                [
+                    f"WARNING:paperless.tasks:No pages to split on!",
+                ],
+            )
+
     def test_save_to_dir(self):
         test_file = os.path.join(
             os.path.dirname(__file__),
