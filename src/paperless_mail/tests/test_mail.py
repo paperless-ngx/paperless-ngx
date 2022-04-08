@@ -409,18 +409,21 @@ class TestMail(DirectoriesMixin, TestCase):
                 _AttachmentDef(filename="f2.pdf"),
                 _AttachmentDef(filename="f3.pdf"),
                 _AttachmentDef(filename="f2.png"),
+                _AttachmentDef(filename="file.PDf"),
+                _AttachmentDef(filename="f1.Pdf"),
             ],
         )
 
         tests = [
-            ("*.pdf", ["f1.pdf", "f2.pdf", "f3.pdf"]),
-            ("f1.pdf", ["f1.pdf"]),
+            ("*.pdf", ["f1.pdf", "f1.Pdf", "f2.pdf", "f3.pdf", "file.PDf"]),
+            ("f1.pdf", ["f1.pdf", "f1.Pdf"]),
             ("f1", []),
-            ("*", ["f1.pdf", "f2.pdf", "f3.pdf", "f2.png"]),
+            ("*", ["f1.pdf", "f2.pdf", "f3.pdf", "f2.png", "f1.Pdf", "file.PDf"]),
             ("*.png", ["f2.png"]),
         ]
 
         for (pattern, matches) in tests:
+            matches.sort()
             self.async_task.reset_mock()
             account = MailAccount()
             rule = MailRule(
@@ -431,11 +434,11 @@ class TestMail(DirectoriesMixin, TestCase):
 
             result = self.mail_account_handler.handle_message(message, rule)
 
-            self.assertEqual(result, len(matches))
-            filenames = [
-                a[1]["override_filename"] for a in self.async_task.call_args_list
-            ]
-            self.assertCountEqual(filenames, matches)
+            self.assertEqual(result, len(matches), f"Error with pattern: {pattern}")
+            filenames = sorted(
+                [a[1]["override_filename"] for a in self.async_task.call_args_list],
+            )
+            self.assertListEqual(filenames, matches)
 
     def test_handle_mail_account_mark_read(self):
 
