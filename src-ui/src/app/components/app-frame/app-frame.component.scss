@@ -35,20 +35,19 @@
 
 .sidebar .nav-link {
   font-weight: 500;
-}
 
-.sidebar .nav-link .sidebaricon {
-  margin-right: 4px;
-}
+  &:hover, &.active {
+    color: var(--bs-primary);
+  }
 
-.sidebar .nav-link.active {
-  color: var(--bs-primary);
-  font-weight: bold;
-}
+  &.active {
+    font-weight: bold;
+  }
 
-.sidebar .nav-link.active .sidebaricon,
-.sidebar .nav-link:hover .sidebaricon {
-  color: inherit;
+  .sidebaricon {
+    margin-right: 4px;
+    color: inherit;
+  }
 }
 
 .sidebar-heading {
