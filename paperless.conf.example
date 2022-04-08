@@ -27,8 +27,10 @@
 # Security and hosting
 
 #PAPERLESS_SECRET_KEY=change-me
-#PAPERLESS_ALLOWED_HOSTS=example.com,www.example.com
-#PAPERLESS_CORS_ALLOWED_HOSTS=http://example.com,http://localhost:8000
+#PAPERLESS_URL=https://example.com
+#PAPERLESS_CSRF_TRUSTED_ORIGINS=https://example.com # can be set using PAPERLESS_URL
+#PAPERLESS_ALLOWED_HOSTS=example.com,www.example.com # can be set using PAPERLESS_URL
+#PAPERLESS_CORS_ALLOWED_HOSTS=https://localhost:8080,https://example.com # can be set using PAPERLESS_URL
 #PAPERLESS_FORCE_SCRIPT_NAME=
 #PAPERLESS_STATIC_URL=/static/
 #PAPERLESS_AUTO_LOGIN_USERNAME=

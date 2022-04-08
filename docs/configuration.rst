@@ -142,7 +142,24 @@ PAPERLESS_SECRET_KEY=<key>
 
     Default is listed in the file ``src/paperless/settings.py``.
 
-PAPERLESS_ALLOWED_HOSTS<comma-separated-list>
+PAPERLESS_URL=<url>
+    This setting can be used to set the three options below (ALLOWED_HOSTS,
+    CORS_ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS). If the other options are
+    set the values will be combined with this one. Do not include a trailing
+    slash. E.g. https://paperless.domain.com
+
+    Defaults to empty string, leaving the other settings unaffected.
+
+PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>
+    A list of trusted origins for unsafe requests (e.g. POST). As of Django 4.0
+    this is required to access the Django admin via the web.
+    See https://docs.djangoproject.com/en/4.0/ref/settings/#csrf-trusted-origins
+
+    Can also be set using PAPERLESS_URL (see above).
+
+    Defaults to empty string, which does not add any origins to the trusted list.
+
+PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>
     If you're planning on putting Paperless on the open internet, then you
     really should set this value to the domain name you're using.  Failing to do
     so leaves you open to HTTP host header attacks:
@@ -151,11 +168,15 @@ PAPERLESS_ALLOWED_HOSTS<comma-separated-list>
     Just remember that this is a comma-separated list, so "example.com" is fine,
     as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 
+    Can also be set using PAPERLESS_URL (see above).
+
     Defaults to "*", which is all hosts.
 
-PAPERLESS_CORS_ALLOWED_HOSTS<comma-separated-list>
+PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>
     You need to add your servers to the list of allowed hosts that can do CORS
     calls. Set this to your public domain name.
+
+    Can also be set using PAPERLESS_URL (see above).
 
     Defaults to "http://localhost:8000".
 
