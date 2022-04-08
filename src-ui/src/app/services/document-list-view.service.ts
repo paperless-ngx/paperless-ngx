@@ -161,7 +161,10 @@ export class DocumentListViewService {
             this.reload()
           } else {
             let errorMessage
-            if (Object.keys(error.error).length > 0) {
+            if (
+              typeof error.error !== 'string' &&
+              Object.keys(error.error).length > 0
+            ) {
               // e.g. { archive_serial_number: Array<string> }
               errorMessage = Object.keys(error.error)
                 .map((fieldName) => {
