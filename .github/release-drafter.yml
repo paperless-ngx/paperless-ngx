@@ -1,0 +1,34 @@
+categories:
+  - title: 'Features'
+    labels:
+      - 'enhancement'
+  - title: 'Bug Fixes'
+    labels:
+      - 'bug'
+  - title: 'Documentation'
+    label: 'documentation'
+  - title: 'Maintenance'
+    labels:
+      - 'chore'
+      - 'deployment'
+      - 'translation'
+  - title: 'Dependencies'
+    collapse-after: 3
+    label: 'dependencies'
+include-labels:
+  - 'enhancement'
+  - 'bug'
+  - 'chore'
+  - 'deployment'
+  - 'translation'
+  - 'dependencies'
+replacers: # Changes "Feature: Update checker" to "Update checker"
+  - search: '/Feature:|Feat:|\[feature\]/gi'
+    replace: ''
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&#@'
+tag-prefix: "ngx-"
+template: |
+  ## Changelog
+
+  $CHANGES
