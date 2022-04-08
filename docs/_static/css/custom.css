@@ -191,6 +191,14 @@ a:hover, .wy-breadcrumbs-aside a {
   color: #5c5962;
 }
 
+a.image-reference, a.image-reference:hover {
+  background: none !important;
+}
+
+a.image-reference img {
+  cursor: zoom-in;
+}
+
 
 /* Code blocks */
 .rst-content code, .rst-content tt, code {
