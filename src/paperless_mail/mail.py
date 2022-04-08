@@ -253,7 +253,7 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_message(self, message, rule):
+    def handle_message(self, message, rule) -> int:
         if not message.attachments:
             return 0
 
@@ -285,7 +285,12 @@ class MailAccountHandler(LoggingMixin):
                 continue
 
             if rule.filter_attachment_filename:
-                if not fnmatch(att.filename, rule.filter_attachment_filename):
+                # Force the filename and pattern to the lowercase
+                # as this is system dependent otherwise
+                if not fnmatch(
+                    att.filename.lower(),
+                    rule.filter_attachment_filename.lower(),
+                ):
                     continue
 
             title = self.get_title(message, att, rule)
