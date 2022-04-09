@@ -18,6 +18,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -89,14 +90,18 @@ def make_criterias(rule):
 
 
 def get_mailbox(server, port, security):
-    if security == MailAccount.IMAP_SECURITY_NONE:
-        mailbox = MailBoxUnencrypted(server, port)
-    elif security == MailAccount.IMAP_SECURITY_STARTTLS:
-        mailbox = MailBox(server, port, starttls=True)
-    elif security == MailAccount.IMAP_SECURITY_SSL:
-        mailbox = MailBox(server, port)
-    else:
-        raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
+    try:
+        if security == MailAccount.IMAP_SECURITY_NONE:
+            mailbox = MailBoxUnencrypted(server, port)
+        elif security == MailAccount.IMAP_SECURITY_STARTTLS:
+            mailbox = MailBoxTls(server, port)
+        elif security == MailAccount.IMAP_SECURITY_SSL:
+            mailbox = MailBox(server, port)
+        else:
+            raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
+    except Exception as e:
+        print(f"Error while retrieving mailbox from {server}: {e}")
+        raise
     return mailbox
 
 
@@ -154,32 +159,45 @@ class MailAccountHandler(LoggingMixin):
         self.log("debug", f"Processing mail account {account}")
 
         total_processed_files = 0
-
-        with get_mailbox(
-            account.imap_server,
-            account.imap_port,
-            account.imap_security,
-        ) as M:
-
-            try:
-                M.login(account.username, account.password)
-            except Exception:
-                raise MailError(f"Error while authenticating account {account}")
-
-            self.log(
-                "debug",
-                f"Account {account}: Processing " f"{account.rules.count()} rule(s)",
-            )
-
-            for rule in account.rules.order_by("order"):
+        try:
+            with get_mailbox(
+                account.imap_server,
+                account.imap_port,
+                account.imap_security,
+            ) as M:
                 try:
-                    total_processed_files += self.handle_mail_rule(M, rule)
+                    M.login(account.username, account.password)
                 except Exception as e:
                     self.log(
                         "error",
-                        f"Rule {rule}: Error while processing rule: {e}",
-                        exc_info=True,
+                        f"Error while authenticating account {account}: {e}",
+                        exc_info=False,
                     )
+                    return total_processed_files
+
+                self.log(
+                    "debug",
+                    f"Account {account}: Processing "
+                    f"{account.rules.count()} rule(s)",
+                )
+
+                for rule in account.rules.order_by("order"):
+                    try:
+                        total_processed_files += self.handle_mail_rule(M, rule)
+                    except Exception as e:
+                        self.log(
+                            "error",
+                            f"Rule {rule}: Error while processing rule: {e}",
+                            exc_info=True,
+                        )
+        except MailError:
+            raise
+        except Exception as e:
+            self.log(
+                "error",
+                f"Error while retrieving mailbox {account}: {e}",
+                exc_info=False,
+            )
 
         return total_processed_files
 
