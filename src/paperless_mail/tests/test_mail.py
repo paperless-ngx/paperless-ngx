@@ -246,13 +246,13 @@ class TestMail(DirectoriesMixin, TestCase):
 
         rule = MailRule(
             name="a",
-            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NOTHING,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NOTHING,
         )
         self.assertIsNone(handler.get_correspondent(message, rule))
 
         rule = MailRule(
             name="b",
-            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_EMAIL,
         )
         c = handler.get_correspondent(message, rule)
         self.assertIsNotNone(c)
@@ -264,7 +264,7 @@ class TestMail(DirectoriesMixin, TestCase):
 
         rule = MailRule(
             name="c",
-            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_NAME,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_NAME,
         )
         c = handler.get_correspondent(message, rule)
         self.assertIsNotNone(c)
@@ -275,7 +275,7 @@ class TestMail(DirectoriesMixin, TestCase):
 
         rule = MailRule(
             name="d",
-            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_CUSTOM,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_CUSTOM,
             assign_correspondent=someone_else,
         )
         c = handler.get_correspondent(message, rule)
@@ -289,9 +289,15 @@ class TestMail(DirectoriesMixin, TestCase):
 
         handler = MailAccountHandler()
 
-        rule = MailRule(name="a", assign_title_from=MailRule.TITLE_FROM_FILENAME)
+        rule = MailRule(
+            name="a",
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+        )
         self.assertEqual(handler.get_title(message, att, rule), "this_is_the_file")
-        rule = MailRule(name="b", assign_title_from=MailRule.TITLE_FROM_SUBJECT)
+        rule = MailRule(
+            name="b",
+            assign_title_from=MailRule.TitleSource.FROM_SUBJECT,
+        )
         self.assertEqual(handler.get_title(message, att, rule), "the message title")
 
     def test_handle_message(self):
@@ -302,7 +308,10 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account)
+        rule = MailRule(
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            account=account,
+        )
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -346,7 +355,10 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account)
+        rule = MailRule(
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            account=account,
+        )
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -369,7 +381,10 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
-        rule = MailRule(assign_title_from=MailRule.TITLE_FROM_FILENAME, account=account)
+        rule = MailRule(
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
+            account=account,
+        )
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -392,9 +407,9 @@ class TestMail(DirectoriesMixin, TestCase):
 
         account = MailAccount()
         rule = MailRule(
-            assign_title_from=MailRule.TITLE_FROM_FILENAME,
+            assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
-            attachment_type=MailRule.ATTACHMENT_TYPE_EVERYTHING,
+            attachment_type=MailRule.AttachmentProcessing.EVERYTHING,
         )
 
         result = self.mail_account_handler.handle_message(message, rule)
@@ -427,7 +442,7 @@ class TestMail(DirectoriesMixin, TestCase):
             self.async_task.reset_mock()
             account = MailAccount()
             rule = MailRule(
-                assign_title_from=MailRule.TITLE_FROM_FILENAME,
+                assign_title_from=MailRule.TitleSource.FROM_FILENAME,
                 account=account,
                 filter_attachment_filename=pattern,
             )
@@ -452,7 +467,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.ACTION_MARK_READ,
+            action=MailRule.AttachmentAction.MARK_READ,
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
@@ -475,7 +490,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.ACTION_DELETE,
+            action=MailRule.AttachmentAction.DELETE,
             filter_subject="Invoice",
         )
 
@@ -496,7 +511,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.ACTION_FLAG,
+            action=MailRule.AttachmentAction.FLAG,
             filter_subject="Invoice",
         )
 
@@ -519,7 +534,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.ACTION_MOVE,
+            action=MailRule.AttachmentAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
         )
@@ -565,7 +580,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.ACTION_MOVE,
+            action=MailRule.AttachmentAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
         )
@@ -586,7 +601,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.ACTION_MOVE,
+            action=MailRule.AttachmentAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
             order=1,
@@ -595,7 +610,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule2",
             account=account,
-            action=MailRule.ACTION_MOVE,
+            action=MailRule.AttachmentAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
             order=2,
@@ -625,7 +640,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.ACTION_MOVE,
+            action=MailRule.AttachmentAction.MOVE,
             action_parameter="spam",
         )
 
@@ -650,9 +665,9 @@ class TestMail(DirectoriesMixin, TestCase):
             name="testrule",
             filter_from="amazon@amazon.de",
             account=account,
-            action=MailRule.ACTION_MOVE,
+            action=MailRule.AttachmentAction.MOVE,
             action_parameter="spam",
-            assign_correspondent_from=MailRule.CORRESPONDENT_FROM_EMAIL,
+            assign_correspondent_from=MailRule.CorrespondentSource.FROM_EMAIL,
         )
 
         self.mail_account_handler.handle_mail_account(account)
@@ -687,7 +702,7 @@ class TestMail(DirectoriesMixin, TestCase):
         rule = MailRule.objects.create(
             name="testrule3",
             account=account,
-            action=MailRule.ACTION_DELETE,
+            action=MailRule.AttachmentAction.DELETE,
             filter_subject="Claim",
         )
 
