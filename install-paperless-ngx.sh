@@ -66,10 +66,12 @@ fi
 # If this fails, the user probably does not have permissions for Docker.
 docker stats --no-stream 2>/dev/null 1>&2
 if [ $? -ne 0 ] ; then
-	echo ""
-	echo "WARN: It look like the current user does not have Docker permissions."
-	echo "WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user."
-	echo ""
+    cat <<EOM
+
+WARN: It look like the current user does not have Docker permissions.
+WARN: Use 'sudo usermod -aG docker $USER' to assign Docker permissions to the user.
+
+EOM
 	sleep 3
 fi
 
@@ -77,159 +79,213 @@ default_time_zone=$(timedatectl show -p Timezone --value)
 
 set -e
 
-echo ""
-echo "#############################################"
-echo "###   paperless-ngx docker installation   ###"
-echo "#############################################"
-echo ""
-echo "This script will download, configure and start paperless-ngx."
+[[ -r "${HOME}/.paperless-ngx.setup.env" ]] && source "${HOME}/.paperless-ngx.setup.env"
 
-echo ""
-echo "1. Application configuration"
-echo "============================"
+function dumpEnv() {
+    mv "${HOME}/.paperless-ngx.setup.env" "${HOME}/.paperless-ngx.setup.env.bak" || true
+    cat > "${HOME}/.paperless-ngx.setup.env" <<EOF
+#==================================================================
+# Papaerless NGX config,  $(date)
+#==================================================================
+PORT="${PORT}"
+TIME_ZONE="${TIME_ZONE}"
+DATABASE_BACKEND="${DATABASE_BACKEND}"
+TIKA_ENABLED="${TIKA_ENABLED}"
+OCR_LANGUAGE="${OCR_LANGUAGE}"
+USERMAP_UID="${USERMAP_UID}"
+USERMAP_GID="${USERMAP_GID}"
+TARGET_FOLDER="${TARGET_FOLDER}"
+CONSUME_FOLDER="${CONSUME_FOLDER}"
+MEDIA_FOLDER="${MEDIA_FOLDER}"
+DATA_FOLDER="${DATA_FOLDER}"
+POSTGRES_FOLDER="${POSTGRES_FOLDER}"
+USERNAME="${USERNAME}"
+EMAIL="${EMAIL}"
+FILENAME_FORMAT="${FILENAME_FORMAT}"
+# FILENAME_FORMAT="{created_year}/{correspondent}/{title}"
+# FILENAME_FORMAT="{tag_list}/{created_year}/{correspondent}/{title}"
 
-echo ""
-echo "The port on which the paperless webserver will listen for incoming"
-echo "connections."
-echo ""
+EOF
+    cat "${HOME}/.paperless-ngx.setup.env.bak" \
+    | sed -e 's/^/# /' \
+    >> "${HOME}/.paperless-ngx.setup.env"
+}
 
-ask "Port" "8000"
-PORT=$ask_result
+cat <<EOM
 
-echo ""
-echo "Paperless requires you to configure the current time zone correctly."
-echo "Otherwise, the dates of your documents may appear off by one day,"
-echo "depending on where you are on earth."
-echo ""
+#############################################"
+###   paperless-ngx docker installation   ###"
+#############################################"
 
-ask "Current time zone" "$default_time_zone"
-TIME_ZONE=$ask_result
+This script will download, configure and start paperless-ngx.
 
-echo ""
-echo "Database backend: PostgreSQL and SQLite are available. Use PostgreSQL"
-echo "if unsure. If you're running on a low-power device such as Raspberry"
-echo "Pi, use SQLite to save resources."
-echo ""
 
-ask "Database backend" "postgres" "postgres sqlite"
-DATABASE_BACKEND=$ask_result
+1. Application configuration
+============================
 
-echo ""
-echo "Paperless is able to use Apache Tika to support Office documents such as"
-echo "Word, Excel, Powerpoint, and Libreoffice equivalents. This feature"
-echo "requires more resources due to the required services."
-echo ""
 
-ask "Enable Apache Tika?" "no" "yes no"
-TIKA_ENABLED=$ask_result
+The port on which the paperless webserver will listen for incoming
+connections.
 
-echo ""
-echo "Specify the default language that most of your documents are written in."
-echo "Use ISO 639-2, (T) variant language codes: "
-echo "https://www.loc.gov/standards/iso639-2/php/code_list.php"
-echo "Common values: eng (English) deu (German) nld (Dutch) fra (French)"
-echo "This can be a combination of multiple languages such as deu+eng"
-echo ""
+EOM
 
-ask "OCR language" "eng"
-OCR_LANGUAGE=$ask_result
+ask "Port" "${PORT:-8000}"
+PORT="${ask_result}"
 
-echo ""
-echo "Specify the user id and group id you wish to run paperless as."
-echo "Paperless will also change ownership on the data, media and consume"
-echo "folder to the specified values, so it's a good idea to supply the user id"
-echo "and group id of your unix user account."
-echo "If unsure, leave default."
-echo ""
+cat <<EOM
 
-ask "User ID" "$(id -u)"
-USERMAP_UID=$ask_result
+Paperless requires you to configure the current time zone correctly.
+Otherwise, the dates of your documents may appear off by one day,
+depending on where you are on earth.
 
-ask "Group ID" "$(id -g)"
-USERMAP_GID=$ask_result
+EOM
 
-echo ""
-echo "2. Folder configuration"
-echo "======================="
-echo ""
-echo "The target folder is used to store the configuration files of "
-echo "paperless. You can move this folder around after installing paperless."
-echo "You will need this folder whenever you want to start, stop, update or "
-echo "maintain your paperless instance."
-echo ""
+ask "Current time zone" "${TIME_ZONE:-${default_time_zone}}"
+TIME_ZONE="${ask_result}"
 
-ask "Target folder" "$(pwd)/paperless-ngx"
-TARGET_FOLDER=$ask_result
+cat <<EOM
 
-echo ""
-echo "The consume folder is where paperles will search for new documents."
-echo "Point this to a folder where your scanner is able to put your scanned"
-echo "documents."
-echo ""
-echo "CAUTION: You must specify an absolute path starting with / or a relative "
-echo "path starting with ./ here. Examples:"
-echo "  /mnt/consume"
-echo "  ./consume"
-echo ""
+Database backend: PostgreSQL and SQLite are available. Use PostgreSQL
+if unsure. If you're running on a low-power device such as Raspberry
+Pi, use SQLite to save resources.
 
-ask_docker_folder "Consume folder" "$TARGET_FOLDER/consume"
-CONSUME_FOLDER=$ask_result
+EOM
 
-echo ""
-echo "The media folder is where paperless stores your documents."
-echo "Leave empty and docker will manage this folder for you."
-echo "Docker usually stores managed folders in /var/lib/docker/volumes."
-echo ""
-echo "CAUTION: If specified, you must specify an absolute path starting with /"
-echo "or a relative path starting with ./ here."
-echo ""
+ask "Database backend" "${DATABASE_BACKEND:-postgres}" "postgres sqlite"
+DATABASE_BACKEND="${ask_result}"
 
-ask_docker_folder "Media folder" ""
-MEDIA_FOLDER=$ask_result
+cat <<EOM
 
-echo ""
-echo "The data folder is where paperless stores other data, such as your"
-if [[ "$DATABASE_BACKEND" == "sqlite" ]] ; then
-	echo -n "SQLite database, the "
+Paperless is able to use Apache Tika to support Office documents such as
+Word, Excel, Powerpoint, and Libreoffice equivalents. This feature
+requires more resources due to the required services.
+
+EOM
+
+ask "Enable Apache Tika?" "${TIKA_ENABLED:-no}" "yes no"
+TIKA_ENABLED="${ask_result}"
+
+cat <<EOM
+
+Specify the default language that most of your documents are written in.
+Use ISO 639-2, (T) variant language codes:
+https://www.loc.gov/standards/iso639-2/php/code_list.php
+Common values: eng (English) deu (German) nld (Dutch) fra (French)
+This can be a combination of multiple languages such as deu+eng
+
+EOM
+
+ask "OCR language" "${OCR_LANGUAGE:-eng}"
+OCR_LANGUAGE="${ask_result}"
+
+cat <<EOM
+
+Specify the user id and group id you wish to run paperless as.
+Paperless will also change ownership on the data, media and consume
+folder to the specified values, so it's a good idea to supply the user id
+and group id of your unix user account.
+If unsure, leave default.
+
+EOM
+
+ask "User ID" "${USERMAP_UID:-$(id -u)}"
+USERMAP_UID="${ask_result}"
+
+ask "Group ID" "${USERMAP_GID:-$(id -g)}"
+USERMAP_GID="${ask_result}"
+
+cat <<EOM
+
+2. Folder configuration
+=======================
+
+The target folder is used to store the configuration files of
+paperless. You can move this folder around after installing paperless.
+You will need this folder whenever you want to start, stop, update or
+maintain your paperless instance.
+
+EOM
+
+ask "Target folder" "${TARGET_FOLDER:-$(/bin/pwd)/paperless-ngx}"
+TARGET_FOLDER="${ask_result}"
+
+cat <<EOM
+
+The consume folder is where paperles will search for new documents.
+Point this to a folder where your scanner is able to put your scanned
+documents.
+
+CAUTION: You must specify an absolute path starting with / or a relative
+path starting with ./ here. Examples:
+  /mnt/consume
+  ./consume
+
+EOM
+
+ask_docker_folder "Consume folder" "${CONSUME_FOLDER:-${TARGET_FOLDER}/consume}"
+CONSUME_FOLDER="${ask_result}"
+
+cat <<EOM
+
+The media folder is where paperless stores your documents.
+Leave empty and docker will manage this folder for you.
+Docker usually stores managed folders in /var/lib/docker/volumes.
+
+CAUTION: If specified, you must specify an absolute path starting with /
+or a relative path starting with ./ here.
+
+EOM
+
+ask_docker_folder "Media folder" "${MEDIA_FOLDER}"
+MEDIA_FOLDER="${ask_result}"
+
+[[ "${DATABASE_BACKEND}" == "sqlite" ]] && msgPfx="SQLite database, the "
+cat <<EOM
+
+The data folder is where paperless stores other data, such as your
+${msgPfx}search index and other data.
+As with the media folder, leave empty to have this managed by docker.
+
+CAUTION: If specified, you must specify an absolute path starting with /
+or a relative path starting with ./ here.
+
+EOM
+
+ask_docker_folder "Data folder" "${DATA_FOLDER}"
+DATA_FOLDER="${ask_result}"
+
+if [[ "${DATABASE_BACKEND}" == "postgres" ]] ; then
+    cat <<EOM
+
+The database folder, where postgres stores its data.
+Leave empty to have this managed by docker.
+
+CAUTION: If specified, you must specify an absolute path starting with /
+or a relative path starting with ./ here.
+
+EOM
+
+	ask_docker_folder "Database (postgres) folder" "${POSTGRES_FOLDER}"
+	POSTGRES_FOLDER="${ask_result}"
 fi
-echo "search index and other data."
-echo "As with the media folder, leave empty to have this managed by docker."
-echo ""
-echo "CAUTION: If specified, you must specify an absolute path starting with /"
-echo "or a relative path starting with ./ here."
-echo ""
 
-ask_docker_folder "Data folder" ""
-DATA_FOLDER=$ask_result
+cat <<EOM
 
-if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
-	echo ""
-	echo "The database folder, where postgres stores its data."
-	echo "Leave empty to have this managed by docker."
-	echo ""
-	echo "CAUTION: If specified, you must specify an absolute path starting with /"
-	echo "or a relative path starting with ./ here."
-	echo ""
+3. Login credentials
+====================
 
-	ask_docker_folder "Database folder" ""
-	POSTGRES_FOLDER=$ask_result
-fi
+Specify initial login credentials. You can change these later.
+A mail address is required, however it is not used in paperless. You don't
+need to provide an actual mail address.
 
-echo ""
-echo "3. Login credentials"
-echo "===================="
-echo ""
-echo "Specify initial login credentials. You can change these later."
-echo "A mail address is required, however it is not used in paperless. You don't"
-echo "need to provide an actual mail address."
-echo ""
+EOM
 
-ask "Paperless username" "$(whoami)"
-USERNAME=$ask_result
+ask "Paperless username" "${USERNAME:-$(whoami)}"
+USERNAME="${ask_result}"
 
 while true; do
 	read -sp "Paperless password: " PASSWORD
-	echo ""
+	echo
 
 	if [[ -z $PASSWORD ]] ; then
 		echo "Password cannot be empty."
@@ -237,72 +293,65 @@ while true; do
 	fi
 
 	read -sp "Paperless password (again): " PASSWORD_REPEAT
-	echo ""
+	echo
 
-	if [[ ! "$PASSWORD" == "$PASSWORD_REPEAT" ]] ; then
-		echo "Passwords did not match"
-	else
+	if [[ "$PASSWORD" == "$PASSWORD_REPEAT" ]] ; then
 		break
 	fi
+
+    echo "Passwords did not match"
 done
 
-ask "Email" "$USERNAME@localhost"
-EMAIL=$ask_result
+ask "Email" "${EMAIL:-$USERNAME@localhost}"
+EMAIL="${ask_result}"
 
-echo ""
-echo "Summary"
-echo "======="
-echo ""
+dumpEnv
 
-echo "Target folder: $TARGET_FOLDER"
-echo "Consume folder: $CONSUME_FOLDER"
-if [[ -z $MEDIA_FOLDER ]] ; then
-	echo "Media folder: Managed by docker"
-else
-	echo "Media folder: $MEDIA_FOLDER"
-fi
-if [[ -z $DATA_FOLDER ]] ; then
-	echo "Data folder: Managed by docker"
-else
-	echo "Data folder: $DATA_FOLDER"
-fi
-if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
-	if [[ -z $POSTGRES_FOLDER ]] ; then
-		echo "Database (postgres) folder: Managed by docker"
-	else
-		echo "Database (postgres) folder: $POSTGRES_FOLDER"
-	fi
-fi
-echo ""
-echo "Port: $PORT"
-echo "Database: $DATABASE_BACKEND"
-echo "Tika enabled: $TIKA_ENABLED"
-echo "OCR language: $OCR_LANGUAGE"
-echo "User id: $USERMAP_UID"
-echo "Group id: $USERMAP_GID"
-echo ""
-echo "Paperless username: $USERNAME"
-echo "Paperless email: $EMAIL"
+# dbFolderMsg="Database: SQLite"
+[[ "$DATABASE_BACKEND" == "postgres" ]] && dbFolderMsg="Database (postgres) folder: ${POSTGRES_FOLDER:-Managed by docker}"
+cat <<EOM
 
-echo ""
+Summary
+=======
+
+Target folder      : ${TARGET_FOLDER}
+Consume folder     : ${CONSUME_FOLDER}
+Media folder       : ${MEDIA_FOLDER:-Managed by docker}
+Data folder        : ${DATA_FOLDER:-Managed by docker}
+
+Port               : ${PORT}
+Database           : ${DATABASE_BACKEND}
+${dbFolderMsg}
+Tika enabled       : ${TIKA_ENABLED}
+OCR language       : ${OCR_LANGUAGE}
+User  id           : ${USERMAP_UID}
+Group id           : ${USERMAP_GID}
+
+Paperless username : ${USERNAME}
+Paperless email    : ${EMAIL}
+
+EOM
 read -p "Press any key to install."
 
-echo ""
-echo "Installing paperless..."
-echo ""
+cat <<EOM
 
-mkdir -p "$TARGET_FOLDER"
+Installing paperless...
 
-cd "$TARGET_FOLDER"
+EOM
 
-DOCKER_COMPOSE_VERSION=$DATABASE_BACKEND
+mkdir -p "${TARGET_FOLDER}"
 
-if [[ $TIKA_ENABLED == "yes" ]] ; then
-	DOCKER_COMPOSE_VERSION="$DOCKER_COMPOSE_VERSION-tika"
+cd "${TARGET_FOLDER}"
+
+DOCKER_COMPOSE_VERSION="${DATABASE_BACKEND}"
+
+if [[ "${TIKA_ENABLED}" == "yes" ]] ; then
+	DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION}-tika"
 fi
 
-wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
-wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/docker/compose/.env" -O .env
+BASE_URL="https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose"
+wget "${BASE_URL}/docker-compose.${DOCKER_COMPOSE_VERSION}.yml" -O docker-compose.yml
+wget "${BASE_URL}/.env" -O .env
 
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
@@ -321,6 +370,7 @@ DEFAULT_LANGUAGES="deu eng fra ita spa"
 	if [[ ! " ${DEFAULT_LANGUAGES[@]} " =~ " ${OCR_LANGUAGE} " ]] ; then
 		echo "PAPERLESS_OCR_LANGUAGES=$OCR_LANGUAGE"
 	fi
+	[[ -z "${FILENAME_FORMAT}" ]] || echo "PAPERLESS_FILENAME_FORMAT=${FILENAME_FORMAT}"
 } > docker-compose.env
 
 sed -i "s/- 8000:8000/- $PORT:8000/g" docker-compose.yml
@@ -341,6 +391,6 @@ fi
 
 docker-compose pull
 
-docker-compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL"
+docker-compose run --rm -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" webserver createsuperuser --noinput --username "$USERNAME" --email "$EMAIL" || true
 
 docker-compose up -d
