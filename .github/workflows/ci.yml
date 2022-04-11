@@ -132,7 +132,7 @@ jobs:
         name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng
+          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng libzbar0 poppler-utils
       -
         name: Install Python dependencies
         run: |
