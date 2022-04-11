@@ -577,9 +577,9 @@ a.image-reference img {
 .dark-mode-toggle {
   position: absolute;
   top: 14px;
-  right: 15px;
+  right: 12px;
   height: 20px;
-  width: 20px;
+  width: 24px;
   z-index: 1000;
   border: none;
   background-color: transparent;
