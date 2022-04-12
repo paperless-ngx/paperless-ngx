@@ -5,6 +5,11 @@
 Changelog
 *********
 
+paperless-ngx 1.7.0
+###################
+
+Changelog pending
+
 paperless-ngx 1.6.0
 ###################
 
