@@ -170,6 +170,9 @@ PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>
 
     Can also be set using PAPERLESS_URL (see above).
 
+    If manually set, please remember to include "localhost". Otherwise docker
+    healthcheck will fail.
+
     Defaults to "*", which is all hosts.
 
 PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>
