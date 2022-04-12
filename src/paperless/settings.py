@@ -251,7 +251,8 @@ if _paperless_url:
     if _allowed_hosts:
         ALLOWED_HOSTS.append(_paperless_uri.hostname)
     else:
-        ALLOWED_HOSTS = [_paperless_uri.hostname]
+        # always allow localhost. Necessary e.g. for healthcheck in docker.
+        ALLOWED_HOSTS = [_paperless_uri.hostname] + ["localhost"]
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
