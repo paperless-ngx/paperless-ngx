@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-04-12 11:00\n"
+"PO-Revision-Date: 2022-04-12 15:26\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -60,7 +60,7 @@ msgstr "algorytm dopasowania"
 
 #: documents/models.py:48
 msgid "is insensitive"
-msgstr "bez rozróżniania wielkości liter"
+msgstr "bez rozróżniania wielkości znaków"
 
 #: documents/models.py:61 documents/models.py:104
 msgid "correspondent"
@@ -240,7 +240,7 @@ msgstr "użytkownik"
 
 #: documents/models.py:317
 msgid "show on dashboard"
-msgstr "pokaż na pulpicie"
+msgstr "pokaż na stronie głównej"
 
 #: documents/models.py:320
 msgid "show in sidebar"
