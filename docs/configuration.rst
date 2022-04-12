@@ -130,6 +130,8 @@ PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>
 
     Defaults to 20.
 
+.. _hosting-and-security:
+
 Hosting & Security
 ##################
 
