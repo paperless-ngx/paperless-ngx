@@ -8,6 +8,10 @@ Changelog
 paperless-ngx 1.7.0
 ###################
 
+Breaking Changes
+
+* ``PAPERLESS_URL`` is now required when using a reverse proxy. See `#674`_.
+
 Features
 
 * global drag'n'drop `@shamoon`_ (#283).
@@ -1769,6 +1773,7 @@ bulk of the work on this big change.
 .. _#488: https://github.com/the-paperless-project/paperless/pull/488
 .. _#489: https://github.com/the-paperless-project/paperless/pull/489
 .. _#492: https://github.com/the-paperless-project/paperless/pull/492
+.. _#674: https://github.com/paperless-ngx/paperless-ngx/pull/674
 
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
 .. _optipng: http://optipng.sourceforge.net/
