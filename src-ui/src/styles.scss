@@ -209,7 +209,8 @@ input,
 select,
 textarea,
 .form-select:not(.is-invalid):not(:disabled),
-.form-check-input {
+.form-check-input,
+.ng-select .ng-select-container .ng-value-container .ng-input > input {
   color: var(--bs-body-color);
   background-color: var(--bs-body-bg);
   border-color: var(--bs-border-color);
