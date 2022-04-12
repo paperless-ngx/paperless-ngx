@@ -28,6 +28,7 @@ Features
 
 Bug Fixes
 
+* add "localhost" to ALLOWED_HOSTS `@gador`_ (#700).
 * Fix: scanners table `@qcasey`_ (#690).
 * Adds wait for file before consuming `@stumpylog`_ (#483).
 * Fix: frontend document editing erases time data `@shamoon`_ (#654).
