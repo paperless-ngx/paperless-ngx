@@ -62,13 +62,13 @@ class FlagMailAction(BaseMailAction):
 
 
 def get_rule_action(rule):
-    if rule.action == MailRule.ACTION_FLAG:
+    if rule.action == MailRule.AttachmentAction.FLAG:
         return FlagMailAction()
-    elif rule.action == MailRule.ACTION_DELETE:
+    elif rule.action == MailRule.AttachmentAction.DELETE:
         return DeleteMailAction()
-    elif rule.action == MailRule.ACTION_MOVE:
+    elif rule.action == MailRule.AttachmentAction.MOVE:
         return MoveMailAction()
-    elif rule.action == MailRule.ACTION_MARK_READ:
+    elif rule.action == MailRule.AttachmentAction.MARK_READ:
         return MarkReadMailAction()
     else:
         raise NotImplementedError("Unknown action.")  # pragma: nocover
@@ -117,10 +117,10 @@ class MailAccountHandler(LoggingMixin):
             return None
 
     def get_title(self, message, att, rule):
-        if rule.assign_title_from == MailRule.TITLE_FROM_SUBJECT:
+        if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
             return message.subject
 
-        elif rule.assign_title_from == MailRule.TITLE_FROM_FILENAME:
+        elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
             return os.path.splitext(os.path.basename(att.filename))[0]
 
         else:
@@ -131,20 +131,20 @@ class MailAccountHandler(LoggingMixin):
     def get_correspondent(self, message: MailMessage, rule):
         c_from = rule.assign_correspondent_from
 
-        if c_from == MailRule.CORRESPONDENT_FROM_NOTHING:
+        if c_from == MailRule.CorrespondentSource.FROM_NOTHING:
             return None
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_EMAIL:
+        elif c_from == MailRule.CorrespondentSource.FROM_EMAIL:
             return self._correspondent_from_name(message.from_)
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_NAME:
+        elif c_from == MailRule.CorrespondentSource.FROM_NAME:
             from_values = message.from_values
             if from_values is not None and len(from_values.name) > 0:
                 return self._correspondent_from_name(from_values.name)
             else:
                 return self._correspondent_from_name(message.from_)
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_CUSTOM:
+        elif c_from == MailRule.CorrespondentSource.FROM_CUSTOM:
             return rule.assign_correspondent
 
         else:
@@ -273,7 +273,7 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_message(self, message, rule):
+    def handle_message(self, message, rule) -> int:
         if not message.attachments:
             return 0
 
@@ -294,7 +294,8 @@ class MailAccountHandler(LoggingMixin):
 
             if (
                 not att.content_disposition == "attachment"
-                and rule.attachment_type == MailRule.ATTACHMENT_TYPE_ATTACHMENTS_ONLY
+                and rule.attachment_type
+                == MailRule.AttachmentProcessing.ATTACHMENTS_ONLY
             ):
                 self.log(
                     "debug",
@@ -305,7 +306,12 @@ class MailAccountHandler(LoggingMixin):
                 continue
 
             if rule.filter_attachment_filename:
-                if not fnmatch(att.filename, rule.filter_attachment_filename):
+                # Force the filename and pattern to the lowercase
+                # as this is system dependent otherwise
+                if not fnmatch(
+                    att.filename.lower(),
+                    rule.filter_attachment_filename.lower(),
+                ):
                     continue
 
             title = self.get_title(message, att, rule)

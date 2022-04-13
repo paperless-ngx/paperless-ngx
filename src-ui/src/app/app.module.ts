@@ -39,7 +39,6 @@ import { TextComponent } from './components/common/input/text/text.component'
 import { SelectComponent } from './components/common/input/select/select.component'
 import { CheckComponent } from './components/common/input/check/check.component'
 import { SaveViewConfigDialogComponent } from './components/document-list/save-view-config-dialog/save-view-config-dialog.component'
-import { InfiniteScrollModule } from 'ngx-infinite-scroll'
 import { TagsComponent } from './components/common/input/tags/tags.component'
 import { SortableDirective } from './directives/sortable.directive'
 import { CookieService } from 'ngx-cookie-service'
@@ -69,6 +68,7 @@ import { ColorSliderModule } from 'ngx-color/slider'
 import { ColorComponent } from './components/common/input/color/color.component'
 import { DocumentAsnComponent } from './components/document-asn/document-asn.component'
 
+import localeBe from '@angular/common/locales/be'
 import localeCs from '@angular/common/locales/cs'
 import localeDa from '@angular/common/locales/da'
 import localeDe from '@angular/common/locales/de'
@@ -88,6 +88,7 @@ import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
 
+registerLocaleData(localeBe)
 registerLocaleData(localeCs)
 registerLocaleData(localeDa)
 registerLocaleData(localeDe)
@@ -168,7 +169,6 @@ registerLocaleData(localeZh)
     FormsModule,
     ReactiveFormsModule,
     NgxFileDropModule,
-    InfiniteScrollModule,
     PdfViewerModule,
     NgSelectModule,
     ColorSliderModule,

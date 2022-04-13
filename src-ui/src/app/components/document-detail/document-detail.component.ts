@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ElementRef,
-} from '@angular/core'
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal, NgbNav } from '@ng-bootstrap/ng-bootstrap'
@@ -90,6 +84,11 @@ export class DocumentDetailComponent
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
 
+  requiresPassword: boolean = false
+  password: string
+
+  ogDate: Date
+
   @ViewChild('nav') nav: NgbNav
   @ViewChild('pdfPreview') set pdfPreview(element) {
     // this gets called when compontent added or removed from DOM
@@ -145,7 +144,21 @@ export class DocumentDetailComponent
   ngOnInit(): void {
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((wow) => {
+      .subscribe((changes) => {
+        if (this.ogDate) {
+          let newDate = new Date(changes['created'])
+          newDate.setHours(
+            this.ogDate.getHours(),
+            this.ogDate.getMinutes(),
+            this.ogDate.getSeconds(),
+            this.ogDate.getMilliseconds()
+          )
+          this.documentForm.patchValue(
+            { created: this.formatDate(newDate) },
+            { emitEvent: false }
+          )
+        }
+
         Object.assign(this.document, this.documentForm.value)
       })
 
@@ -186,16 +199,24 @@ export class DocumentDetailComponent
             this.updateComponent(doc)
           }
 
+          this.ogDate = new Date(doc.created)
+
           // Initialize dirtyCheck
           this.store = new BehaviorSubject({
             title: doc.title,
             content: doc.content,
-            created: doc.created,
+            created: this.formatDate(this.ogDate),
             correspondent: doc.correspondent,
             document_type: doc.document_type,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
           })
+
+          // ensure we're always starting with 24-char ISO8601 string
+          this.documentForm.patchValue(
+            { created: this.formatDate(this.ogDate) },
+            { emitEvent: false }
+          )
 
           this.isDirty$ = dirtyCheck(
             this.documentForm,
@@ -450,5 +471,22 @@ export class DocumentDetailComponent
 
   pdfPreviewLoaded(pdf: PDFDocumentProxy) {
     this.previewNumPages = pdf.numPages
+    if (this.password) this.requiresPassword = false
+  }
+
+  onError(event) {
+    if (event.name == 'PasswordException') {
+      this.requiresPassword = true
+    }
+  }
+
+  onPasswordKeyUp(event: KeyboardEvent) {
+    if ('Enter' == event.key) {
+      this.password = (event.target as HTMLInputElement).value
+    }
+  }
+
+  formatDate(date: Date): string {
+    return date.toISOString().split('.')[0] + 'Z'
   }
 }

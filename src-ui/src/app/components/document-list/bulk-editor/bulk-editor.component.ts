@@ -39,6 +39,7 @@ export class BulkEditorComponent {
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+  awaitingDownload: boolean
 
   constructor(
     private documentTypeService: DocumentTypeService,
@@ -317,10 +318,12 @@ export class BulkEditorComponent {
   }
 
   downloadSelected(content = 'archive') {
+    this.awaitingDownload = true
     this.documentService
       .bulkDownload(Array.from(this.list.selected), content)
       .subscribe((result: any) => {
         saveAs(result, 'documents.zip')
+        this.awaitingDownload = false
       })
   }
 }

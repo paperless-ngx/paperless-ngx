@@ -142,7 +142,24 @@ PAPERLESS_SECRET_KEY=<key>
 
     Default is listed in the file ``src/paperless/settings.py``.
 
-PAPERLESS_ALLOWED_HOSTS<comma-separated-list>
+PAPERLESS_URL=<url>
+    This setting can be used to set the three options below (ALLOWED_HOSTS,
+    CORS_ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS). If the other options are
+    set the values will be combined with this one. Do not include a trailing
+    slash. E.g. https://paperless.domain.com
+
+    Defaults to empty string, leaving the other settings unaffected.
+
+PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>
+    A list of trusted origins for unsafe requests (e.g. POST). As of Django 4.0
+    this is required to access the Django admin via the web.
+    See https://docs.djangoproject.com/en/4.0/ref/settings/#csrf-trusted-origins
+
+    Can also be set using PAPERLESS_URL (see above).
+
+    Defaults to empty string, which does not add any origins to the trusted list.
+
+PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>
     If you're planning on putting Paperless on the open internet, then you
     really should set this value to the domain name you're using.  Failing to do
     so leaves you open to HTTP host header attacks:
@@ -151,11 +168,15 @@ PAPERLESS_ALLOWED_HOSTS<comma-separated-list>
     Just remember that this is a comma-separated list, so "example.com" is fine,
     as is "example.com,www.example.com", but NOT " example.com" or "example.com,"
 
+    Can also be set using PAPERLESS_URL (see above).
+
     Defaults to "*", which is all hosts.
 
-PAPERLESS_CORS_ALLOWED_HOSTS<comma-separated-list>
+PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>
     You need to add your servers to the list of allowed hosts that can do CORS
     calls. Set this to your public domain name.
+
+    Can also be set using PAPERLESS_URL (see above).
 
     Defaults to "http://localhost:8000".
 
@@ -389,6 +410,15 @@ PAPERLESS_OCR_IMAGE_DPI=<num>
     Default is none, which will automatically calculate image DPI so that
     the produced PDF documents are A4 sized.
 
+PAPERLESS_OCR_MAX_IMAGE_PIXELS=<num>
+    Paperless will not OCR images that have more pixels than this limit.
+    This is intended to prevent decompression bombs from overloading paperless.
+    Increasing this limit is desired if you face a DecompressionBombError despite
+    the concerning file not being malicious; this could e.g. be caused by invalidly
+    recognized metadata.
+    If you have enough resources or if you are certain that your uploaded files
+    are not malicious you can increase this value to your needs.
+    The default value is 256000000, an image with more pixels than that would not be parsed.
 
 PAPERLESS_OCR_USER_ARGS=<json>
     OCRmyPDF offers many more options. Use this parameter to specify any
@@ -531,6 +561,10 @@ PAPERLESS_WORKER_TIMEOUT=<num>
     large documents within the default 1800 seconds. So extending this timeout
     may prove to be useful on weak hardware setups.
 
+PAPERLESS_WORKER_RETRY=<num>
+    If PAPERLESS_WORKER_TIMEOUT has been configured, the retry time for a task can
+    also be configured.  By default, this value will be set to 10s more than the
+    worker timeout.  This value should never be set less than the worker timeout.
 
 PAPERLESS_TIME_ZONE=<timezone>
     Set the time zone here.
@@ -578,6 +612,27 @@ PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS=<bool>
     PAPERLESS_CONSUMER_RECURSIVE must be enabled for this to work.
 
     Defaults to false.
+
+PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
+    Enables the scanning and page separation based on detected barcodes.
+    This allows for scanning and adding multiple documents per uploaded
+    file, which are separated by one or multiple barcode pages.
+
+    For ease of use, it is suggested to use a standardized separation page,
+    e.g. `here <https://www.alliancegroup.co.uk/patch-codes.htm>`_.
+
+    If no barcodes are detected in the uploaded file, no page separation
+    will happen.
+
+    Defaults to false.
+
+
+PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
+  Defines the string to be detected as a separator barcode.
+  If paperless is used with the PATCH-T separator pages, users
+  shouldn't change this.
+
+  Defaults to "PATCHT"
 
 
 PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
@@ -662,7 +717,7 @@ PAPERLESS_CONSUMER_IGNORE_PATTERNS=<json>
 
     This can be adjusted by configuring a custom json array with patterns to exclude.
 
-    Defautls to ``[".DS_STORE/*", "._*", ".stfolder/*"]``.
+    Defaults to ``[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]``.
 
 Binaries
 ########
@@ -755,3 +810,26 @@ PAPERLESS_OCR_LANGUAGES=<list>
         PAPERLESS_OCR_LANGUAGE=tur
 
     Defaults to none, which does not install any additional languages.
+
+
+.. _configuration-update-checking:
+
+Update Checking
+###############
+
+PAPERLESS_ENABLE_UPDATE_CHECK=<bool>
+    Enable (or disable) the automatic check for available updates. This feature is disabled
+    by default but if it is not explicitly set Paperless-ngx will show a message about this.
+
+    If enabled, the feature works by pinging the the Github API for the latest release e.g.
+    https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest
+    to determine whether a new version is available.
+
+    Actual updating of the app must still be performed manually.
+
+    Note that for users of thirdy-party containers e.g. linuxserver.io this notification
+    may be 'ahead' of a new release from the third-party maintainers.
+
+    In either case, no tracking data is collected by the app in any way.
+
+    Defaults to none, which disables the feature.

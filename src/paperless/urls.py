@@ -14,6 +14,7 @@ from documents.views import DocumentTypeViewSet
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
+from documents.views import RemoteVersionView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
@@ -71,6 +72,11 @@ urlpatterns = [
                     r"^documents/bulk_download/",
                     BulkDownloadView.as_view(),
                     name="bulk_download",
+                ),
+                re_path(
+                    r"^remote_version/",
+                    RemoteVersionView.as_view(),
+                    name="remoteversion",
                 ),
                 path("token/", views.obtain_auth_token),
             ]
