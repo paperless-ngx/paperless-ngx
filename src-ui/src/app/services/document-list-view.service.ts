@@ -9,7 +9,7 @@ import {
 import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { DocumentService } from './rest/document.service'
+import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
 import { SettingsService, SETTINGS_KEYS } from './settings.service'
 
 /**
@@ -143,8 +143,8 @@ export class DocumentListViewService {
         activeListViewState.sortReverse,
         activeListViewState.filterRules
       )
-      .subscribe(
-        (result) => {
+      .subscribe({
+        next: (result) => {
           this.isReloading = false
           activeListViewState.collectionSize = result.count
           activeListViewState.documents = result.results
@@ -153,17 +153,34 @@ export class DocumentListViewService {
           }
           this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
         },
-        (error) => {
+        error: (error) => {
           this.isReloading = false
           if (activeListViewState.currentPage != 1 && error.status == 404) {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             activeListViewState.currentPage = 1
             this.reload()
           } else {
-            this.error = error.error
+            let errorMessage
+            if (
+              typeof error.error !== 'string' &&
+              Object.keys(error.error).length > 0
+            ) {
+              // e.g. { archive_serial_number: Array<string> }
+              errorMessage = Object.keys(error.error)
+                .map((fieldName) => {
+                  const fieldError: Array<string> = error.error[fieldName]
+                  return `${
+                    DOCUMENT_SORT_FIELDS.find((f) => f.field == fieldName)?.name
+                  }: ${fieldError[0]}`
+                })
+                .join(', ')
+            } else {
+              errorMessage = error.error
+            }
+            this.error = errorMessage
           }
-        }
-      )
+        },
+      })
   }
 
   set filterRules(filterRules: FilterRule[]) {
@@ -249,20 +266,11 @@ export class DocumentListViewService {
   }
 
   quickFilter(filterRules: FilterRule[]) {
-    this._activeSavedViewId = null
-    this.activeListViewState.filterRules = filterRules
-    this.activeListViewState.currentPage = 1
-    if (isFullTextFilterRule(filterRules)) {
-      this.activeListViewState.sortField = 'score'
-      this.activeListViewState.sortReverse = false
-    }
-    this.reduceSelectionToFilter()
-    this.saveDocumentListView()
-    if (this.router.url == '/documents') {
-      this.reload()
-    } else {
-      this.router.navigate(['documents'])
-    }
+    const params = this.documentService.filterRulesToQueryParams(filterRules)
+    this.router.navigate(['/documents'], {
+      relativeTo: this.route,
+      queryParams: params,
+    })
   }
 
   getLastPage(): number {

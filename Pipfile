@@ -22,13 +22,15 @@ gunicorn = "*"
 imap-tools = "~=0.53.0"
 langdetect = "*"
 pathvalidate = "*"
-pillow = "~=9.0"
+pillow = "~=9.1"
+# Any version update to pikepdf requires a base image update
 pikepdf = "~=5.1"
 python-gnupg = "*"
 python-dotenv = "*"
 python-dateutil = "*"
 python-magic = "*"
-psycopg2-binary = "*"
+# Any version update to psycopg2 requires a base image update
+psycopg2 = "*"
 redis = "*"
 # Pinned because aarch64 wheels and updates cause warnings when loading the classifier model.
 scikit-learn="==1.0.2"
@@ -49,6 +51,8 @@ concurrent-log-handler = "*"
 "backports.zoneinfo" = {version = "*", markers = "python_version < '3.9'"}
 "importlib-resources" = {version = "*", markers = "python_version < '3.9'"}
 zipp = {version = "*", markers = "python_version < '3.9'"}
+pyzbar = "*"
+pdf2image = "*"
 
 [dev-packages]
 coveralls = "*"
@@ -60,7 +64,7 @@ pytest-django = "*"
 pytest-env = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
-sphinx = "~=4.4.0"
+sphinx = "~=4.5.0"
 sphinx_rtd_theme = "*"
 tox = "*"
 black = "*"

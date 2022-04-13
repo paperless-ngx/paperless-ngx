@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 
 from django.conf import settings
 from django.contrib.admin.models import ADDITION
@@ -252,7 +253,7 @@ def cleanup_document_deletion(sender, instance, using, **kwargs):
 
             logger.debug(f"Moving {instance.source_path} to trash at {new_file_path}")
             try:
-                os.rename(instance.source_path, new_file_path)
+                shutil.move(instance.source_path, new_file_path)
             except OSError as e:
                 logger.error(
                     f"Failed to move {instance.source_path} to trash at "

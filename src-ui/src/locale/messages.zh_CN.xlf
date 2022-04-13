@@ -101,7 +101,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">注销</target>
+        <target state="translated">退出</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -241,7 +241,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="translated">管理</target>
+        <target state="translated">后台管理</target>
       </trans-unit>
       <trans-unit id="314315645942131479" datatype="html">
         <source>Info</source>
@@ -257,7 +257,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">167</context>
         </context-group>
-        <target state="translated">文档</target>
+        <target state="translated">帮助文档</target>
       </trans-unit>
       <trans-unit id="1534029177398918729" datatype="html">
         <source>GitHub</source>
@@ -641,7 +641,7 @@
           <context context-type="linenumber">25</context>
         </context-group>
         <note priority="1" from="description">This is shown as a summary line when there are more than 5 document in the processing pipeline.</note>
-        <target state="translated">{VAR_PLURAL, plural, =1 {还有一个文档} other {<x id="INTERPOLATION"/> 更多文档}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {还有一个文档} other {<x id="INTERPOLATION"/> 个更多文档}}</target>
       </trans-unit>
       <trans-unit id="6443586946875325554" datatype="html">
         <source>Processing: <x id="PH" equiv-text="countUploadingAndProcessing"/></source>
@@ -1256,7 +1256,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="translated">此操作将把标签“<x id="PH" equiv-text="tag.name"/>”添加到 <x id="PH_1" equiv-text="this.list.selected.size"/> 选定的文档。</target>
+        <target state="translated">此操作将把标签“<x id="PH" equiv-text="tag.name"/>”添加到 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档。</target>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> to <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1264,7 +1264,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="translated">此操作将添加标签 <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> 到 <x id="PH_1" equiv-text="this.list.selected.size"/> 选定的文档。</target>
+        <target state="translated">此操作将添加标签 <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> 到 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档。</target>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1272,7 +1272,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="translated">此操作将从 <x id="PH_1" equiv-text="this.list.selected.size"/> 选定的文档中移除标签“<x id="PH" equiv-text="tag.name"/>”。</target>
+        <target state="translated">此操作将从 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档中移除标签“<x id="PH" equiv-text="tag.name"/>”。</target>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html">
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> from <x id="PH_1" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1280,7 +1280,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">137</context>
         </context-group>
-        <target state="translated">此操作将从 <x id="PH_1" equiv-text="this.list.selected.size"/> 选定的文档中删除标签 <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/>。</target>
+        <target state="translated">此操作将从 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档中删除标签 <x id="PH" equiv-text="this._localizeList(changedTags.itemsToRemove)"/>。</target>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/> on <x id="PH_2" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1288,7 +1288,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">139</context>
         </context-group>
-        <target state="translated">此操作将在指定的文档添加标签 <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> 并删除标签 <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/>。</target>
+        <target state="translated">此操作将在 <x id="PH_2" equiv-text="this.list.selected.size"/> 个指定的文档添加标签 <x id="PH" equiv-text="this._localizeList(changedTags.itemsToAdd)"/> 并删除标签 <x id="PH_1" equiv-text="this._localizeList(changedTags.itemsToRemove)"/>。</target>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
@@ -1304,7 +1304,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="translated">此操作将分配联系人 "<x id="PH" equiv-text="correspondent.name"/>" 到 <x id="PH_1" equiv-text="this.list.selected.size"/> 选定的文档。</target>
+        <target state="translated">此操作将分配联系人 "<x id="PH" equiv-text="correspondent.name"/>" 到 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档。</target>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1328,7 +1328,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">184</context>
         </context-group>
-        <target state="translated">此操作将将文档类型 "<x id="PH" equiv-text="documentType.name"/> 分配到 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档。</target>
+        <target state="translated">此操作将把文档类型 "<x id="PH" equiv-text="documentType.name"/> 分配到 <x id="PH_1" equiv-text="this.list.selected.size"/> 个选定的文档。</target>
       </trans-unit>
       <trans-unit id="2236642492594872779" datatype="html">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.list.selected.size"/> selected document(s).</source>
@@ -1984,7 +1984,7 @@
           <context context-type="sourcefile">src/app/components/manage/generic-list/generic-list.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="translated">关联的文档将不会被删除。</target>
+        <target state="translated">已关联的文档将不会被删除。</target>
       </trans-unit>
       <trans-unit id="5467489005440577210" datatype="html">
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(error.error)"/></source>
@@ -2128,7 +2128,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">99</context>
         </context-group>
-        <target state="translated">在暗色模式下反转缩略图</target>
+        <target state="translated">在深色模式下反转缩略图</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
@@ -2216,7 +2216,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="translated">这将禁止所有关于仪表盘文件处理状态的消息。</target>
+        <target state="translated">这将禁止仪表盘上所有有关文件处理状态的消息。</target>
       </trans-unit>
       <trans-unit id="6925788033494878061" datatype="html">
         <source>Appears on</source>
@@ -2332,7 +2332,7 @@
           <context context-type="sourcefile">src/app/components/not-found/not-found.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">页面未找到</target>
+        <target state="translated">404 页面未找到</target>
       </trans-unit>
       <trans-unit id="5851669019930456395" datatype="html">
         <source>Any word</source>
@@ -2348,7 +2348,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">任意：文档包含其中任何一个单词(空间分隔)</target>
+        <target state="translated">任意：文档包含其中任何一个单词(空格分隔)</target>
       </trans-unit>
       <trans-unit id="700315718208181326" datatype="html">
         <source>All words</source>

@@ -45,7 +45,7 @@
 }
 
 .doc-img-background-selected {
-  background-color: var(--ngx-primary-faded);
+  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {
@@ -75,4 +75,8 @@
 ::ng-deep .tooltip-inner {
   text-align: left !important;
   font-size: 90%;
+}
+
+a {
+  cursor: pointer;
 }

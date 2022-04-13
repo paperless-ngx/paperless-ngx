@@ -60,7 +60,7 @@
 }
 
 .doc-img-background-selected {
-  background-color: var(--ngx-primary-faded);
+  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {
@@ -89,4 +89,8 @@
 span ::ng-deep .match {
   color: black;
   background-color: rgb(255, 211, 66);
+}
+
+a {
+  cursor: pointer;
 }
