@@ -9,6 +9,20 @@ class TestIgnoreDateParsing(TestCase):
     Tests the parsing of the PAPERLESS_IGNORE_DATES setting value
     """
 
+    def _parse_checker(self, test_cases):
+        """
+        Helper function to check ignore date parsing
+
+        Args:
+            test_cases (_type_): _description_
+        """
+        for env_str, date_format, expected_date_set in test_cases:
+
+            self.assertSetEqual(
+                _parse_ignore_dates(env_str, date_format),
+                expected_date_set,
+            )
+
     def test_no_ignore_dates_set(self):
         """
         GIVEN:
@@ -26,20 +40,19 @@ class TestIgnoreDateParsing(TestCase):
             - All ignore dates are parsed
         """
         test_cases = [
-            ("1985-05-01", [datetime.date(1985, 5, 1)]),
+            ("1985-05-01", "YMD", {datetime.date(1985, 5, 1)}),
             (
                 "1985-05-01,1991-12-05",
-                [datetime.date(1985, 5, 1), datetime.date(1991, 12, 5)],
+                "YMD",
+                {datetime.date(1985, 5, 1), datetime.date(1991, 12, 5)},
             ),
-            ("2010-12-13", [datetime.date(2010, 12, 13)]),
+            ("2010-12-13", "YMD", {datetime.date(2010, 12, 13)}),
+            ("11.01.10", "DMY", {datetime.date(2010, 1, 11)}),
+            (
+                "11.01.2001,15-06-1996",
+                "DMY",
+                {datetime.date(2001, 1, 11), datetime.date(1996, 6, 15)},
+            ),
         ]
-        for env_str, expected_dates in test_cases:
-            expected_date_set = set()
 
-            for expected_date in expected_dates:
-                expected_date_set.add(expected_date)
-
-            self.assertSetEqual(
-                _parse_ignore_dates(env_str),
-                expected_date_set,
-            )
+        self._parse_checker(test_cases)

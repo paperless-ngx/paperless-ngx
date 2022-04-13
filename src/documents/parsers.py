@@ -247,10 +247,8 @@ def parse_date(filename, text) -> Optional[datetime.datetime]:
 
     # if filename date parsing is enabled, search there first:
     if settings.FILENAME_DATE_ORDER:
-        logger.info("Attempting parsing from filename")
         for m in re.finditer(DATE_REGEX, filename):
             date_string = m.group(0)
-            logger.info(f"Found potential date: {date_string}")
 
             try:
                 date = __parser(date_string, settings.FILENAME_DATE_ORDER)
@@ -260,16 +258,11 @@ def parse_date(filename, text) -> Optional[datetime.datetime]:
 
             date = __filter(date)
             if date is not None:
-                logger.info(f"Found date: {date}")
                 return date
-            else:
-                logger.info("Filtered date out")
 
-    logger.info("Attempting parsing from content")
     # Iterate through all regex matches in text and try to parse the date
     for m in re.finditer(DATE_REGEX, text):
         date_string = m.group(0)
-        logger.info(f"Found potential date: {date_string}")
 
         try:
             date = __parser(date_string, settings.DATE_ORDER)
@@ -279,10 +272,7 @@ def parse_date(filename, text) -> Optional[datetime.datetime]:
 
         date = __filter(date)
         if date is not None:
-            logger.info(f"Found date: {date}")
             return date
-        else:
-            logger.info("Filtered date out")
 
     return date
 
