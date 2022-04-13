@@ -3,6 +3,7 @@ import tempfile
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
+from imaplib import IMAP4
 
 import magic
 import pathvalidate
@@ -145,7 +146,7 @@ class MailAccountHandler(LoggingMixin):
 
         else:
             raise NotImplementedError(
-                "Unknwown correspondent selector",
+                "Unknown correspondent selector",
             )  # pragma: nocover
 
     def handle_mail_account(self, account):
@@ -164,6 +165,26 @@ class MailAccountHandler(LoggingMixin):
 
             try:
                 M.login(account.username, account.password)
+
+            except UnicodeEncodeError:
+                try:
+                    # rfc2595 section 6 - PLAIN SASL mechanism
+                    client: IMAP4 = M.client
+                    encoded = (
+                        b"\0"
+                        + account.username.encode("utf8")
+                        + b"\0"
+                        + account.password.encode("utf8")
+                    )
+                    # Assumption is the server supports AUTH=PLAIN capability
+                    # Could check the list with client.capability(), but then what?
+                    # We're failing anyway then
+                    client.authenticate("PLAIN", lambda x: encoded)
+
+                    # Need to transition out of AUTH state to SELECTED
+                    M.folder.set("INBOX")
+                except Exception:
+                    raise MailError(f"Error while authenticating account {account}")
             except Exception:
                 raise MailError(f"Error while authenticating account {account}")
 
@@ -184,7 +205,7 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_mail_rule(self, M, rule):
+    def handle_mail_rule(self, M: MailBox, rule):
 
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
