@@ -650,7 +650,6 @@ PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
 
   Defaults to "PATCHT"
 
-
 PAPERLESS_CONVERT_MEMORY_LIMIT=<num>
     On smaller systems, or even in the case of Very Large Documents, the consumer
     may explode, complaining about how it's "unable to extend pixel cache".  In
@@ -713,10 +712,8 @@ PAPERLESS_IGNORE_DATES=<string>
     this process. This is useful for special dates (like date of birth) that appear
     in documents regularly but are very unlikely to be the documents creation date.
 
-    You may specify dates in a multitude of formats supported by dateparser (see
-    https://dateparser.readthedocs.io/en/latest/#popular-formats) but as the dates
-    need to be comma separated, the options are limited.
-    Example: "2020-12-02,22.04.1999"
+    You must specify dates in the same date ordering as PAPERLESS_DATE_ORDER is
+    set to or its default ordering.
 
     Defaults to an empty string to not ignore any dates.
 
