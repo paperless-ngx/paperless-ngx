@@ -9,7 +9,11 @@ import {
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
-import { hexToHsl } from 'src/app/utils/color'
+import {
+  BRIGHTNESS,
+  estimateBrightnessForColor,
+  hexToHsl,
+} from 'src/app/utils/color'
 
 export interface PaperlessSettings {
   key: string
@@ -138,10 +142,9 @@ export class SettingsService {
 
     if (themeColor) {
       const hsl = hexToHsl(themeColor)
-      const useDarkTextColor =
-        parseInt(themeColor.replace('#', ''), 16) > 0xffffff / 1.5
+      const bgBrightnessEstimate = estimateBrightnessForColor(themeColor)
 
-      if (useDarkTextColor) {
+      if (bgBrightnessEstimate == BRIGHTNESS.DARK) {
         this.renderer.addClass(this.document.body, 'text-bg-dark')
         this.renderer.removeClass(this.document.body, 'text-bg-light')
       } else {
