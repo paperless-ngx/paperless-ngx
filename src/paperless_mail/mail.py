@@ -90,18 +90,14 @@ def make_criterias(rule):
 
 
 def get_mailbox(server, port, security):
-    try:
-        if security == MailAccount.IMAP_SECURITY_NONE:
-            mailbox = MailBoxUnencrypted(server, port)
-        elif security == MailAccount.IMAP_SECURITY_STARTTLS:
-            mailbox = MailBoxTls(server, port)
-        elif security == MailAccount.IMAP_SECURITY_SSL:
-            mailbox = MailBox(server, port)
-        else:
-            raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
-    except Exception as e:
-        print(f"Error while retrieving mailbox from {server}: {e}")
-        raise
+    if security == MailAccount.ImapSecurity.NONE:
+        mailbox = MailBoxUnencrypted(server, port)
+    elif security == MailAccount.ImapSecurity.STARTTLS:
+        mailbox = MailBoxTls(server, port)
+    elif security == MailAccount.ImapSecurity.SSL:
+        mailbox = MailBox(server, port)
+    else:
+        raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
     return mailbox
 
 
