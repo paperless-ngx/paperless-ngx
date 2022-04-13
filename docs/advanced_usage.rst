@@ -242,7 +242,7 @@ will create a directory structure as follows:
     last filename a document was stored as. If you do rename a file, paperless will
     report your files as missing and won't be able to find them.
 
-Paperless provides the following placeholders withing filenames:
+Paperless provides the following placeholders within filenames:
 
 * ``{asn}``: The archive serial number of the document, or "none".
 * ``{correspondent}``: The name of the correspondent, or "none".
