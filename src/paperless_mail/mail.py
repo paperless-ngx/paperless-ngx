@@ -18,6 +18,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -92,7 +93,7 @@ def get_mailbox(server, port, security):
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
     elif security == MailAccount.ImapSecurity.STARTTLS:
-        mailbox = MailBox(server, port, starttls=True)
+        mailbox = MailBoxTls(server, port)
     elif security == MailAccount.ImapSecurity.SSL:
         mailbox = MailBox(server, port)
     else:
