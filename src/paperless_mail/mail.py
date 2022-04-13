@@ -173,7 +173,9 @@ class MailAccountHandler(LoggingMixin):
                         f"Error while authenticating account {account}: {e}",
                         exc_info=False,
                     )
-                    return total_processed_files
+                    raise MailError(
+                        f"Error while authenticating account {account}",
+                    ) from e
 
                 self.log(
                     "debug",
