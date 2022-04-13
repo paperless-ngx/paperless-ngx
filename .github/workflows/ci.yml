@@ -195,7 +195,6 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=match,pattern=ngx-(\d.\d.\d),group=1
             type=ref,event=branch
             type=ref,event=tag
       -
