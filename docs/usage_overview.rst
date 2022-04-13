@@ -62,7 +62,7 @@ your documents:
 
 1.  OCR the document, if it has no text. Digital documents usually have text,
     and this step will be skipped for those documents.
-2.  Paperless will create an archiveable PDF/A document from your document.
+2.  Paperless will create an archivable PDF/A document from your document.
     If this document is coming from your scanner, it will have embedded selectable text.
 3.  Paperless performs automatic matching of tags, correspondents and types on the
     document before storing it in the database.
