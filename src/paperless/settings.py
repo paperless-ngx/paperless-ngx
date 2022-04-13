@@ -605,20 +605,39 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
 if PAPERLESS_TIKA_ENABLED:
     INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
-# List dates that should be ignored when trying to parse date from document text
-IGNORE_DATES: Set[datetime.date] = set()
 
+def _parse_ignore_dates(
+    env_ignore: str,
+    date_order: str = DATE_ORDER,
+) -> Set[datetime.datetime]:
+    """
+    If the PAPERLESS_IGNORE_DATES environment variable is set, parse the
+    user provided string(s) into dates
 
-def _parse_ignore_dates(env_ignore: str) -> Set[datetime.datetime]:
+    Args:
+        env_ignore (str): The value of the environment variable, comma seperated dates
+        date_order (str, optional): The format of the date strings. Defaults to DATE_ORDER.
+
+    Returns:
+        Set[datetime.datetime]: The set of parsed date objects
+    """
     import dateparser
 
     ignored_dates = set()
     for s in env_ignore.split(","):
-        d = dateparser.parse(s)
+        d = dateparser.parse(
+            s,
+            settings={
+                "DATE_ORDER": date_order,
+            },
+        )
         if d:
             ignored_dates.add(d.date())
     return ignored_dates
 
+
+# List dates that should be ignored when trying to parse date from document text
+IGNORE_DATES: Set[datetime.date] = set()
 
 if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
     IGNORE_DATES = _parse_ignore_dates(os.getenv("PAPERLESS_IGNORE_DATES"))
