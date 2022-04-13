@@ -14,6 +14,7 @@ Breaking Changes
 
 Features
 
+* Allow setting more than one tag in mail rules `@jonasc`_ (#270)
 * global drag'n'drop `@shamoon`_ (#283).
 * Fix: download buttons should disable while waiting `@shamoon`_ (#630).
 * Update checker `@shamoon`_ (#591).
@@ -1665,6 +1666,7 @@ bulk of the work on this big change.
 .. _@DarkoBG79: https://github.com/DarkoBG79
 .. _Kemal Secer: https://crowdin.com/profile/kemal.secer
 .. _@Prominence: https://github.com/Prominence
+.. _@jonasc: https://github.com/jonasc
 
 .. _#20: https://github.com/the-paperless-project/paperless/issues/20
 .. _#44: https://github.com/the-paperless-project/paperless/issues/44
