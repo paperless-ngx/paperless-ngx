@@ -8,6 +8,8 @@ from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import ParseError
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = settings.OCR_MAX_IMAGE_PIXELS
+
 
 class NoTextFoundException(Exception):
     pass

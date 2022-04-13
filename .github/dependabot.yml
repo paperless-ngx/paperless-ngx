@@ -8,7 +8,7 @@ updates:
     target-branch: "dev"
     # Look for `package.json` and `lock` files in the `root` directory
     directory: "/src-ui"
-    # Check the npm registry for updates every week
+    # Check the npm registry for updates every month
     schedule:
       interval: "monthly"
     # Add reviewers

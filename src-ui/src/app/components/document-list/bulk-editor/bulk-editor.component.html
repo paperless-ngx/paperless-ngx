@@ -57,13 +57,18 @@
   </div>
   <div class="col-auto ms-auto mb-2 mb-xl-0 d-flex">
     <div class="btn-group btn-group-sm me-2">
-      <button type="button" class="btn btn-outline-primary btn-sm" (click)="downloadSelected()">
-        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
+      <button type="button" [disabled]="awaitingDownload" class="btn btn-outline-primary btn-sm" (click)="downloadSelected()">
+        <svg *ngIf="!awaitingDownload" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor">
           <use xlink:href="assets/bootstrap-icons.svg#download" />
-        </svg>&nbsp;<ng-container i18n>Download</ng-container>
+        </svg>
+        <div *ngIf="awaitingDownload" class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">Preparing download...</span>
+        </div>
+        &nbsp;
+        <ng-container i18n>Download</ng-container>
       </button>
       <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
-        <button class="btn btn-outline-primary btn-sm dropdown-toggle-split" ngbDropdownToggle></button>
+        <button [disabled]="awaitingDownload" class="btn btn-outline-primary btn-sm dropdown-toggle-split" ngbDropdownToggle></button>
         <div class="dropdown-menu shadow" ngbDropdownMenu>
           <button ngbDropdownItem i18n (click)="downloadSelected('originals')">Download originals</button>
         </div>

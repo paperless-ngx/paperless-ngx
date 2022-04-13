@@ -1,0 +1,10 @@
+/.github/workflows/ @paperless-ngx/ci-cd
+/docker/ @paperless-ngx/ci-cd
+/scripts/ @paperless-ngx/ci-cd
+
+/src-ui/ @paperless-ngx/frontend
+
+/src/ @paperless-ngx/backend
+Pipfile* @paperless-ngx/backend
+*.py @paperless-ngx/backend
+requirements.txt @paperless-ngx/backend
