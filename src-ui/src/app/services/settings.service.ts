@@ -132,8 +132,22 @@ export class SettingsService {
         : this.renderer.removeClass(this.document.body, 'color-scheme-dark')
     }
 
+    // remove these in case they were there
+    this.renderer.removeClass(this.document.body, 'text-bg-dark')
+    this.renderer.removeClass(this.document.body, 'text-bg-light')
+
     if (themeColor) {
       const hsl = hexToHsl(themeColor)
+      const useDarkTextColor =
+        parseInt(themeColor.replace('#', ''), 16) > 0xffffff / 1.5
+
+      if (useDarkTextColor) {
+        this.renderer.addClass(this.document.body, 'text-bg-dark')
+        this.renderer.removeClass(this.document.body, 'text-bg-light')
+      } else {
+        this.renderer.addClass(this.document.body, 'text-bg-light')
+        this.renderer.removeClass(this.document.body, 'text-bg-dark')
+      }
       this.renderer.setStyle(
         document.documentElement,
         '--pngx-primary',
