@@ -695,6 +695,9 @@ PAPERLESS_FILENAME_DATE_ORDER=<format>
     The filename will be checked first, and if nothing is found, the document
     text will be checked as normal.
 
+    A date in a filename must have some separators (`.`, `-`, `/`, etc)
+    for it to be parsed.
+
     Defaults to none, which disables this feature.
 
 PAPERLESS_THUMBNAIL_FONT_NAME=<filename>
