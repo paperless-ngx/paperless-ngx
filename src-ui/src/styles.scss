@@ -4,7 +4,6 @@ $enable-negative-margins: true;
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "theme";
-@import "theme_dark";
 @import "print";
 
 // Paperless-ngx styles
@@ -36,9 +35,19 @@ svg.logo {
 
 .bg-primary {
   background-color: var(--bs-primary) !important;
+  color: var(--pngx-primary-text-contrast);
+}
+
+.navbar-brand {
+  color: var(--pngx-primary-text-contrast) !important;
+}
+
+.navbar .dropdown .btn {
+  color: var(--pngx-primary-text-contrast) !important;
 }
 
 .btn-primary {
+  color: var(--pngx-primary-text-contrast);
   background-color: var(--bs-primary);
   border-color: var(--bs-primary);
 
@@ -48,6 +57,7 @@ svg.logo {
   }
 
   &:disabled, &.disabled {
+    color: var(--pngx-primary-text-contrast);
     background-color: var(--pngx-primary-darken-10) !important;
     border-color: var(--pngx-primary-darken-10) !important;
   }
@@ -347,6 +357,14 @@ table.table {
 
   .des,.asc {
     background-color: var(--bs-body-bg) !important;
+  }
+}
+
+.toast {
+  color: var(--pngx-primary-text-contrast);
+
+  .toast-header {
+    color: var(--pngx-primary-text-contrast);
   }
 }
 

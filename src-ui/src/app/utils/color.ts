@@ -1,4 +1,4 @@
-import { HSL } from 'ngx-color'
+import { HSL, RGB } from 'ngx-color'
 
 function componentToHex(c) {
   var hex = Math.floor(c).toString(16)
@@ -86,14 +86,19 @@ export function rgbToHsl(r, g, b) {
 }
 
 export function hexToHsl(hex: string): HSL {
+  const rgb = hexToRGB(hex)
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+  return { h: hsl[0], s: hsl[1], l: hsl[2] }
+}
+
+export function hexToRGB(hex: string): RGB {
   hex = hex.replace('#', '')
   let aRgbHex = hex.match(/.{1,2}/g)
-  const hsl = rgbToHsl(
-    parseInt(aRgbHex[0], 16),
-    parseInt(aRgbHex[1], 16),
-    parseInt(aRgbHex[2], 16)
-  )
-  return { h: hsl[0], s: hsl[1], l: hsl[2] }
+  return {
+    r: parseInt(aRgbHex[0], 16),
+    g: parseInt(aRgbHex[1], 16),
+    b: parseInt(aRgbHex[2], 16),
+  }
 }
 
 export function randomColor() {
