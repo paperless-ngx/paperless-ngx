@@ -1,9 +1,11 @@
+import datetime
 import json
 import math
 import multiprocessing
 import os
 import re
 from typing import Final
+from typing import Set
 from urllib.parse import urlparse
 
 from concurrent_log_handler.queue import setup_logging_queues
@@ -604,15 +606,22 @@ if PAPERLESS_TIKA_ENABLED:
     INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
 # List dates that should be ignored when trying to parse date from document text
-IGNORE_DATES = set()
+IGNORE_DATES: Set[datetime.date] = set()
 
-if os.getenv("PAPERLESS_IGNORE_DATES", ""):
+
+def _parse_ignore_dates(env_ignore: str) -> Set[datetime.datetime]:
     import dateparser
 
-    for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
+    ignored_dates = set()
+    for s in env_ignore.split(","):
         d = dateparser.parse(s)
         if d:
-            IGNORE_DATES.add(d.date())
+            ignored_dates.add(d.date())
+    return ignored_dates
+
+
+if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
+    IGNORE_DATES = _parse_ignore_dates(os.getenv("PAPERLESS_IGNORE_DATES"))
 
 ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":
