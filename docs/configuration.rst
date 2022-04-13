@@ -712,8 +712,7 @@ PAPERLESS_IGNORE_DATES=<string>
     this process. This is useful for special dates (like date of birth) that appear
     in documents regularly but are very unlikely to be the documents creation date.
 
-    You must specify dates in the same date ordering as PAPERLESS_DATE_ORDER is
-    set to or its default ordering.
+    The date is parsed using the order specified in PAPERLESS_DATE_ORDER
 
     Defaults to an empty string to not ignore any dates.
 
