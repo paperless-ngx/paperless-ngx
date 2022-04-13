@@ -137,19 +137,19 @@ export class SettingsService {
     }
 
     // remove these in case they were there
-    this.renderer.removeClass(this.document.body, 'text-bg-dark')
-    this.renderer.removeClass(this.document.body, 'text-bg-light')
+    this.renderer.removeClass(this.document.body, 'primary-dark')
+    this.renderer.removeClass(this.document.body, 'primary-light')
 
     if (themeColor) {
       const hsl = hexToHsl(themeColor)
       const bgBrightnessEstimate = estimateBrightnessForColor(themeColor)
 
       if (bgBrightnessEstimate == BRIGHTNESS.DARK) {
-        this.renderer.addClass(this.document.body, 'text-bg-dark')
-        this.renderer.removeClass(this.document.body, 'text-bg-light')
+        this.renderer.addClass(this.document.body, 'primary-dark')
+        this.renderer.removeClass(this.document.body, 'primary-light')
       } else {
-        this.renderer.addClass(this.document.body, 'text-bg-light')
-        this.renderer.removeClass(this.document.body, 'text-bg-dark')
+        this.renderer.addClass(this.document.body, 'primary-light')
+        this.renderer.removeClass(this.document.body, 'primary-dark')
       }
       this.renderer.setStyle(
         document.documentElement,

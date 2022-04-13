@@ -35,8 +35,13 @@
 .sidebar .nav-link {
   font-weight: 500;
 
-  &:hover, &.active {
+  &:hover, &.active, &:focus {
     color: var(--bs-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    background-color: var(--bs-body-bg);
   }
 
   &.active {
