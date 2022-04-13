@@ -869,7 +869,7 @@ class TestMail(DirectoriesMixin, TestCase):
         """
         GIVEN:
             - Mail account with password containing non-ASCII characters
-            - Incorrect password alue
+            - Incorrect password value
         THEN:
             - Should raise a MailError for the account
         """

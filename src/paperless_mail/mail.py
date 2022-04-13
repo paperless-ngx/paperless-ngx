@@ -167,6 +167,7 @@ class MailAccountHandler(LoggingMixin):
                 M.login(account.username, account.password)
 
             except UnicodeEncodeError:
+                self.log("debug", "Falling back to AUTH=PLAIN")
                 try:
                     # rfc2595 section 6 - PLAIN SASL mechanism
                     client: IMAP4 = M.client
@@ -184,8 +185,13 @@ class MailAccountHandler(LoggingMixin):
                     # Need to transition out of AUTH state to SELECTED
                     M.folder.set("INBOX")
                 except Exception:
+                    self.log(
+                        "error",
+                        "Unable to authenticate with mail server using AUTH=PLAIN",
+                    )
                     raise MailError(f"Error while authenticating account {account}")
             except Exception:
+                self.log("error", "Unable to authenticate with mail server")
                 raise MailError(f"Error while authenticating account {account}")
 
             self.log(
