@@ -266,7 +266,7 @@ class MailAccountHandler(LoggingMixin):
         )
 
         correspondent = self.get_correspondent(message, rule)
-        tag = rule.assign_tag
+        tag_ids = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
         processed_attachments = 0
@@ -329,7 +329,7 @@ class MailAccountHandler(LoggingMixin):
                     if correspondent
                     else None,
                     override_document_type_id=doc_type.id if doc_type else None,
-                    override_tag_ids=[tag.id] if tag else None,
+                    override_tag_ids=tag_ids,
                     task_name=att.filename[:100],
                 )
 

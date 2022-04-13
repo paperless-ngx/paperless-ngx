@@ -308,10 +308,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -355,10 +357,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -381,10 +385,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -406,11 +412,13 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
             attachment_type=MailRule.AttachmentProcessing.EVERYTHING,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -440,12 +448,15 @@ class TestMail(DirectoriesMixin, TestCase):
         for (pattern, matches) in tests:
             matches.sort()
             self.async_task.reset_mock()
-            account = MailAccount()
+            account = MailAccount(name=str(uuid.uuid4()))
+            account.save()
             rule = MailRule(
+                name=str(uuid.uuid4()),
                 assign_title_from=MailRule.TitleSource.FROM_FILENAME,
                 account=account,
                 filter_attachment_filename=pattern,
             )
+            rule.save()
 
             result = self.mail_account_handler.handle_message(message, rule)
 
