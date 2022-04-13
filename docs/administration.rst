@@ -369,7 +369,7 @@ the naming scheme.
 
 .. warning::
 
-    Since this command moves you documents around alot, it is advised to to
+    Since this command moves you documents around a lot, it is advised to to
     a backup before. The renaming logic is robust and will never overwrite
     or delete a file, but you can't ever be careful enough.
 
