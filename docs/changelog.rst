@@ -35,6 +35,10 @@ Version 1.6.0 merges several pending PRs from jonaswinkler's repo and includes n
 * `@shamoon`_ created a slick new logo (#165).
 * `@tim-vogel`_ fixed exports missing groups (#193).
 
+Known issues:
+
+* 1.6.0 included a malformed package-lock.json, as a result users who want to build the docker image themselves need to change line 6 of the ``Dockerfile`` to ``RUN npm update npm -g && npm install --legacy-peer-deps``.
+
 Thank you to the following people for their documentation updates, fixes, and comprehensive testing:
 
 `@m0veax`_, `@a17t`_, `@fignew`_, `@muued`_, `@bauerj`_, `@isigmund`_, `@denilsonsa`_, `@mweimerskirch`_, `@alexander-bauer`_, `@apeltzer`_, `@tribut`_, `@yschroeder`_, `@gador`_, `@sAksham-Ar`_, `@sbrunner`_, `@philpagel`_, `@davemachado`_, `@2600box`_, `@qcasey`_, `@Nicarim`_, `@kpj`_, `@filcuk`_, `@Timoms`_, `@mattlamb99`_, `@padraigkitterick`_, `@ajkavanagh`_, `@Tooa`_, `@Unkn0wnCat`_, `@pewter77`_, `@stumpylog`_, `@Toxix`_, `@azapater`_, `@jschpp`_
