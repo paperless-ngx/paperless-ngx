@@ -56,6 +56,7 @@ class MailRuleAdmin(admin.ModelAdmin):
                     "filter_body",
                     "filter_attachment_filename",
                     "maximum_age",
+                    "consumption_scope",
                     "attachment_type",
                 ),
             },
