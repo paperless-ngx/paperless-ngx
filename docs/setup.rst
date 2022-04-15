@@ -291,12 +291,14 @@ writing. Windows is not and will never be supported.
     *   ``libpq-dev`` for PostgreSQL
     *   ``libmagic-dev`` for mime type detection
     *   ``mime-support`` for mime type detection
+    *   ``libzbar0`` for barcode detection
+    *   ``poppler-utils`` for barcode detection
 
     Use this list for your preferred package management:
 
     .. code::
 
-        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support
+        python3 python3-pip python3-dev imagemagick fonts-liberation optipng gnupg libpq-dev libmagic-dev mime-support libzbar0 poppler-utils
 
     These dependencies are required for OCRmyPDF, which is used for text recognition.
 
@@ -345,6 +347,8 @@ writing. Windows is not and will never be supported.
         paperless stores its data. If you like, you can point both to the same directory.
     *   ``PAPERLESS_SECRET_KEY`` should be a random sequence of characters. It's used for authentication. Failure
         to do so allows third parties to forge authentication credentials.
+    *   ``PAPERLESS_URL`` if you are behind a reverse proxy. This should point to your domain. Please see 
+        :ref:`configuration` for more information.
 
     Many more adjustments can be made to paperless, especially the OCR part. The following options are recommended
     for everyone:
