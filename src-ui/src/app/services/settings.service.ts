@@ -152,25 +152,25 @@ export class SettingsService {
         this.renderer.removeClass(this.document.body, 'primary-dark')
       }
       this.renderer.setStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary',
         `${+hsl.h * 360},${hsl.s * 100}%`,
         RendererStyleFlags2.DashCase
       )
       this.renderer.setStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary-lightness',
         `${hsl.l * 100}%`,
         RendererStyleFlags2.DashCase
       )
     } else {
       this.renderer.removeStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary',
         RendererStyleFlags2.DashCase
       )
       this.renderer.removeStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary-lightness',
         RendererStyleFlags2.DashCase
       )
