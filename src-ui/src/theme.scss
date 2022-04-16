@@ -1,15 +1,18 @@
-:root {
+@mixin paperless-green {
   // base color e.g. #17541f = hsl(128, 57%, 21%)
   --pngx-primary: 128, 57%;
   --pngx-primary-lightness: 21%;
+}
+
+body {
+  @include paperless-green;
   --pngx-primary-text-contrast: var(--bs-light);
 
   --bs-primary: hsl(var(--pngx-primary), var(--pngx-primary-lightness));
   --bs-border-color: var(--bs-gray-400);
   --pngx-primary-faded: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 72%));
-  --pngx-primary-lighten-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 10%));
   --pngx-primary-lighten-30: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 30%));
-  --pngx-primary-darken-10: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 10%));
+  --pngx-primary-darken-5: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 5%));
   --pngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
   --pngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
   --pngx-bg-darker: var(--bs-gray-100);
@@ -41,9 +44,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 }
 
 // Dark mode
-$primary-dark-mode: #45973a;
-$primary-dark-mode-rgb: 69, 151, 58;
-$primary-dark-mode-darken-10: darken($primary-dark-mode, 10%);
+@mixin paperless-green-dark-mode {
+  --pngx-primary-lightness: 31%;
+}
+
 $danger-dark-mode: #b71631;
 $danger-dark-mode-rgb: 183, 22, 49;
 $bg-dark-mode: #161618;
@@ -55,7 +59,6 @@ $bg-light-dark-mode-rgb: 28, 28, 31;
 $border-color-dark-mode: #47494f;
 
 @mixin dark-mode {
-  --bs-primary: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) + 10%));
   --bs-body-color: #{$text-color-dark-bg};
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
   --bs-danger: #{$danger-dark-mode};
@@ -67,7 +70,7 @@ $border-color-dark-mode: #47494f;
   --bs-border-color: #{$border-color-dark-mode};
   --pngx-bg-darker: #{$bg-dark-mode-accent};
   --pngx-bg-alt: #{$bg-dark-mode-alt};
-  --pngx-focus-alpha: 0.7;
+  --pngx-focus-alpha: 0.6;
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
 
@@ -75,7 +78,13 @@ $border-color-dark-mode: #47494f;
     color: var(--bs-body-color) !important;
   }
 
-  .btn-outline-primary, .btn-primary {
+  .btn-primary {
+    &:hover, &:focus, &.active, &:active {
+      color: var(--bs-body-color) !important;
+    }
+  }
+
+  .btn-outline-primary {
     &:hover, &:focus, &.active, &:active {
       color: var(--bs-light) !important;
     }
@@ -86,6 +95,10 @@ $border-color-dark-mode: #47494f;
       background-color: var(--pngx-bg-darker);
       color: var(--bs-primary);
     }
+  }
+
+  .btn-light {
+    color: var(--bs-body-color);
   }
 
   .search-form-container {
@@ -163,7 +176,7 @@ $border-color-dark-mode: #47494f;
   }
 
   .toast, .toast-header {
-    background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%), 0.9);
+    background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%), 0.8);
   }
 
   .toast,
@@ -174,10 +187,31 @@ $border-color-dark-mode: #47494f;
 }
 
 body.color-scheme-dark {
+  // no custom theme color
+  &:not(.primary-light):not(.primary-dark) {
+    @include paperless-green-dark-mode;
+
+    .navbar.bg-primary {
+      // navbar is og green in dark mode
+      @include paperless-green;
+    }
+  }
+
   @include dark-mode;
 }
-body.color-scheme-system {
-  @media (prefers-color-scheme: dark) {
+
+@media (prefers-color-scheme: dark) {
+  body.color-scheme-system {
+    // no custom theme color
+    &:not(.primary-light):not(.primary-dark) {
+      @include paperless-green-dark-mode;
+
+      .navbar.bg-primary {
+        // navbar is og green in dark mode
+        @include paperless-green;
+      }
+    }
+
     @include dark-mode;
   }
 }
