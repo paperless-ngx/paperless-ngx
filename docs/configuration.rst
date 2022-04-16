@@ -626,6 +626,12 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
 
     Defaults to false.
 
+PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>
+    Whether TIFF image files should be scanned for barcodes.
+    This will automatically convert any TIFF image(s) to pdfs for later
+    processing.
+
+    Defaults to false.
 
 PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
   Defines the string to be detected as a separator barcode.
