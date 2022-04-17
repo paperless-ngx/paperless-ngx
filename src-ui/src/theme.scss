@@ -48,28 +48,18 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-primary-lightness: 31%;
 }
 
-$danger-dark-mode: #b71631;
-$danger-dark-mode-rgb: 183, 22, 49;
-$bg-dark-mode: #161618;
-$bg-dark-mode-rgb: 22, 22, 24;
-$bg-dark-mode-accent: #101216;
-$bg-dark-mode-alt: #242529;
-$bg-light-dark-mode: #1c1c1f;
-$bg-light-dark-mode-rgb: 28, 28, 31;
-$border-color-dark-mode: #47494f;
-
 @mixin dark-mode {
   --bs-body-color: #{$text-color-dark-bg};
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
-  --bs-danger: #{$danger-dark-mode};
-  --bs-danger-rgb: #{$danger-dark-mode-rgb};
-  --bs-body-bg: #{$bg-dark-mode};
-  --bs-body-bg-rgb: #{$bg-dark-mode-rgb};
-  --bs-light: #{$bg-light-dark-mode};
-  --bs-light-rgb: #{$bg-light-dark-mode-rgb};
-  --bs-border-color: #{$border-color-dark-mode};
-  --pngx-bg-darker: #{$bg-dark-mode-accent};
-  --pngx-bg-alt: #{$bg-dark-mode-alt};
+  --bs-danger: #b71631;
+  --bs-danger-rgb: 183, 22, 49;
+  --bs-body-bg: #161618;
+  --bs-body-bg-rgb: 22, 22, 24;
+  --bs-light: #1c1c1f;
+  --bs-light-rgb: 28, 28, 31;
+  --bs-border-color: #47494f;
+  --pngx-bg-darker: #101216;
+  --pngx-bg-alt: #242529;
   --pngx-focus-alpha: 0.6;
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
@@ -145,7 +135,7 @@ $border-color-dark-mode: #47494f;
 
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-    background-color: $bg-light-dark-mode;
+    background-color: var(--bs-light);
   }
 
   table {
@@ -157,7 +147,7 @@ $border-color-dark-mode: #47494f;
     }
 
     &.table-hover > tbody > tr:hover > * {
-      background-color: $bg-light-dark-mode;
+      background-color: var(--bs-light);
       color: var(--pngx-body-color-accent);
     }
 
