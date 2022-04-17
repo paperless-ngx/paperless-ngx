@@ -153,6 +153,12 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   }
 
+  .alert-secondary {
+    background-color: var(--bs-light);
+    border-color: var(--pngx-bg-darker);
+    color: var(--bs-body-color);
+  }
+
   .table-striped > tbody > tr:nth-of-type(odd) > * {
     color: var(--pngx-body-color-accent);
   }

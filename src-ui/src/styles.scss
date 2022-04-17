@@ -442,10 +442,8 @@ table.table {
   border-color: var(--bs-danger);
 }
 
-.alert-secondary {
-  background-color: var(--pngx-primary-darken-18);
-  border-color: var(--pngx-primary-darken-15);
-  color: var(--bs-body-color);
+.progress {
+  background-color: var(--bs-body-bg);
 }
 
 .ngb-dp-header,
