@@ -119,20 +119,21 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
             images[0].save(newpath)
         else:
             images[0].save(newpath, save_all=True, append_images=images[1:])
-        os.unlink(filepath)
     except OSError as e:
         logger.warning(
             f"Could not save the file as pdf. "
             f"The original image file was not deleted. Error: "
             f"{str(e)}",
         )
+        return ""
+    os.unlink(filepath)
     image.close()
     return newpath
 
 
 def scan_file_for_separating_barcodes(filepath: str) -> List[int]:
     """
-    Scan the provided file for page separating barcodes
+    Scan the provided pdf file for page separating barcodes
     Returns a list of pagenumbers, which separate the file
     """
     separator_page_numbers = []
@@ -149,7 +150,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> List[int]:
 
 def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
     """
-    Separate the provided file on the pages_to_split_on.
+    Separate the provided pdf file on the pages_to_split_on.
     The pages which are defined by page_numbers will be removed.
     Returns a list of (temporary) filepaths to consume.
     These will need to be deleted later.
