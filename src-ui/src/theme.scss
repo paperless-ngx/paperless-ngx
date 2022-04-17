@@ -38,6 +38,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   .form-check-input:checked[type=radio] {
     background-image: escape-svg($form-check-radio-checked-bg-image-dark);
   }
+
+  .btn-close {
+    filter: none !important;
+  }
 }
 
 .primary-dark {
@@ -168,7 +172,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     text-shadow: 0 1px 0 #666;
   }
 
-  .modal .btn-close, .alert .btn-close {
+  .modal .btn-close, .alert .btn-close, .toast .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
   }
 
