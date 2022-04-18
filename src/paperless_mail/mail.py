@@ -199,7 +199,7 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_mail_rule(self, M, rule):
+    def handle_mail_rule(self, M, rule: MailRule):
 
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
