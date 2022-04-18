@@ -1,0 +1,13 @@
+# This Dockerfile compiles the frontend
+# Inputs: None
+
+FROM node:16-bullseye-slim AS compile-frontend
+
+COPY . /src
+
+WORKDIR /src/src-ui
+RUN set -eux \
+	&& npm update npm -g \
+	&& npm ci --no-optional
+RUN set -eux \
+	&& ./node_modules/.bin/ng build --configuration production

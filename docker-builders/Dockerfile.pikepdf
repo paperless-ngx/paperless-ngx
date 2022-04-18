@@ -1,0 +1,65 @@
+# This Dockerfile builds the pikepdf wheel
+# Inputs:
+#		- QPDF_BASE_IMAGE - The image to copy built qpdf .ded files from
+#		- GIT_TAG - The Git tag to clone and build from
+#		- VERSION - Used to force the built pikepdf version to match
+
+ARG QPDF_BASE_IMAGE
+FROM ${QPDF_BASE_IMAGE} as qpdf-builder
+
+# This does nothing, except provide a name for a copy below
+
+FROM python:3.9-slim-bullseye
+
+LABEL org.opencontainers.image.description="A intermediate image with pikepdf wheel built"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG BUILD_PACKAGES="\
+  build-essential \
+  git \
+  libjpeg62-turbo-dev \
+  zlib1g-dev \
+  libgnutls28-dev \
+  libxml2-dev \
+  libxslt1-dev \
+  python3-dev \
+  python3-pip"
+
+WORKDIR /usr/src
+
+COPY --from=qpdf-builder /usr/src/qpdf/*.deb .
+
+# As this is an base image for a multi-stage final image
+# the added size of the install is basically irrelevant
+
+RUN set -eux \
+  && apt-get update --quiet \
+  && apt-get install --yes --quiet --no-install-recommends $BUILD_PACKAGES \
+  && dpkg --install libqpdf28_*.deb \
+  && dpkg --install libqpdf-dev_*.deb \
+  && python3 -m pip install --no-cache-dir --upgrade pip wheel pybind11 \
+  && rm -rf /var/lib/apt/lists/*
+
+# Layers after this point change according to required version
+# For better caching, seperate the basic installs from
+# the building
+
+ARG GIT_TAG
+ARG VERSION
+
+RUN set -eux \
+	&& echo "building pikepdf wheel" \
+  # Note the v in the tag name here
+  && git clone --quiet --depth 1 --branch "${GIT_TAG}" https://github.com/pikepdf/pikepdf.git \
+  && cd pikepdf \
+  # pikepdf seems to specifciy either a next version when built OR
+  # a post release tag.
+  # In either case, this won't match what we want from requirements.txt
+  # Directly modify the setup.py to set the version we just checked out of Git
+  && sed -i "s/use_scm_version=True/version=\"${VERSION}\"/g" setup.py \
+  # https://github.com/pikepdf/pikepdf/issues/323
+  && rm pyproject.toml \
+  && mkdir wheels \
+  && python3 -m pip wheel . --wheel-dir wheels \
+  && ls -ahl wheels
