@@ -142,6 +142,8 @@ WORKDIR /usr/src/paperless/
 
 COPY gunicorn.conf.py .
 
+WORKDIR /usr/src/paperless/src/
+
 # copy app
 COPY --from=compile-frontend /src/src/ ./
 
