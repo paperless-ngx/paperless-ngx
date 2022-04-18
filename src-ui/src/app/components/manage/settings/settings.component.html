@@ -7,7 +7,7 @@
 
   <ul ngbNav #nav="ngbNav" class="nav-tabs">
     <li [ngbNavItem]="1">
-      <a ngbNavLink i18n>General settings</a>
+      <a ngbNavLink i18n>General</a>
       <ng-template ngbNavContent>
 
         <h4 i18n>Appearance</h4>
@@ -104,7 +104,7 @@
           <div class="col-md-3 col-form-label">
             <span i18n>Theme Color</span>
           </div>
-          <div class="col-3">
+          <div class="col col-md-3">
             <app-input-color i18n-title formControlName="themeColor" [error]="error?.color"></app-input-color>
           </div>
           <div class="col-2">

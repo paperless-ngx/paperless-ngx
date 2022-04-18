@@ -15,6 +15,7 @@ body {
   --pngx-primary-darken-5: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 5%));
   --pngx-primary-darken-15: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%));
   --pngx-primary-darken-18: hsl(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 18%));
+  --pngx-bg-alt: #fff;
   --pngx-bg-darker: var(--bs-gray-100);
   --pngx-focus-alpha: 0.3;
 }
@@ -24,8 +25,8 @@ $text-color-light-bg: #212529;
 $text-color-dark-bg: #abb2bf;
 $text-color-dark-bg-accent: lighten($text-color-dark-bg, 10%);
 // Taken from bootstrap
-$form-check-input-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#212529' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>");
-$form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#212529'/></svg>");
+$form-check-input-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$text-color-light-bg}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>");
+$form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$text-color-light-bg}'/></svg>");
 
 .primary-light {
   --pngx-primary-text-contrast: #{$text-color-light-bg} !important;
@@ -36,6 +37,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
 
   .form-check-input:checked[type=radio] {
     background-image: escape-svg($form-check-radio-checked-bg-image-dark);
+  }
+
+  .btn-close {
+    filter: none !important;
   }
 }
 
@@ -48,28 +53,18 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
   --pngx-primary-lightness: 31%;
 }
 
-$danger-dark-mode: #b71631;
-$danger-dark-mode-rgb: 183, 22, 49;
-$bg-dark-mode: #161618;
-$bg-dark-mode-rgb: 22, 22, 24;
-$bg-dark-mode-accent: #101216;
-$bg-dark-mode-alt: #242529;
-$bg-light-dark-mode: #1c1c1f;
-$bg-light-dark-mode-rgb: 28, 28, 31;
-$border-color-dark-mode: #47494f;
-
 @mixin dark-mode {
   --bs-body-color: #{$text-color-dark-bg};
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
-  --bs-danger: #{$danger-dark-mode};
-  --bs-danger-rgb: #{$danger-dark-mode-rgb};
-  --bs-body-bg: #{$bg-dark-mode};
-  --bs-body-bg-rgb: #{$bg-dark-mode-rgb};
-  --bs-light: #{$bg-light-dark-mode};
-  --bs-light-rgb: #{$bg-light-dark-mode-rgb};
-  --bs-border-color: #{$border-color-dark-mode};
-  --pngx-bg-darker: #{$bg-dark-mode-accent};
-  --pngx-bg-alt: #{$bg-dark-mode-alt};
+  --bs-danger: #b71631;
+  --bs-danger-rgb: 183, 22, 49;
+  --bs-body-bg: #161618;
+  --bs-body-bg-rgb: 22, 22, 24;
+  --bs-light: #1c1c1f;
+  --bs-light-rgb: 28, 28, 31;
+  --bs-border-color: #47494f;
+  --pngx-bg-darker: #101216;
+  --pngx-bg-alt: #242529;
   --pngx-focus-alpha: 0.6;
   --pngx-primary-faded: var(--pngx-primary-darken-15);
   --pngx-primary-text-contrast: var(--bs-body-color);
@@ -145,7 +140,7 @@ $border-color-dark-mode: #47494f;
 
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-    background-color: $bg-light-dark-mode;
+    background-color: var(--bs-light);
   }
 
   table {
@@ -157,10 +152,16 @@ $border-color-dark-mode: #47494f;
     }
 
     &.table-hover > tbody > tr:hover > * {
-      background-color: $bg-light-dark-mode;
+      background-color: var(--bs-light);
       color: var(--pngx-body-color-accent);
     }
 
+  }
+
+  .alert-secondary {
+    background-color: var(--bs-light);
+    border-color: var(--pngx-bg-darker);
+    color: var(--bs-body-color);
   }
 
   .table-striped > tbody > tr:nth-of-type(odd) > * {
@@ -171,7 +172,7 @@ $border-color-dark-mode: #47494f;
     text-shadow: 0 1px 0 #666;
   }
 
-  .modal .btn-close, .alert .btn-close {
+  .modal .btn-close, .alert .btn-close, .toast .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
   }
 
