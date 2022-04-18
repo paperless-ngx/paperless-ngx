@@ -1,0 +1,51 @@
+FROM debian:bullseye-slim
+
+LABEL org.opencontainers.image.description="A intermediate image with qpdf built"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG BUILD_PACKAGES="\
+  build-essential \
+  debhelper \
+  debian-keyring \
+  devscripts \
+  equivs  \
+  libtool \
+  libjpeg62-turbo-dev \
+  libgnutls28-dev \
+  packaging-dev \
+  zlib1g-dev"
+
+WORKDIR /usr/src
+
+# As this is an base image for a multi-stage final image
+# the added size of the install is basically irrelevant
+
+RUN set -eux \
+  && apt-get update --quiet \
+  && apt-get install --yes --quiet --no-install-recommends $BUILD_PACKAGES \
+  && rm -rf /var/lib/apt/lists/*
+
+# Layers after this point change according to required version
+# For better caching, seperate the basic installs from
+# the building
+
+# This must match to pikepdf's minimum at least
+ARG QPDF_VERSION
+
+# In order to get the required version of qpdf, it is backported from bookwork
+# and then built from source
+RUN set -eux \
+	&& echo "Building qpdf" \
+  && echo "deb-src http://deb.debian.org/debian/ bookworm main" | tee /etc/apt/sources.list.d/bookworm-src.list \
+  && apt-get update \
+  && mkdir qpdf \
+  && cd qpdf \
+  && apt-get source --yes --quiet qpdf=${QPDF_VERSION}-1/bookworm \
+  && rm -rf /var/lib/apt/lists/* \
+  && cd qpdf-$QPDF_VERSION \
+  && DEBEMAIL=hello@paperless-ngx.com debchange --bpo \
+	&& export DEB_BUILD_OPTIONS="terse nocheck nodoc parallel=2" \
+  && dpkg-buildpackage --build=binary --unsigned-source --unsigned-changes \
+  && pwd \
+  && ls -ahl ../*.deb

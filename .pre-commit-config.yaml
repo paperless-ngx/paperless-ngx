@@ -63,10 +63,17 @@ repos:
     hooks:
       - id: black
   # Dockerfile hooks
-  - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
-    rev: "v0.1.0"
+  - repo: https://github.com/AleksaC/hadolint-py
+    rev: v1.19.0
     hooks:
-      - id: dockerfilelint
+      - id: hadolint
+        args:
+          - --ignore
+          - DL3006      # https://github.com/hadolint/hadolint/wiki/DL3006  (doesn't understand FROM with ARG)
+          - --ignore
+          - DL3008      # https://github.com/hadolint/hadolint/wiki/DL3008  (should probably do this at some point)
+          - --ignore
+          - DL3013      # https://github.com/hadolint/hadolint/wiki/DL3013  (should probably do this too at some point)
   # Shell script hooks
   - repo: https://github.com/lovesegfault/beautysh
     rev: v6.2.1
