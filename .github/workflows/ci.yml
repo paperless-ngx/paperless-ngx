@@ -45,73 +45,158 @@ jobs:
           name: documentation
           path: docs/_build/html/
 
-  code-checks-backend:
-    name: "Backend Code Checks"
+  ci-backend:
+    uses: ./.github/workflows/reusable-ci-backend.yml
+
+  ci-frontend:
+    uses: ./.github/workflows/reusable-ci-frontend.yml
+
+  prepare-docker-build:
+    name: Prepare Docker Pipeline Data
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
     runs-on: ubuntu-20.04
+    needs:
+      - documentation
+      - ci-backend
+      - ci-frontend
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install checkers
-        run: |
-          pipx install reorder-python-imports
-          pipx install yesqa
-          pipx install add-trailing-comma
-          pipx install flake8
+        name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5
       -
-        name: Run reorder-python-imports
-        run: |
-          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs reorder-python-imports
-      -
-        name: Run yesqa
-        run: |
-          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs yesqa
-      -
-        name: Run add-trailing-comma
-        run: |
-          find src/ -type f -name '*.py' ! -path "*/migrations/*" | xargs add-trailing-comma
-      # black is placed after add-trailing-comma because it may format differently
-      # if a trailing comma is added
-      -
-        name: Run black
-        uses: psf/black@stable
+        name: Login to Github Container Registry
+        uses: docker/login-action@v1
         with:
-          options: "--check --diff"
-          version: "22.3.0"
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Run flake8 checks
-        run: |
-          cd src/
-          flake8 --max-line-length=88 --ignore=E203,W503
-
-  code-checks-frontend:
-    name: "Frontend Code Checks"
-    runs-on: ubuntu-20.04
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+        name: Set up Python
+        uses: actions/setup-python@v3
         with:
-          node-version: '16'
+          python-version: "3.9"
       -
-        name: Install prettier
+        name: Make script executable
         run: |
-          npm install prettier
+          chmod +x ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py
       -
-        name: Run prettier
-        run:
-          npx prettier --check --ignore-path Pipfile.lock **/*.js **/*.ts *.md **/*.md
+        name: Setup qpdf image
+        id: qpdf-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py qpdf)
 
-  tests-backend:
-    needs: [code-checks-backend]
-    name: "Backend Tests (${{ matrix.python-version }})"
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10']
-      fail-fast: false
+          echo ${build_json}
+
+          echo ::set-output name=qpdf-json::${build_json}
+      -
+        name: Setup psycopg2 image
+        id: psycopg2-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py psycopg2)
+
+          echo ${build_json}
+
+          echo ::set-output name=psycopg2-json::${build_json}
+      -
+        name: Setup pikepdf image
+        id: pikepdf-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py pikepdf)
+
+          echo ${build_json}
+
+          echo ::set-output name=pikepdf-json::${build_json}
+      -
+        name: Setup jbig2enc image
+        id: jbig2enc-setup
+        run: |
+          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py jbig2enc)
+
+          echo ${build_json}
+
+          echo ::set-output name=jbig2enc-json::${build_json}
+      -
+        name: Setup frontend image
+        id: frontend-setup
+        run: |
+          frontend_image=ghcr.io/${{ github.repository }}/ngx-frontend:${{ steps.branch-name.outputs.current_branch }}
+
+          echo ${frontend_image}
+
+          echo ::set-output name=frontend-image-tag::${frontend_image}
+
+    outputs:
+
+      frontend-image-tag: ${{ steps.frontend-setup.outputs.frontend-image-tag }}
+
+      qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
+
+      pikepdf-json: ${{ steps.pikepdf-setup.outputs.pikepdf-json }}
+
+      psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
+
+      jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
+
+  build-qpdf-debs:
+    name: qpdf
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.qpdf
+      build-json: ${{ needs.prepare-docker-build.outputs.qpdf-json }}
+      build-args: |
+        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+
+  build-jbig2enc:
+    name: jbig2enc
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.jbig2enc
+      build-json: ${{ needs.prepare-docker-build.outputs.jbig2enc-json }}
+      build-args: |
+        JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
+
+  build-psycopg2-wheel:
+    name: psycopg2
+    needs:
+      - prepare-docker-build
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.psycopg2
+      build-json: ${{ needs.prepare-docker-build.outputs.psycopg2-json }}
+      build-args: |
+        GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).git_tag }}
+        VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
+
+  build-pikepdf-wheel:
+    name: pikepdf
+    needs:
+      - prepare-docker-build
+      - build-qpdf-debs
+    uses: ./.github/workflows/reusable-workflow-builder.yml
+    with:
+      dockerfile: ./docker-builders/Dockerfile.pikepdf
+      build-json: ${{ needs.prepare-docker-build.outputs.pikepdf-json }}
+      build-args: |
+        QPDF_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).image_tag }}
+        GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).git_tag }}
+        VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
+
+  build-frontend:
+    name: Compile frontend
+    concurrency:
+      group: ${{ github.workflow }}-build-frontend-${{ github.ref }}
+      cancel-in-progress: false
+    needs:
+      - prepare-docker-build
+    runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
@@ -119,77 +204,82 @@ jobs:
         with:
           fetch-depth: 2
       -
-        name: Install pipenv
-        run: pipx install pipenv
-      -
-        name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: "${{ matrix.python-version }}"
-          cache: "pipenv"
-          cache-dependency-path: 'Pipfile.lock'
-      -
-        name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends unpaper tesseract-ocr imagemagick ghostscript optipng libzbar0 poppler-utils
-      -
-        name: Install Python dependencies
-        run: |
-          pipenv sync --dev
-      -
-        name: Tests
-        run: |
-          cd src/
-          pipenv run pytest
-      -
-        name: Get changed files
+        name: Get changed frontend files
         id: changed-files-specific
         uses: tj-actions/changed-files@v18.1
         with:
           files: |
-            src/**
+            src-ui/**
       -
-        name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files-specific.outputs.all_changed_files }}; do
-            echo "${file} was changed"
-          done
-      -
-        name: Publish coverage results
-        if: matrix.python-version == '3.9' && steps.changed-files-specific.outputs.any_changed == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # https://github.com/coveralls-clients/coveralls-python/issues/251
-        run: |
-          cd src/
-          pipenv run coveralls --service=github
-
-  tests-frontend:
-    needs: [code-checks-frontend]
-    name: "Frontend Tests"
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        name: Login to Github Container Registry
+        uses: docker/login-action@v1
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: cd src-ui && npm ci
-      - run: cd src-ui && npm run test
-      - run: cd src-ui && npm run e2e:ci
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Determine if build needed
+        id: build-skip-check
+        # Skip building the frontend if the tag exists and no src-ui files changed
+        run: |
+          if ! docker manifest inspect ${{ needs.prepare-docker-build.outputs.frontend-image-tag }} &> /dev/null ; then
+            echo "Build required, no existing image"
+            echo ::set-output name=frontend-build-needed::true
+          elif ${{ steps.changed-files-specific.outputs.any_changed }} == 'true' ; then
+            echo "Build required, src-ui changes"
+            echo ::set-output name=frontend-build-needed::true
+          else
+            echo "No build required"
+            echo ::set-output name=frontend-build-needed::false
+          fi
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        if: ${{ steps.build-skip-check.outputs.frontend-build-needed == 'true' }}
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        if: ${{ steps.build-skip-check.outputs.frontend-build-needed == 'true' }}
+      -
+        name: Compile frontend
+        uses: docker/build-push-action@v2
+        if: ${{ steps.build-skip-check.outputs.frontend-build-needed == 'true' }}
+        with:
+          context: .
+          file: ./docker-builders/Dockerfile.frontend
+          tags: ${{ needs.prepare-docker-build.outputs.frontend-image-tag }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      -
+        name: Export frontend artifact from docker
+        run: |
+          docker create --name frontend-extract ${{ needs.prepare-docker-build.outputs.frontend-image-tag }}
+          docker cp frontend-extract:/src/src/documents/static/frontend src/documents/static/frontend/
+      -
+        name: Upload frontend artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
 
   # build and push image to docker hub.
   build-docker-image:
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref }}
       cancel-in-progress: true
     runs-on: ubuntu-20.04
-    needs: [tests-backend, tests-frontend]
+    concurrency:
+      group: ${{ github.workflow }}-build-docker-image-${{ github.ref }}
+      cancel-in-progress: true
+    needs:
+      - prepare-docker-build
+      - build-psycopg2-wheel
+      - build-jbig2enc
+      - build-qpdf-debs
+      - build-pikepdf-wheel
+      - build-frontend
     steps:
       -
         name: Gather Docker metadata
@@ -226,26 +316,22 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
+          build-args: |
+            JBIG2ENC_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).image_tag }}
+            QPDF_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).image_tag }}
+            PIKEPDF_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).image_tag }}
+            PSYCOPG2_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).image_tag }}
+            FRONTEND_BASE_IMAGE=${{ needs.prepare-docker-build.outputs.frontend-image-tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       -
         name: Inspect image
         run: |
           docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
-      -
-        name: Export frontend artifact from docker
-        run: |
-          docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
-          docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
-      -
-        name: Upload frontend artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-compiled
-          path: src/documents/static/frontend/
 
   build-release:
-    needs: [build-docker-image, documentation]
+    needs:
+      - build-docker-image
     runs-on: ubuntu-20.04
     steps:
       -
@@ -313,7 +399,8 @@ jobs:
 
   publish-release:
     runs-on: ubuntu-20.04
-    needs: build-release
+    needs:
+      - build-release
     if: contains(github.ref, 'refs/tags/ngx-') || contains(github.ref, 'refs/tags/beta-')
     steps:
       -
