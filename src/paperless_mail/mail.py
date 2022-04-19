@@ -197,7 +197,7 @@ class MailAccountHandler(LoggingMixin):
             )
             try:
                 for folder_info in M.folder.list():
-                    self.log("info", f"Located folder: {str(folder_info)}")
+                    self.log("info", f"Located folder: {folder_info.name}")
             except Exception:
                 self.log(
                     "error",
