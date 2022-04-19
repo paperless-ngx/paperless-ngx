@@ -225,8 +225,7 @@ class TestTasks(DirectoriesMixin, TestCase):
         )
         dst = os.path.join(settings.SCRATCH_DIR, "simple.pdf")
         shutil.copy(test_file, dst)
-        target_file = tasks.convert_from_tiff_to_pdf(dst)
-        self.assertFalse(os.path.isfile(target_file))
+        self.assertIsNone(tasks.convert_from_tiff_to_pdf(dst))
 
     def test_scan_file_for_separating_barcodes(self):
         test_file = os.path.join(
