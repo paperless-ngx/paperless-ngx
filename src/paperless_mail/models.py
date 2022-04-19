@@ -68,11 +68,11 @@ class MailRule(models.Model):
         ATTACHMENTS_ONLY = 1, _("Only process attachments.")
         EVERYTHING = 2, _("Process all files, including 'inline' " "attachments.")
 
-    class AttachmentAction(models.IntegerChoices):
-        DELETE = 1, _("Mark as read, don't process read mails")
-        MOVE = 2, _("Flag the mail, don't process flagged mails")
-        MARK_READ = 3, _("Move to specified folder")
-        FLAG = 4, _("Delete")
+    class MailAction(models.IntegerChoices):
+        DELETE = 1, _("Delete")
+        MOVE = 2, _("Move to specified folder")
+        MARK_READ = 3, _("Mark as read, don't process read mails")
+        FLAG = 4, _("Flag the mail, don't process flagged mails")
 
     class TitleSource(models.IntegerChoices):
         FROM_SUBJECT = 1, _("Use subject as title")
@@ -160,8 +160,8 @@ class MailRule(models.Model):
 
     action = models.PositiveIntegerField(
         _("action"),
-        choices=AttachmentAction.choices,
-        default=AttachmentAction.MARK_READ,
+        choices=MailAction.choices,
+        default=MailAction.MARK_READ,
     )
 
     action_parameter = models.CharField(
