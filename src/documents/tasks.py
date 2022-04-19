@@ -97,15 +97,15 @@ def barcode_reader(image) -> List[str]:
 
 def convert_from_tiff_to_pdf(filepath: str) -> str:
     """
-    converts a given TIFF image file to pdf.
+    converts a given TIFF image file to pdf into a temp. directory.
     Returns the new pdf file.
     """
-    file_extension = os.path.splitext(os.path.basename(filepath))[1]
+    file_name = os.path.splitext(os.path.basename(filepath))[0]
+    file_extension = os.path.splitext(os.path.basename(filepath))[1].lower()
+    tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
     # use old file name with pdf extension
-    if file_extension == ".tif":
-        newpath = filepath.replace(".tif", ".pdf")
-    elif file_extension == ".tiff":
-        newpath = filepath.replace(".tiff", ".pdf")
+    if file_extension == ".tif" or file_extension == ".tiff":
+        newpath = os.path.join(tempdir, file_name + ".pdf")
     else:
         logger.warning(f"Cannot convert from {str(file_extension)} to pdf.")
         return ""
@@ -121,12 +121,9 @@ def convert_from_tiff_to_pdf(filepath: str) -> str:
             images[0].save(newpath, save_all=True, append_images=images[1:])
     except OSError as e:
         logger.warning(
-            f"Could not save the file as pdf. "
-            f"The original image file was not deleted. Error: "
-            f"{str(e)}",
+            f"Could not save the file as pdf. Error: {str(e)}",
         )
         return ""
-    os.unlink(filepath)
     image.close()
     return newpath
 
@@ -233,22 +230,35 @@ def consume_file(
     if settings.CONSUMER_ENABLE_BARCODES:
         separators = []
         document_list = []
+        converted_tiff = None
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
             supported_extensions = [".pdf", ".tiff", ".tif"]
         else:
             supported_extensions = [".pdf"]
-        file_extension = os.path.splitext(os.path.basename(path))[1]
+        file_extension = os.path.splitext(os.path.basename(path))[1].lower()
         if file_extension not in supported_extensions:
+            # if not supported, skip this routine
             logger.warning(
                 f"Unsupported file format for barcode reader: {str(file_extension)}",
             )
         else:
             if file_extension == ".tif" or file_extension == ".tiff":
-                path = convert_from_tiff_to_pdf(path)
-            separators = scan_file_for_separating_barcodes(path)
+                converted_tiff = convert_from_tiff_to_pdf(path)
+            if converted_tiff:
+                separators = scan_file_for_separating_barcodes(converted_tiff)
+            else:
+                separators = scan_file_for_separating_barcodes(path)
             if separators:
-                logger.debug(f"Pages with separators found in: {str(path)}")
-                document_list = separate_pages(path, separators)
+                if converted_tiff:
+                    logger.debug(
+                        f"Pages with separators found in: {str(converted_tiff)}",
+                    )
+                    document_list = separate_pages(converted_tiff, separators)
+                else:
+                    logger.debug(
+                        f"Pages with separators found in: {str(path)}",
+                    )
+                    document_list = separate_pages(path, separators)
             if document_list:
                 for n, document in enumerate(document_list):
                     # save to consumption dir
@@ -260,6 +270,9 @@ def consume_file(
                     save_to_dir(document, newname=newname)
                 # if we got here, the document was successfully split
                 # and can safely be deleted
+                if converted_tiff:
+                    logger.debug("Deleting file {}".format(converted_tiff))
+                    os.unlink(converted_tiff)
                 logger.debug("Deleting file {}".format(path))
                 os.unlink(path)
                 # notify the sender, otherwise the progress bar
@@ -282,6 +295,8 @@ def consume_file(
                         "OSError. It could be, the broker cannot be reached.",
                     )
                     logger.warning(str(e))
+                # consuming stops here, since the original document with
+                # the barcodes has been split and will be consumed separately
                 return "File successfully split"
 
     # continue with consumption if no barcode was found
