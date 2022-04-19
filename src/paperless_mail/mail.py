@@ -190,6 +190,20 @@ class MailAccountHandler(LoggingMixin):
         try:
             M.folder.set(rule.folder)
         except MailboxFolderSelectError:
+
+            self.log(
+                "error",
+                f"Unable to access folder {rule.folder}, attempting folder listing",
+            )
+            try:
+                for folder_info in M.folder.list():
+                    self.log("info", f"Located folder: {str(folder_info)}")
+            except Exception:
+                self.log(
+                    "error",
+                    "Exception during folder listing, unable to provide list folders",
+                )
+
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
                 f"does not exist in account {rule.account}",
