@@ -184,7 +184,9 @@ These are as follows:
     define how the sub-folders are separated.  Common values include ".", "/" or "|", but
     this varies by the mail server.  Unfortunately, this isn't a value we can determine
     automatically.  Either check the documentation for your mail server, or check for
-    errors in the logs and try different folder separator values.
+    errors in the logs and try different folder separator values.  If possible,
+    the log will contain a listing of account folders, in the event of an error when
+    trying to fetch mail from a certain folder.
 
 .. note::
 
