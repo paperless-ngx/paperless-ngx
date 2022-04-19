@@ -62,13 +62,13 @@ class FlagMailAction(BaseMailAction):
 
 
 def get_rule_action(rule):
-    if rule.action == MailRule.AttachmentAction.FLAG:
+    if rule.action == MailRule.MailAction.FLAG:
         return FlagMailAction()
-    elif rule.action == MailRule.AttachmentAction.DELETE:
+    elif rule.action == MailRule.MailAction.DELETE:
         return DeleteMailAction()
-    elif rule.action == MailRule.AttachmentAction.MOVE:
+    elif rule.action == MailRule.MailAction.MOVE:
         return MoveMailAction()
-    elif rule.action == MailRule.AttachmentAction.MARK_READ:
+    elif rule.action == MailRule.MailAction.MARK_READ:
         return MarkReadMailAction()
     else:
         raise NotImplementedError("Unknown action.")  # pragma: nocover
