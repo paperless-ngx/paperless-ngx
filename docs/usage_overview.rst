@@ -182,11 +182,10 @@ These are as follows:
 
     When defining a mail rule with a folder, you may need to try different characters to
     define how the sub-folders are separated.  Common values include ".", "/" or "|", but
-    this varies by the mail server.  Unfortunately, this isn't a value we can determine
-    automatically.  Either check the documentation for your mail server, or check for
-    errors in the logs and try different folder separator values.  If possible,
-    the log will contain a listing of account folders, in the event of an error when
-    trying to fetch mail from a certain folder.
+    this varies by the mail server.  Check the documentation for your mail server.  In the
+    event of an error fetching mail from a certain folder, check the Paperless logs.  When
+    a folder is not located, Paperless will attempt to list all folders found in the account
+    to the Paperless logs.
 
 .. note::
 
