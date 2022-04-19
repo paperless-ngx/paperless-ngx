@@ -15,6 +15,7 @@ from django.test import TestCase
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
 from imap_tools import EmailAddress
+from imap_tools import FolderInfo
 from imap_tools import MailboxFolderSelectError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
@@ -53,12 +54,11 @@ class BogusMailBox(ContextManager):
     def __init__(self):
         self.messages: List[MailMessage] = []
         self.messages_spam: List[MailMessage] = []
+        self.folder = BogusFolderManager()
 
     def login(self, username, password):
         if not (username == "admin" and password == "secret"):
             raise Exception()
-
-    folder = BogusFolderManager()
 
     def fetch(self, criteria, mark_seen, charset=""):
         msg = self.messages
@@ -620,6 +620,72 @@ class TestMail(DirectoriesMixin, TestCase):
         self.assertEqual(self.async_task.call_count, 1)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
+
+    def test_error_folder_set(self):
+        """
+        GIVEN:
+            - Mail rule with non-existent folder
+        THEN:
+            - Should call list to output all folders in the account
+            - Should not process any messages
+        """
+        account = MailAccount.objects.create(
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.AttachmentAction.MOVE,
+            action_parameter="spam",
+            filter_subject="Claim",
+            order=1,
+            folder="uuuhhhh",  # Invalid folder name
+        )
+
+        self.bogus_mailbox.folder.list = mock.Mock(
+            return_value=[FolderInfo("SomeFoldername", "|", ())],
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.bogus_mailbox.folder.list.assert_called_once()
+        self.assertEqual(self.async_task.call_count, 0)
+
+    def test_error_folder_set_error_listing(self):
+        """
+        GIVEN:
+            - Mail rule with non-existent folder
+            - Mail account folder listing raises exception
+        THEN:
+            - Should not process any messages
+        """
+        account = MailAccount.objects.create(
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.AttachmentAction.MOVE,
+            action_parameter="spam",
+            filter_subject="Claim",
+            order=1,
+            folder="uuuhhhh",  # Invalid folder name
+        )
+
+        self.bogus_mailbox.folder.list = mock.Mock(
+            side_effect=MailboxFolderSelectError(None, "uhm"),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.bogus_mailbox.folder.list.assert_called_once()
+        self.assertEqual(self.async_task.call_count, 0)
 
     @mock.patch("paperless_mail.mail.MailAccountHandler.get_correspondent")
     def test_error_skip_mail(self, m):
