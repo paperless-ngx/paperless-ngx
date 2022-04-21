@@ -1,16 +1,19 @@
+# Default to pulling from the main repo registry when manually building
+ARG REPO="paperless-ngx/paperless-ngx"
+
 # These are all built previously in the pipeline
 # They provide either a .deb, .whl or whatever npm outputs
-ARG JBIG2ENC_BASE_IMAGE
-ARG QPDF_BASE_IMAGE
-ARG PIKEPDF_BASE_IMAGE
-ARG PSYCOPG2_BASE_IMAGE
-ARG FRONTEND_BASE_IMAGE
+ARG JBIG2ENC_VERSION
+ARG QPDF_VERSION
+ARG PIKEPDF_VERSION
+ARG PSYCOPG2_VERSION
+ARG FRONTEND_VERSION
 
-FROM ${JBIG2ENC_BASE_IMAGE} AS jbig2enc-builder
-FROM ${QPDF_BASE_IMAGE} as qpdf-builder
-FROM ${PIKEPDF_BASE_IMAGE} as pikepdf-builder
-FROM ${PSYCOPG2_BASE_IMAGE} as psycopg2-builder
-FROM ${FRONTEND_BASE_IMAGE} as compile-frontend
+FROM ghcr.io/${REPO}/builder/jbig2enc:${JBIG2ENC_VERSION} as jbig2enc-builder
+FROM ghcr.io/${REPO}/builder/qpdf:${QPDF_VERSION} as qpdf-builder
+FROM ghcr.io/${REPO}/builder/pikepdf:${PIKEPDF_VERSION} as pikepdf-builder
+FROM ghcr.io/${REPO}/builder/psycopg2:${PSYCOPG2_VERSION} as psycopg2-builder
+FROM ghcr.io/${REPO}/builder/frontend:${FRONTEND_VERSION} as compile-frontend
 
 FROM python:3.9-slim-bullseye as main-app
 
