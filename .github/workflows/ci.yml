@@ -64,10 +64,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v5
-      -
         name: Login to Github Container Registry
         uses: docker/login-action@v1
         with:
@@ -123,15 +119,13 @@ jobs:
         name: Setup frontend image
         id: frontend-setup
         run: |
-          frontend_image=ghcr.io/${{ github.repository }}/ngx-frontend:${{ steps.branch-name.outputs.current_branch }}
+          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py frontend)
 
-          echo ${frontend_image}
+          echo ${build_json}
 
-          echo ::set-output name=frontend-image-tag::${frontend_image}
+          echo ::set-output name=frontend-json::${build_json}
 
     outputs:
-
-      frontend-image-tag: ${{ steps.frontend-setup.outputs.frontend-image-tag }}
 
       qpdf-json: ${{ steps.qpdf-setup.outputs.qpdf-json }}
 
@@ -140,6 +134,8 @@ jobs:
       psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
 
       jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
+
+      frontend-json: ${{ steps.frontend-setup.outputs.frontend-json}}
 
   build-qpdf-debs:
     name: qpdf
@@ -185,14 +181,15 @@ jobs:
       dockerfile: ./docker-builders/Dockerfile.pikepdf
       build-json: ${{ needs.prepare-docker-build.outputs.pikepdf-json }}
       build-args: |
-        QPDF_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).image_tag }}
+        REPO=${{ github.repository }}
+        QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
         GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).git_tag }}
         VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
 
   build-frontend:
     name: Compile frontend
     concurrency:
-      group: ${{ github.workflow }}-build-frontend-${{ github.ref }}
+      group: ${{ github.workflow }}-build-frontend-${{ github.ref_name }}
       cancel-in-progress: false
     needs:
       - prepare-docker-build
@@ -222,7 +219,7 @@ jobs:
         id: build-skip-check
         # Skip building the frontend if the tag exists and no src-ui files changed
         run: |
-          if ! docker manifest inspect ${{ needs.prepare-docker-build.outputs.frontend-image-tag }} &> /dev/null ; then
+          if ! docker manifest inspect ${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).image_tag }} &> /dev/null ; then
             echo "Build required, no existing image"
             echo ::set-output name=frontend-build-needed::true
           elif ${{ steps.changed-files-specific.outputs.any_changed }} == 'true' ; then
@@ -247,15 +244,18 @@ jobs:
         with:
           context: .
           file: ./docker-builders/Dockerfile.frontend
-          tags: ${{ needs.prepare-docker-build.outputs.frontend-image-tag }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          tags: ${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).image_tag }}
+          # The compilation is identical between different platforms
+          # The buildx and QEMU setup is left, just in case that ever changes
+          # But the platform is set to the runner's native for speedup
+          platforms: linux/amd64
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
       -
         name: Export frontend artifact from docker
         run: |
-          docker create --name frontend-extract ${{ needs.prepare-docker-build.outputs.frontend-image-tag }}
+          docker create --name frontend-extract ${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).image_tag }}
           docker cp frontend-extract:/src/src/documents/static/frontend src/documents/static/frontend/
       -
         name: Upload frontend artifact
@@ -271,7 +271,7 @@ jobs:
       cancel-in-progress: true
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.workflow }}-build-docker-image-${{ github.ref }}
+      group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
       cancel-in-progress: true
     needs:
       - prepare-docker-build
@@ -317,11 +317,12 @@ jobs:
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
           build-args: |
-            JBIG2ENC_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).image_tag }}
-            QPDF_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).image_tag }}
-            PIKEPDF_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).image_tag }}
-            PSYCOPG2_BASE_IMAGE=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).image_tag }}
-            FRONTEND_BASE_IMAGE=${{ needs.prepare-docker-build.outputs.frontend-image-tag }}
+            REPO=${{ github.repository }}
+            JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
+            QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
+            PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
+            PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
+            FRONTEND_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       -
@@ -401,7 +402,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs:
       - build-release
-    if: contains(github.ref, 'refs/tags/ngx-') || contains(github.ref, 'refs/tags/beta-')
+    if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'ngx-') || startsWith(github.ref_name, 'beta-'))
     steps:
       -
         name: Download release artifact

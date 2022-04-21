@@ -1,11 +1,15 @@
 # This Dockerfile builds the pikepdf wheel
 # Inputs:
-#		- QPDF_BASE_IMAGE - The image to copy built qpdf .ded files from
+#		- REPO - Docker repository to pull qpdf from
+#		- QPDF_VERSION - The image qpdf version to copy .deb files from
 #		- GIT_TAG - The Git tag to clone and build from
 #		- VERSION - Used to force the built pikepdf version to match
 
-ARG QPDF_BASE_IMAGE
-FROM ${QPDF_BASE_IMAGE} as qpdf-builder
+# Default to pulling from the main repo registry when manually building
+ARG REPO="paperless-ngx/paperless-ngx"
+
+ARG QPDF_VERSION
+FROM ghcr.io/${REPO}/builder/qpdf:${QPDF_VERSION} as qpdf-builder
 
 # This does nothing, except provide a name for a copy below
 

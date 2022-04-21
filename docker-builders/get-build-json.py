@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 """
-This is a helper script to either parse the JSON of the Pipfile.lock
-or otherwise return a JSON object detailing versioning and image tags
-for the packages we build seperately, then copy into the final Docker image
+This is a helper script for the mutli-stage Docker image builder.
+It provides a single point of configuration for package version control.
+The output JSON object is used by the CI workflow to determine what versions
+to build and pull into the final Docker image.
+
+Python package information is obtained from the Pipfile.lock.  As this is
+kept updated by dependabot, it usually will need no further configuration.
+The sole exception currently is pikepdf, which has a dependency on qpdf,
+and is configured here to use the latest version of qpdf built by the workflow.
+
+Other package version information is configured directly below, generally by
+setting the version and Git information, if any.
+
 """
 import argparse
 import json
@@ -14,11 +24,13 @@ CONFIG: Final = {
     # All packages need to be in the dict, even if not configured further
     # as it is used for the possible choices in the argument
     "psycopg2": {},
+    "frontend": {},
     # Most information about Python packages comes from the Pipfile.lock
+    # Excpetion being pikepdf, which needs a specific qpdf
     "pikepdf": {
         "qpdf_version": "10.6.3",
     },
-    # For other packages, it is directly configured, for now
+    # For other packages, version and Git information are directly configured
     # These require manual updates to this file for version updates
     "qpdf": {
         "version": "10.6.3",
@@ -59,11 +71,9 @@ def _main():
     output = {"name": args.package}
 
     # Read Pipfile.lock file
-
     pipfile_data = json.loads(pip_lock.read_text())
 
     # Read the version from Pipfile.lock
-
     if args.package in pipfile_data["default"]:
 
         pkg_data = pipfile_data["default"][args.package]
@@ -73,7 +83,6 @@ def _main():
         output["version"] = pkg_version
 
         # Based on the package, generate the expected Git tag name
-
         if args.package == "pikepdf":
             git_tag_name = f"v{pkg_version}"
         elif args.package == "psycopg2":
@@ -81,31 +90,18 @@ def _main():
 
         output["git_tag"] = git_tag_name
 
-        # Based on the package and environment, generate the Docker image tag
+    # Use the basic ref name, minus refs/heads or refs/tags for frontend builder image
+    elif args.package == "frontend":
+        output["version"] = os.environ["GITHUB_REF_NAME"]
 
-        image_tag = _get_image_tag(repo_name, args.package, pkg_version)
+    # Add anything special from the config
+    output.update(CONFIG[args.package])
 
-        output["image_tag"] = image_tag
-
-        # Check for any special configuration, based on package
-
-        if args.package in CONFIG:
-            output.update(CONFIG[args.package])
-
-    elif args.package in CONFIG:
-
-        # This is not a Python package
-
-        output.update(CONFIG[args.package])
-
-        output["image_tag"] = _get_image_tag(repo_name, args.package, output["version"])
-
-    else:
-        raise NotImplementedError(args.package)
+    # Based on the package and environment, generate the Docker image tag
+    output["image_tag"] = _get_image_tag(repo_name, args.package, output["version"])
 
     # Output the JSON info to stdout
-
-    print(json.dumps(output, indent=2))
+    print(json.dumps(output))
 
 
 if __name__ == "__main__":
