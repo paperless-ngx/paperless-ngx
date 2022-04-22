@@ -580,9 +580,13 @@ a.image-reference img {
   right: 12px;
   height: 20px;
   width: 24px;
-  z-index: 1000;
+  z-index: 10;
   border: none;
   background-color: transparent;
   color: inherit;
   opacity: 0.7;
+}
+
+.wy-nav-content-wrap {
+  z-index: 20;
 }
