@@ -96,6 +96,10 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     color: var(--bs-body-color);
   }
 
+  .btn .progress {
+    background-color: var(--pngx-body-color-accent);
+  }
+
   .search-form-container {
     input, input:focus {
       color: var(--bs-body-color) !important;
