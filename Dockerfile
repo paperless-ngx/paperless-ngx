@@ -138,6 +138,8 @@ RUN set -eux \
   && chmod 755 /sbin/docker-entrypoint.sh \
   && cp docker-prepare.sh /sbin/docker-prepare.sh \
   && chmod 755 /sbin/docker-prepare.sh \
+  && cp wait-for-redis.py /sbin/wait-for-redis.py \
+  && chmod 755 /sbin/wait-for-redis.py \
   && chmod +x install_management_commands.sh \
   && ./install_management_commands.sh
 
