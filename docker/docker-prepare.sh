@@ -27,6 +27,14 @@ wait_for_postgres() {
 	done
 }
 
+wait_for_redis() {
+	# We use a Python script to send the Redis ping
+	# instead of installing redis-tools just for 1 thing
+	if ! python3 /sbin/wait-for-redis.py; then
+		exit 1
+	fi
+}
+
 migrations() {
 	(
 		# flock is in place to prevent multiple containers from doing migrations
@@ -59,6 +67,8 @@ do_work() {
 	if [[ -n "${PAPERLESS_DBHOST}" ]]; then
 		wait_for_postgres
 	fi
+
+	wait_for_redis
 
 	migrations
 
