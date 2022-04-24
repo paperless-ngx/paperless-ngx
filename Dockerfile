@@ -77,14 +77,14 @@ ARG RUNTIME_PACKAGES="\
 WORKDIR /usr/src/paperless/src/
 
 # Copy qpdf and runtime library
-COPY --from=qpdf-builder /usr/src/qpdf/libqpdf28_*.deb .
-COPY --from=qpdf-builder /usr/src/qpdf/qpdf_*.deb .
+COPY --from=qpdf-builder /usr/src/qpdf/libqpdf28_*.deb ./
+COPY --from=qpdf-builder /usr/src/qpdf/qpdf_*.deb ./
 
 # Copy pikepdf wheel and dependencies
-COPY --from=pikepdf-builder /usr/src/pikepdf/wheels/*.whl .
+COPY --from=pikepdf-builder /usr/src/pikepdf/wheels/*.whl ./
 
 # Copy psycopg2 wheel
-COPY --from=psycopg2-builder /usr/src/psycopg2/wheels/psycopg2*.whl .
+COPY --from=psycopg2-builder /usr/src/psycopg2/wheels/psycopg2*.whl ./
 
 # copy jbig2enc
 COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
