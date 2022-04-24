@@ -26,7 +26,7 @@ CONFIG: Final = {
     "psycopg2": {},
     "frontend": {},
     # Most information about Python packages comes from the Pipfile.lock
-    # Excpetion being pikepdf, which needs a specific qpdf
+    # Exception being pikepdf, which needs a specific qpdf version
     "pikepdf": {
         "qpdf_version": "10.6.3",
     },
