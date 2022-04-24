@@ -20,28 +20,6 @@ import os
 from pathlib import Path
 from typing import Final
 
-CONFIG: Final = {
-    # All packages need to be in the dict, even if not configured further
-    # as it is used for the possible choices in the argument
-    "psycopg2": {},
-    "frontend": {},
-    # Most information about Python packages comes from the Pipfile.lock
-    # Exception being pikepdf, which needs a specific qpdf version
-    "pikepdf": {
-        "qpdf_version": "10.6.3",
-    },
-    # For other packages, version and Git information are directly configured
-    # These require manual updates to this file for version updates
-    "qpdf": {
-        "version": "10.6.3",
-        "git_tag": "N/A",
-    },
-    "jbig2enc": {
-        "version": "0.29",
-        "git_tag": "0.29",
-    },
-}
-
 
 def _get_image_tag(
     repo_name: str,
@@ -58,47 +36,63 @@ def _main():
     parser.add_argument(
         "package",
         help="The name of the package to generate JSON for",
-        choices=CONFIG.keys(),
     )
 
-    args = parser.parse_args()
+    PIPFILE_LOCK_PATH: Final[Path] = Path("Pipfile.lock")
+    BUILD_CONFIG_PATH: Final[Path] = Path(".build-config.json")
 
-    pip_lock = Path("Pipfile.lock")
-
-    repo_name = os.environ["GITHUB_REPOSITORY"]
-
-    # The JSON object we'll output
-    output = {"name": args.package}
+    # Read the main config file
+    build_json: Final = json.loads(BUILD_CONFIG_PATH.read_text())
 
     # Read Pipfile.lock file
-    pipfile_data = json.loads(pip_lock.read_text())
+    pipfile_data: Final = json.loads(PIPFILE_LOCK_PATH.read_text())
 
-    # Read the version from Pipfile.lock
-    if args.package in pipfile_data["default"]:
+    args: Final = parser.parse_args()
 
+    repo_name: Final[str] = os.environ["GITHUB_REPOSITORY"]
+
+    # Default output values
+    version = None
+    git_tag = None
+    extra_config = {}
+
+    if args.package == "frontend":
+        # Version is just the branch or tag name
+        version = os.environ["GITHUB_REF_NAME"]
+    elif args.package in pipfile_data["default"]:
+        # Read the version from Pipfile.lock
         pkg_data = pipfile_data["default"][args.package]
-
         pkg_version = pkg_data["version"].split("==")[-1]
-
-        output["version"] = pkg_version
+        version = pkg_version
 
         # Based on the package, generate the expected Git tag name
         if args.package == "pikepdf":
-            git_tag_name = f"v{pkg_version}"
+            git_tag = f"v{pkg_version}"
         elif args.package == "psycopg2":
-            git_tag_name = pkg_version.replace(".", "_")
+            git_tag = pkg_version.replace(".", "_")
 
-        output["git_tag"] = git_tag_name
+        # Any extra/special values needed
+        if args.package == "pikepdf":
+            extra_config["qpdf_version"] = build_json["qpdf"]["version"]
 
-    # Use the basic ref name, minus refs/heads or refs/tags for frontend builder image
-    elif args.package == "frontend":
-        output["version"] = os.environ["GITHUB_REF_NAME"]
+    elif args.package in build_json:
+        version = build_json[args.package]["version"]
 
-    # Add anything special from the config
-    output.update(CONFIG[args.package])
+        if "git_tag" in build_json[args.package]:
+            git_tag = build_json[args.package]["git_tag"]
+    else:
+        raise NotImplementedError(args.package)
 
-    # Based on the package and environment, generate the Docker image tag
-    output["image_tag"] = _get_image_tag(repo_name, args.package, output["version"])
+    # The JSON object we'll output
+    output = {
+        "name": args.package,
+        "version": version,
+        "git_tag": git_tag,
+        "image_tag": _get_image_tag(repo_name, args.package, version),
+    }
+
+    # Add anything special a package may need
+    output.update(extra_config)
 
     # Output the JSON info to stdout
     print(json.dumps(output))
