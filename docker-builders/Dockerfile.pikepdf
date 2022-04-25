@@ -1,9 +1,9 @@
 # This Dockerfile builds the pikepdf wheel
 # Inputs:
-#		- REPO - Docker repository to pull qpdf from
-#		- QPDF_VERSION - The image qpdf version to copy .deb files from
-#		- PIKEPDF_GIT_TAG - The Git tag to clone and build from
-#		- PIKEPDF_VERSION - Used to force the built pikepdf version to match
+#    - REPO - Docker repository to pull qpdf from
+#    - QPDF_VERSION - The image qpdf version to copy .deb files from
+#    - PIKEPDF_GIT_TAG - The Git tag to clone and build from
+#    - PIKEPDF_VERSION - Used to force the built pikepdf version to match
 
 # Default to pulling from the main repo registry when manually building
 ARG REPO="paperless-ngx/paperless-ngx"
@@ -53,7 +53,7 @@ ARG PIKEPDF_GIT_TAG
 ARG PIKEPDF_VERSION
 
 RUN set -eux \
-	&& echo "building pikepdf wheel" \
+  && echo "building pikepdf wheel" \
   # Note the v in the tag name here
   && git clone --quiet --depth 1 --branch "${PIKEPDF_GIT_TAG}" https://github.com/pikepdf/pikepdf.git \
   && cd pikepdf \
