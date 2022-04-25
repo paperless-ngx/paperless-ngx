@@ -8,7 +8,7 @@ updates:
     target-branch: "dev"
     # Look for `package.json` and `lock` files in the `root` directory
     directory: "/src-ui"
-    # Check the npm registry for updates every week
+    # Check the npm registry for updates every month
     schedule:
       interval: "monthly"
     # Add reviewers
@@ -23,6 +23,19 @@ updates:
     # Check for updates once a week
     schedule:
       interval: "weekly"
+    labels:
+      - "backend"
+      - "dependencies"
+
+  # Enable updates for Github Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      # Check for updates to GitHub Actions every month
+      interval: "monthly"
+    labels:
+      - "ci-cd"
+      - "dependencies"
     # Add reviewers
     reviewers:
       - "paperless-ngx/backend"

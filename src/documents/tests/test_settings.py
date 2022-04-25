@@ -2,8 +2,8 @@ import logging
 from unittest import mock
 
 from django.test import TestCase
-
-from paperless.settings import default_task_workers, default_threads_per_worker
+from paperless.settings import default_task_workers
+from paperless.settings import default_threads_per_worker
 
 
 class TestSettings(TestCase):
@@ -21,7 +21,7 @@ class TestSettings(TestCase):
     def test_workers_threads(self):
         for i in range(1, 64):
             with mock.patch(
-                "paperless.settings.multiprocessing.cpu_count"
+                "paperless.settings.multiprocessing.cpu_count",
             ) as cpu_count:
                 cpu_count.return_value = i
 

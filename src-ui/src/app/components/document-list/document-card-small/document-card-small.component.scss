@@ -1,5 +1,3 @@
-@import "/src/theme";
-
 .card-text {
   font-size: 90%;
 }
@@ -37,7 +35,7 @@
 }
 
 .card-selected {
-  border-color: $primary;
+  border-color:var(--bs-primary);
 
   .document-card-check {
     display: block;
@@ -45,7 +43,7 @@
 }
 
 .doc-img-background-selected {
-  background-color: $primaryFaded;
+  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {
@@ -57,7 +55,7 @@
     &:hover,
     &:focus {
       background-color: transparent !important;
-      color: $primary;
+      color: var(--bs-primary);
     }
   }
 
@@ -75,4 +73,8 @@
 ::ng-deep .tooltip-inner {
   text-align: left !important;
   font-size: 90%;
+}
+
+a {
+  cursor: pointer;
 }

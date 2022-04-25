@@ -7,7 +7,8 @@ class Command(BaseCommand):
     help = """
         This command checks your document archive for issues.
     """.replace(
-        "    ", ""
+        "    ",
+        "",
     )
 
     def add_arguments(self, parser):

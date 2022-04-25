@@ -1,5 +1,3 @@
-@import "/src/theme";
-
 .result-content {
   overflow-wrap: anywhere;
 }
@@ -52,7 +50,7 @@
 }
 
 .card-selected {
-  border-color: $primary;
+  border-color: var(--bs-primary);
 
   .document-card-check {
     display: block;
@@ -60,7 +58,7 @@
 }
 
 .doc-img-background-selected {
-  background-color: $primaryFaded;
+  background-color: var(--pngx-primary-faded);
 }
 
 .card-info {
@@ -89,4 +87,8 @@
 span ::ng-deep .match {
   color: black;
   background-color: rgb(255, 211, 66);
+}
+
+a {
+  cursor: pointer;
 }

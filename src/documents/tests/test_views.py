@@ -25,7 +25,7 @@ class TestViews(TestCase):
         ]:
             if language_given:
                 self.client.cookies.load(
-                    {settings.LANGUAGE_COOKIE_NAME: language_given}
+                    {settings.LANGUAGE_COOKIE_NAME: language_given},
                 )
             elif settings.LANGUAGE_COOKIE_NAME in self.client.cookies.keys():
                 self.client.cookies.pop(settings.LANGUAGE_COOKIE_NAME)
@@ -51,5 +51,6 @@ class TestViews(TestCase):
                 f"frontend/{language_actual}/polyfills.js",
             )
             self.assertEqual(
-                response.context_data["main_js"], f"frontend/{language_actual}/main.js"
+                response.context_data["main_js"],
+                f"frontend/{language_actual}/main.js",
             )

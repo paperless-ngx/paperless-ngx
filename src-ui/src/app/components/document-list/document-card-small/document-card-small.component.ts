@@ -1,18 +1,33 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { DocumentService } from 'src/app/services/rest/document.service';
-import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core'
+import { map } from 'rxjs/operators'
+import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import {
+  SettingsService,
+  SETTINGS_KEYS,
+} from 'src/app/services/settings.service'
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
   selector: 'app-document-card-small',
   templateUrl: './document-card-small.component.html',
-  styleUrls: ['./document-card-small.component.scss', '../popover-preview/popover-preview.scss']
+  styleUrls: [
+    './document-card-small.component.scss',
+    '../popover-preview/popover-preview.scss',
+  ],
 })
 export class DocumentCardSmallComponent implements OnInit {
-
-  constructor(private documentService: DocumentService, private settingsService: SettingsService) { }
+  constructor(
+    private documentService: DocumentService,
+    private settingsService: SettingsService
+  ) {}
 
   @Input()
   selected = false
@@ -39,8 +54,7 @@ export class DocumentCardSmallComponent implements OnInit {
   mouseOnPreview = false
   popoverHidden = true
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
@@ -60,7 +74,7 @@ export class DocumentCardSmallComponent implements OnInit {
 
   getTagsLimited$() {
     return this.document.tags$.pipe(
-      map(tags => {
+      map((tags) => {
         if (tags.length > 7) {
           this.moreTags = tags.length - 6
           return tags.slice(0, 6)
@@ -84,7 +98,7 @@ export class DocumentCardSmallComponent implements OnInit {
         } else {
           this.popover.close()
         }
-      }, 600);
+      }, 600)
     }
   }
 

@@ -4,16 +4,14 @@ import tempfile
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from django.test import TestCase, override_settings
-
-from documents.parsers import (
-    get_parser_class,
-    get_supported_file_extensions,
-    get_default_file_extension,
-    get_parser_class_for_mime_type,
-    DocumentParser,
-    is_file_ext_supported,
-)
+from django.test import override_settings
+from django.test import TestCase
+from documents.parsers import DocumentParser
+from documents.parsers import get_default_file_extension
+from documents.parsers import get_parser_class
+from documents.parsers import get_parser_class_for_mime_type
+from documents.parsers import get_supported_file_extensions
+from documents.parsers import is_file_ext_supported
 from paperless_tesseract.parsers import RasterisedDocumentParser
 from paperless_text.parsers import TextDocumentParser
 

@@ -1,4 +1,5 @@
-from documents.tests.utils import DirectoriesMixin, TestMigrations
+from documents.tests.utils import DirectoriesMixin
+from documents.tests.utils import TestMigrations
 
 
 class TestMigrateTagColor(DirectoriesMixin, TestMigrations):

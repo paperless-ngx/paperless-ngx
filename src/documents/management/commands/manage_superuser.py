@@ -2,7 +2,7 @@ import logging
 import os
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 logger = logging.getLogger("paperless.management.superuser")
@@ -13,7 +13,8 @@ class Command(BaseCommand):
     help = """
         Creates a Django superuser based on env variables.
     """.replace(
-        "    ", ""
+        "    ",
+        "",
     )
 
     def handle(self, *args, **options):
@@ -39,5 +40,5 @@ class Command(BaseCommand):
             self.stdout.write(f'Did not create superuser "{username}".')
             self.stdout.write(
                 'Make sure you specified "PAPERLESS_ADMIN_PASSWORD" in your '
-                '"docker-compose.env" file.'
+                '"docker-compose.env" file.',
             )

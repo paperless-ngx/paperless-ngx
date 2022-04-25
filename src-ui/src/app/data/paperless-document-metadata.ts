@@ -1,5 +1,4 @@
 export interface PaperlessDocumentMetadata {
-
   original_checksum?: string
 
   archived_checksum?: string
@@ -9,5 +8,4 @@ export interface PaperlessDocumentMetadata {
   media_filename?: string
 
   has_archive_version?: boolean
-
 }

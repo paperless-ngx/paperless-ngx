@@ -1,10 +1,11 @@
 import textwrap
 
 from django.conf import settings
-from django.core.checks import Error, register
+from django.core.checks import Error
+from django.core.checks import register
 from django.core.exceptions import FieldError
-from django.db.utils import OperationalError, ProgrammingError
-
+from django.db.utils import OperationalError
+from django.db.utils import ProgrammingError
 from documents.signals import document_consumer_declaration
 
 
@@ -16,7 +17,7 @@ def changed_password_check(app_configs, **kwargs):
 
     try:
         encrypted_doc = Document.objects.filter(
-            storage_type=Document.STORAGE_TYPE_GPG
+            storage_type=Document.STORAGE_TYPE_GPG,
         ).first()
     except (OperationalError, ProgrammingError, FieldError):
         return []  # No documents table yet
@@ -27,8 +28,8 @@ def changed_password_check(app_configs, **kwargs):
             return [
                 Error(
                     "The database contains encrypted documents but no password "
-                    "is set."
-                )
+                    "is set.",
+                ),
             ]
 
         if not GnuPG.decrypted(encrypted_doc.source_file):
@@ -42,9 +43,9 @@ def changed_password_check(app_configs, **kwargs):
                 If you intend to change your password, you must first export
                 all of the old documents, start fresh with the new password
                 and then re-import them."
-                """
-                    )
-                )
+                """,
+                    ),
+                ),
             ]
 
     return []
@@ -61,8 +62,8 @@ def parser_check(app_configs, **kwargs):
         return [
             Error(
                 "No parsers found. This is a bug. The consumer won't be "
-                "able to consume any documents without parsers."
-            )
+                "able to consume any documents without parsers.",
+            ),
         ]
     else:
         return []

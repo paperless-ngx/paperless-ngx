@@ -1,23 +1,30 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AbstractInputComponent } from '../abstract-input';
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  Output,
+} from '@angular/core'
+import { NG_VALUE_ACCESSOR } from '@angular/forms'
+import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => SelectComponent),
-    multi: true
-  }],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SelectComponent),
+      multi: true,
+    },
+  ],
   selector: 'app-input-select',
   templateUrl: './select.component.html',
-  styleUrls: ['./select.component.scss']
+  styleUrls: ['./select.component.scss'],
 })
 export class SelectComponent extends AbstractInputComponent<number> {
-
   constructor() {
     super()
     this.addItemRef = this.addItem.bind(this)
-   }
+  }
 
   @Input()
   items: any[]
@@ -47,7 +54,9 @@ export class SelectComponent extends AbstractInputComponent<number> {
 
   getSuggestions() {
     if (this.suggestions && this.items) {
-      return this.suggestions.filter(id => id != this.value).map(id => this.items.find(item => item.id == id))
+      return this.suggestions
+        .filter((id) => id != this.value)
+        .map((id) => this.items.find((item) => item.id == id))
     } else {
       return []
     }
@@ -75,7 +84,6 @@ export class SelectComponent extends AbstractInputComponent<number> {
   onBlur() {
     setTimeout(() => {
       this.clearLastSearchTerm()
-    }, 3000);
+    }, 3000)
   }
-
 }

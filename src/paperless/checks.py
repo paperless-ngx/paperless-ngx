@@ -3,7 +3,9 @@ import shutil
 import stat
 
 from django.conf import settings
-from django.core.checks import Error, Warning, register
+from django.core.checks import Error
+from django.core.checks import register
+from django.core.checks import Warning
 
 exists_message = "{} is set but doesn't exist."
 exists_hint = "Create a directory at {}"
@@ -19,11 +21,12 @@ def path_check(var, directory):
     if directory:
         if not os.path.isdir(directory):
             messages.append(
-                Error(exists_message.format(var), exists_hint.format(directory))
+                Error(exists_message.format(var), exists_hint.format(directory)),
             )
         else:
             test_file = os.path.join(
-                directory, f"__paperless_write_test_{os.getpid()}__"
+                directory,
+                f"__paperless_write_test_{os.getpid()}__",
             )
             try:
                 with open(test_file, "w"):
@@ -34,9 +37,9 @@ def path_check(var, directory):
                         writeable_message.format(var),
                         writeable_hint.format(
                             f"\n{stat.filemode(os.stat(directory).st_mode)} "
-                            f"{directory}\n"
+                            f"{directory}\n",
                         ),
-                    )
+                    ),
                 )
             finally:
                 if os.path.isfile(test_file):
@@ -88,8 +91,8 @@ def debug_mode_check(app_configs, **kwargs):
                 "security issue, since it puts security overides in place which "
                 "are meant to be only used during development. This "
                 "also means that paperless will tell anyone various "
-                "debugging information when something goes wrong."
-            )
+                "debugging information when something goes wrong.",
+            ),
         ]
     else:
         return []
