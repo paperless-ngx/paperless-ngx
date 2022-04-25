@@ -34,6 +34,8 @@ it fixed for everyone!
 Before contributing please review our `code of conduct`_ and other important
 information in the `contributing guidelines`_.
 
+.. _code-formatting-with-pre-commit-hooks:
+
 Code formatting with pre-commit Hooks
 =====================================
 
@@ -85,6 +87,7 @@ To do the setup you need to perform the steps from the following chapters in a c
             docker run -d -p 6379:6379 --restart unless-stopped redis:latest
 
 7.  Install the python dependencies by performing in the src/ directory.
+
     .. code:: shell-session
 
         pipenv install --dev
@@ -139,8 +142,9 @@ Testing and code style:
 *   Run ``pytest`` in the src/ directory to execute all tests. This also generates a HTML coverage
     report. When runnings test, paperless.conf is loaded as well. However: the tests rely on the default
     configuration. This is not ideal. But for now, make sure no settings except for DEBUG are overridden when testing.
-*   Run ``black`` to format your code.
-*   Run ``pycodestyle`` to test your code for issues with the configured code style settings.
+*   Coding style is enforced by the Git pre-commit hooks.  These will ensure your code is formatted and do some
+    linting when you do a `git commit`.
+*   You can also run ``black`` manually to format your code
 
     .. note::
 
@@ -181,6 +185,31 @@ If you enabled DEBUG on the back end, several security overrides for allowed hos
 X-Frame-Options are in place so that the front end behaves exactly as in production. This also
 relies on you being logged into the back end. Without a valid session, The front end will simply
 not work.
+
+Testing and code style:
+
+*   The frontend code (.ts, .html, .scss) use ``prettier`` for code formatting via the Git
+    ``pre-commit`` hooks which run automatically on commit. See
+    :ref:`above <code-formatting-with-pre-commit-hooks>` for installation. You can also run this
+    via cli with a command such as
+
+    .. code:: shell-session
+
+        $ git ls-files -- '*.ts' | xargs pre-commit run prettier --files
+
+*   Frontend testing uses jest and cypress. There is currently a need for significantly more
+    frontend tests. Unit tests and e2e tests, respectively, can be run non-interactively with:
+
+    .. code:: shell-session
+
+        $ ng test
+        $ npm run e2e:ci
+
+    Cypress also includes a UI which can be run from within the ``src-ui`` directory with
+
+    .. code:: shell-session
+
+        $ ./node_modules/.bin/cypress open
 
 In order to build the front end and serve it as part of django, execute
 

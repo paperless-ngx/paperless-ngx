@@ -4,10 +4,11 @@ from unittest import mock
 from django.core.checks import Error
 from django.test import TestCase
 
-from .factories import DocumentFactory
-from .. import document_consumer_declaration
-from ..checks import changed_password_check, parser_check
+from ..checks import changed_password_check
+from ..checks import parser_check
 from ..models import Document
+from ..signals import document_consumer_declaration
+from .factories import DocumentFactory
 
 
 class ChecksTestCase(TestCase):
@@ -30,7 +31,7 @@ class ChecksTestCase(TestCase):
                 [
                     Error(
                         "No parsers found. This is a bug. The consumer won't be "
-                        "able to consume any documents without parsers."
-                    )
+                        "able to consume any documents without parsers.",
+                    ),
                 ],
             )

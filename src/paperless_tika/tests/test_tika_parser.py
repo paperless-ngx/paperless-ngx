@@ -4,9 +4,8 @@ from pathlib import Path
 from unittest import mock
 
 from django.test import TestCase
-from requests import Response
-
 from paperless_tika.parsers import TikaDocumentParser
+from requests import Response
 
 
 class TestTikaParser(TestCase):
@@ -42,14 +41,15 @@ class TestTikaParser(TestCase):
     @mock.patch("paperless_tika.parsers.parser.from_file")
     def test_metadata(self, from_file):
         from_file.return_value = {
-            "metadata": {"Creation-Date": "2020-11-21", "Some-key": "value"}
+            "metadata": {"Creation-Date": "2020-11-21", "Some-key": "value"},
         }
 
         file = os.path.join(self.parser.tempdir, "input.odt")
         Path(file).touch()
 
         metadata = self.parser.extract_metadata(
-            file, "application/vnd.oasis.opendocument.text"
+            file,
+            "application/vnd.oasis.opendocument.text",
         )
 
         self.assertTrue("Creation-Date" in [m["key"] for m in metadata])

@@ -110,7 +110,7 @@ performs all the steps described in :ref:`setup-docker_hub` automatically.
 
     .. code:: shell-session
 
-        $ bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/master/install-paperless-ngx.sh)"
+        $ bash -c "$(curl -L https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
 
 .. _setup-docker_hub:
 
@@ -481,7 +481,7 @@ Migrating from Paperless-ng
 ===========================
 
 Paperless-ngx is meant to be a drop-in replacement for Paperless-ng and thus upgrading should be
-trivial for most users, especially when using docker. However, as with any major change, it is 
+trivial for most users, especially when using docker. However, as with any major change, it is
 recommended to take a full backup first. Once you are ready, simply change the docker image to
 point to the new source. E.g. if using Docker Compose, edit ``docker-compose.yml`` and change:
 
@@ -494,12 +494,12 @@ to
 .. code::
 
   image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    
+
 and then run ``docker-compose up -d`` which will pull the new image recreate the container.
 That's it!
 
-Users who installed with the bare-metal route should also update their Git clone to point to 
-``https://github.com/paperless-ngx/paperless-ngx``, e.g. using the command 
+Users who installed with the bare-metal route should also update their Git clone to point to
+``https://github.com/paperless-ngx/paperless-ngx``, e.g. using the command
 ``git remote set-url origin https://github.com/paperless-ngx/paperless-ngx`` and then pull the
 lastest version.
 
@@ -728,6 +728,8 @@ configuring some options in paperless can help improve performance immensely:
     times. Thumbnails will be about 20% larger.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
+*   Use the arm compatible docker-compose if you're wanting to use Tika on something like
+		a raspberry pi. The official apache/tika image does not support the arm architecture.
 
 For details, refer to :ref:`configuration`.
 
@@ -785,5 +787,7 @@ the following configuration is required for paperless to operate:
             }
         }
     }
+
+The ``PAPERLESS_URL`` configuration variable is also required when using a reverse proxy. Please refer to the :ref:`hosting-and-security` docs.
 
 Also read `this <https://channels.readthedocs.io/en/stable/deploying.html#nginx-supervisor-ubuntu>`__, towards the end of the section.

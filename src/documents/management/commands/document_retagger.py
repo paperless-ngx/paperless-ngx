@@ -2,10 +2,12 @@ import logging
 
 import tqdm
 from django.core.management.base import BaseCommand
-
 from documents.classifier import load_classifier
 from documents.models import Document
-from ...signals.handlers import set_correspondent, set_document_type, set_tags
+
+from ...signals.handlers import set_correspondent
+from ...signals.handlers import set_document_type
+from ...signals.handlers import set_tags
 
 
 logger = logging.getLogger("paperless.management.retagger")
@@ -19,7 +21,8 @@ class Command(BaseCommand):
         back-tag all previously indexed documents with metadata created (or
         modified) after their initial import.
     """.replace(
-        "    ", ""
+        "    ",
+        "",
     )
 
     def add_arguments(self, parser):
@@ -57,7 +60,8 @@ class Command(BaseCommand):
             help="Return the suggestion, don't change anything.",
         )
         parser.add_argument(
-            "--base-url", help="The base URL to use to build the link to the documents."
+            "--base-url",
+            help="The base URL to use to build the link to the documents.",
         )
 
     def handle(self, *args, **options):

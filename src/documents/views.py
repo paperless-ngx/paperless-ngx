@@ -1,67 +1,79 @@
+import json
 import logging
 import os
 import tempfile
+import urllib
 import uuid
 import zipfile
 from datetime import datetime
 from time import mktime
-from urllib.parse import quote_plus
 from unicodedata import normalize
+from urllib.parse import quote
 
 from django.conf import settings
-from django.db.models import Count, Max, Case, When, IntegerField
+from django.db.models import Case
+from django.db.models import Count
+from django.db.models import IntegerField
+from django.db.models import Max
+from django.db.models import When
 from django.db.models.functions import Lower
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.http import Http404
+from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
+from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 from django_filters.rest_framework import DjangoFilterBackend
 from django_q.tasks import async_task
+from packaging import version as packaging_version
+from paperless import version
+from paperless.db import GnuPG
+from paperless.views import StandardPagination
 from rest_framework import parsers
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
-from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.filters import OrderingFilter
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
-from rest_framework.mixins import (
-    DestroyModelMixin,
-    ListModelMixin,
-    RetrieveModelMixin,
-    UpdateModelMixin,
-)
+from rest_framework.mixins import DestroyModelMixin
+from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet, ModelViewSet, ViewSet
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ViewSet
 
-from paperless.db import GnuPG
-from paperless.views import StandardPagination
-from .bulk_download import (
-    OriginalAndArchiveStrategy,
-    OriginalsOnlyStrategy,
-    ArchiveOnlyStrategy,
-)
+from .bulk_download import ArchiveOnlyStrategy
+from .bulk_download import OriginalAndArchiveStrategy
+from .bulk_download import OriginalsOnlyStrategy
 from .classifier import load_classifier
-from .filters import (
-    CorrespondentFilterSet,
-    DocumentFilterSet,
-    TagFilterSet,
-    DocumentTypeFilterSet,
-)
-from .matching import match_correspondents, match_tags, match_document_types
-from .models import Correspondent, Document, Tag, DocumentType, SavedView
+from .filters import CorrespondentFilterSet
+from .filters import DocumentFilterSet
+from .filters import DocumentTypeFilterSet
+from .filters import TagFilterSet
+from .matching import match_correspondents
+from .matching import match_document_types
+from .matching import match_tags
+from .models import Correspondent
+from .models import Document
+from .models import DocumentType
+from .models import SavedView
+from .models import Tag
 from .parsers import get_parser_class_for_mime_type
-from .serialisers import (
-    CorrespondentSerializer,
-    DocumentSerializer,
-    TagSerializerVersion1,
-    TagSerializer,
-    DocumentTypeSerializer,
-    PostDocumentSerializer,
-    SavedViewSerializer,
-    BulkEditSerializer,
-    DocumentListSerializer,
-    BulkDownloadSerializer,
-)
+from .serialisers import BulkDownloadSerializer
+from .serialisers import BulkEditSerializer
+from .serialisers import CorrespondentSerializer
+from .serialisers import DocumentListSerializer
+from .serialisers import DocumentSerializer
+from .serialisers import DocumentTypeSerializer
+from .serialisers import PostDocumentSerializer
+from .serialisers import SavedViewSerializer
+from .serialisers import TagSerializer
+from .serialisers import TagSerializerVersion1
 
 logger = logging.getLogger("paperless.api")
 
@@ -89,16 +101,14 @@ class IndexView(TemplateView):
         context["full_name"] = self.request.user.get_full_name()
         context["styles_css"] = f"frontend/{self.get_language()}/styles.css"
         context["runtime_js"] = f"frontend/{self.get_language()}/runtime.js"
-        context[
-            "polyfills_js"
-        ] = f"frontend/{self.get_language()}/polyfills.js"  # NOQA: E501
+        context["polyfills_js"] = f"frontend/{self.get_language()}/polyfills.js"
         context["main_js"] = f"frontend/{self.get_language()}/main.js"
         context[
             "webmanifest"
-        ] = f"frontend/{self.get_language()}/manifest.webmanifest"  # NOQA: E501
+        ] = f"frontend/{self.get_language()}/manifest.webmanifest"  # noqa: E501
         context[
             "apple_touch_icon"
-        ] = f"frontend/{self.get_language()}/apple-touch-icon.png"  # NOQA: E501
+        ] = f"frontend/{self.get_language()}/apple-touch-icon.png"  # noqa: E501
         return context
 
 
@@ -106,7 +116,8 @@ class CorrespondentViewSet(ModelViewSet):
     model = Correspondent
 
     queryset = Correspondent.objects.annotate(
-        document_count=Count("documents"), last_correspondence=Max("documents__created")
+        document_count=Count("documents"),
+        last_correspondence=Max("documents__created"),
     ).order_by(Lower("name"))
 
     serializer_class = CorrespondentSerializer
@@ -127,7 +138,7 @@ class TagViewSet(ModelViewSet):
     model = Tag
 
     queryset = Tag.objects.annotate(document_count=Count("documents")).order_by(
-        Lower("name")
+        Lower("name"),
     )
 
     def get_serializer_class(self):
@@ -147,7 +158,7 @@ class DocumentTypeViewSet(ModelViewSet):
     model = DocumentType
 
     queryset = DocumentType.objects.annotate(
-        document_count=Count("documents")
+        document_count=Count("documents"),
     ).order_by(Lower("name"))
 
     serializer_class = DocumentTypeSerializer
@@ -220,9 +231,7 @@ class DocumentViewSet(
 
     def file_response(self, pk, request, disposition):
         doc = Document.objects.get(id=pk)
-        if (
-            not self.original_requested(request) and doc.has_archive_version
-        ):  # NOQA: E501
+        if not self.original_requested(request) and doc.has_archive_version:
             file_handle = doc.archive_file
             filename = doc.get_public_filename(archive=True)
             mime_type = "application/pdf"
@@ -239,7 +248,7 @@ class DocumentViewSet(
         # RFC 5987 addresses this issue
         # see https://datatracker.ietf.org/doc/html/rfc5987#section-4.2
         filename_normalized = normalize("NFKD", filename).encode("ascii", "ignore")
-        filename_encoded = quote_plus(filename)
+        filename_encoded = quote(filename)
         content_disposition = (
             f"{disposition}; "
             f'filename="{filename_normalized}"; '
@@ -258,7 +267,7 @@ class DocumentViewSet(
 
             try:
                 return parser.extract_metadata(file, mime_type)
-            except Exception as e:
+            except Exception:
                 # TODO: cover GPG errors, remove later.
                 return []
         else:
@@ -291,7 +300,8 @@ class DocumentViewSet(
         if doc.has_archive_version:
             meta["archive_size"] = self.get_filesize(doc.archive_path)
             meta["archive_metadata"] = self.get_metadata(
-                doc.archive_path, "application/pdf"
+                doc.archive_path,
+                "application/pdf",
             )
         else:
             meta["archive_size"] = None
@@ -315,7 +325,7 @@ class DocumentViewSet(
                 "document_types": [
                     dt.id for dt in match_document_types(doc, classifier)
                 ],
-            }
+            },
         )
 
     @action(methods=["get"], detail=True)
@@ -327,7 +337,7 @@ class DocumentViewSet(
             raise Http404()
 
     @action(methods=["get"], detail=True)
-    @cache_control(public=False, max_age=315360000)
+    @method_decorator(cache_control(public=False, max_age=315360000))
     def thumb(self, request, pk=None):
         try:
             doc = Document.objects.get(id=pk)
@@ -357,7 +367,7 @@ class SearchResultSerializer(DocumentSerializer):
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content)
             if doc
-            else None,  # NOQA: E501
+            else None,
             "rank": instance.rank,
         }
 
@@ -500,7 +510,9 @@ class PostDocumentView(GenericAPIView):
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
 
         with tempfile.NamedTemporaryFile(
-            prefix="paperless-upload-", dir=settings.SCRATCH_DIR, delete=False
+            prefix="paperless-upload-",
+            dir=settings.SCRATCH_DIR,
+            delete=False,
         ) as f:
             f.write(doc_data)
             os.utime(f.name, times=(t, t))
@@ -537,20 +549,20 @@ class SelectionDataView(GenericAPIView):
 
         correspondents = Correspondent.objects.annotate(
             document_count=Count(
-                Case(When(documents__id__in=ids, then=1), output_field=IntegerField())
-            )
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
         )
 
         tags = Tag.objects.annotate(
             document_count=Count(
-                Case(When(documents__id__in=ids, then=1), output_field=IntegerField())
-            )
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
         )
 
         types = DocumentType.objects.annotate(
             document_count=Count(
-                Case(When(documents__id__in=ids, then=1), output_field=IntegerField())
-            )
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
         )
 
         r = Response(
@@ -565,7 +577,7 @@ class SelectionDataView(GenericAPIView):
                 "selected_document_types": [
                     {"id": t.id, "document_count": t.document_count} for t in types
                 ],
-            }
+            },
         )
 
         return r
@@ -612,7 +624,7 @@ class StatisticsView(APIView):
             {
                 "documents_total": documents_total,
                 "documents_inbox": documents_inbox,
-            }
+            },
         )
 
 
@@ -632,7 +644,9 @@ class BulkDownloadView(GenericAPIView):
 
         os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
         temp = tempfile.NamedTemporaryFile(
-            dir=settings.SCRATCH_DIR, suffix="-compressed-archive", delete=False
+            dir=settings.SCRATCH_DIR,
+            suffix="-compressed-archive",
+            delete=False,
         )
 
         if content == "both":
@@ -651,7 +665,45 @@ class BulkDownloadView(GenericAPIView):
         with open(temp.name, "rb") as f:
             response = HttpResponse(f, content_type="application/zip")
             response["Content-Disposition"] = '{}; filename="{}"'.format(
-                "attachment", "documents.zip"
+                "attachment",
+                "documents.zip",
             )
 
             return response
+
+
+class RemoteVersionView(GenericAPIView):
+    def get(self, request, format=None):
+        remote_version = "0.0.0"
+        is_greater_than_current = False
+        # TODO: this can likely be removed when frontend settings are saved to DB
+        feature_is_set = settings.ENABLE_UPDATE_CHECK != "default"
+        if feature_is_set and settings.ENABLE_UPDATE_CHECK:
+            try:
+                with urllib.request.urlopen(
+                    "https://api.github.com/repos/"
+                    + "paperless-ngx/paperless-ngx/releases/latest",
+                ) as response:
+                    remote = response.read().decode("utf-8")
+                try:
+                    remote_json = json.loads(remote)
+                    remote_version = remote_json["tag_name"].replace("ngx-", "")
+                except ValueError:
+                    logger.debug("An error occured parsing remote version json")
+            except urllib.error.URLError:
+                logger.debug("An error occured checking for available updates")
+
+            current_version = ".".join([str(_) for _ in version.__version__[:3]])
+            is_greater_than_current = packaging_version.parse(
+                remote_version,
+            ) > packaging_version.parse(
+                current_version,
+            )
+
+        return Response(
+            {
+                "version": remote_version,
+                "update_available": is_greater_than_current,
+                "feature_is_set": feature_is_set,
+            },
+        )

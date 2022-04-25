@@ -1,20 +1,22 @@
-import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model';
-import { ObjectWithId } from 'src/app/data/object-with-id';
-import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service';
-import { ToastService } from 'src/app/services/toast.service';
+import { Directive, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { FormGroup } from '@angular/forms'
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { MATCHING_ALGORITHMS, MATCH_AUTO } from 'src/app/data/matching-model'
+import { ObjectWithId } from 'src/app/data/object-with-id'
+import { AbstractPaperlessService } from 'src/app/services/rest/abstract-paperless-service'
+import { ToastService } from 'src/app/services/toast.service'
 
 @Directive()
-export abstract class EditDialogComponent<T extends ObjectWithId> implements OnInit {
-
+export abstract class EditDialogComponent<T extends ObjectWithId>
+  implements OnInit
+{
   constructor(
     private service: AbstractPaperlessService<T>,
     private activeModal: NgbActiveModal,
-    private toastService: ToastService) { }
+    private toastService: ToastService
+  ) {}
 
   @Input()
   dialogMode: string = 'create'
@@ -43,7 +45,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
     // wait to enable close button so it doesnt steal focus from input since its the first clickable element in the DOM
     setTimeout(() => {
       this.closeEnabled = true
-    });
+    })
   }
 
   getCreateTitle() {
@@ -65,7 +67,7 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
       case 'edit':
         return this.getEditTitle()
       default:
-        break;
+        break
     }
   }
 
@@ -78,25 +80,31 @@ export abstract class EditDialogComponent<T extends ObjectWithId> implements OnI
   }
 
   save() {
-    var newObject = Object.assign(Object.assign({}, this.object), this.objectForm.value)
+    var newObject = Object.assign(
+      Object.assign({}, this.object),
+      this.objectForm.value
+    )
     var serverResponse: Observable<T>
     switch (this.dialogMode) {
       case 'create':
         serverResponse = this.service.create(newObject)
-        break;
+        break
       case 'edit':
         serverResponse = this.service.update(newObject)
       default:
-        break;
+        break
     }
     this.networkActive = true
-    serverResponse.subscribe(result => {
-      this.activeModal.close()
-      this.success.emit(result)
-    }, error => {
-      this.error = error.error
-      this.networkActive = false
-    })
+    serverResponse.subscribe(
+      (result) => {
+        this.activeModal.close()
+        this.success.emit(result)
+      },
+      (error) => {
+        this.error = error.error
+        this.networkActive = false
+      }
+    )
   }
 
   cancel() {

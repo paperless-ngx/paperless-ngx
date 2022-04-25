@@ -3,9 +3,8 @@ import logging
 import os
 
 from django.conf import settings
-from tqdm import tqdm
-
 from documents.models import Document
+from tqdm import tqdm
 
 
 class SanityCheckMessages:
@@ -88,19 +87,19 @@ def check_sanity(progress=False):
                 if not checksum == doc.checksum:
                     messages.error(
                         f"Checksum mismatch of document {doc.pk}. "
-                        f"Stored: {doc.checksum}, actual: {checksum}."
+                        f"Stored: {doc.checksum}, actual: {checksum}.",
                     )
 
         # Check sanity of the archive file.
         if doc.archive_checksum and not doc.archive_filename:
             messages.error(
                 f"Document {doc.pk} has an archive file checksum, but no "
-                f"archive filename."
+                f"archive filename.",
             )
         elif not doc.archive_checksum and doc.archive_filename:
             messages.error(
                 f"Document {doc.pk} has an archive file, but its checksum is "
-                f"missing."
+                f"missing.",
             )
         elif doc.has_archive_version:
             if not os.path.isfile(doc.archive_path):
@@ -113,7 +112,7 @@ def check_sanity(progress=False):
                         checksum = hashlib.md5(f.read()).hexdigest()
                 except OSError as e:
                     messages.error(
-                        f"Cannot read archive file of document {doc.pk}: {e}"
+                        f"Cannot read archive file of document {doc.pk}: {e}",
                     )
                 else:
                     if not checksum == doc.archive_checksum:
@@ -121,7 +120,7 @@ def check_sanity(progress=False):
                             f"Checksum mismatch of archived document "
                             f"{doc.pk}. "
                             f"Stored: {doc.archive_checksum}, "
-                            f"actual: {checksum}."
+                            f"actual: {checksum}.",
                         )
 
         # other document checks

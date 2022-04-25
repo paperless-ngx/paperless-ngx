@@ -1,20 +1,36 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { PaperlessDocument } from 'src/app/data/paperless-document';
-import { DocumentService } from 'src/app/services/rest/document.service';
-import { SettingsService, SETTINGS_KEYS } from 'src/app/services/settings.service';
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { DocumentListViewService } from 'src/app/services/document-list-view.service';
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core'
+import { DomSanitizer } from '@angular/platform-browser'
+import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { DocumentService } from 'src/app/services/rest/document.service'
+import {
+  SettingsService,
+  SETTINGS_KEYS,
+} from 'src/app/services/settings.service'
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 
 @Component({
   selector: 'app-document-card-large',
   templateUrl: './document-card-large.component.html',
-  styleUrls: ['./document-card-large.component.scss', '../popover-preview/popover-preview.scss']
+  styleUrls: [
+    './document-card-large.component.scss',
+    '../popover-preview/popover-preview.scss',
+  ],
 })
 export class DocumentCardLargeComponent implements OnInit {
-
-  constructor(private documentService: DocumentService, private sanitizer: DomSanitizer, private settingsService: SettingsService) { }
+  constructor(
+    private documentService: DocumentService,
+    private sanitizer: DomSanitizer,
+    private settingsService: SettingsService
+  ) {}
 
   @Input()
   selected = false
@@ -39,7 +55,7 @@ export class DocumentCardLargeComponent implements OnInit {
   clickDocumentType = new EventEmitter<number>()
 
   @Output()
-  clickMoreLike= new EventEmitter()
+  clickMoreLike = new EventEmitter()
 
   @ViewChild('popover') popover: NgbPopover
 
@@ -49,17 +65,16 @@ export class DocumentCardLargeComponent implements OnInit {
   get searchScoreClass() {
     if (this.document.__search_hit__) {
       if (this.document.__search_hit__.score > 0.7) {
-        return "success"
+        return 'success'
       } else if (this.document.__search_hit__.score > 0.3) {
-        return "warning"
+        return 'warning'
       } else {
-        return "danger"
+        return 'danger'
       }
     }
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   getIsThumbInverted() {
     return this.settingsService.get(SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED)
@@ -90,7 +105,7 @@ export class DocumentCardLargeComponent implements OnInit {
         } else {
           this.popover.close()
         }
-      }, 600);
+      }, 600)
     }
   }
 

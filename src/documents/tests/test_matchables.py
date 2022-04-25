@@ -1,37 +1,52 @@
 import shutil
 import tempfile
 from random import randint
+from typing import Iterable
 
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.test import override_settings
+from django.test import TestCase
 
 from .. import matching
-from ..models import Correspondent, Document, Tag, DocumentType
+from ..models import Correspondent
+from ..models import Document
+from ..models import DocumentType
+from ..models import Tag
 from ..signals import document_consumption_finished
 
 
-class TestMatching(TestCase):
-    def _test_matching(self, text, algorithm, true, false):
+class _TestMatchingBase(TestCase):
+    def _test_matching(
+        self,
+        match_text: str,
+        match_algorithm: str,
+        should_match: Iterable[str],
+        no_match: Iterable[str],
+        case_sensitive: bool = False,
+    ):
         for klass in (Tag, Correspondent, DocumentType):
             instance = klass.objects.create(
                 name=str(randint(10000, 99999)),
-                match=text,
-                matching_algorithm=getattr(klass, algorithm),
+                match=match_text,
+                matching_algorithm=getattr(klass, match_algorithm),
+                is_insensitive=not case_sensitive,
             )
-            for string in true:
+            for string in should_match:
                 doc = Document(content=string)
                 self.assertTrue(
                     matching.matches(instance, doc),
-                    '"%s" should match "%s" but it does not' % (text, string),
+                    '"%s" should match "%s" but it does not' % (match_text, string),
                 )
-            for string in false:
+            for string in no_match:
                 doc = Document(content=string)
                 self.assertFalse(
                     matching.matches(instance, doc),
-                    '"%s" should not match "%s" but it does' % (text, string),
+                    '"%s" should not match "%s" but it does' % (match_text, string),
                 )
 
+
+class TestMatching(_TestMatchingBase):
     def test_match_all(self):
 
         self._test_matching(
@@ -162,7 +177,7 @@ class TestMatching(TestCase):
     def test_match_regex(self):
 
         self._test_matching(
-            "alpha\w+gamma",
+            r"alpha\w+gamma",
             "MATCH_REGEX",
             (
                 "I have alpha_and_gamma in me",
@@ -181,7 +196,7 @@ class TestMatching(TestCase):
         )
 
     def test_tach_invalid_regex(self):
-        self._test_matching("[[", "MATCH_REGEX", [], ["Don't match this"])
+        self._test_matching("[", "MATCH_REGEX", [], ["Don't match this"])
 
     def test_match_fuzzy(self):
 
@@ -198,6 +213,169 @@ class TestMatching(TestCase):
         )
 
 
+class TestCaseSensitiveMatching(_TestMatchingBase):
+    def test_match_all(self):
+        self._test_matching(
+            "alpha charlie gamma",
+            "MATCH_ALL",
+            (
+                "I have alpha, charlie, and gamma in me",
+                "I have gamma, charlie, and alpha in me",
+            ),
+            (
+                "I have Alpha, charlie, and gamma in me",
+                "I have gamma, Charlie, and alpha in me",
+                "I have alpha, charlie, and Gamma in me",
+                "I have gamma, charlie, and ALPHA in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            "Alpha charlie Gamma",
+            "MATCH_ALL",
+            (
+                "I have Alpha, charlie, and Gamma in me",
+                "I have Gamma, charlie, and Alpha in me",
+            ),
+            (
+                "I have Alpha, charlie, and gamma in me",
+                "I have gamma, charlie, and alpha in me",
+                "I have alpha, charlie, and Gamma in me",
+                "I have Gamma, Charlie, and ALPHA in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            'brown fox "lazy dogs"',
+            "MATCH_ALL",
+            (
+                "the quick brown fox jumped over the lazy dogs",
+                "the quick brown fox jumped over the lazy  dogs",
+            ),
+            (
+                "the quick Brown fox jumped over the lazy dogs",
+                "the quick brown Fox jumped over the lazy  dogs",
+                "the quick brown fox jumped over the Lazy dogs",
+                "the quick brown fox jumped over the lazy  Dogs",
+            ),
+            case_sensitive=True,
+        )
+
+    def test_match_any(self):
+        self._test_matching(
+            "alpha charlie gamma",
+            "MATCH_ANY",
+            (
+                "I have alpha in me",
+                "I have charlie in me",
+                "I have gamma in me",
+                "I have alpha, charlie, and gamma in me",
+                "I have alpha and charlie in me",
+            ),
+            (
+                "I have Alpha in me",
+                "I have chaRLie in me",
+                "I have gamMA in me",
+                "I have aLPha, cHArlie, and gAMma in me",
+                "I have AlphA and CharlIe in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            "Alpha Charlie Gamma",
+            "MATCH_ANY",
+            (
+                "I have Alpha in me",
+                "I have Charlie in me",
+                "I have Gamma in me",
+                "I have Alpha, Charlie, and Gamma in me",
+                "I have Alpha and Charlie in me",
+            ),
+            (
+                "I have alpha in me",
+                "I have ChaRLie in me",
+                "I have GamMA in me",
+                "I have ALPha, CHArlie, and GAMma in me",
+                "I have AlphA and CharlIe in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            '"brown fox" " lazy  dogs "',
+            "MATCH_ANY",
+            (
+                "the quick brown fox",
+                "jumped over the lazy  dogs.",
+            ),
+            (
+                "the quick Brown fox",
+                "jumped over the lazy  Dogs.",
+            ),
+            case_sensitive=True,
+        )
+
+    def test_match_literal(self):
+
+        self._test_matching(
+            "alpha charlie gamma",
+            "MATCH_LITERAL",
+            ("I have 'alpha charlie gamma' in me",),
+            (
+                "I have 'Alpha charlie gamma' in me",
+                "I have 'alpha Charlie gamma' in me",
+                "I have 'alpha charlie Gamma' in me",
+                "I have 'Alpha Charlie Gamma' in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            "Alpha Charlie Gamma",
+            "MATCH_LITERAL",
+            ("I have 'Alpha Charlie Gamma' in me",),
+            (
+                "I have 'Alpha charlie gamma' in me",
+                "I have 'alpha Charlie gamma' in me",
+                "I have 'alpha charlie Gamma' in me",
+                "I have 'alpha charlie gamma' in me",
+            ),
+            case_sensitive=True,
+        )
+
+    def test_match_regex(self):
+        self._test_matching(
+            r"alpha\w+gamma",
+            "MATCH_REGEX",
+            (
+                "I have alpha_and_gamma in me",
+                "I have alphas_and_gamma in me",
+            ),
+            (
+                "I have Alpha_and_Gamma in me",
+                "I have alpHAs_and_gaMMa in me",
+            ),
+            case_sensitive=True,
+        )
+
+        self._test_matching(
+            r"Alpha\w+gamma",
+            "MATCH_REGEX",
+            (
+                "I have Alpha_and_gamma in me",
+                "I have Alphas_and_gamma in me",
+            ),
+            (
+                "I have Alpha_and_Gamma in me",
+                "I have alphas_and_gamma in me",
+            ),
+            case_sensitive=True,
+        )
+
+
 @override_settings(POST_CONSUME_SCRIPT=None)
 class TestDocumentConsumptionFinishedSignal(TestCase):
     """
@@ -209,7 +387,8 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
         TestCase.setUp(self)
         User.objects.create_user(username="test_consumer", password="12345")
         self.doc_contains = Document.objects.create(
-            content="I contain the keyword.", mime_type="application/pdf"
+            content="I contain the keyword.",
+            mime_type="application/pdf",
         )
 
         self.index_dir = tempfile.mkdtemp()
@@ -221,43 +400,56 @@ class TestDocumentConsumptionFinishedSignal(TestCase):
 
     def test_tag_applied_any(self):
         t1 = Tag.objects.create(
-            name="test", match="keyword", matching_algorithm=Tag.MATCH_ANY
+            name="test",
+            match="keyword",
+            matching_algorithm=Tag.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertTrue(list(self.doc_contains.tags.all()) == [t1])
 
     def test_tag_not_applied(self):
         Tag.objects.create(
-            name="test", match="no-match", matching_algorithm=Tag.MATCH_ANY
+            name="test",
+            match="no-match",
+            matching_algorithm=Tag.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertTrue(list(self.doc_contains.tags.all()) == [])
 
     def test_correspondent_applied(self):
         correspondent = Correspondent.objects.create(
-            name="test", match="keyword", matching_algorithm=Correspondent.MATCH_ANY
+            name="test",
+            match="keyword",
+            matching_algorithm=Correspondent.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertTrue(self.doc_contains.correspondent == correspondent)
 
     def test_correspondent_not_applied(self):
         Tag.objects.create(
-            name="test", match="no-match", matching_algorithm=Correspondent.MATCH_ANY
+            name="test",
+            match="no-match",
+            matching_algorithm=Correspondent.MATCH_ANY,
         )
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
         self.assertEqual(self.doc_contains.correspondent, None)
 
     def test_logentry_created(self):
         document_consumption_finished.send(
-            sender=self.__class__, document=self.doc_contains
+            sender=self.__class__,
+            document=self.doc_contains,
         )
 
         self.assertEqual(LogEntry.objects.count(), 1)

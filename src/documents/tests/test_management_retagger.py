@@ -1,35 +1,50 @@
 from django.core.management import call_command
 from django.test import TestCase
-
-from documents.models import Document, Tag, Correspondent, DocumentType
+from documents.models import Correspondent
+from documents.models import Document
+from documents.models import DocumentType
+from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
 class TestRetagger(DirectoriesMixin, TestCase):
     def make_models(self):
         self.d1 = Document.objects.create(
-            checksum="A", title="A", content="first document"
+            checksum="A",
+            title="A",
+            content="first document",
         )
         self.d2 = Document.objects.create(
-            checksum="B", title="B", content="second document"
+            checksum="B",
+            title="B",
+            content="second document",
         )
         self.d3 = Document.objects.create(
-            checksum="C", title="C", content="unrelated document"
+            checksum="C",
+            title="C",
+            content="unrelated document",
         )
         self.d4 = Document.objects.create(
-            checksum="D", title="D", content="auto document"
+            checksum="D",
+            title="D",
+            content="auto document",
         )
 
         self.tag_first = Tag.objects.create(
-            name="tag1", match="first", matching_algorithm=Tag.MATCH_ANY
+            name="tag1",
+            match="first",
+            matching_algorithm=Tag.MATCH_ANY,
         )
         self.tag_second = Tag.objects.create(
-            name="tag2", match="second", matching_algorithm=Tag.MATCH_ANY
+            name="tag2",
+            match="second",
+            matching_algorithm=Tag.MATCH_ANY,
         )
         self.tag_inbox = Tag.objects.create(name="test", is_inbox_tag=True)
         self.tag_no_match = Tag.objects.create(name="test2")
         self.tag_auto = Tag.objects.create(
-            name="tagauto", matching_algorithm=Tag.MATCH_AUTO
+            name="tagauto",
+            matching_algorithm=Tag.MATCH_AUTO,
         )
 
         self.d3.tags.add(self.tag_inbox)
@@ -37,17 +52,25 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.d4.tags.add(self.tag_auto)
 
         self.correspondent_first = Correspondent.objects.create(
-            name="c1", match="first", matching_algorithm=Correspondent.MATCH_ANY
+            name="c1",
+            match="first",
+            matching_algorithm=Correspondent.MATCH_ANY,
         )
         self.correspondent_second = Correspondent.objects.create(
-            name="c2", match="second", matching_algorithm=Correspondent.MATCH_ANY
+            name="c2",
+            match="second",
+            matching_algorithm=Correspondent.MATCH_ANY,
         )
 
         self.doctype_first = DocumentType.objects.create(
-            name="dt1", match="first", matching_algorithm=DocumentType.MATCH_ANY
+            name="dt1",
+            match="first",
+            matching_algorithm=DocumentType.MATCH_ANY,
         )
         self.doctype_second = DocumentType.objects.create(
-            name="dt2", match="second", matching_algorithm=DocumentType.MATCH_ANY
+            name="dt2",
+            match="second",
+            matching_algorithm=DocumentType.MATCH_ANY,
         )
 
     def get_updated_docs(self):
@@ -98,10 +121,12 @@ class TestRetagger(DirectoriesMixin, TestCase):
         self.assertIsNotNone(Tag.objects.get(id=self.tag_second.id))
 
         self.assertCountEqual(
-            [tag.id for tag in d_first.tags.all()], [self.tag_first.id]
+            [tag.id for tag in d_first.tags.all()],
+            [self.tag_first.id],
         )
         self.assertCountEqual(
-            [tag.id for tag in d_second.tags.all()], [self.tag_second.id]
+            [tag.id for tag in d_second.tags.all()],
+            [self.tag_second.id],
         )
         self.assertCountEqual(
             [tag.id for tag in d_unrelated.tags.all()],
@@ -133,7 +158,10 @@ class TestRetagger(DirectoriesMixin, TestCase):
 
     def test_add_tags_suggest_url(self):
         call_command(
-            "document_retagger", "--tags", "--suggest", "--base-url=http://localhost"
+            "document_retagger",
+            "--tags",
+            "--suggest",
+            "--base-url=http://localhost",
         )
         d_first, d_second, d_unrelated, d_auto = self.get_updated_docs()
 

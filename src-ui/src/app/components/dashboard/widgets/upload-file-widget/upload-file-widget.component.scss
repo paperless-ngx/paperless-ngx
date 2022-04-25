@@ -1,5 +1,3 @@
-@import "/src/theme";
-
 form {
   position: relative;
 }
@@ -32,4 +30,8 @@ form {
   height: auto;
   mix-blend-mode: soft-light;
   pointer-events: none;
+}
+
+::ng-deep .ngx-file-drop__drop-zone--over {
+  background-color: var(--pngx-primary-faded) !important;
 }

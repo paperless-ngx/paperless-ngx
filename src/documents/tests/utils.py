@@ -7,7 +7,8 @@ from contextlib import contextmanager
 from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import override_settings, TransactionTestCase
+from django.test import override_settings
+from django.test import TransactionTestCase
 
 
 def setup_directories():
@@ -97,7 +98,7 @@ class TestMigrations(TransactionTestCase):
         assert (
             self.migrate_from and self.migrate_to
         ), "TestCase '{}' must define migrate_from and migrate_to     properties".format(
-            type(self).__name__
+            type(self).__name__,
         )
         self.migrate_from = [(self.app, self.migrate_from)]
         self.migrate_to = [(self.app, self.migrate_to)]

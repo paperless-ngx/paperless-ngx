@@ -1,5 +1,5 @@
 <div class="mb-3">
-  <label [for]="inputId">{{title}}</label>
+  <label *ngIf="title" [for]="inputId">{{title}}</label>
 
   <div class="input-group" [class.is-invalid]="error">
     <span class="input-group-text" [style.background-color]="value">&nbsp;&nbsp;&nbsp;</span>

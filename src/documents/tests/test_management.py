@@ -1,16 +1,14 @@
-import hashlib
-import tempfile
 import filecmp
+import hashlib
 import os
 import shutil
+import tempfile
 from pathlib import Path
 from unittest import mock
 
-from django.test import TestCase, override_settings
-
-
 from django.core.management import call_command
-
+from django.test import override_settings
+from django.test import TestCase
 from documents.file_handling import generate_filename
 from documents.management.commands.document_archiver import handle_document
 from documents.models import Document
@@ -34,7 +32,8 @@ class TestArchiver(DirectoriesMixin, TestCase):
 
         doc = self.make_models()
         shutil.copy(
-            sample_file, os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf")
+            sample_file,
+            os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"),
         )
 
         call_command("document_archiver")
@@ -43,7 +42,8 @@ class TestArchiver(DirectoriesMixin, TestCase):
 
         doc = self.make_models()
         shutil.copy(
-            sample_file, os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf")
+            sample_file,
+            os.path.join(self.dirs.originals_dir, f"{doc.id:07}.pdf"),
         )
 
         handle_document(doc.pk)
@@ -90,7 +90,8 @@ class TestArchiver(DirectoriesMixin, TestCase):
         )
         shutil.copy(sample_file, os.path.join(self.dirs.originals_dir, f"document.pdf"))
         shutil.copy(
-            sample_file, os.path.join(self.dirs.originals_dir, f"document_01.pdf")
+            sample_file,
+            os.path.join(self.dirs.originals_dir, f"document_01.pdf"),
         )
 
         handle_document(doc2.pk)
@@ -120,7 +121,9 @@ class TestDecryptDocuments(TestCase):
         os.makedirs(thumb_dir, exist_ok=True)
 
         override_settings(
-            ORIGINALS_DIR=originals_dir, THUMBNAIL_DIR=thumb_dir, PASSPHRASE="test"
+            ORIGINALS_DIR=originals_dir,
+            THUMBNAIL_DIR=thumb_dir,
+            PASSPHRASE="test",
         ).enable()
 
         doc = Document.objects.create(
@@ -206,7 +209,7 @@ class TestRenamer(DirectoriesMixin, TestCase):
 
 class TestCreateClassifier(TestCase):
     @mock.patch(
-        "documents.management.commands.document_create_classifier.train_classifier"
+        "documents.management.commands.document_create_classifier.train_classifier",
     )
     def test_create_classifier(self, m):
         call_command("document_create_classifier")
@@ -224,7 +227,10 @@ class TestSanityChecker(DirectoriesMixin, TestCase):
 
     def test_errors(self):
         doc = Document.objects.create(
-            title="test", content="test", filename="test.pdf", checksum="abc"
+            title="test",
+            content="test",
+            filename="test.pdf",
+            checksum="abc",
         )
         Path(doc.source_path).touch()
         Path(doc.thumbnail_path).touch()
