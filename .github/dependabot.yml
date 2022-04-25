@@ -29,6 +29,7 @@ updates:
 
   # Enable updates for Github Actions
   - package-ecosystem: "github-actions"
+    target-branch: "dev"
     directory: "/"
     schedule:
       # Check for updates to GitHub Actions every month
