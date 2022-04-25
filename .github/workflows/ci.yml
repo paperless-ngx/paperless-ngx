@@ -168,8 +168,8 @@ jobs:
       dockerfile: ./docker-builders/Dockerfile.psycopg2
       build-json: ${{ needs.prepare-docker-build.outputs.psycopg2-json }}
       build-args: |
-        GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).git_tag }}
-        VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
+        PSYCOPG2_GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).git_tag }}
+        PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
 
   build-pikepdf-wheel:
     name: pikepdf
@@ -183,8 +183,8 @@ jobs:
       build-args: |
         REPO=${{ github.repository }}
         QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
-        GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).git_tag }}
-        VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
+        PIKEPDF_GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).git_tag }}
+        PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
 
   build-frontend:
     name: Compile frontend

@@ -2,8 +2,8 @@
 # Inputs:
 #		- REPO - Docker repository to pull qpdf from
 #		- QPDF_VERSION - The image qpdf version to copy .deb files from
-#		- GIT_TAG - The Git tag to clone and build from
-#		- VERSION - Used to force the built pikepdf version to match
+#		- PIKEPDF_GIT_TAG - The Git tag to clone and build from
+#		- PIKEPDF_VERSION - Used to force the built pikepdf version to match
 
 # Default to pulling from the main repo registry when manually building
 ARG REPO="paperless-ngx/paperless-ngx"
@@ -32,7 +32,7 @@ ARG BUILD_PACKAGES="\
 
 WORKDIR /usr/src
 
-COPY --from=qpdf-builder /usr/src/qpdf/*.deb .
+COPY --from=qpdf-builder /usr/src/qpdf/*.deb ./
 
 # As this is an base image for a multi-stage final image
 # the added size of the install is basically irrelevant
@@ -49,19 +49,19 @@ RUN set -eux \
 # For better caching, seperate the basic installs from
 # the building
 
-ARG GIT_TAG
-ARG VERSION
+ARG PIKEPDF_GIT_TAG
+ARG PIKEPDF_VERSION
 
 RUN set -eux \
 	&& echo "building pikepdf wheel" \
   # Note the v in the tag name here
-  && git clone --quiet --depth 1 --branch "${GIT_TAG}" https://github.com/pikepdf/pikepdf.git \
+  && git clone --quiet --depth 1 --branch "${PIKEPDF_GIT_TAG}" https://github.com/pikepdf/pikepdf.git \
   && cd pikepdf \
   # pikepdf seems to specifciy either a next version when built OR
   # a post release tag.
   # In either case, this won't match what we want from requirements.txt
   # Directly modify the setup.py to set the version we just checked out of Git
-  && sed -i "s/use_scm_version=True/version=\"${VERSION}\"/g" setup.py \
+  && sed -i "s/use_scm_version=True/version=\"${PIKEPDF_VERSION}\"/g" setup.py \
   # https://github.com/pikepdf/pikepdf/issues/323
   && rm pyproject.toml \
   && mkdir wheels \
