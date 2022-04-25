@@ -52,7 +52,7 @@
     "wait-on": "~6.0.1"
   },
   "optionalDependencies": {
-    "cypress": "~9.5.3",
+    "cypress": "~9.6.0",
     "@cypress/schematic": "^1.6.0"
   }
 }
