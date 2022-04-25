@@ -266,9 +266,6 @@ jobs:
 
   # build and push image to docker hub.
   build-docker-image:
-    concurrency:
-      group: ${{ github.workflow }}-build-docker-image-${{ github.ref }}
-      cancel-in-progress: true
     runs-on: ubuntu-20.04
     concurrency:
       group: ${{ github.workflow }}-build-docker-image-${{ github.ref_name }}
