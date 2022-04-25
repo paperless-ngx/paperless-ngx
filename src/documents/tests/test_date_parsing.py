@@ -5,15 +5,16 @@ from uuid import uuid4
 
 from dateutil import tz
 from django.conf import settings
-from django.test import TestCase, override_settings
-
+from django.test import override_settings
+from django.test import TestCase
 from documents.parsers import parse_date
 
 
 class TestDate(TestCase):
 
     SAMPLE_FILES = os.path.join(
-        os.path.dirname(__file__), "../../paperless_tesseract/tests/samples"
+        os.path.dirname(__file__),
+        "../../paperless_tesseract/tests/samples",
     )
     SCRATCH = "/tmp/paperless-tests-{}".format(str(uuid4())[:8])
 
@@ -99,6 +100,57 @@ class TestDate(TestCase):
             datetime.datetime(2020, 3, 1, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
 
+    def test_date_format_10(self):
+        text = "Customer Number Currency 22-MAR-2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_11(self):
+        text = "Customer Number Currency 22 MAR 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_12(self):
+        text = "Customer Number Currency 22/MAR/2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_13(self):
+        text = "Customer Number Currency 22.MAR.2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_14(self):
+        text = "Customer Number Currency 22.MAR 2022 Credit Card 1934829304"
+        self.assertEqual(
+            parse_date("", text),
+            datetime.datetime(2022, 3, 22, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_date_format_15(self):
+        text = "Customer Number Currency 22.MAR.22 Credit Card 1934829304"
+        self.assertIsNone(parse_date("", text), None)
+
+    def test_date_format_16(self):
+        text = "Customer Number Currency 22.MAR,22 Credit Card 1934829304"
+        self.assertIsNone(parse_date("", text), None)
+
+    def test_date_format_17(self):
+        text = "Customer Number Currency 22,MAR,2022 Credit Card 1934829304"
+        self.assertIsNone(parse_date("", text), None)
+
+    def test_date_format_18(self):
+        text = "Customer Number Currency 22 MAR,2022 Credit Card 1934829304"
+        self.assertIsNone(parse_date("", text), None)
+
     def test_crazy_date_past(self, *args):
         self.assertIsNone(parse_date("", "01-07-0590 00:00:00"))
 
@@ -111,11 +163,11 @@ class TestDate(TestCase):
     @override_settings(FILENAME_DATE_ORDER="YMD")
     def test_filename_date_parse_invalid(self, *args):
         self.assertIsNone(
-            parse_date("/tmp/20 408000l 2475 - test.pdf", "No date in here")
+            parse_date("/tmp/20 408000l 2475 - test.pdf", "No date in here"),
         )
 
     @override_settings(
-        IGNORE_DATES=(datetime.date(2019, 11, 3), datetime.date(2020, 1, 17))
+        IGNORE_DATES=(datetime.date(2019, 11, 3), datetime.date(2020, 1, 17)),
     )
     def test_ignored_dates(self, *args):
         text = "lorem ipsum 110319, 20200117 and lorem 13.02.2018 lorem " "ipsum"

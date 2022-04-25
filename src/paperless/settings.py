@@ -3,11 +3,12 @@ import math
 import multiprocessing
 import os
 import re
+from typing import Final
+from urllib.parse import urlparse
 
 from concurrent_log_handler.queue import setup_logging_queues
-from dotenv import load_dotenv
-
 from django.utils.translation import gettext_lazy as _
+from dotenv import load_dotenv
 
 # Tap paperless.conf if it's available
 if os.path.exists("../paperless.conf"):
@@ -30,12 +31,19 @@ elif os.path.exists("/usr/local/etc/paperless.conf"):
 os.environ["OMP_THREAD_LIMIT"] = "1"
 
 
-def __get_boolean(key, default="NO"):
+def __get_boolean(key: str, default: str = "NO") -> bool:
     """
     Return a boolean value based on whatever the user has supplied in the
     environment based on whether the value "looks like" it's True or not.
     """
     return bool(os.getenv(key, default).lower() in ("yes", "y", "1", "t", "true"))
+
+
+def __get_int(key: str, default: int) -> int:
+    """
+    Return an integer value based on the environment variable or a default
+    """
+    return int(os.getenv(key, default))
 
 
 # NEVER RUN WITH DEBUG IN PRODUCTION.
@@ -68,7 +76,8 @@ MODEL_FILE = os.path.join(DATA_DIR, "classification_model.pickle")
 LOGGING_DIR = os.getenv("PAPERLESS_LOGGING_DIR", os.path.join(DATA_DIR, "log"))
 
 CONSUMPTION_DIR = os.getenv(
-    "PAPERLESS_CONSUMPTION_DIR", os.path.join(BASE_DIR, "..", "consume")
+    "PAPERLESS_CONSUMPTION_DIR",
+    os.path.join(BASE_DIR, "..", "consume"),
 )
 
 # This will be created if it doesn't exist
@@ -119,7 +128,7 @@ REST_FRAMEWORK = {
 
 if DEBUG:
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
-        "paperless.auth.AngularApiAuthenticationOverride"
+        "paperless.auth.AngularApiAuthenticationOverride",
     )
 
 MIDDLEWARE = [
@@ -191,7 +200,8 @@ if AUTO_LOGIN_USERNAME:
 
 ENABLE_HTTP_REMOTE_USER = __get_boolean("PAPERLESS_ENABLE_HTTP_REMOTE_USER")
 HTTP_REMOTE_USER_HEADER_NAME = os.getenv(
-    "PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME", "HTTP_REMOTE_USER"
+    "PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME",
+    "HTTP_REMOTE_USER",
 )
 
 if ENABLE_HTTP_REMOTE_USER:
@@ -201,7 +211,7 @@ if ENABLE_HTTP_REMOTE_USER:
         "django.contrib.auth.backends.ModelBackend",
     ]
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append(
-        "rest_framework.authentication.RemoteUserAuthentication"
+        "rest_framework.authentication.RemoteUserAuthentication",
     )
 
 # X-Frame options for embedded PDF display:
@@ -210,27 +220,47 @@ if DEBUG:
 else:
     X_FRAME_OPTIONS = "SAMEORIGIN"
 
-# We allow CORS from localhost:8080
+
+# The next 3 settings can also be set using just PAPERLESS_URL
+_csrf_origins = os.getenv("PAPERLESS_CSRF_TRUSTED_ORIGINS")
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = _csrf_origins.split(",")
+else:
+    CSRF_TRUSTED_ORIGINS = []
+
+# We allow CORS from localhost:8000
 CORS_ALLOWED_ORIGINS = tuple(
-    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(",")
+    os.getenv("PAPERLESS_CORS_ALLOWED_HOSTS", "http://localhost:8000").split(","),
 )
 
 if DEBUG:
     # Allow access from the angular development server during debugging
     CORS_ALLOWED_ORIGINS += ("http://localhost:4200",)
 
-# The secret key has a default that should be fine so long as you're hosting
-# Paperless on a closed network.  However, if you're putting this anywhere
-# public, you should change the key to something unique and verbose.
-SECRET_KEY = os.getenv(
-    "PAPERLESS_SECRET_KEY", "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee"
-)
-
 _allowed_hosts = os.getenv("PAPERLESS_ALLOWED_HOSTS")
 if _allowed_hosts:
     ALLOWED_HOSTS = _allowed_hosts.split(",")
 else:
     ALLOWED_HOSTS = ["*"]
+
+_paperless_url = os.getenv("PAPERLESS_URL")
+if _paperless_url:
+    _paperless_uri = urlparse(_paperless_url)
+    CSRF_TRUSTED_ORIGINS.append(_paperless_url)
+    CORS_ALLOWED_ORIGINS += (_paperless_url,)
+    if _allowed_hosts:
+        ALLOWED_HOSTS.append(_paperless_uri.hostname)
+    else:
+        # always allow localhost. Necessary e.g. for healthcheck in docker.
+        ALLOWED_HOSTS = [_paperless_uri.hostname] + ["localhost"]
+
+# The secret key has a default that should be fine so long as you're hosting
+# Paperless on a closed network.  However, if you're putting this anywhere
+# public, you should change the key to something unique and verbose.
+SECRET_KEY = os.getenv(
+    "PAPERLESS_SECRET_KEY",
+    "e11fl1oa-*ytql8p)(06fbj4ukrlo+n7k&q5+$1md7i+mge=ee",
+)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -268,7 +298,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(DATA_DIR, "db.sqlite3"),
-    }
+    },
 }
 
 if os.getenv("PAPERLESS_DBHOST"):
@@ -297,6 +327,7 @@ LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
     ("en-us", _("English (US)")),  # needs to be first to act as fallback language
+    ("be-by", _("Belarusian")),
     ("cs-cz", _("Czech")),
     ("da-dk", _("Danish")),
     ("de-de", _("German")),
@@ -311,7 +342,11 @@ LANGUAGES = [
     ("pt-pt", _("Portuguese")),
     ("ro-ro", _("Romanian")),
     ("ru-ru", _("Russian")),
+    ("sl-si", _("Slovenian")),
+    ("sr-cs", _("Serbian")),
     ("sv-se", _("Swedish")),
+    ("tr-tr", _("Turkish")),
+    ("zh-cn", _("Chinese Simplified")),
 ]
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
@@ -389,7 +424,7 @@ LOGGING = {
 # in total.
 
 
-def default_task_workers():
+def default_task_workers() -> int:
     # always leave one core open
     available_cores = max(multiprocessing.cpu_count(), 1)
     try:
@@ -400,20 +435,29 @@ def default_task_workers():
         return 1
 
 
-TASK_WORKERS = int(os.getenv("PAPERLESS_TASK_WORKERS", default_task_workers()))
+TASK_WORKERS = __get_int("PAPERLESS_TASK_WORKERS", default_task_workers())
+
+PAPERLESS_WORKER_TIMEOUT: Final[int] = __get_int("PAPERLESS_WORKER_TIMEOUT", 1800)
+
+# Per django-q docs, timeout must be smaller than retry
+# We default retry to 10s more than the timeout
+PAPERLESS_WORKER_RETRY: Final[int] = __get_int(
+    "PAPERLESS_WORKER_RETRY",
+    PAPERLESS_WORKER_TIMEOUT + 10,
+)
 
 Q_CLUSTER = {
     "name": "paperless",
     "catch_up": False,
     "recycle": 1,
-    "retry": 1800,
-    "timeout": int(os.getenv("PAPERLESS_WORKER_TIMEOUT", 1800)),
+    "retry": PAPERLESS_WORKER_RETRY,
+    "timeout": PAPERLESS_WORKER_TIMEOUT,
     "workers": TASK_WORKERS,
     "redis": os.getenv("PAPERLESS_REDIS", "redis://localhost:6379"),
 }
 
 
-def default_threads_per_worker(task_workers):
+def default_threads_per_worker(task_workers) -> int:
     # always leave one core open
     available_cores = max(multiprocessing.cpu_count(), 1)
     try:
@@ -423,7 +467,8 @@ def default_threads_per_worker(task_workers):
 
 
 THREADS_PER_WORKER = os.getenv(
-    "PAPERLESS_THREADS_PER_WORKER", default_threads_per_worker(TASK_WORKERS)
+    "PAPERLESS_THREADS_PER_WORKER",
+    default_threads_per_worker(TASK_WORKERS),
 )
 
 ###############################################################################
@@ -435,7 +480,7 @@ CONSUMER_POLLING = int(os.getenv("PAPERLESS_CONSUMER_POLLING", 0))
 CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
 
 CONSUMER_POLLING_RETRY_COUNT = int(
-    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5)
+    os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5),
 )
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
@@ -447,12 +492,18 @@ CONSUMER_IGNORE_PATTERNS = list(
     json.loads(
         os.getenv(
             "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            '[".DS_STORE/*", "._*", ".stfolder/*"]',
-        )
-    )
+            '[".DS_STORE/*", "._*", ".stfolder/*", ".stversions/*", ".localized/*", "desktop.ini"]',
+        ),
+    ),
 )
 
 CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
+
+CONSUMER_ENABLE_BARCODES = __get_boolean(
+    "PAPERLESS_CONSUMER_ENABLE_BARCODES",
+)
+
+CONSUMER_BARCODE_STRING = os.getenv("PAPERLESS_CONSUMER_BARCODE_STRING", "PATCHT")
 
 OPTIMIZE_THUMBNAILS = __get_boolean("PAPERLESS_OPTIMIZE_THUMBNAILS", "true")
 
@@ -479,7 +530,12 @@ OCR_DESKEW = __get_boolean("PAPERLESS_OCR_DESKEW", "true")
 OCR_ROTATE_PAGES = __get_boolean("PAPERLESS_OCR_ROTATE_PAGES", "true")
 
 OCR_ROTATE_PAGES_THRESHOLD = float(
-    os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0)
+    os.getenv("PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD", 12.0),
+)
+
+OCR_MAX_IMAGE_PIXELS = os.environ.get(
+    "PAPERLESS_OCR_MAX_IMAGE_PIXELS",
+    256000000,
 )
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS", "{}")
@@ -536,7 +592,8 @@ THUMBNAIL_FONT_NAME = os.getenv(
 PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
 PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
 PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
-    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT", "http://localhost:3000"
+    "PAPERLESS_TIKA_GOTENBERG_ENDPOINT",
+    "http://localhost:3000",
 )
 
 if PAPERLESS_TIKA_ENABLED:
@@ -552,3 +609,7 @@ if os.getenv("PAPERLESS_IGNORE_DATES", ""):
         d = dateparser.parse(s)
         if d:
             IGNORE_DATES.add(d.date())
+
+ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
+if ENABLE_UPDATE_CHECK != "default":
+    ENABLE_UPDATE_CHECK = __get_boolean("PAPERLESS_ENABLE_UPDATE_CHECK")

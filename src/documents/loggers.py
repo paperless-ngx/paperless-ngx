@@ -1,8 +1,6 @@
 import logging
 import uuid
 
-from django.conf import settings
-
 
 class LoggingMixin:
 

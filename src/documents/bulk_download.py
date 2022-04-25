@@ -8,7 +8,10 @@ class BulkArchiveStrategy:
         self.zipf = zipf
 
     def make_unique_filename(
-        self, doc: Document, archive: bool = False, folder: str = ""
+        self,
+        doc: Document,
+        archive: bool = False,
+        folder: str = "",
     ):
         counter = 0
         while True:
@@ -34,7 +37,8 @@ class ArchiveOnlyStrategy(BulkArchiveStrategy):
     def add_document(self, doc: Document):
         if doc.has_archive_version:
             self.zipf.write(
-                doc.archive_path, self.make_unique_filename(doc, archive=True)
+                doc.archive_path,
+                self.make_unique_filename(doc, archive=True),
             )
         else:
             self.zipf.write(doc.source_path, self.make_unique_filename(doc))
@@ -49,5 +53,6 @@ class OriginalAndArchiveStrategy(BulkArchiveStrategy):
             )
 
         self.zipf.write(
-            doc.source_path, self.make_unique_filename(doc, folder="originals/")
+            doc.source_path,
+            self.make_unique_filename(doc, folder="originals/"),
         )

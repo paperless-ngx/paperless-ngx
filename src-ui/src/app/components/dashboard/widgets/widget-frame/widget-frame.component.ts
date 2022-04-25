@@ -1,18 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core'
 
 @Component({
   selector: 'app-widget-frame',
   templateUrl: './widget-frame.component.html',
-  styleUrls: ['./widget-frame.component.scss']
+  styleUrls: ['./widget-frame.component.scss'],
 })
 export class WidgetFrameComponent implements OnInit {
-
-  constructor() { }
+  constructor() {}
 
   @Input()
   title: string
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

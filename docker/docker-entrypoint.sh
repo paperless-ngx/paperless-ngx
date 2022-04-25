@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -10,7 +10,7 @@ map_uidgid() {
 	USERMAP_NEW_GID=${USERMAP_GID:-${USERMAP_ORIG_GID:-$USERMAP_NEW_UID}}
 	if [[ ${USERMAP_NEW_UID} != "${USERMAP_ORIG_UID}" || ${USERMAP_NEW_GID} != "${USERMAP_ORIG_GID}" ]]; then
 		echo "Mapping UID and GID for paperless:paperless to $USERMAP_NEW_UID:$USERMAP_NEW_GID"
-		usermod -u "${USERMAP_NEW_UID}" paperless
+		usermod -o -u "${USERMAP_NEW_UID}" paperless
 		groupmod -o -g "${USERMAP_NEW_GID}" paperless
 	fi
 }
@@ -56,12 +56,12 @@ install_languages() {
 		#    continue
 		#fi
 
-		if dpkg -s $pkg &>/dev/null; then
+		if dpkg -s "$pkg" &>/dev/null; then
 			echo "Package $pkg already installed!"
 			continue
 		fi
 
-		if ! apt-cache show $pkg &>/dev/null; then
+		if ! apt-cache show "$pkg" &>/dev/null; then
 			echo "Package $pkg not found! :("
 			continue
 		fi
@@ -77,7 +77,7 @@ install_languages() {
 echo "Paperless-ngx docker container starting..."
 
 # Install additional languages if specified
-if [[ ! -z "$PAPERLESS_OCR_LANGUAGES" ]]; then
+if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
 	install_languages "$PAPERLESS_OCR_LANGUAGES"
 fi
 

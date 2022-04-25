@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
 from django.db import transaction
-
-from documents.tasks import index_reindex, index_optimize
+from documents.tasks import index_optimize
+from documents.tasks import index_reindex
 
 
 class Command(BaseCommand):

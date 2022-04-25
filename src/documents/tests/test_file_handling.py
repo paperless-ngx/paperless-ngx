@@ -9,17 +9,19 @@ from unittest import mock
 
 from django.conf import settings
 from django.db import DatabaseError
-from django.test import TestCase, override_settings
+from django.test import override_settings
+from django.test import TestCase
 from django.utils import timezone
 
+from ..file_handling import create_source_path_directory
+from ..file_handling import delete_empty_directories
+from ..file_handling import generate_filename
+from ..file_handling import generate_unique_filename
+from ..models import Correspondent
+from ..models import Document
+from ..models import DocumentType
+from ..models import Tag
 from .utils import DirectoriesMixin
-from ..file_handling import (
-    generate_filename,
-    create_source_path_directory,
-    delete_empty_directories,
-    generate_unique_filename,
-)
-from ..models import Document, Correspondent, Tag, DocumentType
 
 
 class TestFileHandling(DirectoriesMixin, TestCase):
@@ -34,7 +36,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
 
         document.storage_type = Document.STORAGE_TYPE_GPG
         self.assertEqual(
-            generate_filename(document), "{:07d}.pdf.gpg".format(document.pk)
+            generate_filename(document),
+            "{:07d}.pdf.gpg".format(document.pk),
         )
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
@@ -75,7 +78,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/test"), True)
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
         self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/test/test.pdf.gpg"), True
+            os.path.isfile(settings.ORIGINALS_DIR + "/test/test.pdf.gpg"),
+            True,
         )
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
@@ -93,7 +97,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
 
         # Test source_path
         self.assertEqual(
-            document.source_path, settings.ORIGINALS_DIR + "/none/none.pdf"
+            document.source_path,
+            settings.ORIGINALS_DIR + "/none/none.pdf",
         )
 
         # Make the folder read- and execute-only (no writing and no renaming)
@@ -105,7 +110,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
 
         # Check proper handling of files
         self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"), True
+            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
+            True,
         )
         self.assertEqual(document.filename, "none/none.pdf")
 
@@ -145,7 +151,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
             # Check proper handling of files
             self.assertTrue(os.path.isfile(document.source_path))
             self.assertEqual(
-                os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"), True
+                os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
+                True,
             )
             self.assertEqual(document.filename, "none/none.pdf")
 
@@ -167,7 +174,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         pk = document.pk
         document.delete()
         self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"), False
+            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
+            False,
         )
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
 
@@ -192,7 +200,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none/none.pdf"), False)
         document.delete()
         self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"), False
+            os.path.isfile(settings.ORIGINALS_DIR + "/none/none.pdf"),
+            False,
         )
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
         self.assertEqual(os.path.isfile(settings.TRASH_DIR + "/none.pdf"), True)
@@ -363,7 +372,9 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(generate_filename(doc), "doc1 tag1,tag2.pdf")
 
         doc = Document.objects.create(
-            title="doc2", checksum="B", mime_type="application/pdf"
+            title="doc2",
+            checksum="B",
+            mime_type="application/pdf",
         )
 
         self.assertEqual(generate_filename(doc), "doc2.pdf")
@@ -380,12 +391,14 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         )
 
     @override_settings(
-        PAPERLESS_FILENAME_FORMAT="{created_year}-{created_month}-{created_day}"
+        PAPERLESS_FILENAME_FORMAT="{created_year}-{created_month}-{created_day}",
     )
     def test_created_year_month_day(self):
         d1 = timezone.make_aware(datetime.datetime(2020, 3, 6, 1, 1, 1))
         doc1 = Document.objects.create(
-            title="doc1", mime_type="application/pdf", created=d1
+            title="doc1",
+            mime_type="application/pdf",
+            created=d1,
         )
 
         self.assertEqual(generate_filename(doc1), "2020-03-06.pdf")
@@ -395,12 +408,14 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
 
     @override_settings(
-        PAPERLESS_FILENAME_FORMAT="{added_year}-{added_month}-{added_day}"
+        PAPERLESS_FILENAME_FORMAT="{added_year}-{added_month}-{added_day}",
     )
     def test_added_year_month_day(self):
         d1 = timezone.make_aware(datetime.datetime(232, 1, 9, 1, 1, 1))
         doc1 = Document.objects.create(
-            title="doc1", mime_type="application/pdf", added=d1
+            title="doc1",
+            mime_type="application/pdf",
+            added=d1,
         )
 
         self.assertEqual(generate_filename(doc1), "232-01-09.pdf")
@@ -410,7 +425,7 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         self.assertEqual(generate_filename(doc1), "2020-11-16.pdf")
 
     @override_settings(
-        PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}"
+        PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}/{correspondent}",
     )
     def test_nested_directory_cleanup(self):
         document = Document()
@@ -431,7 +446,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         document.delete()
 
         self.assertEqual(
-            os.path.isfile(settings.ORIGINALS_DIR + "/none/none/none.pdf"), False
+            os.path.isfile(settings.ORIGINALS_DIR + "/none/none/none.pdf"),
+            False,
         )
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none/none"), False)
         self.assertEqual(os.path.isdir(settings.ORIGINALS_DIR + "/none"), False)
@@ -456,7 +472,8 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         os.makedirs(os.path.join(tmp, "notempty", "empty"))
 
         delete_empty_directories(
-            os.path.join(tmp, "notempty", "empty"), root=settings.ORIGINALS_DIR
+            os.path.join(tmp, "notempty", "empty"),
+            root=settings.ORIGINALS_DIR,
         )
         self.assertEqual(os.path.isdir(os.path.join(tmp, "notempty")), True)
         self.assertEqual(os.path.isfile(os.path.join(tmp, "notempty", "file")), True)
@@ -483,10 +500,16 @@ class TestFileHandling(DirectoriesMixin, TestCase):
     @override_settings(PAPERLESS_FILENAME_FORMAT="{title}")
     def test_duplicates(self):
         document = Document.objects.create(
-            mime_type="application/pdf", title="qwe", checksum="A", pk=1
+            mime_type="application/pdf",
+            title="qwe",
+            checksum="A",
+            pk=1,
         )
         document2 = Document.objects.create(
-            mime_type="application/pdf", title="qwe", checksum="B", pk=2
+            mime_type="application/pdf",
+            title="qwe",
+            checksum="B",
+            pk=2,
         )
         Path(document.source_path).touch()
         Path(document2.source_path).touch()
@@ -584,10 +607,12 @@ class TestFileHandlingWithArchive(DirectoriesMixin, TestCase):
         self.assertTrue(os.path.isfile(doc.source_path))
         self.assertTrue(os.path.isfile(doc.archive_path))
         self.assertEqual(
-            doc.source_path, os.path.join(settings.ORIGINALS_DIR, "none", "my_doc.pdf")
+            doc.source_path,
+            os.path.join(settings.ORIGINALS_DIR, "none", "my_doc.pdf"),
         )
         self.assertEqual(
-            doc.archive_path, os.path.join(settings.ARCHIVE_DIR, "none", "my_doc.pdf")
+            doc.archive_path,
+            os.path.join(settings.ARCHIVE_DIR, "none", "my_doc.pdf"),
         )
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
@@ -851,7 +876,10 @@ class TestFilenameGeneration(TestCase):
     def test_invalid_characters(self):
 
         doc = Document.objects.create(
-            title="This. is the title.", mime_type="application/pdf", pk=1, checksum="1"
+            title="This. is the title.",
+            mime_type="application/pdf",
+            pk=1,
+            checksum="1",
         )
         self.assertEqual(generate_filename(doc), "This. is the title.pdf")
 
@@ -877,7 +905,9 @@ class TestFilenameGeneration(TestCase):
 
 def run():
     doc = Document.objects.create(
-        checksum=str(uuid.uuid4()), title=str(uuid.uuid4()), content="wow"
+        checksum=str(uuid.uuid4()),
+        title=str(uuid.uuid4()),
+        content="wow",
     )
     doc.filename = generate_unique_filename(doc)
     Path(doc.thumbnail_path).touch()

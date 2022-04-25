@@ -1,20 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { Meta } from '@angular/platform-browser';
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view';
-import { SavedViewService } from 'src/app/services/rest/saved-view.service';
-
+import { Component, OnInit } from '@angular/core'
+import { Meta } from '@angular/platform-browser'
+import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
+import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-
-  constructor(
-    private savedViewService: SavedViewService,
-    private meta: Meta
-  ) { }
+  constructor(private savedViewService: SavedViewService, private meta: Meta) {}
 
   get displayName() {
     let tagFullName = this.meta.getTag('name=full_name')
@@ -39,9 +34,10 @@ export class DashboardComponent implements OnInit {
   savedViews: PaperlessSavedView[] = []
 
   ngOnInit(): void {
-    this.savedViewService.listAll().subscribe(results => {
-      this.savedViews = results.results.filter(savedView => savedView.show_on_dashboard)
+    this.savedViewService.listAll().subscribe((results) => {
+      this.savedViews = results.results.filter(
+        (savedView) => savedView.show_on_dashboard
+      )
     })
   }
-
 }

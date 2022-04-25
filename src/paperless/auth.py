@@ -1,9 +1,9 @@
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import authentication
-from django.contrib.auth.middleware import RemoteUserMiddleware
 
 
 class AutoLoginMiddleware(MiddlewareMixin):
@@ -25,7 +25,7 @@ class AngularApiAuthenticationOverride(authentication.BaseAuthentication):
             settings.DEBUG
             and "Referer" in request.headers
             and request.headers["Referer"].startswith("http://localhost:4200/")
-        ):  # NOQA: E501
+        ):
             user = User.objects.filter(is_staff=True).first()
             print("Auto-Login with user {}".format(user))
             return (user, None)

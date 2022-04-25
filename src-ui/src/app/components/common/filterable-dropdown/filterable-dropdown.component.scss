@@ -1,5 +1,3 @@
-@import "/src/theme";
-
 .badge-corner {
   position: absolute;
   top: -8px;
@@ -42,7 +40,7 @@
   filter: brightness(0.5);
 
   &.active {
-    background-color: lighten($primary, 30%);
+    background-color: var(--pngx-primary-lighten-30);
   }
 }
 

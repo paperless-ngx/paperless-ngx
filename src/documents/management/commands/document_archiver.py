@@ -1,7 +1,6 @@
 import hashlib
-import multiprocessing
-
 import logging
+import multiprocessing
 import os
 import shutil
 import uuid
@@ -11,12 +10,12 @@ from django import db
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from filelock import FileLock
-from whoosh.writing import AsyncWriter
-
 from documents.models import Document
+from filelock import FileLock
+
 from ... import index
-from ...file_handling import create_source_path_directory, generate_unique_filename
+from ...file_handling import create_source_path_directory
+from ...file_handling import generate_unique_filename
 from ...parsers import get_parser_class_for_mime_type
 
 
@@ -33,7 +32,7 @@ def handle_document(document_id):
     if not parser_class:
         logger.error(
             f"No parser found for mime type {mime_type}, cannot "
-            f"archive document {document} (ID: {document_id})"
+            f"archive document {document} (ID: {document_id})",
         )
         return
 
@@ -43,7 +42,9 @@ def handle_document(document_id):
         parser.parse(document.source_path, mime_type, document.get_public_filename())
 
         thumbnail = parser.get_optimised_thumbnail(
-            document.source_path, mime_type, document.get_public_filename()
+            document.source_path,
+            mime_type,
+            document.get_public_filename(),
         )
 
         if parser.get_archive_path():
@@ -55,7 +56,8 @@ def handle_document(document_id):
                 # We also don't use save() since that triggers the filehandling
                 # logic, and we don't want that yet (file not yet in place)
                 document.archive_filename = generate_unique_filename(
-                    document, archive_filename=True
+                    document,
+                    archive_filename=True,
                 )
                 Document.objects.filter(pk=document.pk).update(
                     archive_checksum=checksum,
@@ -70,9 +72,9 @@ def handle_document(document_id):
             with index.open_index_writer() as writer:
                 index.update_document(writer, document)
 
-    except Exception as e:
+    except Exception:
         logger.exception(
-            f"Error while parsing document {document} " f"(ID: {document_id})"
+            f"Error while parsing document {document} " f"(ID: {document_id})",
         )
     finally:
         parser.cleanup()
@@ -86,7 +88,8 @@ class Command(BaseCommand):
         back-tag all previously indexed documents with metadata created (or
         modified) after their initial import.
     """.replace(
-        "    ", ""
+        "    ",
+        "",
     )
 
     def add_arguments(self, parser):
@@ -129,7 +132,7 @@ class Command(BaseCommand):
             map(
                 lambda doc: doc.id,
                 filter(lambda d: overwrite or not d.has_archive_version, documents),
-            )
+            ),
         )
 
         # Note to future self: this prevents django from reusing database
@@ -146,7 +149,7 @@ class Command(BaseCommand):
                         pool.imap_unordered(handle_document, document_ids),
                         total=len(document_ids),
                         disable=options["no_progress_bar"],
-                    )
+                    ),
                 )
         except KeyboardInterrupt:
             print("Aborting...")

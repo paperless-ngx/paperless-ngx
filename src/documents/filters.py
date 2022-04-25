@@ -1,7 +1,13 @@
 from django.db.models import Q
-from django_filters.rest_framework import BooleanFilter, FilterSet, Filter
+from django_filters.rest_framework import BooleanFilter
+from django_filters.rest_framework import Filter
+from django_filters.rest_framework import FilterSet
 
-from .models import Correspondent, Document, Tag, DocumentType, Log
+from .models import Correspondent
+from .models import Document
+from .models import DocumentType
+from .models import Log
+from .models import Tag
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
 ID_KWARGS = ["in", "exact"]
@@ -75,7 +81,10 @@ class TitleContentFilter(Filter):
 class DocumentFilterSet(FilterSet):
 
     is_tagged = BooleanFilter(
-        label="Is tagged", field_name="tags", lookup_expr="isnull", exclude=True
+        label="Is tagged",
+        field_name="tags",
+        lookup_expr="isnull",
+        exclude=True,
     )
 
     tags__id__all = TagsFilter()

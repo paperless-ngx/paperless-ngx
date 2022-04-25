@@ -1,8 +1,8 @@
 from unittest import mock
 
 from django.core.checks import ERROR
-from django.test import TestCase, override_settings
-
+from django.test import override_settings
+from django.test import TestCase
 from paperless_tesseract import check_default_language_available
 
 
@@ -16,8 +16,8 @@ class TestChecks(TestCase):
         self.assertEqual(len(msgs), 1)
         self.assertTrue(
             msgs[0].msg.startswith(
-                "No OCR language has been specified with PAPERLESS_OCR_LANGUAGE"
-            )
+                "No OCR language has been specified with PAPERLESS_OCR_LANGUAGE",
+            ),
         )
 
     @override_settings(OCR_LANGUAGE="ita")

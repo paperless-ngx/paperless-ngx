@@ -1,6 +1,7 @@
 import os
 import tempfile
-from datetime import timedelta, date
+from datetime import date
+from datetime import timedelta
 from fnmatch import fnmatch
 
 import magic
@@ -8,18 +9,18 @@ import pathvalidate
 from django.conf import settings
 from django.db import DatabaseError
 from django_q.tasks import async_task
-from imap_tools import (
-    MailBox,
-    MailBoxUnencrypted,
-    AND,
-    MailMessageFlags,
-    MailboxFolderSelectError,
-)
-
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
 from documents.parsers import is_mime_type_supported
-from paperless_mail.models import MailAccount, MailRule
+from imap_tools import AND
+from imap_tools import MailBox
+from imap_tools import MailboxFolderSelectError
+from imap_tools import MailBoxUnencrypted
+from imap_tools import MailMessage
+from imap_tools import MailMessageFlags
+from imap_tools.mailbox import MailBoxTls
+from paperless_mail.models import MailAccount
+from paperless_mail.models import MailRule
 
 
 class MailError(Exception):
@@ -61,13 +62,13 @@ class FlagMailAction(BaseMailAction):
 
 
 def get_rule_action(rule):
-    if rule.action == MailRule.ACTION_FLAG:
+    if rule.action == MailRule.MailAction.FLAG:
         return FlagMailAction()
-    elif rule.action == MailRule.ACTION_DELETE:
+    elif rule.action == MailRule.MailAction.DELETE:
         return DeleteMailAction()
-    elif rule.action == MailRule.ACTION_MOVE:
+    elif rule.action == MailRule.MailAction.MOVE:
         return MoveMailAction()
-    elif rule.action == MailRule.ACTION_MARK_READ:
+    elif rule.action == MailRule.MailAction.MARK_READ:
         return MarkReadMailAction()
     else:
         raise NotImplementedError("Unknown action.")  # pragma: nocover
@@ -89,11 +90,11 @@ def make_criterias(rule):
 
 
 def get_mailbox(server, port, security):
-    if security == MailAccount.IMAP_SECURITY_NONE:
+    if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
-    elif security == MailAccount.IMAP_SECURITY_STARTTLS:
-        mailbox = MailBox(server, port, starttls=True)
-    elif security == MailAccount.IMAP_SECURITY_SSL:
+    elif security == MailAccount.ImapSecurity.STARTTLS:
+        mailbox = MailBoxTls(server, port)
+    elif security == MailAccount.ImapSecurity.SSL:
         mailbox = MailBox(server, port)
     else:
         raise NotImplementedError("Unknown IMAP security")  # pragma: nocover
@@ -112,43 +113,40 @@ class MailAccountHandler(LoggingMixin):
             return None
 
     def get_title(self, message, att, rule):
-        if rule.assign_title_from == MailRule.TITLE_FROM_SUBJECT:
+        if rule.assign_title_from == MailRule.TitleSource.FROM_SUBJECT:
             return message.subject
 
-        elif rule.assign_title_from == MailRule.TITLE_FROM_FILENAME:
+        elif rule.assign_title_from == MailRule.TitleSource.FROM_FILENAME:
             return os.path.splitext(os.path.basename(att.filename))[0]
 
         else:
             raise NotImplementedError(
-                "Unknown title selector."
-            )  # pragma: nocover  # NOQA: E501
+                "Unknown title selector.",
+            )  # pragma: nocover
 
-    def get_correspondent(self, message, rule):
+    def get_correspondent(self, message: MailMessage, rule):
         c_from = rule.assign_correspondent_from
 
-        if c_from == MailRule.CORRESPONDENT_FROM_NOTHING:
+        if c_from == MailRule.CorrespondentSource.FROM_NOTHING:
             return None
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_EMAIL:
+        elif c_from == MailRule.CorrespondentSource.FROM_EMAIL:
             return self._correspondent_from_name(message.from_)
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_NAME:
-            if (
-                message.from_values
-                and "name" in message.from_values
-                and message.from_values["name"]
-            ):  # NOQA: E501
-                return self._correspondent_from_name(message.from_values["name"])
+        elif c_from == MailRule.CorrespondentSource.FROM_NAME:
+            from_values = message.from_values
+            if from_values is not None and len(from_values.name) > 0:
+                return self._correspondent_from_name(from_values.name)
             else:
                 return self._correspondent_from_name(message.from_)
 
-        elif c_from == MailRule.CORRESPONDENT_FROM_CUSTOM:
+        elif c_from == MailRule.CorrespondentSource.FROM_CUSTOM:
             return rule.assign_correspondent
 
         else:
             raise NotImplementedError(
-                "Unknwown correspondent selector"
-            )  # pragma: nocover  # NOQA: E501
+                "Unknwown correspondent selector",
+            )  # pragma: nocover
 
     def handle_mail_account(self, account):
 
@@ -159,7 +157,9 @@ class MailAccountHandler(LoggingMixin):
         total_processed_files = 0
 
         with get_mailbox(
-            account.imap_server, account.imap_port, account.imap_security
+            account.imap_server,
+            account.imap_port,
+            account.imap_security,
         ) as M:
 
             try:
@@ -193,7 +193,7 @@ class MailAccountHandler(LoggingMixin):
         except MailboxFolderSelectError:
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
-                f"does not exist in account {rule.account}"
+                f"does not exist in account {rule.account}",
             )
 
         criterias = make_criterias(rule)
@@ -242,17 +242,19 @@ class MailAccountHandler(LoggingMixin):
 
         try:
             get_rule_action(rule).post_consume(
-                M, post_consume_messages, rule.action_parameter
+                M,
+                post_consume_messages,
+                rule.action_parameter,
             )
 
         except Exception as e:
             raise MailError(
-                f"Rule {rule}: Error while processing post-consume actions: " f"{e}"
+                f"Rule {rule}: Error while processing post-consume actions: " f"{e}",
             )
 
         return total_processed_files
 
-    def handle_message(self, message, rule):
+    def handle_message(self, message, rule) -> int:
         if not message.attachments:
             return 0
 
@@ -264,7 +266,7 @@ class MailAccountHandler(LoggingMixin):
         )
 
         correspondent = self.get_correspondent(message, rule)
-        tag = rule.assign_tag
+        tag_ids = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
         processed_attachments = 0
@@ -273,8 +275,9 @@ class MailAccountHandler(LoggingMixin):
 
             if (
                 not att.content_disposition == "attachment"
-                and rule.attachment_type == MailRule.ATTACHMENT_TYPE_ATTACHMENTS_ONLY
-            ):  # NOQA: E501
+                and rule.attachment_type
+                == MailRule.AttachmentProcessing.ATTACHMENTS_ONLY
+            ):
                 self.log(
                     "debug",
                     f"Rule {rule}: "
@@ -284,7 +287,12 @@ class MailAccountHandler(LoggingMixin):
                 continue
 
             if rule.filter_attachment_filename:
-                if not fnmatch(att.filename, rule.filter_attachment_filename):
+                # Force the filename and pattern to the lowercase
+                # as this is system dependent otherwise
+                if not fnmatch(
+                    att.filename.lower(),
+                    rule.filter_attachment_filename.lower(),
+                ):
                     continue
 
             title = self.get_title(message, att, rule)
@@ -297,7 +305,8 @@ class MailAccountHandler(LoggingMixin):
 
                 os.makedirs(settings.SCRATCH_DIR, exist_ok=True)
                 _, temp_filename = tempfile.mkstemp(
-                    prefix="paperless-mail-", dir=settings.SCRATCH_DIR
+                    prefix="paperless-mail-",
+                    dir=settings.SCRATCH_DIR,
                 )
                 with open(temp_filename, "wb") as f:
                     f.write(att.payload)
@@ -313,16 +322,14 @@ class MailAccountHandler(LoggingMixin):
                     "documents.tasks.consume_file",
                     path=temp_filename,
                     override_filename=pathvalidate.sanitize_filename(
-                        att.filename
-                    ),  # NOQA: E501
+                        att.filename,
+                    ),
                     override_title=title,
                     override_correspondent_id=correspondent.id
                     if correspondent
-                    else None,  # NOQA: E501
-                    override_document_type_id=doc_type.id
-                    if doc_type
-                    else None,  # NOQA: E501
-                    override_tag_ids=[tag.id] if tag else None,
+                    else None,
+                    override_document_type_id=doc_type.id if doc_type else None,
+                    override_tag_ids=tag_ids,
                     task_name=att.filename[:100],
                 )
 
