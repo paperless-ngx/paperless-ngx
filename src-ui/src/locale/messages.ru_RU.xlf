@@ -54,14 +54,14 @@
         </context-group>
         <target state="final">Документ <x id="PH" equiv-text="status.filename"/> обрабатывается paperless</target>
       </trans-unit>
-      <trans-unit id="2173456130768795374" datatype="html">
+      <trans-unit id="2173456130768795374" datatype="html" approved="yes">
         <source>Paperless-ngx</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="translated">Paperless-ngx</target>
+        <target state="final">Paperless-ngx</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html" approved="yes">
         <source>Search documents</source>
@@ -433,7 +433,7 @@
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">Нажмите снова, чтобы исключить элементы.</target>
+        <target state="translated">Нажмите еще раз, чтобы исключить элементы.</target>
       </trans-unit>
       <trans-unit id="7593728289020204896" datatype="html" approved="yes">
         <source>Not assigned</source>

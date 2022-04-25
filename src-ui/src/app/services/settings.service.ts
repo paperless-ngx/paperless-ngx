@@ -9,7 +9,11 @@ import {
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
-import { hexToHsl } from 'src/app/utils/color'
+import {
+  BRIGHTNESS,
+  estimateBrightnessForColor,
+  hexToHsl,
+} from 'src/app/utils/color'
 
 export interface PaperlessSettings {
   key: string
@@ -132,28 +136,41 @@ export class SettingsService {
         : this.renderer.removeClass(this.document.body, 'color-scheme-dark')
     }
 
+    // remove these in case they were there
+    this.renderer.removeClass(this.document.body, 'primary-dark')
+    this.renderer.removeClass(this.document.body, 'primary-light')
+
     if (themeColor) {
       const hsl = hexToHsl(themeColor)
+      const bgBrightnessEstimate = estimateBrightnessForColor(themeColor)
+
+      if (bgBrightnessEstimate == BRIGHTNESS.DARK) {
+        this.renderer.addClass(this.document.body, 'primary-dark')
+        this.renderer.removeClass(this.document.body, 'primary-light')
+      } else {
+        this.renderer.addClass(this.document.body, 'primary-light')
+        this.renderer.removeClass(this.document.body, 'primary-dark')
+      }
       this.renderer.setStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary',
         `${+hsl.h * 360},${hsl.s * 100}%`,
         RendererStyleFlags2.DashCase
       )
       this.renderer.setStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary-lightness',
         `${hsl.l * 100}%`,
         RendererStyleFlags2.DashCase
       )
     } else {
       this.renderer.removeStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary',
         RendererStyleFlags2.DashCase
       )
       this.renderer.removeStyle(
-        document.documentElement,
+        document.body,
         '--pngx-primary-lightness',
         RendererStyleFlags2.DashCase
       )

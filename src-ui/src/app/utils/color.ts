@@ -1,4 +1,9 @@
-import { HSL } from 'ngx-color'
+import { HSL, RGB } from 'ngx-color'
+
+export const BRIGHTNESS = {
+  LIGHT: 'light',
+  DARK: 'dark',
+}
 
 function componentToHex(c) {
   var hex = Math.floor(c).toString(16)
@@ -86,14 +91,42 @@ export function rgbToHsl(r, g, b) {
 }
 
 export function hexToHsl(hex: string): HSL {
+  const rgb = hexToRGB(hex)
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b)
+  return { h: hsl[0], s: hsl[1], l: hsl[2] }
+}
+
+export function hexToRGB(hex: string): RGB {
   hex = hex.replace('#', '')
   let aRgbHex = hex.match(/.{1,2}/g)
-  const hsl = rgbToHsl(
-    parseInt(aRgbHex[0], 16),
-    parseInt(aRgbHex[1], 16),
-    parseInt(aRgbHex[2], 16)
-  )
-  return { h: hsl[0], s: hsl[1], l: hsl[2] }
+  return {
+    r: parseInt(aRgbHex[0], 16),
+    g: parseInt(aRgbHex[1], 16),
+    b: parseInt(aRgbHex[2], 16),
+  }
+}
+
+export function computeLuminance(color: RGB) {
+  // Formula: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
+  const colorKeys = Object.keys(color)
+  for (var i = 0; i < 3; i++) {
+    var rgb = color[colorKeys[i]]
+    rgb /= 255
+    rgb = rgb < 0.03928 ? rgb / 12.92 : Math.pow((rgb + 0.055) / 1.055, 2.4)
+    color[i] = rgb
+  }
+  return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2]
+}
+
+export function estimateBrightnessForColor(colorHex: string) {
+  // See <https://www.w3.org/TR/WCAG20/#contrast-ratiodef>
+  // Adapted from https://api.flutter.dev/flutter/material/ThemeData/estimateBrightnessForColor.html
+  const rgb = hexToRGB(colorHex)
+  const luminance = computeLuminance(rgb)
+  const kThreshold = 0.15
+  return (luminance + 0.05) * (luminance + 0.05) > kThreshold
+    ? BRIGHTNESS.LIGHT
+    : BRIGHTNESS.DARK
 }
 
 export function randomColor() {

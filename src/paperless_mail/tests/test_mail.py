@@ -308,10 +308,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -355,10 +357,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -381,10 +385,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -406,11 +412,13 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
             attachment_type=MailRule.AttachmentProcessing.EVERYTHING,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -440,12 +448,15 @@ class TestMail(DirectoriesMixin, TestCase):
         for (pattern, matches) in tests:
             matches.sort()
             self.async_task.reset_mock()
-            account = MailAccount()
+            account = MailAccount(name=str(uuid.uuid4()))
+            account.save()
             rule = MailRule(
+                name=str(uuid.uuid4()),
                 assign_title_from=MailRule.TitleSource.FROM_FILENAME,
                 account=account,
                 filter_attachment_filename=pattern,
             )
+            rule.save()
 
             result = self.mail_account_handler.handle_message(message, rule)
 
@@ -467,7 +478,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MARK_READ,
+            action=MailRule.MailAction.MARK_READ,
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
@@ -490,7 +501,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.DELETE,
+            action=MailRule.MailAction.DELETE,
             filter_subject="Invoice",
         )
 
@@ -511,7 +522,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.FLAG,
+            action=MailRule.MailAction.FLAG,
             filter_subject="Invoice",
         )
 
@@ -534,7 +545,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
         )
@@ -580,7 +591,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
         )
@@ -601,7 +612,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
             order=1,
@@ -610,7 +621,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule2",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
             order=2,
@@ -706,7 +717,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
         )
 
@@ -731,7 +742,7 @@ class TestMail(DirectoriesMixin, TestCase):
             name="testrule",
             filter_from="amazon@amazon.de",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
             assign_correspondent_from=MailRule.CorrespondentSource.FROM_EMAIL,
         )
@@ -768,7 +779,7 @@ class TestMail(DirectoriesMixin, TestCase):
         rule = MailRule.objects.create(
             name="testrule3",
             account=account,
-            action=MailRule.AttachmentAction.DELETE,
+            action=MailRule.MailAction.DELETE,
             filter_subject="Claim",
         )
 
