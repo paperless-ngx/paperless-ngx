@@ -185,6 +185,9 @@ jobs:
   # build and push image to docker hub.
   build-docker-image:
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
+    concurrency:
+      group: ${{ github.workflow }}-build-docker-image-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-20.04
     needs: [tests-backend, tests-frontend]
     steps:
@@ -195,7 +198,6 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=match,pattern=ngx-(\d.\d.\d),group=1
             type=ref,event=branch
             type=ref,event=tag
       -

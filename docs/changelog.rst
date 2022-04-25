@@ -5,6 +5,87 @@
 Changelog
 *********
 
+paperless-ngx 1.7.0
+###################
+
+Breaking Changes
+
+* ``PAPERLESS_URL`` is now required when using a reverse proxy. See `#674`_.
+
+Features
+
+* Allow setting more than one tag in mail rules `@jonasc`_ (#270)
+* global drag'n'drop `@shamoon`_ (#283).
+* Fix: download buttons should disable while waiting `@shamoon`_ (#630).
+* Update checker `@shamoon`_ (#591).
+* Show prompt on password-protected pdfs `@shamoon`_ (#564).
+* Filtering query params aka browser navigation for filtering `@shamoon`_ (#540).
+* Clickable tags in dashboard widgets `@shamoon`_ (#515).
+* Add bottom pagination `@shamoon`_ (#372).
+* Feature barcode splitter `@gador`_ (#532).
+* App loading screen `@shamoon`_ (#298).
+* Use progress bar for delayed buttons `@shamoon`_ (#415).
+* Add minimum length for documents text filter `@shamoon`_ (#401).
+* Added nav buttons in the document detail view `@GruberViktor`_ (#273).
+* Improve date keyboard input `@shamoon`_ (#253).
+* Color theming `@shamoon`_ (#243).
+* Parse dates when entered without separators `@GruberViktor`_ (#250).
+
+Bug Fixes
+
+* add "localhost" to ALLOWED_HOSTS `@gador`_ (#700).
+* Fix: scanners table `@qcasey`_ (#690).
+* Adds wait for file before consuming `@stumpylog`_ (#483).
+* Fix: frontend document editing erases time data `@shamoon`_ (#654).
+* Increase length of SavedViewFilterRule `@stumpylog`_ (#612).
+* Fixes attachment filename matching during mail fetching `@stumpylog`_ (#680).
+* Add ``PAPERLESS_URL`` env variable & CSRF var `@shamoon`_ (#674).
+* Fix: download buttons should disable while waiting `@shamoon`_ (#630).
+* Fixes downloaded filename, add more consumer ignore settings `@stumpylog`_ (#599).
+* FIX BUG: case-sensitive matching was not possible `@danielBreitlauch`_ (#594).
+* uses shutil.move instead of rename `@gador`_ (#617).
+* Fix npm deps 01.02.22 2 `@shamoon`_ (#610).
+* Fix npm dependencies 01.02.22 `@shamoon`_ (#600).
+* fix issue 416: implement PAPERLESS_OCR_MAX_IMAGE_PIXELS `@hacker-h`_ (#441).
+* fix: exclude cypress from build in Dockerfile `@FrankStrieter`_ (#526).
+* Corrections to pass pre-commit hooks `@schnuffle`_ (#454).
+* Fix 311 unable to click checkboxes in document list `@shamoon`_ (#313).
+* Fix imap tools bug `@stumpylog`_ (#393).
+* Fix filterable dropdown buttons arent translated `@shamoon`_ (#366).
+* Fix 224: "Auto-detected date is day before receipt date" `@a17t`_ (#246).
+* Fix minor sphinx errors `@shamoon`_ (#322).
+* Fix page links hidden `@shamoon`_ (#314).
+* Fix: Include excluded items in dropdown count `@shamoon`_ (#263).
+
+Translation
+
+* `@miku323`_ contributed to Slovenian translation.
+* `@FaintGhost`_ contributed to Chinese Simplified translation.
+* `@DarkoBG79`_ contributed to Serbian translation.
+* `Kemal Secer`_ contributed to Turkish translation.
+* `@Prominence`_ contributed to Belarusian translation.
+
+Documentation
+
+* Fix: scanners table `@qcasey`_ (#690).
+* Add `PAPERLESS_URL` env variable & CSRF var `@shamoon`_ (#674).
+* Fixes downloaded filename, add more consumer ignore settings `@stumpylog`_ (#599).
+* fix issue 416: implement ``PAPERLESS_OCR_MAX_IMAGE_PIXELS`` `@hacker-h`_ (#441).
+* Fix minor sphinx errors `@shamoon`_ (#322).
+
+Maintenance
+
+* Add ``PAPERLESS_URL`` env variable & CSRF var `@shamoon`_ (#674).
+* Chore: Implement release-drafter action for Changelogs `@qcasey`_ (#669).
+* Chore: Add CODEOWNERS `@qcasey`_ (#667).
+* Support docker-compose v2 in install `@stumpylog`_ (#611).
+* Add Belarusian localization `@shamoon`_ (#588).
+* Add Turkish localization `@shamoon`_ (#536).
+* Add Serbian localization `@shamoon`_ (#504).
+* Create PULL_REQUEST_TEMPLATE.md `@shamoon`_ (#304).
+* Add Chinese localization `@shamoon`_ (#247).
+* Add Slovenian language for frontend `@shamoon`_ (#315).
+
 paperless-ngx 1.6.0
 ###################
 
@@ -34,6 +115,10 @@ Version 1.6.0 merges several pending PRs from jonaswinkler's repo and includes n
 * `@muellermartin`_ fixed an error when uploading transparent PNGs (#133).
 * `@shamoon`_ created a slick new logo (#165).
 * `@tim-vogel`_ fixed exports missing groups (#193).
+
+Known issues:
+
+* 1.6.0 included a malformed package-lock.json, as a result users who want to build the docker image themselves need to change line 6 of the ``Dockerfile`` to ``RUN npm update npm -g && npm install --legacy-peer-deps``.
 
 Thank you to the following people for their documentation updates, fixes, and comprehensive testing:
 
@@ -140,7 +225,7 @@ paperless-ng 1.4.0
 
   * New URL pattern for accessing documents by ASN directly (http://<paperless>/asn/123)
 
-  * Added logging when executing pre- and post-consume scripts.
+  * Added logging when executing pre* and post-consume scripts.
 
   * Better error logging during document consumption.
 
@@ -1576,6 +1661,16 @@ bulk of the work on this big change.
 .. _@azapater: https://github.com/azapater
 .. _@tim-vogel: https://github.com/tim-vogel
 .. _@jschpp: https://github.com/jschpp
+.. _@schnuffle: https://github.com/schnuffle
+.. _@GruberViktor: https://github.com/gruberviktor
+.. _@hacker-h: https://github.com/hacker-h
+.. _@danielBreitlauch: https://github.com/danielbreitlauch
+.. _@miku323: https://github.com/miku323
+.. _@FaintGhost: https://github.com/FaintGhost
+.. _@DarkoBG79: https://github.com/DarkoBG79
+.. _Kemal Secer: https://crowdin.com/profile/kemal.secer
+.. _@Prominence: https://github.com/Prominence
+.. _@jonasc: https://github.com/jonasc
 
 .. _#20: https://github.com/the-paperless-project/paperless/issues/20
 .. _#44: https://github.com/the-paperless-project/paperless/issues/44
@@ -1684,6 +1779,7 @@ bulk of the work on this big change.
 .. _#488: https://github.com/the-paperless-project/paperless/pull/488
 .. _#489: https://github.com/the-paperless-project/paperless/pull/489
 .. _#492: https://github.com/the-paperless-project/paperless/pull/492
+.. _#674: https://github.com/paperless-ngx/paperless-ngx/pull/674
 
 .. _a new home on Docker Hub: https://hub.docker.com/r/danielquinn/paperless/
 .. _optipng: http://optipng.sourceforge.net/

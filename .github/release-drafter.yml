@@ -1,4 +1,7 @@
 categories:
+  - title: 'Breaking Changes'
+    labels:
+      - 'breaking-change'
   - title: 'Features'
     labels:
       - 'enhancement'
@@ -29,6 +32,6 @@ change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&#@'
 tag-prefix: "ngx-"
 template: |
-  ## Changelog
+  # Changelog
 
   $CHANGES
