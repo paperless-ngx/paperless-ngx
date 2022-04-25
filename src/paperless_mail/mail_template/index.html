@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="output.css" rel="stylesheet">
+</head>
+
+<body class="bg-white w-screen flex flex-col items-center">
+  <div class="container max-w-4xl">
+    <!-- Header -->
+    <div class="grid grid-rows-5 grid-cols-12 gap-x-2 bg-slate-200 p-4">
+
+      <div class="col-start-11 col-span-2 row-start-1 text-right">23.04.2022 18:18</div>
+
+      <div class="col-start-1 row-start-1 text-slate-400 text-right">From</div>
+      <div class="col-start-2 col-span-8 row-start 1">{{ from }}</div>
+
+      <div class="col-start-1 row-start-2 text-slate-400 text-right">Subject</div>
+      <div class=" col-start-2 col-span-10 row-start 2 font-bold">{{ Subject }}
+      </div>
+
+      <div class="col-start-1 row-start-3 text-slate-400 text-right">To</div>
+      <div class="col-start-2 col-span-10 row-start 3">{{ To }}
+      </div>
+
+      <div class="col-start-1 row-start-4 text-slate-400 text-right">CC</div>
+      <div class="col-start-2 col-span-10 row-start 4">{{ CC }}
+      </div>
+
+      <div class="col-start-1 row-start-5 text-slate-400 text-right">BCC</div>
+      <div class="col-start-2 col-span-10 row-start 5">{{ BCC }}
+      </div>
+    </div>
+
+    <!-- Separator-->
+    <div class="border-t border-solid border-b w-full h-[1px] box-content border-black mb-5 bg-slate-200"></div>
+
+    <!-- Content-->
+    <div class="w-full whitespace-pre-line">{{ content }}
+    </div>
+
+</body>
+
+</html>
