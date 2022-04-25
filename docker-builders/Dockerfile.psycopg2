@@ -1,7 +1,7 @@
 # This Dockerfile builds the psycopg2 wheel
 # Inputs:
-#		- GIT_TAG - The Git tag to clone and build from
-#		- VERSION - Unused, kept for future possible usage
+#		- PSYCOPG2_GIT_TAG - The Git tag to clone and build from
+#		- PSYCOPG2_VERSION - Unused, kept for future possible usage
 
 FROM python:3.9-slim-bullseye
 
@@ -31,13 +31,13 @@ RUN set -eux \
 # For better caching, seperate the basic installs from
 # the building
 
-ARG GIT_TAG
-ARG VERSION
+ARG PSYCOPG2_GIT_TAG
+ARG PSYCOPG2_VERSION
 
 RUN set -eux \
 	&& echo "Building psycopg2 wheel" \
   && cd /usr/src \
-  && git clone --quiet --depth 1 --branch ${GIT_TAG} https://github.com/psycopg/psycopg2.git \
+  && git clone --quiet --depth 1 --branch ${PSYCOPG2_GIT_TAG} https://github.com/psycopg/psycopg2.git \
   && cd psycopg2 \
   && mkdir wheels \
   && python3 -m pip wheel . --wheel-dir wheels \
