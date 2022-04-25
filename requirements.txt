@@ -97,7 +97,7 @@ tika==1.24
 tqdm==4.64.0
 twisted[tls]==22.4.0; python_full_version >= '3.6.7'
 txaio==22.2.1; python_version >= '3.6'
-typing-extensions==4.1.1; python_version >= '3.6'
+typing-extensions==4.2.0; python_version >= '3.7'
 tzdata==2022.1; python_version >= '3.6'
 tzlocal==4.2; python_version >= '3.6'
 urllib3==1.26.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'
@@ -106,7 +106,7 @@ uvloop==0.16.0
 watchdog==2.1.7
 watchgod==0.8.2
 wcwidth==0.2.5
-websockets==10.2
+websockets==10.3
 whitenoise==6.0.0
 whoosh==2.7.4
 zipp==3.8.0; python_version < '3.9'
