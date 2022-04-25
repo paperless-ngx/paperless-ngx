@@ -1,6 +1,6 @@
 # This Dockerfile compiles the jbig2enc library
 # Inputs:
-#		- JBIG2ENC_VERSION - the Git tag to checkout and build
+#    - JBIG2ENC_VERSION - the Git tag to checkout and build
 
 FROM debian:bullseye-slim
 
@@ -32,8 +32,8 @@ RUN apt-get update --quiet \
 ARG JBIG2ENC_VERSION
 
 RUN set -eux \
-	&& git clone --quiet --branch $JBIG2ENC_VERSION https://github.com/agl/jbig2enc .
+  && git clone --quiet --branch $JBIG2ENC_VERSION https://github.com/agl/jbig2enc .
 RUN set -eux \
-	&& ./autogen.sh
+  && ./autogen.sh
 RUN set -eux \
-	&& ./configure && make
+  && ./configure && make

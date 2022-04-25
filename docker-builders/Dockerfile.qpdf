@@ -36,16 +36,17 @@ ARG QPDF_VERSION
 # In order to get the required version of qpdf, it is backported from bookwork
 # and then built from source
 RUN set -eux \
-	&& echo "Building qpdf" \
-  && echo "deb-src http://deb.debian.org/debian/ bookworm main" | tee /etc/apt/sources.list.d/bookworm-src.list \
+  && echo "Building qpdf" \
+  && echo "deb-src http://deb.debian.org/debian/ bookworm main" > /etc/apt/sources.list.d/bookworm-src.list \
   && apt-get update \
   && mkdir qpdf \
   && cd qpdf \
   && apt-get source --yes --quiet qpdf=${QPDF_VERSION}-1/bookworm \
   && rm -rf /var/lib/apt/lists/* \
   && cd qpdf-$QPDF_VERSION \
+  # We don't need to build the tests (also don't run them)
+  && rm -rf libtests \
   && DEBEMAIL=hello@paperless-ngx.com debchange --bpo \
-	&& export DEB_BUILD_OPTIONS="terse nocheck nodoc parallel=2" \
+  && export DEB_BUILD_OPTIONS="terse nocheck nodoc parallel=2" \
   && dpkg-buildpackage --build=binary --unsigned-source --unsigned-changes \
-  && pwd \
   && ls -ahl ../*.deb
