@@ -671,11 +671,11 @@
         },
         "ocrmypdf": {
             "hashes": [
-                "sha256:7f0a6165b80ba1b37ce5943cf5b4faf93bf98c04c8f5157ef83c5f292491485f",
-                "sha256:d52410bc38cf5b66da27668e38c66ac41fd3136457c1ec388b311f0a78ee213c"
+                "sha256:0c1cc0a7596fa9da1bfde67141227eeb813aba5e954f88199eacc5f51f1d67d9",
+                "sha256:48bbdd5d15b76f34aa3a91910918e51f91bb3833b4e86da45f8542afda118404"
             ],
             "index": "pypi",
-            "version": "==13.4.2"
+            "version": "==13.4.3"
         },
         "packaging": {
             "hashes": [
