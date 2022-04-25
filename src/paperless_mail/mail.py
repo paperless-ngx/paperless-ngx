@@ -18,6 +18,7 @@ from imap_tools import MailboxFolderSelectError
 from imap_tools import MailBoxUnencrypted
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
+from imap_tools.mailbox import MailBoxTls
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 
@@ -61,13 +62,13 @@ class FlagMailAction(BaseMailAction):
 
 
 def get_rule_action(rule):
-    if rule.action == MailRule.AttachmentAction.FLAG:
+    if rule.action == MailRule.MailAction.FLAG:
         return FlagMailAction()
-    elif rule.action == MailRule.AttachmentAction.DELETE:
+    elif rule.action == MailRule.MailAction.DELETE:
         return DeleteMailAction()
-    elif rule.action == MailRule.AttachmentAction.MOVE:
+    elif rule.action == MailRule.MailAction.MOVE:
         return MoveMailAction()
-    elif rule.action == MailRule.AttachmentAction.MARK_READ:
+    elif rule.action == MailRule.MailAction.MARK_READ:
         return MarkReadMailAction()
     else:
         raise NotImplementedError("Unknown action.")  # pragma: nocover
@@ -92,7 +93,7 @@ def get_mailbox(server, port, security):
     if security == MailAccount.ImapSecurity.NONE:
         mailbox = MailBoxUnencrypted(server, port)
     elif security == MailAccount.ImapSecurity.STARTTLS:
-        mailbox = MailBox(server, port, starttls=True)
+        mailbox = MailBoxTls(server, port)
     elif security == MailAccount.ImapSecurity.SSL:
         mailbox = MailBox(server, port)
     else:
@@ -280,7 +281,7 @@ class MailAccountHandler(LoggingMixin):
         )
 
         correspondent = self.get_correspondent(message, rule)
-        tag = rule.assign_tag
+        tag_ids = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
         processed_attachments = 0
@@ -343,7 +344,7 @@ class MailAccountHandler(LoggingMixin):
                     if correspondent
                     else None,
                     override_document_type_id=doc_type.id if doc_type else None,
-                    override_tag_ids=[tag.id] if tag else None,
+                    override_tag_ids=tag_ids,
                     task_name=att.filename[:100],
                 )
 

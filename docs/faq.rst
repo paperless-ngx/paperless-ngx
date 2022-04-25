@@ -7,7 +7,7 @@ Frequently asked questions
 
 **A:** While Paperless-ngx is already considered largely "feature-complete" it is a community-driven
 project and development will be guided in this way. New features can be submitted via
-GitHub discussions and "up-voted" by the community but this is not a garauntee the feature
+GitHub discussions and "up-voted" by the community but this is not a guarantee the feature
 will be implemented. This project will always be open to collaboration in the form of PRs,
 ideas etc.
 
