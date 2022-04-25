@@ -8,9 +8,6 @@ from django.conf import settings
 from documents.parsers import DocumentParser
 from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import ParseError
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
 from tika import parser
 
 
@@ -112,22 +109,19 @@ class TikaDocumentParserEml(DocumentParser):
     logging_name = "paperless.parsing.tikaeml"
 
     def get_thumbnail(self, document_path, mime_type, file_name=None):
+        if not self.archive_path:
+            self.archive_path = self.generate_pdf(document_path)
 
-        img = Image.new("RGB", (500, 700), color="white")
-        draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype(
-            font=settings.THUMBNAIL_FONT_NAME,
-            size=20,
-            layout_engine=ImageFont.LAYOUT_BASIC,
+        return make_thumbnail_from_pdf(
+            self.archive_path,
+            self.tempdir,
+            self.logging_group,
         )
-        draw.text((5, 5), self.text, font=font, fill="black")
-
-        out_path = os.path.join(self.tempdir, "thumb.png")
-        img.save(out_path)
-
-        return out_path
 
     def extract_metadata(self, document_path, mime_type):
+        result = []
+        prefix_pattern = re.compile(r"(.*):(.*)")
+
         tika_server = settings.PAPERLESS_TIKA_ENDPOINT
         try:
             parsed = parser.from_file(document_path, tika_server)
@@ -136,17 +130,38 @@ class TikaDocumentParserEml(DocumentParser):
                 "warning",
                 f"Error while fetching document metadata for " f"{document_path}: {e}",
             )
-            return []
+            return result
 
-        return [
-            {
-                "namespace": "",
-                "prefix": "",
-                "key": key,
-                "value": parsed["metadata"][key],
-            }
-            for key in parsed["metadata"]
-        ]
+        for key, value in parsed["metadata"].items():
+            if isinstance(value, list):
+                value = ", ".join([str(e) for e in value])
+            value = str(value)
+            try:
+                m = prefix_pattern.match(key)
+                result.append(
+                    {
+                        "namespace": "",
+                        "prefix": m.group(1),
+                        "key": m.group(2),
+                        "value": value,
+                    },
+                )
+            except AttributeError:
+                result.append(
+                    {
+                        "namespace": "",
+                        "prefix": "",
+                        "key": key,
+                        "value": value,
+                    },
+                )
+            except Exception as e:
+                self.log(
+                    "warning",
+                    f"Error while reading metadata {key}: {value}. Error: " f"{e}",
+                )
+            result.sort(key=lambda item: (item["prefix"], item["key"]))
+        return result
 
     def parse(self, document_path, mime_type, file_name=None):
         self.log("info", f"Sending {document_path} to Tika server")
@@ -160,57 +175,94 @@ class TikaDocumentParserEml(DocumentParser):
                 f"{tika_server}: {err}",
             )
 
-        text = re.sub(" +", " ", str(parsed))
-        text = re.sub("\n+", "\n", text)
-        self.text = text
+        metadata = parsed["metadata"].copy()
 
-        print(text)
+        subject = metadata.pop("dc:subject", "<no subject>")
+        content = parsed["content"].strip()
+
+        if content.startswith(subject):
+            content = content[len(subject) :].strip()
+
+        content = re.sub(" +", " ", content)
+        content = re.sub("\n+", "\n", content)
+
+        self.text = (
+            f"{content}\n"
+            f"______________________\n"
+            f"From: {metadata.pop('Message-From', '')}\n"
+            f"To: {metadata.pop('Message-To', '')}\n"
+            f"CC: {metadata.pop('Message-CC', '')}"
+        )
 
         try:
-            self.date = dateutil.parser.isoparse(parsed["metadata"]["Creation-Date"])
+            self.date = dateutil.parser.isoparse(parsed["metadata"]["dcterms:created"])
         except Exception as e:
             self.log(
                 "warning",
                 f"Unable to extract date for document " f"{document_path}: {e}",
             )
 
-        md_path = self.convert_to_md(document_path, file_name)
-        self.archive_path = self.convert_md_to_pdf(md_path)
+        self.archive_path = self.generate_pdf(document_path, parsed)
 
-    def convert_md_to_pdf(self, md_path):
+    def generate_pdf(self, document_path, parsed=None):
+        if not parsed:
+            self.log("info", f"Sending {document_path} to Tika server")
+            tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+
+            try:
+                parsed = parser.from_file(document_path, tika_server)
+            except Exception as err:
+                raise ParseError(
+                    f"Could not parse {document_path} with tika server at "
+                    f"{tika_server}: {err}",
+                )
+
+        def clean_html(text: str):
+            if isinstance(text, list):
+                text = ", ".join([str(e) for e in text])
+            if type(text) != str:
+                text = str(text)
+            text = text.replace("&", "&amp;")
+            text = text.replace("<", "&lt;")
+            text = text.replace(">", "&gt;")
+            text = text.replace(" ", "&nbsp;")
+            text = text.replace("'", "&apos;")
+            text = text.replace('"', "&quot;")
+            return text
+
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
         gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-        url = gotenberg_server + "/forms/chromium/convert/markdown"
+        url = gotenberg_server + "/forms/chromium/convert/html"
 
-        self.log("info", f"Converting {md_path} to PDF as {pdf_path}")
+        self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
+
+        subject = parsed["metadata"].pop("dc:subject", "<no subject>")
+        content = parsed.pop("content", "<no content>").strip()
+
+        if content.startswith(subject):
+            content = content[len(subject) :].strip()
+
         html = StringIO(
-            """
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>My PDF</title>
-  </head>
-  <body>
-    {{ toHTML "convert.md" }}
-  </body>
-</html>
-        """,
-        )
-        md = StringIO(
-            """
-# Subject
-
-blub  \nblah
-blib
-        """,
+            f"""
+            <!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8">
+                <title>My PDF</title>
+              </head>
+              <body>
+                <h1>{clean_html(subject)}</h1>
+                <p>From: {clean_html(parsed['metadata'].pop('Message-From', ''))}
+                <p>To: {clean_html(parsed['metadata'].pop('Message-To', ''))}
+                <p>CC: {clean_html(parsed['metadata'].pop('Message-CC', ''))}
+                <p>Date: {clean_html(parsed['metadata'].pop('dcterms:created', ''))}
+                <pre>{clean_html(content)}</pre>
+              </body>
+            </html>
+            """,
         )
 
         files = {
-            "md": (
-                os.path.basename(md_path),
-                md,
-            ),
             "html": (
                 "index.html",
                 html,
@@ -229,19 +281,3 @@ blib
             file.close()
 
         return pdf_path
-
-    def convert_to_md(self, document_path, file_name):
-        md_path = os.path.join(self.tempdir, "convert.md")
-
-        self.log("info", f"Converting {document_path} to markdown as {md_path}")
-
-        with open(md_path, "w") as file:
-            md = [
-                "# Subject",
-                "\n\n",
-                "blah",
-            ]
-            file.writelines(md)
-            file.close()
-
-        return md_path
