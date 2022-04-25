@@ -649,7 +649,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
             order=1,
@@ -682,7 +682,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MOVE,
+            action=MailRule.MailAction.MOVE,
             action_parameter="spam",
             filter_subject="Claim",
             order=1,
