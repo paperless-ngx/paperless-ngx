@@ -107,6 +107,25 @@ class TikaDocumentParserEml(DocumentParser):
     """
 
     logging_name = "paperless.parsing.tikaeml"
+    _tika_parsed = None
+
+    def get_tika_result(self, document_path):
+        if not self._tika_parsed:
+            self.log("info", f"Sending {document_path} to Tika server")
+            tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+
+            try:
+                self._tika_parsed = parser.from_file(
+                    document_path,
+                    tika_server,
+                )
+            except Exception as err:
+                raise ParseError(
+                    f"Could not parse {document_path} with tika server at "
+                    f"{tika_server}: {err}",
+                )
+
+        return self._tika_parsed
 
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         if not self.archive_path:
@@ -122,10 +141,9 @@ class TikaDocumentParserEml(DocumentParser):
         result = []
         prefix_pattern = re.compile(r"(.*):(.*)")
 
-        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
         try:
-            parsed = parser.from_file(document_path, tika_server)
-        except Exception as e:
+            parsed = self.get_tika_result(document_path)
+        except ParseError as e:
             self.log(
                 "warning",
                 f"Error while fetching document metadata for " f"{document_path}: {e}",
@@ -164,20 +182,9 @@ class TikaDocumentParserEml(DocumentParser):
         return result
 
     def parse(self, document_path, mime_type, file_name=None):
-        self.log("info", f"Sending {document_path} to Tika server")
-        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+        parsed = self.get_tika_result(document_path)
 
-        try:
-            parsed = parser.from_file(document_path, tika_server)
-        except Exception as err:
-            raise ParseError(
-                f"Could not parse {document_path} with tika server at "
-                f"{tika_server}: {err}",
-            )
-
-        metadata = parsed["metadata"].copy()
-
-        subject = metadata.pop("dc:subject", "<no subject>")
+        subject = parsed["metadata"].get("dc:subject", "<no subject>")
         content = parsed["content"].strip()
 
         if content.startswith(subject):
@@ -187,36 +194,25 @@ class TikaDocumentParserEml(DocumentParser):
         content = re.sub("\n+", "\n", content)
 
         self.text = (
-            f"{content}\n"
-            f"______________________\n"
-            f"From: {metadata.pop('Message-From', '')}\n"
-            f"To: {metadata.pop('Message-To', '')}\n"
-            f"CC: {metadata.pop('Message-CC', '')}"
+            f"{content}\n\n"
+            f"From: {parsed['metadata'].get('Message-From', '')}\n"
+            f"To: {parsed['metadata'].get('Message-To', '')}\n"
+            f"CC: {parsed['metadata'].get('Message-CC', '')}"
         )
 
         try:
-            self.date = dateutil.parser.isoparse(parsed["metadata"]["dcterms:created"])
+            self.date = dateutil.parser.isoparse(
+                parsed["metadata"]["dcterms:created"],
+            )
         except Exception as e:
             self.log(
                 "warning",
                 f"Unable to extract date for document " f"{document_path}: {e}",
             )
 
-        self.archive_path = self.generate_pdf(document_path, parsed)
+        self.archive_path = self.generate_pdf(document_path)
 
-    def generate_pdf(self, document_path, parsed=None):
-        if not parsed:
-            self.log("info", f"Sending {document_path} to Tika server")
-            tika_server = settings.PAPERLESS_TIKA_ENDPOINT
-
-            try:
-                parsed = parser.from_file(document_path, tika_server)
-            except Exception as err:
-                raise ParseError(
-                    f"Could not parse {document_path} with tika server at "
-                    f"{tika_server}: {err}",
-                )
-
+    def generate_pdf(self, document_path):
         def clean_html(text: str):
             if isinstance(text, list):
                 text = ", ".join([str(e) for e in text])
@@ -230,51 +226,59 @@ class TikaDocumentParserEml(DocumentParser):
             text = text.replace('"', "&quot;")
             return text
 
+        parsed = self.get_tika_result(document_path)
+
         pdf_path = os.path.join(self.tempdir, "convert.pdf")
         gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
         url = gotenberg_server + "/forms/chromium/convert/html"
 
         self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
 
-        subject = parsed["metadata"].pop("dc:subject", "<no subject>")
-        content = parsed.pop("content", "<no content>").strip()
+        data = {}
+        data["subject"] = clean_html(parsed["metadata"].get("dc:subject", ""))
+        data["from"] = clean_html(parsed["metadata"].get("Message-From", ""))
+        data["to"] = clean_html(parsed["metadata"].get("Message-To", ""))
+        data["cc"] = clean_html(parsed["metadata"].get("Message-CC", ""))
+        data["date"] = clean_html(parsed["metadata"].get("dcterms:created", ""))
 
-        if content.startswith(subject):
-            content = content[len(subject) :].strip()
+        content = parsed.get("content", "").strip()
+        if content.startswith(data["subject"]):
+            content = content[len(data["subject"]) :].strip()
+        data["content"] = clean_html(content)
 
-        html = StringIO(
-            f"""
-            <!doctype html>
-            <html lang="en">
-              <head>
-                <meta charset="utf-8">
-                <title>My PDF</title>
-              </head>
-              <body>
-                <h1>{clean_html(subject)}</h1>
-                <p>From: {clean_html(parsed['metadata'].pop('Message-From', ''))}
-                <p>To: {clean_html(parsed['metadata'].pop('Message-To', ''))}
-                <p>CC: {clean_html(parsed['metadata'].pop('Message-CC', ''))}
-                <p>Date: {clean_html(parsed['metadata'].pop('dcterms:created', ''))}
-                <pre>{clean_html(content)}</pre>
-              </body>
-            </html>
-            """,
-        )
+        html_file = os.path.join(os.path.dirname(__file__), "mail_template/index.html")
+        css_file = os.path.join(os.path.dirname(__file__), "mail_template/output.css")
+        placeholder_pattern = re.compile(r"{{(.+)}}")
+        html = StringIO()
 
-        files = {
-            "html": (
-                "index.html",
-                html,
-            ),
-        }
-        headers = {}
+        with open(html_file, "r") as html_template_handle:
+            with open(css_file, "rb") as css_handle:
+                for line in html_template_handle.readlines():
+                    for placeholder in placeholder_pattern.findall(line):
+                        line = re.sub(
+                            "{{" + placeholder + "}}",
+                            data.get(placeholder.strip(), ""),
+                            line,
+                        )
+                    html.write(line)
+                html.seek(0)
+                files = {
+                    "html": (
+                        "index.html",
+                        html,
+                    ),
+                    "css": (
+                        "output.css",
+                        css_handle,
+                    ),
+                }
+                headers = {}
 
-        try:
-            response = requests.post(url, files=files, headers=headers)
-            response.raise_for_status()  # ensure we notice bad responses
-        except Exception as err:
-            raise ParseError(f"Error while converting document to PDF: {err}")
+                try:
+                    response = requests.post(url, files=files, headers=headers)
+                    response.raise_for_status()  # ensure we notice bad responses
+                except Exception as err:
+                    raise ParseError(f"Error while converting document to PDF: {err}")
 
         with open(pdf_path, "wb") as file:
             file.write(response.content)
