@@ -228,7 +228,6 @@ class TestMail(DirectoriesMixin, TestCase):
         message.from_values = EmailAddress(
             "Someone!",
             "someone@somewhere.com",
-            "Someone! <someone@somewhere.com>",
         )
 
         message2 = namedtuple("MailMessage", [])
@@ -236,7 +235,6 @@ class TestMail(DirectoriesMixin, TestCase):
         message2.from_values = EmailAddress(
             "",
             "fake@localhost.com",
-            "",
         )
 
         me_localhost = Correspondent.objects.create(name=message2.from_)
