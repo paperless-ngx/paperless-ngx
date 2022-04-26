@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 wait_for_postgres() {
 	attempt_num=1
 	max_attempts=5

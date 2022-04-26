@@ -1,10 +1,10 @@
 FROM python:3.5.1
 
 # Install Sphinx and Pygments
-RUN pip install Sphinx Pygments
+RUN pip install --no-cache-dir Sphinx Pygments \
+  # Setup directories, copy data
+  && mkdir /build
 
-# Setup directories, copy data
-RUN mkdir /build
 COPY . /build
 WORKDIR /build/docs
 
