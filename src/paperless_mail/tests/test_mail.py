@@ -852,7 +852,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MARK_READ,
+            action=MailRule.MailAction.MARK_READ,
         )
 
         self.assertEqual(len(self.bogus_mailbox.messages), 3)
@@ -885,7 +885,7 @@ class TestMail(DirectoriesMixin, TestCase):
         _ = MailRule.objects.create(
             name="testrule",
             account=account,
-            action=MailRule.AttachmentAction.MARK_READ,
+            action=MailRule.MailAction.MARK_READ,
         )
 
         self.assertRaises(
