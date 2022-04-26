@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ask() {
 	while true ; do
@@ -319,7 +319,10 @@ wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/
 
 SECRET_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 64 | head -n 1)
 
-DEFAULT_LANGUAGES="deu eng fra ita spa"
+DEFAULT_LANGUAGES=("deu eng fra ita spa")
+
+_split_langs="${OCR_LANGUAGE//+/ }"
+read -r -a OCR_LANGUAGES_ARRAY <<< "${_split_langs}"
 
 {
 	if [[ ! $URL == "" ]] ; then
@@ -334,8 +337,8 @@ DEFAULT_LANGUAGES="deu eng fra ita spa"
 	echo "PAPERLESS_TIME_ZONE=$TIME_ZONE"
 	echo "PAPERLESS_OCR_LANGUAGE=$OCR_LANGUAGE"
 	echo "PAPERLESS_SECRET_KEY=$SECRET_KEY"
-	if [[ ! " ${DEFAULT_LANGUAGES[*]} " =~ ${OCR_LANGUAGE} ]] ; then
-		echo "PAPERLESS_OCR_LANGUAGES=$OCR_LANGUAGE"
+	if [[ ! ${DEFAULT_LANGUAGES[*]} =~ ${OCR_LANGUAGES_ARRAY[*]} ]] ; then
+		echo "PAPERLESS_OCR_LANGUAGES=${OCR_LANGUAGES_ARRAY[*]}"
 	fi
 } > docker-compose.env
 
