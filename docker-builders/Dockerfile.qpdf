@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:bullseye-slim as main
 
 LABEL org.opencontainers.image.description="A intermediate image with qpdf built"
 
@@ -11,6 +11,7 @@ ARG BUILD_PACKAGES="\
   devscripts \
   equivs  \
   libtool \
+  # https://qpdf.readthedocs.io/en/stable/installation.html#system-requirements
   libjpeg62-turbo-dev \
   libgnutls28-dev \
   packaging-dev \

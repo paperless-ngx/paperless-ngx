@@ -37,6 +37,9 @@ psycopg2_git_tag=${psycopg2_version//./_}
 # pikepdf uses vX.Y.Z
 pikepdf_git_tag="v${pikepdf_version}"
 
+# https://docs.docker.com/develop/develop-images/build_enhancements/
+export DOCKER_BUILDKIT=1
+
 docker build --file "$1" \
 	--build-arg JBIG2ENC_VERSION="${jbig2enc_version}" \
 	--build-arg QPDF_VERSION="${qpdf_version}" \
