@@ -22,14 +22,6 @@ body:
     validations:
       required: true
   - type: textarea
-    id: expected-behavior
-    attributes:
-      label: Expected behavior
-      description: A clear and concise description of what you expected to happen.
-      placeholder: In this situation...
-    validations:
-      required: true
-  - type: textarea
     id: reproduction
     attributes:
       label: Steps to reproduce
