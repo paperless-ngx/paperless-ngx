@@ -29,7 +29,7 @@ ARG BUILD_PACKAGES="\
   # lxml requrements - https://lxml.de/installation.html
   libxml2-dev \
   libxslt1-dev \
-  # Pillow requirements - https://pillow.readthedocs.io/en/stable/installation.html
+  # Pillow requirements - https://pillow.readthedocs.io/en/stable/installation.html#external-libraries
   # JPEG functionality
   libjpeg62-turbo-dev \
   # conpressed PNG
