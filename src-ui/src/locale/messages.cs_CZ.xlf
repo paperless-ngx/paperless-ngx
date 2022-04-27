@@ -155,7 +155,7 @@
           <context context-type="sourcefile">node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">67,68</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="ackground color"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="ackground color"/></target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.HH" datatype="html">
         <source>HH</source>
