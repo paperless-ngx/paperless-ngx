@@ -696,7 +696,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .auto-cols-fr {
-  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-columns: minmax();
 }
 
 .auto-cols-max {
@@ -705,23 +705,23 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 .grid-cols-5 {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax());
 }
 
 .grid-cols-7 {
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax());
 }
 
 .grid-cols-12 {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax());
 }
 
 .grid-rows-4 {
-  grid-template-rows: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax());
 }
 
 .grid-rows-5 {
-  grid-template-rows: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(5, minmax());
 }
 
 .flex-col {
