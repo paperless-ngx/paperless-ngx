@@ -76,14 +76,10 @@ jobs:
         with:
           python-version: "3.9"
       -
-        name: Make script executable
-        run: |
-          chmod +x ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py
-      -
         name: Setup qpdf image
         id: qpdf-setup
         run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py qpdf)
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py qpdf)
 
           echo ${build_json}
 
@@ -92,7 +88,7 @@ jobs:
         name: Setup psycopg2 image
         id: psycopg2-setup
         run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py psycopg2)
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py psycopg2)
 
           echo ${build_json}
 
@@ -101,7 +97,7 @@ jobs:
         name: Setup pikepdf image
         id: pikepdf-setup
         run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py pikepdf)
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py pikepdf)
 
           echo ${build_json}
 
@@ -110,7 +106,7 @@ jobs:
         name: Setup jbig2enc image
         id: jbig2enc-setup
         run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py jbig2enc)
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py jbig2enc)
 
           echo ${build_json}
 
@@ -119,7 +115,7 @@ jobs:
         name: Setup frontend image
         id: frontend-setup
         run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/docker-builders/get-build-json.py frontend)
+          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py frontend)
 
           echo ${build_json}
 
@@ -198,15 +194,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-      -
-        name: Get changed frontend files
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v18.1
-        with:
-          files: |
-            src-ui/**
       -
         name: Login to Github Container Registry
         uses: docker/login-action@v1
@@ -215,32 +202,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Determine if build needed
-        id: build-skip-check
-        # Skip building the frontend if the tag exists and no src-ui files changed
-        run: |
-          if ! docker manifest inspect ${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).image_tag }} &> /dev/null ; then
-            echo "Build required, no existing image"
-            echo ::set-output name=frontend-build-needed::true
-          elif ${{ steps.changed-files-specific.outputs.any_changed }} == 'true' ; then
-            echo "Build required, src-ui changes"
-            echo ::set-output name=frontend-build-needed::true
-          else
-            echo "No build required"
-            echo ::set-output name=frontend-build-needed::false
-          fi
-      -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        if: ${{ steps.build-skip-check.outputs.frontend-build-needed == 'true' }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-        if: ${{ steps.build-skip-check.outputs.frontend-build-needed == 'true' }}
       -
         name: Compile frontend
         uses: docker/build-push-action@v2
-        if: ${{ steps.build-skip-check.outputs.frontend-build-needed == 'true' }}
         with:
           context: .
           file: ./docker-builders/Dockerfile.frontend
@@ -250,8 +219,8 @@ jobs:
           # But the platform is set to the runner's native for speedup
           platforms: linux/amd64
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).cache_tag }}
+          cache-to: type=registry,mode=max,ref=${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).cache_tag }}
       -
         name: Export frontend artifact from docker
         run: |
