@@ -89,7 +89,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">250,252</context>
         </context-group>
-        <target state="needs-translation">««</target>
+        <target state="translated">««</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.previous" datatype="html">
         <source>«</source>
@@ -97,7 +97,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">267</context>
         </context-group>
-        <target state="needs-translation">«</target>
+        <target state="translated">«</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.next" datatype="html">
         <source>»</source>
@@ -105,7 +105,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">294</context>
         </context-group>
-        <target state="needs-translation">»</target>
+        <target state="translated">»</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.last" datatype="html">
         <source>»»</source>
@@ -113,7 +113,7 @@
           <context context-type="sourcefile">node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">313,316</context>
         </context-group>
-        <target state="needs-translation">»»</target>
+        <target state="translated">»»</target>
       </trans-unit>
       <trans-unit id="ngb.pagination.first-aria" datatype="html">
         <source>First</source>
@@ -155,7 +155,7 @@
           <context context-type="sourcefile">node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">67,68</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="ackground color"/></target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="ackground color"/></target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.HH" datatype="html">
         <source>HH</source>
