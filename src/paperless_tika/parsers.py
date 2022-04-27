@@ -215,7 +215,7 @@ class TikaDocumentParserEml(DocumentParser):
     def generate_pdf(self, document_path):
         def clean_html(text: str):
             if isinstance(text, list):
-                text = ", ".join([str(e) for e in text])
+                text = "\n".join([str(e) for e in text])
             if type(text) != str:
                 text = str(text)
             text = text.replace("&", "&amp;")
@@ -236,9 +236,20 @@ class TikaDocumentParserEml(DocumentParser):
 
         data = {}
         data["subject"] = clean_html(parsed["metadata"].get("dc:subject", ""))
+        if data["subject"] != "":
+            data["subject_label"] = "Subject"
         data["from"] = clean_html(parsed["metadata"].get("Message-From", ""))
+        if data["from"] != "":
+            data["from_label"] = "From"
         data["to"] = clean_html(parsed["metadata"].get("Message-To", ""))
+        if data["to"] != "":
+            data["to_label"] = "To"
         data["cc"] = clean_html(parsed["metadata"].get("Message-CC", ""))
+        if data["cc"] != "":
+            data["cc_label"] = "CC"
+        data["bcc"] = clean_html(parsed["metadata"].get("Message-BCC", ""))
+        if data["bcc"] != "":
+            data["bcc_label"] = "BCC"
         data["date"] = clean_html(parsed["metadata"].get("dcterms:created", ""))
 
         content = parsed.get("content", "").strip()
@@ -273,9 +284,22 @@ class TikaDocumentParserEml(DocumentParser):
                     ),
                 }
                 headers = {}
-
+                data = {
+                    "marginTop": "0",
+                    "marginBottom": "0",
+                    "marginLeft": "0",
+                    "marginRight": "0",
+                    "paperWidth": "8.27",
+                    "paperHeight": "11.7",
+                    "scale": "1.0",
+                }
                 try:
-                    response = requests.post(url, files=files, headers=headers)
+                    response = requests.post(
+                        url,
+                        files=files,
+                        headers=headers,
+                        data=data,
+                    )
                     response.raise_for_status()  # ensure we notice bad responses
                 except Exception as err:
                     raise ParseError(f"Error while converting document to PDF: {err}")
