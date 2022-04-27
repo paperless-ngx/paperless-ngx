@@ -9,7 +9,7 @@ wait_for_postgres() {
 	echo "Waiting for PostgreSQL to start..."
 
 	host="${PAPERLESS_DBHOST:=localhost}"
-	port="${PAPERLESS_DBPORT:=5342}"
+	port="${PAPERLESS_DBPORT:=5432}"
 
 
 	while [ ! "$(pg_isready -h $host -p $port)" ]; do
