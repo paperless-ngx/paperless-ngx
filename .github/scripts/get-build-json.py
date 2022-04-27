@@ -20,13 +20,8 @@ import os
 from pathlib import Path
 from typing import Final
 
-
-def _get_image_tag(
-    repo_name: str,
-    pkg_name: str,
-    pkg_version: str,
-) -> str:
-    return f"ghcr.io/{repo_name}/builder/{pkg_name}:{pkg_version}"
+from common import get_cache_image_tag
+from common import get_image_tag
 
 
 def _main():
@@ -49,7 +44,9 @@ def _main():
 
     args: Final = parser.parse_args()
 
+    # Read from environment variables set by GitHub Actions
     repo_name: Final[str] = os.environ["GITHUB_REPOSITORY"]
+    branch_name: Final[str] = os.environ["GITHUB_REF_NAME"]
 
     # Default output values
     version = None
@@ -58,7 +55,7 @@ def _main():
 
     if args.package == "frontend":
         # Version is just the branch or tag name
-        version = os.environ["GITHUB_REF_NAME"]
+        version = branch_name
     elif args.package in pipfile_data["default"]:
         # Read the version from Pipfile.lock
         pkg_data = pipfile_data["default"][args.package]
@@ -88,7 +85,13 @@ def _main():
         "name": args.package,
         "version": version,
         "git_tag": git_tag,
-        "image_tag": _get_image_tag(repo_name, args.package, version),
+        "image_tag": get_image_tag(repo_name, args.package, version),
+        "cache_tag": get_cache_image_tag(
+            repo_name,
+            args.package,
+            version,
+            branch_name,
+        ),
     }
 
     # Add anything special a package may need
