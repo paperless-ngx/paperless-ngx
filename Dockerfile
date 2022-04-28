@@ -47,7 +47,14 @@ ARG RUNTIME_PACKAGES="\
   liblept5 \
   libpq5 \
   libxml2 \
+  liblcms2-2 \
+  libtiff5 \
   libxslt1.1 \
+  libfreetype6 \
+  libwebp6 \
+  libopenjp2-7 \
+  libimagequant0 \
+  libraqm0 \
   libgnutls30 \
   libjpeg62-turbo \
   optipng \
