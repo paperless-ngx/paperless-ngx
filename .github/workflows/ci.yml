@@ -3,8 +3,9 @@ name: ci
 on:
   push:
     tags:
-      - ngx-*
-      - beta-*
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
+      - 'beta-[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
     branches-ignore:
       - 'translations**'
   pull_request:
@@ -53,7 +54,7 @@ jobs:
 
   prepare-docker-build:
     name: Prepare Docker Pipeline Data
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/ngx-') || startsWith(github.ref, 'refs/tags/beta-'))
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/beta-'))
     runs-on: ubuntu-20.04
     needs:
       - documentation
@@ -388,7 +389,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs:
       - build-release
-    if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'ngx-') || startsWith(github.ref_name, 'beta-'))
+    if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'beta-'))
     steps:
       -
         name: Download release artifact
@@ -400,11 +401,11 @@ jobs:
         name: Get version
         id: get_version
         run: |
-          if [[ $GITHUB_REF == refs/tags/ngx-* ]]; then
-            echo ::set-output name=version::${GITHUB_REF#refs/tags/ngx-}
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo ::set-output name=version::${{ github.ref_name }}
             echo ::set-output name=prerelease::false
           elif [[ $GITHUB_REF == refs/tags/beta-* ]]; then
-            echo ::set-output name=version::${GITHUB_REF#refs/tags/beta-}
+            echo ::set-output name=version::${{ github.ref_name }}
             echo ::set-output name=prerelease::true
           fi
       -
@@ -413,7 +414,7 @@ jobs:
         uses: release-drafter/release-drafter@v5
         with:
           name: Paperless-ngx ${{ steps.get_version.outputs.version }}
-          tag: ngx-${{ steps.get_version.outputs.version }}
+          tag: ${{ steps.get_version.outputs.version }}
           version: ${{ steps.get_version.outputs.version }}
           prerelease: ${{ steps.get_version.outputs.prerelease }}
           publish: true # ensures release is not marked as draft
