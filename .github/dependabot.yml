@@ -29,6 +29,9 @@ updates:
     labels:
       - "backend"
       - "dependencies"
+    # Add reviewers
+    reviewers:
+      - "paperless-ngx/backend"
 
   # Enable updates for Github Actions
   - package-ecosystem: "github-actions"
