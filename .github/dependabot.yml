@@ -6,11 +6,14 @@ updates:
   # Enable version updates for npm
   - package-ecosystem: "npm"
     target-branch: "dev"
-    # Look for `package.json` and `lock` files in the `root` directory
+    # Look for `package.json` and `lock` files in the `/src-ui` directory
     directory: "/src-ui"
     # Check the npm registry for updates every month
     schedule:
       interval: "monthly"
+    labels:
+      - "frontend"
+      - "dependencies"
     # Add reviewers
     reviewers:
       - "paperless-ngx/frontend"
@@ -26,6 +29,9 @@ updates:
     labels:
       - "backend"
       - "dependencies"
+    # Add reviewers
+    reviewers:
+      - "paperless-ngx/backend"
 
   # Enable updates for Github Actions
   - package-ecosystem: "github-actions"
@@ -39,4 +45,4 @@ updates:
       - "dependencies"
     # Add reviewers
     reviewers:
-      - "paperless-ngx/backend"
+      - "paperless-ngx/ci-cd"
