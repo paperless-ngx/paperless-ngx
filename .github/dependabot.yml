@@ -11,6 +11,9 @@ updates:
     # Check the npm registry for updates every month
     schedule:
       interval: "monthly"
+    labels:
+      - "frontend"
+      - "dependencies"
     # Add reviewers
     reviewers:
       - "paperless-ngx/frontend"
