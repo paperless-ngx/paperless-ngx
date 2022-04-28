@@ -6,7 +6,7 @@ updates:
   # Enable version updates for npm
   - package-ecosystem: "npm"
     target-branch: "dev"
-    # Look for `package.json` and `lock` files in the `root` directory
+    # Look for `package.json` and `lock` files in the `/src-ui` directory
     directory: "/src-ui"
     # Check the npm registry for updates every month
     schedule:
