@@ -22,6 +22,8 @@ from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from pdf2image import convert_from_path
 from pikepdf import Pdf
+from PIL import Image
+from PIL import ImageSequence
 from pyzbar import pyzbar
 from whoosh.writing import AsyncWriter
 
@@ -93,9 +95,41 @@ def barcode_reader(image) -> List[str]:
     return barcodes
 
 
+def convert_from_tiff_to_pdf(filepath: str) -> str:
+    """
+    converts a given TIFF image file to pdf into a temp. directory.
+    Returns the new pdf file.
+    """
+    file_name = os.path.splitext(os.path.basename(filepath))[0]
+    file_extension = os.path.splitext(os.path.basename(filepath))[1].lower()
+    tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
+    # use old file name with pdf extension
+    if file_extension == ".tif" or file_extension == ".tiff":
+        newpath = os.path.join(tempdir, file_name + ".pdf")
+    else:
+        logger.warning(f"Cannot convert from {str(file_extension)} to pdf.")
+        return None
+    with Image.open(filepath) as image:
+        images = []
+        for i, page in enumerate(ImageSequence.Iterator(image)):
+            page = page.convert("RGB")
+            images.append(page)
+        try:
+            if len(images) == 1:
+                images[0].save(newpath)
+            else:
+                images[0].save(newpath, save_all=True, append_images=images[1:])
+        except OSError as e:
+            logger.warning(
+                f"Could not save the file as pdf. Error: {str(e)}",
+            )
+            return None
+    return newpath
+
+
 def scan_file_for_separating_barcodes(filepath: str) -> List[int]:
     """
-    Scan the provided file for page separating barcodes
+    Scan the provided pdf file for page separating barcodes
     Returns a list of pagenumbers, which separate the file
     """
     separator_page_numbers = []
@@ -112,7 +146,7 @@ def scan_file_for_separating_barcodes(filepath: str) -> List[int]:
 
 def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
     """
-    Separate the provided file on the pages_to_split_on.
+    Separate the provided pdf file on the pages_to_split_on.
     The pages which are defined by page_numbers will be removed.
     Returns a list of (temporary) filepaths to consume.
     These will need to be deleted later.
@@ -195,42 +229,70 @@ def consume_file(
     if settings.CONSUMER_ENABLE_BARCODES:
         separators = []
         document_list = []
-        separators = scan_file_for_separating_barcodes(path)
-        if separators:
-            logger.debug(f"Pages with separators found in: {str(path)}")
-            document_list = separate_pages(path, separators)
-        if document_list:
-            for n, document in enumerate(document_list):
-                # save to consumption dir
-                # rename it to the original filename  with number prefix
-                if override_filename:
-                    newname = f"{str(n)}_" + override_filename
-                else:
-                    newname = None
-                save_to_dir(document, newname=newname)
-            # if we got here, the document was successfully split
-            # and can safely be deleted
-            logger.debug("Deleting file {}".format(path))
-            os.unlink(path)
-            # notify the sender, otherwise the progress bar
-            # in the UI stays stuck
-            payload = {
-                "filename": override_filename,
-                "task_id": task_id,
-                "current_progress": 100,
-                "max_progress": 100,
-                "status": "SUCCESS",
-                "message": "finished",
-            }
-            try:
-                async_to_sync(get_channel_layer().group_send)(
-                    "status_updates",
-                    {"type": "status_update", "data": payload},
+        converted_tiff = None
+        if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
+            supported_extensions = [".pdf", ".tiff", ".tif"]
+        else:
+            supported_extensions = [".pdf"]
+        file_extension = os.path.splitext(os.path.basename(path))[1].lower()
+        if file_extension not in supported_extensions:
+            # if not supported, skip this routine
+            logger.warning(
+                f"Unsupported file format for barcode reader: {str(file_extension)}",
+            )
+        else:
+            if file_extension in {".tif", ".tiff"}:
+                file_to_process = convert_from_tiff_to_pdf(path)
+            else:
+                file_to_process = path
+
+            separators = scan_file_for_separating_barcodes(file_to_process)
+
+            if separators:
+                logger.debug(
+                    f"Pages with separators found in: {str(path)}",
                 )
-            except OSError as e:
-                logger.warning("OSError. It could be, the broker cannot be reached.")
-                logger.warning(str(e))
-            return "File successfully split"
+                document_list = separate_pages(file_to_process, separators)
+
+            if document_list:
+                for n, document in enumerate(document_list):
+                    # save to consumption dir
+                    # rename it to the original filename  with number prefix
+                    if override_filename:
+                        newname = f"{str(n)}_" + override_filename
+                    else:
+                        newname = None
+                    save_to_dir(document, newname=newname)
+                # if we got here, the document was successfully split
+                # and can safely be deleted
+                if converted_tiff:
+                    logger.debug("Deleting file {}".format(file_to_process))
+                    os.unlink(file_to_process)
+                logger.debug("Deleting file {}".format(path))
+                os.unlink(path)
+                # notify the sender, otherwise the progress bar
+                # in the UI stays stuck
+                payload = {
+                    "filename": override_filename,
+                    "task_id": task_id,
+                    "current_progress": 100,
+                    "max_progress": 100,
+                    "status": "SUCCESS",
+                    "message": "finished",
+                }
+                try:
+                    async_to_sync(get_channel_layer().group_send)(
+                        "status_updates",
+                        {"type": "status_update", "data": payload},
+                    )
+                except OSError as e:
+                    logger.warning(
+                        "OSError. It could be, the broker cannot be reached.",
+                    )
+                    logger.warning(str(e))
+                # consuming stops here, since the original document with
+                # the barcodes has been split and will be consumed separately
+                return "File successfully split"
 
     # continue with consumption if no barcode was found
     document = Consumer().try_consume_file(
