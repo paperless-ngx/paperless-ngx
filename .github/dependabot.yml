@@ -45,4 +45,4 @@ updates:
       - "dependencies"
     # Add reviewers
     reviewers:
-      - "paperless-ngx/backend"
+      - "paperless-ngx/ci-cd"
