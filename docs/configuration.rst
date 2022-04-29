@@ -494,7 +494,7 @@ requires are as follows:
             restart: unless-stopped
             command:
                 - "gotenberg"
-                - "--chromium-disable-routes=true"
+                - "--chromium-disable-web-security"
 
         tika:
             image: apache/tika
