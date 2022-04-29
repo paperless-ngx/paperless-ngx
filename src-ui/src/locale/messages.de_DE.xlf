@@ -2245,7 +2245,7 @@
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">correspondent</target>
+        <target state="translated">Korrespondenten</target>
       </trans-unit>
       <trans-unit id="697889236478552968" datatype="html" approved="yes">
         <source>Last correspondence</source>
@@ -2269,7 +2269,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">document type</target>
+        <target state="translated">Dokumenttypen</target>
       </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html" approved="yes">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
