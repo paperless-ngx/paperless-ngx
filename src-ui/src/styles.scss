@@ -4,7 +4,6 @@ $enable-negative-margins: true;
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "theme";
-@import "theme_dark";
 @import "print";
 
 // Paperless-ngx styles
@@ -26,6 +25,27 @@ svg.logo {
   }
 }
 
+.navbar.bg-primary {
+  --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
+  --bs-primary-rgb: var(--bs-primary);
+}
+
+.border {
+  border-color: var(--bs-border-color) !important;
+}
+
+.border-end {
+  border-right: 1px solid var(--bs-border-color) !important;
+}
+
+.border-start {
+  border-left: 1px solid var(--bs-border-color) !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--bs-border-color) !important;
+}
+
 .nav-link, .list-group-item {
   color: var(--bs-body-color);
 }
@@ -36,20 +56,31 @@ svg.logo {
 
 .bg-primary {
   background-color: var(--bs-primary) !important;
+  color: var(--pngx-primary-text-contrast);
+}
+
+.navbar-brand {
+  color: var(--pngx-primary-text-contrast) !important;
+}
+
+.navbar .dropdown .btn {
+  color: var(--pngx-primary-text-contrast) !important;
 }
 
 .btn-primary {
+  color: var(--pngx-primary-text-contrast);
   background-color: var(--bs-primary);
   border-color: var(--bs-primary);
 
   &:hover, &:focus {
-    background-color: var(--pngx-primary-darken-10);
-    border-color: var(--pngx-primary-darken-10);
+    background-color: var(--pngx-primary-darken-5);
+    border-color: var(--pngx-primary-darken-5);
   }
 
   &:disabled, &.disabled {
-    background-color: var(--pngx-primary-darken-10) !important;
-    border-color: var(--pngx-primary-darken-10) !important;
+    color: var(--pngx-primary-text-contrast);
+    background-color: var(--pngx-primary-darken-5) !important;
+    border-color: var(--pngx-primary-darken-5) !important;
   }
 }
 
@@ -90,14 +121,14 @@ svg.logo {
   background-image: escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#bbb'/></svg>"));
 }
 
-.nav-link:focus-visible, .nav-item a:focus-visible {
+.nav-item a:focus-visible {
   outline: none;
-  background-color: var(--pngx-bg-darker);
+  background-color: var(--bs-body-bg);
 }
 
 a.navbar-brand:focus-visible {
   outline: none;
-  color: var(--pngx-primary-darken-10);
+  color: var(--pngx-primary-darken-5);
 }
 
 .dropdown.show {
@@ -209,7 +240,8 @@ input,
 select,
 textarea,
 .form-select:not(.is-invalid):not(:disabled),
-.form-check-input {
+.form-check-input,
+.ng-select .ng-select-container .ng-value-container .ng-input > input {
   color: var(--bs-body-color);
   background-color: var(--bs-body-bg);
   border-color: var(--bs-border-color);
@@ -324,6 +356,13 @@ textarea,
   }
 }
 
+.doc-img-container {
+  border: none !important;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+  overflow: hidden;
+}
+
 // icons
 .toolbaricon {
   width: 1.2em;
@@ -403,10 +442,8 @@ table.table {
   border-color: var(--bs-danger);
 }
 
-.alert-secondary {
-  background-color: var(--pngx-primary-darken-18);
-  border-color: var(--pngx-primary-darken-15);
-  color: var(--bs-body-color);
+.progress {
+  background-color: var(--bs-body-bg);
 }
 
 .ngb-dp-header,
