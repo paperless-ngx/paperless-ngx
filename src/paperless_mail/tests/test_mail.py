@@ -15,7 +15,9 @@ from django.test import TestCase
 from documents.models import Correspondent
 from documents.tests.utils import DirectoriesMixin
 from imap_tools import EmailAddress
+from imap_tools import FolderInfo
 from imap_tools import MailboxFolderSelectError
+from imap_tools import MailboxLoginError
 from imap_tools import MailMessage
 from imap_tools import MailMessageFlags
 from paperless_mail import tasks
@@ -43,6 +45,14 @@ class BogusFolderManager:
         self.current_folder = new_folder
 
 
+class BogusClient(object):
+    def authenticate(self, mechanism, authobject):
+        # authobject must be a callable object
+        auth_bytes = authobject(None)
+        if auth_bytes != b"\x00admin\x00w57\xc3\xa4\xc3\xb6\xc3\xbcw4b6huwb6nhu":
+            raise MailboxLoginError("BAD", "OK")
+
+
 class BogusMailBox(ContextManager):
     def __enter__(self):
         return self
@@ -53,12 +63,15 @@ class BogusMailBox(ContextManager):
     def __init__(self):
         self.messages: List[MailMessage] = []
         self.messages_spam: List[MailMessage] = []
+        self.folder = BogusFolderManager()
+        self.client = BogusClient()
 
     def login(self, username, password):
-        if not (username == "admin" and password == "secret"):
-            raise Exception()
-
-    folder = BogusFolderManager()
+        # This will raise a UnicodeEncodeError if the password is not ASCII only
+        password.encode("ascii")
+        # Otherwise, check for correct values
+        if username != "admin" or password not in {"secret"}:
+            raise MailboxLoginError("BAD", "OK")
 
     def fetch(self, criteria, mark_seen, charset=""):
         msg = self.messages
@@ -228,7 +241,6 @@ class TestMail(DirectoriesMixin, TestCase):
         message.from_values = EmailAddress(
             "Someone!",
             "someone@somewhere.com",
-            "Someone! <someone@somewhere.com>",
         )
 
         message2 = namedtuple("MailMessage", [])
@@ -236,7 +248,6 @@ class TestMail(DirectoriesMixin, TestCase):
         message2.from_values = EmailAddress(
             "",
             "fake@localhost.com",
-            "",
         )
 
         me_localhost = Correspondent.objects.create(name=message2.from_)
@@ -308,10 +319,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -355,10 +368,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -381,10 +396,12 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -406,11 +423,13 @@ class TestMail(DirectoriesMixin, TestCase):
         )
 
         account = MailAccount()
+        account.save()
         rule = MailRule(
             assign_title_from=MailRule.TitleSource.FROM_FILENAME,
             account=account,
             attachment_type=MailRule.AttachmentProcessing.EVERYTHING,
         )
+        rule.save()
 
         result = self.mail_account_handler.handle_message(message, rule)
 
@@ -440,12 +459,15 @@ class TestMail(DirectoriesMixin, TestCase):
         for (pattern, matches) in tests:
             matches.sort()
             self.async_task.reset_mock()
-            account = MailAccount()
+            account = MailAccount(name=str(uuid.uuid4()))
+            account.save()
             rule = MailRule(
+                name=str(uuid.uuid4()),
                 assign_title_from=MailRule.TitleSource.FROM_FILENAME,
                 account=account,
                 filter_attachment_filename=pattern,
             )
+            rule.save()
 
             result = self.mail_account_handler.handle_message(message, rule)
 
@@ -621,6 +643,72 @@ class TestMail(DirectoriesMixin, TestCase):
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(len(self.bogus_mailbox.messages_spam), 1)
 
+    def test_error_folder_set(self):
+        """
+        GIVEN:
+            - Mail rule with non-existent folder
+        THEN:
+            - Should call list to output all folders in the account
+            - Should not process any messages
+        """
+        account = MailAccount.objects.create(
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MOVE,
+            action_parameter="spam",
+            filter_subject="Claim",
+            order=1,
+            folder="uuuhhhh",  # Invalid folder name
+        )
+
+        self.bogus_mailbox.folder.list = mock.Mock(
+            return_value=[FolderInfo("SomeFoldername", "|", ())],
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.bogus_mailbox.folder.list.assert_called_once()
+        self.assertEqual(self.async_task.call_count, 0)
+
+    def test_error_folder_set_error_listing(self):
+        """
+        GIVEN:
+            - Mail rule with non-existent folder
+            - Mail account folder listing raises exception
+        THEN:
+            - Should not process any messages
+        """
+        account = MailAccount.objects.create(
+            name="test2",
+            imap_server="",
+            username="admin",
+            password="secret",
+        )
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MOVE,
+            action_parameter="spam",
+            filter_subject="Claim",
+            order=1,
+            folder="uuuhhhh",  # Invalid folder name
+        )
+
+        self.bogus_mailbox.folder.list = mock.Mock(
+            side_effect=MailboxFolderSelectError(None, "uhm"),
+        )
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.bogus_mailbox.folder.list.assert_called_once()
+        self.assertEqual(self.async_task.call_count, 0)
+
     @mock.patch("paperless_mail.mail.MailAccountHandler.get_correspondent")
     def test_error_skip_mail(self, m):
         def get_correspondent_fake(message, rule):
@@ -743,6 +831,66 @@ class TestMail(DirectoriesMixin, TestCase):
         self.mail_account_handler.handle_mail_account(account)
         self.assertEqual(len(self.bogus_mailbox.messages), 2)
         self.assertEqual(self.async_task.call_count, 5)
+
+    def test_auth_plain_fallback(self):
+        """
+        GIVEN:
+            - Mail account with password containing non-ASCII characters
+        THEN:
+            - Should still authenticate to the mail account
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            # Note the non-ascii characters here
+            password="w57äöüw4b6huwb6nhu",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MARK_READ,
+        )
+
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+        self.assertEqual(self.async_task.call_count, 0)
+        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 2)
+
+        self.mail_account_handler.handle_mail_account(account)
+
+        self.assertEqual(self.async_task.call_count, 2)
+        self.assertEqual(len(self.bogus_mailbox.fetch("UNSEEN", False)), 0)
+        self.assertEqual(len(self.bogus_mailbox.messages), 3)
+
+    def test_auth_plain_fallback_fails_still(self):
+        """
+        GIVEN:
+            - Mail account with password containing non-ASCII characters
+            - Incorrect password value
+        THEN:
+            - Should raise a MailError for the account
+        """
+        account = MailAccount.objects.create(
+            name="test",
+            imap_server="",
+            username="admin",
+            # Note the non-ascii characters here
+            # Passes the check in login, not in authenticate
+            password="réception",
+        )
+
+        _ = MailRule.objects.create(
+            name="testrule",
+            account=account,
+            action=MailRule.MailAction.MARK_READ,
+        )
+
+        self.assertRaises(
+            MailError,
+            self.mail_account_handler.handle_mail_account,
+            account,
+        )
 
 
 class TestManagementCommand(TestCase):

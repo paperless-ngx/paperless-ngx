@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 wait_for_postgres() {
 	attempt_num=1
 	max_attempts=5
@@ -7,7 +9,7 @@ wait_for_postgres() {
 	echo "Waiting for PostgreSQL to start..."
 
 	host="${PAPERLESS_DBHOST:=localhost}"
-	port="${PAPERLESS_DBPORT:=5342}"
+	port="${PAPERLESS_DBPORT:=5432}"
 
 
 	while [ ! "$(pg_isready -h $host -p $port)" ]; do
@@ -23,6 +25,14 @@ wait_for_postgres() {
 		attempt_num=$(("$attempt_num" + 1))
 		sleep 5
 	done
+}
+
+wait_for_redis() {
+	# We use a Python script to send the Redis ping
+	# instead of installing redis-tools just for 1 thing
+	if ! python3 /sbin/wait-for-redis.py; then
+		exit 1
+	fi
 }
 
 migrations() {
@@ -57,6 +67,8 @@ do_work() {
 	if [[ -n "${PAPERLESS_DBHOST}" ]]; then
 		wait_for_postgres
 	fi
+
+	wait_for_redis
 
 	migrations
 

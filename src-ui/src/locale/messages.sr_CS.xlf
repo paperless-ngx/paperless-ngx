@@ -1352,7 +1352,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">202</context>
         </context-group>
-        <target state="translated">Ova radnja će trajno obrisati <x id="PH" equiv-text="this.list.selected.size"/> selektovane dokumente.</target>
+        <target state="translated">Ova radnja će trajno obrisati <x id="PH" equiv-text="this.list.selected.size"/> selektovan(a) dokument(a).</target>
       </trans-unit>
       <trans-unit id="5641451190833696892" datatype="html">
         <source>This operation cannot be undone.</source>
