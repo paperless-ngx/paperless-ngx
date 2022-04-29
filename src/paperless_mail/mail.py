@@ -3,6 +3,7 @@ import tempfile
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
+from imaplib import IMAP4
 
 import magic
 import pathvalidate
@@ -145,7 +146,7 @@ class MailAccountHandler(LoggingMixin):
 
         else:
             raise NotImplementedError(
-                "Unknwown correspondent selector",
+                "Unknown correspondent selector",
             )  # pragma: nocover
 
     def handle_mail_account(self, account):
@@ -161,8 +162,34 @@ class MailAccountHandler(LoggingMixin):
                 account.imap_port,
                 account.imap_security,
             ) as M:
+
                 try:
                     M.login(account.username, account.password)
+
+                except UnicodeEncodeError:
+                    self.log("debug", "Falling back to AUTH=PLAIN")
+                    try:
+                        # rfc2595 section 6 - PLAIN SASL mechanism
+                        client: IMAP4 = M.client
+                        encoded = (
+                            b"\0"
+                            + account.username.encode("utf8")
+                            + b"\0"
+                            + account.password.encode("utf8")
+                        )
+                        # Assumption is the server supports AUTH=PLAIN capability
+                        # Could check the list with client.capability(), but then what?
+                        # We're failing anyway then
+                        client.authenticate("PLAIN", lambda x: encoded)
+
+                        # Need to transition out of AUTH state to SELECTED
+                        M.folder.set("INBOX")
+                    except Exception:
+                        self.log(
+                            "error",
+                            "Unable to authenticate with mail server using AUTH=PLAIN",
+                        )
+                        raise MailError(f"Error while authenticating account {account}")
                 except Exception as e:
                     self.log(
                         "error",
@@ -199,13 +226,28 @@ class MailAccountHandler(LoggingMixin):
 
         return total_processed_files
 
-    def handle_mail_rule(self, M, rule: MailRule):
+    def handle_mail_rule(self, M: MailBox, rule: MailRule):
 
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
         try:
             M.folder.set(rule.folder)
         except MailboxFolderSelectError:
+
+            self.log(
+                "error",
+                f"Unable to access folder {rule.folder}, attempting folder listing",
+            )
+            try:
+                for folder_info in M.folder.list():
+                    self.log("info", f"Located folder: {folder_info.name}")
+            except Exception as e:
+                self.log(
+                    "error",
+                    "Exception during folder listing, unable to provide list folders: "
+                    + str(e),
+                )
+
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
                 f"does not exist in account {rule.account}",
@@ -284,7 +326,7 @@ class MailAccountHandler(LoggingMixin):
         )
 
         correspondent = self.get_correspondent(message, rule)
-        tag = rule.assign_tag
+        tag_ids = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
 
         processed_attachments = 0
@@ -317,7 +359,7 @@ class MailAccountHandler(LoggingMixin):
                 override_title=message.subject,
                 override_correspondent_id=correspondent.id if correspondent else None,
                 override_document_type_id=doc_type.id if doc_type else None,
-                override_tag_ids=[tag.id] if tag else None,
+                override_tag_ids=tag_ids,
                 task_name=message.subject[:100],
             )
             processed_attachments += 1
@@ -384,7 +426,7 @@ class MailAccountHandler(LoggingMixin):
                         if correspondent
                         else None,
                         override_document_type_id=doc_type.id if doc_type else None,
-                        override_tag_ids=[tag.id] if tag else None,
+                        override_tag_ids=tag_ids,
                         task_name=att.filename[:100],
                     )
 

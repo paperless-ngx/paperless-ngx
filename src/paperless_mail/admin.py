@@ -83,7 +83,7 @@ class MailRuleAdmin(admin.ModelAdmin):
                 ),
                 "fields": (
                     "assign_title_from",
-                    "assign_tag",
+                    "assign_tags",
                     "assign_document_type",
                     "assign_correspondent_from",
                     "assign_correspondent",

@@ -251,7 +251,8 @@ if _paperless_url:
     if _allowed_hosts:
         ALLOWED_HOSTS.append(_paperless_uri.hostname)
     else:
-        ALLOWED_HOSTS = [_paperless_uri.hostname]
+        # always allow localhost. Necessary e.g. for healthcheck in docker.
+        ALLOWED_HOSTS = [_paperless_uri.hostname] + ["localhost"]
 
 # The secret key has a default that should be fine so long as you're hosting
 # Paperless on a closed network.  However, if you're putting this anywhere
@@ -500,6 +501,10 @@ CONSUMER_SUBDIRS_AS_TAGS = __get_boolean("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
 
 CONSUMER_ENABLE_BARCODES = __get_boolean(
     "PAPERLESS_CONSUMER_ENABLE_BARCODES",
+)
+
+CONSUMER_BARCODE_TIFF_SUPPORT = __get_boolean(
+    "PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT",
 )
 
 CONSUMER_BARCODE_STRING = os.getenv("PAPERLESS_CONSUMER_BARCODE_STRING", "PATCHT")
