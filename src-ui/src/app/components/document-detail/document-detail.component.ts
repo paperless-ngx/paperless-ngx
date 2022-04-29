@@ -244,6 +244,7 @@ export class DocumentDetailComponent
 
   updateComponent(doc: PaperlessDocument) {
     this.document = doc
+    this.requiresPassword = false
     this.documentsService
       .getMetadata(doc.id)
       .pipe(first())
