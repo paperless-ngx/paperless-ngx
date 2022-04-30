@@ -8,7 +8,7 @@
           <context context-type="sourcefile">node_modules/src/alert/alert.ts</context>
           <context context-type="linenumber">79,80</context>
         </context-group>
-        <target state="needs-translation">Close</target>
+        <target state="translated">Chiudi</target>
       </trans-unit>
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
         <source> Slide <x id="INTERPOLATION" equiv-text="keyboard &apos;arrow"/> of <x id="INTERPOLATION_1" equiv-text="t&apos;.    */   @In"/> </source>
@@ -17,7 +17,7 @@
           <context context-type="linenumber">154,159</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="keyboard 'arrow"/> of <x id="INTERPOLATION_1" equiv-text="t'.    */   @In"/> </target>
+        <target state="translated"> Diapositiva <x id="INTERPOLATION" equiv-text="keyboard 'arrow"/> di <x id="INTERPOLATION_1" equiv-text="t'.    */   @In"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
