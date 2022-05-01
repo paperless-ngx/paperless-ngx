@@ -21,7 +21,7 @@ body:
       label: Description
       description: A clear and concise description of what the bug is. If applicable, add screenshots to help explain your problem.
       placeholder: |
-        Currently...
+        Currently Paperless does not work when...
 
         [Screenshot if applicable]
     validations:
