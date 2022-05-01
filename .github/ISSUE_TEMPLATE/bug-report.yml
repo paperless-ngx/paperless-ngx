@@ -20,7 +20,10 @@ body:
     attributes:
       label: Description
       description: A clear and concise description of what the bug is. If applicable, add screenshots to help explain your problem.
-      placeholder: Currently...
+      placeholder: |
+        Currently...
+
+        [Screenshot if applicable]
     validations:
       required: true
   - type: textarea
@@ -28,7 +31,10 @@ body:
     attributes:
       label: Steps to reproduce
       description: Steps to reproduce the behavior.
-      placeholder: "1. Go to '...', 2. Click on '....', 3. See error"
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. See error"
     validations:
       required: true
   - type: textarea
@@ -48,7 +54,7 @@ body:
     id: host-os
     attributes:
       label: Host OS
-      description: Host OS of the machine running paperless-ngx.
+      description: Host OS of the machine running paperless-ngx. Please add the architecture (uname -m) if applicable.
       placeholder: e.g. Archlinux / Ubuntu 20.04 / Raspberry Pi `arm64`
     validations:
       required: true
