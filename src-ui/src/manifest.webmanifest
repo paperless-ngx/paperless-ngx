@@ -1,14 +1,15 @@
 {
+  "name": "Paperless-ngx",
+  "short_name": "Paperless-ngx",
   "background_color": "white",
+  "theme_color": "#17541f",
   "description": "A supercharged version of paperless: scan, index and archive all your physical documents",
-  "display": "fullscreen",
+  "display": "standalone",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "128x128"
     }
   ],
-  "name": "Paperless NG",
-  "short_name": "Paperless NG",
   "start_url": "/"
 }
