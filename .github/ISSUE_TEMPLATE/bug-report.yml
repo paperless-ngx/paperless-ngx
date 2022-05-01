@@ -27,7 +27,7 @@ body:
     id: reproduction
     attributes:
       label: Steps to reproduce
-      description: Steps to reproduce the behavior
+      description: Steps to reproduce the behavior.
       placeholder: "1. Go to '...', 2. Click on '....', 3. See error"
     validations:
       required: true
@@ -48,7 +48,7 @@ body:
     id: host-os
     attributes:
       label: Host OS
-      description: Host OS of the machine running paperless-ngx
+      description: Host OS of the machine running paperless-ngx.
       placeholder: e.g. Archlinux / Ubuntu 20.04 / Raspberry Pi `arm64`
     validations:
       required: true
@@ -66,7 +66,7 @@ body:
     id: browser
     attributes:
       label: Browser
-      description: Which browser you are using, if relevant
+      description: Which browser you are using, if relevant.
       placeholder: e.g. Chrome, Safari
   - type: input
     id: config-changes
@@ -77,4 +77,4 @@ body:
     id: other
     attributes:
       label: Other
-      description: Any other relevant details
+      description: Any other relevant details.
