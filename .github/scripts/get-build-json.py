@@ -53,10 +53,7 @@ def _main():
     git_tag = None
     extra_config = {}
 
-    if args.package == "frontend":
-        # Version is just the branch or tag name
-        version = branch_name
-    elif args.package in pipfile_data["default"]:
+    if args.package in pipfile_data["default"]:
         # Read the version from Pipfile.lock
         pkg_data = pipfile_data["default"][args.package]
         pkg_version = pkg_data["version"].split("==")[-1]
