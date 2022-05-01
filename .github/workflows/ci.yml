@@ -104,15 +104,6 @@ jobs:
           echo ${build_json}
 
           echo ::set-output name=jbig2enc-json::${build_json}
-      -
-        name: Setup frontend image
-        id: frontend-setup
-        run: |
-          build_json=$(python ${GITHUB_WORKSPACE}/.github/scripts/get-build-json.py frontend)
-
-          echo ${build_json}
-
-          echo ::set-output name=frontend-json::${build_json}
 
     outputs:
 
@@ -123,8 +114,6 @@ jobs:
       psycopg2-json: ${{ steps.psycopg2-setup.outputs.psycopg2-json }}
 
       jbig2enc-json: ${{ steps.jbig2enc-setup.outputs.jbig2enc-json}}
-
-      frontend-json: ${{ steps.frontend-setup.outputs.frontend-json}}
 
   build-qpdf-debs:
     name: qpdf
@@ -175,57 +164,6 @@ jobs:
         PIKEPDF_GIT_TAG=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).git_tag }}
         PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
 
-  build-frontend:
-    name: Compile frontend
-    concurrency:
-      group: ${{ github.workflow }}-build-frontend-${{ github.ref_name }}
-      cancel-in-progress: false
-    needs:
-      - prepare-docker-build
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Login to Github Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Compile frontend
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./docker-builders/Dockerfile.frontend
-          tags: ${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).image_tag }}
-          # The compilation is identical between different platforms
-          # The buildx and QEMU setup is left, just in case that ever changes
-          # But the platform is set to the runner's native for speedup
-          platforms: linux/amd64
-          push: true
-          cache-from: type=registry,ref=${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).cache_tag }}
-          cache-to: type=registry,mode=max,ref=${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).cache_tag }}
-      -
-        name: Export frontend artifact from docker
-        run: |
-          docker create --name frontend-extract ${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).image_tag }}
-          docker cp frontend-extract:/src/src/documents/static/frontend src/documents/static/frontend/
-      -
-        name: Upload frontend artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-compiled
-          path: src/documents/static/frontend/
-
   # build and push image to docker hub.
   build-docker-image:
     runs-on: ubuntu-20.04
@@ -238,7 +176,6 @@ jobs:
       - build-jbig2enc
       - build-qpdf-debs
       - build-pikepdf-wheel
-      - build-frontend
     steps:
       -
         name: Check pushing to Docker Hub
@@ -297,18 +234,33 @@ jobs:
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
           build-args: |
-            REPO=${{ github.repository }}
             JBIG2ENC_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.jbig2enc-json).version }}
             QPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.qpdf-json).version }}
             PIKEPDF_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.pikepdf-json).version }}
             PSYCOPG2_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.psycopg2-json).version }}
-            FRONTEND_VERSION=${{ fromJSON(needs.prepare-docker-build.outputs.frontend-json).version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Get cache layers from this branch, then dev, then main
+          # This allows new branches to get at least some cache benefits, generally from dev
+          cache-from: |
+            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
+            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:dev
+            type=registry,ref=ghcr.io/${{ github.repository }}/builder/cache/app:main
+          cache-to: |
+            type=registry,mode=max,ref=ghcr.io/${{ github.repository }}/builder/cache/app:${{ github.ref_name }}
       -
         name: Inspect image
         run: |
           docker buildx imagetools inspect ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+      -
+        name: Export frontend artifact from docker
+        run: |
+          docker create --name frontend-extract ${{ fromJSON(steps.docker-meta.outputs.json).tags[0] }}
+          docker cp frontend-extract:/usr/src/paperless/src/documents/static/frontend src/documents/static/frontend/
+      -
+        name: Upload frontend artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-compiled
+          path: src/documents/static/frontend/
 
   build-release:
     needs:
