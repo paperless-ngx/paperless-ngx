@@ -146,18 +146,24 @@ export class DocumentDetailComponent
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((changes) => {
+        this.error = null
         if (this.ogDate) {
-          let newDate = new Date(normalizeDateStr(changes['created']))
-          newDate.setHours(
-            this.ogDate.getHours(),
-            this.ogDate.getMinutes(),
-            this.ogDate.getSeconds(),
-            this.ogDate.getMilliseconds()
-          )
-          this.documentForm.patchValue(
-            { created: newDate.toISOString() },
-            { emitEvent: false }
-          )
+          try {
+            let newDate = new Date(normalizeDateStr(changes['created']))
+            newDate.setHours(
+              this.ogDate.getHours(),
+              this.ogDate.getMinutes(),
+              this.ogDate.getSeconds(),
+              this.ogDate.getMilliseconds()
+            )
+            this.documentForm.patchValue(
+              { created: newDate.toISOString() },
+              { emitEvent: false }
+            )
+          } catch (e) {
+            // catch this before we try to save and simulate an api error
+            this.error = { created: e.message }
+          }
         }
 
         Object.assign(this.document, this.documentForm.value)
@@ -320,16 +326,17 @@ export class DocumentDetailComponent
     this.documentsService
       .get(this.documentId)
       .pipe(first())
-      .subscribe(
-        (doc) => {
+      .subscribe({
+        next: (doc) => {
           Object.assign(this.document, doc)
           this.title = doc.title
           this.documentForm.patchValue(doc)
+          this.openDocumentService.setDirty(doc.id, false)
         },
-        (error) => {
+        error: () => {
           this.router.navigate(['404'])
-        }
-      )
+        },
+      })
   }
 
   save() {
