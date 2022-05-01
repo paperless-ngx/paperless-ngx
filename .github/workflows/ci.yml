@@ -3,9 +3,10 @@ name: ci
 on:
   push:
     tags:
+      # https://semver.org/#spec-item-2
       - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
-      - 'beta-[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
+      # https://semver.org/#spec-item-9
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.rc[0-9]+'
     branches-ignore:
       - 'translations**'
   pull_request:
@@ -54,7 +55,7 @@ jobs:
 
   prepare-docker-build:
     name: Prepare Docker Pipeline Data
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/beta-'))
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature-') || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/beta' || contains(github.ref, 'beta.rc') || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-20.04
     needs:
       - documentation
@@ -263,8 +264,6 @@ jobs:
           tags: |
             # Tag branches with branch name
             type=ref,event=branch
-            # Tag tags with tag name
-            type=ref,event=tag
             # Process semver tags
             # For a tag x.y.z or vX.Y.Z, output an x.y.z and x.y image tag
             type=semver,pattern={{version}}
@@ -389,7 +388,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs:
       - build-release
-    if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'beta-'))
+    if: github.ref_type == 'tag' && (startsWith(github.ref_name, 'v') || contains(github.ref_name, '-beta.rc'))
     steps:
       -
         name: Download release artifact
@@ -401,12 +400,11 @@ jobs:
         name: Get version
         id: get_version
         run: |
-          if [[ $GITHUB_REF == refs/tags/v* ]]; then
-            echo ::set-output name=version::${{ github.ref_name }}
-            echo ::set-output name=prerelease::false
-          elif [[ $GITHUB_REF == refs/tags/beta-* ]]; then
-            echo ::set-output name=version::${{ github.ref_name }}
+          echo ::set-output name=version::${{ github.ref_name }}
+          if [[ ${{ contains(github.ref_name, '-beta.rc') }} == 'true' ]]; then
             echo ::set-output name=prerelease::true
+          else
+            echo ::set-output name=prerelease::false
           fi
       -
         name: Create Release and Changelog
