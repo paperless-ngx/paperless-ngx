@@ -62,7 +62,7 @@ your documents:
 
 1.  OCR the document, if it has no text. Digital documents usually have text,
     and this step will be skipped for those documents.
-2.  Paperless will create an archiveable PDF/A document from your document.
+2.  Paperless will create an archivable PDF/A document from your document.
     If this document is coming from your scanner, it will have embedded selectable text.
 3.  Paperless performs automatic matching of tags, correspondents and types on the
     document before storing it in the database.
@@ -102,12 +102,14 @@ files from the scanner.  Typically, you're looking at an FTP server like
 
 .. TODO: hyperref to configuration of the location of this magic folder.
 
-Dashboard upload
-================
+Web UI Upload
+=============
 
 The dashboard has a file drop field to upload documents to paperless. Simply drag a file
 onto this field or select a file with the file dialog. Multiple files are supported.
 
+You can also upload documents on any other page of the web UI by dragging-and-dropping
+files into your browser window.
 
 .. _usage-mobile_upload:
 
@@ -182,9 +184,10 @@ These are as follows:
 
     When defining a mail rule with a folder, you may need to try different characters to
     define how the sub-folders are separated.  Common values include ".", "/" or "|", but
-    this varies by the mail server.  Unfortunately, this isn't a value we can determine
-    automatically.  Either check the documentation for your mail server, or check for
-    errors in the logs and try different folder separator values.
+    this varies by the mail server.  Check the documentation for your mail server.  In the
+    event of an error fetching mail from a certain folder, check the Paperless logs.  When
+    a folder is not located, Paperless will attempt to list all folders found in the account
+    to the Paperless logs.
 
 .. note::
 

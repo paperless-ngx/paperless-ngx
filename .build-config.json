@@ -1,0 +1,9 @@
+{
+  "qpdf": {
+      "version": "10.6.3"
+    },
+  "jbig2enc": {
+      "version": "0.29",
+      "git_tag": "0.29"
+    }
+}

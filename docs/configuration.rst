@@ -130,6 +130,8 @@ PAPERLESS_LOGROTATE_MAX_BACKUPS=<num>
 
     Defaults to 20.
 
+.. _hosting-and-security:
+
 Hosting & Security
 ##################
 
@@ -170,6 +172,9 @@ PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>
 
     Can also be set using PAPERLESS_URL (see above).
 
+    If manually set, please remember to include "localhost". Otherwise docker
+    healthcheck will fail.
+
     Defaults to "*", which is all hosts.
 
 PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>
@@ -206,7 +211,7 @@ PAPERLESS_AUTO_LOGIN_USERNAME=<username>
 PAPERLESS_ADMIN_USER=<username>
     If this environment variable is specified, Paperless automatically creates
     a superuser with the provided username at start. This is useful in cases
-    where you can not run the `createsuperuser` command seperately, such as Kubernetes
+    where you can not run the `createsuperuser` command separately, such as Kubernetes
     or AWS ECS.
 
     Requires `PAPERLESS_ADMIN_PASSWORD` to be set.
@@ -624,8 +629,19 @@ PAPERLESS_CONSUMER_ENABLE_BARCODES=<bool>
     If no barcodes are detected in the uploaded file, no page separation
     will happen.
 
+    The original document will be removed and the separated pages will be
+    saved as pdf.
+
     Defaults to false.
 
+PAPERLESS_CONSUMER_BARCODE_TIFF_SUPPORT=<bool>
+    Whether TIFF image files should be scanned for barcodes.
+    This will automatically convert any TIFF image(s) to pdfs for later
+    processing.
+    This only has an effect, if PAPERLESS_CONSUMER_ENABLE_BARCODES has been
+    enabled.
+
+    Defaults to false.
 
 PAPERLESS_CONSUMER_BARCODE_STRING=PATCHT
   Defines the string to be detected as a separator barcode.
