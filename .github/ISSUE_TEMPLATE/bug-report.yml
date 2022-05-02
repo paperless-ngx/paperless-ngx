@@ -7,26 +7,34 @@ body:
     attributes:
       value: |
         Have a question? 👉 [Start a new discussion](https://github.com/paperless-ngx/paperless-ngx/discussions/new) or [ask in chat](https://matrix.to/#/#paperless:adnidor.de).
-        
-        Before opening an issue, please check [the documentation](https://paperless-ngx.readthedocs.io/en/latest/troubleshooting.html) and see if it helps you resolve your issue. Please also make sure that you followed the installation instructions.
-        
-        If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support). Remember that Paperless successfully runs on a variety of different systems. If Paperless-ngx does not start, it's likely an issue with your system, not an issue of Paperless-ngx.
-        
-        Finally, please search issues and discussions before opening a new bug report.
+
+        Before opening an issue, please double check:
+
+        - [The troubleshooting documentation](https://paperless-ngx.readthedocs.io/en/latest/troubleshooting.html).
+        - [The installation instructions](https://paperless-ngx.readthedocs.io/en/latest/setup.html#installation).
+        - [Existing issues and discussions](https://github.com/paperless-ngx/paperless-ngx/search?q=&type=issues).
+
+        If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support).
   - type: textarea
     id: description
     attributes:
       label: Description
-      description: A clear and concise description of what the bug is.
-      placeholder: Currently...
+      description: A clear and concise description of what the bug is. If applicable, add screenshots to help explain your problem.
+      placeholder: |
+        Currently Paperless does not work when...
+
+        [Screenshot if applicable]
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
       label: Steps to reproduce
-      description: Steps to reproduce the behavior
-      placeholder: "1. Go to '...', 2. Click on '....', 3. See error"
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. See error
     validations:
       required: true
   - type: textarea
@@ -35,11 +43,6 @@ body:
       label: Webserver logs
       description: If available, post any logs from the web server related to your issue.
       render: bash
-  - type: textarea
-    id: screenshots
-    attributes:
-      label: Screenshots
-      description: If applicable, add screenshots to help explain your problem.
   - type: input
     id: version
     attributes:
@@ -51,8 +54,8 @@ body:
     id: host-os
     attributes:
       label: Host OS
-      description: Host OS of the machine running paperless-ngx
-      placeholder: e.g. Archlinux / Ubuntu 20.04
+      description: Host OS of the machine running paperless-ngx. Please add the architecture (uname -m) if applicable.
+      placeholder: e.g. Archlinux / Ubuntu 20.04 / Raspberry Pi `arm64`
     validations:
       required: true
   - type: dropdown
@@ -69,7 +72,7 @@ body:
     id: browser
     attributes:
       label: Browser
-      description: Which browser you are using, if relevant
+      description: Which browser you are using, if relevant.
       placeholder: e.g. Chrome, Safari
   - type: input
     id: config-changes
@@ -80,4 +83,4 @@ body:
     id: other
     attributes:
       label: Other
-      description: Any other relevant details
+      description: Any other relevant details.
