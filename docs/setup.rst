@@ -347,7 +347,7 @@ writing. Windows is not and will never be supported.
         paperless stores its data. If you like, you can point both to the same directory.
     *   ``PAPERLESS_SECRET_KEY`` should be a random sequence of characters. It's used for authentication. Failure
         to do so allows third parties to forge authentication credentials.
-    *   ``PAPERLESS_URL`` if you are behind a reverse proxy. This should point to your domain. Please see 
+    *   ``PAPERLESS_URL`` if you are behind a reverse proxy. This should point to your domain. Please see
         :ref:`configuration` for more information.
 
     Many more adjustments can be made to paperless, especially the OCR part. The following options are recommended
@@ -728,8 +728,6 @@ configuring some options in paperless can help improve performance immensely:
     times. Thumbnails will be about 20% larger.
 *   If using docker, consider setting ``PAPERLESS_WEBSERVER_WORKERS`` to
     1. This will save some memory.
-*   Use the arm compatible docker-compose if you're wanting to use Tika on something like
-		a raspberry pi. The official apache/tika image does not support the arm architecture.
 
 For details, refer to :ref:`configuration`.
 
