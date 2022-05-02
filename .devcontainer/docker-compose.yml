@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+    paperless-ngx:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+              VARIANT: 3.9-bullseye
+              NODE_VERSION: lts/*
+
+        environment:
+            PORT: 3000
+
+        ports:
+            - 3000:3000
+
+        volumes:
+            - ..:/workspace/paperless-ngx:cached
+
+        user: vscode
+        command: sleep infinity
+
+        links:
+            - "redis:redis"
+
+    redis:
+        image: redis:latest
+        restart: unless-stopped
+        ports:
+            - 6379:6379

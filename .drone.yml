@@ -1,0 +1,32 @@
+---
+kind: pipeline
+type: docker
+name: build
+
+steps:
+- name: build
+  image: node:16-bullseye
+  environment:
+    DRONE_TAG: ${DRONE_TAG}
+  commands:   
+    - |
+      cd src-ui
+      npm install
+      ./node_modules/.bin/ng build --configuration production
+      
+      cp paperless.conf.example paperless.conf
+      tar -czvf release.tgz src/ requirements.txt paperless.conf gunicorn.conf.py
+
+- name: gitea_release
+  image: plugins/gitea-release
+  settings:
+    api_key: 
+      from_secret: gitea_api_key
+    base_url: https://git.markus-kling.net/
+    file_exists: overwrite
+    files: 
+     - release.tgz
+
+trigger:
+  event:
+  - tag
