@@ -1,4 +1,4 @@
-import 'jest-preset-angular/setup-jest'
+import { jest } from '@jest/globals'
 
 /* global mocks for jsdom */
 const mock = () => {
@@ -26,5 +26,6 @@ Object.defineProperty(document.body.style, 'transform', {
   },
 })
 
-/* output shorter and more meaningful Zone error stack traces */
-// Error.stackTraceLimit = 2
+HTMLCanvasElement.prototype.getContext = <
+  typeof HTMLCanvasElement.prototype.getContext
+>jest.fn()
