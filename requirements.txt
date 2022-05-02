@@ -62,7 +62,7 @@ packaging==21.3; python_version >= '3.6'
 pathvalidate==2.5.0
 pdf2image==1.16.0
 pdfminer.six==20220319
-pikepdf==5.1.1
+pikepdf==5.1.2
 pillow==9.1.0
 pluggy==1.0.0; python_version >= '3.6'
 portalocker==2.4.0; python_version >= '3'
