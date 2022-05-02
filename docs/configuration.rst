@@ -474,7 +474,7 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT=<url>
     Defaults to "http://localhost:3000".
 
 If you run paperless on docker, you can add those services to the docker-compose
-file (see the provided ``docker-compose.tika.yml`` file for reference). The changes
+file (see the provided ``docker-compose.sqlite-tika.yml`` file for reference). The changes
 requires are as follows:
 
 .. code:: yaml
@@ -495,14 +495,14 @@ requires are as follows:
         # ...
 
         gotenberg:
-            image: gotenberg/gotenberg:7
+            image: gotenberg/gotenberg:7.4
             restart: unless-stopped
             command:
                 - "gotenberg"
                 - "--chromium-disable-routes=true"
 
         tika:
-            image: apache/tika
+            image: ghcr.io/paperless-ngx/tika:latest
             restart: unless-stopped
 
 Add the configuration variables to the environment of the webserver (alternatively
