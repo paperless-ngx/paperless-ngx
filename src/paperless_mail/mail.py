@@ -156,58 +156,73 @@ class MailAccountHandler(LoggingMixin):
         self.log("debug", f"Processing mail account {account}")
 
         total_processed_files = 0
+        try:
+            with get_mailbox(
+                account.imap_server,
+                account.imap_port,
+                account.imap_security,
+            ) as M:
 
-        with get_mailbox(
-            account.imap_server,
-            account.imap_port,
-            account.imap_security,
-        ) as M:
-
-            try:
-                M.login(account.username, account.password)
-
-            except UnicodeEncodeError:
-                self.log("debug", "Falling back to AUTH=PLAIN")
                 try:
-                    # rfc2595 section 6 - PLAIN SASL mechanism
-                    client: IMAP4 = M.client
-                    encoded = (
-                        b"\0"
-                        + account.username.encode("utf8")
-                        + b"\0"
-                        + account.password.encode("utf8")
-                    )
-                    # Assumption is the server supports AUTH=PLAIN capability
-                    # Could check the list with client.capability(), but then what?
-                    # We're failing anyway then
-                    client.authenticate("PLAIN", lambda x: encoded)
+                    M.login(account.username, account.password)
 
-                    # Need to transition out of AUTH state to SELECTED
-                    M.folder.set("INBOX")
-                except Exception:
-                    self.log(
-                        "error",
-                        "Unable to authenticate with mail server using AUTH=PLAIN",
-                    )
-                    raise MailError(f"Error while authenticating account {account}")
-            except Exception:
-                self.log("error", "Unable to authenticate with mail server")
-                raise MailError(f"Error while authenticating account {account}")
+                except UnicodeEncodeError:
+                    self.log("debug", "Falling back to AUTH=PLAIN")
+                    try:
+                        # rfc2595 section 6 - PLAIN SASL mechanism
+                        client: IMAP4 = M.client
+                        encoded = (
+                            b"\0"
+                            + account.username.encode("utf8")
+                            + b"\0"
+                            + account.password.encode("utf8")
+                        )
+                        # Assumption is the server supports AUTH=PLAIN capability
+                        # Could check the list with client.capability(), but then what?
+                        # We're failing anyway then
+                        client.authenticate("PLAIN", lambda x: encoded)
 
-            self.log(
-                "debug",
-                f"Account {account}: Processing " f"{account.rules.count()} rule(s)",
-            )
-
-            for rule in account.rules.order_by("order"):
-                try:
-                    total_processed_files += self.handle_mail_rule(M, rule)
+                        # Need to transition out of AUTH state to SELECTED
+                        M.folder.set("INBOX")
+                    except Exception:
+                        self.log(
+                            "error",
+                            "Unable to authenticate with mail server using AUTH=PLAIN",
+                        )
+                        raise MailError(f"Error while authenticating account {account}")
                 except Exception as e:
                     self.log(
                         "error",
-                        f"Rule {rule}: Error while processing rule: {e}",
-                        exc_info=True,
+                        f"Error while authenticating account {account}: {e}",
+                        exc_info=False,
                     )
+                    raise MailError(
+                        f"Error while authenticating account {account}",
+                    ) from e
+
+                self.log(
+                    "debug",
+                    f"Account {account}: Processing "
+                    f"{account.rules.count()} rule(s)",
+                )
+
+                for rule in account.rules.order_by("order"):
+                    try:
+                        total_processed_files += self.handle_mail_rule(M, rule)
+                    except Exception as e:
+                        self.log(
+                            "error",
+                            f"Rule {rule}: Error while processing rule: {e}",
+                            exc_info=True,
+                        )
+        except MailError:
+            raise
+        except Exception as e:
+            self.log(
+                "error",
+                f"Error while retrieving mailbox {account}: {e}",
+                exc_info=False,
+            )
 
         return total_processed_files
 
