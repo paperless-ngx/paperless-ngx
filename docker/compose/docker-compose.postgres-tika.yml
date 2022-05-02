@@ -85,7 +85,7 @@ services:
       - "--chromium-disable-routes=true"
 
   tika:
-    image: apache/tika
+    image: ghcr.io/paperless-ngx/tika:latest
     restart: unless-stopped
 
 volumes:
