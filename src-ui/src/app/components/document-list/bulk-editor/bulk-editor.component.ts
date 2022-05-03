@@ -25,6 +25,8 @@ import {
 } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { saveAs } from 'file-saver'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 
 @Component({
   selector: 'app-bulk-editor',
@@ -35,10 +37,12 @@ export class BulkEditorComponent {
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
+  storagePathes: PaperlessStoragePath[]
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+  storagePathesSelectionModel = new FilterableDropdownSelectionModel()
   awaitingDownload: boolean
 
   constructor(
@@ -50,7 +54,8 @@ export class BulkEditorComponent {
     private modalService: NgbModal,
     private openDocumentService: OpenDocumentsService,
     private settings: SettingsService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private storagePathService: StoragePathService
   ) {}
 
   applyOnClose: boolean = this.settings.get(
@@ -70,6 +75,9 @@ export class BulkEditorComponent {
     this.documentTypeService
       .listAll()
       .subscribe((result) => (this.documentTypes = result.results))
+    this.storagePathService
+      .listAll()
+      .subscribe((result) => (this.storagePathes = result.results))
   }
 
   private executeBulkOperation(modal, method: string, args) {
@@ -143,6 +151,17 @@ export class BulkEditorComponent {
         this.applySelectionData(
           s.selected_correspondents,
           this.correspondentSelectionModel
+        )
+      })
+  }
+
+  openStoragePathDropdown() {
+    this.documentService
+      .getSelectionData(Array.from(this.list.selected))
+      .subscribe((s) => {
+        this.applySelectionData(
+          s.selected_storage_pathes,
+          this.storagePathesSelectionModel
         )
       })
   }
@@ -297,6 +316,42 @@ export class BulkEditorComponent {
     } else {
       this.executeBulkOperation(null, 'set_document_type', {
         document_type: documentType ? documentType.id : null,
+      })
+    }
+  }
+
+  setStoragePathes(changedDocumentPathes: ChangedItems) {
+    if (
+      changedDocumentPathes.itemsToAdd.length == 0 &&
+      changedDocumentPathes.itemsToRemove.length == 0
+    )
+      return
+
+    let storagePath =
+      changedDocumentPathes.itemsToAdd.length > 0
+        ? changedDocumentPathes.itemsToAdd[0]
+        : null
+
+    if (this.showConfirmationDialogs) {
+      let modal = this.modalService.open(ConfirmDialogComponent, {
+        backdrop: 'static',
+      })
+      modal.componentInstance.title = $localize`Confirm storage path assignment`
+      if (storagePath) {
+        modal.componentInstance.message = $localize`This operation will assign the storage path "${storagePath.name}" to ${this.list.selected.size} selected document(s).`
+      } else {
+        modal.componentInstance.message = $localize`This operation will remove the storage path from ${this.list.selected.size} selected document(s).`
+      }
+      modal.componentInstance.btnClass = 'btn-warning'
+      modal.componentInstance.btnCaption = $localize`Confirm`
+      modal.componentInstance.confirmClicked.subscribe(() => {
+        this.executeBulkOperation(modal, 'set_storage_path', {
+          storage_path: storagePath ? storagePath.id : null,
+        })
+      })
+    } else {
+      this.executeBulkOperation(null, 'set_storage_path', {
+        storage_path: storagePath ? storagePath.id : null,
       })
     }
   }

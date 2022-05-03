@@ -26,6 +26,8 @@ export const FILTER_TITLE_CONTENT = 19
 export const FILTER_FULLTEXT_QUERY = 20
 export const FILTER_FULLTEXT_MORELIKE = 21
 
+export const FILTER_STORAGE_DIRECTORY = 30
+
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
     id: FILTER_TITLE,
@@ -56,6 +58,15 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     datatype: 'correspondent',
     multi: false,
   },
+
+  {
+    id: FILTER_STORAGE_DIRECTORY,
+    filtervar: 'storage_path__id',
+    isnull_filtervar: 'storage_path__isnull',
+    datatype: 'storage_path',
+    multi: false,
+  },
+
   {
     id: FILTER_DOCUMENT_TYPE,
     filtervar: 'document_type__id',

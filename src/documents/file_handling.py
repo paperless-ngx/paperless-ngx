@@ -129,11 +129,23 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     path = ""
 
     try:
-        if settings.PAPERLESS_FILENAME_FORMAT is not None:
-            tags = defaultdictNoStr(lambda: slugify(None), many_to_dictionary(doc.tags))
+        filename_format = settings.PAPERLESS_FILENAME_FORMAT
+
+        if doc.storage_path:
+            filename_format = doc.storage_path.path
+
+        if filename_format is not None:
+            tags = defaultdictNoStr(
+                lambda: slugify(None),
+                many_to_dictionary(doc.tags),
+            )
 
             tag_list = pathvalidate.sanitize_filename(
-                ",".join(sorted(tag.name for tag in doc.tags.all())),
+                ",".join(
+                    sorted(
+                        [tag.name for tag in doc.tags.all()],
+                    ),
+                ),
                 replacement_text="-",
             )
 
@@ -143,7 +155,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                     replacement_text="-",
                 )
             else:
-                correspondent = "none"
+                correspondent = "-none-"
 
             if doc.document_type:
                 document_type = pathvalidate.sanitize_filename(
@@ -151,20 +163,25 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                     replacement_text="-",
                 )
             else:
-                document_type = "none"
+                document_type = "-none-"
 
             if doc.archive_serial_number:
                 asn = str(doc.archive_serial_number)
             else:
-                asn = "none"
+                asn = "-none-"
 
-            path = settings.PAPERLESS_FILENAME_FORMAT.format(
-                title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
+            path = filename_format.format(
+                title=pathvalidate.sanitize_filename(
+                    doc.title,
+                    replacement_text="-",
+                ),
                 correspondent=correspondent,
                 document_type=document_type,
                 created=datetime.date.isoformat(doc.created),
                 created_year=doc.created.year if doc.created else "none",
-                created_month=f"{doc.created.month:02}" if doc.created else "none",
+                created_month=f"{doc.created.month:02}"
+                if doc.created
+                else "none",  # noqa: E501
                 created_day=f"{doc.created.day:02}" if doc.created else "none",
                 added=datetime.date.isoformat(doc.added),
                 added_year=doc.added.year if doc.added else "none",
@@ -174,6 +191,9 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 tags=tags,
                 tag_list=tag_list,
             ).strip()
+
+            path = path.replace("-none-/", "")
+            path = path.replace(" -none-", "")
 
             path = path.strip(os.sep)
 

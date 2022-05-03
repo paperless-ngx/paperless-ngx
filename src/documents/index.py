@@ -46,6 +46,9 @@ def get_schema():
         created=DATETIME(sortable=True),
         modified=DATETIME(sortable=True),
         added=DATETIME(sortable=True),
+        path=TEXT(sortable=True),
+        path_id=NUMERIC(),
+        has_path=BOOLEAN(),
     )
 
 
@@ -104,6 +107,9 @@ def update_document(writer, doc):
         added=doc.added,
         asn=doc.archive_serial_number,
         modified=doc.modified,
+        path=doc.storage_path.name if doc.storage_path else None,
+        path_id=doc.storage_path.id if doc.storage_path else None,
+        has_path=doc.storage_path is not None,
     )
 
 

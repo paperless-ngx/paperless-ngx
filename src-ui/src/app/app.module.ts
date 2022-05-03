@@ -87,6 +87,8 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
+import { StoragePathListComponent } from './components/manage/storage-path-list/storage-path-list.component'
+import { StoragePathEditDialogComponent } from './components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -118,6 +120,7 @@ registerLocaleData(localeZh)
     TagListComponent,
     DocumentTypeListComponent,
     CorrespondentListComponent,
+    StoragePathListComponent,
     LogsComponent,
     SettingsComponent,
     NotFoundComponent,
@@ -125,6 +128,7 @@ registerLocaleData(localeZh)
     ConfirmDialogComponent,
     TagEditDialogComponent,
     DocumentTypeEditDialogComponent,
+    StoragePathEditDialogComponent,
     TagComponent,
     PageHeaderComponent,
     AppFrameComponent,

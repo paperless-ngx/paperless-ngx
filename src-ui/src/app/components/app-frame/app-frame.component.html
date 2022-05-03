@@ -135,6 +135,13 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" routerLink="storagepathes" routerLinkActive="active" (click)="closeMenu()">
+              <svg class="sidebaricon" fill="currentColor">
+                <use xlink:href="assets/bootstrap-icons.svg#folder"/>
+              </svg>&nbsp;<ng-container i18n>Storage pathes</ng-container>
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" routerLink="logs" routerLinkActive="active" (click)="closeMenu()">
               <svg class="sidebaricon" fill="currentColor">
                 <use xlink:href="assets/bootstrap-icons.svg#text-left"/>

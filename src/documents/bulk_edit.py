@@ -5,6 +5,7 @@ from django_q.tasks import async_task
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import StoragePath
 
 
 def set_correspondent(doc_ids, correspondent):
@@ -16,6 +17,24 @@ def set_correspondent(doc_ids, correspondent):
     qs.update(correspondent=correspondent)
 
     async_task("documents.tasks.bulk_update_documents", document_ids=affected_docs)
+
+    return "OK"
+
+
+def set_storage_path(doc_ids, storage_path):
+    if storage_path:
+        storage_path = StoragePath.objects.get(id=storage_path)
+
+    qs = Document.objects.filter(
+        Q(id__in=doc_ids) & ~Q(storage_path=storage_path),
+    )
+    affected_docs = [doc.id for doc in qs]
+    qs.update(storage_path=storage_path)
+
+    async_task(
+        "documents.tasks.bulk_update_documents",
+        document_ids=affected_docs,
+    )
 
     return "OK"
 
