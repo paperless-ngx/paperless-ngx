@@ -129,7 +129,6 @@ If using docker-compose, this is achieved by the following configuration change 
         restart: unless-stopped
         command:
             - "gotenberg"
-            - "--chromium-disable-web-security"
             - "--api-timeout=60"
 
 Permission denied errors in the consumption directory
