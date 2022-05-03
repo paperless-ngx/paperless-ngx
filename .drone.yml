@@ -10,7 +10,7 @@ steps:
     DRONE_TAG: ${DRONE_TAG}
   commands:   
     - |
-      sed -i -E "s/version\: \\"(.*)\\"/version\: \\"$DRONE_TAG\\"/g" src-ui/src/environments/environment.prod.ts
+      sed -i -E \"s/version: \\\"(.*)\\\"/version: \\\"$DRONE_TAG\\\"/g\" src-ui/src/environments/environment.prod.ts
 
       cd src-ui
       npm ci --no-optional
