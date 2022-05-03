@@ -1,19 +1,32 @@
-# Default to pulling from the main repo registry when manually building
-ARG REPO="paperless-ngx/paperless-ngx"
+# Pull the installer images from the library
+# These are all built previously
+# They provide either a .deb or .whl
 
-# These are all built previously in the pipeline
-# They provide either a .deb, .whl or whatever npm outputs
 ARG JBIG2ENC_VERSION
 ARG QPDF_VERSION
 ARG PIKEPDF_VERSION
 ARG PSYCOPG2_VERSION
-ARG FRONTEND_VERSION
 
-FROM ghcr.io/${REPO}/builder/jbig2enc:${JBIG2ENC_VERSION} as jbig2enc-builder
-FROM ghcr.io/${REPO}/builder/qpdf:${QPDF_VERSION} as qpdf-builder
-FROM ghcr.io/${REPO}/builder/pikepdf:${PIKEPDF_VERSION} as pikepdf-builder
-FROM ghcr.io/${REPO}/builder/psycopg2:${PSYCOPG2_VERSION} as psycopg2-builder
-FROM ghcr.io/${REPO}/builder/frontend:${FRONTEND_VERSION} as compile-frontend
+FROM ghcr.io/paperless-ngx/paperless-ngx/builder/jbig2enc:${JBIG2ENC_VERSION} as jbig2enc-builder
+FROM ghcr.io/paperless-ngx/paperless-ngx/builder/qpdf:${QPDF_VERSION} as qpdf-builder
+FROM ghcr.io/paperless-ngx/paperless-ngx/builder/pikepdf:${PIKEPDF_VERSION} as pikepdf-builder
+FROM ghcr.io/paperless-ngx/paperless-ngx/builder/psycopg2:${PSYCOPG2_VERSION} as psycopg2-builder
+
+FROM --platform=$BUILDPLATFORM node:16-bullseye-slim AS compile-frontend
+
+# This stage compiles the frontend
+# This stage runs once for the native platform, as the outputs are not
+# dependent on target arch
+# Inputs: None
+
+COPY ./src-ui /src/src-ui
+
+WORKDIR /src/src-ui
+RUN set -eux \
+  && npm update npm -g \
+  && npm ci --no-optional
+RUN set -eux \
+  && ./node_modules/.bin/ng build --configuration production
 
 FROM python:3.9-slim-bullseye as main-app
 
@@ -156,8 +169,11 @@ COPY gunicorn.conf.py .
 
 WORKDIR /usr/src/paperless/src/
 
-# copy app
-COPY --from=compile-frontend /src/src/ ./
+# copy backend
+COPY ./src ./
+
+# copy frontend
+COPY --from=compile-frontend /src/src/documents/static/frontend/ ./documents/static/frontend/
 
 # add users, setup scripts
 RUN set -eux \
