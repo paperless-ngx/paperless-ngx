@@ -676,28 +676,33 @@ class RemoteVersionView(GenericAPIView):
     def get(self, request, format=None):
         remote_version = "0.0.0"
         is_greater_than_current = False
+        current_version = packaging_version.parse(version.__full_version_str__)
         # TODO: this can likely be removed when frontend settings are saved to DB
         feature_is_set = settings.ENABLE_UPDATE_CHECK != "default"
         if feature_is_set and settings.ENABLE_UPDATE_CHECK:
             try:
-                with urllib.request.urlopen(
-                    "https://api.github.com/repos/"
-                    + "paperless-ngx/paperless-ngx/releases/latest",
-                ) as response:
+                req = urllib.request.Request(
+                    "https://api.github.com/repos/paperless-ngx/"
+                    "paperless-ngx/releases/latest",
+                )
+                # Ensure a JSON response
+                req.add_header("Accept", "application/json")
+
+                with urllib.request.urlopen(req) as response:
                     remote = response.read().decode("utf-8")
                 try:
                     remote_json = json.loads(remote)
-                    remote_version = remote_json["tag_name"].replace("ngx-", "")
+                    remote_version = remote_json["tag_name"].removeprefix("ngx-")
                 except ValueError:
-                    logger.debug("An error occured parsing remote version json")
+                    logger.debug("An error occurred parsing remote version json")
             except urllib.error.URLError:
-                logger.debug("An error occured checking for available updates")
+                logger.debug("An error occurred checking for available updates")
 
-            current_version = ".".join([str(_) for _ in version.__version__[:3]])
-            is_greater_than_current = packaging_version.parse(
-                remote_version,
-            ) > packaging_version.parse(
-                current_version,
+            is_greater_than_current = (
+                packaging_version.parse(
+                    remote_version,
+                )
+                > current_version
             )
 
         return Response(

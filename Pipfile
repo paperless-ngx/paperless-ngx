@@ -19,7 +19,7 @@ djangorestframework = "~=3.13"
 filelock = "*"
 fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
-imap-tools = "~=0.53.0"
+imap-tools = "~=0.54.0"
 langdetect = "*"
 pathvalidate = "*"
 pillow = "~=9.1"
@@ -53,7 +53,6 @@ concurrent-log-handler = "*"
 zipp = {version = "*", markers = "python_version < '3.9'"}
 pyzbar = "*"
 pdf2image = "*"
-click = "==8.0.4"
 bleach = "*"
 
 [dev-packages]
