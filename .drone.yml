@@ -10,6 +10,8 @@ steps:
     DRONE_TAG: ${DRONE_TAG}
   commands:   
     - |
+      # sed -i -E "s/version: \"(.*)\"/version: \"$DRONE_TAG\"/g" src-ui/src/environments/environment.prod.ts
+
       cd src-ui
       npm ci --no-optional
       ./node_modules/.bin/ng build --configuration production
@@ -17,7 +19,7 @@ steps:
       cd ..
 
       cp paperless.conf.example paperless.conf
-      tar -czvf --exclude=*/tests/* release.tgz src/ requirements.txt paperless.conf gunicorn.conf.py
+      tar --exclude='*/tests/*' -czvf release.tgz src/ requirements.txt paperless.conf gunicorn.conf.py
 
 - name: gitea_release
   image: plugins/gitea-release
