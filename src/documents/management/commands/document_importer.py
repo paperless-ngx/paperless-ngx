@@ -6,9 +6,11 @@ from contextlib import contextmanager
 
 import tqdm
 from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from django.core.serializers.base import DeserializationError
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
 from documents.models import Document
@@ -16,6 +18,7 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from filelock import FileLock
+from paperless import version
 
 from ...file_handling import create_source_path_directory
 from ...signals.handlers import update_filename_and_move_files
@@ -53,6 +56,7 @@ class Command(BaseCommand):
         BaseCommand.__init__(self, *args, **kwargs)
         self.source = None
         self.manifest = None
+        self.version = None
 
     def handle(self, *args, **options):
 
@@ -72,6 +76,11 @@ class Command(BaseCommand):
         with open(manifest_path) as f:
             self.manifest = json.load(f)
 
+        version_path = os.path.join(self.source, "version.json")
+        if os.path.exists(version_path):
+            with open(version_path) as f:
+                self.version = json.load(f)["version"]
+
         self._check_manifest()
         with disable_signal(
             post_save,
@@ -84,7 +93,20 @@ class Command(BaseCommand):
                 sender=Document.tags.through,
             ):
                 # Fill up the database with whatever is in the manifest
-                call_command("loaddata", manifest_path)
+                try:
+                    call_command("loaddata", manifest_path)
+                except (FieldDoesNotExist, DeserializationError) as e:
+                    if (
+                        self.version is not None
+                        and self.version != version.__full_version_str__
+                    ):
+                        raise CommandError(
+                            "Error loading database, version mismatch. "
+                            f"Currently {version.__full_version_str__},"
+                            f" importing {self.version}",
+                        ) from e
+                    else:
+                        raise CommandError("Error loading database") from e
 
                 self._import_files_from_manifest(options["no_progress_bar"])
 
