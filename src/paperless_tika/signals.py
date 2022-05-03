@@ -22,19 +22,3 @@ def tika_consumer_declaration(sender, **kwargs):
             "text/rtf": ".rtf",
         },
     }
-
-
-def get_parser_eml(*args, **kwargs):
-    from .parsers import TikaDocumentParserEml
-
-    return TikaDocumentParserEml(*args, **kwargs)
-
-
-def tika_consumer_declaration_eml(sender, **kwargs):
-    return {
-        "parser": get_parser_eml,
-        "weight": 10,
-        "mime_types": {
-            "message/rfc822": ".eml",
-        },
-    }

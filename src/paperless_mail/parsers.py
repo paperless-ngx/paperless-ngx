@@ -10,6 +10,7 @@ from documents.parsers import DocumentParser
 from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import ParseError
 from imap_tools import MailMessage
+from tika import parser
 
 
 class MailDocumentParser(DocumentParser):
@@ -116,6 +117,36 @@ class MailDocumentParser(DocumentParser):
 
         self.date = mail.date
         self.archive_path = self.generate_pdf(document_path)
+
+    def tika_parse(self, document_path):
+
+        self.log("info", f"Sending {document_path} to Tika server")
+        tika_server = settings.PAPERLESS_TIKA_ENDPOINT
+
+        try:
+            parsed = parser.from_file(document_path, tika_server)
+        except Exception as err:
+            raise ParseError(
+                f"Could not parse {document_path} with tika server at "
+                f"{tika_server}: {err}",
+            )
+
+        subject = parsed["metadata"].get("dc:subject", "<no subject>")
+        content = parsed["content"].strip()
+
+        if content.startswith(subject):
+            content = content[len(subject) :].strip()
+
+        content = re.sub(" +", " ", content)
+        content = re.sub("\n+", "\n", content)
+
+        text = (
+            f"{content}\n\n"
+            f"From: {parsed['metadata'].get('Message-From', '')}\n"
+            f"To: {parsed['metadata'].get('Message-To', '')}\n"
+            f"CC: {parsed['metadata'].get('Message-CC', '')}"
+        )
+        return text
 
     def generate_pdf(self, document_path):
         def clean_html(text: str):
