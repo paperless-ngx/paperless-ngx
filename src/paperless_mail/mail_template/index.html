@@ -37,20 +37,9 @@
     <div class="border-t border-solid border-b w-full h-[1px] box-content border-black mb-5 bg-slate-200"></div>
 
     <!-- Content-->
-    <div class="w-full break-words">{{ content }}    </div>
-
-	<div class="border-t border-solid border-b w-full h-[1px] box-content border-black mb-5 bg-slate-200"></div>
-	<iframe src=mail_html.html  style="width: 100%;" scrolling="no" id="myIframe" ></iframe>
+    <div class="w-full break-words">{{ content }}</div>
 	</div>
-    <script>
-    // Selecting the iframe element
-    var iframe = document.getElementById("myIframe");
 
-    // Adjusting the iframe height onload event
-    iframe.onload = function(){
-        iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-    }
-    </script>
 </body>
 
 </html>

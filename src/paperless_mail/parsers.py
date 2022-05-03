@@ -1,5 +1,6 @@
 import os
 import re
+from io import BytesIO
 from io import StringIO
 
 import requests
@@ -92,61 +93,50 @@ class MailDocumentParser(DocumentParser):
         return result
 
     def parse(self, document_path, mime_type, file_name=None):
+        def strip_content(text: str):
+            text = re.sub("\t", " ", text)
+            text = re.sub(" +", " ", text)
+            text = re.sub("(\n *)+", "\n", text)
+            return text.strip()
+
         mail = self.get_parsed(document_path)
 
-        content = mail.text.strip()
-
-        content = re.sub(" +", " ", content)
-        content = re.sub("\n+", "\n", content)
-
-        self.text = f"{content}\n\n"
-        self.text += f"Subject: {mail.subject}\n"
-        self.text += f"From: {mail.from_values.full}\n"
-        self.text += f"To: {', '.join(address.full for address in mail.to_values)}\n"
+        self.text = f"{strip_content(mail.text)}\n\n"
+        self.text += f"Subject: {mail.subject}\n\n"
+        self.text += f"From: {mail.from_values.full}\n\n"
+        self.text += f"To: {', '.join(address.full for address in mail.to_values)}\n\n"
         if len(mail.cc_values) >= 1:
             self.text += (
-                f"CC: {', '.join(address.full for address in mail.cc_values)}\n"
+                f"CC: {', '.join(address.full for address in mail.cc_values)}\n\n"
             )
         if len(mail.bcc_values) >= 1:
             self.text += (
-                f"BCC: {', '.join(address.full for address in mail.bcc_values)}\n"
+                f"BCC: {', '.join(address.full for address in mail.bcc_values)}\n\n"
             )
         if len(mail.attachments) >= 1:
             att = ", ".join(f"{a.filename} ({a.size})" for a in mail.attachments)
-            self.text += f"Attachments: {att}"
+            self.text += f"Attachments: {att}\n\n"
+
+        if mail.html != "":
+            self.text += "HTML content: " + strip_content(self.tika_parse(mail.html))
 
         self.date = mail.date
         self.archive_path = self.generate_pdf(document_path)
 
-    def tika_parse(self, document_path):
-
-        self.log("info", f"Sending {document_path} to Tika server")
+    def tika_parse(self, input):
+        self.log("info", "Sending content to Tika server")
         tika_server = settings.PAPERLESS_TIKA_ENDPOINT
 
         try:
-            parsed = parser.from_file(document_path, tika_server)
+            parsed = parser.from_buffer(input, tika_server)
         except Exception as err:
             raise ParseError(
-                f"Could not parse {document_path} with tika server at "
-                f"{tika_server}: {err}",
+                f"Could not parse content with tika server at " f"{tika_server}: {err}",
             )
-
-        subject = parsed["metadata"].get("dc:subject", "<no subject>")
-        content = parsed["content"].strip()
-
-        if content.startswith(subject):
-            content = content[len(subject) :].strip()
-
-        content = re.sub(" +", " ", content)
-        content = re.sub("\n+", "\n", content)
-
-        text = (
-            f"{content}\n\n"
-            f"From: {parsed['metadata'].get('Message-From', '')}\n"
-            f"To: {parsed['metadata'].get('Message-To', '')}\n"
-            f"CC: {parsed['metadata'].get('Message-CC', '')}"
-        )
-        return text
+        if parsed["content"]:
+            return parsed["content"]
+        else:
+            return ""
 
     def generate_pdf(self, document_path):
         def clean_html(text: str):
@@ -201,7 +191,6 @@ class MailDocumentParser(DocumentParser):
         css_file = os.path.join(os.path.dirname(__file__), "mail_template/output.css")
         placeholder_pattern = re.compile(r"{{(.+)}}")
         html = StringIO()
-        orig_html = StringIO(clean_html_script(mail.html))
 
         with open(html_file, "r") as html_template_handle:
             with open(css_file, "rb") as css_handle:
@@ -222,10 +211,6 @@ class MailDocumentParser(DocumentParser):
                     "css": (
                         "output.css",
                         css_handle,
-                    ),
-                    "mail_html": (
-                        "mail_html.html",
-                        orig_html,
                     ),
                 }
                 headers = {}
@@ -249,8 +234,76 @@ class MailDocumentParser(DocumentParser):
                 except Exception as err:
                     raise ParseError(f"Error while converting document to PDF: {err}")
 
+        if mail.html != "":
+            pdf_html = self.generate_pdf_from_html(
+                clean_html_script(mail.html),
+                mail.attachments,
+            )
+
+        url_merge = gotenberg_server + "/forms/pdfengines/merge"
+
+        files = {
+            "mail": (
+                "1_mail.pdf",
+                BytesIO(response.content),
+            ),
+            "html": (
+                "2_html.pdf",
+                BytesIO(pdf_html),
+            ),
+        }
+        headers = {}
+        try:
+            response = requests.post(
+                url_merge,
+                files=files,
+                headers=headers,
+            )
+            response.raise_for_status()  # ensure we notice bad responses
+        except Exception as err:
+            raise ParseError(f"Error while converting document to PDF: {err}")
+
         with open(pdf_path, "wb") as file:
             file.write(response.content)
             file.close()
 
         return pdf_path
+
+    def generate_pdf_from_html(self, orig_html, attachments):
+        gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+        url = gotenberg_server + "/forms/chromium/convert/html"
+
+        self.log("info", "Converting html to PDF")
+
+        files = {}
+
+        for a in attachments:
+            name_cid = "cid:" + a.content_id
+            name_clean = "".join(e for e in name_cid if e.isalnum())
+            files[name_clean] = (name_clean, BytesIO(a.payload))
+            orig_html = orig_html.replace(name_cid, name_clean)
+
+        files["mail_html"] = ("index.html", StringIO(orig_html))
+
+        headers = {}
+        data = {
+            "marginTop": "0.1",
+            "marginBottom": "0.1",
+            "marginLeft": "0.1",
+            "marginRight": "0.1",
+            "paperWidth": "8.27",
+            "paperHeight": "11.7",
+            "scale": "1.0",
+        }
+        try:
+            response = requests.post(
+                url,
+                files=files,
+                headers=headers,
+                data=data,
+            )
+            response.raise_for_status()  # ensure we notice bad responses
+        except Exception as err:
+            raise ParseError(f"Error while converting document to PDF: {err}")
+
+        return response.content
