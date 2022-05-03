@@ -10,8 +10,8 @@ steps:
     DRONE_TAG: ${DRONE_TAG}
   commands:   
     - |
-      echo if \[ -z $\{DRONE_TAG+x\} \]; then export DRONE_TAG=development; fi
-      echo sed -i -E \"s/version\: \\\"(.*)\\\"/version\: \\\"$DRONE_TAG\\\"/g\" src-ui/src/environments/environment.prod.ts
+      if [ -z ${{DRONE_TAG+x}} ]; then export DRONE_TAG=dev; fi
+      sed -i -E "s/version: \\"(.*)\"/version: \\"$DRONE_TAG\\"/g" src-ui/src/environments/environment.prod.ts
 
       cd src-ui
       npm ci --no-optional
