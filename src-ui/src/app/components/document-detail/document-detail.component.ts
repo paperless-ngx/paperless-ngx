@@ -34,6 +34,7 @@ import {
 } from 'rxjs/operators'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
+import { normalizeDateStr } from 'src/app/utils/date'
 
 @Component({
   selector: 'app-document-detail',
@@ -145,18 +146,24 @@ export class DocumentDetailComponent
     this.documentForm.valueChanges
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((changes) => {
+        this.error = null
         if (this.ogDate) {
-          let newDate = new Date(changes['created'])
-          newDate.setHours(
-            this.ogDate.getHours(),
-            this.ogDate.getMinutes(),
-            this.ogDate.getSeconds(),
-            this.ogDate.getMilliseconds()
-          )
-          this.documentForm.patchValue(
-            { created: this.formatDate(newDate) },
-            { emitEvent: false }
-          )
+          try {
+            let newDate = new Date(normalizeDateStr(changes['created']))
+            newDate.setHours(
+              this.ogDate.getHours(),
+              this.ogDate.getMinutes(),
+              this.ogDate.getSeconds(),
+              this.ogDate.getMilliseconds()
+            )
+            this.documentForm.patchValue(
+              { created: newDate.toISOString() },
+              { emitEvent: false }
+            )
+          } catch (e) {
+            // catch this before we try to save and simulate an api error
+            this.error = { created: e.message }
+          }
         }
 
         Object.assign(this.document, this.documentForm.value)
@@ -199,22 +206,22 @@ export class DocumentDetailComponent
             this.updateComponent(doc)
           }
 
-          this.ogDate = new Date(doc.created)
+          this.ogDate = new Date(normalizeDateStr(doc.created.toString()))
 
           // Initialize dirtyCheck
           this.store = new BehaviorSubject({
             title: doc.title,
             content: doc.content,
-            created: this.formatDate(this.ogDate),
+            created: this.ogDate.toISOString(),
             correspondent: doc.correspondent,
             document_type: doc.document_type,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
           })
 
-          // ensure we're always starting with 24-char ISO8601 string
+          // start with ISO8601 string
           this.documentForm.patchValue(
-            { created: this.formatDate(this.ogDate) },
+            { created: this.ogDate.toISOString() },
             { emitEvent: false }
           )
 
@@ -319,16 +326,17 @@ export class DocumentDetailComponent
     this.documentsService
       .get(this.documentId)
       .pipe(first())
-      .subscribe(
-        (doc) => {
+      .subscribe({
+        next: (doc) => {
           Object.assign(this.document, doc)
           this.title = doc.title
           this.documentForm.patchValue(doc)
+          this.openDocumentService.setDirty(doc.id, false)
         },
-        (error) => {
+        error: () => {
           this.router.navigate(['404'])
-        }
-      )
+        },
+      })
   }
 
   save() {
@@ -485,9 +493,5 @@ export class DocumentDetailComponent
     if ('Enter' == event.key) {
       this.password = (event.target as HTMLInputElement).value
     }
-  }
-
-  formatDate(date: Date): string {
-    return date.toISOString().split('.')[0] + 'Z'
   }
 }
