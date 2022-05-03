@@ -1,9 +1,9 @@
 import shutil
 import tempfile
+import zoneinfo
 from pathlib import Path
 from unittest import mock
 
-import pytz
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
@@ -69,7 +69,7 @@ class TestDocument(TestCase):
                 0,
                 0,
                 0,
-                pytz.timezone("Europe/Berlin"),
+                zoneinfo.ZoneInfo("Europe/Berlin"),
             ),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
