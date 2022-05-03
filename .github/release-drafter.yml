@@ -30,7 +30,6 @@ replacers: # Changes "Feature: Update checker" to "Update checker"
     replace: ''
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&#@'
-tag-prefix: "ngx-"
 template: |
   # Changelog
 
