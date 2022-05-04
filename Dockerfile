@@ -56,6 +56,7 @@ ARG RUNTIME_PACKAGES="\
   curl \
   file \
   # fonts for text file thumbnail generation
+  default-libmysqlclient-dev \
   fonts-liberation \
   gettext \
   ghostscript \
@@ -186,6 +187,7 @@ COPY Pipfile* ./
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
+  mariadb-client \
   python3-dev"
 
 RUN set -eux \
