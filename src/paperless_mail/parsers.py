@@ -16,8 +16,11 @@ from tika import parser
 
 class MailDocumentParser(DocumentParser):
     """
-    This parser sends documents to a local tika server
+    This parser uses imap_tools to parse .eml files, generates pdf using
+    gotenbergs and sends the html part to a local tika server for text extraction.
     """
+
+    gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
 
     logging_name = "paperless.parsing.mail"
     _parsed = None
@@ -93,7 +96,7 @@ class MailDocumentParser(DocumentParser):
         return result
 
     def parse(self, document_path, mime_type, file_name=None):
-        def strip_content(text: str):
+        def strip_text(text: str):
             text = re.sub("\t", " ", text)
             text = re.sub(" +", " ", text)
             text = re.sub("(\n *)+", "\n", text)
@@ -101,7 +104,7 @@ class MailDocumentParser(DocumentParser):
 
         mail = self.get_parsed(document_path)
 
-        self.text = f"{strip_content(mail.text)}\n\n"
+        self.text = f"{strip_text(mail.text)}\n\n"
         self.text += f"Subject: {mail.subject}\n\n"
         self.text += f"From: {mail.from_values.full}\n\n"
         self.text += f"To: {', '.join(address.full for address in mail.to_values)}\n\n"
@@ -118,17 +121,17 @@ class MailDocumentParser(DocumentParser):
             self.text += f"Attachments: {att}\n\n"
 
         if mail.html != "":
-            self.text += "HTML content: " + strip_content(self.tika_parse(mail.html))
+            self.text += "HTML content: " + strip_text(self.tika_parse(mail.html))
 
         self.date = mail.date
         self.archive_path = self.generate_pdf(document_path)
 
-    def tika_parse(self, input):
+    def tika_parse(self, html: str):
         self.log("info", "Sending content to Tika server")
         tika_server = settings.PAPERLESS_TIKA_ENDPOINT
 
         try:
-            parsed = parser.from_buffer(input, tika_server)
+            parsed = parser.from_buffer(html, tika_server)
         except Exception as err:
             raise ParseError(
                 f"Could not parse content with tika server at " f"{tika_server}: {err}",
@@ -139,6 +142,46 @@ class MailDocumentParser(DocumentParser):
             return ""
 
     def generate_pdf(self, document_path):
+        pdf_collection = []
+        url_merge = self.gotenberg_server + "/forms/pdfengines/merge"
+        pdf_path = os.path.join(self.tempdir, "merged.pdf")
+        mail = self.get_parsed(document_path)
+
+        pdf_collection.append(("1_mail.pdf", self.generate_pdf_from_mail(mail)))
+
+        if mail.html != "":
+            pdf_collection.append(
+                (
+                    "2_html.pdf",
+                    self.generate_pdf_from_html(mail.html, mail.attachments),
+                ),
+            )
+
+        if len(pdf_collection) == 1:
+            with open(pdf_path, "wb") as file:
+                file.write(pdf_collection[0][1])
+                file.close()
+            return pdf_path
+
+        files = {}
+        for name, content in pdf_collection:
+            files[name] = (name, BytesIO(content))
+        headers = {}
+        try:
+            response = requests.post(url_merge, files=files, headers=headers)
+            response.raise_for_status()  # ensure we notice bad responses
+        except Exception as err:
+            raise ParseError(f"Error while converting document to PDF: {err}")
+
+        with open(pdf_path, "wb") as file:
+            file.write(response.content)
+            file.close()
+
+        return pdf_path
+
+    def mail_to_html(self, mail):
+        data = {}
+
         def clean_html(text: str):
             if isinstance(text, list):
                 text = "\n".join([str(e) for e in text])
@@ -155,135 +198,104 @@ class MailDocumentParser(DocumentParser):
             text = text.replace("\n", "<br>")
             return text
 
-        def clean_html_script(text: str):
-            text = text.replace("<script", "<div hidden ")
-            text = text.replace("</script", "</div")
-            return text
-
-        mail = self.get_parsed(document_path)
-
-        pdf_path = os.path.join(self.tempdir, "convert.pdf")
-        gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-        url = gotenberg_server + "/forms/chromium/convert/html"
-
-        self.log("info", f"Converting {document_path} to PDF as {pdf_path}")
-
-        data = {}
         data["subject"] = clean_html(mail.subject)
         if data["subject"] != "":
             data["subject_label"] = "Subject"
         data["from"] = clean_html(mail.from_values.full)
         if data["from"] != "":
             data["from_label"] = "From"
-        data["to"] = clean_html("\n".join(address.full for address in mail.to_values))
+        data["to"] = clean_html(", ".join(address.full for address in mail.to_values))
         if data["to"] != "":
             data["to_label"] = "To"
-        data["cc"] = clean_html("\n".join(address.full for address in mail.cc_values))
+        data["cc"] = clean_html(", ".join(address.full for address in mail.cc_values))
         if data["cc"] != "":
             data["cc_label"] = "CC"
-        data["bcc"] = clean_html("\n".join(address.full for address in mail.bcc_values))
+        data["bcc"] = clean_html(", ".join(address.full for address in mail.bcc_values))
         if data["bcc"] != "":
             data["bcc_label"] = "BCC"
         data["date"] = clean_html(mail.date.astimezone().strftime("%Y-%m-%d %H:%M"))
         data["content"] = clean_html(mail.text.strip())
 
         html_file = os.path.join(os.path.dirname(__file__), "mail_template/index.html")
-        css_file = os.path.join(os.path.dirname(__file__), "mail_template/output.css")
         placeholder_pattern = re.compile(r"{{(.+)}}")
+
         html = StringIO()
 
         with open(html_file, "r") as html_template_handle:
-            with open(css_file, "rb") as css_handle:
-                for line in html_template_handle.readlines():
-                    for placeholder in placeholder_pattern.findall(line):
-                        line = re.sub(
-                            "{{" + placeholder + "}}",
-                            data.get(placeholder.strip(), ""),
-                            line,
-                        )
-                    html.write(line)
-                html.seek(0)
-                files = {
-                    "html": (
-                        "index.html",
-                        html,
-                    ),
-                    "css": (
-                        "output.css",
-                        css_handle,
-                    ),
-                }
-                headers = {}
-                data = {
-                    "marginTop": "0.1",
-                    "marginBottom": "0.1",
-                    "marginLeft": "0.1",
-                    "marginRight": "0.1",
-                    "paperWidth": "8.27",
-                    "paperHeight": "11.7",
-                    "scale": "1.0",
-                }
-                try:
-                    response = requests.post(
-                        url,
-                        files=files,
-                        headers=headers,
-                        data=data,
+            for line in html_template_handle.readlines():
+                for placeholder in placeholder_pattern.findall(line):
+                    line = re.sub(
+                        "{{" + placeholder + "}}",
+                        data.get(placeholder.strip(), ""),
+                        line,
                     )
-                    response.raise_for_status()  # ensure we notice bad responses
-                except Exception as err:
-                    raise ParseError(f"Error while converting document to PDF: {err}")
+                html.write(line)
+            html.seek(0)
 
-        if mail.html != "":
-            pdf_html = self.generate_pdf_from_html(
-                clean_html_script(mail.html),
-                mail.attachments,
-            )
+        return html
 
-        url_merge = gotenberg_server + "/forms/pdfengines/merge"
+    def generate_pdf_from_mail(self, mail):
 
-        files = {
-            "mail": (
-                "1_mail.pdf",
-                BytesIO(response.content),
-            ),
-            "html": (
-                "2_html.pdf",
-                BytesIO(pdf_html),
-            ),
-        }
-        headers = {}
-        try:
-            response = requests.post(
-                url_merge,
-                files=files,
-                headers=headers,
-            )
-            response.raise_for_status()  # ensure we notice bad responses
-        except Exception as err:
-            raise ParseError(f"Error while converting document to PDF: {err}")
+        url = self.gotenberg_server + "/forms/chromium/convert/html"
+        self.log("info", "Converting mail to PDF")
 
-        with open(pdf_path, "wb") as file:
-            file.write(response.content)
-            file.close()
+        css_file = os.path.join(os.path.dirname(__file__), "mail_template/output.css")
 
-        return pdf_path
+        with open(css_file, "rb") as css_handle:
 
-    def generate_pdf_from_html(self, orig_html, attachments):
-        gotenberg_server = settings.PAPERLESS_TIKA_GOTENBERG_ENDPOINT
-        url = gotenberg_server + "/forms/chromium/convert/html"
+            files = {
+                "html": ("index.html", self.mail_to_html(mail)),
+                "css": ("output.css", css_handle),
+            }
+            headers = {}
+            data = {
+                "marginTop": "0.1",
+                "marginBottom": "0.1",
+                "marginLeft": "0.1",
+                "marginRight": "0.1",
+                "paperWidth": "8.27",
+                "paperHeight": "11.7",
+                "scale": "1.0",
+            }
+            try:
+                response = requests.post(
+                    url,
+                    files=files,
+                    headers=headers,
+                    data=data,
+                )
+                response.raise_for_status()  # ensure we notice bad responses
+            except Exception as err:
+                raise ParseError(f"Error while converting document to PDF: {err}")
 
-        self.log("info", "Converting html to PDF")
+        return response.content
 
-        files = {}
+    def transform_inline_html(self, orig_html, attachments):
+        def clean_html_script(text: str):
+            text = text.replace("<script", "<div hidden ")
+            text = text.replace("</script", "</div")
+            return text
+
+        orig_html = clean_html_script(orig_html)
+        files = []
 
         for a in attachments:
             name_cid = "cid:" + a.content_id
             name_clean = "".join(e for e in name_cid if e.isalnum())
-            files[name_clean] = (name_clean, BytesIO(a.payload))
+            files.append((name_clean, BytesIO(a.payload)))
             orig_html = orig_html.replace(name_cid, name_clean)
 
-        files["mail_html"] = ("index.html", StringIO(orig_html))
+        files.append(("index.html", StringIO(orig_html)))
+
+        return files
+
+    def generate_pdf_from_html(self, orig_html, attachments):
+        url = self.gotenberg_server + "/forms/chromium/convert/html"
+        self.log("info", "Converting html to PDF")
+
+        files = {}
+        for name, file in self.transform_inline_html(orig_html, attachments):
+            files[name] = (name, file)
 
         headers = {}
         data = {
