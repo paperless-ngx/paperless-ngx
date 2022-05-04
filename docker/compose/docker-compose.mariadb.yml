@@ -49,8 +49,7 @@ services:
       - "3306:3306"
 
   webserver:
-#    image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    image: paperless-bktest:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
       - db
