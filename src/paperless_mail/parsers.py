@@ -117,8 +117,13 @@ class MailDocumentParser(DocumentParser):
                 f"BCC: {', '.join(address.full for address in mail.bcc_values)}\n\n"
             )
         if len(mail.attachments) >= 1:
-            att = ", ".join(f"{a.filename} ({a.size})" for a in mail.attachments)
-            self.text += f"Attachments: {att}\n\n"
+            att = []
+            for a in mail.attachments:
+                if a.size >= 1024 * 600:
+                    att.append(f"{a.filename} ({(a.size / 1024 / 1024):.2f} MiB)")
+                else:
+                    att.append(f"{a.filename} ({(a.size / 1024):.2f} KiB)")
+            self.text += f"Attachments: {', '.join(att)}\n\n"
 
         if mail.html != "":
             self.text += "HTML content: " + strip_text(self.tika_parse(mail.html))
@@ -213,6 +218,26 @@ class MailDocumentParser(DocumentParser):
         data["bcc"] = clean_html(", ".join(address.full for address in mail.bcc_values))
         if data["bcc"] != "":
             data["bcc_label"] = "BCC"
+
+        att = []
+        for a in mail.attachments:
+            if a.size >= 1024 * 600:
+                att.append(f"{a.filename} ({(a.size / 1024 / 1024):.2f} MiB)")
+            else:
+                att.append(f"{a.filename} ({(a.size / 1024):.2f} KiB)")
+        data["attachments"] = clean_html(", ".join(att))
+        if data["attachments"] != "":
+            data["attachments_label"] = "Attachments"
+
+        if len(mail.attachments) >= 1:
+            att = []
+            for a in mail.attachments:
+                if a.size >= 1024 * 600:
+                    att.append(f"{a.filename} ({(a.size / 1024 / 1024):.2f} MiB)")
+                else:
+                    att.append(f"{a.filename} ({(a.size / 1024):.2f} KiB)")
+            self.text += f"Attachments: {', '.join(att)}\n\n"
+
         data["date"] = clean_html(mail.date.astimezone().strftime("%Y-%m-%d %H:%M"))
         data["content"] = clean_html(mail.text.strip())
 
