@@ -1,8 +1,12 @@
 import shutil
 import tempfile
-import zoneinfo
 from pathlib import Path
 from unittest import mock
+
+try:
+    import zoneinfo
+except ImportError:
+    import backports.zoneinfo as zoneinfo
 
 from django.test import override_settings
 from django.test import TestCase
