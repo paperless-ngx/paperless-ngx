@@ -137,32 +137,36 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe((queryParams) => {
-        // transform query params to filter rules
-        let filterRulesFromQueryParams: FilterRule[] = []
-        allFilterRuleQueryParams
-          .filter((frqp) => queryParams.has(frqp))
-          .forEach((filterQueryParamName) => {
-            const filterQueryParamValues: string[] = queryParams
-              .get(filterQueryParamName)
-              .split(',')
+        if (queryParams.has('view')) {
+          this.loadViewConfig(parseInt(queryParams.get('view')))
+        } else {
+          // transform query params to filter rules
+          let filterRulesFromQueryParams: FilterRule[] = []
+          allFilterRuleQueryParams
+            .filter((frqp) => queryParams.has(frqp))
+            .forEach((filterQueryParamName) => {
+              const filterQueryParamValues: string[] = queryParams
+                .get(filterQueryParamName)
+                .split(',')
 
-            filterRulesFromQueryParams = filterRulesFromQueryParams.concat(
-              // map all values to filter rules
-              filterQueryParamValues.map((val) => {
-                return {
-                  rule_type: FILTER_RULE_TYPES.find(
-                    (rt) => rt.filtervar == filterQueryParamName
-                  ).id,
-                  value: val,
-                }
-              })
-            )
-          })
+              filterRulesFromQueryParams = filterRulesFromQueryParams.concat(
+                // map all values to filter rules
+                filterQueryParamValues.map((val) => {
+                  return {
+                    rule_type: FILTER_RULE_TYPES.find(
+                      (rt) => rt.filtervar == filterQueryParamName
+                    ).id,
+                    value: val,
+                  }
+                })
+              )
+            })
 
-        this.list.activateSavedView(null)
-        this.list.filterRules = filterRulesFromQueryParams
-        this.list.reload()
-        this.unmodifiedFilterRules = []
+          this.list.activateSavedView(null)
+          this.list.filterRules = filterRulesFromQueryParams
+          this.list.reload()
+          this.unmodifiedFilterRules = []
+        }
       })
   }
 
@@ -192,9 +196,19 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.unsubscribeNotifier.complete()
   }
 
-  loadViewConfig(view: PaperlessSavedView) {
-    this.list.loadSavedView(view)
-    this.list.reload()
+  loadViewConfig(viewId: number) {
+    this.savedViewService
+      .getCached(viewId)
+      .pipe(first())
+      .subscribe((view) => {
+        this.list.loadSavedView(view)
+        this.list.reload()
+        // update query params if needed
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { view: viewId },
+        })
+      })
   }
 
   saveViewConfig() {
