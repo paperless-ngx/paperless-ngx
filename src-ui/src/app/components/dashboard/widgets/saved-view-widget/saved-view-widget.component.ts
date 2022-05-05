@@ -60,8 +60,9 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
     if (this.savedView.show_in_sidebar) {
       this.router.navigate(['view', this.savedView.id])
     } else {
-      this.list.loadSavedView(this.savedView, true)
-      this.router.navigate(['documents'])
+      this.router.navigate(['documents'], {
+        queryParams: { view: this.savedView.id },
+      })
     }
   }
 
