@@ -34,7 +34,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
       [
         {
           key: 'last_correspondence',
-          name: $localize`Last correspondence`,
+          name: $localize`Last used`,
           valueFn: (c: PaperlessCorrespondent) => {
             return this.datePipe.transform(c.last_correspondence)
           },
