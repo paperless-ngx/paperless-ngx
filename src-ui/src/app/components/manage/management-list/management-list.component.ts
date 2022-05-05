@@ -19,6 +19,7 @@ import {
   SortEvent,
 } from 'src/app/directives/sortable.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -42,7 +43,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     private modalService: NgbModal,
     private editDialogComponent: any,
     private toastService: ToastService,
-    private list: DocumentListViewService,
+    private queryParamsService: QueryParamsService,
     protected filterRuleType: number,
     public typeName: string,
     public extraColumns: ManagementListColumn[]
@@ -140,7 +141,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   filterDocuments(object: ObjectWithId) {
-    this.list.quickFilter([
+    this.queryParamsService.loadFilterRules([
       { rule_type: this.filterRuleType, value: object.id.toString() },
     ])
   }

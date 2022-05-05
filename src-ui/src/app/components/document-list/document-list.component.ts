@@ -31,6 +31,7 @@ import {
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 import {
   DocumentService,
   DOCUMENT_SORT_FIELDS,
@@ -55,7 +56,8 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private toastService: ToastService,
     private modalService: NgbModal,
-    private consumerStatusService: ConsumerStatusService
+    private consumerStatusService: ConsumerStatusService,
+    private queryParamsService: QueryParamsService
   ) {}
 
   @ViewChild('filterEditor')
@@ -127,10 +129,6 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.unmodifiedFilterRules = view.filter_rules
       })
 
-    const allFilterRuleQueryParams: string[] = FILTER_RULE_TYPES.map(
-      (rt) => rt.filtervar
-    )
-
     this.route.queryParamMap
       .pipe(
         filter(() => !this.route.snapshot.paramMap.has('id')), // only when not on saved view
@@ -140,30 +138,9 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
         if (queryParams.has('view')) {
           this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
-          // transform query params to filter rules
-          let filterRulesFromQueryParams: FilterRule[] = []
-          allFilterRuleQueryParams
-            .filter((frqp) => queryParams.has(frqp))
-            .forEach((filterQueryParamName) => {
-              const filterQueryParamValues: string[] = queryParams
-                .get(filterQueryParamName)
-                .split(',')
-
-              filterRulesFromQueryParams = filterRulesFromQueryParams.concat(
-                // map all values to filter rules
-                filterQueryParamValues.map((val) => {
-                  return {
-                    rule_type: FILTER_RULE_TYPES.find(
-                      (rt) => rt.filtervar == filterQueryParamName
-                    ).id,
-                    value: val,
-                  }
-                })
-              )
-            })
-
           this.list.activateSavedView(null)
-          this.list.filterRules = filterRulesFromQueryParams
+          this.queryParamsService.params = queryParams
+          this.list.filterRules = this.queryParamsService.filterRules
           this.list.reload()
           this.unmodifiedFilterRules = []
         }
@@ -175,8 +152,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (filterRules) => {
-          const params =
-            this.documentService.filterRulesToQueryParams(filterRules)
+          this.queryParamsService.filterRules = filterRules
 
           // if we were on a saved view we navigate 'away' to /documents
           let base = []
@@ -184,7 +160,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
 
           this.router.navigate(base, {
             relativeTo: this.route,
-            queryParams: params,
+            queryParams: this.queryParamsService.params,
           })
         },
       })
@@ -296,7 +272,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   clickMoreLike(documentID: number) {
-    this.list.quickFilter([
+    this.queryParamsService.loadFilterRules([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString() },
     ])
   }
