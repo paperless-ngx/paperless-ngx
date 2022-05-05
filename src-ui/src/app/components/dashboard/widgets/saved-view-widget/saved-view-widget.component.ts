@@ -67,7 +67,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
   }
 
   clickTag(tag: PaperlessTag) {
-    this.queryParamsService.loadFilterRules([
+    this.queryParamsService.navigateWithFilterRules([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tag.id.toString() },
     ])
   }

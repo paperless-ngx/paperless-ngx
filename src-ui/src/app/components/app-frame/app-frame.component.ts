@@ -94,7 +94,7 @@ export class AppFrameComponent {
 
   search() {
     this.closeMenu()
-    this.queryParamsService.loadFilterRules([
+    this.queryParamsService.navigateWithFilterRules([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
         value: (this.searchField.value as string).trim(),
