@@ -35,6 +35,7 @@ import {
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { normalizeDateStr } from 'src/app/utils/date'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 
 @Component({
   selector: 'app-document-detail',
@@ -114,7 +115,8 @@ export class DocumentDetailComponent
     private documentListViewService: DocumentListViewService,
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
-    private settings: SettingsService
+    private settings: SettingsService,
+    private queryParamsService: QueryParamsService
   ) {
     this.titleSubject
       .pipe(
@@ -446,7 +448,7 @@ export class DocumentDetailComponent
   }
 
   moreLike() {
-    this.documentListViewService.quickFilter([
+    this.queryParamsService.loadFilterRules([
       {
         rule_type: FILTER_FULLTEXT_MORELIKE,
         value: this.documentId.toString(),

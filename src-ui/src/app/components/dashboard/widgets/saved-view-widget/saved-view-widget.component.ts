@@ -3,11 +3,11 @@ import { Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 
 @Component({
   selector: 'app-saved-view-widget',
@@ -18,7 +18,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
   constructor(
     private documentService: DocumentService,
     private router: Router,
-    private list: DocumentListViewService,
+    private queryParamsService: QueryParamsService,
     private consumerStatusService: ConsumerStatusService
   ) {}
 
@@ -67,7 +67,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
   }
 
   clickTag(tag: PaperlessTag) {
-    this.list.quickFilter([
+    this.queryParamsService.loadFilterRules([
       { rule_type: FILTER_HAS_TAGS_ALL, value: tag.id.toString() },
     ])
   }
