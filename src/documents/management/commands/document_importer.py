@@ -80,6 +80,18 @@ class Command(BaseCommand):
         if os.path.exists(version_path):
             with open(version_path) as f:
                 self.version = json.load(f)["version"]
+                # Provide an initial warning if needed to the user
+                if self.version != version.__full_version_str__:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            "Version mismatch:"
+                            f" {self.version} vs {version.__full_version_str__}."
+                            "  Continuing, but import may fail",
+                        ),
+                    )
+
+        else:
+            self.stdout.write(self.style.WARNING("No version.json file located"))
 
         self._check_manifest()
         with disable_signal(
@@ -110,8 +122,12 @@ class Command(BaseCommand):
 
                 self._import_files_from_manifest(options["no_progress_bar"])
 
-        print("Updating search index...")
-        call_command("document_index", "reindex")
+        self.stdout.write("Updating search index...")
+        call_command(
+            "document_index",
+            "reindex",
+            no_progress_bar=options["no_progress_bar"],
+        )
 
     @staticmethod
     def _check_manifest_exists(path):
@@ -154,7 +170,7 @@ class Command(BaseCommand):
         os.makedirs(settings.THUMBNAIL_DIR, exist_ok=True)
         os.makedirs(settings.ARCHIVE_DIR, exist_ok=True)
 
-        print("Copy files into paperless...")
+        self.stdout.write("Copy files into paperless...")
 
         manifest_documents = list(
             filter(lambda r: r["model"] == "documents.document", self.manifest),
