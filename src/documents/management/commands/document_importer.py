@@ -70,13 +70,13 @@ class Command(BaseCommand):
         if not os.access(self.source, os.R_OK):
             raise CommandError("That path doesn't appear to be readable")
 
-        manifest_path = os.path.join(self.source, "manifest.json")
+        manifest_path = os.path.normpath(os.path.join(self.source, "manifest.json"))
         self._check_manifest_exists(manifest_path)
 
         with open(manifest_path) as f:
             self.manifest = json.load(f)
 
-        version_path = os.path.join(self.source, "version.json")
+        version_path = os.path.normpath(os.path.join(self.source, "version.json"))
         if os.path.exists(version_path):
             with open(version_path) as f:
                 self.version = json.load(f)["version"]
@@ -91,7 +91,7 @@ class Command(BaseCommand):
                     )
 
         else:
-            self.stdout.write(self.style.WARNING("No version.json file located"))
+            self.stdout.write(self.style.NOTICE("No version.json file located"))
 
         self._check_manifest()
         with disable_signal(
@@ -108,17 +108,24 @@ class Command(BaseCommand):
                 try:
                     call_command("loaddata", manifest_path)
                 except (FieldDoesNotExist, DeserializationError) as e:
+                    self.stdout.write(self.style.ERROR("Database import failed"))
                     if (
                         self.version is not None
                         and self.version != version.__full_version_str__
                     ):
-                        raise CommandError(
-                            "Error loading database, version mismatch. "
-                            f"Currently {version.__full_version_str__},"
-                            f" importing {self.version}",
-                        ) from e
+                        self.stdout.write(
+                            self.style.ERROR(
+                                "Version mismatch: "
+                                f"Currently {version.__full_version_str__},"
+                                f" importing {self.version}",
+                            ),
+                        )
+                        raise e
                     else:
-                        raise CommandError("Error loading database") from e
+                        self.stdout.write(
+                            self.style.ERROR("No version information present"),
+                        )
+                        raise e
 
                 self._import_files_from_manifest(options["no_progress_bar"])
 
