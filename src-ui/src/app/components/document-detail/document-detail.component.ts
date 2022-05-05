@@ -448,7 +448,7 @@ export class DocumentDetailComponent
   }
 
   moreLike() {
-    this.queryParamsService.loadFilterRules([
+    this.queryParamsService.navigateWithFilterRules([
       {
         rule_type: FILTER_FULLTEXT_MORELIKE,
         value: this.documentId.toString(),

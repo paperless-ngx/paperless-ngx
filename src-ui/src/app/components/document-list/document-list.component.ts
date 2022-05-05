@@ -9,20 +9,9 @@ import {
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import {
-  filter,
-  first,
-  map,
-  Subject,
-  Subscription,
-  switchMap,
-  takeUntil,
-} from 'rxjs'
+import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
 import { FilterRule, isFullTextFilterRule } from 'src/app/data/filter-rule'
-import {
-  FILTER_FULLTEXT_MORELIKE,
-  FILTER_RULE_TYPES,
-} from 'src/app/data/filter-rule-type'
+import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import {
@@ -31,9 +20,11 @@ import {
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { QueryParamsService } from 'src/app/services/query-params.service'
 import {
-  DocumentService,
+  filterRulesFromQueryParams,
+  QueryParamsService,
+} from 'src/app/services/query-params.service'
+import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/services/rest/document.service'
@@ -50,7 +41,6 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
 export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     public list: DocumentListViewService,
-    private documentService: DocumentService,
     public savedViewService: SavedViewService,
     public route: ActivatedRoute,
     private router: Router,
@@ -85,8 +75,26 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       : DOCUMENT_SORT_FIELDS
   }
 
+  set listSort(reverse: boolean) {
+    this.list.sortReverse = reverse
+    this.queryParamsService.sortField = this.list.sortField
+    this.queryParamsService.sortReverse = reverse
+  }
+
+  get listSort(): boolean {
+    return this.list.sortReverse
+  }
+
+  setSortField(field: string) {
+    this.list.sortField = field
+    this.queryParamsService.sortField = field
+    this.queryParamsService.sortReverse = this.listSort
+  }
+
   onSort(event: SortEvent) {
     this.list.setSort(event.column, event.reverse)
+    this.queryParamsService.sortField = event.column
+    this.queryParamsService.sortReverse = event.reverse
   }
 
   get isBulkEditing(): boolean {
@@ -139,9 +147,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
           this.list.activateSavedView(null)
-          this.queryParamsService.params = queryParams
-          this.list.filterRules = this.queryParamsService.filterRules
-          this.list.reload()
+          this.queryParamsService.parseQueryParams(queryParams)
           this.unmodifiedFilterRules = []
         }
       })
@@ -152,16 +158,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (filterRules) => {
-          this.queryParamsService.filterRules = filterRules
-
-          // if we were on a saved view we navigate 'away' to /documents
-          let base = []
-          if (this.route.snapshot.paramMap.has('id')) base = ['/documents']
-
-          this.router.navigate(base, {
-            relativeTo: this.route,
-            queryParams: this.queryParamsService.params,
-          })
+          this.queryParamsService.updateFilterRules(filterRules)
         },
       })
   }
@@ -272,7 +269,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   clickMoreLike(documentID: number) {
-    this.queryParamsService.loadFilterRules([
+    this.queryParamsService.navigateWithFilterRules([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString() },
     ])
   }

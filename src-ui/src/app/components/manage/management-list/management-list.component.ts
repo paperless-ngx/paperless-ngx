@@ -18,7 +18,6 @@ import {
   SortableDirective,
   SortEvent,
 } from 'src/app/directives/sortable.directive'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { QueryParamsService } from 'src/app/services/query-params.service'
 import { AbstractNameFilterService } from 'src/app/services/rest/abstract-name-filter-service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -141,7 +140,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
   }
 
   filterDocuments(object: ObjectWithId) {
-    this.queryParamsService.loadFilterRules([
+    this.queryParamsService.navigateWithFilterRules([
       { rule_type: this.filterRuleType, value: object.id.toString() },
     ])
   }
