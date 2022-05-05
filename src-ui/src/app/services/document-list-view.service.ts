@@ -9,7 +9,6 @@ import {
 import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
-import { QueryParamsService } from './query-params.service'
 import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
 import { SettingsService, SETTINGS_KEYS } from './settings.service'
 
@@ -434,8 +433,7 @@ export class DocumentListViewService {
 
   constructor(
     private documentService: DocumentService,
-    private settings: SettingsService,
-    private queryParamsService: QueryParamsService
+    private settings: SettingsService
   ) {
     let documentListViewConfigJson = localStorage.getItem(
       DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG
