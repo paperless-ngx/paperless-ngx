@@ -15,7 +15,7 @@ def source_path_before(self):
     if self.filename:
         fname = str(self.filename)
     else:
-        fname = "{:07}.{}".format(self.pk, self.file_type)
+        fname = f"{self.pk:07}.{self.file_type}"
         if self.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"
 
@@ -30,7 +30,7 @@ def source_path_after(doc):
     if doc.filename:
         fname = str(doc.filename)
     else:
-        fname = "{:07}{}".format(doc.pk, file_type_after(doc))
+        fname = f"{doc.pk:07}{file_type_after(doc)}"
         if doc.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"  # pragma: no cover
 

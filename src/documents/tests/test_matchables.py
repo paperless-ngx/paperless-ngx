@@ -36,13 +36,13 @@ class _TestMatchingBase(TestCase):
                 doc = Document(content=string)
                 self.assertTrue(
                     matching.matches(instance, doc),
-                    '"%s" should match "%s" but it does not' % (match_text, string),
+                    f'"{match_text}" should match "{string}" but it does not',
                 )
             for string in no_match:
                 doc = Document(content=string)
                 self.assertFalse(
                     matching.matches(instance, doc),
-                    '"%s" should not match "%s" but it does' % (match_text, string),
+                    f'"{match_text}" should not match "{string}" but it does',
                 )
 
 

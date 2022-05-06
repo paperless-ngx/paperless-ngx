@@ -17,4 +17,4 @@ class Command(LoadDataCommand):
     def find_fixtures(self, fixture_label):
         if fixture_label == "-":
             return [("-", None, "-")]
-        return super(Command, self).find_fixtures(fixture_label)
+        return super().find_fixtures(fixture_label)

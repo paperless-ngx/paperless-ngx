@@ -210,7 +210,7 @@ class DocumentViewSet(
         return serializer_class(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        response = super(DocumentViewSet, self).update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
         from documents import index
 
         index.add_or_update_document(self.get_object())
@@ -220,7 +220,7 @@ class DocumentViewSet(
         from documents import index
 
         index.remove_document_from_index(self.get_object())
-        return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
+        return super().destroy(request, *args, **kwargs)
 
     @staticmethod
     def original_requested(request):
@@ -362,7 +362,7 @@ class DocumentViewSet(
 class SearchResultSerializer(DocumentSerializer):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
-        r = super(SearchResultSerializer, self).to_representation(doc)
+        r = super().to_representation(doc)
         r["__search_hit__"] = {
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content)
@@ -376,7 +376,7 @@ class SearchResultSerializer(DocumentSerializer):
 
 class UnifiedSearchViewSet(DocumentViewSet):
     def __init__(self, *args, **kwargs):
-        super(UnifiedSearchViewSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.searcher = None
 
     def get_serializer_class(self):
@@ -408,7 +408,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 self.paginator.get_page_size(self.request),
             )
         else:
-            return super(UnifiedSearchViewSet, self).filter_queryset(queryset)
+            return super().filter_queryset(queryset)
 
     def list(self, request, *args, **kwargs):
         if self._is_search_request():
@@ -417,13 +417,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
             try:
                 with index.open_index_searcher() as s:
                     self.searcher = s
-                    return super(UnifiedSearchViewSet, self).list(request)
+                    return super().list(request)
             except NotFound:
                 raise
             except Exception as e:
                 return HttpResponseBadRequest(str(e))
         else:
-            return super(UnifiedSearchViewSet, self).list(request)
+            return super().list(request)
 
 
 class LogViewSet(ViewSet):
@@ -441,7 +441,7 @@ class LogViewSet(ViewSet):
         if not os.path.isfile(filename):
             raise Http404()
 
-        with open(filename, "r") as f:
+        with open(filename) as f:
             lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)

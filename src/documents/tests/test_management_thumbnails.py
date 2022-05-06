@@ -39,7 +39,7 @@ class TestMakeThumbnails(DirectoriesMixin, TestCase):
         )
 
     def setUp(self) -> None:
-        super(TestMakeThumbnails, self).setUp()
+        super().setUp()
         self.make_models()
 
     def test_process_document(self):
