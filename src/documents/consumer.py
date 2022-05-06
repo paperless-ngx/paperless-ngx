@@ -257,7 +257,7 @@ class Consumer(LoggingMixin):
 
         try:
             self._send_progress(20, 100, "WORKING", MESSAGE_PARSING_DOCUMENT)
-            self.log("debug", "Parsing {}...".format(self.filename))
+            self.log("debug", f"Parsing {self.filename}...")
             document_parser.parse(self.path, mime_type, self.filename)
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
@@ -346,7 +346,7 @@ class Consumer(LoggingMixin):
                 document.save()
 
                 # Delete the file only if it was successfully consumed
-                self.log("debug", "Deleting file {}".format(self.path))
+                self.log("debug", f"Deleting file {self.path}")
                 os.unlink(self.path)
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
@@ -356,7 +356,7 @@ class Consumer(LoggingMixin):
                 )
 
                 if os.path.isfile(shadow_file):
-                    self.log("debug", "Deleting file {}".format(shadow_file))
+                    self.log("debug", f"Deleting file {shadow_file}")
                     os.unlink(shadow_file)
 
         except Exception as e:
@@ -370,7 +370,7 @@ class Consumer(LoggingMixin):
 
         self.run_post_consume_script(document)
 
-        self.log("info", "Document {} consumption finished".format(document))
+        self.log("info", f"Document {document} consumption finished")
 
         self._send_progress(100, 100, "SUCCESS", MESSAGE_FINISHED, document.id)
 

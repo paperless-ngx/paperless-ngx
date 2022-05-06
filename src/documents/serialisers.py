@@ -30,7 +30,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
         fields = kwargs.pop("fields", None)
 
         # Instantiate the superclass normally
-        super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if fields is not None:
             # Drop any fields that are not specified in the `fields` argument.
@@ -263,7 +263,7 @@ class SavedViewSerializer(serializers.ModelSerializer):
             rules_data = validated_data.pop("filter_rules")
         else:
             rules_data = None
-        super(SavedViewSerializer, self).update(instance, validated_data)
+        super().update(instance, validated_data)
         if rules_data is not None:
             SavedViewFilterRule.objects.filter(saved_view=instance).delete()
             for rule_data in rules_data:

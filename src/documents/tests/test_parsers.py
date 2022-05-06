@@ -31,7 +31,7 @@ def fake_magic_from_file(file, mime=False):
 class TestParserDiscovery(TestCase):
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test__get_parser_class_1_parser(self, m, *args):
-        class DummyParser(object):
+        class DummyParser:
             pass
 
         m.return_value = (
@@ -49,10 +49,10 @@ class TestParserDiscovery(TestCase):
 
     @mock.patch("documents.parsers.document_consumer_declaration.send")
     def test__get_parser_class_n_parsers(self, m, *args):
-        class DummyParser1(object):
+        class DummyParser1:
             pass
 
-        class DummyParser2(object):
+        class DummyParser2:
             pass
 
         m.return_value = (

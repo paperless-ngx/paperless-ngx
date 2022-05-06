@@ -19,7 +19,7 @@ from documents.tests.utils import DirectoriesMixin
 
 class TestClassifier(DirectoriesMixin, TestCase):
     def setUp(self):
-        super(TestClassifier, self).setUp()
+        super().setUp()
         self.classifier = DocumentClassifier()
 
     def generate_test_data(self):

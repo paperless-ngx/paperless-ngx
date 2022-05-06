@@ -98,7 +98,7 @@ class RasterisedDocumentParser(DocumentParser):
 
     def extract_text(self, sidecar_file, pdf_file):
         if sidecar_file and os.path.isfile(sidecar_file):
-            with open(sidecar_file, "r") as f:
+            with open(sidecar_file) as f:
                 text = f.read()
 
             if "[OCR skipped on page" not in text:
