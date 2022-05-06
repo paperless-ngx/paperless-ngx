@@ -29,9 +29,14 @@ PAPERLESS_REDIS=<url>
 
     Defaults to redis://localhost:6379.
 
+PAPERLESS_DBENGINE=<engine_name>
+    Optional, gives the ability to choose Postgres or MariaDB for database engine.
+    Available options are `postgresql` and `mariadb`.
+    Default is `postgresql`.
+
 PAPERLESS_DBHOST=<hostname>
     By default, sqlite is used as the database backend. This can be changed here.
-    Set PAPERLESS_DBHOST and PostgreSQL will be used instead of mysql.
+    Set PAPERLESS_DBHOST and another database will be used instead of sqlite.
 
 PAPERLESS_DBPORT=<port>
     Adjust port if necessary.
@@ -39,17 +44,17 @@ PAPERLESS_DBPORT=<port>
     Default is 5432.
 
 PAPERLESS_DBNAME=<name>
-    Database name in PostgreSQL.
+    Database name in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 PAPERLESS_DBUSER=<name>
-    Database user in PostgreSQL.
+    Database user in PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 
 PAPERLESS_DBPASS=<password>
-    Database password for PostgreSQL.
+    Database password for PostgreSQL or MariaDB.
 
     Defaults to "paperless".
 

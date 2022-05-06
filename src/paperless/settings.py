@@ -307,15 +307,25 @@ if os.getenv("PAPERLESS_DBHOST"):
     DATABASES["sqlite"] = DATABASES["default"].copy()
 
     DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
         "HOST": os.getenv("PAPERLESS_DBHOST"),
         "NAME": os.getenv("PAPERLESS_DBNAME", "paperless"),
         "USER": os.getenv("PAPERLESS_DBUSER", "paperless"),
         "PASSWORD": os.getenv("PAPERLESS_DBPASS", "paperless"),
-        "OPTIONS": {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")},
+        "OPTIONS": {},
     }
     if os.getenv("PAPERLESS_DBPORT"):
         DATABASES["default"]["PORT"] = os.getenv("PAPERLESS_DBPORT")
+
+    # Leave room for future extensibility
+    if os.getenv("PAPERLESS_DBENGINE") == "mariadb":
+        engine = "django.db.backends.mysql"
+        options = {"read_default_file": "/etc/mysql/my.cnf"}
+    else:  # Default to PostgresDB
+        engine = "django.db.backends.postgresql_psycopg2"
+        options = {"sslmode": os.getenv("PAPERLESS_DBSSLMODE", "prefer")}
+    DATABASES["default"]["ENGINE"] = engine
+    for key, value in options.items():
+        DATABASES["default"]["OPTIONS"][key] = value
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 

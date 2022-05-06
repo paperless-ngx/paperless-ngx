@@ -79,7 +79,7 @@ To do the setup you need to perform the steps from the following chapters in a c
 6.  You can now either ...
 
     *  install redis or
-    *  use the included scripts/start-services.sh to use docker to fire up a redis instance (and some other services such as tika, gotenberg and a postgresql server) or
+    *  use the included scripts/start-services.sh to use docker to fire up a redis instance (and some other services such as tika, gotenberg and a database server) or
     *  spin up a bare redis container
 
         .. code:: shell-session

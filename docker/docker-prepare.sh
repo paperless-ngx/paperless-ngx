@@ -27,6 +27,30 @@ wait_for_postgres() {
 	done
 }
 
+wait_for_mariadb() {
+	echo "Waiting for MariaDB to start..."
+
+	host="${PAPERLESS_DBHOST:=localhost}"
+	port="${PAPERLESS_DBPORT:=3306}"
+
+	attempt_num=1
+	max_attempts=5
+
+	while ! </dev/tcp/$host/$port; do
+
+		if [ $attempt_num -eq $max_attempts ]; then
+			echo "Unable to connect to database."
+			exit 1
+		else
+			echo "Attempt $attempt_num failed! Trying again in 5 seconds..."
+
+		fi
+
+		attempt_num=$(expr "$attempt_num" + 1)
+		sleep 5
+	done
+}
+
 wait_for_redis() {
 	# We use a Python script to send the Redis ping
 	# instead of installing redis-tools just for 1 thing
@@ -64,7 +88,9 @@ superuser() {
 }
 
 do_work() {
-	if [[ -n "${PAPERLESS_DBHOST}" ]]; then
+	if [[ "${PAPERLESS_DBENGINE}" == "mariadb" ]]; then
+		wait_for_mariadb
+	elif [[ -n "${PAPERLESS_DBHOST}" ]]; then
 		wait_for_postgres
 	fi
 

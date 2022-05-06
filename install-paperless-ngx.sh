@@ -118,12 +118,12 @@ ask "Current time zone" "$default_time_zone"
 TIME_ZONE=$ask_result
 
 echo ""
-echo "Database backend: PostgreSQL and SQLite are available. Use PostgreSQL"
+echo "Database backend: PostgreSQL, MariaDB, and SQLite are available. Use PostgreSQL"
 echo "if unsure. If you're running on a low-power device such as Raspberry"
 echo "Pi, use SQLite to save resources."
 echo ""
 
-ask "Database backend" "postgres" "postgres sqlite"
+ask "Database backend" "postgres" "postgres sqlite" "mariadb"
 DATABASE_BACKEND=$ask_result
 
 echo ""
@@ -227,6 +227,18 @@ if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
 	POSTGRES_FOLDER=$ask_result
 fi
 
+if [[ "$DATABASE_BACKEND" == "mariadb" ]] ; then
+	echo ""
+	echo "The database folder, where mariadb stores its data."
+	echo ""
+	echo "CAUTION: If specified, you must specify an absolute path starting with /"
+	echo "or a relative path starting with ./ here."
+	echo ""
+
+	ask_docker_folder "Database folder" ""
+	MARIADB_FOLDER=$ask_result
+fi
+
 echo ""
 echo "3. Login credentials"
 echo "===================="
@@ -284,6 +296,9 @@ if [[ "$DATABASE_BACKEND" == "postgres" ]] ; then
 	else
 		echo "Database (postgres) folder: $POSTGRES_FOLDER"
 	fi
+fi
+if [[ "$DATABASE_BACKEND" == "mariadb" ]] ; then
+	echo "Database (mariadb) folder: $MARIADB_FOLDER"
 fi
 echo ""
 echo "URL: $URL"
@@ -359,6 +374,10 @@ fi
 if [[ -n $POSTGRES_FOLDER ]] ; then
 	sed -i "s#- pgdata:/var/lib/postgresql/data#- $POSTGRES_FOLDER:/var/lib/postgresql/data#g" docker-compose.yml
 	sed -i "/^\s*pgdata:/d" docker-compose.yml
+fi
+
+if [[ -n $MARIADB_FOLDER ]] ; then
+	sed -i "s#- dbdata:/var/lib/mariadb/data#- $MARIADB_FOLDER:/var/lib/mariadb/data#g" docker-compose.yml
 fi
 
 # remove trailing blank lines from end of file

@@ -42,6 +42,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG BUILD_PACKAGES="\
   build-essential \
   git \
+  mariadb-client \
   python3-dev"
 
 # Packages need for running
@@ -49,6 +50,7 @@ ARG RUNTIME_PACKAGES="\
   curl \
   file \
   # fonts for text file thumbnail generation
+  default-libmysqlclient-dev \
   fonts-liberation \
   gettext \
   ghostscript \
