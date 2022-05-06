@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 # Pull the installer images from the library
 # These are all built previously
 # They provide either a .deb or .whl
@@ -38,11 +40,16 @@ LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Packages needed only for building
-ARG BUILD_PACKAGES="\
-  build-essential \
-  git \
-  python3-dev"
+#
+# Begin installation and configuration
+# Order the steps below from least often changed to most
+#
+
+# copy jbig2enc
+# Basically will never change again
+COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
+COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/jbig2 /usr/local/bin/
+COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/*.h /usr/local/include/
 
 # Packages need for running
 ARG RUNTIME_PACKAGES="\
@@ -94,45 +101,81 @@ ARG RUNTIME_PACKAGES="\
   libzbar0 \
   poppler-utils"
 
-WORKDIR /usr/src/paperless/src/
+# Install basic runtime packages.
+# These change very infrequently
+RUN set -eux \
+  echo "Installing system packages" \
+    && apt-get update \
+    && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} \
+    && rm -rf /var/lib/apt/lists/* \
+  && echo "Installing supervisor" \
+    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.4
 
-# Copy qpdf and runtime library
-COPY --from=qpdf-builder /usr/src/qpdf/libqpdf28_*.deb ./
-COPY --from=qpdf-builder /usr/src/qpdf/qpdf_*.deb ./
+# Copy gunicorn config
+# Changes very infrequently
+WORKDIR /usr/src/paperless/
 
-# Copy pikepdf wheel and dependencies
-COPY --from=pikepdf-builder /usr/src/pikepdf/wheels/*.whl ./
+COPY gunicorn.conf.py .
 
-# Copy psycopg2 wheel
-COPY --from=psycopg2-builder /usr/src/psycopg2/wheels/psycopg2*.whl ./
+# setup docker-specific things
+# Use mounts to avoid copying installer files into the image
+# These change sometimes, but rarely
+WORKDIR /usr/src/paperless/src/docker/
 
-# copy jbig2enc
-COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/.libs/libjbig2enc* /usr/local/lib/
-COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/jbig2 /usr/local/bin/
-COPY --from=jbig2enc-builder /usr/src/jbig2enc/src/*.h /usr/local/include/
+RUN --mount=type=bind,readwrite,source=docker,target=./ \
+  set -eux \
+  && echo "Configuring ImageMagick" \
+    && cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
+  && echo "Configuring supervisord" \
+    && mkdir /var/log/supervisord /var/run/supervisord \
+    && cp supervisord.conf /etc/supervisord.conf \
+  && echo "Setting up Docker scripts" \
+    && cp docker-entrypoint.sh /sbin/docker-entrypoint.sh \
+    && chmod 755 /sbin/docker-entrypoint.sh \
+    && cp docker-prepare.sh /sbin/docker-prepare.sh \
+    && chmod 755 /sbin/docker-prepare.sh \
+    && cp wait-for-redis.py /sbin/wait-for-redis.py \
+    && chmod 755 /sbin/wait-for-redis.py \
+  && echo "Installing managment commands" \
+    && chmod +x install_management_commands.sh \
+    && ./install_management_commands.sh
 
-COPY requirements.txt ../
+# Install the built packages from the installer library images
+# Use mounts to avoid copying installer files into the image
+# These change sometimes
+RUN --mount=type=bind,from=qpdf-builder,target=/qpdf \
+    --mount=type=bind,from=psycopg2-builder,target=/psycopg2 \
+    --mount=type=bind,from=pikepdf-builder,target=/pikepdf \
+  set -eux \
+  && echo "Installing qpdf" \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/libqpdf28_*.deb \
+    && apt-get install --yes --no-install-recommends /qpdf/usr/src/qpdf/qpdf_*.deb \
+  && echo "Installing pikepdf and dependencies" \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/pikepdf/wheels/packaging*.whl \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/pikepdf/wheels/lxml*.whl \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/pikepdf/wheels/Pillow*.whl \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/pikepdf/wheels/pyparsing*.whl \
+    && python3 -m pip install --no-cache-dir /pikepdf/usr/src/pikepdf/wheels/pikepdf*.whl \
+    && python -m pip list \
+  && echo "Installing psycopg2" \
+    && python3 -m pip install --no-cache-dir /psycopg2/usr/src/psycopg2/wheels/psycopg2*.whl \
+    && python -m pip list
 
 # Python dependencies
+# Change pretty frequently
+COPY requirements.txt ../
+
+# Packages needed only for building a few quick Python
+# dependencies
+ARG BUILD_PACKAGES="\
+  build-essential \
+  python3-dev"
+
 RUN set -eux \
-  && apt-get update \
-  && apt-get install --yes --quiet --no-install-recommends ${RUNTIME_PACKAGES} ${BUILD_PACKAGES} \
-  && python3 -m pip install --no-cache-dir --upgrade wheel \
-  && echo "Installing qpdf" \
-    && apt-get install --yes --no-install-recommends ./libqpdf28_*.deb \
-    && apt-get install --yes --no-install-recommends ./qpdf_*.deb \
-  && echo "Installing pikepdf and dependencies wheel" \
-    && python3 -m pip install --no-cache-dir packaging*.whl \
-    && python3 -m pip install --no-cache-dir lxml*.whl \
-    && python3 -m pip install --no-cache-dir Pillow*.whl \
-    && python3 -m pip install --no-cache-dir pyparsing*.whl \
-    && python3 -m pip install --no-cache-dir pikepdf*.whl \
-    && python -m pip list \
-  && echo "Installing psycopg2 wheel" \
-    && python3 -m pip install --no-cache-dir psycopg2*.whl \
-    && python -m pip list \
-  && echo "Installing supervisor" \
-    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor \
+  && echo "Installing build system packages" \
+    && apt-get update \
+    && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
+    && python3 -m pip install --no-cache-dir --upgrade wheel \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --no-cache-dir -r ../requirements.txt \
   && echo "Cleaning up image" \
@@ -144,28 +187,6 @@ RUN set -eux \
     && rm -rf /var/tmp/* \
     && rm -rf /var/cache/apt/archives/* \
     && truncate -s 0 /var/log/*log
-
-# setup docker-specific things
-COPY docker/ ./docker/
-
-WORKDIR /usr/src/paperless/src/docker/
-
-RUN set -eux \
-  && cp imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
-  && mkdir /var/log/supervisord /var/run/supervisord \
-  && cp supervisord.conf /etc/supervisord.conf \
-  && cp docker-entrypoint.sh /sbin/docker-entrypoint.sh \
-  && chmod 755 /sbin/docker-entrypoint.sh \
-  && cp docker-prepare.sh /sbin/docker-prepare.sh \
-  && chmod 755 /sbin/docker-prepare.sh \
-  && cp wait-for-redis.py /sbin/wait-for-redis.py \
-  && chmod 755 /sbin/wait-for-redis.py \
-  && chmod +x install_management_commands.sh \
-  && ./install_management_commands.sh
-
-WORKDIR /usr/src/paperless/
-
-COPY gunicorn.conf.py .
 
 WORKDIR /usr/src/paperless/src/
 
