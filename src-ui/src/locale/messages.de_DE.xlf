@@ -33,7 +33,7 @@
           <context context-type="sourcefile">node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">205,206</context>
         </context-group>
-        <target state="needs-translation">Next</target>
+        <target state="translated">Weiter</target>
       </trans-unit>
       <trans-unit id="ngb.datepicker.select-month" datatype="html">
         <source>Select month</source>
@@ -195,7 +195,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">218,219</context>
         </context-group>
-        <target state="needs-translation">Increment hours</target>
+        <target state="translated">Stunden erhöhen</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html">
         <source>Decrement hours</source>
@@ -203,7 +203,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">240,243</context>
         </context-group>
-        <target state="needs-translation">Decrement hours</target>
+        <target state="translated">Stunden verringern</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html">
         <source>Increment minutes</source>
@@ -211,7 +211,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">Increment minutes</target>
+        <target state="translated">Minuten erhöhen</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html">
         <source>Decrement minutes</source>
@@ -219,7 +219,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">288,289</context>
         </context-group>
-        <target state="needs-translation">Decrement minutes</target>
+        <target state="translated">Minuten verringern</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
@@ -285,7 +285,7 @@
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Drop files to begin upload</target>
+        <target state="translated">Dateien ablegen um Upload zu beginnen</target>
       </trans-unit>
       <trans-unit id="9103526311244275943" datatype="html" approved="yes">
         <source>Document added</source>
@@ -345,7 +345,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">Initiating upload...</target>
+        <target state="translated">Starte Upload...</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
         <source>Paperless-ngx</source>
@@ -578,7 +578,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="needs-translation">Checking for updates is disabled.</target>
+        <target state="translated">Nach Updates suchen deaktiviert.</target>
       </trans-unit>
       <trans-unit id="3601519436351639860" datatype="html">
         <source>Click for more information.</source>
@@ -586,7 +586,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">193</context>
         </context-group>
-        <target state="needs-translation">Click for more information.</target>
+        <target state="translated">Klick für mehr Information.</target>
       </trans-unit>
       <trans-unit id="509090351011426949" datatype="html">
         <source>Update available</source>
