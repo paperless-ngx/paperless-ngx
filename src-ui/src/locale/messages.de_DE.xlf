@@ -17,7 +17,7 @@
           <context context-type="linenumber">154,159</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="keyboard 'arrow"/> of <x id="INTERPOLATION_1" equiv-text="t'.    */   @In"/> </target>
+        <target state="translated"> Folie <x id="INTERPOLATION" equiv-text="keyboard 'arrow"/> von <x id="INTERPOLATION_1" equiv-text="t'.    */   @In"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -163,7 +163,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">138,141</context>
         </context-group>
-        <target state="needs-translation">HH</target>
+        <target state="translated">HH</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.hours" datatype="html">
         <source>Hours</source>
@@ -179,7 +179,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">MM</target>
+        <target state="translated">MM</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.minutes" datatype="html">
         <source>Minutes</source>
@@ -227,7 +227,7 @@
           <context context-type="sourcefile">node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">295</context>
         </context-group>
-        <target state="needs-translation">SS</target>
+        <target state="translated">SS</target>
       </trans-unit>
       <trans-unit id="ngb.timepicker.seconds" datatype="html">
         <source>Seconds</source>
@@ -602,7 +602,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/confirm-dialog.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Cancel<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
+        <target state="translated"><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;d-inline-block&quot; style=&quot;padding-bottom: 1px;&quot; &gt;"/>Abbrechen<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
       <trans-unit id="1234709746630139322" datatype="html" approved="yes">
         <source>Confirmation</source>
@@ -1715,7 +1715,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">97,99</context>
         </context-group>
-        <target state="needs-translation">Error executing bulk operation: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">Fehler beim Ausführen der Massenverarbeitung: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
@@ -2417,7 +2417,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/>s}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {} =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> gesamt <x id="INTERPOLATION"/>s}}</target>
       </trans-unit>
       <trans-unit id="810888510148304696" datatype="html" approved="yes">
         <source>Automatic</source>
@@ -2437,7 +2437,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">139</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</target>
+        <target state="translated">Möchten Sie das Dokument "<x id="PH" equiv-text="this.typeName"/>" wirklich löschen?</target>
       </trans-unit>
       <trans-unit id="8371896857609524947" datatype="html" approved="yes">
         <source>Associated documents will not be deleted.</source>
@@ -2453,7 +2453,7 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
           <context context-type="linenumber">167,169</context>
         </context-group>
-        <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">Fehler beim Löschen des Elements: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
       <trans-unit id="6439365426343089851" datatype="html">
         <source>General</source>
@@ -2749,7 +2749,7 @@
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.ts</context>
           <context context-type="linenumber">264,266</context>
         </context-group>
-        <target state="needs-translation">Error while storing settings on server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
+        <target state="translated">Fehler beim Speichern der Einstellungen auf dem Server: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
       <trans-unit id="6402703264596649214" datatype="html">
         <source>tag</source>
