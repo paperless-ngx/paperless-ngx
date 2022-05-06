@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { FILTER_DOCUMENT_TYPE } from 'src/app/data/filter-rule-type'
 import { PaperlessDocumentType } from 'src/app/data/paperless-document-type'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -18,14 +18,14 @@ export class DocumentTypeListComponent extends ManagementListComponent<Paperless
     documentTypeService: DocumentTypeService,
     modalService: NgbModal,
     toastService: ToastService,
-    list: DocumentListViewService
+    queryParamsService: QueryParamsService
   ) {
     super(
       documentTypeService,
       modalService,
       DocumentTypeEditDialogComponent,
       toastService,
-      list,
+      queryParamsService,
       FILTER_DOCUMENT_TYPE,
       $localize`document type`,
       []

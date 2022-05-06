@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute, Params, Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import {
   cloneFilterRules,
@@ -220,6 +220,13 @@ export class DocumentListViewService {
     return this.activeListViewState.sortReverse
   }
 
+  get sortParams(): Params {
+    return {
+      sortField: this.sortField,
+      sortReverse: this.sortReverse,
+    }
+  }
+
   get collectionSize(): number {
     return this.activeListViewState.collectionSize
   }
@@ -263,14 +270,6 @@ export class DocumentListViewService {
         JSON.stringify(savedState)
       )
     }
-  }
-
-  quickFilter(filterRules: FilterRule[]) {
-    const params = this.documentService.filterRulesToQueryParams(filterRules)
-    this.router.navigate(['/documents'], {
-      relativeTo: this.route,
-      queryParams: params,
-    })
   }
 
   getLastPage(): number {
@@ -434,9 +433,7 @@ export class DocumentListViewService {
 
   constructor(
     private documentService: DocumentService,
-    private settings: SettingsService,
-    private router: Router,
-    private route: ActivatedRoute
+    private settings: SettingsService
   ) {
     let documentListViewConfigJson = localStorage.getItem(
       DOCUMENT_LIST_SERVICE.CURRENT_VIEW_CONFIG
