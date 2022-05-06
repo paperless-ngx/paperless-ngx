@@ -14,7 +14,7 @@ django = "~=4.0"
 django-cors-headers = "*"
 django-extensions = "*"
 django-filter = "~=21.1"
-django-q = "~=1.3"
+django-q = {editable = true, ref = "relock-deps", git = "https://github.com/stumpylog/django-q.git"}
 djangorestframework = "~=3.13"
 filelock = "*"
 fuzzywuzzy = {extras = ["speedup"], version = "*"}
