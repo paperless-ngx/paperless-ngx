@@ -119,31 +119,33 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.route.paramMap
       .pipe(
-        filter((params) => params.has('id')), // only on saved view
+        filter((params) => params.has('id')), // only on saved view e.g. /view/id
         switchMap((params) => {
           return this.savedViewService
             .getCached(+params.get('id'))
-            .pipe(map((view) => ({ params, view })))
+            .pipe(map((view) => ({ view })))
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(({ view, params }) => {
+      .subscribe(({ view }) => {
         if (!view) {
           this.router.navigate(['404'])
           return
         }
         this.list.activateSavedView(view)
         this.list.reload()
+        this.queryParamsService.updateFromView(view)
         this.unmodifiedFilterRules = view.filter_rules
       })
 
     this.route.queryParamMap
       .pipe(
-        filter(() => !this.route.snapshot.paramMap.has('id')), // only when not on saved view
+        filter(() => !this.route.snapshot.paramMap.has('id')), // only when not on /view/id
         takeUntil(this.unsubscribeNotifier)
       )
       .subscribe((queryParams) => {
         if (queryParams.has('view')) {
+          // loading a saved view on /documents
           this.loadViewConfig(parseInt(queryParams.get('view')))
         } else {
           this.list.activateSavedView(null)
@@ -176,11 +178,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe((view) => {
         this.list.loadSavedView(view)
         this.list.reload()
-        // update query params if needed
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { view: viewId },
-        })
+        this.queryParamsService.updateFromView(view)
       })
   }
 

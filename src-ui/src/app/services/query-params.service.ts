@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { ParamMap, Params, Router } from '@angular/router'
 import { FilterRule } from '../data/filter-rule'
 import { FILTER_RULE_TYPES } from '../data/filter-rule-type'
+import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { DocumentListViewService } from './document-list-view.service'
 
 const SORT_FIELD_PARAMETER = 'sort'
@@ -76,6 +77,19 @@ export class QueryParamsService {
       this.sortField = this.list.sortField
       this.sortReverse = this.list.sortReverse
     }
+  }
+
+  updateFromView(view: PaperlessSavedView) {
+    if (!this.router.routerState.snapshot.url.includes('/view/')) {
+      // navigation for /documents?view=
+      this.router.navigate([], {
+        queryParams: { view: view.id },
+      })
+    }
+    // make sure params are up-to-date
+    this.updateFilterRules(view.filter_rules, false)
+    this.sortParams[SORT_FIELD_PARAMETER] = this.list.sortField
+    this.sortParams[SORT_REVERSE_PARAMETER] = this.list.sortReverse
   }
 
   navigateWithFilterRules(filterRules: FilterRule[]) {
