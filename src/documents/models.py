@@ -470,12 +470,12 @@ class FileInfo:
 
 
 # Extending User Model Using a One-To-One Link
-class FrontendSettings(models.Model):
+class UiSettings(models.Model):
 
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name="frontend_settings",
+        related_name="ui_settings",
     )
     settings = models.JSONField(null=True)
 
@@ -484,6 +484,6 @@ class FrontendSettings(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_user_frontend_settings(sender, instance, created, **kwargs):
+def create_user_ui_settings(sender, instance, created, **kwargs):
     if created:
-        FrontendSettings.objects.create(user=instance)
+        UiSettings.objects.create(user=instance)

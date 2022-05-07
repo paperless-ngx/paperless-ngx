@@ -11,7 +11,6 @@ from documents.views import BulkDownloadView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import DocumentTypeViewSet
-from documents.views import FrontendSettingsView
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
@@ -21,6 +20,7 @@ from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
 from documents.views import StatisticsView
 from documents.views import TagViewSet
+from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
 from paperless.consumers import StatusConsumer
 from paperless.views import FaviconView
@@ -80,9 +80,9 @@ urlpatterns = [
                     name="remoteversion",
                 ),
                 re_path(
-                    r"^frontend_settings/",
-                    FrontendSettingsView.as_view(),
-                    name="frontend_settings",
+                    r"^ui_settings/",
+                    UiSettingsView.as_view(),
+                    name="ui_settings",
                 ),
                 path("token/", views.obtain_auth_token),
             ]

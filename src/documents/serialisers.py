@@ -11,11 +11,11 @@ from . import bulk_edit
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
-from .models import FrontendSettings
 from .models import MatchingModel
 from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import Tag
+from .models import UiSettings
 from .parsers import is_mime_type_supported
 
 
@@ -501,9 +501,9 @@ class BulkDownloadSerializer(DocumentListSerializer):
         }[compression]
 
 
-class FrontendSettingsViewSerializer(serializers.ModelSerializer):
+class UiSettingsViewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FrontendSettings
+        model = UiSettings
         depth = 1
         fields = [
             "id",
@@ -511,12 +511,12 @@ class FrontendSettingsViewSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        super(FrontendSettingsViewSerializer, self).update(instance, validated_data)
+        super(UiSettingsViewSerializer, self).update(instance, validated_data)
         return instance
 
     def create(self, validated_data):
-        frontend_settings = FrontendSettings.objects.update_or_create(
+        ui_settings = UiSettings.objects.update_or_create(
             user=validated_data.get("user"),
             defaults={"settings": validated_data.get("settings", None)},
         )
-        return frontend_settings
+        return ui_settings

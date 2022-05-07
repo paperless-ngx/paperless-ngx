@@ -3,8 +3,8 @@ describe('settings', () => {
     this.modifiedViews = []
 
     // mock API methods
-    cy.intercept('http://localhost:8000/api/frontend_settings/', {
-      fixture: 'frontend_settings/settings.json',
+    cy.intercept('http://localhost:8000/api/ui_settings/', {
+      fixture: 'ui_settings/settings.json',
     }).then(() => {
       cy.fixture('saved_views/savedviews.json').then((savedViewsJson) => {
         // saved views PATCH
