@@ -18,6 +18,7 @@ import {
 } from 'src/app/utils/color'
 import { environment } from 'src/environments/environment'
 import { Results } from '../data/results'
+import { ToastService } from './toast.service'
 
 export interface PaperlessSettings {
   key: string
@@ -146,7 +147,8 @@ export class SettingsService {
     private cookieService: CookieService,
     private meta: Meta,
     @Inject(LOCALE_ID) private localeId: string,
-    protected http: HttpClient
+    protected http: HttpClient,
+    private toastService: ToastService
   ) {
     this.renderer = rendererFactory.createRenderer(null, null)
   }
@@ -156,6 +158,7 @@ export class SettingsService {
     let settings$ = this.http.get<Results<any>>(this.baseUrl)
     settings$.pipe(first()).subscribe((response) => {
       Object.assign(this.settings, response['settings'])
+      this.maybeMigrateSettings()
     })
     return settings$
   }
@@ -446,5 +449,40 @@ export class SettingsService {
 
   storeSettings(): Observable<any> {
     return this.http.post(this.baseUrl, { settings: this.settings })
+  }
+
+  maybeMigrateSettings() {
+    if (
+      !this.settings.hasOwnProperty('documentListSize') &&
+      localStorage.getItem(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)
+    ) {
+      // lets migrate
+      const successMessage = $localize`Successfully completed one-time migratration of settings to the database!`
+      const errorMessage = $localize`Unable to migrate settings to the database, please try saving manually.`
+
+      try {
+        for (const setting in SETTINGS_KEYS) {
+          const key = SETTINGS_KEYS[setting]
+          const value = localStorage.getItem(key)
+          this.set(key, value)
+        }
+      } catch (error) {
+        this.toastService.showError(errorMessage)
+        console.log(error)
+      }
+
+      this.storeSettings()
+        .pipe(first())
+        .subscribe({
+          next: () => {
+            this.updateAppearanceSettings()
+            this.toastService.showInfo(successMessage)
+          },
+          error: (e) => {
+            this.toastService.showError(errorMessage)
+            console.log(e)
+          },
+        })
+    }
   }
 }
