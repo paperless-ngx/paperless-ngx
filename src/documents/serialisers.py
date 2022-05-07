@@ -11,6 +11,7 @@ from . import bulk_edit
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
+from .models import FrontendSettings
 from .models import MatchingModel
 from .models import SavedView
 from .models import SavedViewFilterRule
@@ -498,3 +499,21 @@ class BulkDownloadSerializer(DocumentListSerializer):
             "bzip2": zipfile.ZIP_BZIP2,
             "lzma": zipfile.ZIP_LZMA,
         }[compression]
+
+
+class FrontendSettingsViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FrontendSettings
+        depth = 1
+        fields = [
+            "id",
+            "settings",
+        ]
+
+    def update(self, instance, validated_data):
+        super(FrontendSettingsViewSerializer, self).update(instance, validated_data)
+        return instance
+
+    def create(self, validated_data):
+        frontend_settings = FrontendSettings.objects.create(**validated_data)
+        return frontend_settings

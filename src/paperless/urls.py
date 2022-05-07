@@ -11,6 +11,7 @@ from documents.views import BulkDownloadView
 from documents.views import BulkEditView
 from documents.views import CorrespondentViewSet
 from documents.views import DocumentTypeViewSet
+from documents.views import FrontendSettingsView
 from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import PostDocumentView
@@ -77,6 +78,11 @@ urlpatterns = [
                     r"^remote_version/",
                     RemoteVersionView.as_view(),
                     name="remoteversion",
+                ),
+                re_path(
+                    r"^frontend_settings/",
+                    FrontendSettingsView.as_view(),
+                    name="frontend_settings",
                 ),
                 path("token/", views.obtain_auth_token),
             ]
