@@ -144,7 +144,7 @@ const SETTINGS: PaperlessSettings[] = [
 })
 export class SettingsService {
   private renderer: Renderer2
-  protected baseUrl: string = environment.apiBaseUrl + 'frontend_settings/'
+  protected baseUrl: string = environment.apiBaseUrl + 'ui_settings/'
 
   private settings: Object = {}
 
