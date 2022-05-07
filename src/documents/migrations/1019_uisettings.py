@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="FrontendSettings",
+            name="UiSettings",
             fields=[
                 (
                     "id",
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                     "user",
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="frontend_settings",
+                        related_name="ui_settings",
                         to=settings.AUTH_USER_MODEL,
                     ),
                 ),

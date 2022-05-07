@@ -71,11 +71,11 @@ from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
 from .serialisers import DocumentSerializer
 from .serialisers import DocumentTypeSerializer
-from .serialisers import FrontendSettingsViewSerializer
 from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
 from .serialisers import TagSerializer
 from .serialisers import TagSerializerVersion1
+from .serialisers import UiSettingsViewSerializer
 
 logger = logging.getLogger("paperless.api")
 
@@ -719,10 +719,10 @@ class RemoteVersionView(GenericAPIView):
         )
 
 
-class FrontendSettingsView(GenericAPIView):
+class UiSettingsView(GenericAPIView):
 
     permission_classes = (IsAuthenticated,)
-    serializer_class = FrontendSettingsViewSerializer
+    serializer_class = UiSettingsViewSerializer
 
     def get(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
@@ -730,8 +730,8 @@ class FrontendSettingsView(GenericAPIView):
 
         user = User.objects.get(pk=request.user.id)
         settings = []
-        if hasattr(user, "frontend_settings"):
-            settings = user.frontend_settings.settings
+        if hasattr(user, "ui_settings"):
+            settings = user.ui_settings.settings
         return Response(
             {
                 "user_id": user.id,
