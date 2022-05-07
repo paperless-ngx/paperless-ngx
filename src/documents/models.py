@@ -9,6 +9,8 @@ import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from documents.parsers import get_default_file_extension
@@ -465,3 +467,23 @@ class FileInfo:
                 cls._mangle_property(properties, "created")
                 cls._mangle_property(properties, "title")
                 return cls(**properties)
+
+
+# Extending User Model Using a One-To-One Link
+class FrontendSettings(models.Model):
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="frontend_settings",
+    )
+    settings = models.JSONField(null=True)
+
+    def __str__(self):
+        return self.user.username
+
+
+@receiver(post_save, sender=User)
+def create_user_frontend_settings(sender, instance, created, **kwargs):
+    if created:
+        FrontendSettings.objects.create(user=instance)
