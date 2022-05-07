@@ -515,5 +515,8 @@ class FrontendSettingsViewSerializer(serializers.ModelSerializer):
         return instance
 
     def create(self, validated_data):
-        frontend_settings = FrontendSettings.objects.update_or_create(**validated_data)
+        frontend_settings = FrontendSettings.objects.update_or_create(
+            user=validated_data.get("user"),
+            defaults={"settings": validated_data.get("settings", None)},
+        )
         return frontend_settings
