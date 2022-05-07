@@ -1,0 +1,29 @@
+{
+    "bulk_edit": {
+        "apply_on_close": false,
+        "confirmation_dialogs": true
+    },
+    "dark_mode": {
+        "enabled": "false",
+        "thumb_inverted": "true",
+        "use_system": true
+    },
+    "date_display": {
+        "date_format": "mediumDate",
+        "date_locale": ""
+    },
+    "documentListSize": 50,
+    "document_details": {
+        "native_pdf_viewer": false
+    },
+    "language": "",
+    "notifications": {
+        "consumer_failed": true,
+        "consumer_new_documents": true,
+        "consumer_success": true,
+        "consumer_suppress_on_dashboard": true
+    },
+    "theme": {
+        "color": "#cd42cf"
+    }
+}
