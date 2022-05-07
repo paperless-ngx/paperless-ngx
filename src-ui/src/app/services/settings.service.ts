@@ -65,18 +65,46 @@ const SETTINGS: PaperlessSettings[] = [
     type: 'boolean',
     default: false,
   },
-  { key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE, type: 'number', default: 50 },
-  { key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM, type: 'boolean', default: true },
-  { key: SETTINGS_KEYS.DARK_MODE_ENABLED, type: 'boolean', default: false },
+  {
+    key: SETTINGS_KEYS.DOCUMENT_LIST_SIZE,
+    type: 'number',
+    default: 50,
+  },
+  {
+    key: SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
+    type: 'boolean',
+    default: true,
+  },
+  {
+    key: SETTINGS_KEYS.DARK_MODE_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
   {
     key: SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED,
     type: 'boolean',
     default: true,
   },
-  { key: SETTINGS_KEYS.THEME_COLOR, type: 'string', default: '' },
-  { key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, type: 'boolean', default: false },
-  { key: SETTINGS_KEYS.DATE_LOCALE, type: 'string', default: '' },
-  { key: SETTINGS_KEYS.DATE_FORMAT, type: 'string', default: 'mediumDate' },
+  {
+    key: SETTINGS_KEYS.THEME_COLOR,
+    type: 'string',
+    default: '',
+  },
+  {
+    key: SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.DATE_LOCALE,
+    type: 'string',
+    default: '',
+  },
+  {
+    key: SETTINGS_KEYS.DATE_FORMAT,
+    type: 'string',
+    default: 'mediumDate',
+  },
   {
     key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT,
     type: 'boolean',
