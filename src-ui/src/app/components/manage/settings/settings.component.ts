@@ -17,7 +17,7 @@ import {
 } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { Observable, Subscription, BehaviorSubject } from 'rxjs'
+import { Observable, Subscription, BehaviorSubject, first } from 'rxjs'
 
 @Component({
   selector: 'app-settings',
@@ -72,85 +72,93 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
   ngOnInit() {
     this.savedViewService.listAll().subscribe((r) => {
       this.savedViews = r.results
-      let storeData = {
-        bulkEditConfirmationDialogs: this.settings.get(
-          SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
-        ),
-        bulkEditApplyOnClose: this.settings.get(
-          SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
-        ),
-        documentListItemPerPage: this.settings.get(
-          SETTINGS_KEYS.DOCUMENT_LIST_SIZE
-        ),
-        darkModeUseSystem: this.settings.get(
-          SETTINGS_KEYS.DARK_MODE_USE_SYSTEM
-        ),
-        darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
-        darkModeInvertThumbs: this.settings.get(
-          SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED
-        ),
-        themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
-        useNativePdfViewer: this.settings.get(
-          SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
-        ),
-        savedViews: {},
-        displayLanguage: this.settings.getLanguage(),
-        dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
-        dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
-        notificationsConsumerNewDocument: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
-        ),
-        notificationsConsumerSuccess: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS
-        ),
-        notificationsConsumerFailed: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED
-        ),
-        notificationsConsumerSuppressOnDashboard: this.settings.get(
-          SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
-        ),
-      }
+      this.settings
+        .retrieveSettings()
+        .pipe(first())
+        .subscribe(() => {
+          let storeData = {
+            bulkEditConfirmationDialogs: this.settings.get(
+              SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS
+            ),
+            bulkEditApplyOnClose: this.settings.get(
+              SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
+            ),
+            documentListItemPerPage: this.settings.get(
+              SETTINGS_KEYS.DOCUMENT_LIST_SIZE
+            ),
+            darkModeUseSystem: this.settings.get(
+              SETTINGS_KEYS.DARK_MODE_USE_SYSTEM
+            ),
+            darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
+            darkModeInvertThumbs: this.settings.get(
+              SETTINGS_KEYS.DARK_MODE_THUMB_INVERTED
+            ),
+            themeColor: this.settings.get(SETTINGS_KEYS.THEME_COLOR),
+            useNativePdfViewer: this.settings.get(
+              SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER
+            ),
+            savedViews: {},
+            displayLanguage: this.settings.getLanguage(),
+            dateLocale: this.settings.get(SETTINGS_KEYS.DATE_LOCALE),
+            dateFormat: this.settings.get(SETTINGS_KEYS.DATE_FORMAT),
+            notificationsConsumerNewDocument: this.settings.get(
+              SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
+            ),
+            notificationsConsumerSuccess: this.settings.get(
+              SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS
+            ),
+            notificationsConsumerFailed: this.settings.get(
+              SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED
+            ),
+            notificationsConsumerSuppressOnDashboard: this.settings.get(
+              SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
+            ),
+          }
 
-      for (let view of this.savedViews) {
-        storeData.savedViews[view.id.toString()] = {
-          id: view.id,
-          name: view.name,
-          show_on_dashboard: view.show_on_dashboard,
-          show_in_sidebar: view.show_in_sidebar,
-        }
-        this.savedViewGroup.addControl(
-          view.id.toString(),
-          new FormGroup({
-            id: new FormControl(null),
-            name: new FormControl(null),
-            show_on_dashboard: new FormControl(null),
-            show_in_sidebar: new FormControl(null),
+          for (let view of this.savedViews) {
+            storeData.savedViews[view.id.toString()] = {
+              id: view.id,
+              name: view.name,
+              show_on_dashboard: view.show_on_dashboard,
+              show_in_sidebar: view.show_in_sidebar,
+            }
+            this.savedViewGroup.addControl(
+              view.id.toString(),
+              new FormGroup({
+                id: new FormControl(null),
+                name: new FormControl(null),
+                show_on_dashboard: new FormControl(null),
+                show_in_sidebar: new FormControl(null),
+              })
+            )
+          }
+
+          this.store = new BehaviorSubject(storeData)
+
+          this.storeSub = this.store.asObservable().subscribe((state) => {
+            this.settingsForm.patchValue(state, { emitEvent: false })
           })
-        )
-      }
 
-      this.store = new BehaviorSubject(storeData)
+          // Initialize dirtyCheck
+          this.isDirty$ = dirtyCheck(
+            this.settingsForm,
+            this.store.asObservable()
+          )
 
-      this.storeSub = this.store.asObservable().subscribe((state) => {
-        this.settingsForm.patchValue(state, { emitEvent: false })
-      })
+          // Record dirty in case we need to 'undo' appearance settings if not saved on close
+          this.isDirty$.subscribe((dirty) => {
+            this.isDirty = dirty
+          })
 
-      // Initialize dirtyCheck
-      this.isDirty$ = dirtyCheck(this.settingsForm, this.store.asObservable())
-
-      // Record dirty in case we need to 'undo' appearance settings if not saved on close
-      this.isDirty$.subscribe((dirty) => {
-        this.isDirty = dirty
-      })
-
-      // "Live" visual changes prior to save
-      this.settingsForm.valueChanges.subscribe(() => {
-        this.settings.updateAppearanceSettings(
-          this.settingsForm.get('darkModeUseSystem').value,
-          this.settingsForm.get('darkModeEnabled').value,
-          this.settingsForm.get('themeColor').value
-        )
-      })
+          // "Live" visual changes prior to save
+          this.settingsForm.valueChanges.subscribe(() => {
+            this.settings.updateAppearanceSettings(
+              this.settingsForm.get('darkModeUseSystem').value,
+              this.settingsForm.get('darkModeEnabled').value,
+              this.settingsForm.get('themeColor').value
+            )
+          })
+        })
     })
   }
 
@@ -227,10 +235,23 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       this.settingsForm.value.notificationsConsumerSuppressOnDashboard
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
-    this.store.next(this.settingsForm.value)
-    this.documentListViewService.updatePageSize()
-    this.settings.updateAppearanceSettings()
-    this.toastService.showInfo($localize`Settings saved successfully.`)
+    this.settings
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          this.store.next(this.settingsForm.value)
+          this.documentListViewService.updatePageSize()
+          this.settings.updateAppearanceSettings()
+          this.toastService.showInfo($localize`Settings saved successfully.`)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.log(error)
+        },
+      })
   }
 
   get displayLanguageOptions(): LanguageOption[] {

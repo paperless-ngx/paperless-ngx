@@ -1,4 +1,5 @@
 import { DOCUMENT } from '@angular/common'
+import { HttpClient } from '@angular/common/http'
 import {
   Inject,
   Injectable,
@@ -9,11 +10,14 @@ import {
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
+import { first, Observable } from 'rxjs'
 import {
   BRIGHTNESS,
   estimateBrightnessForColor,
   hexToHsl,
 } from 'src/app/utils/color'
+import { environment } from 'src/environments/environment'
+import { Results } from '../data/results'
 
 export interface PaperlessSettings {
   key: string
@@ -132,17 +136,34 @@ const SETTINGS: PaperlessSettings[] = [
 })
 export class SettingsService {
   private renderer: Renderer2
+  protected baseUrl: string = environment.apiBaseUrl + 'frontend_settings/'
+
+  private settings: Object = {}
+  private settings$: Observable<Results<any>>
 
   constructor(
-    private rendererFactory: RendererFactory2,
+    rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
     private cookieService: CookieService,
     private meta: Meta,
-    @Inject(LOCALE_ID) private localeId: string
+    @Inject(LOCALE_ID) private localeId: string,
+    protected http: HttpClient
   ) {
     this.renderer = rendererFactory.createRenderer(null, null)
 
-    this.updateAppearanceSettings()
+    this.retrieveSettings()
+      .pipe(first())
+      .subscribe((response) => {
+        Object.assign(this.settings, response['settings'])
+
+        this.updateAppearanceSettings()
+      })
+  }
+
+  public retrieveSettings(): Observable<Results<any>> {
+    if (!this.settings$)
+      this.settings$ = this.http.get<Results<any>>(this.baseUrl)
+    return this.settings$
   }
 
   public updateAppearanceSettings(
@@ -390,7 +411,16 @@ export class SettingsService {
       return null
     }
 
-    let value = localStorage.getItem(key)
+    let value = null
+    // parse key:key:key into nested object
+    const keys = key.replace('general-settings:', '').split(':')
+    let settingObj = this.settings
+    keys.forEach((keyPart, index) => {
+      keyPart = keyPart.replace(/-/g, '_')
+      if (!settingObj.hasOwnProperty(keyPart)) return
+      if (index == keys.length - 1) value = settingObj[keyPart]
+      else settingObj = settingObj[keyPart]
+    })
 
     if (value != null) {
       switch (setting.type) {
@@ -409,10 +439,18 @@ export class SettingsService {
   }
 
   set(key: string, value: any) {
-    localStorage.setItem(key, value.toString())
+    // parse key:key:key into nested object
+    let settingObj = this.settings
+    const keys = key.replace('general-settings:', '').split(':')
+    keys.forEach((keyPart, index) => {
+      keyPart = keyPart.replace(/-/g, '_')
+      if (!settingObj.hasOwnProperty(keyPart)) settingObj[keyPart] = {}
+      if (index == keys.length - 1) settingObj[keyPart] = value
+      else settingObj = settingObj[keyPart]
+    })
   }
 
-  unset(key: string) {
-    localStorage.removeItem(key)
+  storeSettings(): Observable<any> {
+    return this.http.post(this.baseUrl, { settings: this.settings })
   }
 }
