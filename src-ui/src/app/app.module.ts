@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser'
-import { NgModule } from '@angular/core'
+import { APP_INITIALIZER, NgModule } from '@angular/core'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import {
@@ -87,6 +87,8 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
+import { Observable } from 'rxjs'
+import { SettingsService } from './services/settings.service'
 
 registerLocaleData(localeBe)
 registerLocaleData(localeCs)
@@ -108,6 +110,12 @@ registerLocaleData(localeSr)
 registerLocaleData(localeSv)
 registerLocaleData(localeTr)
 registerLocaleData(localeZh)
+
+function initializeApp(settings: SettingsService) {
+  return () => {
+    return settings.initializeSettings()
+  }
+}
 
 @NgModule({
   declarations: [
@@ -174,6 +182,12 @@ registerLocaleData(localeZh)
     ColorSliderModule,
   ],
   providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [SettingsService],
+      multi: true,
+    },
     DatePipe,
     CookieService,
     {

@@ -139,7 +139,6 @@ export class SettingsService {
   protected baseUrl: string = environment.apiBaseUrl + 'frontend_settings/'
 
   private settings: Object = {}
-  private settings$: Observable<Results<any>>
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -150,20 +149,15 @@ export class SettingsService {
     protected http: HttpClient
   ) {
     this.renderer = rendererFactory.createRenderer(null, null)
-
-    this.retrieveSettings()
-      .pipe(first())
-      .subscribe((response) => {
-        Object.assign(this.settings, response['settings'])
-
-        this.updateAppearanceSettings()
-      })
   }
 
-  public retrieveSettings(): Observable<Results<any>> {
-    if (!this.settings$)
-      this.settings$ = this.http.get<Results<any>>(this.baseUrl)
-    return this.settings$
+  // this is called by the app initializer in app.module
+  public initializeSettings(): Observable<Results<any>> {
+    let settings$ = this.http.get<Results<any>>(this.baseUrl)
+    settings$.pipe(first()).subscribe((response) => {
+      Object.assign(this.settings, response['settings'])
+    })
+    return settings$
   }
 
   public updateAppearanceSettings(
