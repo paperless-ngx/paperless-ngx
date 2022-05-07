@@ -38,6 +38,8 @@ export interface LanguageOption {
 }
 
 export const SETTINGS_KEYS = {
+  LANGUAGE: 'language',
+  // maintain old general-settings: for backwards compatibility
   BULK_EDIT_CONFIRMATION_DIALOGS:
     'general-settings:bulk-edit:confirmation-dialogs',
   BULK_EDIT_APPLY_ON_CLOSE: 'general-settings:bulk-edit:apply-on-close',
@@ -60,6 +62,11 @@ export const SETTINGS_KEYS = {
 }
 
 const SETTINGS: PaperlessSettings[] = [
+  {
+    key: SETTINGS_KEYS.LANGUAGE,
+    type: 'string',
+    default: '',
+  },
   {
     key: SETTINGS_KEYS.BULK_EDIT_CONFIRMATION_DIALOGS,
     type: 'boolean',
@@ -379,11 +386,13 @@ export class SettingsService {
   }
 
   getLanguage(): string {
-    return this.cookieService.get(this.getLanguageCookieName())
+    return this.get(SETTINGS_KEYS.LANGUAGE)
   }
 
   setLanguage(language: string) {
-    if (language) {
+    this.set(SETTINGS_KEYS.LANGUAGE, language)
+    if (language?.length) {
+      // for Django
       this.cookieService.set(this.getLanguageCookieName(), language)
     } else {
       this.cookieService.delete(this.getLanguageCookieName())
@@ -466,6 +475,10 @@ export class SettingsService {
           const value = localStorage.getItem(key)
           this.set(key, value)
         }
+        this.set(
+          SETTINGS_KEYS.LANGUAGE,
+          this.cookieService.get(this.getLanguageCookieName())
+        )
       } catch (error) {
         this.toastService.showError(errorMessage)
         console.log(error)
