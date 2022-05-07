@@ -11,6 +11,7 @@ from unicodedata import normalize
 from urllib.parse import quote
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
@@ -70,6 +71,7 @@ from .serialisers import CorrespondentSerializer
 from .serialisers import DocumentListSerializer
 from .serialisers import DocumentSerializer
 from .serialisers import DocumentTypeSerializer
+from .serialisers import FrontendSettingsViewSerializer
 from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
 from .serialisers import TagSerializer
@@ -713,5 +715,38 @@ class RemoteVersionView(GenericAPIView):
                 "version": remote_version,
                 "update_available": is_greater_than_current,
                 "feature_is_set": feature_is_set,
+            },
+        )
+
+
+class FrontendSettingsView(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FrontendSettingsViewSerializer
+
+    def get(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = User.objects.get(pk=request.user.id)
+        settings = []
+        if hasattr(user, "frontend_settings"):
+            settings = user.frontend_settings.settings
+        return Response(
+            {
+                "user_id": user.id,
+                "settings": settings,
+            },
+        )
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(user=self.request.user)
+
+        return Response(
+            {
+                "success": True,
             },
         )
