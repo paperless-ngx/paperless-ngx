@@ -74,8 +74,12 @@ export class QueryParamsService {
     ) {
       // this is navigating to /documents so we need to update the params from the list
       this.updateFilterRules(this.list.filterRules, false)
-      this.sortField = this.list.sortField
-      this.sortReverse = this.list.sortReverse
+      this.sortParams[SORT_FIELD_PARAMETER] = this.list.sortField
+      this.sortParams[SORT_REVERSE_PARAMETER] = this.list.sortReverse
+      this.router.navigate([], {
+        queryParams: this.params,
+        replaceUrl: true,
+      })
     }
   }
 
