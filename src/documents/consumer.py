@@ -405,7 +405,7 @@ class Consumer(LoggingMixin):
             create_date = timezone.make_aware(
                 datetime.datetime.fromtimestamp(stats.st_mtime),
             )
-            self.log("debug", "Creation date from st_mtime: {create_date}")
+            self.log("debug", f"Creation date from st_mtime: {create_date}")
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
