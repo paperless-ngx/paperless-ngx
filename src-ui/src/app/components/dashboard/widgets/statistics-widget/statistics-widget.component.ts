@@ -15,6 +15,8 @@ export interface Statistics {
   styleUrls: ['./statistics-widget.component.scss'],
 })
 export class StatisticsWidgetComponent implements OnInit, OnDestroy {
+  loading: boolean = true
+
   constructor(
     private http: HttpClient,
     private consumerStatusService: ConsumerStatusService
@@ -29,7 +31,9 @@ export class StatisticsWidgetComponent implements OnInit, OnDestroy {
   }
 
   reload() {
+    this.loading = true
     this.getStatistics().subscribe((statistics) => {
+      this.loading = false
       this.statistics = statistics
     })
   }

@@ -15,6 +15,8 @@ import { QueryParamsService } from 'src/app/services/query-params.service'
   styleUrls: ['./saved-view-widget.component.scss'],
 })
 export class SavedViewWidgetComponent implements OnInit, OnDestroy {
+  loading: boolean = true
+
   constructor(
     private documentService: DocumentService,
     private router: Router,
@@ -43,6 +45,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
   }
 
   reload() {
+    this.loading = true
     this.documentService
       .listFiltered(
         1,
@@ -52,6 +55,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
         this.savedView.filter_rules
       )
       .subscribe((result) => {
+        this.loading = false
         this.documents = result.results
       })
   }
