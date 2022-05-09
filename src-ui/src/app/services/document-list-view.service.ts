@@ -8,9 +8,10 @@ import {
 } from '../data/filter-rule'
 import { PaperlessDocument } from '../data/paperless-document'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
+import { SETTINGS_KEYS } from '../data/paperless-uisettings'
 import { DOCUMENT_LIST_SERVICE } from '../data/storage-keys'
 import { DocumentService, DOCUMENT_SORT_FIELDS } from './rest/document.service'
-import { SettingsService, SETTINGS_KEYS } from './settings.service'
+import { SettingsService } from './settings.service'
 
 /**
  * Captures the current state of the list view.
