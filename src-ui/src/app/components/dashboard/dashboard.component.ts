@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'app-dashboard',
@@ -8,23 +9,14 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  constructor(public savedViewService: SavedViewService, private meta: Meta) {}
-
-  get displayName() {
-    let tagFullName = this.meta.getTag('name=full_name')
-    let tagUsername = this.meta.getTag('name=username')
-    if (tagFullName && tagFullName.content) {
-      return tagFullName.content
-    } else if (tagUsername && tagUsername.content) {
-      return tagUsername.content
-    } else {
-      return null
-    }
-  }
+  constructor(
+    public savedViewService: SavedViewService,
+    public settingsService: SettingsService
+  ) {}
 
   get subtitle() {
-    if (this.displayName) {
-      return $localize`Hello ${this.displayName}, welcome to Paperless-ngx!`
+    if (this.settingsService.displayName) {
+      return $localize`Hello ${this.settingsService.displayName}, welcome to Paperless-ngx!`
     } else {
       return $localize`Welcome to Paperless-ngx!`
     }
