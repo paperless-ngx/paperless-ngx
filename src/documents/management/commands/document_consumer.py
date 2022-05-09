@@ -28,8 +28,11 @@ def _tags_from_path(filepath):
     """Walk up the directory tree from filepath to CONSUMPTION_DIR
     and get or create Tag IDs for every directory.
     """
+    normalized_consumption_dir = os.path.abspath(
+        os.path.normpath(settings.CONSUMPTION_DIR),
+    )
     tag_ids = set()
-    path_parts = Path(filepath).relative_to(settings.CONSUMPTION_DIR).parent.parts
+    path_parts = Path(filepath).relative_to(normalized_consumption_dir).parent.parts
     for part in path_parts:
         tag_ids.add(
             Tag.objects.get_or_create(name__iexact=part, defaults={"name": part})[0].pk,
@@ -39,7 +42,10 @@ def _tags_from_path(filepath):
 
 
 def _is_ignored(filepath: str) -> bool:
-    filepath_relative = PurePath(filepath).relative_to(settings.CONSUMPTION_DIR)
+    normalized_consumption_dir = os.path.abspath(
+        os.path.normpath(settings.CONSUMPTION_DIR),
+    )
+    filepath_relative = PurePath(filepath).relative_to(normalized_consumption_dir)
     return any(filepath_relative.match(p) for p in settings.CONSUMER_IGNORE_PATTERNS)
 
 
@@ -159,6 +165,8 @@ class Command(BaseCommand):
 
         if not directory:
             raise CommandError("CONSUMPTION_DIR does not appear to be set.")
+
+        directory = os.path.abspath(directory)
 
         if not os.path.isdir(directory):
             raise CommandError(f"Consumption directory {directory} does not exist")
