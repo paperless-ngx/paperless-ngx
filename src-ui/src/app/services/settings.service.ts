@@ -44,6 +44,8 @@ export class SettingsService {
 
   private settings: Object = {}
 
+  public displayName: string
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document,
@@ -62,6 +64,7 @@ export class SettingsService {
     settings$.pipe(first()).subscribe((uisettings) => {
       Object.assign(this.settings, uisettings.settings)
       this.maybeMigrateSettings()
+      this.displayName = uisettings.display_name.trim()
     })
     return settings$
   }
