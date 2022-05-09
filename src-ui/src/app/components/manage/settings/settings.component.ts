@@ -13,11 +13,11 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import {
   LanguageOption,
   SettingsService,
-  SETTINGS_KEYS,
 } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { Observable, Subscription, BehaviorSubject, first } from 'rxjs'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-settings',
