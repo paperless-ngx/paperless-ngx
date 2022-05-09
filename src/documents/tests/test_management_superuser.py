@@ -1,29 +1,15 @@
 import os
-import shutil
 from io import StringIO
 from unittest import mock
 
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase
-from documents.management.commands.document_thumbnails import _process_document
-from documents.models import Correspondent
-from documents.models import Document
-from documents.models import DocumentType
-from documents.models import Tag
 from documents.tests.utils import DirectoriesMixin
 
 
 class TestManageSuperUser(DirectoriesMixin, TestCase):
-    def reset_environment(self):
-        if "PAPERLESS_ADMIN_PASSWORD" in os.environ:
-            del os.environ["PAPERLESS_ADMIN_PASSWORD"]
-        if "PAPERLESS_ADMIN_USER" in os.environ:
-            del os.environ["PAPERLESS_ADMIN_USER"]
-        if "PAPERLESS_ADMIN_MAIL" in os.environ:
-            del os.environ["PAPERLESS_ADMIN_MAIL"]
-
-    def call_command(self, environ, *args, **kwargs):
+    def call_command(self, environ):
         out = StringIO()
         with mock.patch.dict(os.environ, environ):
             call_command(
@@ -31,7 +17,6 @@ class TestManageSuperUser(DirectoriesMixin, TestCase):
                 "--no-color",
                 stdout=out,
                 stderr=StringIO(),
-                **kwargs,
             )
         return out.getvalue()
 
