@@ -55,7 +55,7 @@ class Command(BaseCommand):
 
         for document in encrypted_files:
 
-            print("Decrypting {}".format(document).encode("utf-8"))
+            print(f"Decrypting {document}".encode())
 
             old_paths = [document.source_path, document.thumbnail_path]
 

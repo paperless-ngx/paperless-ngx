@@ -57,7 +57,7 @@ def load_classifier():
     return classifier
 
 
-class DocumentClassifier(object):
+class DocumentClassifier:
 
     # v7 - Updated scikit-learn package version
     FORMAT_VERSION = 7
@@ -144,12 +144,10 @@ class DocumentClassifier(object):
             labels_correspondent.append(y)
 
             tags = sorted(
-                [
-                    tag.pk
-                    for tag in doc.tags.filter(
-                        matching_algorithm=MatchingModel.MATCH_AUTO,
-                    )
-                ],
+                tag.pk
+                for tag in doc.tags.filter(
+                    matching_algorithm=MatchingModel.MATCH_AUTO,
+                )
             )
             for tag in tags:
                 m.update(tag.to_bytes(4, "little", signed=True))
@@ -163,7 +161,7 @@ class DocumentClassifier(object):
         if self.data_hash and new_data_hash == self.data_hash:
             return False
 
-        labels_tags_unique = set([tag for tags in labels_tags for tag in tags])
+        labels_tags_unique = {tag for tags in labels_tags for tag in tags}
 
         num_tags = len(labels_tags_unique)
 

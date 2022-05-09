@@ -64,7 +64,7 @@ def train_classifier():
     try:
         if classifier.train():
             logger.info(
-                "Saving updated classifier model to {}...".format(settings.MODEL_FILE),
+                f"Saving updated classifier model to {settings.MODEL_FILE}...",
             )
             classifier.save()
         else:
@@ -165,7 +165,7 @@ def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
         for n, page in enumerate(pdf.pages):
             if n < pages_to_split_on[0]:
                 dst.pages.append(page)
-        output_filename = "{}_document_0.pdf".format(fname)
+        output_filename = f"{fname}_document_0.pdf"
         savepath = os.path.join(tempdir, output_filename)
         with open(savepath, "wb") as out:
             dst.save(out)
@@ -185,7 +185,7 @@ def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
                     f"page_number: {str(page_number)} next_page: {str(next_page)}",
                 )
                 dst.pages.append(pdf.pages[page])
-            output_filename = "{}_document_{}.pdf".format(fname, str(count + 1))
+            output_filename = f"{fname}_document_{str(count + 1)}.pdf"
             logger.debug(f"pdf no:{str(count)} has {str(len(dst.pages))} pages")
             savepath = os.path.join(tempdir, output_filename)
             with open(savepath, "wb") as out:
@@ -266,9 +266,9 @@ def consume_file(
                 # if we got here, the document was successfully split
                 # and can safely be deleted
                 if converted_tiff:
-                    logger.debug("Deleting file {}".format(file_to_process))
+                    logger.debug(f"Deleting file {file_to_process}")
                     os.unlink(file_to_process)
-                logger.debug("Deleting file {}".format(path))
+                logger.debug(f"Deleting file {path}")
                 os.unlink(path)
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck
@@ -306,7 +306,7 @@ def consume_file(
     )
 
     if document:
-        return "Success. New document id {} created".format(document.pk)
+        return f"Success. New document id {document.pk} created"
     else:
         raise ConsumerError(
             "Unknown error: Returned document was null, but "

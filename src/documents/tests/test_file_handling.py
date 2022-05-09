@@ -32,12 +32,12 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         document.storage_type = Document.STORAGE_TYPE_UNENCRYPTED
         document.save()
 
-        self.assertEqual(generate_filename(document), "{:07d}.pdf".format(document.pk))
+        self.assertEqual(generate_filename(document), f"{document.pk:07d}.pdf")
 
         document.storage_type = Document.STORAGE_TYPE_GPG
         self.assertEqual(
             generate_filename(document),
-            "{:07d}.pdf.gpg".format(document.pk),
+            f"{document.pk:07d}.pdf.gpg",
         )
 
     @override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{correspondent}")
@@ -50,7 +50,7 @@ class TestFileHandling(DirectoriesMixin, TestCase):
         # Test default source_path
         self.assertEqual(
             document.source_path,
-            settings.ORIGINALS_DIR + "/{:07d}.pdf".format(document.pk),
+            settings.ORIGINALS_DIR + f"/{document.pk:07d}.pdf",
         )
 
         document.filename = generate_filename(document)

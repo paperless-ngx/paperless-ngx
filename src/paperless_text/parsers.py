@@ -18,7 +18,7 @@ class TextDocumentParser(DocumentParser):
 
     def get_thumbnail(self, document_path, mime_type, file_name=None):
         def read_text():
-            with open(document_path, "r") as src:
+            with open(document_path) as src:
                 lines = [line.strip() for line in src.readlines()]
                 text = "\n".join(lines[:50])
                 return text
@@ -38,5 +38,5 @@ class TextDocumentParser(DocumentParser):
         return out_path
 
     def parse(self, document_path, mime_type, file_name=None):
-        with open(document_path, "r") as f:
+        with open(document_path) as f:
             self.text = f.read()

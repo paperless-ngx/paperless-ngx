@@ -41,7 +41,7 @@ class TestAttributes(TestCase):
 
         self.assertEqual(file_info.title, title, filename)
 
-        self.assertEqual(tuple([t.name for t in file_info.tags]), tags, filename)
+        self.assertEqual(tuple(t.name for t in file_info.tags), tags, filename)
 
     def test_guess_attributes_from_name_when_title_starts_with_dash(self):
         self._test_guess_attributes_from_name(
@@ -176,7 +176,7 @@ class DummyParser(DocumentParser):
         raise NotImplementedError()
 
     def __init__(self, logging_group, scratch_dir, archive_path):
-        super(DummyParser, self).__init__(logging_group, None)
+        super().__init__(logging_group, None)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
         self.archive_path = archive_path
 
@@ -195,7 +195,7 @@ class CopyParser(DocumentParser):
         return self.fake_thumb
 
     def __init__(self, logging_group, progress_callback=None):
-        super(CopyParser, self).__init__(logging_group, progress_callback)
+        super().__init__(logging_group, progress_callback)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=self.tempdir)
 
     def parse(self, document_path, mime_type, file_name=None):
@@ -210,7 +210,7 @@ class FaultyParser(DocumentParser):
         raise NotImplementedError()
 
     def __init__(self, logging_group, scratch_dir):
-        super(FaultyParser, self).__init__(logging_group)
+        super().__init__(logging_group)
         _, self.fake_thumb = tempfile.mkstemp(suffix=".png", dir=scratch_dir)
 
     def get_optimised_thumbnail(self, document_path, mime_type, file_name=None):
@@ -270,7 +270,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
         return FaultyParser(logging_group, self.dirs.scratch_dir)
 
     def setUp(self):
-        super(TestConsumer, self).setUp()
+        super().setUp()
 
         patcher = mock.patch("documents.parsers.document_consumer_declaration.send")
         m = patcher.start()

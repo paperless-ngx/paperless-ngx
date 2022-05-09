@@ -32,7 +32,7 @@ class OriginalsOnlyStrategy(BulkArchiveStrategy):
 
 class ArchiveOnlyStrategy(BulkArchiveStrategy):
     def __init__(self, zipf):
-        super(ArchiveOnlyStrategy, self).__init__(zipf)
+        super().__init__(zipf)
 
     def add_document(self, doc: Document):
         if doc.has_archive_version:

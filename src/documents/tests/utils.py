@@ -76,10 +76,10 @@ class DirectoriesMixin:
 
     def setUp(self) -> None:
         self.dirs = setup_directories()
-        super(DirectoriesMixin, self).setUp()
+        super().setUp()
 
     def tearDown(self) -> None:
-        super(DirectoriesMixin, self).tearDown()
+        super().tearDown()
         remove_dirs(self.dirs)
 
 
@@ -93,7 +93,7 @@ class TestMigrations(TransactionTestCase):
     auto_migrate = True
 
     def setUp(self):
-        super(TestMigrations, self).setUp()
+        super().setUp()
 
         assert (
             self.migrate_from and self.migrate_to
