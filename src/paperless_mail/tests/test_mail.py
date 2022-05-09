@@ -28,7 +28,7 @@ from paperless_mail.models import MailRule
 
 
 @dataclasses.dataclass
-class _AttachmentDef(object):
+class _AttachmentDef:
     filename: str = "a_file.pdf"
     maintype: str = "application/pdf"
     subtype: str = "pdf"
@@ -45,7 +45,7 @@ class BogusFolderManager:
         self.current_folder = new_folder
 
 
-class BogusClient(object):
+class BogusClient:
     def authenticate(self, mechanism, authobject):
         # authobject must be a callable object
         auth_bytes = authobject(None)
@@ -205,7 +205,7 @@ class TestMail(DirectoriesMixin, TestCase):
         self.reset_bogus_mailbox()
 
         self.mail_account_handler = MailAccountHandler()
-        super(TestMail, self).setUp()
+        super().setUp()
 
     def reset_bogus_mailbox(self):
         self.bogus_mailbox.messages = []
@@ -473,7 +473,7 @@ class TestMail(DirectoriesMixin, TestCase):
 
             self.assertEqual(result, len(matches), f"Error with pattern: {pattern}")
             filenames = sorted(
-                [a[1]["override_filename"] for a in self.async_task.call_args_list],
+                a[1]["override_filename"] for a in self.async_task.call_args_list
             )
             self.assertListEqual(filenames, matches)
 

@@ -35,7 +35,7 @@ class DocumentTypeFilterSet(FilterSet):
 
 class TagsFilter(Filter):
     def __init__(self, exclude=False, in_list=False):
-        super(TagsFilter, self).__init__()
+        super().__init__()
         self.exclude = exclude
         self.in_list = in_list
 

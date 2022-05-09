@@ -82,7 +82,7 @@ class TestRetagger(DirectoriesMixin, TestCase):
         )
 
     def setUp(self) -> None:
-        super(TestRetagger, self).setUp()
+        super().setUp()
         self.make_models()
 
     def test_add_tags(self):

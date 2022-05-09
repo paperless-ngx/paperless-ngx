@@ -65,7 +65,7 @@ class TestExportImport(DirectoriesMixin, TestCase):
         self.d1.correspondent = self.c1
         self.d1.document_type = self.dt1
         self.d1.save()
-        super(TestExportImport, self).setUp()
+        super().setUp()
 
     def _get_document_from_manifest(self, manifest, id):
         f = list(
