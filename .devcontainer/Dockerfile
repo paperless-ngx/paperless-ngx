@@ -15,7 +15,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends imagemagick fonts-liberation optipng gnupg libmagic-dev mime-support
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends unpaper ghostscript icc-profiles-free qpdf liblept5 libxml2 pngquant zlib1g tesseract-ocr tesseract-ocr-eng tesseract-ocr-deu
+    && apt-get -y install --no-install-recommends unpaper ghostscript icc-profiles-free qpdf liblept5 libxml2 pngquant zlib1g tesseract-ocr tesseract-ocr-eng tesseract-ocr-deu poppler-utils
 
 RUN mkdir workspace && cd /workspace \
     && git clone https://github.com/qpdf/qpdf.git \

@@ -109,7 +109,7 @@ def update_document(writer, doc):
         modified=doc.modified,
         path=doc.storage_path.name if doc.storage_path else None,
         path_id=doc.storage_path.id if doc.storage_path else None,
-        has_path=doc.storage_path is not None,
+        has_path=doc.storage_path is not None,        
     )
 
 
@@ -163,6 +163,11 @@ class DelayedQuery:
                 criterias.append(query.DateRange("added", start=isoparse(v), end=None))
             elif k == "added__date__lt":
                 criterias.append(query.DateRange("added", start=None, end=isoparse(v)))
+            elif k == "storage_path__id":
+                criterias.append(query.Term("path_id", v))
+            elif k == "storage_path__isnull":
+                criterias.append(query.Term("has_path", v == "false"))
+
         if len(criterias) > 0:
             return query.And(criterias)
         else:
