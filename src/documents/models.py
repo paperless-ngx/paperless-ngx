@@ -379,6 +379,10 @@ class SavedViewFilterRule(models.Model):
 
 
 # TODO: why is this in the models file?
+# TODO: how about, what is this and where is it documented?
+# It appears to parsing JSON from an environment variable to get a title and date from
+# the filename, if possible, as a higher priority than either document filename or
+# content parsing
 class FileInfo:
 
     REGEXES = OrderedDict(
@@ -386,8 +390,7 @@ class FileInfo:
             (
                 "created-title",
                 re.compile(
-                    r"^(?P<created>\d\d\d\d\d\d\d\d(\d\d\d\d\d\d)?Z) - "
-                    r"(?P<title>.*)$",
+                    r"^(?P<created>\d{8}(\d{6})?Z) - " r"(?P<title>.*)$",
                     flags=re.IGNORECASE,
                 ),
             ),
@@ -427,7 +430,7 @@ class FileInfo:
             properties[name] = getattr(cls, f"_get_{name}")(properties[name])
 
     @classmethod
-    def from_filename(cls, filename):
+    def from_filename(cls, filename) -> "FileInfo":
         # Mutate filename in-place before parsing its components
         # by applying at most one of the configured transformations.
         for (pattern, repl) in settings.FILENAME_PARSE_TRANSFORMS:

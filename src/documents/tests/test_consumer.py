@@ -1,9 +1,12 @@
+import datetime
 import os
 import re
 import shutil
 import tempfile
 from unittest import mock
 from unittest.mock import MagicMock
+
+from dateutil import tz
 
 try:
     import zoneinfo
@@ -502,7 +505,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 
         self.assertRaisesMessage(
             ConsumerError,
-            "sample.pdf: The following error occured while consuming sample.pdf: NO.",
+            "sample.pdf: The following error occurred while consuming sample.pdf: NO.",
             self.consumer.try_consume_file,
             filename,
         )
@@ -652,6 +655,127 @@ class TestConsumer(DirectoriesMixin, TestCase):
         self.assertEqual(doc3.archive_filename, "simple.png.pdf")
 
         sanity_check()
+
+
+@mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
+class TestConsumerCreatedDate(DirectoriesMixin, TestCase):
+    def setUp(self):
+        super(TestConsumerCreatedDate, self).setUp()
+
+        # this prevents websocket message reports during testing.
+        patcher = mock.patch("documents.consumer.Consumer._send_progress")
+        self._send_progress = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.consumer = Consumer()
+
+    def test_consume_date_from_content(self):
+        """
+        GIVEN:
+            - File content with date in DMY (default) format
+
+        THEN:
+            - Should parse the date from the file content
+        """
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "documents",
+            "originals",
+            "0000005.pdf",
+        )
+        dst = os.path.join(self.dirs.scratch_dir, "sample.pdf")
+        shutil.copy(src, dst)
+
+        document = self.consumer.try_consume_file(dst)
+
+        self.assertEqual(
+            document.created,
+            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    @override_settings(FILENAME_DATE_ORDER="YMD")
+    def test_consume_date_from_filename(self):
+        """
+        GIVEN:
+            - File content with date in DMY (default) format
+            - Filename with date in YMD format
+
+        THEN:
+            - Should parse the date from the filename
+        """
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "documents",
+            "originals",
+            "0000005.pdf",
+        )
+        dst = os.path.join(self.dirs.scratch_dir, "Scan - 2022-02-01.pdf")
+        shutil.copy(src, dst)
+
+        document = self.consumer.try_consume_file(dst)
+
+        self.assertEqual(
+            document.created,
+            datetime.datetime(2022, 2, 1, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    def test_consume_date_filename_date_use_content(self):
+        """
+        GIVEN:
+            - File content with date in DMY (default) format
+            - Filename date parsing disabled
+            - Filename with date in YMD format
+
+        THEN:
+            - Should parse the date from the content
+        """
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "documents",
+            "originals",
+            "0000005.pdf",
+        )
+        dst = os.path.join(self.dirs.scratch_dir, "Scan - 2022-02-01.pdf")
+        shutil.copy(src, dst)
+
+        document = self.consumer.try_consume_file(dst)
+
+        self.assertEqual(
+            document.created,
+            datetime.datetime(1996, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    @override_settings(
+        IGNORE_DATES=(datetime.date(2010, 12, 13), datetime.date(2011, 11, 12)),
+    )
+    def test_consume_date_use_content_with_ignore(self):
+        """
+        GIVEN:
+            - File content with dates in DMY (default) format
+            - File content includes ignored dates
+
+        THEN:
+            - Should parse the date from the filename
+        """
+        src = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "documents",
+            "originals",
+            "0000006.pdf",
+        )
+        dst = os.path.join(self.dirs.scratch_dir, "0000006.pdf")
+        shutil.copy(src, dst)
+
+        document = self.consumer.try_consume_file(dst)
+
+        self.assertEqual(
+            document.created,
+            datetime.datetime(1997, 2, 20, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
 
 
 class PreConsumeTestCase(TestCase):
