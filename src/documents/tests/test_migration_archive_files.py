@@ -22,7 +22,7 @@ def archive_path_old(self):
     if self.filename:
         fname = archive_name_from_filename(self.filename)
     else:
-        fname = "{:07}.pdf".format(self.pk)
+        fname = f"{self.pk:07}.pdf"
 
     return os.path.join(settings.ARCHIVE_DIR, fname)
 
@@ -38,7 +38,7 @@ def source_path(doc):
     if doc.filename:
         fname = str(doc.filename)
     else:
-        fname = "{:07}{}".format(doc.pk, doc.file_type)
+        fname = f"{doc.pk:07}{doc.file_type}"
         if doc.storage_type == STORAGE_TYPE_GPG:
             fname += ".gpg"  # pragma: no cover
 
@@ -46,7 +46,7 @@ def source_path(doc):
 
 
 def thumbnail_path(doc):
-    file_name = "{:07}.png".format(doc.pk)
+    file_name = f"{doc.pk:07}.png"
     if doc.storage_type == STORAGE_TYPE_GPG:
         file_name += ".gpg"
 

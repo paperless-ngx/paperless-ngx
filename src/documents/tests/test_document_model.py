@@ -3,6 +3,11 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+try:
+    import zoneinfo
+except ImportError:
+    import backports.zoneinfo as zoneinfo
+
 from django.test import override_settings
 from django.test import TestCase
 from django.utils import timezone
@@ -52,6 +57,24 @@ class TestDocument(TestCase):
             mime_type="application/pdf",
             title="test",
             created=timezone.datetime(2020, 12, 25),
+        )
+        self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
+
+    def test_file_name_with_timezone(self):
+
+        doc = Document(
+            mime_type="application/pdf",
+            title="test",
+            created=timezone.datetime(
+                2020,
+                12,
+                25,
+                0,
+                0,
+                0,
+                0,
+                zoneinfo.ZoneInfo("Europe/Berlin"),
+            ),
         )
         self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
 

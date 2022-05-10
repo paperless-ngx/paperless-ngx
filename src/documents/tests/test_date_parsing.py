@@ -16,7 +16,7 @@ class TestDate(TestCase):
         os.path.dirname(__file__),
         "../../paperless_tesseract/tests/samples",
     )
-    SCRATCH = "/tmp/paperless-tests-{}".format(str(uuid4())[:8])
+    SCRATCH = f"/tmp/paperless-tests-{str(uuid4())[:8]}"
 
     def setUp(self):
         os.makedirs(self.SCRATCH, exist_ok=True)

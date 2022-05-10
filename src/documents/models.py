@@ -1,4 +1,3 @@
-# coding=utf-8
 import datetime
 import logging
 import os
@@ -11,7 +10,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.utils.timezone import is_aware
 from django.utils.translation import gettext_lazy as _
 from documents.parsers import get_default_file_extension
 
@@ -210,10 +208,8 @@ class Document(models.Model):
         verbose_name_plural = _("documents")
 
     def __str__(self):
-        if is_aware(self.created):
-            created = timezone.localdate(self.created).isoformat()
-        else:
-            created = datetime.date.isoformat(self.created)
+        created = datetime.date.isoformat(self.created)
+
         if self.correspondent and self.title:
             return f"{created} {self.correspondent} {self.title}"
         else:
@@ -224,7 +220,7 @@ class Document(models.Model):
         if self.filename:
             fname = str(self.filename)
         else:
-            fname = "{:07}{}".format(self.pk, self.file_type)
+            fname = f"{self.pk:07}{self.file_type}"
             if self.storage_type == self.STORAGE_TYPE_GPG:
                 fname += ".gpg"  # pragma: no cover
 
@@ -271,7 +267,7 @@ class Document(models.Model):
 
     @property
     def thumbnail_path(self):
-        file_name = "{:07}.png".format(self.pk)
+        file_name = f"{self.pk:07}.png"
         if self.storage_type == self.STORAGE_TYPE_GPG:
             file_name += ".gpg"
 
@@ -417,7 +413,7 @@ class FileInfo:
     @classmethod
     def _get_created(cls, created):
         try:
-            return dateutil.parser.parse("{:0<14}Z".format(created[:-1]))
+            return dateutil.parser.parse(f"{created[:-1]:0<14}Z")
         except ValueError:
             return None
 
@@ -428,7 +424,7 @@ class FileInfo:
     @classmethod
     def _mangle_property(cls, properties, name):
         if name in properties:
-            properties[name] = getattr(cls, "_get_{}".format(name))(properties[name])
+            properties[name] = getattr(cls, f"_get_{name}")(properties[name])
 
     @classmethod
     def from_filename(cls, filename):

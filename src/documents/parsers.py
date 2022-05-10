@@ -143,7 +143,7 @@ def run_convert(
     logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
 
     if not subprocess.Popen(args, env=environment).wait() == 0:
-        raise ParseError("Convert failed at {}".format(args))
+        raise ParseError(f"Convert failed at {args}")
 
 
 def get_default_thumbnail():
@@ -164,7 +164,7 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None):
     cmd = [settings.GS_BINARY, "-q", "-sDEVICE=pngalpha", "-o", gs_out_path, in_path]
     try:
         if not subprocess.Popen(cmd).wait() == 0:
-            raise ParseError("Thumbnail (gs) failed at {}".format(cmd))
+            raise ParseError(f"Thumbnail (gs) failed at {cmd}")
         # then run convert on the output from gs
         run_convert(
             density=300,
@@ -199,7 +199,7 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
             strip=True,
             trim=False,
             auto_orient=True,
-            input_file="{}[0]".format(in_path),
+            input_file=f"{in_path}[0]",
             output_file=out_path,
             logging_group=logging_group,
         )
@@ -333,7 +333,7 @@ class DocumentParser(LoggingMixin):
             self.log("debug", f"Execute: {' '.join(args)}")
 
             if not subprocess.Popen(args).wait() == 0:
-                raise ParseError("Optipng failed at {}".format(args))
+                raise ParseError(f"Optipng failed at {args}")
 
             return out_path
         else:

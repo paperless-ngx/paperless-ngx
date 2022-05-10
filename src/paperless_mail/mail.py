@@ -3,6 +3,7 @@ import tempfile
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
+from imaplib import IMAP4
 
 import magic
 import pathvalidate
@@ -145,7 +146,7 @@ class MailAccountHandler(LoggingMixin):
 
         else:
             raise NotImplementedError(
-                "Unknwown correspondent selector",
+                "Unknown correspondent selector",
             )  # pragma: nocover
 
     def handle_mail_account(self, account):
@@ -155,42 +156,98 @@ class MailAccountHandler(LoggingMixin):
         self.log("debug", f"Processing mail account {account}")
 
         total_processed_files = 0
+        try:
+            with get_mailbox(
+                account.imap_server,
+                account.imap_port,
+                account.imap_security,
+            ) as M:
 
-        with get_mailbox(
-            account.imap_server,
-            account.imap_port,
-            account.imap_security,
-        ) as M:
-
-            try:
-                M.login(account.username, account.password)
-            except Exception:
-                raise MailError(f"Error while authenticating account {account}")
-
-            self.log(
-                "debug",
-                f"Account {account}: Processing " f"{account.rules.count()} rule(s)",
-            )
-
-            for rule in account.rules.order_by("order"):
                 try:
-                    total_processed_files += self.handle_mail_rule(M, rule)
+                    M.login(account.username, account.password)
+
+                except UnicodeEncodeError:
+                    self.log("debug", "Falling back to AUTH=PLAIN")
+                    try:
+                        # rfc2595 section 6 - PLAIN SASL mechanism
+                        client: IMAP4 = M.client
+                        encoded = (
+                            b"\0"
+                            + account.username.encode("utf8")
+                            + b"\0"
+                            + account.password.encode("utf8")
+                        )
+                        # Assumption is the server supports AUTH=PLAIN capability
+                        # Could check the list with client.capability(), but then what?
+                        # We're failing anyway then
+                        client.authenticate("PLAIN", lambda x: encoded)
+
+                        # Need to transition out of AUTH state to SELECTED
+                        M.folder.set("INBOX")
+                    except Exception:
+                        self.log(
+                            "error",
+                            "Unable to authenticate with mail server using AUTH=PLAIN",
+                        )
+                        raise MailError(f"Error while authenticating account {account}")
                 except Exception as e:
                     self.log(
                         "error",
-                        f"Rule {rule}: Error while processing rule: {e}",
-                        exc_info=True,
+                        f"Error while authenticating account {account}: {e}",
+                        exc_info=False,
                     )
+                    raise MailError(
+                        f"Error while authenticating account {account}",
+                    ) from e
+
+                self.log(
+                    "debug",
+                    f"Account {account}: Processing "
+                    f"{account.rules.count()} rule(s)",
+                )
+
+                for rule in account.rules.order_by("order"):
+                    try:
+                        total_processed_files += self.handle_mail_rule(M, rule)
+                    except Exception as e:
+                        self.log(
+                            "error",
+                            f"Rule {rule}: Error while processing rule: {e}",
+                            exc_info=True,
+                        )
+        except MailError:
+            raise
+        except Exception as e:
+            self.log(
+                "error",
+                f"Error while retrieving mailbox {account}: {e}",
+                exc_info=False,
+            )
 
         return total_processed_files
 
-    def handle_mail_rule(self, M, rule):
+    def handle_mail_rule(self, M: MailBox, rule):
 
         self.log("debug", f"Rule {rule}: Selecting folder {rule.folder}")
 
         try:
             M.folder.set(rule.folder)
         except MailboxFolderSelectError:
+
+            self.log(
+                "error",
+                f"Unable to access folder {rule.folder}, attempting folder listing",
+            )
+            try:
+                for folder_info in M.folder.list():
+                    self.log("info", f"Located folder: {folder_info.name}")
+            except Exception as e:
+                self.log(
+                    "error",
+                    "Exception during folder listing, unable to provide list folders: "
+                    + str(e),
+                )
+
             raise MailError(
                 f"Rule {rule}: Folder {rule.folder} "
                 f"does not exist in account {rule.account}",

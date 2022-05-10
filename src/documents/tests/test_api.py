@@ -27,7 +27,7 @@ from whoosh.writing import AsyncWriter
 
 class TestDocumentApi(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestDocumentApi, self).setUp()
+        super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=self.user)
@@ -70,7 +70,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         returned_doc["title"] = "the new title"
 
         response = self.client.put(
-            "/api/documents/{}/".format(doc.pk),
+            f"/api/documents/{doc.pk}/",
             returned_doc,
             format="json",
         )
@@ -82,7 +82,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(doc_after_save.correspondent, c2)
         self.assertEqual(doc_after_save.title, "the new title")
 
-        self.client.delete("/api/documents/{}/".format(doc_after_save.pk))
+        self.client.delete(f"/api/documents/{doc_after_save.pk}/")
 
         self.assertEqual(len(Document.objects.all()), 0)
 
@@ -163,22 +163,22 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         )
 
         with open(
-            os.path.join(self.dirs.thumbnail_dir, "{:07d}.png".format(doc.pk)),
+            os.path.join(self.dirs.thumbnail_dir, f"{doc.pk:07d}.png"),
             "wb",
         ) as f:
             f.write(content_thumbnail)
 
-        response = self.client.get("/api/documents/{}/download/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content)
 
-        response = self.client.get("/api/documents/{}/preview/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content)
 
-        response = self.client.get("/api/documents/{}/thumb/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_thumbnail)
@@ -202,25 +202,25 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         with open(doc.archive_path, "wb") as f:
             f.write(content_archive)
 
-        response = self.client.get("/api/documents/{}/download/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_archive)
 
         response = self.client.get(
-            "/api/documents/{}/download/?original=true".format(doc.pk),
+            f"/api/documents/{doc.pk}/download/?original=true",
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content)
 
-        response = self.client.get("/api/documents/{}/preview/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, content_archive)
 
         response = self.client.get(
-            "/api/documents/{}/preview/?original=true".format(doc.pk),
+            f"/api/documents/{doc.pk}/preview/?original=true",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -234,13 +234,13 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             mime_type="application/pdf",
         )
 
-        response = self.client.get("/api/documents/{}/download/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/download/")
         self.assertEqual(response.status_code, 404)
 
-        response = self.client.get("/api/documents/{}/preview/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/preview/")
         self.assertEqual(response.status_code, 404)
 
-        response = self.client.get("/api/documents/{}/thumb/".format(doc.pk))
+        response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, 404)
 
     def test_document_filters(self):
@@ -283,7 +283,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc2.id, doc3.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__in={},{}".format(tag_inbox.id, tag_3.id),
+            f"/api/documents/?tags__id__in={tag_inbox.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -291,7 +291,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc1.id, doc3.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__in={},{}".format(tag_2.id, tag_3.id),
+            f"/api/documents/?tags__id__in={tag_2.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -299,7 +299,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc2.id, doc3.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__all={},{}".format(tag_2.id, tag_3.id),
+            f"/api/documents/?tags__id__all={tag_2.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -307,27 +307,27 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], doc3.id)
 
         response = self.client.get(
-            "/api/documents/?tags__id__all={},{}".format(tag_inbox.id, tag_3.id),
+            f"/api/documents/?tags__id__all={tag_inbox.id},{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertEqual(len(results), 0)
 
         response = self.client.get(
-            "/api/documents/?tags__id__all={}a{}".format(tag_inbox.id, tag_3.id),
+            f"/api/documents/?tags__id__all={tag_inbox.id}a{tag_3.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertEqual(len(results), 3)
 
-        response = self.client.get("/api/documents/?tags__id__none={}".format(tag_3.id))
+        response = self.client.get(f"/api/documents/?tags__id__none={tag_3.id}")
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
         self.assertEqual(len(results), 2)
         self.assertCountEqual([results[0]["id"], results[1]["id"]], [doc1.id, doc2.id])
 
         response = self.client.get(
-            "/api/documents/?tags__id__none={},{}".format(tag_3.id, tag_2.id),
+            f"/api/documents/?tags__id__none={tag_3.id},{tag_2.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -335,7 +335,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["id"], doc1.id)
 
         response = self.client.get(
-            "/api/documents/?tags__id__none={},{}".format(tag_2.id, tag_inbox.id),
+            f"/api/documents/?tags__id__none={tag_2.id},{tag_inbox.id}",
         )
         self.assertEqual(response.status_code, 200)
         results = response.data["results"]
@@ -1284,7 +1284,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
 
 class TestDocumentApiV2(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestDocumentApiV2, self).setUp()
+        super().setUp()
 
         self.user = User.objects.create_superuser(username="temp_admin")
 
@@ -1365,7 +1365,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
 
 class TestBulkEdit(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestBulkEdit, self).setUp()
+        super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=user)
@@ -1886,7 +1886,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
 
 class TestBulkDownload(DirectoriesMixin, APITestCase):
     def setUp(self):
-        super(TestBulkDownload, self).setUp()
+        super().setUp()
 
         user = User.objects.create_superuser(username="temp_admin")
         self.client.force_login(user=user)

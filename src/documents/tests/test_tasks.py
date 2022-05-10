@@ -204,6 +204,29 @@ class TestTasks(DirectoriesMixin, TestCase):
         img = Image.open(test_file)
         self.assertEqual(tasks.barcode_reader(img), ["CUSTOM BARCODE"])
 
+    def test_convert_from_tiff_to_pdf(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "simple.tiff",
+        )
+        dst = os.path.join(settings.SCRATCH_DIR, "simple.tiff")
+        shutil.copy(test_file, dst)
+        target_file = tasks.convert_from_tiff_to_pdf(dst)
+        file_extension = os.path.splitext(os.path.basename(target_file))[1]
+        self.assertTrue(os.path.isfile(target_file))
+        self.assertEqual(file_extension, ".pdf")
+
+    def test_convert_error_from_pdf_to_pdf(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "simple.pdf",
+        )
+        dst = os.path.join(settings.SCRATCH_DIR, "simple.pdf")
+        shutil.copy(test_file, dst)
+        self.assertIsNone(tasks.convert_from_tiff_to_pdf(dst))
+
     def test_scan_file_for_separating_barcodes(self):
         test_file = os.path.join(
             os.path.dirname(__file__),
@@ -400,10 +423,63 @@ class TestTasks(DirectoriesMixin, TestCase):
             "barcodes",
             "patch-code-t-middle.pdf",
         )
-        dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.pd")
+        dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.pdf")
         shutil.copy(test_file, dst)
 
         self.assertEqual(tasks.consume_file(dst), "File successfully split")
+
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_BARCODE_TIFF_SUPPORT=True,
+    )
+    def test_consume_barcode_tiff_file(self):
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "barcodes",
+            "patch-code-t-middle.tiff",
+        )
+        dst = os.path.join(settings.SCRATCH_DIR, "patch-code-t-middle.tiff")
+        shutil.copy(test_file, dst)
+
+        self.assertEqual(tasks.consume_file(dst), "File successfully split")
+
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_BARCODE_TIFF_SUPPORT=True,
+    )
+    @mock.patch("documents.consumer.Consumer.try_consume_file")
+    def test_consume_barcode_unsupported_jpg_file(self, m):
+        """
+        This test assumes barcode and TIFF support are enabled and
+        the user uploads an unsupported image file (e.g. jpg)
+
+        The function shouldn't try to scan for separating barcodes
+        and continue archiving the file as is.
+        """
+        test_file = os.path.join(
+            os.path.dirname(__file__),
+            "samples",
+            "simple.jpg",
+        )
+        dst = os.path.join(settings.SCRATCH_DIR, "simple.jpg")
+        shutil.copy(test_file, dst)
+        with self.assertLogs("paperless.tasks", level="WARNING") as cm:
+            self.assertIn("Success", tasks.consume_file(dst))
+        self.assertEqual(
+            cm.output,
+            [
+                "WARNING:paperless.tasks:Unsupported file format for barcode reader: .jpg",
+            ],
+        )
+        m.assert_called_once()
+
+        args, kwargs = m.call_args
+        self.assertIsNone(kwargs["override_filename"])
+        self.assertIsNone(kwargs["override_title"])
+        self.assertIsNone(kwargs["override_correspondent_id"])
+        self.assertIsNone(kwargs["override_document_type_id"])
+        self.assertIsNone(kwargs["override_tag_ids"])
 
     @mock.patch("documents.tasks.sanity_checker.check_sanity")
     def test_sanity_check_success(self, m):
