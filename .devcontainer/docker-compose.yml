@@ -11,6 +11,7 @@ services:
 
         environment:
             PORT: 3000
+            LD_LIBRARY_PATH: "/usr/local/lib"
 
         ports:
             - 3000:3000
