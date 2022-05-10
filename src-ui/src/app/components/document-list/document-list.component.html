@@ -142,7 +142,7 @@
         [currentSortField]="list.sortField"
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
-        i18n>Storage path</th>        
+        i18n>Storage path</th>
       <th
         sortable="created"
         [currentSortField]="list.sortField"
@@ -185,7 +185,7 @@
           <ng-container *ngIf="d.storage_path">
             <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path">{{(d.storage_path$ | async)?.name}}</a>
           </ng-container>
-        </td>        
+        </td>
         <td>
           {{d.created | customDate}}
         </td>

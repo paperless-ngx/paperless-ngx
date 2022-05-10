@@ -60,23 +60,26 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       switch (this.filterRules[0].rule_type) {
         case FILTER_CORRESPONDENT:
           if (rule.value) {
-            return $localize`Correspondent: ${this.correspondents.find((c) => c.id == +rule.value)?.name
-              }`
+            return $localize`Correspondent: ${
+              this.correspondents.find((c) => c.id == +rule.value)?.name
+            }`
           } else {
             return $localize`Without correspondent`
           }
 
         case FILTER_DOCUMENT_TYPE:
           if (rule.value) {
-            return $localize`Type: ${this.documentTypes.find((dt) => dt.id == +rule.value)?.name
-              }`
+            return $localize`Type: ${
+              this.documentTypes.find((dt) => dt.id == +rule.value)?.name
+            }`
           } else {
             return $localize`Without document type`
           }
 
         case FILTER_HAS_TAGS_ALL:
-          return $localize`Tag: ${this.tags.find((t) => t.id == +rule.value)?.name
-            }`
+          return $localize`Tag: ${
+            this.tags.find((t) => t.id == +rule.value)?.name
+          }`
 
         case FILTER_HAS_ANY_TAG:
           if (rule.value == 'false') {
@@ -100,7 +103,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     private correspondentService: CorrespondentService,
     private documentService: DocumentService,
     private storagePathService: StoragePathService
-  ) { }
+  ) {}
 
   @ViewChild('textFilterInput')
   textFilterInput: ElementRef
@@ -347,14 +350,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           value: documentType.id?.toString(),
         })
       })
-    this.storagePathSelectionModel
-      .getSelectedItems()
-      .forEach((storagePath) => {
-        filterRules.push({
-          rule_type: FILTER_STORAGE_DIRECTORY,
-          value: storagePath.id?.toString(),
-        })
+    this.storagePathSelectionModel.getSelectedItems().forEach((storagePath) => {
+      filterRules.push({
+        rule_type: FILTER_STORAGE_DIRECTORY,
+        value: storagePath.id?.toString(),
       })
+    })
     if (this.dateCreatedBefore) {
       filterRules.push({
         rule_type: FILTER_CREATED_BEFORE,

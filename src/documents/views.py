@@ -574,7 +574,7 @@ class SelectionDataView(GenericAPIView):
 
         storage_pathes = StoragePath.objects.annotate(
             document_count=Count(
-                Case(When(documents__id__in=ids, then=1), output_field=IntegerField(),),
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
             ),
         )
 
@@ -591,7 +591,8 @@ class SelectionDataView(GenericAPIView):
                     {"id": t.id, "document_count": t.document_count} for t in types
                 ],
                 "selected_storage_pathes": [
-                    {"id": t.id, "document_count": t.document_count, } for t in storage_pathes
+                    {"id": t.id, "document_count": t.document_count}
+                    for t in storage_pathes
                 ],
             },
         )
@@ -737,7 +738,7 @@ class StoragePathViewSet(ModelViewSet):
     model = DocumentType
 
     queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
-        Lower("name")
+        Lower("name"),
     )
 
     serializer_class = StoragePathSerializer

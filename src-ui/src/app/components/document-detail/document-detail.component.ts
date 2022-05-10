@@ -121,8 +121,8 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
-    private queryParamsService: QueryParamsService,
-    private storagePathService: StoragePathService
+    private storagePathService: StoragePathService,
+    private queryParamsService: QueryParamsService
   ) {
     this.titleSubject
       .pipe(
