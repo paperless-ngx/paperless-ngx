@@ -133,7 +133,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
         if doc.storage_path:
             if doc.storage_path.path is not None:
                 logger.debug(
-                    f"Document has storage_path %i (%s) set",
+                    "Document has storage_path %i (%s) set",
                     doc.storage_path.id,
                     doc.storage_path.path,
                 )
