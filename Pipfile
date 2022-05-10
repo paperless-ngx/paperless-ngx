@@ -19,7 +19,7 @@ djangorestframework = "~=3.13"
 filelock = "*"
 fuzzywuzzy = {extras = ["speedup"], version = "*"}
 gunicorn = "*"
-imap-tools = "~=0.54.0"
+imap-tools = "*"
 langdetect = "*"
 pathvalidate = "*"
 pillow = "~=9.1"
