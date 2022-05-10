@@ -15,6 +15,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
 
 

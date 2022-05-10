@@ -109,7 +109,7 @@ def update_document(writer, doc):
         modified=doc.modified,
         path=doc.storage_path.name if doc.storage_path else None,
         path_id=doc.storage_path.id if doc.storage_path else None,
-        has_path=doc.storage_path is not None,
+        has_path=doc.storage_path is not None,        
     )
 
 

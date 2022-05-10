@@ -23,6 +23,7 @@ from documents.models import MatchingModel
 from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
@@ -608,15 +609,9 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
             self.assertEqual(r.status_code, 200)
             return [hit["id"] for hit in r.data["results"]]
 
-        self.assertCountEqual(
-            search_query(""),
-            [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id],
-        )
+        self.assertCountEqual(search_query(""), [d1.id, d2.id, d3.id, d4.id, d5.id, d7.id])
         self.assertCountEqual(search_query("&is_tagged=true"), [d3.id, d4.id])
-        self.assertCountEqual(
-            search_query("&is_tagged=false"),
-            [d1.id, d2.id, d5.id, d7.id],
-        )
+        self.assertCountEqual(search_query("&is_tagged=false"), [d1.id, d2.id, d5.id, d7.id])
         self.assertCountEqual(search_query("&correspondent__id=" + str(c.id)), [d1.id])
         self.assertCountEqual(search_query("&document_type__id=" + str(dt.id)), [d2.id])
         self.assertCountEqual(search_query("&storage_path__id=" + str(sp.id)), [d7.id])
@@ -1064,12 +1059,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data,
-            {
-                "correspondents": [],
-                "tags": [],
-                "document_types": [],
-                "storage_pathes": [],
-            },
+            {"correspondents": [], "tags": [], "document_types": [], "storage_pathes": []},
         )
 
     def test_get_suggestions_invalid_doc(self):
@@ -1101,12 +1091,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(
             response.data,
-            {
-                "correspondents": [88, 2],
-                "tags": [56, 123],
-                "document_types": [23],
-                "storage_pathes": [99, 77],
-            },
+            {"correspondents": [88, 2], "tags": [56, 123], "document_types": [23], "storage_pathes": [99, 77]},
         )
 
     def test_saved_views(self):
