@@ -8,6 +8,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.test import TestCase
 from documents.parsers import parse_date
+from paperless.settings import DATE_ORDER
 
 
 class TestDate(TestCase):
@@ -161,18 +162,111 @@ class TestDate(TestCase):
         self.assertIsNone(parse_date("", "20 408000l 2475"))
 
     @override_settings(FILENAME_DATE_ORDER="YMD")
+    def test_filename_date_parse_valid_ymd(self, *args):
+        """
+        GIVEN:
+            - Date parsing from the filename is enabled
+            - Filename date format is with Year Month Day (YMD)
+            - Filename contains date matching the format
+
+        THEN:
+            - Should parse the date from the filename
+        """
+        self.assertEqual(
+            parse_date("/tmp/Scan-2022-04-01.pdf", "No date in here"),
+            datetime.datetime(2022, 4, 1, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    @override_settings(FILENAME_DATE_ORDER="DMY")
+    def test_filename_date_parse_valid_dmy(self, *args):
+        """
+        GIVEN:
+            - Date parsing from the filename is enabled
+            - Filename date format is with Day Month Year (DMY)
+            - Filename contains date matching the format
+
+        THEN:
+            - Should parse the date from the filename
+        """
+        self.assertEqual(
+            parse_date("/tmp/Scan-10.01.2021.pdf", "No date in here"),
+            datetime.datetime(2021, 1, 10, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    @override_settings(FILENAME_DATE_ORDER="YMD")
     def test_filename_date_parse_invalid(self, *args):
+        """
+        GIVEN:
+            - Date parsing from the filename is enabled
+            - Filename includes no date
+            - File content includes no date
+
+        THEN:
+            - No date is parsed
+        """
         self.assertIsNone(
             parse_date("/tmp/20 408000l 2475 - test.pdf", "No date in here"),
         )
 
     @override_settings(
+        FILENAME_DATE_ORDER="YMD",
+        IGNORE_DATES=(datetime.date(2022, 4, 1),),
+    )
+    def test_filename_date_ignored_use_content(self, *args):
+        """
+        GIVEN:
+            - Date parsing from the filename is enabled
+            - Filename date format is with Day Month Year (YMD)
+            - Date order is Day Month Year (DMY, the default)
+            - Filename contains date matching the format
+            - Filename date is an ignored date
+            - File content includes a date
+
+        THEN:
+            - Should parse the date from the content not filename
+        """
+        self.assertEqual(
+            parse_date("/tmp/Scan-2022-04-01.pdf", "The matching date is 24.03.2022"),
+            datetime.datetime(2022, 3, 24, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    @override_settings(
         IGNORE_DATES=(datetime.date(2019, 11, 3), datetime.date(2020, 1, 17)),
     )
-    def test_ignored_dates(self, *args):
+    def test_ignored_dates_default_order(self, *args):
+        """
+        GIVEN:
+            - Ignore dates have been set
+            - File content includes ignored dates
+            - File content includes 1 non-ignored date
+
+        THEN:
+            - Should parse the date non-ignored date from content
+        """
         text = "lorem ipsum 110319, 20200117 and lorem 13.02.2018 lorem " "ipsum"
-        date = parse_date("", text)
         self.assertEqual(
-            date,
+            parse_date("", text),
+            datetime.datetime(2018, 2, 13, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
+        )
+
+    @override_settings(
+        IGNORE_DATES=(datetime.date(2019, 11, 3), datetime.date(2020, 1, 17)),
+        DATE_ORDER="YMD",
+    )
+    def test_ignored_dates_order_ymd(self, *args):
+        """
+        GIVEN:
+            - Ignore dates have been set
+            - Date order is Year Month Date (YMD)
+            - File content includes ignored dates
+            - File content includes 1 non-ignored date
+
+        THEN:
+            - Should parse the date non-ignored date from content
+        """
+        text = "lorem ipsum 190311, 20200117 and lorem 13.02.2018 lorem " "ipsum"
+
+        self.assertEqual(
+            parse_date("", text),
             datetime.datetime(2018, 2, 13, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE)),
         )
