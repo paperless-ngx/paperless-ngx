@@ -38,7 +38,7 @@
   <div ngbDropdown class="btn-group ms-2 flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
-      <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="list.sortReverse">
+      <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="listSort">
         <label ngbButtonLabel class="btn-outline-primary btn-sm mx-2 flex-fill">
           <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="false">
           <svg class="toolbaricon" fill="currentColor">
@@ -53,7 +53,7 @@
         </label>
       </div>
       <div>
-        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="list.sortField = f.field"
+        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSortField(f.field)"
           [class.active]="list.sortField == f.field">{{f.name}}
         </button>
       </div>
@@ -64,7 +64,7 @@
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" ngbDropdownToggle i18n>Views</button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
       <ng-container *ngIf="!list.activeSavedViewId">
-        <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
+        <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view.id)">{{view.name}}</button>
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 

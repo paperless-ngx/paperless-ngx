@@ -1,0 +1,42 @@
+name: Frontend CI Jobs
+
+on:
+  workflow_call:
+
+jobs:
+
+  code-checks-frontend:
+    name: "Code Style Checks"
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      -
+        name: Install prettier
+        run: |
+          npm install prettier
+      -
+        name: Run prettier
+        run:
+          npx prettier --check --ignore-path Pipfile.lock **/*.js **/*.ts *.md **/*.md
+  tests-frontend:
+    name: "Tests"
+    runs-on: ubuntu-20.04
+    needs:
+      - code-checks-frontend
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cd src-ui && npm ci
+      - run: cd src-ui && npm run test
+      - run: cd src-ui && npm run e2e:ci

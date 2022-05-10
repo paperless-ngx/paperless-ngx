@@ -37,7 +37,7 @@ repos:
         exclude: "(^Pipfile\\.lock$)"
   # Python hooks
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.0.1
+    rev: v3.1.0
     hooks:
       - id: reorder-python-imports
         exclude: "(migrations)"
@@ -47,7 +47,7 @@ repos:
       - id: yesqa
         exclude: "(migrations)"
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: "v2.2.2"
+    rev: "v2.2.3"
     hooks:
       - id: add-trailing-comma
         exclude: "(migrations)"
@@ -62,11 +62,25 @@ repos:
     rev: 22.3.0
     hooks:
       - id: black
-  # Dockerfile hooks
-  - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
-    rev: "v0.1.0"
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.32.1
     hooks:
-      - id: dockerfilelint
+      - id: pyupgrade
+        exclude: "(migrations)"
+        args:
+          - "--py38-plus"
+  # Dockerfile hooks
+  - repo: https://github.com/AleksaC/hadolint-py
+    rev: v2.10.0
+    hooks:
+      - id: hadolint
+        args:
+          - --ignore
+          - DL3008      # https://github.com/hadolint/hadolint/wiki/DL3008  (should probably do this at some point)
+          - --ignore
+          - DL3013      # https://github.com/hadolint/hadolint/wiki/DL3013  (should probably do this too at some point)
+          - --ignore
+          - DL3003      # https://github.com/hadolint/hadolint/wiki/DL3003  (seems excessive to use WORKDIR so much)
   # Shell script hooks
   - repo: https://github.com/lovesegfault/beautysh
     rev: v6.2.1

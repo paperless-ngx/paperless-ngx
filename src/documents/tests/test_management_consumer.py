@@ -39,7 +39,7 @@ class ConsumerMixin:
     sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
     def setUp(self) -> None:
-        super(ConsumerMixin, self).setUp()
+        super().setUp()
         self.t = None
         patcher = mock.patch(
             "documents.management.commands.document_consumer.async_task",
@@ -60,7 +60,7 @@ class ConsumerMixin:
             # wait for the consumer to exit.
             self.t.join()
 
-        super(ConsumerMixin, self).tearDown()
+        super().tearDown()
 
     def wait_for_task_mock_call(self, excpeted_call_count=1):
         n = 0

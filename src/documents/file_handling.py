@@ -133,7 +133,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             tags = defaultdictNoStr(lambda: slugify(None), many_to_dictionary(doc.tags))
 
             tag_list = pathvalidate.sanitize_filename(
-                ",".join(sorted([tag.name for tag in doc.tags.all()])),
+                ",".join(sorted(tag.name for tag in doc.tags.all())),
                 replacement_text="-",
             )
 

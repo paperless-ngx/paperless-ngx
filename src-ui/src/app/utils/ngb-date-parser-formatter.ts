@@ -51,11 +51,22 @@ export class LocalizedDateParserFormatter extends NgbDateParserFormatter {
     const dateSeparator = inputFormat.replace(/[dmy]/gi, '').charAt(0)
 
     if (this.separatorRegExp.test(value)) {
-      // split on separator, pad & re-join without separator
-      value = value
-        .split(this.separatorRegExp)
-        .map((segment) => segment.padStart(2, '0'))
-        .join('')
+      let segments = value.split(this.separatorRegExp)
+
+      // always accept strict yyyy*mm*dd format even if thats not the input format since we can be certain its not yyyy*dd*mm
+      if (
+        value.length == 10 &&
+        segments.length == 3 &&
+        segments[0].length == 4
+      ) {
+        return inputFormat
+          .replace('yyyy', segments[0])
+          .replace('mm', segments[1])
+          .replace('dd', segments[2])
+      } else {
+        // otherwise pad & re-join without separator
+        value = segments.map((segment) => segment.padStart(2, '0')).join('')
+      }
     }
 
     if (value.length == 4 && inputFormat.substring(0, 4) != 'yyyy') {
