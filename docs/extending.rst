@@ -334,11 +334,17 @@ directory.
 Building the Docker image
 =========================
 
+The docker image is primarily built by the GitHub actions workflow, but it can be
+faster when developing to build and tag an image locally.
+
+To provide the build arguments automatically, build the image using the helper
+script ``build-docker-image.sh``.
+
 Building the docker image from source:
 
     .. code:: shell-session
 
-        docker build . -t <your-tag>
+        ./build-docker-image.sh Dockerfile -t <your-tag>
 
 Extending Paperless
 ===================

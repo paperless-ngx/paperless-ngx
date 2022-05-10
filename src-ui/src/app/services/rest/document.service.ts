@@ -10,8 +10,8 @@ import { map } from 'rxjs/operators'
 import { CorrespondentService } from './correspondent.service'
 import { DocumentTypeService } from './document-type.service'
 import { TagService } from './tag.service'
-import { FILTER_RULE_TYPES } from 'src/app/data/filter-rule-type'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
+import { filterRulesToQueryParams } from '../query-params.service'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -57,27 +57,6 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     super(http, 'documents')
   }
 
-  public filterRulesToQueryParams(filterRules: FilterRule[]): Object {
-    if (filterRules) {
-      let params = {}
-      for (let rule of filterRules) {
-        let ruleType = FILTER_RULE_TYPES.find((t) => t.id == rule.rule_type)
-        if (ruleType.multi) {
-          params[ruleType.filtervar] = params[ruleType.filtervar]
-            ? params[ruleType.filtervar] + ',' + rule.value
-            : rule.value
-        } else if (ruleType.isnull_filtervar && rule.value == null) {
-          params[ruleType.isnull_filtervar] = true
-        } else {
-          params[ruleType.filtervar] = rule.value
-        }
-      }
-      return params
-    } else {
-      return null
-    }
-  }
-
   addObservablesToDocument(doc: PaperlessDocument) {
     if (doc.correspondent) {
       doc.correspondent$ = this.correspondentService.getCached(
@@ -106,7 +85,7 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
       pageSize,
       sortField,
       sortReverse,
-      Object.assign(extraParams, this.filterRulesToQueryParams(filterRules))
+      Object.assign(extraParams, filterRulesToQueryParams(filterRules))
     ).pipe(
       map((results) => {
         results.results.forEach((doc) => this.addObservablesToDocument(doc))

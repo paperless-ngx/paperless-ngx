@@ -74,19 +74,19 @@ class DocumentAdmin(admin.ModelAdmin):
             for o in queryset:
                 index.remove_document(writer, o)
 
-        super(DocumentAdmin, self).delete_queryset(request, queryset)
+        super().delete_queryset(request, queryset)
 
     def delete_model(self, request, obj):
         from documents import index
 
         index.remove_document_from_index(obj)
-        super(DocumentAdmin, self).delete_model(request, obj)
+        super().delete_model(request, obj)
 
     def save_model(self, request, obj, form, change):
         from documents import index
 
         index.add_or_update_document(obj)
-        super(DocumentAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
 
 class RuleInline(admin.TabularInline):

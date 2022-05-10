@@ -210,7 +210,7 @@ class DocumentViewSet(
         return serializer_class(*args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        response = super(DocumentViewSet, self).update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
         from documents import index
 
         index.add_or_update_document(self.get_object())
@@ -220,7 +220,7 @@ class DocumentViewSet(
         from documents import index
 
         index.remove_document_from_index(self.get_object())
-        return super(DocumentViewSet, self).destroy(request, *args, **kwargs)
+        return super().destroy(request, *args, **kwargs)
 
     @staticmethod
     def original_requested(request):
@@ -362,7 +362,7 @@ class DocumentViewSet(
 class SearchResultSerializer(DocumentSerializer):
     def to_representation(self, instance):
         doc = Document.objects.get(id=instance["id"])
-        r = super(SearchResultSerializer, self).to_representation(doc)
+        r = super().to_representation(doc)
         r["__search_hit__"] = {
             "score": instance.score,
             "highlights": instance.highlights("content", text=doc.content)
@@ -376,7 +376,7 @@ class SearchResultSerializer(DocumentSerializer):
 
 class UnifiedSearchViewSet(DocumentViewSet):
     def __init__(self, *args, **kwargs):
-        super(UnifiedSearchViewSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.searcher = None
 
     def get_serializer_class(self):
@@ -408,7 +408,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 self.paginator.get_page_size(self.request),
             )
         else:
-            return super(UnifiedSearchViewSet, self).filter_queryset(queryset)
+            return super().filter_queryset(queryset)
 
     def list(self, request, *args, **kwargs):
         if self._is_search_request():
@@ -417,13 +417,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
             try:
                 with index.open_index_searcher() as s:
                     self.searcher = s
-                    return super(UnifiedSearchViewSet, self).list(request)
+                    return super().list(request)
             except NotFound:
                 raise
             except Exception as e:
                 return HttpResponseBadRequest(str(e))
         else:
-            return super(UnifiedSearchViewSet, self).list(request)
+            return super().list(request)
 
 
 class LogViewSet(ViewSet):
@@ -441,7 +441,7 @@ class LogViewSet(ViewSet):
         if not os.path.isfile(filename):
             raise Http404()
 
-        with open(filename, "r") as f:
+        with open(filename) as f:
             lines = [line.rstrip() for line in f.readlines()]
 
         return Response(lines)
@@ -676,28 +676,33 @@ class RemoteVersionView(GenericAPIView):
     def get(self, request, format=None):
         remote_version = "0.0.0"
         is_greater_than_current = False
+        current_version = packaging_version.parse(version.__full_version_str__)
         # TODO: this can likely be removed when frontend settings are saved to DB
         feature_is_set = settings.ENABLE_UPDATE_CHECK != "default"
         if feature_is_set and settings.ENABLE_UPDATE_CHECK:
             try:
-                with urllib.request.urlopen(
-                    "https://api.github.com/repos/"
-                    + "paperless-ngx/paperless-ngx/releases/latest",
-                ) as response:
+                req = urllib.request.Request(
+                    "https://api.github.com/repos/paperless-ngx/"
+                    "paperless-ngx/releases/latest",
+                )
+                # Ensure a JSON response
+                req.add_header("Accept", "application/json")
+
+                with urllib.request.urlopen(req) as response:
                     remote = response.read().decode("utf-8")
                 try:
                     remote_json = json.loads(remote)
-                    remote_version = remote_json["tag_name"].replace("ngx-", "")
+                    remote_version = remote_json["tag_name"].removeprefix("ngx-")
                 except ValueError:
-                    logger.debug("An error occured parsing remote version json")
+                    logger.debug("An error occurred parsing remote version json")
             except urllib.error.URLError:
-                logger.debug("An error occured checking for available updates")
+                logger.debug("An error occurred checking for available updates")
 
-            current_version = ".".join([str(_) for _ in version.__version__[:3]])
-            is_greater_than_current = packaging_version.parse(
-                remote_version,
-            ) > packaging_version.parse(
-                current_version,
+            is_greater_than_current = (
+                packaging_version.parse(
+                    remote_version,
+                )
+                > current_version
             )
 
         return Response(
