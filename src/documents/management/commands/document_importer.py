@@ -84,9 +84,10 @@ class Command(BaseCommand):
                 if self.version != version.__full_version_str__:
                     self.stdout.write(
                         self.style.WARNING(
-                            "Version mismatch:"
-                            f" {self.version} vs {version.__full_version_str__}."
-                            "  Continuing, but import may fail",
+                            "Version mismatch: "
+                            f"Currently {version.__full_version_str__},"
+                            f" importing {self.version}."
+                            " Continuing, but import may fail.",
                         ),
                     )
 
