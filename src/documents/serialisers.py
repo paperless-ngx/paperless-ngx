@@ -511,7 +511,7 @@ class UiSettingsViewSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        super(UiSettingsViewSerializer, self).update(instance, validated_data)
+        super().update(instance, validated_data)
         return instance
 
     def create(self, validated_data):

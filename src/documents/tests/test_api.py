@@ -1384,7 +1384,7 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
         response = self.client.get(f"/api/ui_settings/", format="json")
         self.assertNotEqual(
             response.data["settings"],
-            [],
+            "{}",
         )
 
 
