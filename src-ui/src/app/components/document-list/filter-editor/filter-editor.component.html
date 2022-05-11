@@ -8,7 +8,13 @@
               <button *ngFor="let t of textFilterTargets" ngbDropdownItem [class.active]="textFilterTarget == t.id" (click)="changeTextFilterTarget(t.id)">{{t.name}}</button>
             </div>
           </div>
-          <input #textFilterInput class="form-control form-control-sm" type="text" [(ngModel)]="textFilter" (keyup.enter)="textFilterEnter()" [readonly]="textFilterTarget == 'fulltext-morelike'">
+          <div *ngIf="textFilterTarget == 'asn'" class="input-group-text py-0">
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="textFilterTargetIsNull" (change)="updateRules()">
+              <label class="form-check-label" [class.text-muted]="!textFilterTargetIsNull" i18n>Is empty</label>
+            </div>
+          </div>
+          <input #textFilterInput class="form-control form-control-sm" type="text" [disabled]="textFilterTargetIsNull" [(ngModel)]="textFilter" (keyup.enter)="textFilterEnter()" [readonly]="textFilterTarget == 'fulltext-morelike'">
          </div>
      </div>
   </div>

@@ -33,6 +33,7 @@ import {
   FILTER_DOES_NOT_HAVE_TAG,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  FILTER_ASN_ISNULL,
 } from 'src/app/data/filter-rule-type'
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
@@ -135,6 +136,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   textFilterTarget = TEXT_FILTER_TARGET_TITLE_CONTENT
+  textFilterTargetIsNull: boolean = false
 
   get textFilterTargetName() {
     return this.textFilterTargets.find((t) => t.id == this.textFilterTarget)
@@ -176,6 +178,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
     this.dateCreatedAfter = null
+    this.textFilterTargetIsNull = false
 
     value.forEach((rule) => {
       switch (rule.rule_type) {
@@ -254,6 +257,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             false
           )
           break
+        case FILTER_ASN_ISNULL:
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          this.textFilterTargetIsNull = rule.value == 'true'
+          break
       }
     })
     this.checkIfRulesHaveChanged()
@@ -273,8 +280,15 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
       filterRules.push({ rule_type: FILTER_TITLE, value: this._textFilter })
     }
-    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
-      filterRules.push({ rule_type: FILTER_ASN, value: this._textFilter })
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
+      if (this.textFilter?.length && !this.textFilterTargetIsNull) {
+        filterRules.push({ rule_type: FILTER_ASN, value: this._textFilter })
+      } else if (!this.textFilter?.length) {
+        filterRules.push({
+          rule_type: FILTER_ASN_ISNULL,
+          value: this.textFilterTargetIsNull.toString(),
+        })
+      }
     }
     if (
       this._textFilter &&
@@ -398,7 +412,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   get textFilter() {
-    return this._textFilter
+    return this.textFilterTargetIsNull ? '' : this._textFilter
   }
 
   set textFilter(value) {
