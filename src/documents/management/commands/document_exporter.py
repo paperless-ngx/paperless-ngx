@@ -22,6 +22,7 @@ from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from filelock import FileLock
+from paperless import version
 from paperless.db import GnuPG
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
@@ -232,11 +233,17 @@ class Command(BaseCommand):
                         archive_target,
                     )
 
-        # 4. write manifest to target forlder
+        # 4.1 write manifest to target folder
         manifest_path = os.path.abspath(os.path.join(self.target, "manifest.json"))
 
         with open(manifest_path, "w") as f:
             json.dump(manifest, f, indent=2)
+
+        # 4.2 write version information to target folder
+        version_path = os.path.abspath(os.path.join(self.target, "version.json"))
+
+        with open(version_path, "w") as f:
+            json.dump({"version": version.__full_version_str__}, f, indent=2)
 
         if self.delete:
             # 5. Remove files which we did not explicitly export in this run
