@@ -732,7 +732,7 @@ class UiSettingsView(GenericAPIView):
         displayname = user.username
         if user.first_name or user.last_name:
             displayname = " ".join([user.first_name, user.last_name])
-        settings = []
+        settings = {}
         if hasattr(user, "ui_settings"):
             settings = user.ui_settings.settings
         return Response(
