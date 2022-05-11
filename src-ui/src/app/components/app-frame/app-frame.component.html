@@ -188,7 +188,7 @@
               <div class="me-3">{{ versionString }}</div>
               <div *ngIf="appRemoteVersion" class="version-check">
                 <ng-template #updateAvailablePopContent>
-                  <span class="small">Paperless-ngx v{{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
+                  <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
                 </ng-template>
                 <ng-template #updateCheckingNotEnabledPopContent>
                   <span class="small"><ng-container i18n>Checking for updates is disabled.</ng-container><br/><ng-container i18n>Click for more information.</ng-container></span>
