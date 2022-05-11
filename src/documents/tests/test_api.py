@@ -1370,21 +1370,38 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
         test_user = User.objects.create_superuser(username="test")
         self.client.force_login(user=test_user)
 
-        response = self.client.get(f"/api/ui_settings/", format="json")
+        response = self.client.get("/api/ui_settings/", format="json")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
+        self.assertDictEqual(
             response.data["settings"],
-            [],
+            {},
         )
 
-        UiSettings.objects.create(
-            user=test_user,
-            settings='{"dark_mode":[{"enabled":"true"}]}',
+        settings = {
+            "settings": {
+                "dark_mode": {
+                    "enabled": True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            "/api/ui_settings/",
+            json.dumps(settings),
+            content_type="application/json",
         )
-        response = self.client.get(f"/api/ui_settings/", format="json")
-        self.assertNotEqual(
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/api/ui_settings/", format="json")
+
+        print(response)
+        print(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
             response.data["settings"],
-            "{}",
+            settings["settings"],
         )
 
 
