@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Params, Router } from '@angular/router'
 import { FilterRule } from '../data/filter-rule'
-import { FILTER_RULE_TYPES } from '../data/filter-rule-type'
+import { FilterRuleType, FILTER_RULE_TYPES } from '../data/filter-rule-type'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { DocumentListViewService } from './document-list-view.service'
 
@@ -135,17 +135,19 @@ export function filterRulesFromQueryParams(queryParams: ParamMap) {
   allFilterRuleQueryParams
     .filter((frqp) => queryParams.has(frqp))
     .forEach((filterQueryParamName) => {
-      const filterQueryParamValues: string[] = queryParams
-        .get(filterQueryParamName)
-        .split(',')
+      const rule_type: FilterRuleType = FILTER_RULE_TYPES.find(
+        (rt) => rt.filtervar == filterQueryParamName
+      )
+      const valueURIComponent: string = queryParams.get(filterQueryParamName)
+      const filterQueryParamValues: string[] = rule_type.multi
+        ? valueURIComponent.split(',')
+        : [valueURIComponent]
 
       filterRulesFromQueryParams = filterRulesFromQueryParams.concat(
         // map all values to filter rules
         filterQueryParamValues.map((val) => {
           return {
-            rule_type: FILTER_RULE_TYPES.find(
-              (rt) => rt.filtervar == filterQueryParamName
-            ).id,
+            rule_type: rule_type.id,
             value: val,
           }
         })
