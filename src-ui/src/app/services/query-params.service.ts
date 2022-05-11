@@ -129,6 +129,8 @@ export function filterRulesFromQueryParams(queryParams: ParamMap) {
   const allFilterRuleQueryParams: string[] = FILTER_RULE_TYPES.map(
     (rt) => rt.filtervar
   )
+    .concat(FILTER_RULE_TYPES.map((rt) => rt.isnull_filtervar))
+    .filter((rt) => rt !== undefined)
 
   // transform query params to filter rules
   let filterRulesFromQueryParams: FilterRule[] = []
@@ -136,8 +138,11 @@ export function filterRulesFromQueryParams(queryParams: ParamMap) {
     .filter((frqp) => queryParams.has(frqp))
     .forEach((filterQueryParamName) => {
       const rule_type: FilterRuleType = FILTER_RULE_TYPES.find(
-        (rt) => rt.filtervar == filterQueryParamName
+        (rt) =>
+          rt.filtervar == filterQueryParamName ||
+          rt.isnull_filtervar == filterQueryParamName
       )
+      const isNullRuleType = rule_type.isnull_filtervar == filterQueryParamName
       const valueURIComponent: string = queryParams.get(filterQueryParamName)
       const filterQueryParamValues: string[] = rule_type.multi
         ? valueURIComponent.split(',')
@@ -148,7 +153,7 @@ export function filterRulesFromQueryParams(queryParams: ParamMap) {
         filterQueryParamValues.map((val) => {
           return {
             rule_type: rule_type.id,
-            value: val,
+            value: isNullRuleType ? null : val,
           }
         })
       )
