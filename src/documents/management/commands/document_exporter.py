@@ -18,6 +18,7 @@ from documents.models import DocumentType
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
@@ -112,8 +113,8 @@ class Command(BaseCommand):
                 map(lambda f: os.path.abspath(os.path.join(root, f)), files),
             )
 
-        # 2. Create manifest, containing all correspondents, types, tags and
-        # documents
+        # 2. Create manifest, containing all correspondents, types, tags,
+        # documents and ui_settings
         with transaction.atomic():
             manifest = json.loads(
                 serializers.serialize("json", Correspondent.objects.all()),
@@ -149,6 +150,10 @@ class Command(BaseCommand):
             manifest += json.loads(serializers.serialize("json", Group.objects.all()))
 
             manifest += json.loads(serializers.serialize("json", User.objects.all()))
+
+            manifest += json.loads(
+                serializers.serialize("json", UiSettings.objects.all()),
+            )
 
         # 3. Export files from each document
         for index, document_dict in tqdm.tqdm(
