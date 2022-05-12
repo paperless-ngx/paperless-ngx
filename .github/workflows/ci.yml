@@ -384,14 +384,13 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: main
       -
         name: Append Changelog to docs
         id: append-Changelog
         working-directory: docs
         run: |
-          git status
-          git pull origin main
-          git checkout main
           echo -e "# Changelog\n\n${{ steps.create-release.outputs.body }}\n" > changelog-new.md
           CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
           echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
