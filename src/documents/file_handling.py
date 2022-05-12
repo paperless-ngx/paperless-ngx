@@ -132,10 +132,17 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     try:
         if doc.storage_path:
             if doc.storage_path.path is not None:
-                logger.debug(f"Document has storage_path %i (%s) set", doc.storage_path.id, doc.storage_path.path)
+                logger.debug(
+                    "Document has storage_path %i (%s) set",
+                    doc.storage_path.id,
+                    doc.storage_path.path,
+                )
                 filename_format = doc.storage_path.path
             else:
-                logger.warn("storage_path %i does not have a path set", doc.storage_path.id)
+                logger.warn(
+                    "storage_path %i does not have a path set",
+                    doc.storage_path.id,
+                )
 
         if filename_format is not None:
             tags = defaultdictNoStr(
@@ -196,15 +203,14 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             if settings.PAPERLESS_FILENAME_REMOVE_NONE:
                 path = path.replace("-none-/", "")  # remove empty directories
                 path = path.replace(" -none-", "")  # remove when spaced, with space
-                path = path.replace("-none-", "")   # remove rest of the occurences
-            
-            path = path.replace("-none-", "none") # backward compatibility
+                path = path.replace("-none-", "")  # remove rest of the occurences
+
+            path = path.replace("-none-", "none")  # backward compatibility
             path = path.strip(os.sep)
 
     except (ValueError, KeyError, IndexError):
         logger.warning(
-            f"Invalid filename_format "
-            f"{filename_format}, falling back to default",
+            f"Invalid filename_format " f"{filename_format}, falling back to default",
         )
 
     counter_str = f"_{counter:02}" if counter else ""

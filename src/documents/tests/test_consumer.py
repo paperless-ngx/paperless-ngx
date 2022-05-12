@@ -660,7 +660,7 @@ class TestConsumer(DirectoriesMixin, TestCase):
 @mock.patch("documents.consumer.magic.from_file", fake_magic_from_file)
 class TestConsumerCreatedDate(DirectoriesMixin, TestCase):
     def setUp(self):
-        super(TestConsumerCreatedDate, self).setUp()
+        super().setUp()
 
         # this prevents websocket message reports during testing.
         patcher = mock.patch("documents.consumer.Consumer._send_progress")
