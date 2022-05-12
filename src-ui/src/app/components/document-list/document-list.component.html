@@ -1,10 +1,11 @@
 <app-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="me-2 flex-fill d-flex">
-    <button class="btn btn-sm btn-outline-primary flex-fill" id="dropdownSelect" ngbDropdownToggle>
+  <div ngbDropdown class="me-2 d-flex">
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>&nbsp;<ng-container i18n>Select</ng-container>
+      </svg>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
@@ -75,7 +76,7 @@
 
 </app-page-header>
 
-<div class="row sticky-top pt-4 pb-2 pb-lg-4 bg-body">
+<div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
