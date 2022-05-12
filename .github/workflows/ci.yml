@@ -381,3 +381,22 @@ jobs:
           asset_path: ./paperless-ngx.tar.xz
           asset_name: paperless-ngx-${{ steps.get_version.outputs.version }}.tar.xz
           asset_content_type: application/x-xz
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Append Changelog to docs
+        id: append-Changelog
+        working-directory: docs
+        run: |
+          git status
+          git pull origin main
+          git checkout main
+          echo -e "# Changelog\n\n${{ steps.create-release.outputs.body }}\n" > changelog-new.md
+          CURRENT_CHANGELOG=`tail --lines +2 changelog.md`
+          echo -e "$CURRENT_CHANGELOG" >> changelog-new.md
+          mv changelog-new.md changelog.md
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Changelog ${{ steps.get_version.outputs.version }} - GHA"
+          git push origin HEAD:main
