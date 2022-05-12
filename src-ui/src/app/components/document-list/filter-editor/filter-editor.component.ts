@@ -33,6 +33,9 @@ import {
   FILTER_DOES_NOT_HAVE_TAG,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  FILTER_ASN_ISNULL,
+  FILTER_ASN_GT,
+  FILTER_ASN_LT,
 } from 'src/app/data/filter-rule-type'
 import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
@@ -44,6 +47,12 @@ const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
 const TEXT_FILTER_TARGET_ASN = 'asn'
 const TEXT_FILTER_TARGET_FULLTEXT_QUERY = 'fulltext-query'
 const TEXT_FILTER_TARGET_FULLTEXT_MORELIKE = 'fulltext-morelike'
+
+const TEXT_FILTER_MODIFIER_EQUALS = 'equals'
+const TEXT_FILTER_MODIFIER_NULL = 'is null'
+const TEXT_FILTER_MODIFIER_NOTNULL = 'not null'
+const TEXT_FILTER_MODIFIER_GT = 'greater'
+const TEXT_FILTER_MODIFIER_LT = 'less'
 
 @Component({
   selector: 'app-filter-editor',
@@ -141,6 +150,39 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       ?.name
   }
 
+  public textFilterModifier: string
+
+  get textFilterModifiers() {
+    return [
+      {
+        id: TEXT_FILTER_MODIFIER_EQUALS,
+        label: $localize`equals`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_NULL,
+        label: $localize`is empty`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_NOTNULL,
+        label: $localize`is not empty`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_GT,
+        label: $localize`greater than`,
+      },
+      {
+        id: TEXT_FILTER_MODIFIER_LT,
+        label: $localize`less than`,
+      },
+    ]
+  }
+
+  get textFilterModifierIsNull(): boolean {
+    return [TEXT_FILTER_MODIFIER_NULL, TEXT_FILTER_MODIFIER_NOTNULL].includes(
+      this.textFilterModifier
+    )
+  }
+
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
@@ -176,6 +218,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.dateAddedAfter = null
     this.dateCreatedBefore = null
     this.dateCreatedAfter = null
+    this.textFilterModifier = TEXT_FILTER_MODIFIER_EQUALS
 
     value.forEach((rule) => {
       switch (rule.rule_type) {
@@ -254,6 +297,20 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             false
           )
           break
+        case FILTER_ASN_ISNULL:
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          this.textFilterModifier = TEXT_FILTER_MODIFIER_NULL
+          break
+        case FILTER_ASN_GT:
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          this.textFilterModifier = TEXT_FILTER_MODIFIER_GT
+          this._textFilter = rule.value
+          break
+        case FILTER_ASN_LT:
+          this.textFilterTarget = TEXT_FILTER_TARGET_ASN
+          this.textFilterModifier = TEXT_FILTER_MODIFIER_LT
+          this._textFilter = rule.value
+          break
       }
     })
     this.checkIfRulesHaveChanged()
@@ -273,8 +330,33 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_TITLE) {
       filterRules.push({ rule_type: FILTER_TITLE, value: this._textFilter })
     }
-    if (this._textFilter && this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
-      filterRules.push({ rule_type: FILTER_ASN, value: this._textFilter })
+    if (this.textFilterTarget == TEXT_FILTER_TARGET_ASN) {
+      if (
+        this.textFilterModifier == TEXT_FILTER_MODIFIER_EQUALS &&
+        this._textFilter
+      ) {
+        filterRules.push({ rule_type: FILTER_ASN, value: this._textFilter })
+      } else if (this.textFilterModifierIsNull) {
+        filterRules.push({
+          rule_type: FILTER_ASN_ISNULL,
+          value: (
+            this.textFilterModifier == TEXT_FILTER_MODIFIER_NULL
+          ).toString(),
+        })
+      } else if (
+        [TEXT_FILTER_MODIFIER_GT, TEXT_FILTER_MODIFIER_LT].includes(
+          this.textFilterModifier
+        ) &&
+        this._textFilter
+      ) {
+        filterRules.push({
+          rule_type:
+            this.textFilterModifier == TEXT_FILTER_MODIFIER_GT
+              ? FILTER_ASN_GT
+              : FILTER_ASN_LT,
+          value: this._textFilter,
+        })
+      }
     }
     if (
       this._textFilter &&
@@ -398,7 +480,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   }
 
   get textFilter() {
-    return this._textFilter
+    return this.textFilterModifierIsNull ? '' : this._textFilter
   }
 
   set textFilter(value) {
@@ -497,5 +579,19 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.textFilterTarget = target
     this.textFilterInput.nativeElement.focus()
     this.updateRules()
+  }
+
+  textFilterModifierChange() {
+    if (
+      this.textFilterModifierIsNull ||
+      ([
+        TEXT_FILTER_MODIFIER_EQUALS,
+        TEXT_FILTER_MODIFIER_GT,
+        TEXT_FILTER_MODIFIER_LT,
+      ].includes(this.textFilterModifier) &&
+        this._textFilter)
+    ) {
+      this.updateRules()
+    }
   }
 }
