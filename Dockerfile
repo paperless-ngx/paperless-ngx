@@ -169,6 +169,7 @@ COPY requirements.txt ../
 # dependencies
 ARG BUILD_PACKAGES="\
   build-essential \
+  git \
   python3-dev"
 
 RUN set -eux \
