@@ -28,6 +28,7 @@ export class DocumentTypeListComponent extends ManagementListComponent<Paperless
       queryParamsService,
       FILTER_DOCUMENT_TYPE,
       $localize`document type`,
+      $localize`document types`,
       []
     )
   }

@@ -1,4 +1,4 @@
-<app-page-header title="{{ typeName | titlecase }}s">
+<app-page-header title="{{ typeNamePlural | titlecase }}">
   <button type="button" class="btn btn-sm btn-outline-primary" (click)="openCreateDialog()" i18n>Create</button>
 </app-page-header>
 
@@ -71,6 +71,6 @@
 </table>
 
 <div class="d-flex">
-  <div i18n *ngIf="collectionSize > 0">{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeName}}s}}</div>
+  <div i18n *ngIf="collectionSize > 0">{collectionSize, plural, =1 {One {{typeName}}} other {{{collectionSize || 0}} total {{typeNamePlural}}}}</div>
   <ngb-pagination *ngIf="collectionSize > 20" class="ms-auto" [pageSize]="25" [collectionSize]="collectionSize" [(page)]="page" (pageChange)="reloadData()" aria-label="Default pagination"></ngb-pagination>
 </div>
