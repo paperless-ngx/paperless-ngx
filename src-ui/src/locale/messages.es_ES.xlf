@@ -908,7 +908,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <target state="translated">Color</target>
       </trans-unit>
@@ -1341,7 +1341,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">156</context>
+          <context context-type="linenumber">157</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/settings/settings.component.html</context>
@@ -1621,7 +1621,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="final">Confirmar borrado</target>
       </trans-unit>
@@ -2319,11 +2319,19 @@
         </context-group>
         <target state="translated">interlocutor</target>
       </trans-unit>
+      <trans-unit id="1612355304340685070" datatype="html">
+        <source>correspondents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <target state="needs-translation">correspondents</target>
+      </trans-unit>
       <trans-unit id="6360600151505327572" datatype="html">
         <source>Last used</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">38</context>
         </context-group>
         <target state="translated">Usado por última vez</target>
       </trans-unit>
@@ -2331,7 +2339,7 @@
         <source>Do you really want to delete the correspondent &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/correspondent-list/correspondent-list.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">48</context>
         </context-group>
         <target state="final">¿Estás seguro de querer borrar el tipo de documento "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
@@ -2343,11 +2351,19 @@
         </context-group>
         <target state="needs-translation">document type</target>
       </trans-unit>
+      <trans-unit id="2992451138146293104" datatype="html">
+        <source>document types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <target state="needs-translation">document types</target>
+      </trans-unit>
       <trans-unit id="4990731724078522539" datatype="html" approved="yes">
         <source>Do you really want to delete the document type &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-type-list/document-type-list.component.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <target state="final">¿Estás seguro de querer borrar el tipo de documento "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
@@ -2451,8 +2467,8 @@
         </context-group>
         <target state="needs-translation">Filter Documents</target>
       </trans-unit>
-      <trans-unit id="808959623879724772" datatype="html">
-        <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/>s}}</source>
+      <trans-unit id="8095412801504464756" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">74</context>
@@ -2465,13 +2481,13 @@
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION"/>s}}</target>
+        <target state="needs-translation">{VAR_PLURAL, plural, =1 {One <x id="INTERPOLATION"/>} other {<x id="INTERPOLATION_1"/> total <x id="INTERPOLATION_2"/>}}</target>
       </trans-unit>
       <trans-unit id="810888510148304696" datatype="html" approved="yes">
         <source>Automatic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">87</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
@@ -2483,7 +2499,7 @@
         <source>Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">140</context>
         </context-group>
         <target state="needs-translation">Do you really want to delete the <x id="PH" equiv-text="this.typeName"/>?</target>
       </trans-unit>
@@ -2491,7 +2507,7 @@
         <source>Associated documents will not be deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">155</context>
         </context-group>
         <target state="final">Los documentos asociados no serán borrados.</target>
       </trans-unit>
@@ -2499,7 +2515,7 @@
         <source>Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.ts</context>
-          <context context-type="linenumber">167,169</context>
+          <context context-type="linenumber">168,170</context>
         </context-group>
         <target state="needs-translation">Error while deleting element: <x id="PH" equiv-text="JSON.stringify(               error.error             )"/></target>
       </trans-unit>
@@ -2807,11 +2823,19 @@
         </context-group>
         <target state="needs-translation">tag</target>
       </trans-unit>
+      <trans-unit id="4975748273657042999" datatype="html">
+        <source>tags</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <target state="needs-translation">tags</target>
+      </trans-unit>
       <trans-unit id="93754014749412887" datatype="html" approved="yes">
         <source>Do you really want to delete the tag &quot;<x id="PH" equiv-text="object.name"/>&quot;?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/tag-list/tag-list.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <target state="final">¿Estás seguro de querer borrar la etiqueta "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
