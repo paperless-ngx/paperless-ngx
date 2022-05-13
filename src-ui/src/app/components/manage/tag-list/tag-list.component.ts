@@ -28,6 +28,7 @@ export class TagListComponent extends ManagementListComponent<PaperlessTag> {
       queryParamsService,
       FILTER_HAS_TAGS_ALL,
       $localize`tag`,
+      $localize`tags`,
       [
         {
           key: 'color',

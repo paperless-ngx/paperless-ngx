@@ -31,6 +31,7 @@ export class CorrespondentListComponent extends ManagementListComponent<Paperles
       queryParamsService,
       FILTER_CORRESPONDENT,
       $localize`correspondent`,
+      $localize`correspondents`,
       [
         {
           key: 'last_correspondence',
