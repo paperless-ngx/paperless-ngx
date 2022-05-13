@@ -6,6 +6,7 @@ from collections import defaultdict
 import pathvalidate
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.utils import timezone
 
 
 logger = logging.getLogger("paperless.filehandling")
@@ -158,18 +159,22 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             else:
                 asn = "none"
 
+            # Convert UTC database date to localized date
+            local_added = timezone.localdate(doc.added)
+            local_created = timezone.localdate(doc.created)
+
             path = settings.PAPERLESS_FILENAME_FORMAT.format(
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
-                created=datetime.date.isoformat(doc.created),
-                created_year=doc.created.year if doc.created else "none",
-                created_month=f"{doc.created.month:02}" if doc.created else "none",
-                created_day=f"{doc.created.day:02}" if doc.created else "none",
-                added=datetime.date.isoformat(doc.added),
-                added_year=doc.added.year if doc.added else "none",
-                added_month=f"{doc.added.month:02}" if doc.added else "none",
-                added_day=f"{doc.added.day:02}" if doc.added else "none",
+                created=datetime.date.isoformat(local_created),
+                created_year=local_created.year,
+                created_month=f"{local_created.month:02}",
+                created_day=f"{local_created.day:02}",
+                added=datetime.date.isoformat(local_added),
+                added_year=local_added.year,
+                added_month=f"{local_added.month:02}",
+                added_day=f"{local_added.day:02}",
                 asn=asn,
                 tags=tags,
                 tag_list=tag_list,
