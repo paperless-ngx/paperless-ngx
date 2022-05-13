@@ -208,7 +208,9 @@ class Document(models.Model):
         verbose_name_plural = _("documents")
 
     def __str__(self):
-        created = datetime.date.isoformat(self.created)
+
+        # Convert UTC database time to local time
+        created = datetime.date.isoformat(timezone.localdate(self.created))
 
         if self.correspondent and self.title:
             return f"{created} {self.correspondent} {self.title}"
