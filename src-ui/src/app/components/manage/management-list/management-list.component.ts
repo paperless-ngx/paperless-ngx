@@ -45,6 +45,7 @@ export abstract class ManagementListComponent<T extends ObjectWithId>
     private queryParamsService: QueryParamsService,
     protected filterRuleType: number,
     public typeName: string,
+    public typeNamePlural: string,
     public extraColumns: ManagementListColumn[]
   ) {}
 
