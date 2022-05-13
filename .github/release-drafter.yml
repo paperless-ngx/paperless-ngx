@@ -28,9 +28,10 @@ include-labels:
 replacers: # Changes "Feature: Update checker" to "Update checker"
   - search: '/Feature:|Feat:|\[feature\]/gi'
     replace: ''
-change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+category-template: '### $TITLE'
+change-template: '- $TITLE [@$AUTHOR](https://github.com/$AUTHOR) ([#$NUMBER]($URL))'
 change-title-escapes: '\<*_&#@'
 template: |
-  # Changelog
+  ## paperless-ngx $RESOLVED_VERSION
 
   $CHANGES

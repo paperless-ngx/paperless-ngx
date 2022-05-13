@@ -513,7 +513,7 @@ how you installed paperless.
 This setup describes how to update an existing paperless Docker installation.
 The important things to keep in mind are as follows:
 
-* Read the :ref:`changelog <paperless_changelog>` and take note of breaking changes.
+* Read the :doc:`changelog </changelog>` and take note of breaking changes.
 * You should decide if you want to stick with SQLite or want to migrate your database
   to PostgreSQL. See :ref:`setup-sqlite_to_psql` for details on how to move your data from
   SQLite to PostgreSQL. Both work fine with paperless. However, if you already have a
