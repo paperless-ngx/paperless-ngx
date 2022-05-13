@@ -261,6 +261,11 @@ textarea,
   border-color: var(--bs-primary);
 }
 
+.form-control:disabled, .form-control[readonly] {
+  background-color: var(--pngx-bg-alt);
+  cursor: not-allowed;
+}
+
 .page-link {
   color: var(--bs-secondary);
   background-color: var(--bs-body-bg);
