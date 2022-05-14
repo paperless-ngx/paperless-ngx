@@ -339,8 +339,27 @@ class MailAccountHandler(LoggingMixin):
             _, temp_filename = tempfile.mkstemp(
                 prefix="paperless-mail-",
                 dir=settings.SCRATCH_DIR,
+                suffix=".eml",
             )
             with open(temp_filename, "wb") as f:
+                # Move "Date"-header to beginning of file
+                # TODO: This ugly workaround is needed because the parser is
+                #   chosen only by the mime_type detected via magic
+                #   (see documents/consumer.py "mime_type = magic.from_file")
+                #   Unfortunately magic sometimes fails to detect the mime
+                #   type of .eml files correctly as message/rfc822 and instead
+                #   detects text/plain.
+                #   This also effects direct file consumption of .eml files
+                #   which are not treated with this workaround.
+                date_element = None
+                for i, header in enumerate(message.obj._headers):
+                    if header[0] == "Date":
+                        date_element = i
+                if date_element:
+                    new_headers = [message.obj._headers.pop(date_element)]
+                    new_headers += message.obj._headers
+                    message.obj._headers = new_headers
+
                 f.write(message.obj.as_bytes())
 
             self.log(
