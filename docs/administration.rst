@@ -118,10 +118,10 @@ Then you can start paperless-ngx with ``-d`` to have it run in the background.
                 image: ghcr.io/paperless-ngx/paperless-ngx:latest
 
     .. note::
-        In version 1.7.1 and onwards, the Docker image can now pinned to a release series.
+        In version 1.7.1 and onwards, the Docker image can now be pinned to a release series.
         This is often combined with automatic updaters such as Watchtower to allow safer
         unattended upgrading to new bugfix releases only.  It is still recommended to always
-        review release notes before upgrading.  To ping your install to a release series, edit
+        review release notes before upgrading.  To pin your install to a release series, edit
         the ``docker-compose.yml`` find the line that says
 
             .. code::
