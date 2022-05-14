@@ -77,7 +77,24 @@ class TestDocument(TestCase):
 
         utc_create_date = local_create_date.astimezone(zoneinfo.ZoneInfo("UTC"))
 
+        doc = Document(
+            mime_type="application/pdf",
+            title="test",
+            created=utc_create_date,
+        )
+
+        # Ensure the create date would cause an off by 1 if not properly created above
         self.assertEqual(utc_create_date.date().day, 24)
+        self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
+
+        local_create_date = timezone.datetime(
+            2020,
+            1,
+            1,
+            tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"),
+        )
+
+        utc_create_date = local_create_date.astimezone(zoneinfo.ZoneInfo("UTC"))
 
         doc = Document(
             mime_type="application/pdf",
@@ -85,7 +102,9 @@ class TestDocument(TestCase):
             created=utc_create_date,
         )
 
-        self.assertEqual(doc.get_public_filename(), "2020-12-25 test.pdf")
+        # Ensure the create date would cause an off by 1 in the year if not properly created above
+        self.assertEqual(utc_create_date.date().year, 2019)
+        self.assertEqual(doc.get_public_filename(), "2020-01-01 test.pdf")
 
     def test_file_name_jpg(self):
 
