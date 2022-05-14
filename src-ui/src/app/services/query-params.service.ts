@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ParamMap, Params, Router } from '@angular/router'
 import { FilterRule } from '../data/filter-rule'
-import { FILTER_RULE_TYPES } from '../data/filter-rule-type'
+import { FilterRuleType, FILTER_RULE_TYPES } from '../data/filter-rule-type'
 import { PaperlessSavedView } from '../data/paperless-saved-view'
 import { DocumentListViewService } from './document-list-view.service'
 
@@ -129,24 +129,31 @@ export function filterRulesFromQueryParams(queryParams: ParamMap) {
   const allFilterRuleQueryParams: string[] = FILTER_RULE_TYPES.map(
     (rt) => rt.filtervar
   )
+    .concat(FILTER_RULE_TYPES.map((rt) => rt.isnull_filtervar))
+    .filter((rt) => rt !== undefined)
 
   // transform query params to filter rules
   let filterRulesFromQueryParams: FilterRule[] = []
   allFilterRuleQueryParams
     .filter((frqp) => queryParams.has(frqp))
     .forEach((filterQueryParamName) => {
-      const filterQueryParamValues: string[] = queryParams
-        .get(filterQueryParamName)
-        .split(',')
+      const rule_type: FilterRuleType = FILTER_RULE_TYPES.find(
+        (rt) =>
+          rt.filtervar == filterQueryParamName ||
+          rt.isnull_filtervar == filterQueryParamName
+      )
+      const isNullRuleType = rule_type.isnull_filtervar == filterQueryParamName
+      const valueURIComponent: string = queryParams.get(filterQueryParamName)
+      const filterQueryParamValues: string[] = rule_type.multi
+        ? valueURIComponent.split(',')
+        : [valueURIComponent]
 
       filterRulesFromQueryParams = filterRulesFromQueryParams.concat(
         // map all values to filter rules
         filterQueryParamValues.map((val) => {
           return {
-            rule_type: FILTER_RULE_TYPES.find(
-              (rt) => rt.filtervar == filterQueryParamName
-            ).id,
-            value: val,
+            rule_type: rule_type.id,
+            value: isNullRuleType ? null : val,
           }
         })
       )

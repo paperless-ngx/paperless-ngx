@@ -1,4 +1,4 @@
-<app-widget-frame title="Statistics" i18n-title>
+<app-widget-frame title="Statistics" [loading]="loading" i18n-title>
   <ng-container content>
     <p class="card-text" i18n *ngIf="statistics?.documents_inbox != null">Documents in inbox: {{statistics?.documents_inbox}}</p>
     <p class="card-text" i18n>Total documents: {{statistics?.documents_total}}</p>

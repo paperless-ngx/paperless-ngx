@@ -70,8 +70,9 @@
           </li>
         </ul>
 
-        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.sidebarViews.length > 0'>
+        <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted" *ngIf='savedViewService.loading || savedViewService.sidebarViews.length > 0'>
           <ng-container i18n>Saved views</ng-container>
+          <div *ngIf="savedViewService.loading" class="spinner-border spinner-border-sm fw-normal ms-2" role="status"></div>
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item w-100" *ngFor="let view of savedViewService.sidebarViews">
@@ -187,7 +188,7 @@
               <div class="me-3">{{ versionString }}</div>
               <div *ngIf="appRemoteVersion" class="version-check">
                 <ng-template #updateAvailablePopContent>
-                  <span class="small">Paperless-ngx v{{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
+                  <span class="small">Paperless-ngx {{ appRemoteVersion.version }} <ng-container i18n>is available.</ng-container><br/><ng-container i18n>Click to view.</ng-container></span>
                 </ng-template>
                 <ng-template #updateCheckingNotEnabledPopContent>
                   <span class="small"><ng-container i18n>Checking for updates is disabled.</ng-container><br/><ng-container i18n>Click for more information.</ng-container></span>

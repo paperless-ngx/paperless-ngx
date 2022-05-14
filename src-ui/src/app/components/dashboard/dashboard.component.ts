@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
-import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 
 @Component({
@@ -8,8 +7,8 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit {
-  constructor(private savedViewService: SavedViewService, private meta: Meta) {}
+export class DashboardComponent {
+  constructor(public savedViewService: SavedViewService, private meta: Meta) {}
 
   get displayName() {
     let tagFullName = this.meta.getTag('name=full_name')
@@ -29,15 +28,5 @@ export class DashboardComponent implements OnInit {
     } else {
       return $localize`Welcome to Paperless-ngx!`
     }
-  }
-
-  savedViews: PaperlessSavedView[] = []
-
-  ngOnInit(): void {
-    this.savedViewService.listAll().subscribe((results) => {
-      this.savedViews = results.results.filter(
-        (savedView) => savedView.show_on_dashboard
-      )
-    })
   }
 }

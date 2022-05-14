@@ -1,3 +1,4 @@
+import datetime
 import logging
 import mimetypes
 import os
@@ -5,6 +6,8 @@ import re
 import shutil
 import subprocess
 import tempfile
+from typing import Optional
+from typing import Set
 
 import magic
 from django.conf import settings
@@ -40,11 +43,11 @@ DATE_REGEX = re.compile(
 logger = logging.getLogger("paperless.parsing")
 
 
-def is_mime_type_supported(mime_type):
+def is_mime_type_supported(mime_type) -> bool:
     return get_parser_class_for_mime_type(mime_type) is not None
 
 
-def get_default_file_extension(mime_type):
+def get_default_file_extension(mime_type) -> str:
     for response in document_consumer_declaration.send(None):
         parser_declaration = response[1]
         supported_mime_types = parser_declaration["mime_types"]
@@ -59,14 +62,14 @@ def get_default_file_extension(mime_type):
         return ""
 
 
-def is_file_ext_supported(ext):
+def is_file_ext_supported(ext) -> bool:
     if ext:
         return ext.lower() in get_supported_file_extensions()
     else:
         return False
 
 
-def get_supported_file_extensions():
+def get_supported_file_extensions() -> Set[str]:
     extensions = set()
     for response in document_consumer_declaration.send(None):
         parser_declaration = response[1]
@@ -121,7 +124,7 @@ def run_convert(
     auto_orient=False,
     extra=None,
     logging_group=None,
-):
+) -> None:
 
     environment = os.environ.copy()
     if settings.CONVERT_MEMORY_LIMIT:
@@ -146,11 +149,11 @@ def run_convert(
         raise ParseError(f"Convert failed at {args}")
 
 
-def get_default_thumbnail():
+def get_default_thumbnail() -> str:
     return os.path.join(os.path.dirname(__file__), "resources", "document.png")
 
 
-def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None):
+def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -> str:
     out_path = os.path.join(temp_dir, "convert_gs.png")
 
     # if convert fails, fall back to extracting
@@ -184,7 +187,7 @@ def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None):
         return get_default_thumbnail()
 
 
-def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
+def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None) -> str:
     """
     The thumbnail of a PDF is just a 500px wide image of the first page.
     """
@@ -209,12 +212,12 @@ def make_thumbnail_from_pdf(in_path, temp_dir, logging_group=None):
     return out_path
 
 
-def parse_date(filename, text):
+def parse_date(filename, text) -> Optional[datetime.datetime]:
     """
     Returns the date of the document.
     """
 
-    def __parser(ds, date_order):
+    def __parser(ds: str, date_order: str) -> datetime.datetime:
         """
         Call dateparser.parse with a particular date ordering
         """
@@ -230,9 +233,9 @@ def parse_date(filename, text):
             },
         )
 
-    def __filter(date):
+    def __filter(date: datetime.datetime) -> Optional[datetime.datetime]:
         if (
-            date
+            date is not None
             and date.year > 1900
             and date <= timezone.now()
             and date.date() not in settings.IGNORE_DATES
@@ -269,7 +272,7 @@ def parse_date(filename, text):
 
         date = __filter(date)
         if date is not None:
-            break
+            return date
 
     return date
 
@@ -294,7 +297,7 @@ class DocumentParser(LoggingMixin):
 
         self.archive_path = None
         self.text = None
-        self.date = None
+        self.date: Optional[datetime.datetime] = None
         self.progress_callback = progress_callback
 
     def progress(self, current_progress, max_progress):
@@ -342,7 +345,7 @@ class DocumentParser(LoggingMixin):
     def get_text(self):
         return self.text
 
-    def get_date(self):
+    def get_date(self) -> Optional[datetime.datetime]:
         return self.date
 
     def cleanup(self):
