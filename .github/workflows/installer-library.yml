@@ -19,8 +19,10 @@ on:
       # Trigger if a package was updated
       - ".build-config.json"
       - "Pipfile.lock"
-      # Also trigger on workflow changes (such as this file)
-      - ".github/workflows/**"
+      # Also trigger on workflow changes related to the library
+      - ".github/workflows/installer-library.yml"
+      - ".github/workflows/reusable-workflow-builder.yml"
+      - ".github/scripts/**"
 
 # Set a workflow level concurrency group so primary workflow
 # can wait for this to complete if needed
