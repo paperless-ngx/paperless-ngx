@@ -399,7 +399,8 @@ class Consumer(LoggingMixin):
         if self.override_created is not None:
             create_date = self.override_created
             self.log(
-                "debug", f"Creation date from post_documents parameter: {create_date}",
+                "debug",
+                f"Creation date from post_documents parameter: {create_date}",
             )
         elif file_info.created is not None:
             create_date = file_info.created
