@@ -396,8 +396,10 @@ class Consumer(LoggingMixin):
 
         self.log("debug", "Saving record to database")
 
-<<<<<<< HEAD
-        if file_info.created is not None:
+        if self.override_created is not None:
+            create_date = self.override_created
+            self.log("debug", f"Creation date from post_documents parameter: {create_date}")
+        elif file_info.created is not None:
             create_date = file_info.created
             self.log("debug", f"Creation date from FileInfo: {create_date}")
         elif date is not None:
@@ -409,14 +411,6 @@ class Consumer(LoggingMixin):
                 datetime.datetime.fromtimestamp(stats.st_mtime),
             )
             self.log("debug", f"Creation date from st_mtime: {create_date}")
-=======
-        created = (
-            self.override_created
-            or file_info.created
-            or date
-            or timezone.make_aware(datetime.datetime.fromtimestamp(stats.st_mtime))
-        )
->>>>>>> 51d322e1 (Added "created" as optional parameter for post_documents.)
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
