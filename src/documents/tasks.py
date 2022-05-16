@@ -4,6 +4,7 @@ import shutil
 import tempfile
 from typing import List  # for type hinting. Can be removed, if only Python >3.8 is used
 
+import magic
 import tqdm
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -95,19 +96,33 @@ def barcode_reader(image) -> List[str]:
     return barcodes
 
 
+def get_file_type(path: str) -> str:
+    """
+    Determines the file type, based on MIME type.
+
+    Returns the MIME type.
+    """
+    mime_type = magic.from_file(path, mime=True)
+    logger.debug(f"Detected mime type: {mime_type}")
+    return mime_type
+
+
 def convert_from_tiff_to_pdf(filepath: str) -> str:
     """
-    converts a given TIFF image file to pdf into a temp. directory.
+    converts a given TIFF image file to pdf into a temporary directory.
+
     Returns the new pdf file.
     """
     file_name = os.path.splitext(os.path.basename(filepath))[0]
-    file_extension = os.path.splitext(os.path.basename(filepath))[1].lower()
+    mime_type = get_file_type(filepath)
     tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
     # use old file name with pdf extension
-    if file_extension == ".tif" or file_extension == ".tiff":
+    if mime_type == "image/tiff":
         newpath = os.path.join(tempdir, file_name + ".pdf")
     else:
-        logger.warning(f"Cannot convert from {str(file_extension)} to pdf.")
+        logger.warning(
+            f"Cannot convert mime type {str(mime_type)} from {str(filepath)} to pdf.",
+        )
         return None
     with Image.open(filepath) as image:
         images = []
@@ -231,17 +246,17 @@ def consume_file(
         document_list = []
         converted_tiff = None
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
-            supported_extensions = [".pdf", ".tiff", ".tif"]
+            supported_mime = ["image/tiff", "application/pdf"]
         else:
-            supported_extensions = [".pdf"]
-        file_extension = os.path.splitext(os.path.basename(path))[1].lower()
-        if file_extension not in supported_extensions:
+            supported_mime = ["application/pdf"]
+        mime_type = get_file_type(path)
+        if mime_type not in supported_mime:
             # if not supported, skip this routine
             logger.warning(
-                f"Unsupported file format for barcode reader: {str(file_extension)}",
+                f"Unsupported file format for barcode reader: {str(mime_type)}",
             )
         else:
-            if file_extension in {".tif", ".tiff"}:
+            if mime_type == "image/tiff":
                 file_to_process = convert_from_tiff_to_pdf(path)
             else:
                 file_to_process = path
