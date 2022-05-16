@@ -105,7 +105,7 @@ You can use your phone to "scan" documents. The regular camera app will work, bu
 
 On Android, you can use these applications in combination with one of the :ref:`Paperless-ngx compatible apps <usage-mobile_upload>` to "Share" the documents produced by these scanner apps with paperless. On iOS, you can share the scanned documents via iOS-Sharing to other mail, WebDav or FTP apps.
 
-There is also an iOS Shortcut that allows you to directly upload PDF documents available here: https://www.icloud.com/shortcuts/7696acad005443999cd6b1eaed3e6eba
+There is also an iOS Shortcut that allows you to directly upload text, PDF and image documents available here: https://www.icloud.com/shortcuts/d6dbf8dc1e454f8ea03b4c3d70058847
 Please note this only works for documents downloaded to iCloud / the device, in other words not directly from a URL.
 
 .. _Office Lens: https://play.google.com/store/apps/details?id=com.microsoft.office.officelens
