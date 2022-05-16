@@ -29,6 +29,7 @@ export class StoragePathListComponent extends ManagementListComponent<PaperlessS
       queryParamsService,
       FILTER_STORAGE_DIRECTORY,
       $localize`storage path`,
+      $localize`storage pathes`,
       [
         {
           key: 'path',
