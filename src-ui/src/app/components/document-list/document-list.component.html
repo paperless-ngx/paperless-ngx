@@ -168,7 +168,7 @@
           </ng-container>
         </td>
         <td>
-          <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+          <a (click)="clickEdit(d.id)" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
           <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
         <td class="d-none d-xl-table-cell">
