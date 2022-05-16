@@ -416,6 +416,7 @@ class PostDocumentSerializer(serializers.Serializer):
         label="Created",
         allow_null=True,
         write_only=True,
+        required=False,
     )
 
     document = serializers.FileField(
