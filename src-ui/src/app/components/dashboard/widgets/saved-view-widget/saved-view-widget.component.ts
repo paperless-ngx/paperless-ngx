@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { first, Subscription } from 'rxjs'
+import { Subscription } from 'rxjs'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
@@ -23,7 +23,7 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
     private router: Router,
     private queryParamsService: QueryParamsService,
     private consumerStatusService: ConsumerStatusService,
-    private openDocumentsService: OpenDocumentsService
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()
@@ -70,15 +70,6 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
         queryParams: { view: this.savedView.id },
       })
     }
-  }
-
-  clickDoc(doc: PaperlessDocument) {
-    this.openDocumentsService
-      .openDocument(doc)
-      .pipe(first())
-      .subscribe((open) => {
-        if (open) this.router.navigate(['documents', doc.id])
-      })
   }
 
   clickTag(tag: PaperlessTag) {
