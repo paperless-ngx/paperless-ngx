@@ -209,7 +209,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
 
     original_file_name = SerializerMethodField()
     archived_file_name = SerializerMethodField()
-    created_date = serializers.DateField()
+    created_date = serializers.DateField(required=False)
 
     def get_original_file_name(self, obj):
         return obj.get_public_filename()
@@ -228,6 +228,8 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
             )
             instance.created = new_datetime
             instance.save()
+        validated_data.pop("created_date")
+        super().update(instance, validated_data)
         return instance
 
     class Meta:
