@@ -240,10 +240,12 @@ be instructed to consume the document from there.
 The endpoint supports the following optional form fields:
 
 *   ``title``: Specify a title that the consumer should use for the document.
+*   ``created``: Specify a DateTime where the document was created (e.g. "2016-04-19" or "2016-04-19 06:15:00+02:00").
 *   ``correspondent``: Specify the ID of a correspondent that the consumer should use for the document.
 *   ``document_type``: Similar to correspondent.
 *   ``tags``: Similar to correspondent. Specify this multiple times to have multiple tags added
     to the document.
+
 
 The endpoint will immediately return "OK" if the document consumption process
 was started successfully. No additional status information about the consumption
