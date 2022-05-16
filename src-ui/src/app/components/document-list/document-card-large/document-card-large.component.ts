@@ -14,8 +14,6 @@ import {
 } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { Router } from '@angular/router'
-import { first } from 'rxjs'
 
 @Component({
   selector: 'app-document-card-large',
@@ -29,8 +27,7 @@ export class DocumentCardLargeComponent implements OnInit {
   constructor(
     private documentService: DocumentService,
     private settingsService: SettingsService,
-    private openDocumentsService: OpenDocumentsService,
-    private router: Router
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()
@@ -120,14 +117,5 @@ export class DocumentCardLargeComponent implements OnInit {
 
   get contentTrimmed() {
     return this.document.content.substr(0, 500)
-  }
-
-  clickEdit() {
-    this.openDocumentsService
-      .openDocument(this.document)
-      .pipe(first())
-      .subscribe((open) => {
-        if (open) this.router.navigate(['documents', this.document.id])
-      })
   }
 }

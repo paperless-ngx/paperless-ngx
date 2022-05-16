@@ -6,7 +6,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { first, map } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import {
@@ -15,7 +15,6 @@ import {
 } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-document-card-small',
@@ -29,8 +28,7 @@ export class DocumentCardSmallComponent implements OnInit {
   constructor(
     private documentService: DocumentService,
     private settingsService: SettingsService,
-    private openDocumentsService: OpenDocumentsService,
-    private router: Router
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()
@@ -112,14 +110,5 @@ export class DocumentCardSmallComponent implements OnInit {
 
   mouseLeaveCard() {
     this.popover.close()
-  }
-
-  clickEdit() {
-    this.openDocumentsService
-      .openDocument(this.document)
-      .pipe(first())
-      .subscribe((open) => {
-        if (open) this.router.navigate(['documents', this.document.id])
-      })
   }
 }

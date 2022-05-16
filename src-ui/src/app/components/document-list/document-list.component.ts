@@ -21,10 +21,7 @@ import {
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
-import {
-  filterRulesFromQueryParams,
-  QueryParamsService,
-} from 'src/app/services/query-params.service'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
@@ -49,7 +46,7 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
     private queryParamsService: QueryParamsService,
-    private openDocumentsService: OpenDocumentsService
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @ViewChild('filterEditor')
@@ -245,15 +242,6 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
     if (!event.shiftKey) this.list.toggleSelected(document)
     else this.list.selectRangeTo(document)
-  }
-
-  clickEdit(doc: PaperlessDocument) {
-    this.openDocumentsService
-      .openDocument(doc)
-      .pipe(first())
-      .subscribe((open) => {
-        if (open) this.router.navigate(['documents', doc.id])
-      })
   }
 
   clickTag(tagID: number) {
