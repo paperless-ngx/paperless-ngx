@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { Subscription } from 'rxjs'
+import { first, Subscription } from 'rxjs'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { PaperlessSavedView } from 'src/app/data/paperless-saved-view'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
@@ -8,6 +8,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { QueryParamsService } from 'src/app/services/query-params.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 
 @Component({
   selector: 'app-saved-view-widget',
@@ -21,7 +22,8 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
     private documentService: DocumentService,
     private router: Router,
     private queryParamsService: QueryParamsService,
-    private consumerStatusService: ConsumerStatusService
+    private consumerStatusService: ConsumerStatusService,
+    private openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()
@@ -68,6 +70,15 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
         queryParams: { view: this.savedView.id },
       })
     }
+  }
+
+  clickDoc(doc: PaperlessDocument) {
+    this.openDocumentsService
+      .openDocument(doc)
+      .pipe(first())
+      .subscribe((open) => {
+        if (open) this.router.navigate(['documents', doc.id])
+      })
   }
 
   clickTag(tag: PaperlessTag) {

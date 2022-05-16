@@ -20,6 +20,7 @@ import {
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   filterRulesFromQueryParams,
   QueryParamsService,
@@ -47,7 +48,8 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     private toastService: ToastService,
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
-    private queryParamsService: QueryParamsService
+    private queryParamsService: QueryParamsService,
+    private openDocumentsService: OpenDocumentsService
   ) {}
 
   @ViewChild('filterEditor')
@@ -243,6 +245,15 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
   toggleSelected(document: PaperlessDocument, event: MouseEvent): void {
     if (!event.shiftKey) this.list.toggleSelected(document)
     else this.list.selectRangeTo(document)
+  }
+
+  clickEdit(doc: PaperlessDocument) {
+    this.openDocumentsService
+      .openDocument(doc)
+      .pipe(first())
+      .subscribe((open) => {
+        if (open) this.router.navigate(['documents', doc.id])
+      })
   }
 
   clickTag(tagID: number) {
