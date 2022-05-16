@@ -32,7 +32,11 @@ export interface PaperlessDocument extends ObjectWithId {
 
   checksum?: string
 
+  // UTC
   created?: Date
+
+  // localized date
+  created_date?: Date
 
   modified?: Date
 

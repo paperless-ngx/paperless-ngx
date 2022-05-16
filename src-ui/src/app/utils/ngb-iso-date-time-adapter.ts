@@ -5,11 +5,20 @@ import { NgbDateAdapter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap'
 export class ISODateTimeAdapter extends NgbDateAdapter<string> {
   fromModel(value: string | null): NgbDateStruct | null {
     if (value) {
-      let date = new Date(value)
-      return {
-        day: date.getDate(),
-        month: date.getMonth() + 1,
-        year: date.getFullYear(),
+      if (value.match(/\d\d\d\d\-\d\d\-\d\d/g)) {
+        const segs = value.split('-')
+        return {
+          year: parseInt(segs[0]),
+          month: parseInt(segs[1]),
+          day: parseInt(segs[2]),
+        }
+      } else {
+        let date = new Date(value)
+        return {
+          day: date.getDate(),
+          month: date.getMonth() + 1,
+          year: date.getFullYear(),
+        }
       }
     } else {
       return null
@@ -17,8 +26,6 @@ export class ISODateTimeAdapter extends NgbDateAdapter<string> {
   }
 
   toModel(date: NgbDateStruct | null): string | null {
-    return date
-      ? new Date(date.year, date.month - 1, date.day).toISOString()
-      : null
+    return date ? [date.year, date.month, date.day].join('-') : null
   }
 }
