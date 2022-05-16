@@ -189,7 +189,7 @@ class Consumer(LoggingMixin):
         override_document_type_id=None,
         override_tag_ids=None,
         task_id=None,
-        override_created=None
+        override_created=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -398,7 +398,9 @@ class Consumer(LoggingMixin):
 
         if self.override_created is not None:
             create_date = self.override_created
-            self.log("debug", f"Creation date from post_documents parameter: {create_date}")
+            self.log(
+                "debug", f"Creation date from post_documents parameter: {create_date}"
+            )
         elif file_info.created is not None:
             create_date = file_info.created
             self.log("debug", f"Creation date from FileInfo: {create_date}")

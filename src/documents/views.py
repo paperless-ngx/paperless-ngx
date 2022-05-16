@@ -531,7 +531,7 @@ class PostDocumentView(GenericAPIView):
             override_tag_ids=tag_ids,
             task_id=task_id,
             task_name=os.path.basename(doc_name)[:100],
-            override_created=created
+            override_created=created,
         )
 
         return Response("OK")
