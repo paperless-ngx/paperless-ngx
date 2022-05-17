@@ -38,7 +38,7 @@ services:
     image: mariadb:10
     restart: unless-stopped
     volumes:
-      - dbdata:/var/lib/mariadb/data
+      - dbdata:/var/lib/mysql
     environment:
       MARIADB_HOST: paperless
       MARIADB_DATABASE: paperless
