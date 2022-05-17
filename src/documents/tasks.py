@@ -53,7 +53,7 @@ def train_classifier():
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
-        and not StoragePath.objects.exists()
+        and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
 
         return

@@ -133,15 +133,13 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
         if doc.storage_path:
             if doc.storage_path.path is not None:
                 logger.debug(
-                    "Document has storage_path %i (%s) set",
-                    doc.storage_path.id,
-                    doc.storage_path.path,
+                    f"Document has storage_path {doc.storage_path.id} "
+                    f"({doc.storage_path.path}) set",
                 )
                 filename_format = doc.storage_path.path
             else:
                 logger.warn(
-                    "storage_path %i does not have a path set",
-                    doc.storage_path.id,
+                    f"storage_path {doc.storage_path.id} does not have a path set",
                 )
 
         if filename_format is not None:
@@ -152,9 +150,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 
             tag_list = pathvalidate.sanitize_filename(
                 ",".join(
-                    sorted(
-                        [tag.name for tag in doc.tags.all()],
-                    ),
+                    sorted(tag.name for tag in doc.tags.all()),
                 ),
                 replacement_text="-",
             )
@@ -210,7 +206,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
 
     except (ValueError, KeyError, IndexError):
         logger.warning(
-            f"Invalid filename_format " f"{filename_format}, falling back to default",
+            f"Invalid filename_format '{filename_format}', falling back to default",
         )
 
     counter_str = f"_{counter:02}" if counter else ""

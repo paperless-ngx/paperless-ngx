@@ -59,7 +59,7 @@ def load_classifier():
 
 class DocumentClassifier:
 
-    # v7 - Updated scikit-learn package version
+    # v8 - Added storage path classifier
     FORMAT_VERSION = 8
 
     def __init__(self):
