@@ -590,6 +590,28 @@ PAPERLESS_CONSUMER_POLLING=<num>
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
+PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>
+    If consumer polling is enabled, sets the number of times paperless will check for a
+    file to remain unmodified.
+
+    Defaults to 5.
+
+PAPERLESS_CONSUMER_POLLING_DELAY=<num>
+    If consumer polling is enabled, sets the delay in seconds between each check (above) paperless
+    will do while waiting for a file to remain unmodified.
+
+    Defaults to 5.
+
+.. _configuration-inotify:
+
+PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>
+    Sets the time in seconds the consumer will wait for additional events
+    from inotify before the consumer will consider a file ready and begin consumption.
+    Certain scanners or network setups may generate multiple events for a single file,
+    leading to multiple consumers working on the same file.  Configure this to
+    prevent that.
+
+    Defaults to 0.5 seconds.
 
 PAPERLESS_CONSUMER_DELETE_DUPLICATES=<bool>
     When the consumer detects a duplicate document, it will not touch the

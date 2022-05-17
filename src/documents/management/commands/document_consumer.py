@@ -216,7 +216,7 @@ class Command(BaseCommand):
 
         try:
 
-            inotify_debounce: Final[float] = 0.5
+            inotify_debounce: Final[float] = settings.CONSUMER_INOTIFY_DELAY
             notified_files = {}
 
             while not self.stop_flag:
@@ -234,10 +234,23 @@ class Command(BaseCommand):
                 for filepath in notified_files:
                     # Time of the last inotify event for this file
                     last_event_time = notified_files[filepath]
-                    if (monotonic() - last_event_time) > inotify_debounce:
+
+                    # Current time - last time over the configured timeout
+                    waited_long_enough = (
+                        monotonic() - last_event_time
+                    ) > inotify_debounce
+
+                    # Also make sure the file exists still, some scanners might write a
+                    # temporary file first
+                    file_still_exists = os.path.exists(filepath) and os.path.isfile(
+                        filepath,
+                    )
+
+                    if waited_long_enough and file_still_exists:
                         _consume(filepath)
-                    else:
+                    elif file_still_exists:
                         still_waiting[filepath] = last_event_time
+
                 # These files are still waiting to hit the timeout
                 notified_files = still_waiting
 
