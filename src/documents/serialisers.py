@@ -2,8 +2,11 @@ import datetime
 import math
 import re
 
+try:
+    import zoneinfo
+except ImportError:
+    import backports.zoneinfo as zoneinfo
 import magic
-from dateutil import tz
 from django.conf import settings
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -224,7 +227,7 @@ class DocumentSerializer(DynamicFieldsModelSerializer):
         if "created_date" in validated_data and "created" not in validated_data:
             new_datetime = datetime.datetime.combine(
                 validated_data.get("created_date"),
-                datetime.time(0, 0, 0, 0, tz.gettz(settings.TIME_ZONE)),
+                datetime.time(0, 0, 0, 0, zoneinfo.ZoneInfo(settings.TIME_ZONE)),
             )
             instance.created = new_datetime
             instance.save()
