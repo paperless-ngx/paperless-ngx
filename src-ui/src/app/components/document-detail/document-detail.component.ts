@@ -85,6 +85,7 @@ export class DocumentDetailComponent
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
+  docChangeNotifier: Subject<any> = new Subject()
 
   requiresPassword: boolean = false
   password: string
@@ -117,18 +118,7 @@ export class DocumentDetailComponent
     private toastService: ToastService,
     private settings: SettingsService,
     private queryParamsService: QueryParamsService
-  ) {
-    this.titleSubject
-      .pipe(
-        debounceTime(1000),
-        distinctUntilChanged(),
-        takeUntil(this.unsubscribeNotifier)
-      )
-      .subscribe((titleValue) => {
-        this.title = titleValue
-        this.documentForm.patchValue({ title: titleValue })
-      })
-  }
+  ) {}
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
@@ -184,6 +174,7 @@ export class DocumentDetailComponent
       .pipe(
         switchMap((paramMap) => {
           const documentId = +paramMap.get('id')
+          this.docChangeNotifier.next(documentId)
           return this.documentsService.get(documentId)
         })
       )
@@ -207,6 +198,18 @@ export class DocumentDetailComponent
             this.openDocumentService.openDocument(doc)
             this.updateComponent(doc)
           }
+
+          this.titleSubject
+            .pipe(
+              debounceTime(1000),
+              distinctUntilChanged(),
+              takeUntil(this.docChangeNotifier),
+              takeUntil(this.unsubscribeNotifier)
+            )
+            .subscribe((titleValue) => {
+              this.title = titleValue
+              this.documentForm.patchValue({ title: titleValue })
+            })
 
           this.ogDate = new Date(normalizeDateStr(doc.created.toString()))
 
