@@ -10,7 +10,7 @@ import {
 } from '@angular/core'
 import { Meta } from '@angular/platform-browser'
 import { CookieService } from 'ngx-cookie-service'
-import { first, Observable } from 'rxjs'
+import { first, Observable, tap } from 'rxjs'
 import {
   BRIGHTNESS,
   estimateBrightnessForColor,
@@ -60,13 +60,14 @@ export class SettingsService {
 
   // this is called by the app initializer in app.module
   public initializeSettings(): Observable<PaperlessUiSettings> {
-    let settings$ = this.http.get<PaperlessUiSettings>(this.baseUrl)
-    settings$.pipe(first()).subscribe((uisettings) => {
-      Object.assign(this.settings, uisettings.settings)
-      this.maybeMigrateSettings()
-      this.displayName = uisettings.display_name.trim()
-    })
-    return settings$
+    return this.http.get<PaperlessUiSettings>(this.baseUrl).pipe(
+      first(),
+      tap((uisettings) => {
+        Object.assign(this.settings, uisettings.settings)
+        this.maybeMigrateSettings()
+        this.displayName = uisettings.display_name.trim()
+      })
+    )
   }
 
   public updateAppearanceSettings(
