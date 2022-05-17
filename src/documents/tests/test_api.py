@@ -33,9 +33,6 @@ from rest_framework.test import APITestCase
 from whoosh.writing import AsyncWriter
 
 
-@override_settings(
-    DEBUG=True,
-)
 class TestDocumentApi(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
