@@ -172,6 +172,7 @@ export class DocumentDetailComponent
 
     this.route.paramMap
       .pipe(
+        takeUntil(this.unsubscribeNotifier),
         switchMap((paramMap) => {
           const documentId = +paramMap.get('id')
           this.docChangeNotifier.next(documentId)
@@ -206,9 +207,20 @@ export class DocumentDetailComponent
               takeUntil(this.docChangeNotifier),
               takeUntil(this.unsubscribeNotifier)
             )
-            .subscribe((titleValue) => {
-              this.title = titleValue
-              this.documentForm.patchValue({ title: titleValue })
+            .subscribe({
+              next: (titleValue) => {
+                this.title = titleValue
+                this.documentForm.patchValue({ title: titleValue })
+              },
+              complete: () => {
+                // doc changed so we manually check dirty in case title was changed
+                if (
+                  this.store.getValue().title !==
+                  this.documentForm.get('title').value
+                ) {
+                  this.openDocumentService.setDirty(doc.id, true)
+                }
+              },
             })
 
           this.ogDate = new Date(normalizeDateStr(doc.created.toString()))
@@ -238,7 +250,6 @@ export class DocumentDetailComponent
           return this.isDirty$.pipe(map((dirty) => ({ doc, dirty })))
         })
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: ({ doc, dirty }) => {
           this.openDocumentService.setDirty(doc.id, dirty)
