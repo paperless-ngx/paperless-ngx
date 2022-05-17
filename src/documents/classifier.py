@@ -267,7 +267,7 @@ class DocumentClassifier:
         else:
             self.storage_path_classifier = None
             logger.debug(
-                "There are no storage pathes. Not training storage path " "classifier.",
+                "There are no storage pathes. Not training storage path classifier.",
             )
 
         self.data_hash = new_data_hash
