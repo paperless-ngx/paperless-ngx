@@ -235,3 +235,66 @@ You might find messages like these in your log files:
 This indicates that paperless failed to read PDF metadata from one of your documents. This happens when you
 open the affected documents in paperless for editing. Paperless will continue to work, and will simply not
 show the invalid metadata.
+
+Consumer fails with a FileNotFoundError
+############################
+
+You might find messages like these in your log files:
+
+.. code::
+    [ERROR] [paperless.consumer] Error while consuming document SCN_0001.pdf: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/ocrmypdf.io.yhk3zbv0/origin.pdf'
+    Traceback (most recent call last):
+      File "/app/paperless/src/paperless_tesseract/parsers.py", line 261, in parse
+        ocrmypdf.ocr(**args)
+      File "/usr/local/lib/python3.8/dist-packages/ocrmypdf/api.py", line 337, in ocr
+        return run_pipeline(options=options, plugin_manager=plugin_manager, api=True)
+      File "/usr/local/lib/python3.8/dist-packages/ocrmypdf/_sync.py", line 385, in run_pipeline
+        exec_concurrent(context, executor)
+      File "/usr/local/lib/python3.8/dist-packages/ocrmypdf/_sync.py", line 302, in exec_concurrent
+        pdf = post_process(pdf, context, executor)
+      File "/usr/local/lib/python3.8/dist-packages/ocrmypdf/_sync.py", line 235, in post_process
+        pdf_out = metadata_fixup(pdf_out, context)
+      File "/usr/local/lib/python3.8/dist-packages/ocrmypdf/_pipeline.py", line 798, in metadata_fixup
+        with pikepdf.open(context.origin) as original, pikepdf.open(working_file) as pdf:
+      File "/usr/local/lib/python3.8/dist-packages/pikepdf/_methods.py", line 923, in open
+        pdf = Pdf._open(
+    FileNotFoundError: [Errno 2] No such file or directory: '/tmp/ocrmypdf.io.yhk3zbv0/origin.pdf'
+
+This probably indicates paperless tried to consume the same file twice.  This can happen for a number of reasons,
+depending on how documents are placed into the consume folder.  If paperless is using inotify (the default) to
+check for documents, try adjusting the :ref:`inotify configuration <configuration-inotify>`.  If polling is enabled,
+try adjusting the :ref:`polling configuration <configuration-polling>`.
+
+Consumer fails waiting for file to remain unmodified.
+############################
+
+You might find messages like these in your log files:
+
+.. code::
+    [ERROR] [paperless.management.consumer] Timeout while waiting on file /usr/src/paperless/src/../consume/SCN_0001.pdf to remain unmodified.
+
+This indicates paperless timed out while waiting for the file to be completely written to the consume folder.
+Adjusting :ref:`polling configuration <configuration-polling>` values should resolve the issue.
+
+.. note::
+
+    The user will need to manually move the file out of the consume folder and
+    back in, for the initial failing file to be consumed.
+
+Consumer fails reporting "OS reports file as busy still".
+############################
+
+You might find messages like these in your log files:
+
+.. code::
+    [WARNING] [paperless.management.consumer] Not consuming file /usr/src/paperless/src/../consume/SCN_0001.pdf: OS reports file as busy still
+
+This indicates paperless was unable to open the file, as the OS reported the file as still being in use.  To prevent a
+crash, paperless did not try to consume the file.  If paperless is using inotify (the default) to
+check for documents, try adjusting the :ref:`inotify configuration <configuration-inotify>`.  If polling is enabled,
+try adjusting the :ref:`polling configuration <configuration-polling>`.
+
+.. note::
+
+    The user will need to manually move the file out of the consume folder and
+    back in, for the initial failing file to be consumed.
