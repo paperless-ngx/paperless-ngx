@@ -87,7 +87,6 @@ import localeSr from '@angular/common/locales/sr'
 import localeSv from '@angular/common/locales/sv'
 import localeTr from '@angular/common/locales/tr'
 import localeZh from '@angular/common/locales/zh'
-import { Observable } from 'rxjs'
 import { SettingsService } from './services/settings.service'
 
 registerLocaleData(localeBe)
