@@ -416,7 +416,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">68</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/management-list/management-list.component.html</context>
@@ -2115,7 +2115,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">198</context>
+          <context context-type="linenumber">197</context>
         </context-group>
         <target state="translated">"<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" adlı görünüm başarı ile kayıt edildi.</target>
       </trans-unit>
@@ -2123,7 +2123,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">228</context>
+          <context context-type="linenumber">227</context>
         </context-group>
         <target state="translated"><x id="PH" equiv-text="savedView.name"/> adlı görünüm başarı ile oluşturuldu.</target>
       </trans-unit>
@@ -2943,11 +2943,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">107</context>
+          <context context-type="linenumber">138</context>
         </context-group>
         <target state="translated">Kaydedilmemiş değişiklikler</target>
       </trans-unit>
@@ -2959,11 +2959,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">85</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <target state="translated">Kaydedilmemiş değişiklikleriniz var.</target>
       </trans-unit>
@@ -3115,11 +3111,19 @@
         </context-group>
         <target state="translated">Tamamlandı.</target>
       </trans-unit>
+      <trans-unit id="5523607037798226031" datatype="html">
+        <source>You have unsaved changes to the document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+        <target state="needs-translation">You have unsaved changes to the document</target>
+      </trans-unit>
       <trans-unit id="2089045849587358256" datatype="html">
         <source>Are you sure you want to close this document?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">117</context>
         </context-group>
         <target state="translated">Bu belgeyi kapatmak istediğinizden emin misin?</target>
       </trans-unit>
@@ -3127,7 +3131,7 @@
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">119</context>
         </context-group>
         <target state="translated">Belgeyi kapat</target>
       </trans-unit>
@@ -3135,7 +3139,7 @@
         <source>Are you sure you want to close all documents?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">140</context>
         </context-group>
         <target state="translated">Tüm belgeleri kapatmak istediğinizden emin misiniz?</target>
       </trans-unit>
@@ -3143,7 +3147,7 @@
         <source>Close documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">142</context>
         </context-group>
         <target state="translated">Belgeleri kapat</target>
       </trans-unit>
