@@ -8,6 +8,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessTag } from 'src/app/data/paperless-tag'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
 import { QueryParamsService } from 'src/app/services/query-params.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 
 @Component({
   selector: 'app-saved-view-widget',
@@ -21,7 +22,8 @@ export class SavedViewWidgetComponent implements OnInit, OnDestroy {
     private documentService: DocumentService,
     private router: Router,
     private queryParamsService: QueryParamsService,
-    private consumerStatusService: ConsumerStatusService
+    private consumerStatusService: ConsumerStatusService,
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()

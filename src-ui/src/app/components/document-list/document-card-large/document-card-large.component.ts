@@ -6,7 +6,6 @@ import {
   Output,
   ViewChild,
 } from '@angular/core'
-import { DomSanitizer } from '@angular/platform-browser'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import {
@@ -14,8 +13,7 @@ import {
   SETTINGS_KEYS,
 } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 
 @Component({
   selector: 'app-document-card-large',
@@ -28,8 +26,8 @@ import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 export class DocumentCardLargeComponent implements OnInit {
   constructor(
     private documentService: DocumentService,
-    private sanitizer: DomSanitizer,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()
