@@ -8,9 +8,9 @@
 -i https://pypi.python.org/simple
 --extra-index-url https://www.piwheels.org/simple
 aioredis==1.3.1
-anyio==3.5.0; python_full_version >= '3.6.2'
+anyio==3.6.1; python_full_version >= '3.6.2'
 arrow==1.2.2; python_version >= '3.6'
-asgiref==3.5.1; python_version >= '3.7'
+asgiref==3.5.2; python_version >= '3.7'
 async-timeout==4.0.2; python_version >= '3.6'
 attrs==21.4.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 autobahn==22.4.2; python_version >= '3.7'
@@ -21,13 +21,12 @@ certifi==2021.10.8
 cffi==1.15.0
 channels-redis==3.4.0
 channels==3.0.4
-chardet==4.0.0; python_version >= '3.1'
-charset-normalizer==2.0.12; python_version >= '3'
+charset-normalizer==2.0.12; python_version >= '3.5'
 click==8.1.3; python_version >= '3.7'
 coloredlogs==15.0.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 concurrent-log-handler==0.9.20
 constantly==15.1.0
-cryptography==37.0.2; python_version >= '3.6'
+cryptography==36.0.2; python_version >= '3.6'
 daphne==3.0.2; python_version >= '3.6'
 dateparser==1.1.1
 django-cors-headers==3.12.0
@@ -37,7 +36,7 @@ django-picklefield==3.0.1; python_version >= '3'
 django-q==1.3.9
 django==4.0.4
 djangorestframework==3.13.1
-filelock==3.6.0
+filelock==3.7.0
 fuzzywuzzy[speedup]==0.18.0
 gunicorn==20.1.0
 h11==0.13.0; python_version >= '3.6'
@@ -57,12 +56,12 @@ langdetect==1.0.9
 lxml==4.8.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 msgpack==1.0.3
 numpy==1.22.3; python_version >= '3.8'
-ocrmypdf==13.4.3
+ocrmypdf==13.4.4
 packaging==21.3; python_version >= '3.6'
 pathvalidate==2.5.0
 pdf2image==1.16.0
-pdfminer.six==20220319
-pikepdf==5.1.2
+pdfminer.six==20220506
+pikepdf==5.1.3
 pillow==9.1.0
 pluggy==1.0.0; python_version >= '3.6'
 portalocker==2.4.0; python_version >= '3'
@@ -71,7 +70,7 @@ pyasn1-modules==0.2.8
 pyasn1==0.4.8
 pycparser==2.21
 pyopenssl==22.0.0
-pyparsing==3.0.8; python_full_version >= '3.6.8'
+pyparsing==3.0.9; python_full_version >= '3.6.8'
 python-dateutil==2.8.2
 python-dotenv==0.20.0
 python-gnupg==0.4.8
@@ -103,7 +102,7 @@ tzlocal==4.2; python_version >= '3.6'
 urllib3==1.26.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'
 uvicorn[standard]==0.17.6
 uvloop==0.16.0
-watchdog==2.1.7
+watchdog==2.1.8
 watchgod==0.8.2
 wcwidth==0.2.5
 websockets==10.3
