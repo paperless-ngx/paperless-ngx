@@ -801,7 +801,6 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 {"document": f, "title": "", "correspondent": "", "document_type": ""},
             )
 
-        print(response.content)
         self.assertEqual(response.status_code, 200)
 
         m.assert_called_once()
