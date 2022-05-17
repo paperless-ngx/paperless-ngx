@@ -590,6 +590,20 @@ PAPERLESS_CONSUMER_POLLING=<num>
 
     Defaults to 0, which disables polling and uses filesystem notifications.
 
+PAPERLESS_CONSUMER_POLLING_RETRY_COUNT=<num>
+    If consumer polling is enabled, sets the number of times paperless will check for a
+    file to remain unmodified.
+
+    Defaults to 5.
+
+PAPERLESS_CONSUMER_POLLING_DELAY=<num>
+    If consumer polling is enabled, sets the delay in seconds between each check (above) paperless
+    will do while waiting for a file to remain unmodified.
+
+    Defaults to 5.
+
+.. _configuration-inotify:
+
 PAPERLESS_CONSUMER_INOTIFY_DELAY=<num>
     Sets the time in seconds the consumer will wait for additional events
     from inotify before the consumer will consider a file ready and begin consumption.
