@@ -238,6 +238,7 @@ def consume_file(
     override_document_type_id=None,
     override_tag_ids=None,
     task_id=None,
+    override_created=None,
 ):
 
     # check for separators in current document
@@ -318,6 +319,7 @@ def consume_file(
         override_document_type_id=override_document_type_id,
         override_tag_ids=override_tag_ids,
         task_id=task_id,
+        override_created=override_created,
     )
 
     if document:
