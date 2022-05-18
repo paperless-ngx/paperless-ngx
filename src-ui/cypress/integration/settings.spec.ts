@@ -3,45 +3,53 @@ describe('settings', () => {
     this.modifiedViews = []
 
     // mock API methods
-    cy.fixture('saved_views/savedviews.json').then((savedViewsJson) => {
-      // saved views PATCH
-      cy.intercept(
-        'PATCH',
-        'http://localhost:8000/api/saved_views/*',
-        (req) => {
-          this.modifiedViews.push(req.body) // store this for later
-          req.reply({ result: 'OK' })
-        }
-      )
+    cy.intercept('http://localhost:8000/api/ui_settings/', {
+      fixture: 'ui_settings/settings.json',
+    }).then(() => {
+      cy.fixture('saved_views/savedviews.json').then((savedViewsJson) => {
+        // saved views PATCH
+        cy.intercept(
+          'PATCH',
+          'http://localhost:8000/api/saved_views/*',
+          (req) => {
+            this.modifiedViews.push(req.body) // store this for later
+            req.reply({ result: 'OK' })
+          }
+        )
 
-      cy.intercept('GET', 'http://localhost:8000/api/saved_views/*', (req) => {
-        let response = { ...savedViewsJson }
-        if (this.modifiedViews.length) {
-          response.results = response.results.map((v) => {
-            if (this.modifiedViews.find((mv) => mv.id == v.id))
-              v = this.modifiedViews.find((mv) => mv.id == v.id)
-            return v
-          })
-        }
+        cy.intercept(
+          'GET',
+          'http://localhost:8000/api/saved_views/*',
+          (req) => {
+            let response = { ...savedViewsJson }
+            if (this.modifiedViews.length) {
+              response.results = response.results.map((v) => {
+                if (this.modifiedViews.find((mv) => mv.id == v.id))
+                  v = this.modifiedViews.find((mv) => mv.id == v.id)
+                return v
+              })
+            }
 
-        req.reply(response)
-      }).as('savedViews')
-    })
-
-    cy.fixture('documents/documents.json').then((documentsJson) => {
-      cy.intercept('GET', 'http://localhost:8000/api/documents/1/', (req) => {
-        let response = { ...documentsJson }
-        response = response.results.find((d) => d.id == 1)
-        req.reply(response)
+            req.reply(response)
+          }
+        ).as('savedViews')
       })
-    })
 
-    cy.intercept('http://localhost:8000/api/documents/1/metadata/', {
-      fixture: 'documents/1/metadata.json',
-    })
+      cy.fixture('documents/documents.json').then((documentsJson) => {
+        cy.intercept('GET', 'http://localhost:8000/api/documents/1/', (req) => {
+          let response = { ...documentsJson }
+          response = response.results.find((d) => d.id == 1)
+          req.reply(response)
+        })
+      })
 
-    cy.intercept('http://localhost:8000/api/documents/1/suggestions/', {
-      fixture: 'documents/1/suggestions.json',
+      cy.intercept('http://localhost:8000/api/documents/1/metadata/', {
+        fixture: 'documents/1/metadata.json',
+      })
+
+      cy.intercept('http://localhost:8000/api/documents/1/suggestions/', {
+        fixture: 'documents/1/suggestions.json',
+      })
     })
 
     cy.viewport(1024, 1024)
