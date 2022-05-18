@@ -26,7 +26,7 @@ COPY ./src-ui /src/src-ui
 WORKDIR /src/src-ui
 RUN set -eux \
   && npm update npm -g \
-  && npm ci --no-optional
+  && npm ci --omit=optional
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
