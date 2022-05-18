@@ -13,11 +13,11 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import {
   LanguageOption,
   SettingsService,
-  SETTINGS_KEYS,
 } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { Observable, Subscription, BehaviorSubject } from 'rxjs'
+import { Observable, Subscription, BehaviorSubject, first } from 'rxjs'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-settings',
@@ -227,10 +227,23 @@ export class SettingsComponent implements OnInit, OnDestroy, DirtyComponent {
       this.settingsForm.value.notificationsConsumerSuppressOnDashboard
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
-    this.store.next(this.settingsForm.value)
-    this.documentListViewService.updatePageSize()
-    this.settings.updateAppearanceSettings()
-    this.toastService.showInfo($localize`Settings saved successfully.`)
+    this.settings
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          this.store.next(this.settingsForm.value)
+          this.documentListViewService.updatePageSize()
+          this.settings.updateAppearanceSettings()
+          this.toastService.showInfo($localize`Settings saved successfully.`)
+        },
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.log(error)
+        },
+      })
   }
 
   get displayLanguageOptions(): LanguageOption[] {

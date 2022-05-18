@@ -16,6 +16,7 @@ from .models import SavedView
 from .models import SavedViewFilterRule
 from .models import StoragePath
 from .models import Tag
+from .models import UiSettings
 from .parsers import is_mime_type_supported
 
 
@@ -549,3 +550,24 @@ class StoragePathSerializer(MatchingModelSerializer):
             "is_insensitive",
             "document_count",
         )
+
+
+class UiSettingsViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UiSettings
+        depth = 1
+        fields = [
+            "id",
+            "settings",
+        ]
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+        return instance
+
+    def create(self, validated_data):
+        ui_settings = UiSettings.objects.update_or_create(
+            user=validated_data.get("user"),
+            defaults={"settings": validated_data.get("settings", None)},
+        )
+        return ui_settings

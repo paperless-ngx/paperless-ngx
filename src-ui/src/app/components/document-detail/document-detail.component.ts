@@ -18,10 +18,7 @@ import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
-import {
-  SettingsService,
-  SETTINGS_KEYS,
-} from 'src/app/services/settings.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { Observable, Subject, BehaviorSubject } from 'rxjs'
 import {
@@ -39,6 +36,7 @@ import { QueryParamsService } from 'src/app/services/query-params.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
 import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-document-detail',

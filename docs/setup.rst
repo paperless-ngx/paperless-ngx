@@ -332,6 +332,12 @@ writing. Windows is not and will never be supported.
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
     to use PostgreSQL, SQLite is available as well.
 
+    .. note::
+
+        On bare-metal installations using SQLite, ensure the
+        `JSON1 extension <https://code.djangoproject.com/wiki/JSON1Extension>`_ is enabled. This is
+        usually the case, but not always.
+
 4.  Get the release archive from `<https://github.com/paperless-ngx/paperless-ngx/releases>`_.
     If you clone the git repo as it is, you also have to compile the front end by yourself.
     Extract the archive to a place from where you wish to execute it, such as ``/opt/paperless``.

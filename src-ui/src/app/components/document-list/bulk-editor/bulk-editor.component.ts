@@ -19,14 +19,12 @@ import {
 } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { MatchingModel } from 'src/app/data/matching-model'
-import {
-  SettingsService,
-  SETTINGS_KEYS,
-} from 'src/app/services/settings.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { saveAs } from 'file-saver'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-bulk-editor',

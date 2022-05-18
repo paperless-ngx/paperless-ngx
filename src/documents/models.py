@@ -486,3 +486,17 @@ class FileInfo:
                 cls._mangle_property(properties, "created")
                 cls._mangle_property(properties, "title")
                 return cls(**properties)
+
+
+# Extending User Model Using a One-To-One Link
+class UiSettings(models.Model):
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="ui_settings",
+    )
+    settings = models.JSONField(null=True)
+
+    def __str__(self):
+        return self.user.username
