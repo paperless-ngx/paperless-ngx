@@ -83,12 +83,18 @@ logger = logging.getLogger("paperless.api")
 class IndexView(TemplateView):
     template_name = "index.html"
 
-    def get_language(self):
+    def get_frontend_language(self):
+        if hasattr(
+            self.request.user,
+            "ui_settings",
+        ) and self.request.user.ui_settings.settings.get("language"):
+            lang = self.request.user.ui_settings.settings.get("language")
+        else:
+            lang = get_language()
         # This is here for the following reason:
         # Django identifies languages in the form "en-us"
         # However, angular generates locales as "en-US".
         # this translates between these two forms.
-        lang = get_language()
         if "-" in lang:
             first = lang[: lang.index("-")]
             second = lang[lang.index("-") + 1 :]
@@ -101,16 +107,18 @@ class IndexView(TemplateView):
         context["cookie_prefix"] = settings.COOKIE_PREFIX
         context["username"] = self.request.user.username
         context["full_name"] = self.request.user.get_full_name()
-        context["styles_css"] = f"frontend/{self.get_language()}/styles.css"
-        context["runtime_js"] = f"frontend/{self.get_language()}/runtime.js"
-        context["polyfills_js"] = f"frontend/{self.get_language()}/polyfills.js"
-        context["main_js"] = f"frontend/{self.get_language()}/main.js"
+        context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
+        context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
+        context[
+            "polyfills_js"
+        ] = f"frontend/{self.get_frontend_language()}/polyfills.js"
+        context["main_js"] = f"frontend/{self.get_frontend_language()}/main.js"
         context[
             "webmanifest"
-        ] = f"frontend/{self.get_language()}/manifest.webmanifest"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/manifest.webmanifest"  # noqa: E501
         context[
             "apple_touch_icon"
-        ] = f"frontend/{self.get_language()}/apple-touch-icon.png"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"  # noqa: E501
         return context
 
 
