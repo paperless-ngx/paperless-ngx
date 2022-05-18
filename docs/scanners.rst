@@ -13,45 +13,45 @@ that works right for you based on recommendations from other Paperless users.
 Physical scanners
 =================
 
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brand   | Model          | Supports                                 | Recommended By |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-|         |                | FTP | SFTP | NFS | SMB | SMTP | API [1]_ |                |
-+=========+================+=====+======+=====+=====+======+==========+================+
-| Brother | `ADS-1700W`_   | yes |      |     | yes | yes  |          |`holzhannes`_   |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `ADS-1600W`_   | yes |      |     | yes | yes  |          |`holzhannes`_   |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `ADS-1500W`_   | yes |      |     | yes | yes  |          |`danielquinn`_  |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `ADS-1100W`_   | yes |      |     |     |      |          |`ytzelf`_       |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `ADS-2800W`_   | yes | yes  |     | yes | yes  |          |`philpagel`_    |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `MFC-J6930DW`_ | yes |      |     |     |      |          |`ayounggun`_    |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `MFC-L5850DW`_ | yes |      |     |     | yes  |          |`holzhannes`_   |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `MFC-L2750DW`_ | yes |      |     | yes | yes  |          |`muued`_        |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `MFC-J5910DW`_ | yes |      |     |     |      |          |`bmsleight`_    |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `MFC-8950DW`_  | yes |      |     | yes | yes  |          |`philpagel`_    |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Brother | `MFC-9142CDN`_ | yes |      |     | yes |      |          |`REOLDEV`_      |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Canon | `Maxify MB 5350`_|     |      |     | yes [2]_ | yes |          |`eingemaischt`_       |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Fujitsu | `ix500`_       | yes |      |     | yes |      |          |`eonist`_       |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Epson   | `ES-580W`_     | yes |      |     | yes | yes  |          |`fignew`_       |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Epson   | `WF-7710DWF`_  | yes |      |     | yes |      |          |`Skylinar`_     |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Fujitsu | `S1300i`_      | yes |      |     | yes |      |          |`jonaswinkler`_ |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
-| Doxie   | `Q2`_          |     |      |     |     |      | yes      |`Unkn0wnCat`_   |
-+---------+----------------+-----+------+-----+-----+------+----------+----------------+
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brand   | Model             | Supports                                      | Recommended By |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+|         |                   | FTP | SFTP | NFS | SMB      | SMTP | API [1]_ |                |
++=========+===================+=====+======+=====+==========+======+==========+================+
+| Brother | `ADS-1700W`_      | yes |      |     | yes      | yes  |          |`holzhannes`_   |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `ADS-1600W`_      | yes |      |     | yes      | yes  |          |`holzhannes`_   |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `ADS-1500W`_      | yes |      |     | yes      | yes  |          |`danielquinn`_  |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `ADS-1100W`_      | yes |      |     |          |      |          |`ytzelf`_       |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `ADS-2800W`_      | yes | yes  |     | yes      | yes  |          |`philpagel`_    |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `MFC-J6930DW`_    | yes |      |     |          |      |          |`ayounggun`_    |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `MFC-L5850DW`_    | yes |      |     |          | yes  |          |`holzhannes`_   |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `MFC-L2750DW`_    | yes |      |     | yes      | yes  |          |`muued`_        |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `MFC-J5910DW`_    | yes |      |     |          |      |          |`bmsleight`_    |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `MFC-8950DW`_     | yes |      |     | yes      | yes  |          |`philpagel`_    |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Brother | `MFC-9142CDN`_    | yes |      |     | yes      |      |          |`REOLDEV`_      |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Canon   | `Maxify MB 5350`_ |     |      |     | yes [2]_ | yes  |          |`eingemaischt`_ |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Fujitsu | `ix500`_          | yes |      |     | yes      |      |          |`eonist`_       |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Epson   | `ES-580W`_        | yes |      |     | yes      | yes  |          |`fignew`_       |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Epson   | `WF-7710DWF`_     | yes |      |     | yes      |      |          |`Skylinar`_     |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Fujitsu | `S1300i`_         | yes |      |     | yes      |      |          |`jonaswinkler`_ |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
+| Doxie   | `Q2`_             |     |      |     |          |      | yes      |`Unkn0wnCat`_   |
++---------+-------------------+-----+------+-----+----------+------+----------+----------------+
 
 .. _MFC-L5850DW: https://www.brother-usa.com/products/mfcl5850dw
 .. _MFC-L2750DW: https://www.brother.de/drucker/laserdrucker/mfc-l2750dw
@@ -87,9 +87,9 @@ Physical scanners
 .. _eingemaischt: https://github.com/eingemaischt
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
-.. [2] Canon Multi Function Printers show strange behaviour over SMB. They close and reopen the file after every page. So it is neccessary to not directly scan to the consume 
-folder but to a tmp folder. Adding ``/usr/bin/find [tmp-folder] -mmin +3 -type f -exec sh -c 'mv "{}" [consume-folder]$(uuidgen)-"$(basename "{}")"' \;`` to a crontab looks
-every minute for files that not have been written to for more than 3 minutes (scanner timeout) - and then moves them to the consume folder.
+.. [2] Canon Multi Function Printers show strange behavior over SMB. They close and reopen the file after every page. So it is necessary to not directly scan to the consume
+       folder but to a tmp folder. Adding ``/usr/bin/find [tmp-folder] -mmin +3 -type f -exec sh -c 'mv "{}" [consume-folder]$(uuidgen)-"$(basename "{}")"' \;`` to a crontab looks
+       every minute for files that not have been written to for more than 3 minutes (scanner timeout) - and then moves them to the consume folder.
 
 Mobile phone software
 =====================
