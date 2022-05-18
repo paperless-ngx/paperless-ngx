@@ -412,6 +412,13 @@ class BulkEditSerializer(DocumentListSerializer):
 
 class PostDocumentSerializer(serializers.Serializer):
 
+    created = serializers.DateTimeField(
+        label="Created",
+        allow_null=True,
+        write_only=True,
+        required=False,
+    )
+
     document = serializers.FileField(
         label="Document",
         write_only=True,
