@@ -189,6 +189,7 @@ class Consumer(LoggingMixin):
         override_document_type_id=None,
         override_tag_ids=None,
         task_id=None,
+        override_created=None,
     ) -> Document:
         """
         Return the document object if it was successfully created.
@@ -201,6 +202,7 @@ class Consumer(LoggingMixin):
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
+        self.override_created = override_created
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -394,7 +396,13 @@ class Consumer(LoggingMixin):
 
         self.log("debug", "Saving record to database")
 
-        if file_info.created is not None:
+        if self.override_created is not None:
+            create_date = self.override_created
+            self.log(
+                "debug",
+                f"Creation date from post_documents parameter: {create_date}",
+            )
+        elif file_info.created is not None:
             create_date = file_info.created
             self.log("debug", f"Creation date from FileInfo: {create_date}")
         elif date is not None:

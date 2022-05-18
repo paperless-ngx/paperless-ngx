@@ -9,6 +9,11 @@ import zipfile
 from unittest import mock
 from unittest.mock import MagicMock
 
+try:
+    import zoneinfo
+except ImportError:
+    import backports.zoneinfo as zoneinfo
+
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -954,6 +959,34 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
 
         async_task.assert_not_called()
+
+    @mock.patch("documents.views.async_task")
+    def test_upload_with_created(self, async_task):
+        created = datetime.datetime(
+            2022,
+            5,
+            12,
+            0,
+            0,
+            0,
+            0,
+            tzinfo=zoneinfo.ZoneInfo("America/Los_Angeles"),
+        )
+        with open(
+            os.path.join(os.path.dirname(__file__), "samples", "simple.pdf"),
+            "rb",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f, "created": created},
+            )
+        self.assertEqual(response.status_code, 200)
+
+        async_task.assert_called_once()
+
+        args, kwargs = async_task.call_args
+
+        self.assertEqual(kwargs["override_created"], created)
 
     def test_get_metadata(self):
         doc = Document.objects.create(
