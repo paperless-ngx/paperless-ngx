@@ -20,10 +20,8 @@ import {
 } from 'src/app/directives/sortable.directive'
 import { ConsumerStatusService } from 'src/app/services/consumer-status.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import {
-  filterRulesFromQueryParams,
-  QueryParamsService,
-} from 'src/app/services/query-params.service'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
+import { QueryParamsService } from 'src/app/services/query-params.service'
 import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
@@ -47,7 +45,8 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     private toastService: ToastService,
     private modalService: NgbModal,
     private consumerStatusService: ConsumerStatusService,
-    private queryParamsService: QueryParamsService
+    private queryParamsService: QueryParamsService,
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @ViewChild('filterEditor')

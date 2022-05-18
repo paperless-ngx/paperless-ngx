@@ -6,6 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { Observable, Subject, of } from 'rxjs'
 import { first } from 'rxjs/operators'
+import { Router } from '@angular/router'
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,8 @@ export class OpenDocumentsService {
 
   constructor(
     private documentService: DocumentService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private router: Router
   ) {
     if (sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS)) {
       try {
@@ -55,13 +57,38 @@ export class OpenDocumentsService {
     return this.openDocuments.find((d) => d.id == id)
   }
 
-  openDocument(doc: PaperlessDocument) {
+  openDocument(
+    doc: PaperlessDocument,
+    navigate: boolean = true
+  ): Observable<boolean> {
     if (this.openDocuments.find((d) => d.id == doc.id) == null) {
-      this.openDocuments.unshift(doc)
-      if (this.openDocuments.length > this.MAX_OPEN_DOCUMENTS) {
-        this.openDocuments.pop()
+      if (this.openDocuments.length == this.MAX_OPEN_DOCUMENTS) {
+        // at max, ensure changes arent lost
+        const docToRemove = this.openDocuments[this.MAX_OPEN_DOCUMENTS - 1]
+        const closeObservable = this.closeDocument(docToRemove)
+        closeObservable.pipe(first()).subscribe((closed) => {
+          if (closed) this.finishOpenDocument(doc, navigate)
+        })
+        return closeObservable
+      } else {
+        // not at max
+        this.finishOpenDocument(doc, navigate)
       }
-      this.save()
+    } else {
+      // doc is open, just maybe navigate
+      if (navigate) {
+        this.router.navigate(['documents', doc.id])
+      }
+    }
+    return of(true)
+  }
+
+  private finishOpenDocument(doc: PaperlessDocument, navigate: boolean) {
+    this.openDocuments.unshift(doc)
+    this.dirtyDocuments.delete(doc.id)
+    this.save()
+    if (navigate) {
+      this.router.navigate(['documents', doc.id])
     }
   }
 
@@ -82,7 +109,11 @@ export class OpenDocumentsService {
         backdrop: 'static',
       })
       modal.componentInstance.title = $localize`Unsaved Changes`
-      modal.componentInstance.messageBold = $localize`You have unsaved changes.`
+      modal.componentInstance.messageBold =
+        $localize`You have unsaved changes to the document` +
+        ' "' +
+        doc.title +
+        '".'
       modal.componentInstance.message = $localize`Are you sure you want to close this document?`
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Close document`

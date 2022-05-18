@@ -48,6 +48,13 @@ def __get_int(key: str, default: int) -> int:
     return int(os.getenv(key, default))
 
 
+def __get_float(key: str, default: float) -> float:
+    """
+    Return an integer value based on the environment variable or a default
+    """
+    return float(os.getenv(key, default))
+
+
 # NEVER RUN WITH DEBUG IN PRODUCTION.
 DEBUG = __get_boolean("PAPERLESS_DEBUG", "NO")
 
@@ -483,6 +490,11 @@ CONSUMER_POLLING_DELAY = int(os.getenv("PAPERLESS_CONSUMER_POLLING_DELAY", 5))
 
 CONSUMER_POLLING_RETRY_COUNT = int(
     os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5),
+)
+
+CONSUMER_INOTIFY_DELAY: Final[float] = __get_float(
+    "PAPERLESS_CONSUMER_INOTIFY_DELAY",
+    0.5,
 )
 
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")

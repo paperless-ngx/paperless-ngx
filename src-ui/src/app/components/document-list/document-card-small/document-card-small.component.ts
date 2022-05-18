@@ -14,6 +14,7 @@ import {
   SETTINGS_KEYS,
 } from 'src/app/services/settings.service'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
+import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 
 @Component({
   selector: 'app-document-card-small',
@@ -26,7 +27,8 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 export class DocumentCardSmallComponent implements OnInit {
   constructor(
     private documentService: DocumentService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    public openDocumentsService: OpenDocumentsService
   ) {}
 
   @Input()
