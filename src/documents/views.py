@@ -11,6 +11,7 @@ from unicodedata import normalize
 from urllib.parse import quote
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import IntegerField
@@ -74,6 +75,7 @@ from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
 from .serialisers import TagSerializer
 from .serialisers import TagSerializerVersion1
+from .serialisers import UiSettingsViewSerializer
 
 logger = logging.getLogger("paperless.api")
 
@@ -81,12 +83,18 @@ logger = logging.getLogger("paperless.api")
 class IndexView(TemplateView):
     template_name = "index.html"
 
-    def get_language(self):
+    def get_frontend_language(self):
+        if hasattr(
+            self.request.user,
+            "ui_settings",
+        ) and self.request.user.ui_settings.settings.get("language"):
+            lang = self.request.user.ui_settings.settings.get("language")
+        else:
+            lang = get_language()
         # This is here for the following reason:
         # Django identifies languages in the form "en-us"
         # However, angular generates locales as "en-US".
         # this translates between these two forms.
-        lang = get_language()
         if "-" in lang:
             first = lang[: lang.index("-")]
             second = lang[lang.index("-") + 1 :]
@@ -99,16 +107,18 @@ class IndexView(TemplateView):
         context["cookie_prefix"] = settings.COOKIE_PREFIX
         context["username"] = self.request.user.username
         context["full_name"] = self.request.user.get_full_name()
-        context["styles_css"] = f"frontend/{self.get_language()}/styles.css"
-        context["runtime_js"] = f"frontend/{self.get_language()}/runtime.js"
-        context["polyfills_js"] = f"frontend/{self.get_language()}/polyfills.js"
-        context["main_js"] = f"frontend/{self.get_language()}/main.js"
+        context["styles_css"] = f"frontend/{self.get_frontend_language()}/styles.css"
+        context["runtime_js"] = f"frontend/{self.get_frontend_language()}/runtime.js"
+        context[
+            "polyfills_js"
+        ] = f"frontend/{self.get_frontend_language()}/polyfills.js"
+        context["main_js"] = f"frontend/{self.get_frontend_language()}/main.js"
         context[
             "webmanifest"
-        ] = f"frontend/{self.get_language()}/manifest.webmanifest"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/manifest.webmanifest"  # noqa: E501
         context[
             "apple_touch_icon"
-        ] = f"frontend/{self.get_language()}/apple-touch-icon.png"  # noqa: E501
+        ] = f"frontend/{self.get_frontend_language()}/apple-touch-icon.png"  # noqa: E501
         return context
 
 
@@ -715,5 +725,43 @@ class RemoteVersionView(GenericAPIView):
                 "version": remote_version,
                 "update_available": is_greater_than_current,
                 "feature_is_set": feature_is_set,
+            },
+        )
+
+
+class UiSettingsView(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UiSettingsViewSerializer
+
+    def get(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = User.objects.get(pk=request.user.id)
+        displayname = user.username
+        if user.first_name or user.last_name:
+            displayname = " ".join([user.first_name, user.last_name])
+        settings = {}
+        if hasattr(user, "ui_settings"):
+            settings = user.ui_settings.settings
+        return Response(
+            {
+                "user_id": user.id,
+                "username": user.username,
+                "display_name": displayname,
+                "settings": settings,
+            },
+        )
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(user=self.request.user)
+
+        return Response(
+            {
+                "success": True,
             },
         )
