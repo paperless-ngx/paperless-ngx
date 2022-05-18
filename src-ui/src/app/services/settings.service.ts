@@ -65,6 +65,9 @@ export class SettingsService {
       tap((uisettings) => {
         Object.assign(this.settings, uisettings.settings)
         this.maybeMigrateSettings()
+        // to update lang cookie
+        if (this.settings['language']?.length)
+          this.setLanguage(this.settings['language'])
         this.displayName = uisettings.display_name.trim()
       })
     )
