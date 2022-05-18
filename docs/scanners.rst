@@ -40,6 +40,8 @@ Physical scanners
 +---------+----------------+-----+------+-----+-----+------+----------+----------------+
 | Brother | `MFC-9142CDN`_ | yes |      |     | yes |      |          |`REOLDEV`_      |
 +---------+----------------+-----+------+-----+-----+------+----------+----------------+
+| Canon | `Maxify MB 5350`_|     |      |     | yes [2]_ | yes |          |`eingemaischt`_       |
++---------+----------------+-----+------+-----+-----+------+----------+----------------+
 | Fujitsu | `ix500`_       | yes |      |     | yes |      |          |`eonist`_       |
 +---------+----------------+-----+------+-----+-----+------+----------+----------------+
 | Epson   | `ES-580W`_     | yes |      |     | yes | yes  |          |`fignew`_       |
@@ -58,6 +60,7 @@ Physical scanners
 .. _ADS-1500W: https://www.brother.ca/en/p/ads1500w
 .. _ADS-1100W: https://support.brother.com/g/b/downloadtop.aspx?c=fr&lang=fr&prod=ads1100w_eu_as_cn
 .. _ADS-2800W: https://www.brother-usa.com/products/ads2800w
+.. _Maxify MB 5350: https://www.canon.de/printers/inkjet/maxify/maxify_mb5350/specification.html
 .. _MFC-J6930DW: https://www.brother.ca/en/p/MFCJ6930DW
 .. _MFC-J5910DW: https://www.brother.co.uk/printers/inkjet-printers/mfcj5910dw
 .. _MFC-8950DW: https://www.brother-usa.com/products/mfc8950dw
@@ -81,8 +84,12 @@ Physical scanners
 .. _Unkn0wnCat: https://github.com/Unkn0wnCat
 .. _muued: https://github.com/muued
 .. _philpagel: https://github.com/philpagel
+.. _eingemaischt: https://github.com/eingemaischt
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
+.. [2] Canon Multi Function Printers show strange behaviour over SMB. They close and reopen the file after every page. So it is neccessary to not directly scan to the consume 
+folder but to a tmp folder. Adding ``/usr/bin/find [tmp-folder] -mmin +3 -type f -exec sh -c 'mv "{}" [consume-folder]$(uuidgen)-"$(basename "{}")"' \;`` to a crontab looks
+every minute for files that not have been written to for more than 3 minutes (scanner timeout) - and then moves them to the consume folder.
 
 Mobile phone software
 =====================
