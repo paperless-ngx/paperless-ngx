@@ -237,11 +237,12 @@ open the affected documents in paperless for editing. Paperless will continue to
 show the invalid metadata.
 
 Consumer fails with a FileNotFoundError
-############################
+#######################################
 
 You might find messages like these in your log files:
 
 .. code::
+
     [ERROR] [paperless.consumer] Error while consuming document SCN_0001.pdf: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/ocrmypdf.io.yhk3zbv0/origin.pdf'
     Traceback (most recent call last):
       File "/app/paperless/src/paperless_tesseract/parsers.py", line 261, in parse
@@ -266,11 +267,12 @@ check for documents, try adjusting the :ref:`inotify configuration <configuratio
 try adjusting the :ref:`polling configuration <configuration-polling>`.
 
 Consumer fails waiting for file to remain unmodified.
-############################
+#####################################################
 
 You might find messages like these in your log files:
 
 .. code::
+
     [ERROR] [paperless.management.consumer] Timeout while waiting on file /usr/src/paperless/src/../consume/SCN_0001.pdf to remain unmodified.
 
 This indicates paperless timed out while waiting for the file to be completely written to the consume folder.
@@ -282,11 +284,12 @@ Adjusting :ref:`polling configuration <configuration-polling>` values should res
     back in, for the initial failing file to be consumed.
 
 Consumer fails reporting "OS reports file as busy still".
-############################
+#########################################################
 
 You might find messages like these in your log files:
 
 .. code::
+
     [WARNING] [paperless.management.consumer] Not consuming file /usr/src/paperless/src/../consume/SCN_0001.pdf: OS reports file as busy still
 
 This indicates paperless was unable to open the file, as the OS reported the file as still being in use.  To prevent a
