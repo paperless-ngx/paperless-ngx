@@ -29,6 +29,7 @@ from documents.models import SavedView
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
+from documents.models import StoragePath
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
@@ -1501,6 +1502,7 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.doc2.tags.add(self.t1)
         self.doc3.tags.add(self.t2)
         self.doc4.tags.add(self.t1, self.t2)
+        self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
 
     def test_set_correspondent(self):
         self.assertEqual(Document.objects.filter(correspondent=self.c2).count(), 1)
@@ -1539,6 +1541,60 @@ class TestBulkEdit(DirectoriesMixin, APITestCase):
         self.async_task.assert_called_once()
         args, kwargs = self.async_task.call_args
         self.assertCountEqual(kwargs["document_ids"], [self.doc2.id, self.doc3.id])
+
+    def test_set_document_storage_path(self):
+        """
+        GIVEN:
+            - 5 documents without defined storage path
+        WHEN:
+            - Bulk edit called to add storage path to 1 document
+        THEN:
+            - Single document storage path update
+        """
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            self.sp1.id,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
+
+        self.async_task.assert_called_once()
+        args, kwargs = self.async_task.call_args
+
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
+
+    def test_unset_document_storage_path(self):
+        """
+        GIVEN:
+            - 4 documents without defined storage path
+            - 1 document with a defined storage
+        WHEN:
+            - Bulk edit called to remove storage path from 1 document
+        THEN:
+            - Single document storage path removed
+        """
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            self.sp1.id,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 4)
+
+        bulk_edit.set_storage_path(
+            [self.doc1.id],
+            None,
+        )
+
+        self.assertEqual(Document.objects.filter(storage_path=None).count(), 5)
+
+        self.async_task.assert_called()
+        args, kwargs = self.async_task.call_args
+
+        self.assertCountEqual(kwargs["document_ids"], [self.doc1.id])
 
     def test_add_tag(self):
         self.assertEqual(Document.objects.filter(tags__id=self.t1.id).count(), 2)

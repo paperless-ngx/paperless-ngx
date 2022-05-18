@@ -20,7 +20,7 @@ from ..file_handling import generate_unique_filename
 from ..models import Correspondent
 from ..models import Document
 from ..models import DocumentType
-from ..models import Tag
+from ..models import StoragePath
 from .utils import DirectoriesMixin
 
 
@@ -901,6 +901,140 @@ class TestFilenameGeneration(TestCase):
             checksum="2",
         )
         self.assertEqual(generate_filename(doc), "2020-05-21.pdf")
+
+    def test_dynamic_path(self):
+        """
+        GIVEN:
+            - A document with a defined storage path
+        WHEN:
+            - the filename is generated for the document
+        THEN:
+            - the generated filename uses the defined storage path for the document
+        """
+        doc = Document.objects.create(
+            title="does not matter",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            storage_path=StoragePath.objects.create(path="TestFolder/{created}"),
+        )
+        self.assertEqual(generate_filename(doc), "TestFolder/2020-06-25.pdf")
+
+    def test_dynamic_path_with_none(self):
+        """
+        GIVEN:
+            - A document with a defined storage path
+            - The defined storage path uses an undefined field for the document
+        WHEN:
+            - the filename is generated for the document
+        THEN:
+            - the generated filename uses the defined storage path for the document
+            - the generated filename includes "none" in the place undefined field
+        """
+        doc = Document.objects.create(
+            title="does not matter",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            storage_path=StoragePath.objects.create(path="{asn} - {created}"),
+        )
+        self.assertEqual(generate_filename(doc), "none - 2020-06-25.pdf")
+
+    @override_settings(
+        FILENAME_FORMAT_REMOVE_NONE=True,
+    )
+    def test_dynamic_path_remove_none(self):
+        """
+        GIVEN:
+            - A document with a defined storage path
+            - The defined storage path uses an undefined field for the document
+            - The setting for removing undefined fields is enabled
+        WHEN:
+            - the filename is generated for the document
+        THEN:
+            - the generated filename uses the defined storage path for the document
+            - the generated filename does not include "none" in the place undefined field
+        """
+        doc = Document.objects.create(
+            title="does not matter",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            storage_path=StoragePath.objects.create(path="TestFolder/{asn}/{created}"),
+        )
+        self.assertEqual(generate_filename(doc), "TestFolder/2020-06-25.pdf")
+
+    def test_multiple_doc_paths(self):
+        """
+        GIVEN:
+            - Two documents, each with different storage paths
+        WHEN:
+            - the filename is generated for the documents
+        THEN:
+            - Each document generated filename uses its storage path
+        """
+        doc_a = Document.objects.create(
+            title="does not matter",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            archive_serial_number=4,
+            storage_path=StoragePath.objects.create(
+                name="sp1",
+                path="ThisIsAFolder/{asn}/{created}",
+            ),
+        )
+        doc_b = Document.objects.create(
+            title="does not matter",
+            created=timezone.make_aware(datetime.datetime(2020, 7, 25, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=5,
+            checksum="abcde",
+            storage_path=StoragePath.objects.create(
+                name="sp2",
+                path="SomeImportantNone/{created}",
+            ),
+        )
+
+        self.assertEqual(generate_filename(doc_a), "ThisIsAFolder/4/2020-06-25.pdf")
+        self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
+
+    def test_no_path_fallback(self):
+        """
+        GIVEN:
+            - Two documents, one with defined storage path, the other not
+        WHEN:
+            - the filename is generated for the documents
+        THEN:
+            - Document with defined path uses its format
+            - Document without defined path uses the default path
+        """
+        doc_a = Document.objects.create(
+            title="does not matter",
+            created=timezone.make_aware(datetime.datetime(2020, 6, 25, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=2,
+            checksum="2",
+            archive_serial_number=4,
+        )
+        doc_b = Document.objects.create(
+            title="does not matter",
+            created=timezone.make_aware(datetime.datetime(2020, 7, 25, 7, 36, 51, 153)),
+            mime_type="application/pdf",
+            pk=5,
+            checksum="abcde",
+            storage_path=StoragePath.objects.create(
+                name="sp2",
+                path="SomeImportantNone/{created}",
+            ),
+        )
+
+        self.assertEqual(generate_filename(doc_a), "0000002.pdf")
+        self.assertEqual(generate_filename(doc_b), "SomeImportantNone/2020-07-25.pdf")
 
 
 def run():
