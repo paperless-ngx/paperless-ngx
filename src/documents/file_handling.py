@@ -181,7 +181,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             local_added = timezone.localdate(doc.added)
             local_created = timezone.localdate(doc.created)
 
-            path = settings.FILENAME_FORMAT.format(
+            path = filename_format.format(
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
