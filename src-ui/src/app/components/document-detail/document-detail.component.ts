@@ -85,6 +85,7 @@ export class DocumentDetailComponent
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
+  docChangeNotifier: Subject<any> = new Subject()
 
   requiresPassword: boolean = false
   password: string
@@ -117,18 +118,7 @@ export class DocumentDetailComponent
     private toastService: ToastService,
     private settings: SettingsService,
     private queryParamsService: QueryParamsService
-  ) {
-    this.titleSubject
-      .pipe(
-        debounceTime(1000),
-        distinctUntilChanged(),
-        takeUntil(this.unsubscribeNotifier)
-      )
-      .subscribe((titleValue) => {
-        this.title = titleValue
-        this.documentForm.patchValue({ title: titleValue })
-      })
-  }
+  ) {}
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
@@ -182,8 +172,10 @@ export class DocumentDetailComponent
 
     this.route.paramMap
       .pipe(
+        takeUntil(this.unsubscribeNotifier),
         switchMap((paramMap) => {
           const documentId = +paramMap.get('id')
+          this.docChangeNotifier.next(documentId)
           return this.documentsService.get(documentId)
         })
       )
@@ -207,6 +199,29 @@ export class DocumentDetailComponent
             this.openDocumentService.openDocument(doc, false)
             this.updateComponent(doc)
           }
+
+          this.titleSubject
+            .pipe(
+              debounceTime(1000),
+              distinctUntilChanged(),
+              takeUntil(this.docChangeNotifier),
+              takeUntil(this.unsubscribeNotifier)
+            )
+            .subscribe({
+              next: (titleValue) => {
+                this.title = titleValue
+                this.documentForm.patchValue({ title: titleValue })
+              },
+              complete: () => {
+                // doc changed so we manually check dirty in case title was changed
+                if (
+                  this.store.getValue().title !==
+                  this.documentForm.get('title').value
+                ) {
+                  this.openDocumentService.setDirty(doc.id, true)
+                }
+              },
+            })
 
           this.ogDate = new Date(normalizeDateStr(doc.created.toString()))
 
@@ -235,7 +250,6 @@ export class DocumentDetailComponent
           return this.isDirty$.pipe(map((dirty) => ({ doc, dirty })))
         })
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: ({ doc, dirty }) => {
           this.openDocumentService.setDirty(doc.id, dirty)
