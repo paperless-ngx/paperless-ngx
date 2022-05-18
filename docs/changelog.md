@@ -9,7 +9,7 @@
 - mobile friendlier manage pages [\@shamoon](https://github.com/shamoon) ([\#873](https://github.com/paperless-ngx/paperless-ngx/pull/873))
 - Use semver for release process [\@stumpylog](https://github.com/stumpylog) ([\#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
 - Enable Docker Hub push [\@stumpylog](https://github.com/stumpylog) ([\#828](https://github.com/paperless-ngx/paperless-ngx/pull/828))
-- Feature barcode tiff support @gador ([\#766](https://github.com/paperless-ngx/paperless-ngx/pull/766))
+- Feature barcode tiff support [\@gador](https://github.com/gador) ([\#766](https://github.com/paperless-ngx/paperless-ngx/pull/766))
 - Updates GHA workflow to rebuild intermediate images on changes [\@stumpylog](https://github.com/stumpylog) ([\#820](https://github.com/paperless-ngx/paperless-ngx/pull/820))
 - Adds simple Python to wait for Redis broker to be ready [\@stumpylog](https://github.com/stumpylog) ([\#788](https://github.com/paperless-ngx/paperless-ngx/pull/788))
 - Update GHA workflow to build all Docker images [\@stumpylog](https://github.com/stumpylog) ([\#761](https://github.com/paperless-ngx/paperless-ngx/pull/761))
@@ -32,7 +32,7 @@
 ### Documentation
 
 - Use semver for release process [\@stumpylog](https://github.com/stumpylog) ([\#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
-- Deployment: Consolidate tika compose files @qcasey ([\#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
+- Deployment: Consolidate tika compose files [\@qcasey](https://github.com/qcasey) ([\#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
 - Fix local Docker image building [\@stumpylog](https://github.com/stumpylog) ([\#849](https://github.com/paperless-ngx/paperless-ngx/pull/849))
 
 ### Maintenance
@@ -40,7 +40,7 @@
 - Dockerfile Organization \& Enhancements [\@stumpylog](https://github.com/stumpylog) ([\#888](https://github.com/paperless-ngx/paperless-ngx/pull/888))
 - Add timeout to healthcheck [\@shamoon](https://github.com/shamoon) ([\#880](https://github.com/paperless-ngx/paperless-ngx/pull/880))
 - Use semver for release process [\@stumpylog](https://github.com/stumpylog) ([\#851](https://github.com/paperless-ngx/paperless-ngx/pull/851))
-- Deployment: Consolidate tika compose files @qcasey ([\#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
+- Deployment: Consolidate tika compose files [\@qcasey](https://github.com/qcasey) ([\#866](https://github.com/paperless-ngx/paperless-ngx/pull/866))
 - Fixes Pillow build for armv7 [\@stumpylog](https://github.com/stumpylog) ([\#815](https://github.com/paperless-ngx/paperless-ngx/pull/815))
 - Update frontend localization source file [\@shamoon](https://github.com/shamoon) ([\#814](https://github.com/paperless-ngx/paperless-ngx/pull/814))
 - Fix install script extra OCR languages format [\@stumpylog](https://github.com/stumpylog) ([\#777](https://github.com/paperless-ngx/paperless-ngx/pull/777))
