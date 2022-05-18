@@ -128,7 +128,7 @@ def generate_unique_filename(doc, archive_filename=False):
 
 def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     path = ""
-    filename_format = settings.PAPERLESS_FILENAME_FORMAT
+    filename_format = settings.FILENAME_FORMAT
 
     try:
         if doc.storage_path:
@@ -181,7 +181,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
             local_added = timezone.localdate(doc.added)
             local_created = timezone.localdate(doc.created)
 
-            path = settings.PAPERLESS_FILENAME_FORMAT.format(
+            path = settings.FILENAME_FORMAT.format(
                 title=pathvalidate.sanitize_filename(doc.title, replacement_text="-"),
                 correspondent=correspondent,
                 document_type=document_type,
@@ -198,7 +198,7 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
                 tag_list=tag_list,
             ).strip()
 
-            if settings.PAPERLESS_FILENAME_REMOVE_NONE:
+            if settings.FILENAME_FORMAT_REMOVE_NONE:
                 path = path.replace("-none-/", "")  # remove empty directories
                 path = path.replace(" -none-", "")  # remove when spaced, with space
                 path = path.replace("-none-", "")  # remove rest of the occurences
