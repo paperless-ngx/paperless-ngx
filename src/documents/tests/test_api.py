@@ -27,6 +27,7 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import SavedView
 from documents.models import Tag
+from documents.models import UiSettings
 from documents.tests.utils import DirectoriesMixin
 from paperless import version
 from rest_framework.test import APITestCase
@@ -1396,6 +1397,41 @@ class TestDocumentApiV2(DirectoriesMixin, APITestCase):
         self.assertEqual(
             self.client.get(f"/api/tags/{t.id}/", format="json").data["text_color"],
             "#000000",
+        )
+
+    def test_ui_settings(self):
+        test_user = User.objects.create_superuser(username="test")
+        self.client.force_login(user=test_user)
+
+        response = self.client.get("/api/ui_settings/", format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data["settings"],
+            {},
+        )
+
+        settings = {
+            "settings": {
+                "dark_mode": {
+                    "enabled": True,
+                },
+            },
+        }
+
+        response = self.client.post(
+            "/api/ui_settings/",
+            json.dumps(settings),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/api/ui_settings/", format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data["settings"],
+            settings["settings"],
         )
 
 

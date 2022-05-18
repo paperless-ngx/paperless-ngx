@@ -18,10 +18,7 @@ import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
-import {
-  SettingsService,
-  SETTINGS_KEYS,
-} from 'src/app/services/settings.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { Observable, Subject, BehaviorSubject } from 'rxjs'
 import {
@@ -36,6 +33,7 @@ import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-su
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { normalizeDateStr } from 'src/app/utils/date'
 import { QueryParamsService } from 'src/app/services/query-params.service'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-document-detail',

@@ -1,0 +1,34 @@
+{
+    "user_id": 1,
+    "username": "admin",
+    "display_name": "Admin",
+    "settings": {
+        "language": "",
+        "bulk_edit": {
+            "confirmation_dialogs": true,
+            "apply_on_close": false
+        },
+        "documentListSize": 50,
+        "dark_mode": {
+            "use_system": true,
+            "enabled": "false",
+            "thumb_inverted": "true"
+        },
+        "theme": {
+            "color": "#b198e5"
+        },
+        "document_details": {
+            "native_pdf_viewer": false
+        },
+        "date_display": {
+            "date_locale": "",
+            "date_format": "mediumDate"
+        },
+        "notifications": {
+            "consumer_new_documents": true,
+            "consumer_success": true,
+            "consumer_failed": true,
+            "consumer_suppress_on_dashboard": true
+        }
+    }
+}

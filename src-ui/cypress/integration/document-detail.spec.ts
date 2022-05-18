@@ -2,6 +2,9 @@ describe('document-detail', () => {
   beforeEach(() => {
     this.modifiedDocuments = []
 
+    cy.intercept('http://localhost:8000/api/ui_settings/', {
+      fixture: 'ui_settings/settings.json',
+    })
     cy.fixture('documents/documents.json').then((documentsJson) => {
       cy.intercept('GET', 'http://localhost:8000/api/documents/1/', (req) => {
         let response = { ...documentsJson }
