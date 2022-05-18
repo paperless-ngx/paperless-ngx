@@ -88,7 +88,7 @@ Physical scanners
 
 .. [1] Scanners with API Integration allow to push scanned documents directly to :ref:`Paperless API <api-file_uploads>`, sometimes referred to as Webhook or Document POST.
 .. [2] Canon Multi Function Printers show strange behavior over SMB. They close and reopen the file after every page. It's recommended to tune the
-       :ref:`polling <configuration-polling>` configuration values for your scanner. The scanner timeout is 3 minutes, so ``180`` is a good starting point.
+       :ref:`polling <configuration-polling>` and :ref:`inotify <configuration-inotify>` configuration values for your scanner. The scanner timeout is 3 minutes, so ``180`` is a good starting point.
 
 Mobile phone software
 =====================
