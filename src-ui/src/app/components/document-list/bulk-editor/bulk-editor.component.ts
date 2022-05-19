@@ -35,12 +35,12 @@ export class BulkEditorComponent {
   tags: PaperlessTag[]
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
-  storagePathes: PaperlessStoragePath[]
+  storagePaths: PaperlessStoragePath[]
 
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
-  storagePathesSelectionModel = new FilterableDropdownSelectionModel()
+  storagePathsSelectionModel = new FilterableDropdownSelectionModel()
   awaitingDownload: boolean
 
   constructor(
@@ -75,7 +75,7 @@ export class BulkEditorComponent {
       .subscribe((result) => (this.documentTypes = result.results))
     this.storagePathService
       .listAll()
-      .subscribe((result) => (this.storagePathes = result.results))
+      .subscribe((result) => (this.storagePaths = result.results))
   }
 
   private executeBulkOperation(modal, method: string, args) {
@@ -158,8 +158,8 @@ export class BulkEditorComponent {
       .getSelectionData(Array.from(this.list.selected))
       .subscribe((s) => {
         this.applySelectionData(
-          s.selected_storage_pathes,
-          this.storagePathesSelectionModel
+          s.selected_storage_paths,
+          this.storagePathsSelectionModel
         )
       })
   }
@@ -318,16 +318,16 @@ export class BulkEditorComponent {
     }
   }
 
-  setStoragePathes(changedDocumentPathes: ChangedItems) {
+  setStoragePaths(changedDocumentPaths: ChangedItems) {
     if (
-      changedDocumentPathes.itemsToAdd.length == 0 &&
-      changedDocumentPathes.itemsToRemove.length == 0
+      changedDocumentPaths.itemsToAdd.length == 0 &&
+      changedDocumentPaths.itemsToRemove.length == 0
     )
       return
 
     let storagePath =
-      changedDocumentPathes.itemsToAdd.length > 0
-        ? changedDocumentPathes.itemsToAdd[0]
+      changedDocumentPaths.itemsToAdd.length > 0
+        ? changedDocumentPaths.itemsToAdd[0]
         : null
 
     if (this.showConfirmationDialogs) {

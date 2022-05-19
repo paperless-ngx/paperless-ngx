@@ -38,7 +38,7 @@ export interface SelectionDataItem {
 }
 
 export interface SelectionData {
-  selected_storage_pathes: SelectionDataItem[]
+  selected_storage_paths: SelectionDataItem[]
   selected_correspondents: SelectionDataItem[]
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]

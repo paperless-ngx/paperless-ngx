@@ -59,7 +59,7 @@ from .filters import StoragePathFilterSet
 from .filters import TagFilterSet
 from .matching import match_correspondents
 from .matching import match_document_types
-from .matching import match_storage_pathes
+from .matching import match_storage_paths
 from .matching import match_tags
 from .models import Correspondent
 from .models import Document
@@ -339,9 +339,7 @@ class DocumentViewSet(
                 "document_types": [
                     dt.id for dt in match_document_types(doc, classifier)
                 ],
-                "storage_pathes": [
-                    dt.id for dt in match_storage_pathes(doc, classifier)
-                ],
+                "storage_paths": [dt.id for dt in match_storage_paths(doc, classifier)],
             },
         )
 
@@ -584,7 +582,7 @@ class SelectionDataView(GenericAPIView):
             ),
         )
 
-        storage_pathes = StoragePath.objects.annotate(
+        storage_paths = StoragePath.objects.annotate(
             document_count=Count(
                 Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
             ),
@@ -602,9 +600,9 @@ class SelectionDataView(GenericAPIView):
                 "selected_document_types": [
                     {"id": t.id, "document_count": t.document_count} for t in types
                 ],
-                "selected_storage_pathes": [
+                "selected_storage_paths": [
                     {"id": t.id, "document_count": t.document_count}
-                    for t in storage_pathes
+                    for t in storage_paths
                 ],
             },
         )

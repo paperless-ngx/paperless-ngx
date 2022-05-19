@@ -35,7 +35,7 @@ api_router.register(r"documents", UnifiedSearchViewSet)
 api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
-api_router.register(r"storage_pathes", StoragePathViewSet)
+api_router.register(r"storage_paths", StoragePathViewSet)
 
 
 urlpatterns = [

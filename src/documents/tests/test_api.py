@@ -1103,7 +1103,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "correspondents": [],
                 "tags": [],
                 "document_types": [],
-                "storage_pathes": [],
+                "storage_paths": [],
             },
         )
 
@@ -1111,7 +1111,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         response = self.client.get(f"/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch("documents.views.match_storage_pathes")
+    @mock.patch("documents.views.match_storage_paths")
     @mock.patch("documents.views.match_document_types")
     @mock.patch("documents.views.match_tags")
     @mock.patch("documents.views.match_correspondents")
@@ -1120,7 +1120,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         match_correspondents,
         match_tags,
         match_document_types,
-        match_storage_pathes,
+        match_storage_paths,
     ):
         doc = Document.objects.create(
             title="test",
@@ -1131,7 +1131,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
         match_correspondents.return_value = [Correspondent(id=88), Correspondent(id=2)]
         match_tags.return_value = [Tag(id=56), Tag(id=123)]
         match_document_types.return_value = [DocumentType(id=23)]
-        match_storage_pathes.return_value = [StoragePath(id=99), StoragePath(id=77)]
+        match_storage_paths.return_value = [StoragePath(id=99), StoragePath(id=77)]
 
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(
@@ -1140,7 +1140,7 @@ class TestDocumentApi(DirectoriesMixin, APITestCase):
                 "correspondents": [88, 2],
                 "tags": [56, 123],
                 "document_types": [23],
-                "storage_pathes": [99, 77],
+                "storage_paths": [99, 77],
             },
         )
 

@@ -183,7 +183,7 @@ class DocumentClassifier:
         # it usually is.
         num_correspondents = len(set(labels_correspondent) | {-1}) - 1
         num_document_types = len(set(labels_document_type) | {-1}) - 1
-        num_storage_pathes = len(set(labels_storage_path) | {-1}) - 1
+        num_storage_paths = len(set(labels_storage_path) | {-1}) - 1
 
         logger.debug(
             "{} documents, {} tag(s), {} correspondent(s), "
@@ -192,7 +192,7 @@ class DocumentClassifier:
                 num_tags,
                 num_correspondents,
                 num_document_types,
-                num_storage_pathes,
+                num_storage_paths,
             ),
         )
 
@@ -255,9 +255,9 @@ class DocumentClassifier:
                 "classifier.",
             )
 
-        if num_storage_pathes > 0:
+        if num_storage_paths > 0:
             logger.debug(
-                "Training storage pathes classifier...",
+                "Training storage paths classifier...",
             )
             self.storage_path_classifier = MLPClassifier(tol=0.01)
             self.storage_path_classifier.fit(
@@ -267,7 +267,7 @@ class DocumentClassifier:
         else:
             self.storage_path_classifier = None
             logger.debug(
-                "There are no storage pathes. Not training storage path classifier.",
+                "There are no storage paths. Not training storage path classifier.",
             )
 
         self.data_hash = new_data_hash

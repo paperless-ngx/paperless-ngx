@@ -7,7 +7,7 @@ easier.
 
 .. _advanced-matching:
 
-Matching tags, correspondents, document types, and storage pathes
+Matching tags, correspondents, document types, and storage paths
 ################################################
 
 Paperless will compare the matching algorithms defined by every tag, correspondent,
@@ -25,7 +25,7 @@ necessary to get things right.
 In order to have a tag, correspondent, document type, or storage path assigned
 automatically to newly consumed documents, assign a match and matching algorithm
 using the web interface. These settings define when to assign tags, correspondents,
-document types, and storage pathes to documents.
+document types, and storage paths to documents.
 
 The following algorithms are available:
 
@@ -85,7 +85,7 @@ feature:
   of the bank, so this works reasonably well, However, tags such as "TODO"
   cannot be automatically assigned.
 * The matching algorithm needs a reasonable number of documents to identify when
-  to assign tags, correspondents, storage pathes, and types. If one out of a
+  to assign tags, correspondents, storage paths, and types. If one out of a
   thousand documents has the correspondent "Very obscure web shop I bought
   something five years ago", it will probably not assign this correspondent
   automatically if you buy something from them again. The more documents, the better.
@@ -304,7 +304,7 @@ evaluate to the same value.
     predefined volumes, they will be lost after a restart of paperless.
 
 
-Storage pathes
+Storage paths
 ##################
 
 One of the best things in paperless is, that you can not only access the documents via the
@@ -351,9 +351,9 @@ For simplicity, `By Year` defines the same structure as in the previous example 
 .. hint::
 
     If no storage path is defined for a document, the global `PAPERLESS_FILENAME_FORMAT` is applied.
-    The definition of storage pathes is such optional.
+    The definition of storage paths is such optional.
 
 .. caution::
 
     If you adjust the format of an existing storage path old document don't get relocated automatically.
-    You need to run the :ref:`document renamer <utilities-renamer>` to adjust their pathes.
+    You need to run the :ref:`document renamer <utilities-renamer>` to adjust their paths.

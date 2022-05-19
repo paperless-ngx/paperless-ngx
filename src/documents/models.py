@@ -92,7 +92,7 @@ class StoragePath(MatchingModel):
     class Meta:
         ordering = ("name",)
         verbose_name = _("storage path")
-        verbose_name_plural = _("storage pathes")
+        verbose_name_plural = _("storage paths")
 
 
 class Document(models.Model):

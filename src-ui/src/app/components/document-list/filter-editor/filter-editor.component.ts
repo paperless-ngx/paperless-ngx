@@ -120,7 +120,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
-  storagePathes: PaperlessStoragePath[] = []
+  storagePaths: PaperlessStoragePath[] = []
 
   _textFilter = ''
   _moreLikeId: number
@@ -521,7 +521,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       .subscribe((result) => (this.documentTypes = result.results))
     this.storagePathService
       .listAll()
-      .subscribe((result) => (this.storagePathes = result.results))
+      .subscribe((result) => (this.storagePaths = result.results))
 
     this.textFilterDebounce = new Subject<string>()
 

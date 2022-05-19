@@ -69,7 +69,7 @@ export class DocumentDetailComponent
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
-  storagePathes: PaperlessStoragePath[]
+  storagePaths: PaperlessStoragePath[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -178,7 +178,7 @@ export class DocumentDetailComponent
     this.storagePathService
       .listAll()
       .pipe(first())
-      .subscribe((result) => (this.storagePathes = result.results))
+      .subscribe((result) => (this.storagePaths = result.results))
 
     this.route.paramMap
       .pipe(
@@ -360,12 +360,12 @@ export class DocumentDetailComponent
         switchMap((newStoragePath) => {
           return this.storagePathService
             .listAll()
-            .pipe(map((storagePathes) => ({ newStoragePath, storagePathes })))
+            .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
         })
       )
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(({ newStoragePath, documentTypes: storagePathes }) => {
-        this.storagePathes = storagePathes.results
+      .subscribe(({ newStoragePath, documentTypes: storagePaths }) => {
+        this.storagePaths = storagePaths.results
         this.documentForm.get('storage_path').setValue(newStoragePath.id)
       })
   }

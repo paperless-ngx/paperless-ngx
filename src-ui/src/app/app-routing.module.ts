@@ -28,7 +28,7 @@ const routes: Routes = [
       { path: 'tags', component: TagListComponent },
       { path: 'documenttypes', component: DocumentTypeListComponent },
       { path: 'correspondents', component: CorrespondentListComponent },
-      { path: 'storagepathes', component: StoragePathListComponent },
+      { path: 'storagepaths', component: StoragePathListComponent },
       { path: 'logs', component: LogsComponent },
       {
         path: 'settings',

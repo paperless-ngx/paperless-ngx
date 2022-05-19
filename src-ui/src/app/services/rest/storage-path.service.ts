@@ -8,6 +8,6 @@ import { AbstractNameFilterService } from './abstract-name-filter-service'
 })
 export class StoragePathService extends AbstractNameFilterService<PaperlessStoragePath> {
   constructor(http: HttpClient) {
-    super(http, 'storage_pathes')
+    super(http, 'storage_paths')
   }
 }

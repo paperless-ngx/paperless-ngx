@@ -58,18 +58,18 @@ def match_tags(document, classifier):
     )
 
 
-def match_storage_pathes(document, classifier):
+def match_storage_paths(document, classifier):
     if classifier:
         pred_id = classifier.predict_storage_path(document.content)
     else:
         pred_id = None
 
-    storage_pathes = StoragePath.objects.all()
+    storage_paths = StoragePath.objects.all()
 
     return list(
         filter(
             lambda o: matches(o, document) or o.pk == pred_id,
-            storage_pathes,
+            storage_paths,
         ),
     )
 

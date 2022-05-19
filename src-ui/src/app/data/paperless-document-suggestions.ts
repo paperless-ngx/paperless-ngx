@@ -5,5 +5,5 @@ export interface PaperlessDocumentSuggestions {
 
   document_types?: number[]
 
-  storage_pathes?: number[]
+  storage_paths?: number[]
 }

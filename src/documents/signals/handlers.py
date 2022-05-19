@@ -245,7 +245,7 @@ def set_storage_path(
     if document.storage_path and not replace:
         return
 
-    potential_storage_path = matching.match_storage_pathes(
+    potential_storage_path = matching.match_storage_paths(
         document,
         classifier,
     )
@@ -259,13 +259,13 @@ def set_storage_path(
     if potential_count > 1:
         if use_first:
             logger.info(
-                f"Detected {potential_count} potential storage pathes, "
+                f"Detected {potential_count} potential storage paths, "
                 f"so we've opted for {selected}",
                 extra={"group": logging_group},
             )
         else:
             logger.info(
-                f"Detected {potential_count} potential storage pathes, "
+                f"Detected {potential_count} potential storage paths, "
                 f"not assigning any storage directory",
                 extra={"group": logging_group},
             )

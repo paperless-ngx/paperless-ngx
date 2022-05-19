@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name": "storage path",
-                "verbose_name_plural": "storage pathes",
+                "verbose_name_plural": "storage paths",
                 "ordering": ("name",),
             },
         ),
