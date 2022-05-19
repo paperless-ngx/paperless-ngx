@@ -597,15 +597,22 @@ FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
 
-# TODO: this should not have a prefix.
 # Specify the filename format for out files
-PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+
+# If this is enabled, variables in filename format will resolve to empty-string instead of 'none'.
+# Directories with 'empty names' are omitted, too.
+FILENAME_FORMAT_REMOVE_NONE = __get_boolean(
+    "PAPERLESS_FILENAME_FORMAT_REMOVE_NONE",
+    "NO",
+)
 
 THUMBNAIL_FONT_NAME = os.getenv(
     "PAPERLESS_THUMBNAIL_FONT_NAME",
     "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
 )
 
+# TODO: this should not have a prefix.
 # Tika settings
 PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
 PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")

@@ -19,6 +19,7 @@ from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
 from documents.views import StatisticsView
+from documents.views import StoragePathViewSet
 from documents.views import TagViewSet
 from documents.views import UiSettingsView
 from documents.views import UnifiedSearchViewSet
@@ -34,6 +35,7 @@ api_router.register(r"documents", UnifiedSearchViewSet)
 api_router.register(r"logs", LogViewSet, basename="logs")
 api_router.register(r"tags", TagViewSet)
 api_router.register(r"saved_views", SavedViewViewSet)
+api_router.register(r"storage_paths", StoragePathViewSet)
 
 
 urlpatterns = [

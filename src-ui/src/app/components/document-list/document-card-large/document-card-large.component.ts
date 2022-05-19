@@ -53,6 +53,9 @@ export class DocumentCardLargeComponent implements OnInit {
   clickDocumentType = new EventEmitter<number>()
 
   @Output()
+  clickStoragePath = new EventEmitter<number>()
+
+  @Output()
   clickMoreLike = new EventEmitter()
 
   @ViewChild('popover') popover: NgbPopover

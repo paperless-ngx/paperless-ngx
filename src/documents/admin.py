@@ -5,6 +5,7 @@ from .models import Document
 from .models import DocumentType
 from .models import SavedView
 from .models import SavedViewFilterRule
+from .models import StoragePath
 from .models import Tag
 
 
@@ -100,8 +101,19 @@ class SavedViewAdmin(admin.ModelAdmin):
     inlines = [RuleInline]
 
 
+class StoragePathInline(admin.TabularInline):
+    model = StoragePath
+
+
+class StoragePathAdmin(admin.ModelAdmin):
+    list_display = ("name", "path", "match", "matching_algorithm")
+    list_filter = ("path", "matching_algorithm")
+    list_editable = ("path", "match", "matching_algorithm")
+
+
 admin.site.register(Correspondent, CorrespondentAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(DocumentType, DocumentTypeAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(SavedView, SavedViewAdmin)
+admin.site.register(StoragePath, StoragePathAdmin)

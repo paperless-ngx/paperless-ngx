@@ -230,6 +230,76 @@ def set_tags(
         document.tags.add(*relevant_tags)
 
 
+def set_storage_path(
+    sender,
+    document=None,
+    logging_group=None,
+    classifier=None,
+    replace=False,
+    use_first=True,
+    suggest=False,
+    base_url=None,
+    color=False,
+    **kwargs,
+):
+    if document.storage_path and not replace:
+        return
+
+    potential_storage_path = matching.match_storage_paths(
+        document,
+        classifier,
+    )
+
+    potential_count = len(potential_storage_path)
+    if potential_storage_path:
+        selected = potential_storage_path[0]
+    else:
+        selected = None
+
+    if potential_count > 1:
+        if use_first:
+            logger.info(
+                f"Detected {potential_count} potential storage paths, "
+                f"so we've opted for {selected}",
+                extra={"group": logging_group},
+            )
+        else:
+            logger.info(
+                f"Detected {potential_count} potential storage paths, "
+                f"not assigning any storage directory",
+                extra={"group": logging_group},
+            )
+            return
+
+    if selected or replace:
+        if suggest:
+            if base_url:
+                print(
+                    termcolors.colorize(str(document), fg="green")
+                    if color
+                    else str(document),
+                )
+                print(f"{base_url}/documents/{document.pk}")
+            else:
+                print(
+                    (
+                        termcolors.colorize(str(document), fg="green")
+                        if color
+                        else str(document)
+                    )
+                    + f" [{document.pk}]",
+                )
+            print(f"Sugest storage directory {selected}")
+        else:
+            logger.info(
+                f"Assigning storage path {selected} to {document}",
+                extra={"group": logging_group},
+            )
+
+            document.storage_path = selected
+            document.save(update_fields=("storage_path",))
+
+
 @receiver(models.signals.post_delete, sender=Document)
 def cleanup_document_deletion(sender, instance, using, **kwargs):
     with FileLock(settings.MEDIA_LOCK):

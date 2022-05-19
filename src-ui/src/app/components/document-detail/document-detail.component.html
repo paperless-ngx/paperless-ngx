@@ -73,6 +73,8 @@
                             (createNew)="createCorrespondent($event)" [suggestions]="suggestions?.correspondents"></app-input-select>
                         <app-input-select [items]="documentTypes" i18n-title title="Document type" formControlName="document_type" [allowNull]="true"
                             (createNew)="createDocumentType($event)" [suggestions]="suggestions?.document_types"></app-input-select>
+                        <app-input-select [items]="storagePaths" i18n-title title="Storage path" formControlName="storage_path" [allowNull]="true"
+                            (createNew)="createStoragePath($event)" [suggestions]="suggestions?.storage_paths" i18n-placeholder placeholder="Default"></app-input-select>
                         <app-input-tags formControlName="tags" [suggestions]="suggestions?.tags"></app-input-tags>
 
                     </ng-template>
