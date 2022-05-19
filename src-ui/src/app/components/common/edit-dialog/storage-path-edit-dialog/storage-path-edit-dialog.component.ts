@@ -20,6 +20,14 @@ export class StoragePathEditDialogComponent extends EditDialogComponent<Paperles
     super(service, activeModal, toastService)
   }
 
+  get pathHint() {
+    return (
+      $localize`e.g.` +
+      ' {created_year}/{correspondent}/{title}. ' +
+      $localize`See <a href="https://paperless-ngx.readthedocs.io/en/latest/advanced_usage.html#file-name-handling">documentation</a> for full list.`
+    )
+  }
+
   getCreateTitle() {
     return $localize`Create new storage path`
   }
