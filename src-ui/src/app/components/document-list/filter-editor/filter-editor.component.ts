@@ -310,6 +310,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             ToggleableItemState.Selected,
             false
           )
+          break
         case FILTER_ASN_ISNULL:
           this.textFilterTarget = TEXT_FILTER_TARGET_ASN
           this.textFilterModifier = TEXT_FILTER_MODIFIER_NULL
