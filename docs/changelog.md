@@ -70,12 +70,12 @@
 
 ## paperless-ngx 1.7.0
 
-Breaking Changes
+### Breaking Changes
 
 - `PAPERLESS_URL` is now required when using a reverse proxy. See
   [\#674](https://github.com/paperless-ngx/paperless-ngx/pull/674).
 
-Features
+### Features
 
 - Allow setting more than one tag in mail rules
   [\@jonasc](https://github.com/jonasc) (\#270)
@@ -107,7 +107,7 @@ Features
 - Parse dates when entered without separators
   [\@GruberViktor](https://github.com/gruberviktor) (\#250).
 
-Bug Fixes
+### Bug Fixes
 
 - add \"localhost\" to ALLOWED_HOSTS
   [\@gador](https://github.com/gador) (\#700).
@@ -155,7 +155,7 @@ Bug Fixes
 - Fix: Include excluded items in dropdown count
   [\@shamoon](https://github.com/shamoon) (\#263).
 
-Translation
+### Translation
 
 - [\@miku323](https://github.com/miku323) contributed to Slovenian
   translation.
@@ -168,7 +168,7 @@ Translation
 - [\@Prominence](https://github.com/Prominence) contributed to
   Belarusian translation.
 
-Documentation
+### Documentation
 
 - Fix: scanners table [\@qcasey](https://github.com/qcasey) (\#690).
 - Add [PAPERLESS\_URL]{.title-ref} env variable & CSRF var
@@ -180,7 +180,7 @@ Documentation
 - Fix minor sphinx errors [\@shamoon](https://github.com/shamoon)
   (\#322).
 
-Maintenance
+### Maintenance
 
 - Add `PAPERLESS_URL` env variable & CSRF var
   [\@shamoon](https://github.com/shamoon) (\#674).
