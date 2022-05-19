@@ -8,7 +8,7 @@ easier.
 .. _advanced-matching:
 
 Matching tags, correspondents, document types, and storage paths
-################################################
+################################################################
 
 Paperless will compare the matching algorithms defined by every tag, correspondent,
 document type, and storage path in your database to see if they apply to the text
@@ -37,7 +37,7 @@ The following algorithms are available:
 * **Literal:** Matches only if the match appears exactly as provided (i.e. preserve ordering) in the PDF.
 * **Regular expression:** Parses the match as a regular expression and tries to
   find a match within the document.
-* **Fuzzy match:** I dont know. Look at the source.
+* **Fuzzy match:** I don't know. Look at the source.
 * **Auto:** Tries to automatically match new documents. This does not require you
   to set a match. See the notes below.
 
@@ -270,14 +270,14 @@ append ``_01``, ``_02``, etc to the filename. This happens if all the placeholde
 evaluate to the same value.
 
 .. hint::
-    You can affect how empty placeholders are treated by changeing the follow setting to
+    You can affect how empty placeholders are treated by changing the following setting to
     `true`.
 
     .. code::
 
         PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=True
 
-    Doing this results in all empty placeholders resolve to "" instead of "none" as stated above.
+    Doing this results in all empty placeholders resolving to "" instead of "none" as stated above.
     Spaces before empty placeholders are removed as well, empty directories are omitted.
 
 .. hint::
@@ -305,9 +305,9 @@ evaluate to the same value.
 
 
 Storage paths
-##################
+#############
 
-One of the best things in paperless is, that you can not only access the documents via the
+One of the best things in Paperless is that you can not only access the documents via the
 web interface, but also via the file system.
 
 When as single storage layout is not sufficient for your use case, storage paths come to
@@ -318,10 +318,11 @@ in the file system.
 - Each document is assigned a storage path using the matching algorithms described above, but
   can be overwritten at any time
 
-For example, you could define the following two storage paths: Normal communication is put
-into a folder structure sorted by `year/correspondent`, while communication with insurance
-companies is stored in a flat structure with longer file names, but containing the
-full date of the correspondence.
+For example, you could define the following two storage paths:
+
+1. Normal communications are put into a folder structure sorted by `year/correspondent`
+2. Communications with insurance companies is stored in a flat structure with longer file names,
+   but containing the full date of the correspondence.
 
 .. code::
 
@@ -350,10 +351,10 @@ For simplicity, `By Year` defines the same structure as in the previous example 
 
 .. hint::
 
-    If no storage path is defined for a document, the global `PAPERLESS_FILENAME_FORMAT` is applied.
-    The definition of storage paths is such optional.
+    Defining a storage path is optional. If no storage path is defined for a document, the global
+    `PAPERLESS_FILENAME_FORMAT` is applied.
 
 .. caution::
 
-    If you adjust the format of an existing storage path old document don't get relocated automatically.
-    You need to run the :ref:`document renamer <utilities-renamer>` to adjust their paths.
+    If you adjust the format of an existing storage path, old documents don't get relocated automatically.
+    You need to run the :ref:`document renamer <utilities-renamer>` to adjust their pathes.
