@@ -19,6 +19,7 @@ from documents.consumer import ConsumerError
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import StoragePath
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from pdf2image import convert_from_path
@@ -53,6 +54,7 @@ def train_classifier():
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+        and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
 
         return

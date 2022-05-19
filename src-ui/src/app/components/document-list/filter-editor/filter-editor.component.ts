@@ -33,6 +33,7 @@ import {
   FILTER_DOES_NOT_HAVE_TAG,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
+  FILTER_STORAGE_PATH,
   FILTER_ASN_ISNULL,
   FILTER_ASN_GT,
   FILTER_ASN_LT,
@@ -41,6 +42,8 @@ import { FilterableDropdownSelectionModel } from '../../common/filterable-dropdo
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { PaperlessDocument } from 'src/app/data/paperless-document'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 
 const TEXT_FILTER_TARGET_TITLE = 'title'
 const TEXT_FILTER_TARGET_TITLE_CONTENT = 'title-content'
@@ -107,7 +110,8 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     private documentTypeService: DocumentTypeService,
     private tagService: TagService,
     private correspondentService: CorrespondentService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private storagePathService: StoragePathService
   ) {}
 
   @ViewChild('textFilterInput')
@@ -116,6 +120,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   tags: PaperlessTag[] = []
   correspondents: PaperlessCorrespondent[] = []
   documentTypes: PaperlessDocumentType[] = []
+  storagePaths: PaperlessStoragePath[] = []
 
   _textFilter = ''
   _moreLikeId: number
@@ -186,6 +191,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
   tagSelectionModel = new FilterableDropdownSelectionModel()
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
   documentTypeSelectionModel = new FilterableDropdownSelectionModel()
+  storagePathSelectionModel = new FilterableDropdownSelectionModel()
 
   dateCreatedBefore: string
   dateCreatedAfter: string
@@ -210,6 +216,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this._filterRules = value
 
     this.documentTypeSelectionModel.clear(false)
+    this.storagePathSelectionModel.clear(false)
     this.tagSelectionModel.clear(false)
     this.correspondentSelectionModel.clear(false)
     this._textFilter = null
@@ -292,6 +299,13 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           break
         case FILTER_DOCUMENT_TYPE:
           this.documentTypeSelectionModel.set(
+            rule.value ? +rule.value : null,
+            ToggleableItemState.Selected,
+            false
+          )
+          break
+        case FILTER_STORAGE_PATH:
+          this.storagePathSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Selected,
             false
@@ -418,6 +432,12 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
           value: documentType.id?.toString(),
         })
       })
+    this.storagePathSelectionModel.getSelectedItems().forEach((storagePath) => {
+      filterRules.push({
+        rule_type: FILTER_STORAGE_PATH,
+        value: storagePath.id?.toString(),
+      })
+    })
     if (this.dateCreatedBefore) {
       filterRules.push({
         rule_type: FILTER_CREATED_BEFORE,
@@ -500,6 +520,9 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     this.documentTypeService
       .listAll()
       .subscribe((result) => (this.documentTypes = result.results))
+    this.storagePathService
+      .listAll()
+      .subscribe((result) => (this.storagePaths = result.results))
 
     this.textFilterDebounce = new Subject<string>()
 
@@ -542,6 +565,13 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
     )
   }
 
+  addStoragePath(storagePathID: number) {
+    this.storagePathSelectionModel.set(
+      storagePathID,
+      ToggleableItemState.Selected
+    )
+  }
+
   onTagsDropdownOpen() {
     this.tagSelectionModel.apply()
   }
@@ -552,6 +582,10 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
 
   onDocumentTypeDropdownOpen() {
     this.documentTypeSelectionModel.apply()
+  }
+
+  onStoragePathDropdownOpen() {
+    this.storagePathSelectionModel.apply()
   }
 
   updateTextFilter(text) {

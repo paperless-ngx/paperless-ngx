@@ -111,6 +111,14 @@ PAPERLESS_FILENAME_FORMAT=<format>
 
     Default is none, which disables this feature.
 
+PAPERLESS_FILENAME_FORMAT_REMOVE_NONE=<bool>
+    Tells paperless to replace placeholders in `PAPERLESS_FILENAME_FORMAT` that would resolve
+    to 'none' to be omitted from the resulting filename. This also holds true for directory
+    names.
+    See :ref:`advanced-file_name_handling` for details.
+
+    Defaults to `false` which disables this feature.
+
 PAPERLESS_LOGGING_DIR=<path>
     This is where paperless will store log files.
 

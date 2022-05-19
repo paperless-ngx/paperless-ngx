@@ -111,7 +111,7 @@ simple_png = os.path.join(os.path.dirname(__file__), "samples", "simple-noalpha.
 simple_png2 = os.path.join(os.path.dirname(__file__), "examples", "no-text.png")
 
 
-@override_settings(PAPERLESS_FILENAME_FORMAT="")
+@override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
 
     migrate_from = "1011_auto_20210101_2340"
@@ -240,7 +240,7 @@ class TestMigrateArchiveFiles(DirectoriesMixin, TestMigrations):
         )
 
 
-@override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
+@override_settings(FILENAME_FORMAT="{correspondent}/{title}")
 class TestMigrateArchiveFilesWithFilenameFormat(TestMigrateArchiveFiles):
     def test_filenames(self):
         Document = self.apps.get_model("documents", "Document")
@@ -279,7 +279,7 @@ def fake_parse_wrapper(parser, path, mime_type, file_name):
     parser.text = "the text"
 
 
-@override_settings(PAPERLESS_FILENAME_FORMAT="")
+@override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
 
     migrate_from = "1011_auto_20210101_2340"
@@ -447,7 +447,7 @@ class TestMigrateArchiveFilesErrors(DirectoriesMixin, TestMigrations):
         self.assertIsNone(doc2.archive_filename)
 
 
-@override_settings(PAPERLESS_FILENAME_FORMAT="")
+@override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
 
     migrate_from = "1012_fix_archive_files"
@@ -505,14 +505,14 @@ class TestMigrateArchiveFilesBackwards(DirectoriesMixin, TestMigrations):
         )
 
 
-@override_settings(PAPERLESS_FILENAME_FORMAT="{correspondent}/{title}")
+@override_settings(FILENAME_FORMAT="{correspondent}/{title}")
 class TestMigrateArchiveFilesBackwardsWithFilenameFormat(
     TestMigrateArchiveFilesBackwards,
 ):
     pass
 
 
-@override_settings(PAPERLESS_FILENAME_FORMAT="")
+@override_settings(FILENAME_FORMAT="")
 class TestMigrateArchiveFilesBackwardsErrors(DirectoriesMixin, TestMigrations):
 
     migrate_from = "1012_fix_archive_files"

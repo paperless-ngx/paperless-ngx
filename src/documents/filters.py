@@ -7,6 +7,7 @@ from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import Log
+from .models import StoragePath
 from .models import Tag
 
 CHAR_KWARGS = ["istartswith", "iendswith", "icontains", "iexact"]
@@ -114,6 +115,9 @@ class DocumentFilterSet(FilterSet):
             "document_type": ["isnull"],
             "document_type__id": ID_KWARGS,
             "document_type__name": CHAR_KWARGS,
+            "storage_path": ["isnull"],
+            "storage_path__id": ID_KWARGS,
+            "storage_path__name": CHAR_KWARGS,
         }
 
 
@@ -121,3 +125,12 @@ class LogFilterSet(FilterSet):
     class Meta:
         model = Log
         fields = {"level": INT_KWARGS, "created": DATE_KWARGS, "group": ID_KWARGS}
+
+
+class StoragePathFilterSet(FilterSet):
+    class Meta:
+        model = StoragePath
+        fields = {
+            "name": CHAR_KWARGS,
+            "path": CHAR_KWARGS,
+        }

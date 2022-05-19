@@ -107,7 +107,7 @@
 <ng-template #documentListNoError>
 
   <div *ngIf="displayMode == 'largeCards'">
-    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickMoreLike)="clickMoreLike(d.id)">
+    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
     </app-document-card-large>
   </div>
 
@@ -138,6 +138,12 @@
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Document type</th>
+      <th class="d-none d-xl-table-cell"
+        sortable="storage_path__name"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Storage path</th>
       <th
         sortable="created"
         [currentSortField]="list.sortField"
@@ -176,6 +182,11 @@
             <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
           </ng-container>
         </td>
+        <td class="d-none d-xl-table-cell">
+          <ng-container *ngIf="d.storage_path">
+            <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path">{{(d.storage_path$ | async)?.name}}</a>
+          </ng-container>
+        </td>
         <td>
           {{d.created | customDate}}
         </td>
@@ -187,7 +198,7 @@
   </table>
 
   <div class="row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
-    <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
+    <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
   </div>
   <div *ngIf="list.documents?.length > 15" class="mt-3">
     <ng-container *ngTemplateOutlet="pagination"></ng-container>
