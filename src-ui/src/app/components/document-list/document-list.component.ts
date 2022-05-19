@@ -265,6 +265,13 @@ export class DocumentListComponent implements OnInit, OnDestroy, AfterViewInit {
     })
   }
 
+  clickStoragePath(storagePathID: number) {
+    this.list.selectNone()
+    setTimeout(() => {
+      this.filterEditor.addStoragePath(storagePathID)
+    })
+  }
+
   clickMoreLike(documentID: number) {
     this.queryParamsService.navigateWithFilterRules([
       { rule_type: FILTER_FULLTEXT_MORELIKE, value: documentID.toString() },

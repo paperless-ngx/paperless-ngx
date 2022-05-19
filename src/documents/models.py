@@ -83,6 +83,18 @@ class DocumentType(MatchingModel):
         verbose_name_plural = _("document types")
 
 
+class StoragePath(MatchingModel):
+    path = models.CharField(
+        _("path"),
+        max_length=512,
+    )
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = _("storage path")
+        verbose_name_plural = _("storage paths")
+
+
 class Document(models.Model):
 
     STORAGE_TYPE_UNENCRYPTED = "unencrypted"
@@ -99,6 +111,15 @@ class Document(models.Model):
         related_name="documents",
         on_delete=models.SET_NULL,
         verbose_name=_("correspondent"),
+    )
+
+    storage_path = models.ForeignKey(
+        StoragePath,
+        blank=True,
+        null=True,
+        related_name="documents",
+        on_delete=models.SET_NULL,
+        verbose_name=_("storage path"),
     )
 
     title = models.CharField(_("title"), max_length=128, blank=True, db_index=True)

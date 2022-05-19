@@ -41,6 +41,9 @@ export class SelectComponent extends AbstractInputComponent<number> {
   @Input()
   suggestions: number[]
 
+  @Input()
+  placeholder: string
+
   @Output()
   createNew = new EventEmitter<string>()
 

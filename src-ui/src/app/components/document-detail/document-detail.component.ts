@@ -33,6 +33,9 @@ import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-su
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { normalizeDateStr } from 'src/app/utils/date'
 import { QueryParamsService } from 'src/app/services/query-params.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
@@ -66,6 +69,7 @@ export class DocumentDetailComponent
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
+  storagePaths: PaperlessStoragePath[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -73,6 +77,7 @@ export class DocumentDetailComponent
     created: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
+    storage_path: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
   })
@@ -115,6 +120,7 @@ export class DocumentDetailComponent
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
     private settings: SettingsService,
+    private storagePathService: StoragePathService,
     private queryParamsService: QueryParamsService
   ) {}
 
@@ -163,10 +169,16 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.correspondents = result.results))
+
     this.documentTypeService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.documentTypes = result.results))
+
+    this.storagePathService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.storagePaths = result.results))
 
     this.route.paramMap
       .pipe(
@@ -230,6 +242,7 @@ export class DocumentDetailComponent
             created: this.ogDate.toISOString(),
             correspondent: doc.correspondent,
             document_type: doc.document_type,
+            storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
           })
@@ -333,6 +346,27 @@ export class DocumentDetailComponent
       .subscribe(({ newCorrespondent, correspondents }) => {
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
+      })
+  }
+
+  createStoragePath(newName: string) {
+    var modal = this.modalService.open(StoragePathEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.success
+      .pipe(
+        switchMap((newStoragePath) => {
+          return this.storagePathService
+            .listAll()
+            .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newStoragePath, documentTypes: storagePaths }) => {
+        this.storagePaths = storagePaths.results
+        this.documentForm.get('storage_path').setValue(newStoragePath.id)
       })
   }
 

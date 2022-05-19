@@ -55,14 +55,17 @@ from .classifier import load_classifier
 from .filters import CorrespondentFilterSet
 from .filters import DocumentFilterSet
 from .filters import DocumentTypeFilterSet
+from .filters import StoragePathFilterSet
 from .filters import TagFilterSet
 from .matching import match_correspondents
 from .matching import match_document_types
+from .matching import match_storage_paths
 from .matching import match_tags
 from .models import Correspondent
 from .models import Document
 from .models import DocumentType
 from .models import SavedView
+from .models import StoragePath
 from .models import Tag
 from .parsers import get_parser_class_for_mime_type
 from .serialisers import BulkDownloadSerializer
@@ -73,6 +76,7 @@ from .serialisers import DocumentSerializer
 from .serialisers import DocumentTypeSerializer
 from .serialisers import PostDocumentSerializer
 from .serialisers import SavedViewSerializer
+from .serialisers import StoragePathSerializer
 from .serialisers import TagSerializer
 from .serialisers import TagSerializerVersion1
 from .serialisers import UiSettingsViewSerializer
@@ -335,6 +339,7 @@ class DocumentViewSet(
                 "document_types": [
                     dt.id for dt in match_document_types(doc, classifier)
                 ],
+                "storage_paths": [dt.id for dt in match_storage_paths(doc, classifier)],
             },
         )
 
@@ -577,6 +582,12 @@ class SelectionDataView(GenericAPIView):
             ),
         )
 
+        storage_paths = StoragePath.objects.annotate(
+            document_count=Count(
+                Case(When(documents__id__in=ids, then=1), output_field=IntegerField()),
+            ),
+        )
+
         r = Response(
             {
                 "selected_correspondents": [
@@ -588,6 +599,10 @@ class SelectionDataView(GenericAPIView):
                 ],
                 "selected_document_types": [
                     {"id": t.id, "document_count": t.document_count} for t in types
+                ],
+                "selected_storage_paths": [
+                    {"id": t.id, "document_count": t.document_count}
+                    for t in storage_paths
                 ],
             },
         )
@@ -727,6 +742,21 @@ class RemoteVersionView(GenericAPIView):
                 "feature_is_set": feature_is_set,
             },
         )
+
+
+class StoragePathViewSet(ModelViewSet):
+    model = DocumentType
+
+    queryset = StoragePath.objects.annotate(document_count=Count("documents")).order_by(
+        Lower("name"),
+    )
+
+    serializer_class = StoragePathSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_class = StoragePathFilterSet
+    ordering_fields = ("name", "path", "matching_algorithm", "match", "document_count")
 
 
 class UiSettingsView(GenericAPIView):

@@ -12,6 +12,7 @@ import { DocumentTypeService } from './document-type.service'
 import { TagService } from './tag.service'
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { filterRulesToQueryParams } from '../query-params.service'
+import { StoragePathService } from './storage-path.service'
 
 export const DOCUMENT_SORT_FIELDS = [
   { field: 'archive_serial_number', name: $localize`ASN` },
@@ -37,6 +38,7 @@ export interface SelectionDataItem {
 }
 
 export interface SelectionData {
+  selected_storage_paths: SelectionDataItem[]
   selected_correspondents: SelectionDataItem[]
   selected_tags: SelectionDataItem[]
   selected_document_types: SelectionDataItem[]
@@ -52,7 +54,8 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     http: HttpClient,
     private correspondentService: CorrespondentService,
     private documentTypeService: DocumentTypeService,
-    private tagService: TagService
+    private tagService: TagService,
+    private storagePathService: StoragePathService
   ) {
     super(http, 'documents')
   }
@@ -68,6 +71,9 @@ export class DocumentService extends AbstractPaperlessService<PaperlessDocument>
     }
     if (doc.tags) {
       doc.tags$ = this.tagService.getCachedMany(doc.tags)
+    }
+    if (doc.storage_path) {
+      doc.storage_path$ = this.storagePathService.getCached(doc.storage_path)
     }
     return doc
   }
