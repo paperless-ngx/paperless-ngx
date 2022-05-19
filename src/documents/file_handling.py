@@ -131,17 +131,12 @@ def generate_filename(doc, counter=0, append_gpg=True, archive_filename=False):
     filename_format = settings.FILENAME_FORMAT
 
     try:
-        if doc.storage_path:
-            if doc.storage_path.path is not None:
-                logger.debug(
-                    f"Document has storage_path {doc.storage_path.id} "
-                    f"({doc.storage_path.path}) set",
-                )
-                filename_format = doc.storage_path.path
-            else:
-                logger.warn(
-                    f"storage_path {doc.storage_path.id} does not have a path set",
-                )
+        if doc.storage_path is not None:
+            logger.debug(
+                f"Document has storage_path {doc.storage_path.id} "
+                f"({doc.storage_path.path}) set",
+            )
+            filename_format = doc.storage_path.path
 
         if filename_format is not None:
             tags = defaultdictNoStr(
