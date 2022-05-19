@@ -551,6 +551,30 @@ class StoragePathSerializer(MatchingModelSerializer):
             "document_count",
         )
 
+    def validate_path(self, path):
+        try:
+            path.format(
+                title="title",
+                correspondent="correspondent",
+                document_type="document_type",
+                created="created",
+                created_year="created_year",
+                created_month="created_month",
+                created_day="created_day",
+                added="added",
+                added_year="added_year",
+                added_month="added_month",
+                added_day="added_day",
+                asn="asn",
+                tags="tags",
+                tag_list="tag_list",
+            )
+
+        except (KeyError):
+            raise serializers.ValidationError(_("Invalid variable detected."))
+
+        return path
+
 
 class UiSettingsViewSerializer(serializers.ModelSerializer):
     class Meta:
