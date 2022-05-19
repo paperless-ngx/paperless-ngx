@@ -33,7 +33,7 @@ import {
   FILTER_DOES_NOT_HAVE_TAG,
   FILTER_TITLE,
   FILTER_TITLE_CONTENT,
-  FILTER_STORAGE_DIRECTORY,
+  FILTER_STORAGE_PATH,
   FILTER_ASN_ISNULL,
   FILTER_ASN_GT,
   FILTER_ASN_LT,
@@ -304,7 +304,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
             false
           )
           break
-        case FILTER_STORAGE_DIRECTORY:
+        case FILTER_STORAGE_PATH:
           this.storagePathSelectionModel.set(
             rule.value ? +rule.value : null,
             ToggleableItemState.Selected,
@@ -433,7 +433,7 @@ export class FilterEditorComponent implements OnInit, OnDestroy {
       })
     this.storagePathSelectionModel.getSelectedItems().forEach((storagePath) => {
       filterRules.push({
-        rule_type: FILTER_STORAGE_DIRECTORY,
+        rule_type: FILTER_STORAGE_PATH,
         value: storagePath.id?.toString(),
       })
     })

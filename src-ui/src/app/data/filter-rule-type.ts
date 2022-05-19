@@ -28,7 +28,7 @@ export const FILTER_TITLE_CONTENT = 21
 export const FILTER_FULLTEXT_QUERY = 22
 export const FILTER_FULLTEXT_MORELIKE = 23
 
-export const FILTER_STORAGE_DIRECTORY = 30
+export const FILTER_STORAGE_PATH = 30
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {
@@ -58,15 +58,13 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     datatype: 'correspondent',
     multi: false,
   },
-
   {
-    id: FILTER_STORAGE_DIRECTORY,
+    id: FILTER_STORAGE_PATH,
     filtervar: 'storage_path__id',
     isnull_filtervar: 'storage_path__isnull',
     datatype: 'storage_path',
     multi: false,
   },
-
   {
     id: FILTER_DOCUMENT_TYPE,
     filtervar: 'document_type__id',
@@ -191,7 +189,6 @@ export const FILTER_RULE_TYPES: FilterRuleType[] = [
     datatype: 'string',
     multi: false,
   },
-
   {
     id: FILTER_FULLTEXT_MORELIKE,
     filtervar: 'more_like_id',
