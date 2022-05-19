@@ -340,10 +340,6 @@ export class BulkEditorComponent {
       } else {
         modal.componentInstance.message = $localize`This operation will remove the storage path from ${this.list.selected.size} selected document(s).`
       }
-      modal.componentInstance.message +=
-        '<br/><br/><em>' +
-        $localize`Note: changing the storage path does not apply changes to files until you have run the 'document_renamer' utility.` +
-        '</em>'
       modal.componentInstance.btnClass = 'btn-warning'
       modal.componentInstance.btnCaption = $localize`Confirm`
       modal.componentInstance.confirmClicked.subscribe(() => {
