@@ -1,10 +1,11 @@
 <app-page-header [title]="getTitle()">
 
-  <div ngbDropdown class="me-2 flex-fill d-flex">
-    <button class="btn btn-sm btn-outline-primary flex-fill" id="dropdownSelect" ngbDropdownToggle>
+  <div ngbDropdown class="me-2 d-flex">
+    <button class="btn btn-sm btn-outline-primary" id="dropdownSelect" ngbDropdownToggle>
       <svg class="toolbaricon" fill="currentColor">
         <use xlink:href="assets/bootstrap-icons.svg#text-indent-left" />
-      </svg>&nbsp;<ng-container i18n>Select</ng-container>
+      </svg>
+      <div class="d-none d-sm-inline">&nbsp;<ng-container i18n>Select</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownSelect" class="shadow">
       <button ngbDropdownItem (click)="list.selectNone()" i18n>Select none</button>
@@ -38,7 +39,7 @@
   <div ngbDropdown class="btn-group ms-2 flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle i18n>Sort</button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
-      <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="list.sortReverse">
+      <div class="w-100 d-flex btn-group-toggle pb-2 mb-1 border-bottom" ngbRadioGroup [(ngModel)]="listSort">
         <label ngbButtonLabel class="btn-outline-primary btn-sm mx-2 flex-fill">
           <input ngbButton type="radio" class="btn btn-check btn-sm" [value]="false">
           <svg class="toolbaricon" fill="currentColor">
@@ -53,7 +54,7 @@
         </label>
       </div>
       <div>
-        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="list.sortField = f.field"
+        <button *ngFor="let f of getSortFields()" ngbDropdownItem (click)="setSortField(f.field)"
           [class.active]="list.sortField == f.field">{{f.name}}
         </button>
       </div>
@@ -64,7 +65,7 @@
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" ngbDropdownToggle i18n>Views</button>
     <div class="dropdown-menu shadow dropdown-menu-right" ngbDropdownMenu>
       <ng-container *ngIf="!list.activeSavedViewId">
-        <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view)">{{view.name}}</button>
+        <button ngbDropdownItem *ngFor="let view of savedViewService.allViews" (click)="loadViewConfig(view.id)">{{view.name}}</button>
         <div class="dropdown-divider" *ngIf="savedViewService.allViews.length > 0"></div>
       </ng-container>
 
@@ -75,7 +76,7 @@
 
 </app-page-header>
 
-<div class="row sticky-top pt-4 pb-2 pb-lg-4 bg-body">
+<div class="row sticky-top pt-3 pt-sm-4 pb-2 pb-lg-4 bg-body">
   <app-filter-editor [hidden]="isBulkEditing" [(filterRules)]="list.filterRules" [unmodifiedFilterRules]="unmodifiedFilterRules" #filterEditor></app-filter-editor>
   <app-bulk-editor [hidden]="!isBulkEditing"></app-bulk-editor>
 </div>
@@ -106,7 +107,7 @@
 <ng-template #documentListNoError>
 
   <div *ngIf="displayMode == 'largeCards'">
-    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickMoreLike)="clickMoreLike(d.id)">
+    <app-document-card-large [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" *ngFor="let d of list.documents; trackBy: trackByDocumentId" [document]="d" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)" (clickStoragePath)="clickStoragePath($event)" (clickMoreLike)="clickMoreLike(d.id)">
     </app-document-card-large>
   </div>
 
@@ -137,6 +138,12 @@
         [currentSortReverse]="list.sortReverse"
         (sort)="onSort($event)"
         i18n>Document type</th>
+      <th class="d-none d-xl-table-cell"
+        sortable="storage_path__name"
+        [currentSortField]="list.sortField"
+        [currentSortReverse]="list.sortReverse"
+        (sort)="onSort($event)"
+        i18n>Storage path</th>
       <th
         sortable="created"
         [currentSortField]="list.sortField"
@@ -163,16 +170,21 @@
         </td>
         <td class="d-none d-md-table-cell">
           <ng-container *ngIf="d.correspondent">
-            <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+            <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
-          <a routerLink="/documents/{{d.id}}" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+          <a (click)="openDocumentsService.openDocument(d)" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">
-            <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+            <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
+          </ng-container>
+        </td>
+        <td class="d-none d-xl-table-cell">
+          <ng-container *ngIf="d.storage_path">
+            <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
@@ -186,7 +198,7 @@
   </table>
 
   <div class="row row-cols-paperless-cards" *ngIf="displayMode == 'smallCards'">
-    <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
+    <app-document-card-small class="p-0" [selected]="list.isSelected(d)" (toggleSelected)="toggleSelected(d, $event)" [document]="d" *ngFor="let d of list.documents; trackBy: trackByDocumentId" (clickTag)="clickTag($event)" (clickCorrespondent)="clickCorrespondent($event)" (clickStoragePath)="clickStoragePath($event)" (clickDocumentType)="clickDocumentType($event)"></app-document-card-small>
   </div>
   <div *ngIf="list.documents?.length > 15" class="mt-3">
     <ng-container *ngTemplateOutlet="pagination"></ng-container>

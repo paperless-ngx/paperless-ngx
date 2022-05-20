@@ -332,6 +332,12 @@ writing. Windows is not and will never be supported.
 3.  Optional. Install ``postgresql`` and configure a database, user and password for paperless. If you do not wish
     to use PostgreSQL, SQLite is available as well.
 
+    .. note::
+
+        On bare-metal installations using SQLite, ensure the
+        `JSON1 extension <https://code.djangoproject.com/wiki/JSON1Extension>`_ is enabled. This is
+        usually the case, but not always.
+
 4.  Get the release archive from `<https://github.com/paperless-ngx/paperless-ngx/releases>`_.
     If you clone the git repo as it is, you also have to compile the front end by yourself.
     Extract the archive to a place from where you wish to execute it, such as ``/opt/paperless``.
@@ -513,7 +519,7 @@ how you installed paperless.
 This setup describes how to update an existing paperless Docker installation.
 The important things to keep in mind are as follows:
 
-* Read the :ref:`changelog <paperless_changelog>` and take note of breaking changes.
+* Read the :doc:`changelog </changelog>` and take note of breaking changes.
 * You should decide if you want to stick with SQLite or want to migrate your database
   to PostgreSQL. See :ref:`setup-sqlite_to_psql` for details on how to move your data from
   SQLite to PostgreSQL. Both work fine with paperless. However, if you already have a

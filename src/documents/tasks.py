@@ -4,6 +4,7 @@ import shutil
 import tempfile
 from typing import List  # for type hinting. Can be removed, if only Python >3.8 is used
 
+import magic
 import tqdm
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -18,6 +19,7 @@ from documents.consumer import ConsumerError
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import StoragePath
 from documents.models import Tag
 from documents.sanity_checker import SanityCheckFailedException
 from pdf2image import convert_from_path
@@ -52,6 +54,7 @@ def train_classifier():
         not Tag.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not DocumentType.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
         and not Correspondent.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
+        and not StoragePath.objects.filter(matching_algorithm=Tag.MATCH_AUTO).exists()
     ):
 
         return
@@ -64,7 +67,7 @@ def train_classifier():
     try:
         if classifier.train():
             logger.info(
-                "Saving updated classifier model to {}...".format(settings.MODEL_FILE),
+                f"Saving updated classifier model to {settings.MODEL_FILE}...",
             )
             classifier.save()
         else:
@@ -95,19 +98,33 @@ def barcode_reader(image) -> List[str]:
     return barcodes
 
 
+def get_file_type(path: str) -> str:
+    """
+    Determines the file type, based on MIME type.
+
+    Returns the MIME type.
+    """
+    mime_type = magic.from_file(path, mime=True)
+    logger.debug(f"Detected mime type: {mime_type}")
+    return mime_type
+
+
 def convert_from_tiff_to_pdf(filepath: str) -> str:
     """
-    converts a given TIFF image file to pdf into a temp. directory.
+    converts a given TIFF image file to pdf into a temporary directory.
+
     Returns the new pdf file.
     """
     file_name = os.path.splitext(os.path.basename(filepath))[0]
-    file_extension = os.path.splitext(os.path.basename(filepath))[1].lower()
+    mime_type = get_file_type(filepath)
     tempdir = tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR)
     # use old file name with pdf extension
-    if file_extension == ".tif" or file_extension == ".tiff":
+    if mime_type == "image/tiff":
         newpath = os.path.join(tempdir, file_name + ".pdf")
     else:
-        logger.warning(f"Cannot convert from {str(file_extension)} to pdf.")
+        logger.warning(
+            f"Cannot convert mime type {str(mime_type)} from {str(filepath)} to pdf.",
+        )
         return None
     with Image.open(filepath) as image:
         images = []
@@ -165,7 +182,7 @@ def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
         for n, page in enumerate(pdf.pages):
             if n < pages_to_split_on[0]:
                 dst.pages.append(page)
-        output_filename = "{}_document_0.pdf".format(fname)
+        output_filename = f"{fname}_document_0.pdf"
         savepath = os.path.join(tempdir, output_filename)
         with open(savepath, "wb") as out:
             dst.save(out)
@@ -185,7 +202,7 @@ def separate_pages(filepath: str, pages_to_split_on: List[int]) -> List[str]:
                     f"page_number: {str(page_number)} next_page: {str(next_page)}",
                 )
                 dst.pages.append(pdf.pages[page])
-            output_filename = "{}_document_{}.pdf".format(fname, str(count + 1))
+            output_filename = f"{fname}_document_{str(count + 1)}.pdf"
             logger.debug(f"pdf no:{str(count)} has {str(len(dst.pages))} pages")
             savepath = os.path.join(tempdir, output_filename)
             with open(savepath, "wb") as out:
@@ -223,6 +240,7 @@ def consume_file(
     override_document_type_id=None,
     override_tag_ids=None,
     task_id=None,
+    override_created=None,
 ):
 
     # check for separators in current document
@@ -231,17 +249,17 @@ def consume_file(
         document_list = []
         converted_tiff = None
         if settings.CONSUMER_BARCODE_TIFF_SUPPORT:
-            supported_extensions = [".pdf", ".tiff", ".tif"]
+            supported_mime = ["image/tiff", "application/pdf"]
         else:
-            supported_extensions = [".pdf"]
-        file_extension = os.path.splitext(os.path.basename(path))[1].lower()
-        if file_extension not in supported_extensions:
+            supported_mime = ["application/pdf"]
+        mime_type = get_file_type(path)
+        if mime_type not in supported_mime:
             # if not supported, skip this routine
             logger.warning(
-                f"Unsupported file format for barcode reader: {str(file_extension)}",
+                f"Unsupported file format for barcode reader: {str(mime_type)}",
             )
         else:
-            if file_extension in {".tif", ".tiff"}:
+            if mime_type == "image/tiff":
                 file_to_process = convert_from_tiff_to_pdf(path)
             else:
                 file_to_process = path
@@ -266,9 +284,9 @@ def consume_file(
                 # if we got here, the document was successfully split
                 # and can safely be deleted
                 if converted_tiff:
-                    logger.debug("Deleting file {}".format(file_to_process))
+                    logger.debug(f"Deleting file {file_to_process}")
                     os.unlink(file_to_process)
-                logger.debug("Deleting file {}".format(path))
+                logger.debug(f"Deleting file {path}")
                 os.unlink(path)
                 # notify the sender, otherwise the progress bar
                 # in the UI stays stuck
@@ -303,10 +321,11 @@ def consume_file(
         override_document_type_id=override_document_type_id,
         override_tag_ids=override_tag_ids,
         task_id=task_id,
+        override_created=override_created,
     )
 
     if document:
-        return "Success. New document id {} created".format(document.pk)
+        return f"Success. New document id {document.pk} created"
     else:
         raise ConsumerError(
             "Unknown error: Returned document was null, but "

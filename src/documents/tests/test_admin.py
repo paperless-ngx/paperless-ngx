@@ -16,7 +16,7 @@ class TestDocumentAdmin(DirectoriesMixin, TestCase):
             return searcher.document(id=doc.id)
 
     def setUp(self) -> None:
-        super(TestDocumentAdmin, self).setUp()
+        super().setUp()
         self.doc_admin = DocumentAdmin(model=Document, admin_site=AdminSite())
 
     def test_save_model(self):

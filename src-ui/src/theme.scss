@@ -39,7 +39,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,<svg xmlns='htt
     background-image: escape-svg($form-check-radio-checked-bg-image-dark);
   }
 
-  .btn-close {
+  .toast .btn-close {
     filter: none !important;
   }
 }

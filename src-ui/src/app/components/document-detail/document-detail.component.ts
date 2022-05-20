@@ -18,10 +18,7 @@ import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-
 import { PDFDocumentProxy } from 'ng2-pdf-viewer'
 import { ToastService } from 'src/app/services/toast.service'
 import { TextComponent } from '../common/input/text/text.component'
-import {
-  SettingsService,
-  SETTINGS_KEYS,
-} from 'src/app/services/settings.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { Observable, Subject, BehaviorSubject } from 'rxjs'
 import {
@@ -35,6 +32,11 @@ import {
 import { PaperlessDocumentSuggestions } from 'src/app/data/paperless-document-suggestions'
 import { FILTER_FULLTEXT_MORELIKE } from 'src/app/data/filter-rule-type'
 import { normalizeDateStr } from 'src/app/utils/date'
+import { QueryParamsService } from 'src/app/services/query-params.service'
+import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { PaperlessStoragePath } from 'src/app/data/paperless-storage-path'
+import { StoragePathEditDialogComponent } from '../common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
+import { SETTINGS_KEYS } from 'src/app/data/paperless-uisettings'
 
 @Component({
   selector: 'app-document-detail',
@@ -67,6 +69,7 @@ export class DocumentDetailComponent
 
   correspondents: PaperlessCorrespondent[]
   documentTypes: PaperlessDocumentType[]
+  storagePaths: PaperlessStoragePath[]
 
   documentForm: FormGroup = new FormGroup({
     title: new FormControl(''),
@@ -74,6 +77,7 @@ export class DocumentDetailComponent
     created: new FormControl(),
     correspondent: new FormControl(),
     document_type: new FormControl(),
+    storage_path: new FormControl(),
     archive_serial_number: new FormControl(),
     tags: new FormControl([]),
   })
@@ -84,6 +88,7 @@ export class DocumentDetailComponent
   store: BehaviorSubject<any>
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
+  docChangeNotifier: Subject<any> = new Subject()
 
   requiresPassword: boolean = false
   password: string
@@ -114,19 +119,10 @@ export class DocumentDetailComponent
     private documentListViewService: DocumentListViewService,
     private documentTitlePipe: DocumentTitlePipe,
     private toastService: ToastService,
-    private settings: SettingsService
-  ) {
-    this.titleSubject
-      .pipe(
-        debounceTime(1000),
-        distinctUntilChanged(),
-        takeUntil(this.unsubscribeNotifier)
-      )
-      .subscribe((titleValue) => {
-        this.title = titleValue
-        this.documentForm.patchValue({ title: titleValue })
-      })
-  }
+    private settings: SettingsService,
+    private storagePathService: StoragePathService,
+    private queryParamsService: QueryParamsService
+  ) {}
 
   titleKeyUp(event) {
     this.titleSubject.next(event.target?.value)
@@ -173,15 +169,23 @@ export class DocumentDetailComponent
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.correspondents = result.results))
+
     this.documentTypeService
       .listAll()
       .pipe(first())
       .subscribe((result) => (this.documentTypes = result.results))
 
+    this.storagePathService
+      .listAll()
+      .pipe(first())
+      .subscribe((result) => (this.storagePaths = result.results))
+
     this.route.paramMap
       .pipe(
+        takeUntil(this.unsubscribeNotifier),
         switchMap((paramMap) => {
           const documentId = +paramMap.get('id')
+          this.docChangeNotifier.next(documentId)
           return this.documentsService.get(documentId)
         })
       )
@@ -202,9 +206,32 @@ export class DocumentDetailComponent
               this.openDocumentService.getOpenDocument(this.documentId)
             )
           } else {
-            this.openDocumentService.openDocument(doc)
+            this.openDocumentService.openDocument(doc, false)
             this.updateComponent(doc)
           }
+
+          this.titleSubject
+            .pipe(
+              debounceTime(1000),
+              distinctUntilChanged(),
+              takeUntil(this.docChangeNotifier),
+              takeUntil(this.unsubscribeNotifier)
+            )
+            .subscribe({
+              next: (titleValue) => {
+                this.title = titleValue
+                this.documentForm.patchValue({ title: titleValue })
+              },
+              complete: () => {
+                // doc changed so we manually check dirty in case title was changed
+                if (
+                  this.store.getValue().title !==
+                  this.documentForm.get('title').value
+                ) {
+                  this.openDocumentService.setDirty(doc.id, true)
+                }
+              },
+            })
 
           this.ogDate = new Date(normalizeDateStr(doc.created.toString()))
 
@@ -215,6 +242,7 @@ export class DocumentDetailComponent
             created: this.ogDate.toISOString(),
             correspondent: doc.correspondent,
             document_type: doc.document_type,
+            storage_path: doc.storage_path,
             archive_serial_number: doc.archive_serial_number,
             tags: [...doc.tags],
           })
@@ -233,7 +261,6 @@ export class DocumentDetailComponent
           return this.isDirty$.pipe(map((dirty) => ({ doc, dirty })))
         })
       )
-      .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: ({ doc, dirty }) => {
           this.openDocumentService.setDirty(doc.id, dirty)
@@ -319,6 +346,27 @@ export class DocumentDetailComponent
       .subscribe(({ newCorrespondent, correspondents }) => {
         this.correspondents = correspondents.results
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
+      })
+  }
+
+  createStoragePath(newName: string) {
+    var modal = this.modalService.open(StoragePathEditDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.dialogMode = 'create'
+    if (newName) modal.componentInstance.object = { name: newName }
+    modal.componentInstance.success
+      .pipe(
+        switchMap((newStoragePath) => {
+          return this.storagePathService
+            .listAll()
+            .pipe(map((storagePaths) => ({ newStoragePath, storagePaths })))
+        })
+      )
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(({ newStoragePath, documentTypes: storagePaths }) => {
+        this.storagePaths = storagePaths.results
+        this.documentForm.get('storage_path').setValue(newStoragePath.id)
       })
   }
 
@@ -446,7 +494,7 @@ export class DocumentDetailComponent
   }
 
   moreLike() {
-    this.documentListViewService.quickFilter([
+    this.queryParamsService.navigateWithFilterRules([
       {
         rule_type: FILTER_FULLTEXT_MORELIKE,
         value: this.documentId.toString(),

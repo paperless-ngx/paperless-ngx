@@ -1,9 +1,11 @@
+import datetime
 import json
 import math
 import multiprocessing
 import os
 import re
 from typing import Final
+from typing import Set
 from urllib.parse import urlparse
 
 from concurrent_log_handler.queue import setup_logging_queues
@@ -44,6 +46,13 @@ def __get_int(key: str, default: int) -> int:
     Return an integer value based on the environment variable or a default
     """
     return int(os.getenv(key, default))
+
+
+def __get_float(key: str, default: float) -> float:
+    """
+    Return an integer value based on the environment variable or a default
+    """
+    return float(os.getenv(key, default))
 
 
 # NEVER RUN WITH DEBUG IN PRODUCTION.
@@ -483,6 +492,11 @@ CONSUMER_POLLING_RETRY_COUNT = int(
     os.getenv("PAPERLESS_CONSUMER_POLLING_RETRY_COUNT", 5),
 )
 
+CONSUMER_INOTIFY_DELAY: Final[float] = __get_float(
+    "PAPERLESS_CONSUMER_INOTIFY_DELAY",
+    0.5,
+)
+
 CONSUMER_DELETE_DUPLICATES = __get_boolean("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = __get_boolean("PAPERLESS_CONSUMER_RECURSIVE")
@@ -583,15 +597,22 @@ FILENAME_PARSE_TRANSFORMS = []
 for t in json.loads(os.getenv("PAPERLESS_FILENAME_PARSE_TRANSFORMS", "[]")):
     FILENAME_PARSE_TRANSFORMS.append((re.compile(t["pattern"]), t["repl"]))
 
-# TODO: this should not have a prefix.
 # Specify the filename format for out files
-PAPERLESS_FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+FILENAME_FORMAT = os.getenv("PAPERLESS_FILENAME_FORMAT")
+
+# If this is enabled, variables in filename format will resolve to empty-string instead of 'none'.
+# Directories with 'empty names' are omitted, too.
+FILENAME_FORMAT_REMOVE_NONE = __get_boolean(
+    "PAPERLESS_FILENAME_FORMAT_REMOVE_NONE",
+    "NO",
+)
 
 THUMBNAIL_FONT_NAME = os.getenv(
     "PAPERLESS_THUMBNAIL_FONT_NAME",
     "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
 )
 
+# TODO: this should not have a prefix.
 # Tika settings
 PAPERLESS_TIKA_ENABLED = __get_boolean("PAPERLESS_TIKA_ENABLED", "NO")
 PAPERLESS_TIKA_ENDPOINT = os.getenv("PAPERLESS_TIKA_ENDPOINT", "http://localhost:9998")
@@ -603,16 +624,42 @@ PAPERLESS_TIKA_GOTENBERG_ENDPOINT = os.getenv(
 if PAPERLESS_TIKA_ENABLED:
     INSTALLED_APPS.append("paperless_tika.apps.PaperlessTikaConfig")
 
-# List dates that should be ignored when trying to parse date from document text
-IGNORE_DATES = set()
 
-if os.getenv("PAPERLESS_IGNORE_DATES", ""):
+def _parse_ignore_dates(
+    env_ignore: str,
+    date_order: str = DATE_ORDER,
+) -> Set[datetime.datetime]:
+    """
+    If the PAPERLESS_IGNORE_DATES environment variable is set, parse the
+    user provided string(s) into dates
+
+    Args:
+        env_ignore (str): The value of the environment variable, comma seperated dates
+        date_order (str, optional): The format of the date strings. Defaults to DATE_ORDER.
+
+    Returns:
+        Set[datetime.datetime]: The set of parsed date objects
+    """
     import dateparser
 
-    for s in os.getenv("PAPERLESS_IGNORE_DATES", "").split(","):
-        d = dateparser.parse(s)
+    ignored_dates = set()
+    for s in env_ignore.split(","):
+        d = dateparser.parse(
+            s,
+            settings={
+                "DATE_ORDER": date_order,
+            },
+        )
         if d:
-            IGNORE_DATES.add(d.date())
+            ignored_dates.add(d.date())
+    return ignored_dates
+
+
+# List dates that should be ignored when trying to parse date from document text
+IGNORE_DATES: Set[datetime.date] = set()
+
+if os.getenv("PAPERLESS_IGNORE_DATES") is not None:
+    IGNORE_DATES = _parse_ignore_dates(os.getenv("PAPERLESS_IGNORE_DATES"))
 
 ENABLE_UPDATE_CHECK = os.getenv("PAPERLESS_ENABLE_UPDATE_CHECK", "default")
 if ENABLE_UPDATE_CHECK != "default":

@@ -118,10 +118,10 @@ Then you can start paperless-ngx with ``-d`` to have it run in the background.
                 image: ghcr.io/paperless-ngx/paperless-ngx:latest
 
     .. note::
-        In version 1.7.1 and onwards, the Docker image can now pinned to a release series.
+        In version 1.7.1 and onwards, the Docker image can now be pinned to a release series.
         This is often combined with automatic updaters such as Watchtower to allow safer
         unattended upgrading to new bugfix releases only.  It is still recommended to always
-        review release notes before upgrading.  To ping your install to a release series, edit
+        review release notes before upgrading.  To pin your install to a release series, edit
         the ``docker-compose.yml`` find the line that says
 
             .. code::
@@ -287,6 +287,10 @@ When you use the provided docker compose script, put the export inside the
 ``export`` folder in your paperless source directory. Specify ``../export``
 as the ``source``.
 
+.. note::
+
+    Importing from a previous version of Paperless may work, but for best results
+    it is suggested to match the versions.
 
 .. _utilities-retagger:
 
@@ -386,8 +390,8 @@ the naming scheme.
 
 .. warning::
 
-    Since this command moves you documents around a lot, it is advised to to
-    a backup before. The renaming logic is robust and will never overwrite
+    Since this command moves your documents, it is advised to do
+    a backup beforehand. The renaming logic is robust and will never overwrite
     or delete a file, but you can't ever be careful enough.
 
 .. code::
