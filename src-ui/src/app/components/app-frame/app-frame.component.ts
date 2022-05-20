@@ -22,6 +22,8 @@ import {
   RemoteVersionService,
   AppRemoteVersion,
 } from 'src/app/services/rest/remote-version.service'
+import { QueryParamsService } from 'src/app/services/query-params.service'
+import { SettingsService } from 'src/app/services/settings.service'
 
 @Component({
   selector: 'app-app-frame',
@@ -35,9 +37,9 @@ export class AppFrameComponent {
     private openDocumentsService: OpenDocumentsService,
     private searchService: SearchService,
     public savedViewService: SavedViewService,
-    private list: DocumentListViewService,
-    private meta: Meta,
-    private remoteVersionService: RemoteVersionService
+    private remoteVersionService: RemoteVersionService,
+    private queryParamsService: QueryParamsService,
+    public settingsService: SettingsService
   ) {
     this.remoteVersionService
       .checkForUpdates()
@@ -92,7 +94,7 @@ export class AppFrameComponent {
 
   search() {
     this.closeMenu()
-    this.list.quickFilter([
+    this.queryParamsService.navigateWithFilterRules([
       {
         rule_type: FILTER_FULLTEXT_QUERY,
         value: (this.searchField.value as string).trim(),
@@ -140,18 +142,5 @@ export class AppFrameComponent {
           }
         }
       })
-  }
-
-  get displayName() {
-    // TODO: taken from dashboard component, is this the best way to pass around username?
-    let tagFullName = this.meta.getTag('name=full_name')
-    let tagUsername = this.meta.getTag('name=username')
-    if (tagFullName && tagFullName.content) {
-      return tagFullName.content
-    } else if (tagUsername && tagUsername.content) {
-      return tagUsername.content
-    } else {
-      return null
-    }
   }
 }

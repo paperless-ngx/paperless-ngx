@@ -11,5 +11,8 @@ export class WidgetFrameComponent implements OnInit {
   @Input()
   title: string
 
+  @Input()
+  loading: boolean = false
+
   ngOnInit(): void {}
 }

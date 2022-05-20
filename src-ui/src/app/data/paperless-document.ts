@@ -3,6 +3,7 @@ import { ObjectWithId } from './object-with-id'
 import { PaperlessTag } from './paperless-tag'
 import { PaperlessDocumentType } from './paperless-document-type'
 import { Observable } from 'rxjs'
+import { PaperlessStoragePath } from './paperless-storage-path'
 
 export interface SearchHit {
   score?: number
@@ -19,6 +20,10 @@ export interface PaperlessDocument extends ObjectWithId {
   document_type$?: Observable<PaperlessDocumentType>
 
   document_type?: number
+
+  storage_path$?: Observable<PaperlessStoragePath>
+
+  storage_path?: number
 
   title?: string
 

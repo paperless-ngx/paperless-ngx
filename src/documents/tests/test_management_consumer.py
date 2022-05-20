@@ -39,7 +39,7 @@ class ConsumerMixin:
     sample_file = os.path.join(os.path.dirname(__file__), "samples", "simple.pdf")
 
     def setUp(self) -> None:
-        super(ConsumerMixin, self).setUp()
+        super().setUp()
         self.t = None
         patcher = mock.patch(
             "documents.management.commands.document_consumer.async_task",
@@ -60,7 +60,7 @@ class ConsumerMixin:
             # wait for the consumer to exit.
             self.t.join()
 
-        super(ConsumerMixin, self).tearDown()
+        super().tearDown()
 
     def wait_for_task_mock_call(self, excpeted_call_count=1):
         n = 0
@@ -98,6 +98,9 @@ class ConsumerMixin:
             print("file completed.")
 
 
+@override_settings(
+    CONSUMER_INOTIFY_DELAY=0.01,
+)
 class TestConsumer(DirectoriesMixin, ConsumerMixin, TransactionTestCase):
     def test_consume_file(self):
         self.t_start()
@@ -286,7 +289,7 @@ class TestConsumerPolling(TestConsumer):
     pass
 
 
-@override_settings(CONSUMER_RECURSIVE=True)
+@override_settings(CONSUMER_INOTIFY_DELAY=0.01, CONSUMER_RECURSIVE=True)
 class TestConsumerRecursive(TestConsumer):
     # just do all the tests with recursive
     pass

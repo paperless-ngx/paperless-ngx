@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 11:20-0800\n"
-"PO-Revision-Date: 2022-04-12 15:26\n"
+"PO-Revision-Date: 2022-05-13 03:55\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -638,7 +638,7 @@ msgstr "konto"
 
 #: paperless_mail/models.py:119
 msgid "folder"
-msgstr "folder"
+msgstr "katalog"
 
 #: paperless_mail/models.py:122
 msgid "Subfolders must be separated by dots."

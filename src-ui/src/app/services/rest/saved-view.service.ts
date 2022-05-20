@@ -9,13 +9,19 @@ import { AbstractPaperlessService } from './abstract-paperless-service'
   providedIn: 'root',
 })
 export class SavedViewService extends AbstractPaperlessService<PaperlessSavedView> {
+  loading: boolean
+
   constructor(http: HttpClient) {
     super(http, 'saved_views')
     this.reload()
   }
 
   private reload() {
-    this.listAll().subscribe((r) => (this.savedViews = r.results))
+    this.loading = true
+    this.listAll().subscribe((r) => {
+      this.savedViews = r.results
+      this.loading = false
+    })
   }
 
   private savedViews: PaperlessSavedView[] = []

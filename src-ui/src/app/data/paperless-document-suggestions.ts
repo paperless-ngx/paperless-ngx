@@ -4,4 +4,6 @@ export interface PaperlessDocumentSuggestions {
   correspondents?: number[]
 
   document_types?: number[]
+
+  storage_paths?: number[]
 }

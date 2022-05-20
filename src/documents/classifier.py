@@ -57,10 +57,10 @@ def load_classifier():
     return classifier
 
 
-class DocumentClassifier(object):
+class DocumentClassifier:
 
-    # v7 - Updated scikit-learn package version
-    FORMAT_VERSION = 7
+    # v8 - Added storage path classifier
+    FORMAT_VERSION = 8
 
     def __init__(self):
         # hash of the training data. used to prevent re-training when the
@@ -72,6 +72,7 @@ class DocumentClassifier(object):
         self.tags_classifier = None
         self.correspondent_classifier = None
         self.document_type_classifier = None
+        self.storage_path_classifier = None
 
     def load(self):
         with open(settings.MODEL_FILE, "rb") as f:
@@ -90,6 +91,7 @@ class DocumentClassifier(object):
                     self.tags_classifier = pickle.load(f)
                     self.correspondent_classifier = pickle.load(f)
                     self.document_type_classifier = pickle.load(f)
+                    self.storage_path_classifier = pickle.load(f)
                 except Exception:
                     raise ClassifierModelCorruptError()
 
@@ -107,6 +109,7 @@ class DocumentClassifier(object):
             pickle.dump(self.tags_classifier, f)
             pickle.dump(self.correspondent_classifier, f)
             pickle.dump(self.document_type_classifier, f)
+            pickle.dump(self.storage_path_classifier, f)
 
         if os.path.isfile(target_file):
             os.unlink(target_file)
@@ -118,6 +121,7 @@ class DocumentClassifier(object):
         labels_tags = list()
         labels_correspondent = list()
         labels_document_type = list()
+        labels_storage_path = list()
 
         # Step 1: Extract and preprocess training data from the database.
         logger.debug("Gathering data from database...")
@@ -144,16 +148,21 @@ class DocumentClassifier(object):
             labels_correspondent.append(y)
 
             tags = sorted(
-                [
-                    tag.pk
-                    for tag in doc.tags.filter(
-                        matching_algorithm=MatchingModel.MATCH_AUTO,
-                    )
-                ],
+                tag.pk
+                for tag in doc.tags.filter(
+                    matching_algorithm=MatchingModel.MATCH_AUTO,
+                )
             )
             for tag in tags:
                 m.update(tag.to_bytes(4, "little", signed=True))
             labels_tags.append(tags)
+
+            y = -1
+            sd = doc.storage_path
+            if sd and sd.matching_algorithm == MatchingModel.MATCH_AUTO:
+                y = sd.pk
+            m.update(y.to_bytes(4, "little", signed=True))
+            labels_storage_path.append(y)
 
         if not data:
             raise ValueError("No training data available.")
@@ -163,7 +172,7 @@ class DocumentClassifier(object):
         if self.data_hash and new_data_hash == self.data_hash:
             return False
 
-        labels_tags_unique = set([tag for tags in labels_tags for tag in tags])
+        labels_tags_unique = {tag for tags in labels_tags for tag in tags}
 
         num_tags = len(labels_tags_unique)
 
@@ -174,14 +183,16 @@ class DocumentClassifier(object):
         # it usually is.
         num_correspondents = len(set(labels_correspondent) | {-1}) - 1
         num_document_types = len(set(labels_document_type) | {-1}) - 1
+        num_storage_paths = len(set(labels_storage_path) | {-1}) - 1
 
         logger.debug(
             "{} documents, {} tag(s), {} correspondent(s), "
-            "{} document type(s).".format(
+            "{} document type(s). {} storage path(es)".format(
                 len(data),
                 num_tags,
                 num_correspondents,
                 num_document_types,
+                num_storage_paths,
             ),
         )
 
@@ -244,6 +255,21 @@ class DocumentClassifier(object):
                 "classifier.",
             )
 
+        if num_storage_paths > 0:
+            logger.debug(
+                "Training storage paths classifier...",
+            )
+            self.storage_path_classifier = MLPClassifier(tol=0.01)
+            self.storage_path_classifier.fit(
+                data_vectorized,
+                labels_storage_path,
+            )
+        else:
+            self.storage_path_classifier = None
+            logger.debug(
+                "There are no storage paths. Not training storage path classifier.",
+            )
+
         self.data_hash = new_data_hash
 
         return True
@@ -290,3 +316,14 @@ class DocumentClassifier(object):
                 return []
         else:
             return []
+
+    def predict_storage_path(self, content):
+        if self.storage_path_classifier:
+            X = self.data_vectorizer.transform([preprocess_content(content)])
+            storage_path_id = self.storage_path_classifier.predict(X)
+            if storage_path_id != -1:
+                return storage_path_id
+            else:
+                return None
+        else:
+            return None

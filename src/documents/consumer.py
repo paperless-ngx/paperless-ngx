@@ -3,6 +3,8 @@ import hashlib
 import os
 import uuid
 from subprocess import Popen
+from typing import Optional
+from typing import Type
 
 import magic
 from asgiref.sync import async_to_sync
@@ -23,6 +25,7 @@ from .models import Document
 from .models import DocumentType
 from .models import FileInfo
 from .models import Tag
+from .parsers import DocumentParser
 from .parsers import get_parser_class_for_mime_type
 from .parsers import parse_date
 from .parsers import ParseError
@@ -186,7 +189,8 @@ class Consumer(LoggingMixin):
         override_document_type_id=None,
         override_tag_ids=None,
         task_id=None,
-    ):
+        override_created=None,
+    ) -> Document:
         """
         Return the document object if it was successfully created.
         """
@@ -198,6 +202,7 @@ class Consumer(LoggingMixin):
         self.override_document_type_id = override_document_type_id
         self.override_tag_ids = override_tag_ids
         self.task_id = task_id or str(uuid.uuid4())
+        self.override_created = override_created
 
         self._send_progress(0, 100, "STARTING", MESSAGE_NEW_FILE)
 
@@ -220,7 +225,10 @@ class Consumer(LoggingMixin):
 
         self.log("debug", f"Detected mime type: {mime_type}")
 
-        parser_class = get_parser_class_for_mime_type(mime_type)
+        # Based on the mime type, get the parser for that type
+        parser_class: Optional[Type[DocumentParser]] = get_parser_class_for_mime_type(
+            mime_type,
+        )
         if not parser_class:
             self._fail(MESSAGE_UNSUPPORTED_TYPE, f"Unsupported mime type {mime_type}")
 
@@ -241,7 +249,10 @@ class Consumer(LoggingMixin):
 
         # This doesn't parse the document yet, but gives us a parser.
 
-        document_parser = parser_class(self.logging_group, progress_callback)
+        document_parser: DocumentParser = parser_class(
+            self.logging_group,
+            progress_callback,
+        )
 
         self.log("debug", f"Parser: {type(document_parser).__name__}")
 
@@ -257,7 +268,7 @@ class Consumer(LoggingMixin):
 
         try:
             self._send_progress(20, 100, "WORKING", MESSAGE_PARSING_DOCUMENT)
-            self.log("debug", "Parsing {}...".format(self.filename))
+            self.log("debug", f"Parsing {self.filename}...")
             document_parser.parse(self.path, mime_type, self.filename)
 
             self.log("debug", f"Generating thumbnail for {self.filename}...")
@@ -270,7 +281,7 @@ class Consumer(LoggingMixin):
 
             text = document_parser.get_text()
             date = document_parser.get_date()
-            if not date:
+            if date is None:
                 self._send_progress(90, 100, "WORKING", MESSAGE_PARSE_DATE)
                 date = parse_date(self.filename, text)
             archive_path = document_parser.get_archive_path()
@@ -342,11 +353,11 @@ class Consumer(LoggingMixin):
                             ).hexdigest()
 
                 # Don't save with the lock active. Saving will cause the file
-                # renaming logic to aquire the lock as well.
+                # renaming logic to acquire the lock as well.
                 document.save()
 
                 # Delete the file only if it was successfully consumed
-                self.log("debug", "Deleting file {}".format(self.path))
+                self.log("debug", f"Deleting file {self.path}")
                 os.unlink(self.path)
 
                 # https://github.com/jonaswinkler/paperless-ng/discussions/1037
@@ -356,13 +367,14 @@ class Consumer(LoggingMixin):
                 )
 
                 if os.path.isfile(shadow_file):
-                    self.log("debug", "Deleting file {}".format(shadow_file))
+                    self.log("debug", f"Deleting file {shadow_file}")
                     os.unlink(shadow_file)
 
         except Exception as e:
             self._fail(
                 str(e),
-                f"The following error occured while consuming " f"{self.filename}: {e}",
+                f"The following error occurred while consuming "
+                f"{self.filename}: {e}",
                 exc_info=True,
             )
         finally:
@@ -370,27 +382,38 @@ class Consumer(LoggingMixin):
 
         self.run_post_consume_script(document)
 
-        self.log("info", "Document {} consumption finished".format(document))
+        self.log("info", f"Document {document} consumption finished")
 
         self._send_progress(100, 100, "SUCCESS", MESSAGE_FINISHED, document.id)
 
         return document
 
-    def _store(self, text, date, mime_type):
+    def _store(self, text, date, mime_type) -> Document:
 
         # If someone gave us the original filename, use it instead of doc.
 
         file_info = FileInfo.from_filename(self.filename)
 
-        stats = os.stat(self.path)
-
         self.log("debug", "Saving record to database")
 
-        created = (
-            file_info.created
-            or date
-            or timezone.make_aware(datetime.datetime.fromtimestamp(stats.st_mtime))
-        )
+        if self.override_created is not None:
+            create_date = self.override_created
+            self.log(
+                "debug",
+                f"Creation date from post_documents parameter: {create_date}",
+            )
+        elif file_info.created is not None:
+            create_date = file_info.created
+            self.log("debug", f"Creation date from FileInfo: {create_date}")
+        elif date is not None:
+            create_date = date
+            self.log("debug", f"Creation date from parse_date: {create_date}")
+        else:
+            stats = os.stat(self.path)
+            create_date = timezone.make_aware(
+                datetime.datetime.fromtimestamp(stats.st_mtime),
+            )
+            self.log("debug", f"Creation date from st_mtime: {create_date}")
 
         storage_type = Document.STORAGE_TYPE_UNENCRYPTED
 
@@ -400,8 +423,8 @@ class Consumer(LoggingMixin):
                 content=text,
                 mime_type=mime_type,
                 checksum=hashlib.md5(f.read()).hexdigest(),
-                created=created,
-                modified=created,
+                created=create_date,
+                modified=create_date,
                 storage_type=storage_type,
             )
 

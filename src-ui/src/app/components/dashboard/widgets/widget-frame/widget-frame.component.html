@@ -2,6 +2,10 @@
   <div class="card-header">
     <div class="d-flex justify-content-between align-items-center">
       <h5 class="card-title mb-0">{{title}}</h5>
+      <ng-container *ngIf="loading">
+        <div class="spinner-border spinner-border-sm fw-normal ms-2 me-auto" role="status"></div>
+        <div class="visually-hidden" i18n>Loading...</div>
+      </ng-container>
       <ng-content select ="[header-buttons]"></ng-content>
     </div>
 

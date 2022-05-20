@@ -1,6 +1,6 @@
 import os
 
-bind = f'0.0.0.0:{os.getenv("PAPERLESS_PORT", 8000)}'
+bind = f'[::]:{os.getenv("PAPERLESS_PORT", 8000)}'
 workers = int(os.getenv("PAPERLESS_WEBSERVER_WORKERS", 2))
 worker_class = "paperless.workers.ConfigurableWorker"
 timeout = 120
@@ -24,7 +24,7 @@ def worker_int(worker):
     ## get traceback info
     import threading, sys, traceback
 
-    id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
+    id2name = {th.ident: th.name for th in threading.enumerate()}
     code = []
     for threadId, stack in sys._current_frames().items():
         code.append("\n# Thread: %s(%d)" % (id2name.get(threadId, ""), threadId))

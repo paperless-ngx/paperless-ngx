@@ -9,6 +9,11 @@
   z-index: 995; /* Behind the navbar */
   padding: 50px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+
+  .sidebar-heading .spinner-border {
+    width: 0.8em;
+    height: 0.8em;
+  }
 }
 @media (max-width: 767.98px) {
   .sidebar {
