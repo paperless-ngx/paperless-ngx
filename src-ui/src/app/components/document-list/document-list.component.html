@@ -170,21 +170,21 @@
         </td>
         <td class="d-none d-md-table-cell">
           <ng-container *ngIf="d.correspondent">
-            <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent">{{(d.correspondent$ | async)?.name}}</a>
+            <a (click)="clickCorrespondent(d.correspondent);$event.stopPropagation()" title="Filter by correspondent" i18n-title>{{(d.correspondent$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
-          <a (click)="openDocumentsService.openDocument(d)" title="Edit document" style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
+          <a (click)="openDocumentsService.openDocument(d)" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
+          <app-tag [tag]="t" *ngFor="let t of d.tags$ | async" class="ms-1" clickable="true" linkTitle="Filter by tag" i18n-linkTitle (click)="clickTag(t.id);$event.stopPropagation()"></app-tag>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.document_type">
-            <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type">{{(d.document_type$ | async)?.name}}</a>
+            <a (click)="clickDocumentType(d.document_type);$event.stopPropagation()" title="Filter by document type" i18n-title>{{(d.document_type$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td class="d-none d-xl-table-cell">
           <ng-container *ngIf="d.storage_path">
-            <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path">{{(d.storage_path$ | async)?.name}}</a>
+            <a (click)="clickStoragePath(d.storage_path);$event.stopPropagation()" title="Filter by storage path" i18n-title>{{(d.storage_path$ | async)?.name}}</a>
           </ng-container>
         </td>
         <td>
